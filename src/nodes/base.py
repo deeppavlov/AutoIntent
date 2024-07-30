@@ -1,4 +1,5 @@
 import itertools as it
+from copy import deepcopy
 from typing import Callable
 
 import numpy as np
@@ -21,9 +22,10 @@ class Node:
     def fit(self, data_handler: DataHandler):
         metric_scores = []
         modules_configs = []
-        for search_space in self.modules_search_spaces:
+        for search_space in deepcopy(self.modules_search_spaces):
             module_type = search_space.pop("module_type")
             for module_config in it.product(*search_space.values()):
+                module_config = dict(zip(search_space.keys(), module_config))
                 modules_configs.append(module_config)
                 module: Module = self.modules_available[module_type](**module_config)
                 metric = module.fit_score(

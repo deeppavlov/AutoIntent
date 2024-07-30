@@ -8,6 +8,7 @@ from ..base import DataHandler, Module
 class ScoringModule(Module):
     def score(self, data_handler: DataHandler, metric_fn: Callable):
         probas = self.predict(data_handler.utterances_test)
+        data_handler.scores = probas   # TODO: fix the workaround
         return metric_fn(data_handler.labels_test, probas)
 
     def predict(self, utterances: list[str]):

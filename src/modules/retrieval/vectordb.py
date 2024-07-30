@@ -10,7 +10,7 @@ class VectorDBModule(RetrievalModule):
         self.k = k
 
     def fit(self, data_handler: DataHandler):
-        data_handler.create_collection(self.model_name)
+        data_handler.create_collection(self.model_name, db_name=self.model_name.replace('/', '_'))  # TODO: fix this workaround
 
     def score(self, data_handler: DataHandler, metric_fn: Callable):
         query_res = data_handler.collection.query(

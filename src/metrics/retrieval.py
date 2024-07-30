@@ -17,14 +17,6 @@ common_docstring = """
 """
 
 
-def add_docstring(docstring):
-    def decorator(func):
-        func.__doc__ = docstring
-        return func
-
-    return decorator
-
-
 def average_precision(
     query_label: int, candidate_labels: list[int], k: int = None
 ) -> float:
@@ -40,7 +32,6 @@ def average_precision(
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-@add_docstring(common_docstring)
 def retrieval_map(
     query_labels: list[int], candidates_labels: list[list[int]], k: int = None
 ):
@@ -50,7 +41,6 @@ def retrieval_map(
     return sum(ap_list) / len(ap_list)
 
 
-@add_docstring(common_docstring)
 def retrieval_map_numpy(
     query_labels: list[int], candidates_labels: list[list[int]], k: int
 ) -> float:
@@ -71,9 +61,8 @@ def retrieval_map_numpy(
     return np.mean(average_precision)
 
 
-@add_docstring(common_docstring)
 def retrieval_hit_rate(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int
+    query_labels: list[int], candidates_labels: list[list[int]], k: int = None
 ) -> float:
     num_queries = len(query_labels)
     hit_count = 0
@@ -88,7 +77,6 @@ def retrieval_hit_rate(
     return hit_count / num_queries
 
 
-@add_docstring(common_docstring)
 def retrieval_hit_rate_numpy(
     query_labels: list[int], candidates_labels: list[list[int]], k: int
 ) -> float:
@@ -100,9 +88,8 @@ def retrieval_hit_rate_numpy(
     return hit_rate
 
 
-@add_docstring(common_docstring)
 def retrieval_precision(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int
+    query_labels: list[int], candidates_labels: list[list[int]], k: int = None
 ) -> float:
     total_precision = 0.0
     num_queries = len(query_labels)
@@ -112,14 +99,13 @@ def retrieval_precision(
         candidate_labels = candidates_labels[i][:k]
 
         relevant_items = [label for label in candidate_labels if label == query_label]
-        precision_at_k = len(relevant_items) / k
+        precision_at_k = len(relevant_items) / len(candidate_labels)
 
         total_precision += precision_at_k
 
     return total_precision / num_queries
 
 
-@add_docstring(common_docstring)
 def retrieval_precision_numpy(
     query_labels: list[int], candidates_labels: list[list[int]], k: int
 ) -> float:
@@ -146,7 +132,7 @@ def dcg(relevance_scores, k):
     DCG value at position k
     """
     relevance_scores = relevance_scores[:k]
-    discounts = np.log2(np.arange(2, k + 2))
+    discounts = np.log2(np.arange(2, len(relevance_scores) + 2))
     dcg = np.sum((2**relevance_scores - 1) / discounts)
     return dcg
 
@@ -168,8 +154,7 @@ def idcg(relevance_scores, k):
     return dcg(ideal_scores, k)
 
 
-@add_docstring(common_docstring)
-def retrieval_ndcg(query_labels, candidates_labels, k):
+def retrieval_ndcg(query_labels, candidates_labels, k=None):
     ndcg_scores = []
     relevance_scores = np.array(query_labels)[:, None] == np.array(candidates_labels)
 

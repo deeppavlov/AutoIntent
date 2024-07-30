@@ -5,8 +5,8 @@ from .base import Node
 
 class ScoringNode(Node):
     metrics_available = {
-        "neg_cross_entropy": scoring_neg_cross_entropy,
-        "roc_auc": scoring_roc_auc,
+        "scoring_neg_cross_entropy": scoring_neg_cross_entropy,
+        "scoring_roc_auc": scoring_roc_auc,
     }
 
     modules_available = {"knn": KNNScorer, "linear": LinearScorer, "dnnc": DNNCScorer}

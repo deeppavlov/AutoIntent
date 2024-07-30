@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 
 
-def scoring_neg_cross_entropy(scores: list[list[float]], labels: list[int]) -> float:
+def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> float:
     """
     Arguments
     ---
@@ -28,7 +28,7 @@ def scoring_neg_cross_entropy(scores: list[list[float]], labels: list[int]) -> f
     return np.mean(-np.log(relevant_scores))
 
 
-def scoring_roc_auc(scores: list[list[float]], labels: list[int]) -> float:
+def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:
     """
     Arguments
     ---

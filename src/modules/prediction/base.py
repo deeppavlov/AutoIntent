@@ -11,5 +11,5 @@ class PredictionModule(Module):
         raise NotImplementedError()
 
     def score(self, data_handler: DataHandler, metric_fn: Callable):
-        predictions = self.predict(data_handler.scores)
+        predictions = self.predict(data_handler.scores)     # TODO: fix the workaround
         return metric_fn(data_handler.labels_test, predictions)
