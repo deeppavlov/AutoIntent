@@ -1,3 +1,4 @@
 pandas
 datasets
 ipywidgets
+sentence-transformers
