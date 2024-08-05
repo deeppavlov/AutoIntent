@@ -19,9 +19,16 @@ class DataHandler:
 
         self.client = PersistentClient(path=db_path)
 
-    def create_collection(self, model_name: str, db_name: str = "example_collection"):
+    def create_collection(
+            self,
+            model_name: str,
+            db_name: str = "example_collection",
+            device='cuda'
+        ):
         emb_func = SentenceTransformerEmbeddingFunction(
-            model_name=model_name, trust_remote_code=True
+            model_name=model_name,
+            trust_remote_code=True,
+            device=device
         )
         collection = self.client.get_or_create_collection(
             name=db_name,
@@ -30,7 +37,7 @@ class DataHandler:
         )
         collection.add(
             documents=self.utterances_train,
-            ids=[str(i) for i in range(len(self.utterances_train))],
+            ids=[f"{i}-{db_name}" for i in range(len(self.utterances_train))],
             metadatas=[{"intent_id": lab} for lab in self.labels_train],
         )
         self.collection = collection

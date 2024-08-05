@@ -10,12 +10,11 @@ class DNNCScorer(ScoringModule):
     TODO:
     - think about other cross-encoder settings
     - implement training of cross-encoder with sentence_encoders utils
-    - control device of model
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int):
-        self.model = CrossEncoder(model_name, trust_remote_code=True)
+    def __init__(self, model_name: str, k: int, device='cuda'):
+        self.model = CrossEncoder(model_name, trust_remote_code=True, device=device)
         self.k = k
 
     def fit(self, data_handler: DataHandler):

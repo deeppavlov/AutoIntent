@@ -9,14 +9,20 @@ class LinearScorer(ScoringModule):
     - implement different modes (incremental learning with SGD and simple learning with LogisticRegression)
     - control n_jobs
     - adjust cv
-    - ensure that embeddings of train set are not recalculated
+    - separate the sklearn fit() process and transformers tokenizers process (from data_handler embedding function) to avoid the warnings:
+    ```
+    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+    To disable this warning, you can either:
+        - Avoid using `tokenizers` before the fork if possible
+        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+    ```
     """
 
     def fit(self, data_handler: DataHandler):
         dataset = data_handler.collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
         labels = [dct["intent_id"] for dct in dataset["metadatas"]]
-        clf = LogisticRegressionCV(cv=3, n_jobs=8, multi_class="multinomial")
+        clf = LogisticRegressionCV(cv=3, n_jobs=8)
         clf.fit(features, labels)
 
         self._clf = clf
