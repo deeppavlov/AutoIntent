@@ -133,7 +133,7 @@ def dcg(relevance_scores, k):
     """
     relevance_scores = relevance_scores[:k]
     discounts = np.log2(np.arange(2, len(relevance_scores) + 2))
-    dcg = np.sum((2**relevance_scores - 1) / discounts)
+    dcg = np.sum(relevance_scores / discounts)
     return dcg
 
 
@@ -166,13 +166,13 @@ def retrieval_ndcg(query_labels, candidates_labels, k=None):
     return sum(ndcg_scores) / len(ndcg_scores)
 
 
-def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]]) -> float:
+def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
     mrr_sum = 0.0
     num_queries = len(query_labels)
 
     for i in range(num_queries):
         query_label = query_labels[i]
-        candidate_labels = candidates_labels[i]
+        candidate_labels = candidates_labels[i][:k]
 
         for rank, label in enumerate(candidate_labels):
             if label == query_label:

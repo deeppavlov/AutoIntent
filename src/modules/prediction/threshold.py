@@ -1,11 +1,9 @@
-from typing import Callable
-
 import numpy as np
 
 from .base import DataHandler, PredictionModule
 
 
-class ThresholdModule(PredictionModule):
+class ThresholdPredictor(PredictionModule):
     def __init__(self, single_thresh: bool):
         self.signle_thresh = single_thresh
 
@@ -14,10 +12,6 @@ class ThresholdModule(PredictionModule):
         self.thresh = 0.5 if self.signle_thresh else np.ones(n_classes) / 2
 
         # TODO: optimization
-
-    def score(self, data_handler: DataHandler, metric_fn: Callable):
-        predictions = self.predict(data_handler.scores)
-        return metric_fn(data_handler.labels_test, predictions)
 
     def predict(self, scores: list[list[float]]):
         pred_classes = np.argmax(scores, axis=1)

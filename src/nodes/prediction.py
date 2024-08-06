@@ -5,7 +5,7 @@ from ..metrics import (
     prediction_recall,
     prediction_roc_auc,
 )
-from ..modules import ThresholdModule
+from ..modules import ThresholdPredictor, ArgmaxPredictor
 from .base import Node
 
 
@@ -18,4 +18,7 @@ class PredictionNode(Node):
         "prediction_roc_auc": prediction_roc_auc,
     }
 
-    modules_available = {"threshold": ThresholdModule}
+    modules_available = {
+        "threshold": ThresholdPredictor,
+        "argmax": ArgmaxPredictor
+    }

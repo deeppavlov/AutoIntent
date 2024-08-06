@@ -13,7 +13,7 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int, device='cuda'):
+    def __init__(self, model_name: str, k: int, device="cuda"):
         self.model = CrossEncoder(model_name, trust_remote_code=True, device=device)
         self.k = k
 
@@ -25,8 +25,6 @@ class DNNCScorer(ScoringModule):
         Return
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
-
-        TODO: test this code
         """
         query_res = self._collection.query(
             query_texts=utterances,
@@ -60,11 +58,17 @@ class DNNCScorer(ScoringModule):
         ---
         for each query, return a list of a corresponding cross encoder scores for the k the closest sample utterances
         """
+        assert len(utterances) == len(candidates)
+
         text_pairs = [
             [[query, cand] for cand in docs]
             for query, docs in zip(utterances, candidates)
         ]
+
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
+
+        assert len(flattened_text_pairs) == len(utterances) * len(candidates[0])
+
         flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
         cross_encoder_scores = [
             flattened_cross_encoder_scores[i : i + self.k]
@@ -85,11 +89,16 @@ class DNNCScorer(ScoringModule):
         """
         scores = np.array(scores)
         labels = np.array(labels)
+        n_classes = self._collection.metadata["n_classes"]
 
-        res = np.zeros((len(scores), self._collection.metadata["n_classes"]))
-        best_neighbors = np.argmax(scores, axis=1)
-        idx_helper = np.arange(len(res))
-        best_classes = labels[idx_helper, best_neighbors]
-        best_scores = scores[idx_helper, best_neighbors]
-        res[idx_helper, best_classes] = best_scores
-        return res
+        return build_result(scores, labels, n_classes)
+
+
+def build_result(scores: np.ndarray, labels: np.ndarray, n_classes: int):
+    res = np.zeros((len(scores), n_classes))
+    best_neighbors = np.argmax(scores, axis=1)
+    idx_helper = np.arange(len(res))
+    best_classes = labels[idx_helper, best_neighbors]
+    best_scores = scores[idx_helper, best_neighbors]
+    res[idx_helper, best_classes] = best_scores
+    return res

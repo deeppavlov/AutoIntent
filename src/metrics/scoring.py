@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score
+from .prediction import prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 
 def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> float:
@@ -13,7 +14,7 @@ def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> f
     ---
     mean negative cross-entropy for each utterance classification result, i.e.
     ```math
-    {1\over\ell}\sum_{i=1}^\ell-log(s[y[i]]),
+    {1\\over\\ell}\\sum_{i=1}^\\ell-log(s[y[i]]),
     ```
     where s[y[i]] is a predicted score of ith utterance having ground truth label
     """
@@ -39,7 +40,7 @@ def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:
     ---
     macro averaged roc-auc for utterance classification task, i.e.
     ```math
-    {1\over C}\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
+    {1\\over C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
     ```
     """
     scores = np.array(scores)
@@ -56,3 +57,23 @@ def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:
     macro_roc_auc = np.mean(roc_auc_scores)
 
     return macro_roc_auc
+
+
+def scoring_accuracy(labels: list[int], scores: list[list[float]]) -> float:
+    pred_labels = np.argmax(scores, axis=1)
+    return prediction_accuracy(labels, pred_labels)
+
+
+def scoring_f1(labels: list[int], scores: list[list[float]]) -> float:
+    pred_labels = np.argmax(scores, axis=1)
+    return prediction_f1(labels, pred_labels)
+
+
+def scoring_precision(labels: list[int], scores: list[list[float]]) -> float:
+    pred_labels = np.argmax(scores, axis=1)
+    return prediction_precision(labels, pred_labels)
+
+
+def scoring_recall(labels: list[int], scores: list[list[float]]) -> float:
+    pred_labels = np.argmax(scores, axis=1)
+    return prediction_recall(labels, pred_labels)

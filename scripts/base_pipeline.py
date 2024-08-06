@@ -1,3 +1,19 @@
+import json
+import numpy as np
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
+
+
 if __name__ == "__main__":
     import sys
 
@@ -15,10 +31,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config-path",
         type=str,
-        default="experiments/base_pipeline.assets/example-config.yaml",
+        default="scripts/base_pipeline.assets/example-config.yaml",
     )
     parser.add_argument(
         "--data-path", type=str, default="data/intent_records/banking77.json"
+    )
+    parser.add_argument(
+        "--logs-path",
+        type=str,
+        default="scripts/base_pipeline.assets/example-logs.json",
     )
     args = parser.parse_args()
 
@@ -30,7 +51,7 @@ if __name__ == "__main__":
         "scoring": ScoringNode,
         "prediction": PredictionNode,
     }
-    
+
     pipeline_config = yaml.safe_load(open(args.config_path))
 
     fitted_nodes = []
@@ -41,3 +62,16 @@ if __name__ == "__main__":
         node.fit(data_handler)
         fitted_nodes.append(node)
         print("fitted!")
+
+    logs = [node.optimization_results for node in fitted_nodes]
+
+    import os
+
+    dirname = os.path.dirname(args.logs_path)
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    json.dump(
+        logs, open(args.logs_path, "w"),
+        indent=4, ensure_ascii=False, cls=NumpyEncoder
+    )
