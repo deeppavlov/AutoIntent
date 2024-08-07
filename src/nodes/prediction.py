@@ -22,3 +22,5 @@ class PredictionNode(Node):
         "threshold": ThresholdPredictor,
         "argmax": ArgmaxPredictor
     }
+
+    node_type = "prediction"

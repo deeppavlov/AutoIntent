@@ -10,3 +10,5 @@ class ScoringNode(Node):
     }
 
     modules_available = {"knn": KNNScorer, "linear": LinearScorer, "dnnc": DNNCScorer}
+
+    node_type = "scoring"

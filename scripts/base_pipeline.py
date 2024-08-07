@@ -4,6 +4,7 @@ import numpy as np
 
 class NumpyEncoder(json.JSONEncoder):
     """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -12,6 +13,18 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super().default(obj)
+
+
+def make_report(logs: dict) -> str:
+    nodes = ["retrieval", "scoring", "prediction"]
+    ids = [np.argmax(logs["metrics"][node]) for node in nodes]
+    configs = []
+    for i, node in zip(ids, nodes):
+        cur_config = logs["configs"][node][i]
+        cur_config["metric_value"] = logs["metrics"][node][i]
+        configs.append(cur_config)
+    messages = [json.dumps(c, indent=4) for c in configs]
+    return "\n".join(messages)
 
 
 if __name__ == "__main__":
@@ -54,16 +67,14 @@ if __name__ == "__main__":
 
     pipeline_config = yaml.safe_load(open(args.config_path))
 
-    fitted_nodes = []
     for node_config in pipeline_config["nodes"]:
         node: Node = available_nodes[node_config["node_type"]](
             modules_search_spaces=node_config["modules"], metric=node_config["metric"]
         )
         node.fit(data_handler)
-        fitted_nodes.append(node)
         print("fitted!")
 
-    logs = [node.optimization_results for node in fitted_nodes]
+    logs = data_handler.dump_logs()
 
     import os
 
@@ -72,6 +83,7 @@ if __name__ == "__main__":
         os.makedirs(dirname)
 
     json.dump(
-        logs, open(args.logs_path, "w"),
-        indent=4, ensure_ascii=False, cls=NumpyEncoder
+        logs, open(args.logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
     )
+
+    print(make_report(logs))

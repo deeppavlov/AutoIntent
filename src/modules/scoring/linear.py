@@ -19,14 +19,15 @@ class LinearScorer(ScoringModule):
     """
 
     def fit(self, data_handler: DataHandler):
-        dataset = data_handler.collection.get(include=["embeddings", "metadatas"])
+        collection = data_handler.get_best_collection()
+        dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
         labels = [dct["intent_id"] for dct in dataset["metadatas"]]
         clf = LogisticRegressionCV(cv=3, n_jobs=8)
         clf.fit(features, labels)
 
         self._clf = clf
-        self._emb_func = data_handler.collection._embedding_function
+        self._emb_func = collection._embedding_function
 
     def predict(self, utterances: list[str]):
         features = self._emb_func(utterances)

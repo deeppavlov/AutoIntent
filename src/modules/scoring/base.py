@@ -6,10 +6,16 @@ from ..base import DataHandler, Module
 
 
 class ScoringModule(Module):
-    def score(self, data_handler: DataHandler, metric_fn: Callable):
+    def score(self, data_handler: DataHandler, metric_fn: Callable) -> tuple[float, np.ndarray]:
+        """
+        Return
+        ---
+        - metric calculcated on test set
+        - predicted scores of test set
+        """
         probas = self.predict(data_handler.utterances_test)
-        data_handler.scores = probas  # TODO: fix the workaround
-        return metric_fn(data_handler.labels_test, probas)
+        metric_value = metric_fn(data_handler.labels_test, probas)
+        return metric_value, probas
 
     def predict(self, utterances: list[str]):
         raise NotImplementedError()

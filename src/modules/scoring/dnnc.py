@@ -16,9 +16,10 @@ class DNNCScorer(ScoringModule):
     def __init__(self, model_name: str, k: int, device="cuda"):
         self.model = CrossEncoder(model_name, trust_remote_code=True, device=device)
         self.k = k
+        self.device = device
 
     def fit(self, data_handler: DataHandler):
-        self._collection = data_handler.collection
+        self._collection = data_handler.get_best_collection(self.device)
 
     def predict(self, utterances: list[str]):
         """

@@ -1,100 +1,128 @@
-[
-    {
-        "metric_name": "retrieval_hit_rate",
-        "i_best": 0,
-        "scores": [
+{
+    "metrics": {
+        "retrieval": [
             0.9587628865979382,
             0.9381443298969072
         ],
-        "configs": [
+        "scoring": [
+            0.8488173558897244,
+            0.9079965538847118,
+            0.935082023239918,
+            0.9635138983823194,
+            0.9890350877192984,
+            0.8491548473456368,
+            0.8461807928913193,
+            0.8196991057188426,
+            0.7869951868307131,
+            0.5589862440191387,
+            0.6039302802460698,
+            0.6072446741854637,
+            0.6170183982683983
+        ],
+        "prediction": [
+            0.6804123711340206,
+            0.7319587628865979
+        ]
+    },
+    "configs": {
+        "retrieval": [
             {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
                 "k": 10,
                 "model_name": "avsolatorio/GIST-small-Embedding-v0"
             },
             {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
                 "k": 10,
                 "model_name": "infgrad/stella-base-en-v2"
             }
-        ]
-    },
-    {
-        "metric_name": "scoring_roc_auc",
-        "i_best": 4,
-        "scores": [
-            0.868434580770107,
-            0.9148645762132603,
-            0.9511797960811119,
-            0.9561061745272273,
-            0.9856530530872637,
-            0.8689094896331739,
-            0.83586665527455,
-            0.8194634313055366,
-            0.7932864832535885,
-            0.5586451925267715,
-            0.5910457963089542,
-            0.6040655616313512,
-            0.6169842219184325
         ],
-        "configs": [
+        "scoring": [
             {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
                 "k": 1
             },
             {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
                 "k": 3
             },
             {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
                 "k": 5
             },
             {
-                "k": 10
-            },
-            {},
-            {
-                "model_name": "BAAI/bge-reranker-base",
-                "k": 1
-            },
-            {
-                "model_name": "BAAI/bge-reranker-base",
-                "k": 3
-            },
-            {
-                "model_name": "BAAI/bge-reranker-base",
-                "k": 5
-            },
-            {
-                "model_name": "BAAI/bge-reranker-base",
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
                 "k": 10
             },
             {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc"
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                 "k": 1
             },
             {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                 "k": 3
             },
             {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                 "k": 5
             },
             {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                 "k": 10
             }
-        ]
-    },
-    {
-        "metric_name": "prediction_accuracy",
-        "i_best": 1,
-        "scores": [
-            0.3917525773195876,
-            0.41237113402061853
         ],
-        "configs": [
+        "prediction": [
             {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
                 "single_thresh": true
             },
-            {}
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy"
+            }
         ]
     }
-]
+}

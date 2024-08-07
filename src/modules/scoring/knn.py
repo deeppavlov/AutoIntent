@@ -9,12 +9,13 @@ class KNNScorer(ScoringModule):
     - add weighted knn?
     """
 
-    def __init__(self, k):
+    def __init__(self, k, device="cuda"):
         self.k = k
+        self.device = device
 
     def fit(self, data_handler: DataHandler):
-        self._collection = data_handler.collection
-        self._n_classes = data_handler.collection.metadata["n_classes"]
+        self._collection = data_handler.get_best_collection(self.device)
+        self._n_classes = data_handler.n_classes
 
     def predict(self, utterances: list[str]):
         query_res = self._collection.query(
@@ -28,9 +29,8 @@ class KNNScorer(ScoringModule):
             for candidates in query_res["metadatas"]
         ]
         y = np.array(labels_pred)
-        n_classes = self._collection.metadata["n_classes"]
 
-        counts = get_counts(y, n_classes)
+        counts = get_counts(y, self._n_classes)
 
         return counts / counts.sum(axis=1, keepdims=True)
 

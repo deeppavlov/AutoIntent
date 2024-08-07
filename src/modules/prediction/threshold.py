@@ -8,8 +8,7 @@ class ThresholdPredictor(PredictionModule):
         self.signle_thresh = single_thresh
 
     def fit(self, data_handler: DataHandler):
-        n_classes = data_handler.collection.metadata["n_classes"]
-        self.thresh = 0.5 if self.signle_thresh else np.ones(n_classes) / 2
+        self.thresh = 0.5 if self.signle_thresh else np.ones(data_handler.n_classes) / 2
 
         # TODO: optimization
 

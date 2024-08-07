@@ -19,3 +19,5 @@ class RetrievalNode(Node):
     }
 
     modules_available = {"vector_db": VectorDBModule}
+
+    node_type = "retrieval"
