@@ -8,7 +8,21 @@ def prediction_accuracy(y_true: list[int], y_pred: list[int]):
 
 
 def prediction_roc_auc(y_true: list[int], y_pred: list[int]):
-    return roc_auc_score(y_true, y_pred, average="macro", multi_class="ovr")
+    y_pred = np.array(y_pred)
+    y_true = np.array(y_true)
+
+    n_classes = len(np.unique(y_true))
+
+    roc_auc_scores = []
+    for k in range(n_classes):
+        binarized_true = (y_true == k).astype(int)
+        binarized_pred = (y_pred == k).astype(int)
+        roc_auc = roc_auc_score(binarized_true, binarized_pred)
+        roc_auc_scores.append(roc_auc)
+
+    macro_roc_auc = np.mean(roc_auc_scores)
+
+    return macro_roc_auc
 
 
 def prediction_precision(y_true: list[int], y_pred: list[int]):

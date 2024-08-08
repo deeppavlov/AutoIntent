@@ -1,6 +1,14 @@
+import warnings
+
 import numpy as np
 from sklearn.metrics import roc_auc_score
-from .prediction import prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
+
+from .prediction import (
+    prediction_accuracy,
+    prediction_f1,
+    prediction_precision,
+    prediction_recall,
+)
 
 
 def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> float:
@@ -24,7 +32,7 @@ def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> f
     relevant_scores = scores_array[np.arange(len(labels_array)), labels_array]
 
     if np.any((relevant_scores <= 0) | (relevant_scores > 1)):
-        raise ValueError("One or more scores are non-positive")
+        warnings.warn("One or more scores are non-positive")
 
     return np.mean(np.log(relevant_scores))
 

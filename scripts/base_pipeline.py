@@ -1,4 +1,5 @@
 import json
+
 import numpy as np
 
 
@@ -33,7 +34,9 @@ if __name__ == "__main__":
     sys.path.append("/home/voorhs/repos/AutoIntent")
 
     import json
+    import os
     from argparse import ArgumentParser
+    from datetime import datetime
 
     import yaml
 
@@ -47,17 +50,42 @@ if __name__ == "__main__":
         default="scripts/base_pipeline.assets/example-config.yaml",
     )
     parser.add_argument(
-        "--data-path", type=str, default="data/intent_records/banking77.json"
+        "--data-path",
+        type=str,
+        default="data/intent_records/banking77.json"
     )
     parser.add_argument(
-        "--logs-path",
+        "--db-dir",
         type=str,
-        default="scripts/base_pipeline.assets/example-logs.json",
+        default=""
+    )
+    parser.add_argument(
+        "--logs-dir",
+        type=str,
+        default="scripts/base_pipeline.assets/",
+    )
+    parser.add_argument(
+        "--run-name",
+        type=str,
+        default="",
     )
     args = parser.parse_args()
 
-    banking77 = json.load(open(args.data_path))
-    data_handler = DataHandler(banking77)
+    run_name = (
+        args.run_name
+        if args.run_name != ""
+        else os.path.basename(args.config_path).split('.')[0]
+    )
+    run_name = f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
+
+    db_dir = (
+        args.db_dir
+        if args.db_dir != ""
+        else os.path.join('data', 'chroma', run_name)
+    )
+
+    intent_records = json.load(open(args.data_path))
+    data_handler = DataHandler(intent_records, db_dir)
 
     available_nodes = {
         "retrieval": RetrievalNode,
@@ -76,14 +104,13 @@ if __name__ == "__main__":
 
     logs = data_handler.dump_logs()
 
-    import os
+    if not os.path.exists(args.logs_dir):
+        os.makedirs(args.logs_dir)
 
-    dirname = os.path.dirname(args.logs_path)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
+    logs_path = os.path.join(args.logs_dir, f"{run_name}.json")
 
     json.dump(
-        logs, open(args.logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
+        logs, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
     )
 
     print(make_report(logs))

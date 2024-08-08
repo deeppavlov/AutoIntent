@@ -1,0 +1,366 @@
+{
+    "metrics": {
+        "retrieval": [
+            0.7080190094365353,
+            0.6109270168548522,
+            0.6146354933726068,
+            0.5217578955981019,
+            0.4934421534937,
+            0.6133621747668142,
+            0.6279700540009819,
+            0.5397418589428901
+        ],
+        "scoring": [
+            0.661038961038961,
+            0.5887445887445887,
+            0.5341991341991341,
+            0.38051948051948054,
+            0.7168831168831169,
+            0.661038961038961,
+            0.5246753246753246,
+            0.2490414347557205,
+            0.2248917748917749,
+            0.661038961038961,
+            0.46969696969696967,
+            0.2614100185528757,
+            0.07711811997526284,
+            0.661038961038961,
+            0.4216450216450216,
+            0.2937847866419295,
+            0.18447742733457015,
+            0.661038961038961,
+            0.43311688311688307,
+            0.32084106369820653,
+            0.1137703566274995,
+            0.661038961038961,
+            0.4580086580086579,
+            0.3426303854875283,
+            0.11799628942486087,
+            0.661038961038961,
+            0.48293135435992574,
+            0.4033189033189033,
+            0.15194805194805194,
+            0.661038961038961,
+            0.4927025355596784,
+            0.2875180375180375,
+            0.15681302824159968,
+            0.661038961038961,
+            0.48206555349412483,
+            0.33358070500927645,
+            0.11713048855905998,
+            0.661038961038961,
+            0.5558750773036488,
+            0.4064935064935065,
+            0.18274582560296845
+        ],
+        "prediction": [
+            0.5773195876288659,
+            0.7731958762886598
+        ]
+    },
+    "configs": {
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "intfloat/multilingual-e5-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "sergeyzh/LaBSE-ru-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "deepvk/USER-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "sergeyzh/rubert-tiny-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_map",
+                "k": 10,
+                "model_name": "sentence-transformers/LaBSE"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_f1",
+                "k": 1
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_f1",
+                "k": 3
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_f1",
+                "k": 5
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_f1",
+                "k": 10
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_f1"
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "llmrails/ember-v1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "llmrails/ember-v1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "llmrails/ember-v1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "llmrails/ember-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_f1",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 10
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "single_thresh": true
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy"
+            }
+        ]
+    }
+}

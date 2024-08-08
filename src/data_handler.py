@@ -1,5 +1,6 @@
 import itertools as it
 import os
+from pprint import pprint
 
 from chromadb import PersistentClient
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
@@ -53,7 +54,8 @@ class DataHandler:
         )
         return collection
 
-    def delete_collection(self, db_name: str):
+    def delete_collection(self, model_name: str):
+        db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
 
     def log_module_optimization(
@@ -64,6 +66,7 @@ class DataHandler:
             metric_value: float,
             metric_name: str,
             assets,
+            verbose=False,
         ):
         """
         Purposes:
@@ -78,9 +81,15 @@ class DataHandler:
             self.cache["best_assets"][node_type] = assets
 
         # logging
-        self.cache["configs"][node_type].append(
-            dict(module_type=module_type, metric_name=metric_name, **module_config)
+        logs = dict(
+            module_type=module_type,
+            metric_name=metric_name,
+            metric_value=metric_value,
+            **module_config,
         )
+        self.cache["configs"][node_type].append(logs)
+        if verbose:
+            pprint(logs)
         metrics_list.append(metric_value)
 
     def get_best_collection(self, device="cuda"):

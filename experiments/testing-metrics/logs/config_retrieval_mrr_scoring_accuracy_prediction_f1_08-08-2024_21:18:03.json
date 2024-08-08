@@ -1,0 +1,366 @@
+{
+    "metrics": {
+        "retrieval": [
+            0.7881770577646866,
+            0.6911062019309442,
+            0.6896007200130913,
+            0.5853501881852398,
+            0.574521354933726,
+            0.6783627884143351,
+            0.6971076746849943,
+            0.6046023564064802
+        ],
+        "scoring": [
+            0.7216494845360825,
+            0.6494845360824743,
+            0.6082474226804123,
+            0.4639175257731959,
+            0.7731958762886598,
+            0.7216494845360825,
+            0.5360824742268041,
+            0.41237113402061853,
+            0.2268041237113402,
+            0.7216494845360825,
+            0.5567010309278351,
+            0.30927835051546393,
+            0.17525773195876287,
+            0.7216494845360825,
+            0.5360824742268041,
+            0.38144329896907214,
+            0.1958762886597938,
+            0.7216494845360825,
+            0.5463917525773195,
+            0.3711340206185567,
+            0.18556701030927836,
+            0.7216494845360825,
+            0.5154639175257731,
+            0.4020618556701031,
+            0.21649484536082475,
+            0.7216494845360825,
+            0.5360824742268041,
+            0.38144329896907214,
+            0.27835051546391754,
+            0.7216494845360825,
+            0.5360824742268041,
+            0.3402061855670103,
+            0.27835051546391754,
+            0.7216494845360825,
+            0.5257731958762887,
+            0.41237113402061853,
+            0.21649484536082475,
+            0.7216494845360825,
+            0.5567010309278351,
+            0.41237113402061853,
+            0.25773195876288657
+        ],
+        "prediction": [
+            0.5918803418803419,
+            0.7168831168831169
+        ]
+    },
+    "configs": {
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "intfloat/multilingual-e5-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "sergeyzh/LaBSE-ru-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "deepvk/USER-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "sergeyzh/rubert-tiny-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_mrr",
+                "k": 10,
+                "model_name": "sentence-transformers/LaBSE"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_accuracy",
+                "k": 1
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_accuracy",
+                "k": 3
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_accuracy",
+                "k": 5
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_accuracy",
+                "k": 10
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_accuracy"
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "llmrails/ember-v1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "llmrails/ember-v1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "llmrails/ember-v1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "llmrails/ember-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "w601sxs/b1ade-embed",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "Labib11/MUG-B-1.6",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "WhereIsAI/UAE-Large-V1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "jamesgpt1/sf_model_e5",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_accuracy",
+                "model_name": "avsolatorio/GIST-Embedding-v0",
+                "k": 10
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_f1",
+                "single_thresh": true
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_f1"
+            }
+        ]
+    }
+}
