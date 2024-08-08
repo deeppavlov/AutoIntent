@@ -17,3 +17,6 @@ class PredictionModule(Module):
         predictions = self.predict(scores)
         metric_value = metric_fn(data_handler.labels_test, predictions)
         return metric_value, predictions
+
+    def clear_cache(self):
+        pass

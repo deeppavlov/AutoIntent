@@ -93,6 +93,12 @@ class DNNCScorer(ScoringModule):
         n_classes = self._collection.metadata["n_classes"]
 
         return build_result(scores, labels, n_classes)
+    
+    def clear_cache(self):
+        model = self._collection._embedding_function._model
+        model.to(device='cpu')
+        del model
+        self.collection = None
 
 
 def build_result(scores: np.ndarray, labels: np.ndarray, n_classes: int):

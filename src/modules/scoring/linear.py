@@ -32,3 +32,9 @@ class LinearScorer(ScoringModule):
     def predict(self, utterances: list[str]):
         features = self._emb_func(utterances)
         return self._clf.predict_proba(features)
+    
+    def clear_cache(self):
+        model = self._emb_func._model
+        model.to(device='cpu')
+        del model
+        self.collection = None

@@ -14,3 +14,7 @@ class Module:
     def fit_score(self, data_handler: DataHandler, metric_fn: Callable) -> tuple[float, Any]:
         self.fit(data_handler)
         return self.score(data_handler, metric_fn)
+
+    def clear_cache(self):
+        """clear GPU/CPU memory"""
+        raise NotImplementedError()

@@ -1,6 +1,9 @@
+import gc
 import itertools as it
 from copy import deepcopy
 from typing import Callable
+
+import torch
 
 from ..data_handler import DataHandler
 from ..modules import Module
@@ -35,3 +38,6 @@ class Node:
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                 )
+                module.clear_cache()
+                gc.collect()
+                torch.cuda.empty_cache()

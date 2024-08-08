@@ -3,7 +3,6 @@
 ![](assets/classification_pipeline.png)
 
 Планы:
-- сохранение лучшего модуля с предыдущего узла (в частности это относится к data_handler.scores и data_handler.collection)
 - реализовать метрики для RegExpModule
 - подумать над кешированием запросов к collection (ибо на оптимизации k для knn и dncc можно переиспользовать много запросов)
 - идея для метрики для RegExp:

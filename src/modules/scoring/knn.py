@@ -33,6 +33,12 @@ class KNNScorer(ScoringModule):
         counts = get_counts(y, self._n_classes)
 
         return counts / counts.sum(axis=1, keepdims=True)
+    
+    def clear_cache(self):
+        model = self._collection._embedding_function._model
+        model.to(device='cpu')
+        del model
+        self.collection = None
 
 
 def get_counts(labels, n_classes):
