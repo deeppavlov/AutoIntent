@@ -26,7 +26,7 @@ def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> f
     if np.any((relevant_scores <= 0) | (relevant_scores > 1)):
         raise ValueError("One or more scores are non-positive")
 
-    return np.mean(-np.log(relevant_scores))
+    return np.mean(np.log(relevant_scores))
 
 
 def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:

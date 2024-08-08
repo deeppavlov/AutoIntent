@@ -11,7 +11,7 @@ def test_neg_cross_entropy():
     scores = [
         [.1,.3,.5,.1],
     ]
-    ground_truth = -np.log(.1)
+    ground_truth = np.log(.1)
     output = scoring_neg_cross_entropy(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -23,7 +23,7 @@ def test_neg_cross_entropy():
         [.1,.3,.5,.1],
         [.1,.3,.5,.1],
     ]
-    ground_truth = -np.mean([np.log(.1),np.log(.3),np.log(.5),np.log(.1),])
+    ground_truth = np.mean([np.log(.1),np.log(.3),np.log(.5),np.log(.1),])
     output = scoring_neg_cross_entropy(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
