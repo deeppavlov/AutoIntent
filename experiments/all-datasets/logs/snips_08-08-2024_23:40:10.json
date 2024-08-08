@@ -1,0 +1,115 @@
+{
+    "metrics": {
+        "retrieval": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "scoring": [
+            0.9107142857142857,
+            0.9017857142857143,
+            1.0,
+            0.6964285714285714,
+            0.8571428571428571,
+            0.6696428571428571,
+            0.6160714285714286
+        ],
+        "prediction": [
+            0.5555555555555556,
+            0.8888888888888888
+        ]
+    },
+    "configs": {
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "intfloat/multilingual-e5-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "sergeyzh/LaBSE-ru-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "deepvk/USER-base"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9107142857142857,
+                "k": 1
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9017857142857143,
+                "k": 3
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6964285714285714,
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8571428571428571,
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6696428571428571,
+                "model_name": "llmrails/ember-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6160714285714286,
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.5555555555555556,
+                "single_thresh": true
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.8888888888888888
+            }
+        ]
+    }
+}

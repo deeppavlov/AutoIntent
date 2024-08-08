@@ -38,14 +38,14 @@ class KNNScorer(ScoringModule):
         model = self._collection._embedding_function._model
         model.to(device='cpu')
         del model
-        self.collection = None
+        self._collection = None
 
 
 def get_counts(labels, n_classes):
     """
     Arguments
     ---
-    `y`: np.ndarray of shape (n_samples, n_candidates) with integer labels from `[0,n_classes-1]`
+    `labels`: np.ndarray of shape (n_samples, n_candidates) with integer labels from `[0,n_classes-1]`
 
     Return
     ---

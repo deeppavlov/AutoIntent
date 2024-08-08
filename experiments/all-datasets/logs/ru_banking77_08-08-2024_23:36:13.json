@@ -1,0 +1,115 @@
+{
+    "metrics": {
+        "retrieval": [
+            0.9072164948453608,
+            0.865979381443299,
+            0.8762886597938144,
+            0.8556701030927835
+        ],
+        "scoring": [
+            0.8158079858737755,
+            0.8606815333789017,
+            0.9861272499430394,
+            0.6081802517657781,
+            0.6053728070175439,
+            0.5960077751196172,
+            0.6080435463659148
+        ],
+        "prediction": [
+            0.4948453608247423,
+            0.7010309278350515
+        ]
+    },
+    "configs": {
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9072164948453608,
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.865979381443299,
+                "k": 10,
+                "model_name": "intfloat/multilingual-e5-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.8762886597938144,
+                "k": 10,
+                "model_name": "sergeyzh/LaBSE-ru-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.8556701030927835,
+                "k": 10,
+                "model_name": "deepvk/USER-base"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8158079858737755,
+                "k": 1
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8606815333789017,
+                "k": 3
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9861272499430394
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6081802517657781,
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6053728070175439,
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5960077751196172,
+                "model_name": "llmrails/ember-v1",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6080435463659148,
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.4948453608247423,
+                "single_thresh": true
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.7010309278350515
+            }
+        ]
+    }
+}

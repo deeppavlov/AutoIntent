@@ -14,12 +14,13 @@ class Node:
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str):
+    def __init__(self, modules_search_spaces: list[dict], metric: str, verbose: bool = False):
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
         """
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
+        self.verbose = False
 
     def fit(self, data_handler: DataHandler):
         for search_space in deepcopy(self.modules_search_spaces):
@@ -37,6 +38,7 @@ class Node:
                     metric,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
+                    self.verbose
                 )
                 module.clear_cache()
                 gc.collect()
