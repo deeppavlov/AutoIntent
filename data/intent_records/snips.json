@@ -1,0 +1,93 @@
+[
+    {
+        "intent_id": 0,
+        "intent_name": "AddToPlaylist",
+        "sample_utterances": [
+            "Add Don and Sherri to my Meditate to Sounds of Nature playlist",
+            "put United Abominations onto my rare groove playlist",
+            "add the tune by misato watanabe to the Trapeo playlist",
+            "add this artist to my this is miguel bosé playlist",
+            "add heresy and the hotel choir to the evening acoustic playlist"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 1,
+        "intent_name": "BookRestaurant",
+        "sample_utterances": [
+            "Find a reservation for six at a top-rated brasserie",
+            "Book the Union Oyster House in Guanica Puerto Rico .",
+            "book a spot at a restaurant faraway from 138th St",
+            "Find me a creole restaurant",
+            "book The Fry Bread House for seven in Olive"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 2,
+        "intent_name": "GetWeather",
+        "sample_utterances": [
+            "Tell me the weather forecast for Murone Kōgen Prefectural Natural Park at elevenses",
+            "Is it freezing on Jun. the 21st in Apshawa South Africa",
+            "will it be getting warmer in Rainbow Falls Provincial Park",
+            "what is the Gearhart forecast",
+            "What is the forecast for DE on 9/11/2035"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 3,
+        "intent_name": "PlayMusic",
+        "sample_utterances": [
+            "I wish to listen to some instrumental music.",
+            "Play the greatest melody from Paul Wright on Pandora",
+            "Play the most popular sort by ep by Brooke Fraser",
+            "play music from 1950",
+            "I want to hear some music from Groove Shark"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 4,
+        "intent_name": "RateBook",
+        "sample_utterances": [
+            "Give 3 / 6 stars to Doctor in the House",
+            "I give the Carry Me Down chronicle three of 6 points",
+            "this book isn't good , I'd rate it two out of 6 stars .",
+            "Rate The Desert Column 3 out of 6",
+            "Rate Lords of the Rim zero stars"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 5,
+        "intent_name": "SearchCreativeWork",
+        "sample_utterances": [
+            "Show Force of Nature",
+            "Find a video game called Young .",
+            "find the TV series The Parent Trap IV Hawaiian Honeymoon",
+            "Find the trailer for Bill Cosby Presents the Cosnarati State of Emergency",
+            "help me find the book called Journal of Neuroscience Research"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 6,
+        "intent_name": "SearchScreeningEvent",
+        "sample_utterances": [
+            "Find the schedule for Heart Beats .",
+            "Is Hollows Grove playing at any movie theatre at ten pm ?",
+            "When is One Sunday Morning scheduled to be played?",
+            "what time is The Dungeonmaster playing at AMC Theaters",
+            "What time are movies showing around here"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    }
+]

@@ -1,0 +1,1965 @@
+[
+    {
+        "intent_id": 0,
+        "intent_name": "accept_reservations",
+        "sample_utterances": [
+            "can i make a reservation for redrobin",
+            "is it possible to make a reservation at redrobin",
+            "does redrobin take reservations",
+            "are reservations taken at redrobin",
+            "does redrobin do reservations"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 1,
+        "intent_name": "account_blocked",
+        "sample_utterances": [
+            "why is there a hold on my american saving bank account",
+            "i am nost sure why my account is blocked",
+            "why is there a hold on my capital one checking account",
+            "i think my account is blocked but i do not know the reason",
+            "can you tell me why is my bank account frozen"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 2,
+        "intent_name": "alarm",
+        "sample_utterances": [
+            "wake me up at noon tomorrow",
+            "set my alarm for getting up",
+            "make sure my alarm is set for three thirty in the morning",
+            "please set an alarm for mid day",
+            "have an alarm set for three in the morning"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 3,
+        "intent_name": "application_status",
+        "sample_utterances": [
+            "when will my application for my credit card be processed",
+            "has the discover card approved my app",
+            "do you know if my amex card app went through",
+            "have they looked over my app for the new credit card yet",
+            "has my application for the mastercard card gone through"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 4,
+        "intent_name": "apr",
+        "sample_utterances": [
+            "is the apr on my credit card good",
+            "how good is the apr on my credit card",
+            "do i have a good apr on my credit card",
+            "does my credit card apr fall into a good range",
+            "tell me how the apr on my hy-vee card is"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 5,
+        "intent_name": "are_you_a_bot",
+        "sample_utterances": [
+            "may i know if you are a real person or an ai",
+            "i need to know if you are a real person or an ai",
+            "i want to know if you are a real person or an ai",
+            "tell me if you are a real person or an ai",
+            "are your real or artificial"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 6,
+        "intent_name": "balance",
+        "sample_utterances": [
+            "savings account balance at chase bank please",
+            "check chase bank for my checking balance",
+            "what is my checking account balance at chase",
+            "i want my checking balance at chase",
+            "what's my savings balance at chase"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 7,
+        "intent_name": "bill_balance",
+        "sample_utterances": [
+            "the bill for water and electricity is how much",
+            "what's my bill for water and electricity",
+            "for my water and electricity, how much is the bill",
+            "how much is the bill for my water and electricity",
+            "my water and electricity bill is how much"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 8,
+        "intent_name": "bill_due",
+        "sample_utterances": [
+            "when should i pay my bill by",
+            "when is my car insurance due",
+            "when's the gas bill due",
+            "when do i pay the utilities",
+            "do i pay my rent this week"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 9,
+        "intent_name": "book_flight",
+        "sample_utterances": [
+            "what's the cheapest fares from lax to sfo for round trip flights leaving april 1st and returning april 7th",
+            "for the dates april 1st to the 7th, find me round trip air tickets from la to sfo",
+            "what southwest flights are there for lax to sfo arriving april 1st and returning april 7th",
+            "what airlines have flights round trip on april 1st to april 7th from lax to sfo",
+            "find me round trip flights out of lax to sfox"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 10,
+        "intent_name": "book_hotel",
+        "sample_utterances": [
+            "i need a bed in brownsburg near walmart from apil 4th until the 5th",
+            "i need a room in indianapolis near the track from may 2nd through the 5th",
+            "i need lodging in lizton near the ice cream parlor from may 3rd until the 8th",
+            "need a place to crash in elizabeth near the refinery from june 4th until the 9th",
+            "i need a place to stay in newark near a bodega from may 2nd through the 4th"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 11,
+        "intent_name": "calculator",
+        "sample_utterances": [
+            "what is 7 x 7",
+            "please add 456 and 781 for me",
+            "what is 8 factorial",
+            "can you tell me what 30% off 279 is",
+            "can you tell me what 30% off 235 is, please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 12,
+        "intent_name": "calendar",
+        "sample_utterances": [
+            "does my calendar have anything for january 1st",
+            "what is there on january 1st on my calendar",
+            "are there any events on my calendar for january 1st",
+            "what do i have to do on january 1st",
+            "do i have anything scheduled on january 1st"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 13,
+        "intent_name": "calendar_update",
+        "sample_utterances": [
+            "add my dentist appointment to the calendar",
+            "add a vet appointment for 5 pm on saturday",
+            "i need to edit this event out of my calendar",
+            "please remove an event from this calendar",
+            "i no longer want this event in my calendar"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 14,
+        "intent_name": "calories",
+        "sample_utterances": [
+            "can you provide me the calories in the smoothie",
+            "can you tell me the calories for the cheeseburger",
+            "i'd like the calories for this chicken breast",
+            "how many calories in this slice of pizza",
+            "what about the calories for this chicken salad"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 15,
+        "intent_name": "cancel",
+        "sample_utterances": [
+            "please cancel what you are doing, i've changed my mind",
+            "never mind, cancel that",
+            "stop working on it, i need something else",
+            "cancel my last request, i know the answer",
+            "forget it, i do not need it anymore"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 16,
+        "intent_name": "cancel_reservation",
+        "sample_utterances": [
+            "remove my reservation at outback for timmy",
+            "can you cancel the reservation for kyle's party at red lobster",
+            "cancel my party reservation for brad at longhorn",
+            "get rid of my reservation at chez francois for jennifer",
+            "cancel the reservation at olive garden for tommy"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 17,
+        "intent_name": "car_rental",
+        "sample_utterances": [
+            "i want to reserve a convertible from july 2nd through july 18th for los angeles",
+            "i'd like to rent a vehicle from nov 1st to nov 15th in san antonio and i need a 15 passenger van",
+            "i want to rent the cheapest car for charlottesville, virginia for march 7th through 10th, that's monday, tuesday, wednesday and thursday",
+            "i'd like to reserve a high-end car that seats 5 comfortably for april 12th through 18th for st louis missouri",
+            "i need a van that seats 8 or more for new york city, august 12th, 13th, and 14th"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 18,
+        "intent_name": "card_declined",
+        "sample_utterances": [
+            "why did my card not get accepted",
+            "why did my card not get accepted there",
+            "please tell me why did my card not get accepted",
+            "why did my card not get accepted please",
+            "why did my card not get accepted then"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 19,
+        "intent_name": "carry_on",
+        "sample_utterances": [
+            "if i fly american to los angeles, how many carry ons am i allowed",
+            "how many carry ons will american let me take for a flight to los vegas",
+            "if i take a flight on pan am to denver, how many carry ons are included",
+            "if i fly on virgin to chicago, how many carry ons can i take",
+            "how my carry ons does spirit airlines allow me for a flight to dallas"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 20,
+        "intent_name": "change_accent",
+        "sample_utterances": [
+            "use a different accent",
+            "try using a different accent",
+            "speak in a different accent",
+            "change the accent you're speaking in",
+            "could you change the accent you're using"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 21,
+        "intent_name": "change_ai_name",
+        "sample_utterances": [
+            "rename yourself to betty",
+            "can i call you betty",
+            "rename bob to betty",
+            "is there a way to change your name to betty",
+            "i will call you zander"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 22,
+        "intent_name": "change_language",
+        "sample_utterances": [
+            "adjust your language setting to english",
+            "change and set your language setting to english",
+            "set your language setting to english",
+            "make your preferred language english",
+            "i would like to have language set to spanish, please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 23,
+        "intent_name": "change_speed",
+        "sample_utterances": [
+            "can you slow your speaking down",
+            "slow down your talking too fast i don't understand you",
+            "you're talking too fast i need you to slow it down",
+            "you're speaking too fast, slow down",
+            "can you speak slower please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 24,
+        "intent_name": "change_user_name",
+        "sample_utterances": [
+            "please change the name you refer to me by",
+            "how do i change the name you use to address me",
+            "is there a way i can change the name you use to address me",
+            "i need to change my name to something else for you to call me",
+            "can i have you call me something else"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 25,
+        "intent_name": "change_volume",
+        "sample_utterances": [
+            "raise the volume to 4 please",
+            "please set the volume to 4",
+            "please increase the volume to 4",
+            "please raise the volume to 4",
+            "set the volume to 4 please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 26,
+        "intent_name": "confirm_reservation",
+        "sample_utterances": [
+            "verify that i have reservations at chilis for john doe",
+            "can you check my reservations for mortons under david winters",
+            "can you check for reservations at wongs chinese for john acer",
+            "check and confirm reservations at ruth chris for carol lee",
+            "verify that my reservations at won wons for joe lee are good"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 27,
+        "intent_name": "cook_time",
+        "sample_utterances": [
+            "how long will the turkey take to cook",
+            "so how long do you think the chicken will take",
+            "how long does pizza take to cook",
+            "how long is the chicken gonna take",
+            "how long will the chicken take to cook"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 28,
+        "intent_name": "credit_limit",
+        "sample_utterances": [
+            "how high is my credit limit for my old navy card",
+            "how high is my credit limit for my target card",
+            "what is the credit limit for my usaa card",
+            "how high is my credit limit for my childrens place card",
+            "how high is my credit limit for my walmart card"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 29,
+        "intent_name": "credit_limit_change",
+        "sample_utterances": [
+            "can you see if i can get a higher limit on my discovery card",
+            "can my credit limit on my discovery card go up",
+            "may i have a higher limit on my mastercard",
+            "can i get a higher credit limit on my amex card",
+            "is there a way to get a larger limit on my bank of america card"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 30,
+        "intent_name": "credit_score",
+        "sample_utterances": [
+            "how do i look up my credit score",
+            "please look up my credit score",
+            "can you figure out how to find my credit score",
+            "are you able to lookup my credit rating",
+            "how can i find my credit rating"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 31,
+        "intent_name": "current_location",
+        "sample_utterances": [
+            "check maps for my location",
+            "i'm lost, can you tell me where i am",
+            "how can i go about finding my location right now",
+            "please tell me my location using gps",
+            "where exactly am i"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 32,
+        "intent_name": "damaged_card",
+        "sample_utterances": [
+            "let my credit card company know that my card split in half",
+            "how do you report a burned debit card",
+            "my card split in half, how do i report it",
+            "report my burned card to the company",
+            "what do i say when i report a split credit card"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 33,
+        "intent_name": "date",
+        "sample_utterances": [
+            "i would like to know what today's date is",
+            "i need information on today's date",
+            "tell me what date it is please",
+            "tell me what day today is",
+            "can you tell me tomorrow's date"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 34,
+        "intent_name": "definition",
+        "sample_utterances": [
+            "what is the meaning of realism",
+            "what is regard mean",
+            "what is the meaning of interorganizational",
+            "what is it is all relative mean",
+            "what is intercontinental mean"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 35,
+        "intent_name": "direct_deposit",
+        "sample_utterances": [
+            "do a websearch for direct deposit set up",
+            "search google for how to set up direct deposit",
+            "info on setting up direct deposit",
+            "info on direct deposit set-up",
+            "tell me how to get my paycheck on direct deposit"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 36,
+        "intent_name": "directions",
+        "sample_utterances": [
+            "i'm at home, so where is the closest starbucks",
+            "what's the distance between home and the closest starbucks",
+            "is there a starbucks close to home",
+            "direct me to the closest starbucks near home",
+            "does home have a starbucks nearby"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 37,
+        "intent_name": "distance",
+        "sample_utterances": [
+            "estimated time to airport from current location, la",
+            "how long to get to the airport in la",
+            "how early should i leave to the airport in la",
+            "does it take a long time to get to the airport in la",
+            "is the ride short to the airport in la"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 38,
+        "intent_name": "do_you_have_pets",
+        "sample_utterances": [
+            "what type of pet do you have",
+            "share some information about your pets with me",
+            "do you have any type of pet",
+            "do you own pets",
+            "what are the pets that you have in your possession"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 39,
+        "intent_name": "exchange_rate",
+        "sample_utterances": [
+            "how many pesos can i get for one dollar",
+            "what is the current going rate for exchanging dollars for pesos",
+            "tell me the exchange rate between dollars and pesos",
+            "let me know what the exchange rate between dollars and pesos is",
+            "what's the exchange rate between dollars and pesos"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 40,
+        "intent_name": "expiration_date",
+        "sample_utterances": [
+            "how long til my visa card expires",
+            "on what date does my visa card expires",
+            "on what month and year does my card expire",
+            "how soon does my visa card expire",
+            "how much time do i have before my credit card expires"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 41,
+        "intent_name": "find_phone",
+        "sample_utterances": [
+            "i need help finding my mobile phone",
+            "help me figure out where my cell phone is",
+            "give me a hand finding my mobile device",
+            "i can't find my cell and need help locating it",
+            "can you help me find my cell"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 42,
+        "intent_name": "flight_status",
+        "sample_utterances": [
+            "what is the projected time frame for the flight to land",
+            "is there any news on flight dl123",
+            "what is the word on flight dl123",
+            "when will we begin to board my scheduled flight",
+            "whats the status of my frontier flight"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 43,
+        "intent_name": "flip_coin",
+        "sample_utterances": [
+            "please flip a coin and tell me what side it lands on",
+            "will you flip a coin so i can make a choice",
+            "flip a two sided coin and tell me what it lands on",
+            "i need you to flip a coin so i can decide",
+            "begin the coin flip now"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 44,
+        "intent_name": "food_last",
+        "sample_utterances": [
+            "jello should stay in the fridge for how long",
+            "when will my milk be no good",
+            "when will my eggs go bad",
+            "how long will my eggs be good for",
+            "what date does my apple juice expire"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 45,
+        "intent_name": "freeze_account",
+        "sample_utterances": [
+            "can you block my chase account right away please",
+            "i want my chase account blocked immediately",
+            "i need you to block my chase account immediately",
+            "can you put a block on my chase account right away",
+            "please block my chase account right away"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 46,
+        "intent_name": "fun_fact",
+        "sample_utterances": [
+            "lets hear an interesting fact about funko pops",
+            "know any interesting facts",
+            "what is one fun fact",
+            "tell me a fact",
+            "lets hear a fact"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 47,
+        "intent_name": "gas",
+        "sample_utterances": [
+            "what level is my gas tank at",
+            "where's the gas tank level at",
+            "how does my gas tank look",
+            "what line is the gas tank at",
+            "how much gas is in my gas tank"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 48,
+        "intent_name": "gas_type",
+        "sample_utterances": [
+            "what kind of gasoline can this car take",
+            "is there a certain type of gas i need to use",
+            "i need to know what kind of gas i can use on this car",
+            "is any type of gas ok on this car",
+            "is there a certain type of gas i need to use for this car"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 49,
+        "intent_name": "goodbye",
+        "sample_utterances": [
+            "syonara, ai device!",
+            "goodbye, helpful ai device!",
+            "bye-bye",
+            "goodbye, ai assistant",
+            "glad we got to talk"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 50,
+        "intent_name": "greeting",
+        "sample_utterances": [
+            "how's everything",
+            "how are things going",
+            "hello, anyone there",
+            "are you okay right now",
+            "are you doing okay"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 51,
+        "intent_name": "how_busy",
+        "sample_utterances": [
+            "do you know how long of a wait it will be",
+            "how long is the restaurant line before we go",
+            "how long will it take to get seated at needham's",
+            "how long will the wait be at noon if we went to nagomi",
+            "will i have to wait for long before being seated at the cheese cake factory"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 52,
+        "intent_name": "how_old_are_you",
+        "sample_utterances": [
+            "what is your birthday again",
+            "how many years on the earth",
+            "what year were you born",
+            "how many days old are you",
+            "when were you created"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 53,
+        "intent_name": "improve_credit_score",
+        "sample_utterances": [
+            "what steps should i take to improve my credit score",
+            "give me a recommendation to improve my credit score",
+            "what can i do to raise my credit score",
+            "steps to raise my credit score",
+            "is there a quick way to improve my credit score"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 54,
+        "intent_name": "income",
+        "sample_utterances": [
+            "can you tell me what my total income is for the pay period",
+            "please give me my salary figure",
+            "i need you to tell me my salary",
+            "what is my gross income per pay period",
+            "what is my total annual income"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 55,
+        "intent_name": "ingredient_substitution",
+        "sample_utterances": [
+            "what about changing the sugar for baking soda",
+            "can i swap sugar for salt",
+            "would it be possible to replace the salt with baking soda",
+            "instead of pepper, can i use salt",
+            "can i take out the olive oil and use lard"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 56,
+        "intent_name": "ingredients_list",
+        "sample_utterances": [
+            "what do you put in chicken noodle casserole",
+            "what goes into chicken noodle casserole",
+            "what do i need to make chicken noodle casserole",
+            "how do you make chicken noodle casserole",
+            "chicken noodle casserole is made from what"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 57,
+        "intent_name": "insurance",
+        "sample_utterances": [
+            "what do my health benefits consist of",
+            "what health benefits are available to me",
+            "what health benefits can i use",
+            "what are the health benefits i have",
+            "what health benefits do i have"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 58,
+        "intent_name": "insurance_change",
+        "sample_utterances": [
+            "how to create a new aaa insurance plan",
+            "website to start aaa new insurance plan",
+            "aaa insurance start new plan",
+            "i want to start a new aaa insurance plan",
+            "is new this a good insurance plan for me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 59,
+        "intent_name": "interest_rate",
+        "sample_utterances": [
+            "i want to know my interest rate",
+            "tell me my interest rate",
+            "what interest rate am i paying",
+            "my interest rate please",
+            "how do i know the interest rate for my signature account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 60,
+        "intent_name": "international_fees",
+        "sample_utterances": [
+            "are there any transaction fees associated with my chase card if i am in tokyo",
+            "does my usaa card have international transaction fees",
+            "does my bank of the west card have international transaction fees",
+            "are there any transaction fees associated with my usaa card if i am in india",
+            "does my navy federal card have international transaction fees"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 61,
+        "intent_name": "international_visa",
+        "sample_utterances": [
+            "to visit cambodia, do i need an international visa",
+            "do i need to get a visa to visit canada",
+            "will i need a visa to visit ireland",
+            "will i need a travel visa to go to canary islands",
+            "i want to visit portugal do i need a travel visa"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 62,
+        "intent_name": "jump_start",
+        "sample_utterances": [
+            "what do i do if my car battery is dead",
+            "show me the way to jump start a battery",
+            "how can i replace my car battery",
+            "tell me how to jump start a battery",
+            "what can i do since my car battery died"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 63,
+        "intent_name": "last_maintenance",
+        "sample_utterances": [
+            "tell me when my car last had its oil changed",
+            "when did i last do maintenance on my car",
+            "when did i last take my car in for maintenance",
+            "can you find the date of my last oil change",
+            "when did i last bring my car in to have it looked at"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 64,
+        "intent_name": "lost_luggage",
+        "sample_utterances": [
+            "locate lost luggage from flight america airlines in o'hare",
+            "on flight america airlines in o'hare lost luggage",
+            "in o'hare lost luggage on flight america airlines",
+            "lost luggage on flight america airlines in o'hare",
+            "while on flight america airlines i lost luggage in o'hare"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 65,
+        "intent_name": "make_call",
+        "sample_utterances": [
+            "place a phone call to yiming",
+            "phone lobby",
+            "can you call dominos pizza",
+            "can you redial the last number dialed",
+            "call 911"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 66,
+        "intent_name": "maybe",
+        "sample_utterances": [
+            "i don't know the answer",
+            "i'm unsure",
+            "shit if i know",
+            "no idea",
+            "hell if i know"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 67,
+        "intent_name": "meal_suggestion",
+        "sample_utterances": [
+            "can you give me a french dinner suggestion",
+            "suggest a meal from laos to me, please",
+            "can you give me a vietnamese meal suggestion",
+            "suggest a meal from burma to me",
+            "can you give me a vietnamese dinner suggestion"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 68,
+        "intent_name": "meaning_of_life",
+        "sample_utterances": [
+            "does life have meaning",
+            "is being alive the meaning of life",
+            "what is the real meaning of life",
+            "what is the answer to the meaning of life",
+            "is there really an answer to the meaning of life"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 69,
+        "intent_name": "measurement_conversion",
+        "sample_utterances": [
+            "how many centimeters are in an inch",
+            "whats 5 feet in inches",
+            "what's 32 degrees fahrenheit in celsisus",
+            "what amount of millimeters are in 50 kilometers",
+            "how many crows are in 10 murders"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 70,
+        "intent_name": "meeting_schedule",
+        "sample_utterances": [
+            "when is today's meeting with john",
+            "when is my meeting with dan scheduled for",
+            "when is the meeting with homer scheduled for",
+            "do i have any meetings with stan today",
+            "how many meetings do i have scheduled between 10 and 3"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 71,
+        "intent_name": "min_payment",
+        "sample_utterances": [
+            "what's the minimum i owe on the car payment",
+            "what's the least amount i need to pay on the electric bill",
+            "what's the smallest amount i can pay on the water bill",
+            "what's the minimum amount for my electric bill",
+            "what's the least i can pay on the medical payments for february"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 72,
+        "intent_name": "mpg",
+        "sample_utterances": [
+            "what kind of mileage do i get out of gas",
+            "what's the fuel economy of my car",
+            "how many miles per gallon do i get in my car",
+            "tell me my car's fuel economy",
+            "what kind of gas mileage do i get"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 73,
+        "intent_name": "new_card",
+        "sample_utterances": [
+            "how can i apply for a discover card",
+            "can i apply for a discover card",
+            "how do applications for discover cards work",
+            "is this how i apply for a discover card",
+            "what does it take to get a new card"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 74,
+        "intent_name": "next_holiday",
+        "sample_utterances": [
+            "when is the upcoming holiday, please",
+            "when is the upcoming holiday",
+            "what day is our next free day",
+            "when is the next scheduled holiday",
+            "when is the next scheduled holiday, please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 75,
+        "intent_name": "next_song",
+        "sample_utterances": [
+            "go past this song",
+            "put on the next song",
+            "please play the next song",
+            "go forward to the next song on the playlist",
+            "change the song to the next one"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 76,
+        "intent_name": "no",
+        "sample_utterances": [
+            "no, that's incorrect",
+            "that's not true",
+            "that is not true, it's false",
+            "no way",
+            "not really"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 77,
+        "intent_name": "nutrition_info",
+        "sample_utterances": [
+            "what's the nutritional info for spaghetti",
+            "what's the nutritional info for pizza",
+            "how healthy are potato skins",
+            "how healthy is spaghetti",
+            "share the nutrition info for brownies with me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 78,
+        "intent_name": "oil_change_how",
+        "sample_utterances": [
+            "how do i change a car's oil",
+            "can you find instructions on how to change oil in a car",
+            "what do i need to change my oil",
+            "how do i change the oil in a car",
+            "how do i change the oil in my passat"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 79,
+        "intent_name": "oil_change_when",
+        "sample_utterances": [
+            "when should i change my car oil",
+            "do i need to change my oil",
+            "how often do you have to change your oil",
+            "how do i know when i have to change my oil",
+            "when do i need to change my oil"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 80,
+        "intent_name": "ood",
+        "sample_utterances": [
+            "how much is an overdraft fee for bank",
+            "why are exponents preformed before multiplication in the order of operations",
+            "what size wipers does this car take",
+            "where is the dipstick",
+            "how much is 1 share of aapl"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 81,
+        "intent_name": "order",
+        "sample_utterances": [
+            "can you please order me more plastic bags",
+            "i need you to order some more lysol for me,please",
+            "i need some more lysol, could you order me some",
+            "i'm out of lysol could you order me some",
+            "could you please reorder me some lysol"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 82,
+        "intent_name": "order_checks",
+        "sample_utterances": [
+            "what is the process to get some more checkbooks mailed to me",
+            "how do i get more checkbooks mailed to me",
+            "if i need more checkbooks maild to me what should i do",
+            "can you mail more checkbooks to me please",
+            "can you explain to me how to get some more checkbooks mailed to me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 83,
+        "intent_name": "order_status",
+        "sample_utterances": [
+            "can you find my package in transit",
+            "track my package please",
+            "help me find my package",
+            "i need to track my package",
+            "what's going on with my order"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 84,
+        "intent_name": "pay_bill",
+        "sample_utterances": [
+            "i want to pay my bill, please",
+            "pay my water bill with my charles schwab account",
+            "i'd like to pay my bill",
+            "pay my internet bill with my discover account",
+            "can you help me pay a bill"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 85,
+        "intent_name": "payday",
+        "sample_utterances": [
+            "on what date do i get paid",
+            "what day do i get my paycheck",
+            "i need to know when to expect my next paycheck",
+            "tell me when my next paycheck will arrive",
+            "what date do i get my next paycheck"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 86,
+        "intent_name": "pin_change",
+        "sample_utterances": [
+            "how do i change my pin for number for my abc bank account",
+            "what do i need to do to change my abc bank account pin number",
+            "i have no idea what the pin is for my checking account",
+            "i cannot recall the pin for my savings account",
+            "i forgot the pin number for my college fund account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 87,
+        "intent_name": "play_music",
+        "sample_utterances": [
+            "can i get some music by three six mafia in here",
+            "what does x’s music sound like",
+            "may i hear some music by fleet foxes",
+            "can i hear some music by cloud control",
+            "can x’s music be played"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 88,
+        "intent_name": "plug_type",
+        "sample_utterances": [
+            "do i need a socket converter if i'm going to mexico",
+            "does england have a different plug type and if so what is it",
+            "is there a conversion plug if you travel to australia",
+            "what kind of plug type do they use in russia",
+            "what type of plug do i need to bring if i visit japan"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 89,
+        "intent_name": "pto_balance",
+        "sample_utterances": [
+            "what is my vacation schedule look like",
+            "can you explain to me what type of vacation days i have still",
+            "what type of vacation schedule do i have left",
+            "can i get vacation day totals i have left",
+            "how many vacation days do i have saved up, please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 90,
+        "intent_name": "pto_request",
+        "sample_utterances": [
+            "how do i put in a pto request for the first to the ninth",
+            "am i allowed to put in a pto request for now to april",
+            "is there a time i can put in a pto request for dec 2 to new years",
+            "when can i put a pto request in for feb 22 to march 1",
+            "i need a pto request on march 1 to 2"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 91,
+        "intent_name": "pto_request_status",
+        "sample_utterances": [
+            "have they approved my vacation request yet",
+            "give me the status of my vacation request",
+            "am i going to be able to get my vacation request",
+            "i want to check on my vacation request",
+            "is my vacation approved yet"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 92,
+        "intent_name": "pto_used",
+        "sample_utterances": [
+            "have i used half of my days off yet",
+            "go to my job portal, i'd like to know how many days off i have used",
+            "what amount of days off have i already utilized",
+            "call hr so i can figure out how many days off i've taken",
+            "how many times have i taken off from work this year"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 93,
+        "intent_name": "recipe",
+        "sample_utterances": [
+            "whats the best way to roast a chicken",
+            "how do i make pie crust",
+            "find a recipe for german chocolate cake",
+            "how do i fry pork chops",
+            "how do i cook boiled eggs"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 94,
+        "intent_name": "redeem_rewards",
+        "sample_utterances": [
+            "i am ready now to cash in on the many credit card points i have saved up",
+            "i have credit card points but don't know how to use them",
+            "walk me through the best ways to use my credit card points",
+            "i am ready now to use some of the credit card points i have saved",
+            "i want to hear more about how i can use my credit card points"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 95,
+        "intent_name": "reminder",
+        "sample_utterances": [
+            "tell me my reminders",
+            "tell me my current reminders list",
+            "please read my reminders",
+            "will you repeat my reminder list",
+            "check my reminders for mop and floor"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 96,
+        "intent_name": "reminder_update",
+        "sample_utterances": [
+            "remind me to call my mother saturday morning",
+            "please set up a reminder i need to remember to ask about work",
+            "make a reminder for me to do my resume",
+            "remind me to take out the garbage in the morning",
+            "the next time it rains, remind me to close the windows"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 97,
+        "intent_name": "repeat",
+        "sample_utterances": [
+            "i didn't hear you please repeat",
+            "please repeat",
+            "i want you to repeat that",
+            "one more time please",
+            "i need you to repeat that"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 98,
+        "intent_name": "replacement_card_duration",
+        "sample_utterances": [
+            "tell me about today weather",
+            "can my debit card be replaced quickly",
+            "how long does visa take to get me a new card",
+            "is my card made immedietly after reporting stolen",
+            "can i replace a stolen card soon"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 99,
+        "intent_name": "report_fraud",
+        "sample_utterances": [
+            "i'm afraid this charge on my account is fraud",
+            "i think there's fraud on my account",
+            "i think i have fraud on my account from walmart",
+            "there's been some fraudulent activity on my card",
+            "i'm pretty sure this charge from sam's club is fraudulent"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 100,
+        "intent_name": "report_lost_card",
+        "sample_utterances": [
+            "immediately the credit card company must be told that i lost my card from them",
+            "i lost my debit card and need it reported as lost",
+            "i can't seem to find my gold card and want it reported as lost",
+            "i lost my chase bank card and want it labeled as lost",
+            "can you report my td bank card as lost"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 101,
+        "intent_name": "reset_settings",
+        "sample_utterances": [
+            "make the settings go back to the original",
+            "go back the the settings you had originally",
+            "change settings to how they were originally",
+            "go back to your original settings",
+            "reset the factory settings"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 102,
+        "intent_name": "restaurant_reservation",
+        "sample_utterances": [
+            "you need to call the melt in lakewood for a table for at 2:00, monday, the first week in march",
+            "hey computer, make a reservation for 2 for my parents at red lobster on wednseday next, 2:00pm if possible",
+            "i think we should reserve dad's regular table friday for 6 people, use his name, make that close to 4:00 pm at the club",
+            "listen i need to get a reservation for , me and teresa at georgetown cafe on tuesday at 7:00 pm",
+            "can you make me a reservation for 4 pm on the 22nd at ruth's"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 103,
+        "intent_name": "restaurant_reviews",
+        "sample_utterances": [
+            "do people like the donuts at tgi",
+            "are the donuts at tgi well reviewed",
+            "how are the donuts reviews at tgi",
+            "what are the comments on the donuts at tgi",
+            "are people recommending the donuts at tgi"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 104,
+        "intent_name": "restaurant_suggestion",
+        "sample_utterances": [
+            "can you suggest a restaurant for me to eat tonight",
+            "tell me where to go since i want to eat out tonight",
+            "i'm craving for italian food, where should i go",
+            "suggest a restaurant for me to eat tonight, please",
+            "i'm not going to cook today, can you suggest a restaurant"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 105,
+        "intent_name": "rewards_balance",
+        "sample_utterances": [
+            "how high are the rewards on my discover card",
+            "how many rewards do i now have on my hy-vee card",
+            "what's the current reward amount on my mastercard",
+            "what's my current reward balance on my amex card",
+            "what's my visa's current rewards balance"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 106,
+        "intent_name": "roll_dice",
+        "sample_utterances": [
+            "will you roll a d20",
+            "will you roll a 12 sided dice",
+            "will you roll a 10 sided dice",
+            "i'd like you to roll dice",
+            "i'd like a 7 sided dice roll please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 107,
+        "intent_name": "rollover_401k",
+        "sample_utterances": [
+            "ways to transfer my 401k",
+            "where do i go the transfer my 401k",
+            "who do i go to, to transfer my 401k",
+            "what are the ways i can transfer my 401k",
+            "i need guidance on how to rollover my 401k"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 108,
+        "intent_name": "routing",
+        "sample_utterances": [
+            "where can i see the routing number for bmo",
+            "i need to know what my wife's account's routing number is",
+            "how do i locate my routing number for tax reasons",
+            "where can i look up x's routing number",
+            "please give my routing number for my national account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 109,
+        "intent_name": "schedule_maintenance",
+        "sample_utterances": [
+            "my car needs to be brought for maintenance",
+            "could you schedule car maintenance for me",
+            "i need someone to look at my car because my check engine light is on",
+            "locate someone to look at my car because my check engine light is on",
+            "i require a car maintenance"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 110,
+        "intent_name": "schedule_meeting",
+        "sample_utterances": [
+            "i want to know if there is meeting room available at 8",
+            "meeting room availability from 8:00 please",
+            "are there any meetings room available between 8:00 and 9:00 am",
+            "i want to check if there is any meeting room available between 8:00 and 10:00 am",
+            "tell me how do i schedule a meeting"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 111,
+        "intent_name": "share_location",
+        "sample_utterances": [
+            "tell lydia and laura where i am located",
+            "share my location with brad and terry",
+            "tell john and sam where i am",
+            "share my location with darren and stacey",
+            "let cora and nancy know were i am now"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 112,
+        "intent_name": "shopping_list",
+        "sample_utterances": [
+            "would you let me know what is on my shopping list",
+            "list out what is on my shopping list",
+            "i need for you to tell me what is on my shopping list",
+            "do you want me to shop for peanut butter",
+            "do you want peanut butter for your lunches this week"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 113,
+        "intent_name": "shopping_list_update",
+        "sample_utterances": [
+            "delete fries from shopping list",
+            "take off fries from the shopping list",
+            "please take away the fries from the shopping list",
+            "remove fries from my shopping list",
+            "we no longer need fries on the shopping lisr"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 114,
+        "intent_name": "smart_home",
+        "sample_utterances": [
+            "can you please turn on my furnace",
+            "oven should be set to 350 now",
+            "what temp is the ac at",
+            "tell me who is by the garage door",
+            "set my oven to 350 please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 115,
+        "intent_name": "spelling",
+        "sample_utterances": [
+            "what is the spelling of potato",
+            "spell potato",
+            "give me the spelling of potato",
+            "spell out potato",
+            "how do you spell tomato"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 116,
+        "intent_name": "spending_history",
+        "sample_utterances": [
+            "how much did i spend at restaurants last week",
+            "how much have i spent lately on eating out",
+            "what did i spend at the grocery store yesterday",
+            "how much money did i spend at starbucks in the last week",
+            "what was the total i spent at home depot last month"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 117,
+        "intent_name": "sync_device",
+        "sample_utterances": [
+            "please link with my phone",
+            "please connect the device to my phone",
+            "please link up to my phone",
+            "could you link with my phone",
+            "please turn off your wifi from my phone"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 118,
+        "intent_name": "taxes",
+        "sample_utterances": [
+            "how much are my state taxes",
+            "what will my state taxes cost",
+            "how much are taxes in my state",
+            "how much state taxes do i owe",
+            "tell me how much in tax on this"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 119,
+        "intent_name": "tell_joke",
+        "sample_utterances": [
+            "please, recite to me some good one liners",
+            "do you know any good jokes about zebras",
+            "can you tell me any truly funny knock knock jokes",
+            "what do people find funny about food",
+            "what are some funny things about food"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 120,
+        "intent_name": "text",
+        "sample_utterances": [
+            "can you text elizabeth and tell them i forgot to bring drinks",
+            "text wenona and tell her we will be there tomorrow",
+            "text christopher and tell him i will stop by",
+            "text audrey and tell her i will be there soon",
+            "text christy and ask her what she wants for dinner"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 121,
+        "intent_name": "thank_you",
+        "sample_utterances": [
+            "you have been a big help, thank you so much",
+            "i appreciate your help, thank you",
+            "i really appreciate your help, thank you",
+            "i am very grateful",
+            "i appreciate the assistance"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 122,
+        "intent_name": "time",
+        "sample_utterances": [
+            "what time is it in punta gorda, florida",
+            "what time is it in glenwood springs, co",
+            "what time is it in fredericksburg, tx",
+            "what time is it in las vegas, nv",
+            "what time is it in houston, tx"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 123,
+        "intent_name": "timer",
+        "sample_utterances": [
+            "please set a 4 minute timer",
+            "please set a timer for 6 minutes",
+            "set a timer for 5 minutes",
+            "i need a 7 minute timer",
+            "i need to set the timer for two minutes"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 124,
+        "intent_name": "timezone",
+        "sample_utterances": [
+            "timezone of cuba",
+            "what is the time zone of france",
+            "french time zone",
+            "which timezone is colombia",
+            "time zone in france"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 125,
+        "intent_name": "tire_change",
+        "sample_utterances": [
+            "tell me the status of my tires and when i need to replace them",
+            "how many more miles can i drive before changing my tires",
+            "how many miles can i drive before changing my tires",
+            "when will my tires need to be replaced",
+            "how is the tread on my tires"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 126,
+        "intent_name": "tire_pressure",
+        "sample_utterances": [
+            "how's the air pressure in my tires",
+            "what's my tires current air pressure",
+            "what's the amount of air in my tires right now",
+            "are my tire's air pressure good enough to drive on",
+            "what's the inflation of my tires"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 127,
+        "intent_name": "todo_list",
+        "sample_utterances": [
+            "what are the things that i have for today",
+            "what is left to do today",
+            "what do i have to do today",
+            "the tasks for today, what are they",
+            "i need to know what my to-do list is looking like"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 128,
+        "intent_name": "todo_list_update",
+        "sample_utterances": [
+            "i need to add the chore of vacuuming to my task list",
+            "put wash the counters down on my list of pending tasks",
+            "take doing the dishes off my todo list",
+            "blank out my todo list",
+            "erase all items on my todo list"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 129,
+        "intent_name": "traffic",
+        "sample_utterances": [
+            "is there any traffic congestion on my way to the closest whole foods",
+            "how bad is traffic to the closet atm machine",
+            "is traffic bad on my way to the next mcdonalds",
+            "what will traffic be like at 5:00 going towards the mall",
+            "is the traffic bad at 5:00 if i'm going to the mall"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 130,
+        "intent_name": "transactions",
+        "sample_utterances": [
+            "before i make my mastercard payment can you tell me what i've recently charged on it",
+            "please tell me all of my recent transactions",
+            "i want to pay my amazon credit card but i need to know the last few transactions",
+            "before i pay my walmart credit card did i make any purchases using it recently",
+            "i need to know all the recent transactions i've made"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 131,
+        "intent_name": "transfer",
+        "sample_utterances": [
+            "i need $20000 transferred from my savings to my checking",
+            "complete a transaction from savings to checking of $20000",
+            "transfer $20000 from my savings account to checking account",
+            "take $20000 from savings and put it in checking",
+            "put $20000 into my checking account from my savings account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 132,
+        "intent_name": "translate",
+        "sample_utterances": [
+            "what expression would i use to say i love you if i were an italian",
+            "can you tell me how to say 'i do not speak much spanish', in spanish",
+            "what is the equivalent of, 'life is good' in french",
+            "tell me how to say, 'it is a beautiful morning' in italian",
+            "if i were mongolian, how would i say that i am a tourist"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 133,
+        "intent_name": "travel_alert",
+        "sample_utterances": [
+            "does ireland have any travel alerts i should be aware of",
+            "does north korea have any travel alerts i should be aware of",
+            "are there any travel alerts for russia",
+            "does spain have any travel alerts i should be aware of",
+            "are there any travel alerts for north korea"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 134,
+        "intent_name": "travel_notification",
+        "sample_utterances": [
+            "im going to be in canada from august 10th until august 12th",
+            "im going to be in slovakia from january 16th until january 19th",
+            "im going to be in paraguay from january 7th until january 10th",
+            "i'm going to be in thailand from october 15th until october 23rd",
+            "im going to be in jamaica from october 4th until october 8th"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 135,
+        "intent_name": "travel_suggestion",
+        "sample_utterances": [
+            "can you give me some suggestions to go site seeing when i get there",
+            "can you get me any recommendations for the place i'm traveling to",
+            "please suggest some fun tourist activities in tokyo",
+            "i need help with some fun tourist things to do in tokyo",
+            "could you tell me what fun tourist things i could do in tokyo"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 136,
+        "intent_name": "uber",
+        "sample_utterances": [
+            "book an uber for 6 people to go to the movies",
+            "i need an uber for 6 people to the movies",
+            "book a 6 person uber to the movies",
+            "i need an uber to the movies for me and 5 other people",
+            "i'm going to the movies book an uber for 6 people"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 137,
+        "intent_name": "update_playlist",
+        "sample_utterances": [
+            "insert what i am listening to into my jazz playlist",
+            "add this tune to my jazz playlist",
+            "can you add this song to my jazz playlist",
+            "please add this song to my jazz playlist",
+            "add this song to my jazz playlist"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 138,
+        "intent_name": "user_name",
+        "sample_utterances": [
+            "you refer to me as what",
+            "by what name do you refer to me",
+            "what name do you use when addressing me",
+            "is there a name that you call me",
+            "how do you usually refer to me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 139,
+        "intent_name": "vaccines",
+        "sample_utterances": [
+            "are there any specific shots i should get before traveling to england",
+            "what are the recommended shots to get before i travel to south korea",
+            "what are the recommended shots to get before i travel to england",
+            "are there recommendations to get any specific shots before i travel to germany",
+            "do i need certain shots before flying to eithiopia"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 140,
+        "intent_name": "w2",
+        "sample_utterances": [
+            "where can i locate my w2 so i can do my taxes",
+            "where is the w-2 form located",
+            "where can i locate my w-2 form",
+            "where can one receive their w-2 form",
+            "what is the location of my w2 that is needed for taxes"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 141,
+        "intent_name": "weather",
+        "sample_utterances": [
+            "what are the conditions like in orlando",
+            "what's the temperature like in tampa",
+            "what's the forecast like for pittsburgh",
+            "what are the conditions like in sarasota",
+            "what's the climate like in chicago"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 142,
+        "intent_name": "what_are_your_hobbies",
+        "sample_utterances": [
+            "what kinds of things are you into",
+            "what's your favorite hobby",
+            "what do you like to do in your spare time",
+            "what do you do for fun",
+            "do you have any hobbies"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 143,
+        "intent_name": "what_can_i_ask_you",
+        "sample_utterances": [
+            "what things can you help me with exactly",
+            "what are the things you can help me with",
+            "what exactly can you help me with",
+            "what can you help me with exactly",
+            "what can you help me with"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 144,
+        "intent_name": "what_is_your_name",
+        "sample_utterances": [
+            "what's your full name",
+            "i didn't get your name",
+            "what's should i call you by",
+            "can you tell me the ai's name",
+            "what is the ai's name"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 145,
+        "intent_name": "what_song",
+        "sample_utterances": [
+            "which song is playing",
+            "what's this song called",
+            "what song is this",
+            "what's the name of this song",
+            "what is this song"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 146,
+        "intent_name": "where_are_you_from",
+        "sample_utterances": [
+            "where is your place of origin",
+            "what is your place of origin",
+            "what is your country of origin",
+            "where is your country of origin",
+            "what is your nationality"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 147,
+        "intent_name": "whisper_mode",
+        "sample_utterances": [
+            "change to whisper mode",
+            "change mode to whisper",
+            "whisper mode off",
+            "change out of whisper mode",
+            "turn off whisper mode"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 148,
+        "intent_name": "who_do_you_work_for",
+        "sample_utterances": [
+            "who is your employeer",
+            "who is the boss of you",
+            "i gotta know who is your boss",
+            "tell me who is your boss",
+            "let me know who is your boss"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 149,
+        "intent_name": "who_made_you",
+        "sample_utterances": [
+            "who formed you",
+            "who constructed you",
+            "what's your design company",
+            "what company coded you",
+            "who fabricated you"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 150,
+        "intent_name": "yes",
+        "sample_utterances": [
+            "yep",
+            "that is affirmative",
+            "what you just said is true",
+            "that is not false",
+            "that is a fact"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    }
+]

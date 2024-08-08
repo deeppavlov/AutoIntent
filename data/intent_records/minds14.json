@@ -1,0 +1,184 @@
+[
+    {
+        "intent_id": 0,
+        "intent_name": null,
+        "sample_utterances": [
+            "Hello, I would like to know if I can use my card abroad and I need to warn My Bank for this. Thank you",
+            "Hello, what will be the commission if I use my card abroad",
+            "Hello In a few days I am leaving for sweden for a whole month I would like to know if I can pay with my card Thank you",
+            "Hello, I am going abroad for a few weeks and would like to know Can I use your card there I would like to pay for purchases in America Do I need to do anything for this",
+            "Hello, I would like to ask you one question, I am going on vacation and I need to clarify whether my credit card will work abroad"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 1,
+        "intent_name": null,
+        "sample_utterances": [
+            "Good afternoon. I would like to contact you with a request. I need to change the address",
+            "I want to change my residence details",
+            "Good afternoon I would like to change my address at which my card is registered How can I do this",
+            "inflate I would like to change my address",
+            "Good afternoon, I have changed my place of residence and would be grateful for you to change my official address of your record"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 2,
+        "intent_name": null,
+        "sample_utterances": [
+            "I have some problems with the application does not open, I press the button as usual and the process does not go Help please The application is buggy there",
+            "the application freezes I cannot use it normally",
+            "when entering the application, it throws me out of it",
+            "I cannot open the application and the application does not work Yes Why not listen",
+            "I can't log into my account and see the balance of my account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 3,
+        "intent_name": null,
+        "sample_utterances": [
+            "what is the maximum amount that I can withdraw from an ATM",
+            "Please tell me which item is worth I want to withdraw the maximum amount of money",
+            "Hello I want to withdraw money from an ATM and would like to know what is the maximum amount that I could withdraw at a time",
+            "How much money can be withdrawn here",
+            "how much money can we withdraw at a time from an ATM in France"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 4,
+        "intent_name": null,
+        "sample_utterances": [
+            "Please show me my account balance",
+            "What is my account balance Thank you",
+            "get the balance in the current account",
+            "How much money do I have left in my account?",
+            "Hello my Balance please"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 5,
+        "intent_name": null,
+        "sample_utterances": [
+            "Good afternoon, I would like to take out a loan for my existing business, you can inquire about the credit rates of your bank",
+            "Good afternoon. I am calling you about my business loan. Is there any way to increase monthly payments to pay it off faster How much percentage can I raise them Thank you",
+            "Hello, hello. I'm calling about a business loan. What suggestions do you have for me at the moment?",
+            "and I am calling about a business loan, could you provide me with information about this",
+            "I called about a business loan"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 6,
+        "intent_name": null,
+        "sample_utterances": [
+            "Hello, something happened to me with the card, I can not make a payment and I am told that my payment was declined, what is the problem, can you explain please",
+            "Hello, my card does not work, I need to make a payment but there is a refund why is this happening",
+            "I can’t pay my card or can you do something",
+            "Can you help me with my card",
+            "Why did my card stop working and is blocked"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 7,
+        "intent_name": null,
+        "sample_utterances": [
+            "I would like to know how to transfer money to my account",
+            "What are the ways to fund the account",
+            "How to add money to your account",
+            "Tell me how can I put money into my account",
+            "Hello, I would like to deposit money into my account. Could you explain to me how this should be done"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 8,
+        "intent_name": null,
+        "sample_utterances": [
+            "I want to know about my priorities",
+            "Hello I have a small problem and I would like to clarify how I can return a direct debit",
+            "Good morning, the purchase was made in a store for some reason was paid twice by direct debit Please return the extra payment to me",
+            "can you give me information repair write-off",
+            "I have questions direct debit Please show me my direct debit"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 9,
+        "intent_name": null,
+        "sample_utterances": [
+            "Good afternoon, I lost my card, I would like to block it urgently. Thank you",
+            "hello i need to block my card urgently please do it",
+            "please block my card",
+            "block my card",
+            "Hello I lost my card today I want to block it Thank you"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 10,
+        "intent_name": null,
+        "sample_utterances": [
+            "I do not know what to do with these payment codes that I receive from you",
+            "I received an SMS confirmation for making a payment, but I don't know what to do with it",
+            "Good afternoon, just trying to make a payment through your bank, the amount turned out to be large and some of these messages of mine began to come to my phone that I owe them",
+            "I'm trying to pay online they are not asked to enter the SMS code to confirm the payment but I do not receive a contact could you help me with this",
+            "Hello, I'm going to make a purchase for a large amount, I need to wait for an SMS code from the bank with confirmation"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 11,
+        "intent_name": null,
+        "sample_utterances": [
+            "Hello I have a need to create a joint account, can I have an account with my partner and can I do this through the application via the phone and what functions are there in the application",
+            "Good afternoon I would like to create a joint account what needs to be done for this you need to open a new account or you can add a second person to my already existing account",
+            "I am today from opening a joint account",
+            "hello I need to clarify How can I open a joint account with my partner what I need to do for this Can I do this by phone or we need to come to the bank in person",
+            "Please tell me how to create a joint account"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 12,
+        "intent_name": null,
+        "sample_utterances": [
+            "Hello, I would like to review my previous last transactions that took place on my card directly in addition to his account. Please show the transactions of the last three months",
+            "Show me my last transactions if there is a payment that I don’t know Yes, I accept the payment",
+            "show me my latest recent transactions",
+            "Show me information about all my payments for the last week",
+            "I want to know my last transactions for today"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 13,
+        "intent_name": null,
+        "sample_utterances": [
+            "bill payment",
+            "I want to pay the bill",
+            "Hello I want to pay for the bill on my card you can do it by phone now Thank you more",
+            "I want to pay the bill",
+            "Good afternoon, as far as I know, my credit card payment deadline is right. I would like to take a ride right now"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    }
+]

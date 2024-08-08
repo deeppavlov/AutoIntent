@@ -1,0 +1,781 @@
+[
+    {
+        "intent_id": 0,
+        "intent_name": "alarm_query",
+        "sample_utterances": [
+            "please list active alarms",
+            "show me the alarms i set",
+            "do i have any alarms",
+            "show alarms",
+            "do i have an alarm set for morning flight"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 1,
+        "intent_name": "alarm_remove",
+        "sample_utterances": [
+            "stop seven am alarm",
+            "remove the alarm",
+            "cancel my eight am alarm",
+            "cancel wake up calls for this week",
+            "stop wake up calls for this week"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 2,
+        "intent_name": "alarm_set",
+        "sample_utterances": [
+            "wake me up at nine am on friday",
+            "set an alarm for two hours from now",
+            "set an alarm for twelve",
+            "set an alarm forty minutes from now",
+            "set alarm for eight every weekday"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 3,
+        "intent_name": "audio_volume_down",
+        "sample_utterances": [
+            "you're too loud",
+            "quieter",
+            "turn down volume",
+            "it is too loud decrease the volume",
+            "could you please lower your volume"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 4,
+        "intent_name": "audio_volume_mute",
+        "sample_utterances": [
+            "olly quiet",
+            "stop",
+            "olly pause for ten seconds",
+            "pause for ten seconds",
+            "mute"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 5,
+        "intent_name": "audio_volume_other",
+        "sample_utterances": [
+            "change the volume",
+            "change the volume of the speakers",
+            "change the audio settings",
+            "show volume settings",
+            "need to see volume settings"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 6,
+        "intent_name": "audio_volume_up",
+        "sample_utterances": [
+            "turn up the volume",
+            "i can barely hear you olly",
+            "can you speak a little louder",
+            "i am unable to hear you can you speak little loud",
+            "please speak loud"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 7,
+        "intent_name": "calendar_query",
+        "sample_utterances": [
+            "check when the show starts",
+            "please tell me current events for the day",
+            "can you confirm that my meeting for tomorrow has been canceled",
+            "what is the time for jimmy's party",
+            "what are the upcoming reminders"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 8,
+        "intent_name": "calendar_remove",
+        "sample_utterances": [
+            "olly cancel business meeting on wednesday",
+            "delete the richard's wedding event next year",
+            "remove stand-up on friday at ten am",
+            "olly remove stand-up on friday at ten am",
+            "remove chat with allan"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 9,
+        "intent_name": "calendar_set",
+        "sample_utterances": [
+            "remind me if anything else happens",
+            "remind me at one p. m.",
+            "remind my friend to get the assignment tomorrow",
+            "open memo add note about my meeting",
+            "reminders"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 10,
+        "intent_name": "cooking_query",
+        "sample_utterances": [
+            "what to cook for lunch",
+            "i need a recipe for chicken thighs for my pressure cooker",
+            "olly can i use brown sugar instead of white in peanut butter cookies",
+            "what's the easiest and quickest way to cook a turkey"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 11,
+        "intent_name": "cooking_recipe",
+        "sample_utterances": [
+            "how long should i boil the eggs",
+            "what ingredients do i need for tomato soup",
+            "how to make cheesecake",
+            "tell me how to cook steak",
+            "what's needed to make pizza"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 12,
+        "intent_name": "datetime_convert",
+        "sample_utterances": [
+            "tell me the time in g. m. t. plus five",
+            "if it is noon in virginia what time is it in california",
+            "what is the time difference between eastern time and pacific time",
+            "please can i know what time will it be at six p. m. here in australia",
+            "can you tell how many hours of difference are between boston and los angeles"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 13,
+        "intent_name": "datetime_query",
+        "sample_utterances": [
+            "tell me the time in moscow",
+            "what is the time",
+            "tell me the time",
+            "what's date today",
+            "what day is today"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 14,
+        "intent_name": "email_addcontact",
+        "sample_utterances": [
+            "add new email to anna",
+            "olly add new email to anna",
+            "create new contact with email",
+            "create new contact",
+            "change my mum's email in my phonebook"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 15,
+        "intent_name": "email_query",
+        "sample_utterances": [
+            "emails",
+            "check new message in inbox",
+            "read me the last email from stefan and oil change",
+            "find me all mails from magda with holidays word in the title",
+            "are there new emails for me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 16,
+        "intent_name": "email_querycontact",
+        "sample_utterances": [
+            "call mom",
+            "what is jimmy johns's corporate number",
+            "what's the email address of silvia",
+            "what's his number",
+            "tell me the landline number"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 17,
+        "intent_name": "email_sendemail",
+        "sample_utterances": [
+            "i did not want you to send that text yet wait until i say send",
+            "please send a mail to mr. richard stating that i going to met him on first of february twenty seventeen at five p. m. at this office",
+            "please send a voicemail to mr. richard office about meting him on first of february twenty seventeen at five p. m.",
+            "send an email to sarah about brunch today",
+            "send email to martha saying last evening was wild"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 18,
+        "intent_name": "general_greet",
+        "sample_utterances": [
+            "what's up",
+            "how are you",
+            "how are you doing",
+            "morning what's up",
+            "hi"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 19,
+        "intent_name": "general_joke",
+        "sample_utterances": [
+            "make me laugh",
+            "olly make me laugh",
+            "tell me a good joke",
+            "tell me a joke",
+            "alexa tell me a joke"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 20,
+        "intent_name": "general_quirky",
+        "sample_utterances": [
+            "check my car is ready",
+            "check my laptop is working",
+            "is the brightness of my screen running low",
+            "i need to have location services on can you check",
+            "check the status of my power usage"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 21,
+        "intent_name": "iot_cleaning",
+        "sample_utterances": [
+            "olly clean the flat",
+            "vacuum the house",
+            "vacuum the house olly",
+            "hoover the carpets around",
+            "hey start vacuum cleaner robot"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 22,
+        "intent_name": "iot_coffee",
+        "sample_utterances": [
+            "make me a coffee",
+            "olly make me a coffee",
+            "i need a coffee",
+            "i fancy some coffee now",
+            "yo i need a coffee now"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 23,
+        "intent_name": "iot_hue_lightchange",
+        "sample_utterances": [
+            "make the lighting bit more warm here",
+            "please set the lighting suitable for reading",
+            "set lights to twenty percent",
+            "olly set lights to twenty percent",
+            "set brightness to fifty percent"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 24,
+        "intent_name": "iot_hue_lightdim",
+        "sample_utterances": [
+            "olly dim the lights in the hall",
+            "dim the lights in the kitchen olly",
+            "dim the lights in the kitchen",
+            "turn down the brightness",
+            "reduce the brightness"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 25,
+        "intent_name": "iot_hue_lightoff",
+        "sample_utterances": [
+            "time to sleep",
+            "time to sleep olly",
+            "turn off the light in the bathroom",
+            "turn the lights off in the bedroom",
+            "olly lights off"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 26,
+        "intent_name": "iot_hue_lighton",
+        "sample_utterances": [
+            "and the light began",
+            "it's awfully dark here",
+            "olly it's too dark i can't even see my hands",
+            "lights out",
+            "turn the lights on"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 27,
+        "intent_name": "iot_hue_lightup",
+        "sample_utterances": [
+            "make lights brightener",
+            "please raise the lights to max",
+            "make the room brighter",
+            "make the lights brighter",
+            "brighten the lamp next to the sofa"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 28,
+        "intent_name": "iot_wemo_off",
+        "sample_utterances": [
+            "turn off the rice cooker socket",
+            "please turn off the plug socket of my phone when it'll be charged",
+            "i want you to turn off the plug socket before the cell phone is charged",
+            "turn off smart socket",
+            "wemo plug socket off"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 29,
+        "intent_name": "iot_wemo_on",
+        "sample_utterances": [
+            "turn on the plug",
+            "switch on the plug",
+            "turn on my plug",
+            "turn on the rice cooker socket",
+            "turn on the smart charger"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 30,
+        "intent_name": "lists_createoradd",
+        "sample_utterances": [
+            "create a new to do list",
+            "create a list",
+            "please create a new list",
+            "can you create a new list in the playlist",
+            "i need to put together a to-do list for work"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 31,
+        "intent_name": "lists_query",
+        "sample_utterances": [
+            "i finished my to do list",
+            "list the items on my shopping list",
+            "what's on my list",
+            "how many events on my list",
+            "what is on my list"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 32,
+        "intent_name": "lists_remove",
+        "sample_utterances": [
+            "remove grocery shopping from my to do list on sunday",
+            "delete everything on the menu",
+            "delete my shopping list",
+            "remove eggs for the shopping list",
+            "take eggs off the list"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 33,
+        "intent_name": "music_dislikeness",
+        "sample_utterances": [
+            "i don't like it",
+            "that song in the background is annoying",
+            "this song is not very good",
+            "do not play this song again",
+            "i don't like this song"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 34,
+        "intent_name": "music_likeness",
+        "sample_utterances": [
+            "i like rock music",
+            "my favorite music band is queen",
+            "olly i'm really enjoying this song",
+            "the song you are playing is amazing",
+            "this is one of the best songs for me"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 35,
+        "intent_name": "music_query",
+        "sample_utterances": [
+            "who's current music's author",
+            "what's that the album is current music from",
+            "what's playing",
+            "what music is this",
+            "tell me the artist of this song"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 36,
+        "intent_name": "music_settings",
+        "sample_utterances": [
+            "shuffle this playlist",
+            "enable shuffle",
+            "save settings",
+            "repeat album",
+            "please lower the shuffle rate of hips don't lie"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 37,
+        "intent_name": "news_query",
+        "sample_utterances": [
+            "what's happening in football today",
+            "tell me b. b. c. news",
+            "what's the news on b. b. c. news",
+            "what is the b. b. c.'s latest news",
+            "tell me the latest technology news"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 38,
+        "intent_name": "play_audiobook",
+        "sample_utterances": [
+            "please repeat the last sentence from that book",
+            "rewind audiobook by thirty seconds",
+            "play audiobook",
+            "please continue playing odd thomas by dean koontz",
+            "i want to finish listening to the book one thousand nine hundred and eighty four from where i left off"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 39,
+        "intent_name": "play_game",
+        "sample_utterances": [
+            "games",
+            "play chess with me",
+            "let's play a game of trivia",
+            "can we play a game of hangman",
+            "play flappy bird"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 40,
+        "intent_name": "play_music",
+        "sample_utterances": [
+            "i want to listen arijit singh song once again",
+            "i want to play that music one again",
+            "please play yesterday from beatles",
+            "start playing music from favorites",
+            "please play my best music"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 41,
+        "intent_name": "play_podcasts",
+        "sample_utterances": [
+            "go back",
+            "play me the latest podcast about online surveys",
+            "play my newest podcasts from radiolab",
+            "play my favorite podcast",
+            "play next recording"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 42,
+        "intent_name": "play_radio",
+        "sample_utterances": [
+            "play my favorite pandora station",
+            "play pandora",
+            "can you turn on pandora",
+            "play b. b. c. radio",
+            "tune in some radio"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 43,
+        "intent_name": "qa_currency",
+        "sample_utterances": [
+            "alexa i would like my to tell me the trend on foreign exchange rates",
+            "i would like my to tell me the trend on foreign exchange rates",
+            "what is the current dollar to euro conversion rate",
+            "how much is b. p. in u. s. d.",
+            "what's the exchange rates"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 44,
+        "intent_name": "qa_definition",
+        "sample_utterances": [
+            "what is skynet",
+            "tell me about it",
+            "olly tell me about it",
+            "what an umbrella means",
+            "when can you use word set"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 45,
+        "intent_name": "qa_factoid",
+        "sample_utterances": [
+            "what is the gross domestic product of us",
+            "tell me about martin luther king junior",
+            "who was appointed as deputy centimeter of uttar pradesh",
+            "what creates buttermilk",
+            "olly how many stars has swat received on i. m. d. b."
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 46,
+        "intent_name": "qa_maths",
+        "sample_utterances": [
+            "ten percentages of hundred",
+            "seven times seven",
+            "four plus five equals nine",
+            "three times two equals six",
+            "four divided by two equals two"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 47,
+        "intent_name": "qa_stock",
+        "sample_utterances": [
+            "keep me updated on stock market prices",
+            "what's new with the stock market",
+            "what are some updates about the stock market",
+            "set notification for news on the stock market",
+            "stock exchange rates"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 48,
+        "intent_name": "recommendation_events",
+        "sample_utterances": [
+            "what is happening olly",
+            "what is happening",
+            "current local events",
+            "current events",
+            "show me upcoming events in this area"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 49,
+        "intent_name": "recommendation_locations",
+        "sample_utterances": [
+            "find me a nice restaurant for dinner",
+            "which is the nearest restaurants available",
+            "where is a good place to eat cheap pakistani food",
+            "which is the best place to visit in this month",
+            "where can i get shawarma in this area"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 50,
+        "intent_name": "recommendation_movies",
+        "sample_utterances": [
+            "should i watch this movie",
+            "what film should i watch",
+            "what is a good movie to see right now",
+            "top ten movies",
+            "recommend a movie which is released last friday"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 51,
+        "intent_name": "social_post",
+        "sample_utterances": [
+            "send a message on facebook to pending friend requests that my friend list is full and i will be creating a new profile soon",
+            "go to social media and post the following status",
+            "get status changed in social media",
+            "get the status posted for the following",
+            "post that i am going to mcdonalds at manhattan"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 52,
+        "intent_name": "social_query",
+        "sample_utterances": [
+            "what is going on right now on twitter",
+            "what is currently trending on twitter",
+            "do i have new likes",
+            "is anyone likes my latest photo",
+            "are there any interesting stuff happened today in my twitter"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 53,
+        "intent_name": "takeaway_order",
+        "sample_utterances": [
+            "please order some sushi for dinner",
+            "hey i'd like you to order burger",
+            "can i order takeaway dinner from byron's",
+            "order a pizza",
+            "order me a byron from deliveroo"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 54,
+        "intent_name": "takeaway_query",
+        "sample_utterances": [
+            "olly list most rated delivery options for chinese food",
+            "most rated delivery options for chinese food",
+            "olly most rated delivery options for chinese food",
+            "i want some curry to go any recommendations",
+            "i want some curry to go any recommendations olly"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 55,
+        "intent_name": "transport_query",
+        "sample_utterances": [
+            "you need to give me different directions",
+            "olly you need to give me different directions",
+            "you need to find an alternate route to my destination",
+            "olly you need to find an alternate route to my destination",
+            "how long will it take me to drive to the panic concert tomorrow"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 56,
+        "intent_name": "transport_taxi",
+        "sample_utterances": [
+            "olly book me a taxi to leith in half an hour",
+            "schedule an uber in twenty minutes to tesco on fifth street",
+            "book me a cab",
+            "book me a cab olly",
+            "call me a taxi to the airport at five am"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 57,
+        "intent_name": "transport_ticket",
+        "sample_utterances": [
+            "cheapest flights to kansas city from dallas",
+            "hey i want to get trains to manchester on wednesday",
+            "book me a ticket for a train to new york from boston in two days from now",
+            "schedule a journey to las vegas by train",
+            "book me a return trip from edinburgh to london by train"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 58,
+        "intent_name": "transport_traffic",
+        "sample_utterances": [
+            "just how bad is traffic on my commute",
+            "traffic congestion issues",
+            "how is the traffic right now",
+            "what is traffic to work now",
+            "how is my commute"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    },
+    {
+        "intent_id": 59,
+        "intent_name": "weather_query",
+        "sample_utterances": [
+            "is it raining",
+            "is it going to rain",
+            "is it currently snowing",
+            "what's this weeks weather",
+            "tell me the weather"
+        ],
+        "regexp_for_sampling": [],
+        "regexp_as_rules": []
+    }
+]
