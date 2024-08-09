@@ -19,6 +19,7 @@ from torch import nn
 import torch
 import torch.nn.functional as F
 from transformers import AutoModelForSequenceClassification
+from random import shuffle
 
 
 def construct_samples(texts, labels, balancing_factor: int = None) -> list[InputExample]:
@@ -29,6 +30,8 @@ def construct_samples(texts, labels, balancing_factor: int = None) -> list[Input
         label = int(labels[i] == labels[j])
         sample = InputExample(texts=pair, label=label)
         samples[label].append(sample)
+    shuffle(samples[0])
+    shuffle(samples[1])
 
     if balancing_factor is not None:
         i_min = min([0,1], key=lambda i: len(samples[i]))
@@ -69,7 +72,6 @@ class LogLoss(nn.Module):
         smoothed_targets = labels * (1 - self.label_smoothing) + 0.5 * self.label_smoothing
         loss = F.binary_cross_entropy_with_logits(sentence_features, smoothed_targets)
         return loss
-
 
 if __name__ == "__main__":
     import json
@@ -115,8 +117,8 @@ if __name__ == "__main__":
         split_sample_utterances(intent_records)
     )
 
-    train_samples = construct_samples(utterances_train, labels_train, balancing_factor=2)
-    test_samples = construct_samples(utterances_test, labels_test, balancing_factor=2)
+    train_samples = construct_samples(utterances_train, labels_train, balancing_factor=1)
+    test_samples = construct_samples(utterances_test, labels_test, balancing_factor=1)
 
     # We wrap train_samples (which is a List[InputExample]) into a pytorch DataLoader
     train_dataloader = DataLoader(

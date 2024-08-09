@@ -1,0 +1,155 @@
+{
+    "metrics": {
+        "retrieval": [
+            0.979381443298969,
+            0.8969072164948454,
+            0.8865979381443299,
+            0.8350515463917526
+        ],
+        "scoring": [
+            0.8553122863978128,
+            0.8987675153793575,
+            0.9916068580542264,
+            0.753578548644338,
+            0.5622095010252904,
+            0.7007468956482116,
+            0.6022962235133288,
+            0.740798017771702,
+            0.5793375484164958,
+            0.7307871952608794,
+            0.5961081681476419
+        ],
+        "prediction": [
+            0.5773195876288659,
+            0.7731958762886598
+        ]
+    },
+    "configs": {
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.979381443298969,
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.8969072164948454,
+                "k": 10,
+                "model_name": "intfloat/multilingual-e5-base"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.8865979381443299,
+                "k": 10,
+                "model_name": "sergeyzh/LaBSE-ru-turbo"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.8350515463917526,
+                "k": 10,
+                "model_name": "deepvk/USER-base"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8553122863978128,
+                "k": 1
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8987675153793575,
+                "k": 3
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9916068580542264
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.753578548644338,
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5622095010252904,
+                "model_name": "mixedbread-ai/mxbai-embed-large-v1",
+                "k": 10,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7007468956482116,
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6022962235133288,
+                "model_name": "avsolatorio/GIST-large-Embedding-v0",
+                "k": 10,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.740798017771702,
+                "model_name": "llmrails/ember-v1",
+                "k": 10,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5793375484164958,
+                "model_name": "llmrails/ember-v1",
+                "k": 10,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7307871952608794,
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5961081681476419,
+                "model_name": "BAAI/bge-large-en-v1.5",
+                "k": 10,
+                "train_head": false
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.5773195876288659,
+                "single_thresh": true
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.7731958762886598
+            }
+        ]
+    }
+}

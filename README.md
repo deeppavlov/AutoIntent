@@ -3,6 +3,8 @@
 ![](assets/classification_pipeline.png)
 
 Планы:
+- прогнать CrossEncoderWithLogreg на всех датасетах
+- реализовать подбор порога как в статье DNNC
 - реализовать метрики для RegExpModule
 - подумать над кешированием запросов к collection (ибо на оптимизации k для knn и dncc можно переиспользовать много запросов)
 - идея для метрики для RegExp:
@@ -14,3 +16,4 @@ backlog:
 - optuna
 - medium results caching
 - logging
+- dataset expansion (LLM, xeger etc)
