@@ -107,11 +107,11 @@ class DataHandler:
         return res
 
 
-def get_sample_utterances(dataset: list[dict]):
+def get_sample_utterances(intent_records: list[dict]):
     """get plain list of all sample utterances and their intent labels"""
-    utterances = [intent["sample_utterances"] for intent in dataset]
+    utterances = [intent["sample_utterances"] for intent in intent_records]
     labels = [
-        [intent["intent_id"]] * len(uts) for intent, uts in zip(dataset, utterances)
+        [intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances)
     ]
 
     utterances = list(it.chain.from_iterable(utterances))
@@ -120,14 +120,14 @@ def get_sample_utterances(dataset: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(dataset: list[dict]):
+def split_sample_utterances(intent_records: list[dict]):
     """
     Return: utterances_train, utterances_test, labels_train, labels_test
 
     TODO: ensure stratified train test splitting (test set must contain all classes)
     """
 
-    utterances, labels = get_sample_utterances(dataset)
+    utterances, labels = get_sample_utterances(intent_records)
     n_classes = len(set(labels))
     splits = train_test_split(
         utterances,
