@@ -11,11 +11,16 @@ class ScoringModule(Module):
         Return
         ---
         - metric calculcated on test set
-        - predicted scores of test set
+        - predicted scores of test set and oos utterances
         """
-        probas = self.predict(data_handler.utterances_test)
-        metric_value = metric_fn(data_handler.labels_test, probas)
-        return metric_value, probas
+        assets = dict(
+            test_scores=self.predict(data_handler.utterances_test),
+            oos_scores=None if len(data_handler.oos_utterances) == 0 else self.predict(data_handler.oos_utterances)
+        )
+
+        metric_value = metric_fn(data_handler.labels_test, assets["test_scores"])
+
+        return metric_value, assets
 
     def predict(self, utterances: list[str]):
         raise NotImplementedError()

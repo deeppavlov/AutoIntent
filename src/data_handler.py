@@ -2,6 +2,7 @@ import itertools as it
 import os
 from pprint import pprint
 
+import numpy as np
 from chromadb import PersistentClient
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from sklearn.model_selection import train_test_split
@@ -13,6 +14,7 @@ class DataHandler:
     ):
         (
             self.n_classes,
+            self.oos_utterances,
             self.utterances_train,
             self.utterances_test,
             self.labels_train,
@@ -23,7 +25,7 @@ class DataHandler:
         self.cache = dict(
             best_assets=dict(
                 retrieval=None,  # str, name of best retriever
-                scoring=None,  # np.ndarray of shape (n_samples, n_classes), from best scorer
+                scoring=dict(test_scores=None, oos_scores=None),  # dict with values of two np.ndarrays of shape (n_samples, n_classes), from best scorer
                 prediction=None,  # np.ndarray of shape (n_samples,), from best predictor
             ),
             metrics=dict(retrieval=[], scoring=[], prediction=[]),
@@ -96,8 +98,11 @@ class DataHandler:
         model_name = self.cache["best_assets"]["retrieval"]
         return self.get_collection(model_name, device)
 
-    def get_best_scores(self):
-        return self.cache["best_assets"]["scoring"]
+    def get_best_test_scores(self):
+        return self.cache["best_assets"]["scoring"]["test_scores"]
+    
+    def get_best_oos_scores(self):
+        return self.cache["best_assets"]["scoring"]["oos_scores"]
 
     def dump_logs(self):
         res = dict(
@@ -128,14 +133,20 @@ def split_sample_utterances(intent_records: list[dict]):
     """
 
     utterances, labels = get_sample_utterances(intent_records)
-    n_classes = len(set(labels))
+    in_domain_mask = np.array(labels) != -1
+
+    in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if is_in_domain]
+    in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask) if is_in_domain]
+    oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if not is_in_domain]
+
+    n_classes = len(set(in_domain_labels))
     splits = train_test_split(
-        utterances,
-        labels,
+        in_domain_utterances,
+        in_domain_labels,
         test_size=0.25,
         random_state=0,
-        stratify=labels,
+        stratify=in_domain_labels,
         shuffle=True,
     )
-    res = [n_classes] + splits
+    res = [n_classes, oos_utterances] + splits
     return res

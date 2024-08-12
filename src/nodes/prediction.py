@@ -5,7 +5,7 @@ from ..metrics import (
     prediction_recall,
     prediction_roc_auc,
 )
-from ..modules import ThresholdPredictor, ArgmaxPredictor
+from ..modules import ThresholdPredictor, ArgmaxPredictor, JinoosPredictor
 from .base import Node
 
 
@@ -20,7 +20,8 @@ class PredictionNode(Node):
 
     modules_available = {
         "threshold": ThresholdPredictor,
-        "argmax": ArgmaxPredictor
+        "argmax": ArgmaxPredictor,
+        "jinoos": JinoosPredictor
     }
 
     node_type = "prediction"

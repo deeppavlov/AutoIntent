@@ -1,0 +1,20 @@
+nodes:
+  - node_type: retrieval
+    metric: retrieval_hit_rate
+    modules:
+      - module_type: vector_db
+        k: [10]
+        model_name:
+          - deepvk/USER-bge-m3
+  - node_type: scoring
+    metric: scoring_roc_auc
+    modules:
+      - module_type: knn
+        k: [3]
+  - node_type: prediction
+    metric: prediction_accuracy
+    modules:
+      - module_type: threshold
+        thresh: [0.5]
+      - module_type: argmax
+      - module_type: jinoos
