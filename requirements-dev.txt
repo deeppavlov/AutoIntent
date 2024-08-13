@@ -2,3 +2,4 @@ pandas
 datasets
 ipywidgets
 sentence-transformers
+xeger

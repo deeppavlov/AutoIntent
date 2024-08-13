@@ -17,7 +17,7 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 def make_report(logs: dict) -> str:
-    nodes = ["retrieval", "scoring", "prediction"]
+    nodes = ["regexp", "retrieval", "scoring", "prediction"]
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes):
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     import yaml
 
     from src import DataHandler
-    from src.nodes import Node, PredictionNode, RetrievalNode, ScoringNode
+    from src.nodes import Node, RegExpNode, PredictionNode, RetrievalNode, ScoringNode
 
     parser = ArgumentParser()
     parser.add_argument(
@@ -69,10 +69,10 @@ if __name__ == "__main__":
         type=str,
         default="",
     )
-    parser.add_argument(
-        "-v",
-        action="store_true",
-    )
+    # parser.add_argument(
+    #     "-v",
+    #     action="store_true",
+    # )
     args = parser.parse_args()
 
     run_name = (
@@ -92,6 +92,7 @@ if __name__ == "__main__":
     data_handler = DataHandler(intent_records, db_dir)
 
     available_nodes = {
+        "regexp": RegExpNode,
         "retrieval": RetrievalNode,
         "scoring": ScoringNode,
         "prediction": PredictionNode,

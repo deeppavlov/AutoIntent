@@ -9,8 +9,8 @@
             "Hello, I am going abroad for a few weeks and would like to know Can I use your card there I would like to pay for purchases in America Do I need to do anything for this",
             "Hello, I would like to ask you one question, I am going on vacation and I need to clarify whether my credit card will work abroad"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "inflate I would like to change my address",
             "Good afternoon, I have changed my place of residence and would be grateful for you to change my official address of your record"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "I cannot open the application and the application does not work Yes Why not listen",
             "I can't log into my account and see the balance of my account"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "How much money can be withdrawn here",
             "how much money can we withdraw at a time from an ATM in France"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "How much money do I have left in my account?",
             "Hello my Balance please"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "and I am calling about a business loan, could you provide me with information about this",
             "I called about a business loan"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,8 +87,8 @@
             "Can you help me with my card",
             "Why did my card stop working and is blocked"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 7,
@@ -100,8 +100,8 @@
             "Tell me how can I put money into my account",
             "Hello, I would like to deposit money into my account. Could you explain to me how this should be done"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 8,
@@ -113,8 +113,8 @@
             "can you give me information repair write-off",
             "I have questions direct debit Please show me my direct debit"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 9,
@@ -126,8 +126,8 @@
             "block my card",
             "Hello I lost my card today I want to block it Thank you"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 10,
@@ -139,8 +139,8 @@
             "I'm trying to pay online they are not asked to enter the SMS code to confirm the payment but I do not receive a contact could you help me with this",
             "Hello, I'm going to make a purchase for a large amount, I need to wait for an SMS code from the bank with confirmation"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 11,
@@ -152,8 +152,8 @@
             "hello I need to clarify How can I open a joint account with my partner what I need to do for this Can I do this by phone or we need to come to the bank in person",
             "Please tell me how to create a joint account"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 12,
@@ -165,8 +165,8 @@
             "Show me information about all my payments for the last week",
             "I want to know my last transactions for today"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 13,
@@ -178,7 +178,7 @@
             "I want to pay the bill",
             "Good afternoon, as far as I know, my credit card payment deadline is right. I would like to take a ride right now"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

@@ -9,8 +9,8 @@
             "Добавьте \"Объединяйтесь и побеждайте\" в мой вечер",
             "Добавить трек в мой Digster Future Hits"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "У меня группа из четырех человек в Японии, и мне нужна бронь в Rimsky-Korsakoffee House на 3 августа.",
             "Пожалуйста, забронируйте столик в ресторане где-нибудь в Мондови, штат Коннектикут."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "каков прогноз, начиная с 1 сентября 2039 года, для более холодных условий в АК",
             "Как холодно в Принстон-Джанкшн"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "играет альбом Música Da Série De Filmes O Hobbit Алекса Отаолы",
             "Играть в Magic Sam из тридцатых"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "Оцените \"Человека-обезьяну\" на 4",
             "Я ставлю The Penalty три звезды"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "показать творческую работу Through the Back Door",
             "Где можно посмотреть телешоу You Make Me Hate Music"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,7 +87,7 @@
             "Найдите время для Trouble for Two за одну минуту в Landmark Theatres",
             "Пожалуйста, покажите мне расписание фильмов, которые идут по соседству."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

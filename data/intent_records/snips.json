@@ -9,8 +9,8 @@
             "add this artist to my this is miguel bosé playlist",
             "add heresy and the hotel choir to the evening acoustic playlist"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "Find me a creole restaurant",
             "book The Fry Bread House for seven in Olive"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "what is the Gearhart forecast",
             "What is the forecast for DE on 9/11/2035"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "play music from 1950",
             "I want to hear some music from Groove Shark"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "Rate The Desert Column 3 out of 6",
             "Rate Lords of the Rim zero stars"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "Find the trailer for Bill Cosby Presents the Cosnarati State of Emergency",
             "help me find the book called Journal of Neuroscience Research"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,7 +87,7 @@
             "what time is The Dungeonmaster playing at AMC Theaters",
             "What time are movies showing around here"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

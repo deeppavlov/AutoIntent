@@ -21,15 +21,25 @@ class DataHandler:
             self.labels_test,
         ) = split_sample_utterances(intent_records)
 
+        self.regexp_patterns = [
+            dict(
+                intent_id=intent["intent_id"],
+                regexp_full_match=intent['regexp_full_match'],
+                regexp_partial_match=intent['regexp_partial_match'],
+            )
+            for intent in intent_records
+        ]
+
         self.client = PersistentClient(path=db_path)
         self.cache = dict(
             best_assets=dict(
+                regexp=None,    # TODO: choose the format
                 retrieval=None,  # str, name of best retriever
                 scoring=dict(test_scores=None, oos_scores=None),  # dict with values of two np.ndarrays of shape (n_samples, n_classes), from best scorer
                 prediction=None,  # np.ndarray of shape (n_samples,), from best predictor
             ),
-            metrics=dict(retrieval=[], scoring=[], prediction=[]),
-            configs=dict(retrieval=[], scoring=[], prediction=[]),
+            metrics=dict(regexp=[], retrieval=[], scoring=[], prediction=[]),
+            configs=dict(regexp=[], retrieval=[], scoring=[], prediction=[]),
         )
 
     def get_collection(self, model_name: str, device="cuda"):

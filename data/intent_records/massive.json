@@ -9,8 +9,8 @@
             "show alarms",
             "do i have an alarm set for morning flight"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "cancel wake up calls for this week",
             "stop wake up calls for this week"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "set an alarm forty minutes from now",
             "set alarm for eight every weekday"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "it is too loud decrease the volume",
             "could you please lower your volume"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "pause for ten seconds",
             "mute"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "show volume settings",
             "need to see volume settings"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,8 +87,8 @@
             "i am unable to hear you can you speak little loud",
             "please speak loud"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 7,
@@ -100,8 +100,8 @@
             "what is the time for jimmy's party",
             "what are the upcoming reminders"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 8,
@@ -113,8 +113,8 @@
             "olly remove stand-up on friday at ten am",
             "remove chat with allan"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 9,
@@ -126,8 +126,8 @@
             "open memo add note about my meeting",
             "reminders"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 10,
@@ -138,8 +138,8 @@
             "olly can i use brown sugar instead of white in peanut butter cookies",
             "what's the easiest and quickest way to cook a turkey"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 11,
@@ -151,8 +151,8 @@
             "tell me how to cook steak",
             "what's needed to make pizza"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 12,
@@ -164,8 +164,8 @@
             "please can i know what time will it be at six p. m. here in australia",
             "can you tell how many hours of difference are between boston and los angeles"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 13,
@@ -177,8 +177,8 @@
             "what's date today",
             "what day is today"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 14,
@@ -190,8 +190,8 @@
             "create new contact",
             "change my mum's email in my phonebook"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 15,
@@ -203,8 +203,8 @@
             "find me all mails from magda with holidays word in the title",
             "are there new emails for me"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 16,
@@ -216,8 +216,8 @@
             "what's his number",
             "tell me the landline number"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 17,
@@ -229,8 +229,8 @@
             "send an email to sarah about brunch today",
             "send email to martha saying last evening was wild"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 18,
@@ -242,8 +242,8 @@
             "morning what's up",
             "hi"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 19,
@@ -255,8 +255,8 @@
             "tell me a joke",
             "alexa tell me a joke"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 20,
@@ -268,8 +268,8 @@
             "i need to have location services on can you check",
             "check the status of my power usage"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 21,
@@ -281,8 +281,8 @@
             "hoover the carpets around",
             "hey start vacuum cleaner robot"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 22,
@@ -294,8 +294,8 @@
             "i fancy some coffee now",
             "yo i need a coffee now"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 23,
@@ -307,8 +307,8 @@
             "olly set lights to twenty percent",
             "set brightness to fifty percent"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 24,
@@ -320,8 +320,8 @@
             "turn down the brightness",
             "reduce the brightness"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 25,
@@ -333,8 +333,8 @@
             "turn the lights off in the bedroom",
             "olly lights off"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 26,
@@ -346,8 +346,8 @@
             "lights out",
             "turn the lights on"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 27,
@@ -359,8 +359,8 @@
             "make the lights brighter",
             "brighten the lamp next to the sofa"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 28,
@@ -372,8 +372,8 @@
             "turn off smart socket",
             "wemo plug socket off"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 29,
@@ -385,8 +385,8 @@
             "turn on the rice cooker socket",
             "turn on the smart charger"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 30,
@@ -398,8 +398,8 @@
             "can you create a new list in the playlist",
             "i need to put together a to-do list for work"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 31,
@@ -411,8 +411,8 @@
             "how many events on my list",
             "what is on my list"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 32,
@@ -424,8 +424,8 @@
             "remove eggs for the shopping list",
             "take eggs off the list"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 33,
@@ -437,8 +437,8 @@
             "do not play this song again",
             "i don't like this song"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 34,
@@ -450,8 +450,8 @@
             "the song you are playing is amazing",
             "this is one of the best songs for me"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 35,
@@ -463,8 +463,8 @@
             "what music is this",
             "tell me the artist of this song"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 36,
@@ -476,8 +476,8 @@
             "repeat album",
             "please lower the shuffle rate of hips don't lie"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 37,
@@ -489,8 +489,8 @@
             "what is the b. b. c.'s latest news",
             "tell me the latest technology news"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 38,
@@ -502,8 +502,8 @@
             "please continue playing odd thomas by dean koontz",
             "i want to finish listening to the book one thousand nine hundred and eighty four from where i left off"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 39,
@@ -515,8 +515,8 @@
             "can we play a game of hangman",
             "play flappy bird"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 40,
@@ -528,8 +528,8 @@
             "start playing music from favorites",
             "please play my best music"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 41,
@@ -541,8 +541,8 @@
             "play my favorite podcast",
             "play next recording"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 42,
@@ -554,8 +554,8 @@
             "play b. b. c. radio",
             "tune in some radio"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 43,
@@ -567,8 +567,8 @@
             "how much is b. p. in u. s. d.",
             "what's the exchange rates"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 44,
@@ -580,8 +580,8 @@
             "what an umbrella means",
             "when can you use word set"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 45,
@@ -593,8 +593,8 @@
             "what creates buttermilk",
             "olly how many stars has swat received on i. m. d. b."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 46,
@@ -606,8 +606,8 @@
             "three times two equals six",
             "four divided by two equals two"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 47,
@@ -619,8 +619,8 @@
             "set notification for news on the stock market",
             "stock exchange rates"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 48,
@@ -632,8 +632,8 @@
             "current events",
             "show me upcoming events in this area"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 49,
@@ -645,8 +645,8 @@
             "which is the best place to visit in this month",
             "where can i get shawarma in this area"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 50,
@@ -658,8 +658,8 @@
             "top ten movies",
             "recommend a movie which is released last friday"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 51,
@@ -671,8 +671,8 @@
             "get the status posted for the following",
             "post that i am going to mcdonalds at manhattan"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 52,
@@ -684,8 +684,8 @@
             "is anyone likes my latest photo",
             "are there any interesting stuff happened today in my twitter"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 53,
@@ -697,8 +697,8 @@
             "order a pizza",
             "order me a byron from deliveroo"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 54,
@@ -710,8 +710,8 @@
             "i want some curry to go any recommendations",
             "i want some curry to go any recommendations olly"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 55,
@@ -723,8 +723,8 @@
             "olly you need to find an alternate route to my destination",
             "how long will it take me to drive to the panic concert tomorrow"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 56,
@@ -736,8 +736,8 @@
             "book me a cab olly",
             "call me a taxi to the airport at five am"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 57,
@@ -749,8 +749,8 @@
             "schedule a journey to las vegas by train",
             "book me a return trip from edinburgh to london by train"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 58,
@@ -762,8 +762,8 @@
             "what is traffic to work now",
             "how is my commute"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 59,
@@ -775,7 +775,7 @@
             "what's this weeks weather",
             "tell me the weather"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

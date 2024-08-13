@@ -9,8 +9,8 @@
             "Добавить e-mail этого человека",
             "Создать новый контакт"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "Это правильно.",
             "Да, это удивительно."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "Слушать аудиокнигу",
             "Пожалуйста, продолжайте играть в \"Странного Томаса\" Дина Кунца."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "Уборка - это хорошо, пыль - так плохо, сделай сейчас свою магическую уборку моего ковра",
             "Холл The Hallway"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "Йо, Олли, мне нужен кофе сейчас",
             "Запустите кофемашину"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "Этого достаточно, отмените это.",
             "Вы можете, пожалуйста, заткнуться."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,8 +87,8 @@
             "Вы можете проверить детали.",
             "Пожалуйста, проверьте детали."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 7,
@@ -100,8 +100,8 @@
             "Какое время 12 часов по восточному времени по тихоокеанскому времени?",
             "Если сейчас полдень в Вирджинии, который час в Калифорнии?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 8,
@@ -113,8 +113,8 @@
             "Добавить яблоки в список покупок",
             "Я также должен купить батареи ААА"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 9,
@@ -126,8 +126,8 @@
             "Я хотел бы, чтобы мой КПК сообщал мне о тенденциях валютных курсов",
             "Каков текущий обменный курс доллара к евро?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 10,
@@ -139,8 +139,8 @@
             "Найдите определение",
             "Что означает зонтик?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 11,
@@ -152,8 +152,8 @@
             "Эта песня на заднем плане раздражает.",
             "Песня не очень хорошая"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 12,
@@ -165,8 +165,8 @@
             "Для меня это не имеет никакого значения.",
             "Я понятия не имею, что выбрать, Олли."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 13,
@@ -178,8 +178,8 @@
             "Текущие события",
             "Что происходит в Нью-Йорке"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 14,
@@ -191,8 +191,8 @@
             "Я не мог этого понять.",
             "Объясните, пожалуйста, еще раз."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 15,
@@ -204,8 +204,8 @@
             "А что же Тона?",
             "А где Тоня?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 16,
@@ -217,8 +217,8 @@
             "Сыграй со мной в шахматы",
             "Сыграй со мной в игру"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 17,
@@ -230,8 +230,8 @@
             "Как у вас дела?",
             "Утро, что там?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 18,
@@ -243,8 +243,8 @@
             "Олли, включи свет на 20 процентов",
             "Установите яркость на 50%"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 19,
@@ -256,8 +256,8 @@
             "Уменьшите яркость.",
             "Уменьшите яркость."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 20,
@@ -269,8 +269,8 @@
             "Олли, выключи свет в спальне",
             "Свет выключен"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 21,
@@ -282,8 +282,8 @@
             "Олли, слишком темно, я даже не вижу своих рук",
             "Зажгите свет на кухне"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 22,
@@ -295,8 +295,8 @@
             "Сделайте комнату ярче",
             "Олли, сделай свет ярче"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 23,
@@ -308,8 +308,8 @@
             "Расскажи мне анекдот.",
             "Разбуди меня."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 24,
@@ -321,8 +321,8 @@
             "Олли, я действительно наслаждаюсь этой песней",
             "Песня, которую вы играете, потрясающая"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 25,
@@ -334,8 +334,8 @@
             "где хорошо поесть дешевую пакистанскую еду",
             "Какое место лучше всего посетить в этом месяце?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 26,
@@ -347,8 +347,8 @@
             "что такое ___ +-х и т.д. ____",
             "Рассчитать ____"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 27,
@@ -360,8 +360,8 @@
             "какой хороший иранский фильм 2016 года",
             "Какой хороший фильм посмотреть прямо сейчас"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 28,
@@ -373,8 +373,8 @@
             "Я хотел бы услышать Queen's Barcelona",
             "Играй мне Барселона от Queen"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 29,
@@ -386,8 +386,8 @@
             "Ваша команда была неправильной.",
             "Вы не правы."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 30,
@@ -399,8 +399,8 @@
             "Могу ли я заказать ужин на вынос из byron's?",
             "Заказать пиццу"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 31,
@@ -412,8 +412,8 @@
             "Слушайте мои новейшие подкасты от Radiolab.",
             "играть мой любимый подкаст"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 32,
@@ -425,8 +425,8 @@
             "Зайдите в социальные сети и опубликуйте следующий статус",
             "Изменить статус в социальных сетях"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 33,
@@ -438,8 +438,8 @@
             "Вы все правильно сделали, большое спасибо.",
             "Спасибо за ответ, Оля."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 34,
@@ -451,8 +451,8 @@
             "Олли, список самых рейтинговых вариантов доставки китайской еды",
             "Я хочу немного карри с собой, какие-нибудь рекомендации, Олли?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 35,
@@ -464,8 +464,8 @@
             "Какой адрес электронной почты у Сильвии?",
             "Какой у него номер?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 36,
@@ -477,8 +477,8 @@
             "Мне нужно включить службы определения местоположения, можете проверить?",
             "Проверить состояние моего энергопотребления"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 37,
@@ -490,8 +490,8 @@
             "Кортана, ты можешь включить Пандору?",
             "Слушать радио BBC"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 38,
@@ -503,8 +503,8 @@
             "Олли, как долго я должен варить яйца?",
             "Какие ингредиенты нужны для томатного супа"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 39,
@@ -516,8 +516,8 @@
             "Удалите будильник, который я только что установил",
             "Снять сигнализацию"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 40,
@@ -529,8 +529,8 @@
             "Скажите мне еще раз, пожалуйста.",
             "Не могли бы вы сказать мне еще один раз, пожалуйста."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 41,
@@ -542,8 +542,8 @@
             "Отправьте письмо тому, с кем поговорить",
             "Отправьте групповое письмо в Lookafter"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 42,
@@ -555,8 +555,8 @@
             "Установите будильник на 12",
             "Установите будильник через 40 минут"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 43,
@@ -568,8 +568,8 @@
             "Save Settings (Сохранить настройки)",
             "Отключить shuffle"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 44,
@@ -581,8 +581,8 @@
             "Каковы некоторые обновления о фондовом рынке.",
             "Что нового на фондовом рынке?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 45,
@@ -594,8 +594,8 @@
             "Я собираюсь в Чайнатаун через полчаса, закажите для меня Uber.",
             "Олли, вызови мне такси в аэропорт в 5 утра"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 46,
@@ -607,8 +607,8 @@
             "Пожалуйста, отмените мой билет на поезд.",
             "Эй, Олли, я хочу сесть на поезд до Манчестера в среду."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 47,
@@ -620,8 +620,8 @@
             "Как сейчас обстоят дела с трафиком",
             "Какой трафик работать сейчас?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 48,
@@ -633,8 +633,8 @@
             "мягче",
             "Уменьшите громкость"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 49,
@@ -646,8 +646,8 @@
             "Мягкий объем.",
             "Пожалуйста, помолчите еще один час"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 50,
@@ -659,8 +659,8 @@
             "Показать настройки громкости",
             "Где находится настройка громкости"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 51,
@@ -672,8 +672,8 @@
             "Я едва слышу тебя, Олли",
             "Увеличить громкость"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 52,
@@ -685,8 +685,8 @@
             "Отключите питание от штепсельной розетки 1.",
             "пожалуйста, выключите розетку моего телефона, когда он будет заряжаться"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 53,
@@ -698,7 +698,7 @@
             "Включите розетку рисоварки",
             "Разрешить мой плагин"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

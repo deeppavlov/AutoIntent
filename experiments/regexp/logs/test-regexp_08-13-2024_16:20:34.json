@@ -1,0 +1,22 @@
+{
+    "metrics": {
+        "regexp": [
+            1.0
+        ],
+        "retrieval": [],
+        "scoring": [],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [
+            {
+                "module_type": "regexp",
+                "metric_name": "regexp_partial_precision",
+                "metric_value": 1.0
+            }
+        ],
+        "retrieval": [],
+        "scoring": [],
+        "prediction": []
+    }
+}

@@ -9,8 +9,8 @@
             "How do I verify my new card?",
             "I tried activating my plug-in and it didn't piece of work"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 1,
@@ -22,8 +22,8 @@
             "Can my children open an account?",
             "How old do I need to be?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 2,
@@ -35,8 +35,8 @@
             "Can I deposit money using Apple Pay?",
             "Can I use google pay for topping -up"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 3,
@@ -48,8 +48,8 @@
             "What ATMs take this card?",
             "Which ATM's can I use to make a withdrawal?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 4,
@@ -61,8 +61,8 @@
             "I can't find the auto-top up option.",
             "Does the auto top-up have any limits?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 5,
@@ -74,8 +74,8 @@
             "I've made a transfer from France two days ago but I was wondering if international transfers take longer to arrive because it hasn't made it yet.",
             "After I transferred money the balance remained the same."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 6,
@@ -87,8 +87,8 @@
             "I deposited cash but it isn't showing up in my account",
             "I put some cash into my account but it's not displaying that on my balance."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 7,
@@ -100,8 +100,8 @@
             "What are the reasons a beneficiary would be denied?",
             "A transfer to my account was denied."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 8,
@@ -113,8 +113,8 @@
             "I made a mistake this morning when I did a transfer. How do I reverse it?",
             "Can I cancel a transaction?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 9,
@@ -126,8 +126,8 @@
             "Can I get a new card with new expiration date in China?",
             "Are there restrictions on new cards in China?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 10,
@@ -139,8 +139,8 @@
             "Can I tell what business will take this card?",
             "Are there businesses that don't accept this card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 11,
@@ -152,8 +152,8 @@
             "Can I track my card while it is in the process of delivery?",
             "How do I know if I will get my card, or if it is lost?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 12,
@@ -165,8 +165,8 @@
             "Help! When will the card arrive at my home?",
             "Can I get my card fast tracked?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 13,
@@ -178,8 +178,8 @@
             "I just got my card.  It's not linked yet--how do I do that?",
             "lost card found, want to put it back in app"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 14,
@@ -191,8 +191,8 @@
             "Can you tell me what the problem with my card is? It was declined at a restaurant today.",
             "How do I fix a broken card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 15,
@@ -204,8 +204,8 @@
             "Tell me why there is a fee for a card payment.",
             "I don't understand why I'm being charged for using my card."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 16,
@@ -217,8 +217,8 @@
             "Help! In the app there is a payment that I don't remember.",
             "I don't understand where this charge came from."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 17,
@@ -230,8 +230,8 @@
             "The exchange rate I was charged for a purchase was not right.",
             "Can you please explain why the exchange rate for the item I bought is wrong?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 18,
@@ -243,8 +243,8 @@
             "My card got trapped inside an ATM, what should I do?",
             "What do I do if I can't get my card out of the ATM?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 19,
@@ -256,8 +256,8 @@
             "I am inquiring about why there was an extra fee charged when I used an ATM.",
             "Why am I being charged extra when I withdrew money?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 20,
@@ -269,8 +269,8 @@
             "I got a notice from my app that I withdrew cash but I don't remember doing so. How do I fix this?",
             "Someone has a copy of my card !! I definitely still have it here but someone just made a 500£ cash withdrawal, HELP!"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 21,
@@ -282,8 +282,8 @@
             "Can I change my PIN at any cash machines?",
             "I need to make my card PIN a different number"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 22,
@@ -295,8 +295,8 @@
             "I don't recognize some transactions.  Is someone else using it?",
             "I just got an email in confirming my purchase with my card. I login to the mobile app on the card and found out there are several purchase were made without me aware of it. Evidently someone had stole my card information and made these fraudulent purchase. I need the transaction to be reverse and have my card suspended."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 23,
@@ -308,8 +308,8 @@
             "My contactless payments don't work.",
             "how many days processing new card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 24,
@@ -321,8 +321,8 @@
             "Please list the countries you support.",
             "Are these cards available in europe?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 25,
@@ -334,8 +334,8 @@
             "Why isn't my card working? I was pumped to use my new card but it keeps getting declined. Help please.",
             "I could not use my card in a store."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 26,
@@ -347,8 +347,8 @@
             "i needed money for a night out with the girls but i was declined, why?",
             "Why was I blocked from withdrawing from the ATM?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 27,
@@ -360,8 +360,8 @@
             "I tried to buy something online yesterday and got a message saying declined. I tried again today and got the same message. What's the problem?",
             "I am having trouble doing a transfer. A \"Decline \" message appears after making the transfer."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 28,
@@ -373,8 +373,8 @@
             "I am seeing in the App a diret debit that its not mine",
             "There is a direct debit payment that I did not make."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 29,
@@ -386,8 +386,8 @@
             "Can I have more disposable cards?",
             "i tried using a virtual card for a hotel but it didn't work, why not"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 30,
@@ -399,8 +399,8 @@
             "I would like to change my name after marriage.",
             "I would like to change my adress"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 31,
@@ -412,8 +412,8 @@
             "Is there any cost to change foreign money to local?",
             "What are the currency exchange fees?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 32,
@@ -425,8 +425,8 @@
             "What foreign exchange rate will I get on weekdays and on the weekends?",
             "What is the exchange looking like?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 33,
@@ -438,8 +438,8 @@
             "Does the app allowing exchanges between USD and GBP",
             "What if I need to use GBP instead of USD?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 34,
@@ -451,8 +451,8 @@
             "Why do I see an extra £1 charge on my statement?",
             "I am inquiring about a $1 charge on my statement."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 35,
@@ -464,8 +464,8 @@
             "Why was I unable to finish this transfer?",
             "I have made 5 attempts to make a very standard survey, yet I can't get it to work. What is the problem? Is there an issue related to your system?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 36,
@@ -477,8 +477,8 @@
             "Is the EUR accepted for exchanges?",
             "Is it okay to hold money in multiple currencies?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 37,
@@ -490,8 +490,8 @@
             "What are the disposable cards for?",
             "I need a disposable virtual card. Please tell me how to order one."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 38,
@@ -503,8 +503,8 @@
             "my pin hasn't arrived in the post! How do I cancel it or get a new one?",
             "Where is the card PIN located?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 39,
@@ -516,8 +516,8 @@
             "I would like open a second card for my daughter, how can you assist me?",
             "Am I gonna be charged for sending out more cards?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 40,
@@ -529,8 +529,8 @@
             "I haven't received my virtual card yet!!",
             "Can you give me a virtual card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 41,
@@ -542,8 +542,8 @@
             "I need to report a stolen card",
             "How do I replace a stolen card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 42,
@@ -555,8 +555,8 @@
             "Someone has stolen my phone, what should I do?",
             "I think I lost my phone.  Is there a way to prevent anyone from getting into my account on it?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 43,
@@ -568,8 +568,8 @@
             "Can I request a card?",
             "Do I have to pay for a physical card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 44,
@@ -581,8 +581,8 @@
             "I can't recall my password.",
             "What should I do if I don't know my password?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 45,
@@ -594,8 +594,8 @@
             "Is there a problem with the payment that I see is still pending?",
             "There is a payment that I made that hasn't gone through yet."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 46,
@@ -607,8 +607,8 @@
             "I tried to get cash out of the ATM but it is taking too long",
             "Why is the cash withdrawal under pending?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 47,
@@ -620,8 +620,8 @@
             "i put money on my card and i dont see it on the balance",
             "I have a top-up that's still pending and wanted to know about it."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 48,
@@ -633,8 +633,8 @@
             "When will my transfer finish pending?",
             "How long do transfers take, mine just says pending?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 49,
@@ -646,8 +646,8 @@
             "Help me unblock my account.  I entered the PIN wrong too many times.",
             "I locked myself out of my account, how do I unblock my PIN?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 50,
@@ -659,8 +659,8 @@
             "I am paid by my employer in GBP; do I need to do anything in the app to indicate this?",
             "How can my friend give me money?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 51,
@@ -672,8 +672,8 @@
             "I requested a refund but am unable to see it in my account. Why is that?",
             "When will my refund come through"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 52,
@@ -685,8 +685,8 @@
             "I want to return an item for a refund can I do that?",
             "Can I request a refund"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 53,
@@ -698,8 +698,8 @@
             "I think my card payment has been reverted",
             "Tell me why my card payment would be reverted."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 54,
@@ -711,8 +711,8 @@
             "Am I able to add money into my account using my American Express?",
             "Can I use my American Express card to add money into my account?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 55,
@@ -724,8 +724,8 @@
             "How do I discontinue my account?",
             "please delete account"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 56,
@@ -737,8 +737,8 @@
             "Is there a charge for SEPA transfers?",
             "Will I be charged a fee for a SEPA transfer?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 57,
@@ -750,8 +750,8 @@
             "Is there a charge for topping up by card?",
             "Which US cards have top up charges?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 58,
@@ -763,8 +763,8 @@
             "Will a cheque suffice?",
             "I can't find any option to top up with a cheque?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 59,
@@ -776,8 +776,8 @@
             "My top-up hasn't gone through, what happened?",
             "My top-up was rejected by an app."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 60,
@@ -789,8 +789,8 @@
             "Can I top-up any amount?",
             "What's the limit to how much I can top up?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 61,
@@ -802,8 +802,8 @@
             "For what reason did my top-up get cancelled?",
             "I think my top up has been reverted"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 62,
@@ -815,8 +815,8 @@
             "I want to transfer money using my credit card.",
             "I tried topping up using my card, but the money is gone?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 63,
@@ -828,8 +828,8 @@
             "My card got charged twice for the same thing!",
             "My husband and I went out for our weekly \"dinner and a movie,\" and it was my turn to pick up the check. Now I see that my card was charged twice. Who should I contact about negating the second charge and getting my card credited?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 64,
@@ -841,8 +841,8 @@
             "I transferred money, why was charged for an extra fee?",
             "When I made a transfer I was charged extra."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 65,
@@ -854,8 +854,8 @@
             "I have an account that is empty of funds. Can I transfer some from another bank?",
             "HOW DO I TRANSFER MONEY FROM MY BANK ACCOUNT?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 66,
@@ -867,8 +867,8 @@
             "How long does it typically take a transfer to go through?  I sent some money to a friend earlier today, and she really needs it.  It still is a pending transfer, even though I sent it a few hours ago.",
             "I have done a transfer within the country the day before yesterday, but it's still not there yet. Can you please check what's going on with that, the account number definitely is the right one, I've checked that already."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 67,
@@ -880,8 +880,8 @@
             "When will the money reach my  account?",
             "How long does it take to get my money"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 68,
@@ -893,8 +893,8 @@
             "I am having some difficulty verifying my id.",
             "I am not able to verify my id. Why?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 69,
@@ -906,8 +906,8 @@
             "How do I verify my identity?",
             "How do I verify my identity online"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 70,
@@ -919,8 +919,8 @@
             "What are the sources for the funds in my account?",
             "need to know where money comes from"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 71,
@@ -932,8 +932,8 @@
             "Tell me about verifying top-up",
             "What is the verification code for my top up card?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 72,
@@ -945,8 +945,8 @@
             "My virtual card is just not going through.",
             "My virtual card isn't working."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 73,
@@ -958,8 +958,8 @@
             "I prefer using Mastercard, can I substitute?",
             "I prefer Mastecard."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 74,
@@ -971,8 +971,8 @@
             "DO you know the reason for the identity check?",
             "I answered so many questions about my identity. Why do you need this info?"
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 75,
@@ -984,8 +984,8 @@
             "Why is my cash request and the amount I received different?",
             "I tried to withdraw $100, all it gave me was $20."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     },
     {
         "intent_id": 76,
@@ -997,7 +997,7 @@
             "I believe a wrong exchange rate was applied towards a cash transaction I made abroad.",
             "When I got my cash, the amount was not what it should have been, based on the exchange rate."
         ],
-        "regexp_for_sampling": [],
-        "regexp_as_rules": []
+        "regexp_full_match": [],
+        "regexp_partial_match": []
     }
 ]

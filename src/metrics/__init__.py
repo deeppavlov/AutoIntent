@@ -20,3 +20,7 @@ from .scoring import (
     scoring_recall,
     scoring_roc_auc,
 )
+from .regexp import (
+    regexp_partial_accuracy,
+    regexp_partial_precision
+)
