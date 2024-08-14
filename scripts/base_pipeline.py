@@ -48,26 +48,31 @@ if __name__ == "__main__":
         "--config-path",
         type=str,
         default="scripts/base_pipeline.assets/example-config.yaml",
+        help="Path to yaml configuration file"
     )
     parser.add_argument(
         "--data-path",
         type=str,
-        default="data/intent_records/banking77.json"
+        default="data/intent_records/banking77.json",
+        help="Path to json file with intent records"
     )
     parser.add_argument(
         "--db-dir",
         type=str,
-        default=""
+        default="",
+        help="Location where to save chroma database file"
     )
     parser.add_argument(
         "--logs-dir",
         type=str,
         default="scripts/base_pipeline.assets/",
+        help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>.json`"
     )
     parser.add_argument(
         "--run-name",
         type=str,
         default="",
+        help="Name of the run prepended to optimization logs filename"
     )
     # parser.add_argument(
     #     "-v",
