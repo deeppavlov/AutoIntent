@@ -1,5 +1,5 @@
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.multioutput import ClassifierChain
+from sklearn.multioutput import MultiOutputClassifier
 
 from .base import DataHandler, ScoringModule
 
@@ -30,7 +30,7 @@ class LinearScorer(ScoringModule):
 
         if self.multilabel:
             base_clf = LogisticRegression()
-            clf = ClassifierChain(base_clf, order="random", random_state=0)
+            clf = MultiOutputClassifier(base_clf)
         else:
             clf = LogisticRegressionCV(cv=3, n_jobs=8)
 
