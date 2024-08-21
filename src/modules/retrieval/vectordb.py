@@ -1,6 +1,12 @@
 from typing import Callable
 
-from ..base import DataHandler
+from chromadb import Collection
+
+from ...data_handler import (
+    DataHandler,
+    multiclass_metadata_as_labels,
+    multilabel_metadata_as_labels,
+)
 from .base import RetrievalModule
 
 
@@ -23,15 +29,7 @@ class VectorDBModule(RetrievalModule):
         - metric calculated on test set
         - name of embedding model used
         """
-        query_res = self.collection.query(
-            query_texts=data_handler.utterances_test,
-            n_results=self.k,
-            include=["metadatas", "documents"],  # one can add "embeddings", "distances"
-        )
-        labels_pred = [
-            [cand["intent_id"] for cand in candidates]
-            for candidates in query_res["metadatas"]
-        ]
+        labels_pred = retrieve_candidates_labels(self.collection, self.k, data_handler.utterances_test)
         metric_value = metric_fn(data_handler.labels_test, labels_pred)
         return metric_value, self.model_name
     
@@ -40,3 +38,22 @@ class VectorDBModule(RetrievalModule):
         model.to(device='cpu')
         del model
         self.collection = None
+
+
+def retrieve_candidates_labels(collection: Collection, k: int, utterances: list[str]) -> list[int] | list[list[int]]:
+    query_res = collection.query(
+        query_texts=utterances,
+        n_results=k,
+        include=["metadatas", "documents"],  # one can add "embeddings", "distances"
+    )
+    if not collection.metadata["multilabel"]:
+        res = [
+            multiclass_metadata_as_labels(candidates)
+            for candidates in query_res["metadatas"]
+        ]
+    else:
+        res = [
+            multilabel_metadata_as_labels(candidates, collection.metadata["n_classes"])
+            for candidates in query_res["metadatas"]
+        ]
+    return res

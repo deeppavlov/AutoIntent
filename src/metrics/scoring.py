@@ -37,7 +37,7 @@ def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> f
     return np.mean(np.log(relevant_scores))
 
 
-def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:
+def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
     Arguments
     ---
@@ -55,16 +55,20 @@ def scoring_roc_auc(labels: list[int], scores: list[list[float]]) -> float:
     labels = np.array(labels)
 
     n_classes = scores.shape[1]
+    if labels.ndim == 1:
+        labels = (labels[:, None] == np.arange(n_classes)[None, :]).astype(int)
 
-    roc_auc_scores = []
-    for k in range(n_classes):
-        binarized_labels = (labels == k).astype(int)
-        roc_auc = roc_auc_score(binarized_labels, scores[:, k])
-        roc_auc_scores.append(roc_auc)
+    return roc_auc_score(labels, scores, average="macro")
 
-    macro_roc_auc = np.mean(roc_auc_scores)
+    # roc_auc_scores = []
+    # for k in range(n_classes):
+    #     binarized_labels = (labels == k).astype(int)
+    #     roc_auc = roc_auc_score(binarized_labels, scores[:, k])
+    #     roc_auc_scores.append(roc_auc)
 
-    return macro_roc_auc
+    # macro_roc_auc = np.mean(roc_auc_scores)
+
+    # return macro_roc_auc
 
 
 def scoring_accuracy(labels: list[int], scores: list[list[float]]) -> float:

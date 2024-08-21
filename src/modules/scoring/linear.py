@@ -2,6 +2,7 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from .base import DataHandler, ScoringModule
+from ...data_handler import multiclass_metadata_as_labels, multilabel_metadata_as_labels
 
 
 class LinearScorer(ScoringModule):
@@ -26,12 +27,13 @@ class LinearScorer(ScoringModule):
         collection = data_handler.get_best_collection()
         dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
-        labels = [dct["intent_id"] for dct in dataset["metadatas"]]
 
         if self.multilabel:
+            labels = multilabel_metadata_as_labels(dataset["metadatas"], collection.metadata["n_classes"])
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
+            labels = multiclass_metadata_as_labels(dataset["metadatas"])
             clf = LogisticRegressionCV(cv=3, n_jobs=8)
 
         clf.fit(features, labels)
@@ -41,7 +43,11 @@ class LinearScorer(ScoringModule):
 
     def predict(self, utterances: list[str]):
         features = self._emb_func(utterances)
-        return self._clf.predict_proba(features)
+        probas = self._clf.predict_proba(features)
+        if self.multilabel:
+            import numpy as np
+            probas = np.stack(probas, axis=1)[..., 1]
+        return probas
 
     def clear_cache(self):
         model = self._emb_func._model

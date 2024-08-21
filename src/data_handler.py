@@ -10,8 +10,10 @@ from sklearn.model_selection import train_test_split
 
 class DataHandler:
     def __init__(
-        self, intent_records: os.PathLike, db_path: os.PathLike = "../data/chroma"
+        self, intent_records: os.PathLike, db_path: os.PathLike = "../data/chroma", multilabel: bool = False
     ):
+        self.multilabel = multilabel
+
         (
             self.n_classes,
             self.oos_utterances,
@@ -19,16 +21,17 @@ class DataHandler:
             self.utterances_test,
             self.labels_train,
             self.labels_test,
-        ) = split_sample_utterances(intent_records)
+        ) = split_sample_utterances(intent_records, multilabel)
 
-        self.regexp_patterns = [
-            dict(
-                intent_id=intent["intent_id"],
-                regexp_full_match=intent['regexp_full_match'],
-                regexp_partial_match=intent['regexp_partial_match'],
-            )
-            for intent in intent_records
-        ]
+        if not multilabel:
+            self.regexp_patterns = [
+                dict(
+                    intent_id=intent["intent_id"],
+                    regexp_full_match=intent['regexp_full_match'],
+                    regexp_partial_match=intent['regexp_partial_match'],
+                )
+                for intent in intent_records
+            ]
 
         self.client = PersistentClient(path=db_path)
         self.cache = dict(
@@ -52,17 +55,23 @@ class DataHandler:
         collection = self.client.get_or_create_collection(
             name=db_name,
             embedding_function=emb_func,
-            metadata={"n_classes": self.n_classes},
+            metadata={"n_classes": self.n_classes, "multilabel": self.multilabel},
         )
         return collection
 
     def create_collection(self, model_name: str, device="cuda"):
         collection = self.get_collection(model_name, device)
         db_name = model_name.replace("/", "_")
+        
+        if self.multilabel:
+            metadatas = multilabel_labels_as_metadata(self.labels_train, self.n_classes)
+        else:
+            metadatas = multiclass_labels_as_metadata(self.labels_train)
+        
         collection.add(
             documents=self.utterances_train,
             ids=[f"{i}-{db_name}" for i in range(len(self.utterances_train))],
-            metadatas=[{"intent_id": lab} for lab in self.labels_train],
+            metadatas=metadatas,
         )
         return collection
 
@@ -135,28 +144,66 @@ def get_sample_utterances(intent_records: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(intent_records: list[dict]):
+def split_sample_utterances(intent_records: list[dict], multilabel: bool):
     """
     Return: utterances_train, utterances_test, labels_train, labels_test
 
     TODO: ensure stratified train test splitting (test set must contain all classes)
     """
 
-    utterances, labels = get_sample_utterances(intent_records)
-    in_domain_mask = np.array(labels) != -1
+    if not multilabel:
+        utterances, labels = get_sample_utterances(intent_records)
+        in_domain_mask = np.array(labels) != -1
 
-    in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if is_in_domain]
-    in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask) if is_in_domain]
-    oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if not is_in_domain]
+        in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if is_in_domain]
+        in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask) if is_in_domain]
+        oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if not is_in_domain]
+        
+        n_classes = len(set(in_domain_labels))
+        splits = train_test_split(
+            in_domain_utterances,
+            in_domain_labels,
+            test_size=0.25,
+            random_state=0,
+            stratify=in_domain_labels,
+            shuffle=True,
+        )
+    else:
+        utterance_records = intent_records
+        utterances = [dct["utterance"] for dct in utterance_records]
+        labels = [dct["labels"] for dct in utterance_records]
 
-    n_classes = len(set(in_domain_labels))
-    splits = train_test_split(
-        in_domain_utterances,
-        in_domain_labels,
-        test_size=0.25,
-        random_state=0,
-        stratify=in_domain_labels,
-        shuffle=True,
-    )
+        n_classes = len(set(it.chain.from_iterable(labels)))
+
+        in_domain_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) > 0]
+        in_domain_labels = [[int(i in lab) for i in range(n_classes)] for lab in labels if len(lab) > 0]    # binary labels
+        oos_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) == 0]
+        
+        splits = train_test_split(
+            in_domain_utterances,
+            in_domain_labels,
+            test_size=0.25,
+            random_state=0,
+            shuffle=True,
+        )
+
+    
     res = [n_classes, oos_utterances] + splits
     return res
+
+
+def multiclass_labels_as_metadata(labels_list: list[int]):
+    return [{"intent_id": lab} for lab in labels_list]
+
+
+def multilabel_labels_as_metadata(labels_list: list[list[int]], n_classes):
+    """labels_list is already in binary format"""
+    return [{str(i): lab for i, lab in enumerate(labs)} for labs in labels_list]
+
+
+def multiclass_metadata_as_labels(metadata: list[dict]):
+    return [dct["intent_id"] for dct in metadata]
+
+
+def multilabel_metadata_as_labels(metadata: list[dict], n_classes):
+    return [[dct[str(i)] for i in range(n_classes)] for dct in metadata]

@@ -77,6 +77,23 @@ def retrieval_hit_rate(
     return hit_count / num_queries
 
 
+def retrieval_hit_rate_multilabel(
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None
+) -> float:
+    """all the labels are binarized"""
+    num_queries = len(query_labels)
+    hit_count = 0
+
+    for i in range(num_queries):
+        query_label = np.array(query_labels[i])
+        candidate_labels = np.sum(candidates_labels[i][:k], axis=0)
+
+        if np.sum(query_label * candidate_labels) > 0:
+            hit_count += 1
+
+    return hit_count / num_queries
+
+
 def retrieval_hit_rate_numpy(
     query_labels: list[int], candidates_labels: list[list[int]], k: int
 ) -> float:

@@ -16,8 +16,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def make_report(logs: dict) -> str:
-    nodes = ["regexp", "retrieval", "scoring", "prediction"]
+def make_report(logs: dict, nodes) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes):
@@ -74,10 +73,10 @@ if __name__ == "__main__":
         default="",
         help="Name of the run prepended to optimization logs filename"
     )
-    # parser.add_argument(
-    #     "-v",
-    #     action="store_true",
-    # )
+    parser.add_argument(
+        "--multilabel",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     run_name = (
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     )
 
     intent_records = json.load(open(args.data_path))
-    data_handler = DataHandler(intent_records, db_dir)
+    data_handler = DataHandler(intent_records, db_dir, args.multilabel)
 
     available_nodes = {
         "regexp": RegExpNode,
@@ -123,4 +122,4 @@ if __name__ == "__main__":
         logs, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
     )
 
-    print(make_report(logs))
+    print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline_config["nodes"]]))

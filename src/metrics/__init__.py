@@ -7,6 +7,7 @@ from .prediction import (
 )
 from .retrieval import (
     retrieval_hit_rate,
+    retrieval_hit_rate_multilabel,
     retrieval_map,
     retrieval_mrr,
     retrieval_ndcg,

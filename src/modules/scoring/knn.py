@@ -1,5 +1,6 @@
 import numpy as np
 
+from ..retrieval.vectordb import retrieve_candidates_labels
 from .base import DataHandler, ScoringModule
 
 
@@ -18,20 +19,12 @@ class KNNScorer(ScoringModule):
         self._n_classes = data_handler.n_classes
 
     def predict(self, utterances: list[str]):
-        query_res = self._collection.query(
-            query_texts=utterances,
-            n_results=self.k,
-            include=["metadatas", "documents"],  # one can add "embeddings", "distances"
-        )
-
-        labels_pred = [
-            [cand["intent_id"] for cand in candidates]
-            for candidates in query_res["metadatas"]
-        ]
-        y = np.array(labels_pred)
-
-        counts = get_counts(y, self._n_classes)
-
+        labels_pred = retrieve_candidates_labels(self._collection, self.k, utterances)
+        labels_pred = np.array(labels_pred)
+        if not self._collection.metadata["multilabel"]:
+            counts = get_counts(labels_pred, self._n_classes)
+        else:
+            counts = get_counts_multilabel(labels_pred)
         return counts / counts.sum(axis=1, keepdims=True)
     
     def clear_cache(self):
@@ -57,3 +50,16 @@ def get_counts(labels, n_classes):
         n_queries, n_classes
     )
     return counts
+
+
+def get_counts_multilabel(labels):
+    """
+    Arguments
+    ---
+    `labels`: np.ndarray of shape (n_samples, n_candidates, n_classes) with binary labels
+
+    Return
+    ---
+    np.ndarray of shape (n_samples, n_classes) with statistics of how many times each class label occured in candidates
+    """
+    return labels.sum(axis=1)

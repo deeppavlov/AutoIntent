@@ -1,5 +1,6 @@
 from ..metrics import (
     retrieval_hit_rate,
+    retrieval_hit_rate_multilabel,
     retrieval_map,
     retrieval_mrr,
     retrieval_ndcg,
@@ -14,6 +15,7 @@ class RetrievalNode(Node):
         "retrieval_map": retrieval_map,
         "retrieval_ndcg": retrieval_ndcg,
         "retrieval_hit_rate": retrieval_hit_rate,
+        "retrieval_hit_rate_multilabel": retrieval_hit_rate_multilabel,
         "retrieval_precision": retrieval_precision,
         "retrieval_mrr": retrieval_mrr,
     }
