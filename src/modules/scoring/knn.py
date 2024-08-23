@@ -25,7 +25,10 @@ class KNNScorer(ScoringModule):
             counts = get_counts(labels_pred, self._n_classes)
         else:
             counts = get_counts_multilabel(labels_pred)
-        return counts / counts.sum(axis=1, keepdims=True)
+        denom = counts.sum(axis=1, keepdims=True)
+        counts = counts.astype(float)
+        np.divide(counts, denom, out=counts, where=denom!=0)    # TODO: fix this workaround because zero count can mean OOS
+        return counts
     
     def clear_cache(self):
         model = self._collection._embedding_function._model

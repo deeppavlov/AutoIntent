@@ -6,6 +6,8 @@ import numpy as np
 from chromadb import PersistentClient
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from sklearn.model_selection import train_test_split
+from skmultilearn.model_selection import IterativeStratification
+from sklearn.utils import indexable, _safe_indexing
 
 
 class DataHandler:
@@ -130,6 +132,21 @@ class DataHandler:
         )
         return res
 
+    def get_prediction_evaluation_data(self):
+        labels = self.labels_test
+        scores = self.get_best_test_scores()
+
+        oos_scores = self.get_best_oos_scores()
+        if oos_scores is not None:
+            if self.multilabel:
+                oos_labels = [[0] * self.n_classes] * len(oos_scores)
+            else:
+                oos_labels = [-1] * len(oos_scores)
+            labels = np.concatenate([labels, oos_labels])
+            scores = np.concatenate([scores, oos_scores])
+
+        return labels, scores
+
 
 def get_sample_utterances(intent_records: list[dict]):
     """get plain list of all sample utterances and their intent labels"""
@@ -179,14 +196,11 @@ def split_sample_utterances(intent_records: list[dict], multilabel: bool):
         in_domain_labels = [[int(i in lab) for i in range(n_classes)] for lab in labels if len(lab) > 0]    # binary labels
         oos_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) == 0]
         
-        splits = train_test_split(
+        splits = multilabel_train_test_split(
             in_domain_utterances,
             in_domain_labels,
             test_size=0.25,
-            random_state=0,
-            shuffle=True,
         )
-
     
     res = [n_classes, oos_utterances] + splits
     return res
@@ -207,3 +221,23 @@ def multiclass_metadata_as_labels(metadata: list[dict]):
 
 def multilabel_metadata_as_labels(metadata: list[dict], n_classes):
     return [[dct[str(i)] for i in range(n_classes)] for dct in metadata]
+
+
+def multilabel_train_test_split(*arrays, stratify=None, test_size=0.25):
+    if stratify is None:
+        stratify = np.array(arrays[-1])
+
+    n_arrays = len(arrays)
+    if n_arrays == 0:
+        raise ValueError("At least one array required as input")
+
+    arrays = indexable(*arrays)
+
+    stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[test_size, 1.0-test_size])
+    train, test = next(stratifier.split(arrays[0], stratify))
+
+    return list(
+        it.chain.from_iterable(
+            (_safe_indexing(a, train), _safe_indexing(a, test)) for a in arrays
+        )
+    )
