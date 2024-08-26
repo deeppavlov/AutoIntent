@@ -202,7 +202,7 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     from datetime import datetime
 
-    from src.data_handler import get_sample_utterances
+    from autointent.data_handler import get_sample_utterances
 
     parser = ArgumentParser()
     parser.add_argument(

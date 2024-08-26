@@ -1,9 +1,5 @@
 def test_neg_cross_entropy():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.scoring import scoring_neg_cross_entropy
+    from autointent.metrics.scoring import scoring_neg_cross_entropy
     import numpy as np
 
     # case 1
@@ -29,11 +25,7 @@ def test_neg_cross_entropy():
 
 
 def test_roc_auc():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.scoring import scoring_roc_auc
+    from autointent.metrics.scoring import scoring_roc_auc
     import numpy as np
 
     # case 1

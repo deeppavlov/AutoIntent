@@ -1,10 +1,6 @@
 def test_knn_get_counts():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
     import numpy as np
-    from src.modules.scoring.knn import get_counts
+    from autointent.modules.scoring.knn import get_counts
 
     # case 1
     labels = np.array([
@@ -46,12 +42,8 @@ def test_knn_get_counts():
 
 
 def test_scoring_get_topk():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
     import numpy as np
-    from src.modules.scoring.base import get_topk
+    from autointent.modules.scoring.base import get_topk
 
     # case 1
     scores = np.array([
@@ -86,12 +78,8 @@ def test_scoring_get_topk():
 
 
 def test_dnnc_build_result():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
     import numpy as np
-    from src.modules.scoring.dnnc import build_result
+    from autointent.modules.scoring.dnnc import build_result
 
     scores = np.array([
         [0.0, 0.0, 0.2],

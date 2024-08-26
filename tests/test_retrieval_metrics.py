@@ -1,9 +1,5 @@
 def test_map():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.retrieval import retrieval_map
+    from autointent.metrics.retrieval import retrieval_map
     import numpy as np
 
     # case 1
@@ -80,11 +76,7 @@ def test_map():
     np.testing.assert_almost_equal(output, ground_truth)
 
 def test_hit_rate():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.retrieval import retrieval_hit_rate
+    from autointent.metrics.retrieval import retrieval_hit_rate
     import numpy as np
 
     # case 1
@@ -146,11 +138,7 @@ def test_hit_rate():
     np.testing.assert_almost_equal(output, ground_truth)
 
 def test_precision():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.retrieval import retrieval_precision
+    from autointent.metrics.retrieval import retrieval_precision
     import numpy as np
 
     # case 1
@@ -201,11 +189,7 @@ def test_precision():
 
 
 def test_ndcg():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.retrieval import retrieval_ndcg
+    from autointent.metrics.retrieval import retrieval_ndcg
     import numpy as np
 
     # case 1
@@ -276,11 +260,7 @@ def test_ndcg():
 
 
 def test_mrr():
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    from src.metrics.retrieval import retrieval_mrr
+    from autointent.metrics.retrieval import retrieval_mrr
     import numpy as np
 
     # case 1

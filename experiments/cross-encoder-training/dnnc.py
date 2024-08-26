@@ -86,7 +86,7 @@ if __name__ == "__main__":
     )
     from torch.utils.data import DataLoader
 
-    from src.data_handler import split_sample_utterances
+    from autointent.data_handler import split_sample_utterances
 
     #### Just some code to print debug information to stdout
     logging.basicConfig(

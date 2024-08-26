@@ -1,6 +1,19 @@
 import json
+import os
+from argparse import ArgumentParser
+from datetime import datetime
 
 import numpy as np
+import yaml
+
+from autointent import DataHandler
+from autointent.nodes import (
+    Node,
+    PredictionNode,
+    RegExpNode,
+    RetrievalNode,
+    ScoringNode,
+)
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -27,21 +40,7 @@ def make_report(logs: dict, nodes) -> str:
     return "\n".join(messages)
 
 
-if __name__ == "__main__":
-    import sys
-
-    sys.path.append("/home/voorhs/repos/AutoIntent")
-
-    import json
-    import os
-    from argparse import ArgumentParser
-    from datetime import datetime
-
-    import yaml
-
-    from src import DataHandler
-    from src.nodes import Node, RegExpNode, PredictionNode, RetrievalNode, ScoringNode
-
+def main():
     parser = ArgumentParser()
     parser.add_argument(
         "--config-path",

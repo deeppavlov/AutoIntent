@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "autointent"
+version = "0.1.0"
+description = "A tool for automatically configuring a text classification pipeline for intent prediction."
+authors = ["voorhs <ilya_alekseev_2016@list.ru>"]
+readme = "README.md"
+packages = [
+    { include = "autointent" },
+]
+include = [
+    { path = "scripts/" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sentence-transformers = "3.0.1"
+chromadb = "0.5.5"
+scikit-learn = "1.5.1"
+scikit-multilearn = "0.2.0"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+datasets = "2.20.0"
+xeger = "0.4.0"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+pytest = "8.3.2"
+
+[tool.poetry.scripts]
+"autointent" = "scripts.base_pipeline:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
