@@ -9,11 +9,27 @@
 3. Scoring: оценка принадлежности каждому из классов
 4. Prediction: предсказание метки класса и детекция out-of-scope примеров
 
+## Установка
+
+Доступна установка пакета из исходников (см. Releases):
+```bash
+pip install autointent-0.1.0a0-py3-none-any.whl
+```
+
+Для разработчиков:
+```bash
+git clone https://github.com/voorhs/AutoIntent.git
+cd AutoIntent
+poetry install --with dev,test
+```
+
 ## Использование
 
-В текущей alpha-версии оптимизацию можно запустить скриптом `scripts/base_pipeline.py`:
+В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
 ```
-usage: base_pipeline.py [-h] [--config-path CONFIG_PATH] [--data-path DATA_PATH] [--db-dir DB_DIR] [--logs-dir LOGS_DIR] [--run-name RUN_NAME]
+usage: autointent [-h] [--config-path CONFIG_PATH] [--data-path DATA_PATH]
+                  [--db-dir DB_DIR] [--logs-dir LOGS_DIR]
+                  [--run-name RUN_NAME] [--multilabel]
 
 options:
   -h, --help            show this help message and exit
@@ -24,6 +40,7 @@ options:
   --db-dir DB_DIR       Location where to save chroma database file
   --logs-dir LOGS_DIR   Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>.json`
   --run-name RUN_NAME   Name of the run prepended to optimization logs filename
+  --multilabel
 ```
 
 Пример файла конфигурации `scripts/base_pipeline.assets/example-config.yaml`. В нем задаются шаги классификации и области поиска гиперпараметров для каждого модуля.
@@ -66,6 +83,10 @@ options:
 - `sample_utterances` список реплик представителей данного класса
 - `regexp_full_match` грамматика, описывающая представителей данного класса (используется затем в связке с `re.fullmatch(pattern, text)`)
 - `regexp_partial_match` грамматика, описывающая только часть представителей данного класса (используется затем в связке с `re.match(pattern, text)`)
+
+### Multilabel
+
+Для решения задачи multilabel классификации, формат данный другой (см. примеры в `data/multi_label_data`).
 
 ## RegExp Node
 
@@ -141,6 +162,7 @@ options:
 
 Retrieval:
 - `retrieval_hit_rate`
+- `retrieval_hit_rate_multilabel`
 - `retrieval_map`
 - `retrieval_mrr`
 - `retrieval_ndcg`
