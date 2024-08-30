@@ -11,16 +11,12 @@ from .base import RetrievalModule
 
 
 class VectorDBModule(RetrievalModule):
-    def __init__(self, k: int, model_name: str, device="cuda"):
+    def __init__(self, k: int, model_name: str):
         self.model_name = model_name
         self.k = k
-        self.device = device
 
     def fit(self, data_handler: DataHandler):
-        self.collection = data_handler.create_collection(
-            self.model_name,
-            device=self.device,
-        )
+        self.collection = data_handler.create_collection(self.model_name)
 
     def score(self, data_handler: DataHandler, metric_fn: Callable) -> tuple[float, str]:
         """

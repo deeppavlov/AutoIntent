@@ -1,3 +1,4 @@
+import importlib.resources as ires
 import json
 import os
 from argparse import ArgumentParser
@@ -7,6 +8,7 @@ import numpy as np
 import yaml
 
 from autointent import DataHandler
+from autointent.cache_utils import get_db_dir
 from autointent.nodes import (
     Node,
     PredictionNode,
@@ -40,30 +42,74 @@ def make_report(logs: dict, nodes) -> str:
     return "\n".join(messages)
 
 
+def load_data(data_path: os.PathLike, multilabel: bool):
+    """load data from the given path or load sample data which is distributed along with the autointent package"""
+    if data_path != "":
+        file = open(data_path)
+    else:
+        data_name = 'dstc3-20shot.json' if multilabel else 'banking77.json'    # TODO add few-shot version of dstc3.json into package
+        file = ires.files('autointent.datafiles').joinpath(data_name).open()
+    return json.load(file)
+
+
+def load_config(config_path: os.PathLike, multilabel: bool):
+    """load config from the given path or load default config which is distributed along with the autointent package"""
+    if config_path != "":
+        file = open(config_path)
+    else:
+        config_name = 'default-multilabel-config.yaml' if multilabel else 'default-multiclass-config.yaml'
+        file = ires.files('autointent.datafiles').joinpath(config_name).open()
+    return yaml.safe_load(file)
+
+
+def dump_logs(logs, logs_dir, run_name: str):
+    if logs_dir == "":
+        logs_dir = os.getcwd()
+
+    if not os.path.exists(logs_dir):
+        os.makedirs(logs_dir)
+
+    logs_path = os.path.join(logs_dir, f"{run_name}.json")
+
+    json.dump(
+        logs, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
+    )
+
+
+def get_run_name(run_name: str, config_path: os.PathLike):
+    if run_name == "":
+        run_name = (
+            "example_run_name"
+            if config_path == ""
+            else os.path.basename(config_path).split('.')[0]
+        )
+    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
+    
+
 def main():
     parser = ArgumentParser()
     parser.add_argument(
         "--config-path",
         type=str,
-        default="scripts/base_pipeline.assets/example-config.yaml",
-        help="Path to yaml configuration file"
+        default="",
+        help="Path to a yaml configuration file that defines the optimization search space. Omit this to use the default configuration."
     )
     parser.add_argument(
         "--data-path",
         type=str,
-        default="data/intent_records/banking77.json",
-        help="Path to json file with intent records"
+        default="",
+        help="Path to a json file with intent records. Omit this to use banking77 data stored within the autointent package."
     )
     parser.add_argument(
         "--db-dir",
         type=str,
         default="",
-        help="Location where to save chroma database file"
+        help="Location where to save chroma database file. Omit to use your system's default cache directory."
     )
     parser.add_argument(
         "--logs-dir",
         type=str,
-        default="scripts/base_pipeline.assets/",
+        default="",
         help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>.json`"
     )
     parser.add_argument(
@@ -76,33 +122,27 @@ def main():
         "--multilabel",
         action="store_true",
     )
+    parser.add_argument(
+       "--device",
+        type=str,
+        default="cuda:0",
+    )
     args = parser.parse_args()
 
-    run_name = (
-        args.run_name
-        if args.run_name != ""
-        else os.path.basename(args.config_path).split('.')[0]
-    )
-    run_name = f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
+    # configure the run and data
+    run_name = get_run_name(args.run_name, args.config_path)
+    db_dir = get_db_dir(args.db_dir, run_name)
+    intent_records = load_data(args.data_path, args.multilabel)
+    data_handler = DataHandler(intent_records, db_path=db_dir, multilabel=args.multilabel, device=args.device)
 
-    db_dir = (
-        args.db_dir
-        if args.db_dir != ""
-        else os.path.join('data', 'chroma', run_name)
-    )
-
-    intent_records = json.load(open(args.data_path))
-    data_handler = DataHandler(intent_records, db_dir, args.multilabel)
-
+    # run optimization
     available_nodes = {
         "regexp": RegExpNode,
         "retrieval": RetrievalNode,
         "scoring": ScoringNode,
         "prediction": PredictionNode,
     }
-
-    pipeline_config = yaml.safe_load(open(args.config_path))
-
+    pipeline_config = load_config(args.config_path, args.multilabel)
     for node_config in pipeline_config["nodes"]:
         node: Node = available_nodes[node_config["node_type"]](
             modules_search_spaces=node_config["modules"], metric=node_config["metric"]
@@ -110,15 +150,7 @@ def main():
         node.fit(data_handler)
         print("fitted!")
 
+    # save results
     logs = data_handler.dump_logs()
-
-    if not os.path.exists(args.logs_dir):
-        os.makedirs(args.logs_dir)
-
-    logs_path = os.path.join(args.logs_dir, f"{run_name}.json")
-
-    json.dump(
-        logs, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
-    )
-
+    dump_logs(logs, args.logs_dir, run_name)
     print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline_config["nodes"]]))

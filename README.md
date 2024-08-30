@@ -198,3 +198,12 @@ Prediction:
 - много TODO в коде
 - поддержка NLI-pretrained кросс-энкодеров
 - теги для группировки интентов (если два интента в топе имеют одинаковый тег, то это источник доп инфы о противоречащих но очень похожих интентах)
+autointent todo:
+- добавить аналог knn scoring только не на основе количества соседей: скор интента = расстояние до ближайшего представителя этого интента
+- интегрировать возможность multilabel тестирования когда предоставлены multiclass данные
+- interactive cli config file creation (like in poetry)
+- добавить типизацию (dataclasses, pydantic, types) для intent records
+- кросс валидация вместо разделения на обучающую и отложенную выборку
+- evaluation on few-shot episodes?
+- control CUDA device
+- solve CUDA out of memory problem for collection.add and collection.query
