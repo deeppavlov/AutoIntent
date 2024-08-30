@@ -43,6 +43,11 @@ options:
   --multilabel
 ```
 
+Следующей командой можно запустить оптимизацию с дефолтным конфигом и дефолтными данными (5-shot banking77 / 20-shot dstc3):
+```bash
+autointent [--multilabel]
+```
+
 Пример файла конфигурации `scripts/base_pipeline.assets/example-config.yaml`. В нем задаются шаги классификации и области поиска гиперпараметров для каждого модуля.
 
 Пример входных данных в директории `data/intent_records`.
