@@ -1,0 +1,18 @@
+nodes:
+  - node_type: retrieval
+    metric: retrieval_hit_rate
+    modules:
+      - module_type: vector_db
+        k: [30]
+        model_name:
+          - deepvk/USER-bge-m3
+  - node_type: scoring
+    metric: scoring_roc_auc
+    modules:
+      - module_type: knn
+        k: [30, 20, 10]
+        weights: [true, false, "uniform", "distance", "closest"]
+  - node_type: prediction
+    metric: prediction_accuracy
+    modules:
+      - module_type: argmax

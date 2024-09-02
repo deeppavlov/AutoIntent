@@ -210,5 +210,5 @@ autointent todo:
 - добавить типизацию (dataclasses, pydantic, types) для intent records
 - кросс валидация вместо разделения на обучающую и отложенную выборку
 - evaluation on few-shot episodes?
-- control CUDA device
+- control CUDA device (add device propagation from base_pipeline.py to each module)
 - solve CUDA out of memory problem for collection.add and collection.query
