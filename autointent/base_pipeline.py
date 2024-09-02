@@ -47,7 +47,7 @@ def load_data(data_path: os.PathLike, multilabel: bool):
     if data_path != "":
         file = open(data_path)
     else:
-        data_name = 'dstc3-20shot.json' if multilabel else 'banking77.json'    # TODO add few-shot version of dstc3.json into package
+        data_name = 'dstc3-20shot.json' if multilabel else 'banking77.json'
         file = ires.files('autointent.datafiles').joinpath(data_name).open()
     return json.load(file)
 
