@@ -4,14 +4,15 @@ from .vector_index import VectorIndex
 
 
 class Context:
-    def __init__(self, intent_records, device, multilabel, db_dir, regex_sampling) -> None:
-        self.data_handler = DataHandler(intent_records, multilabel, regex_sampling)
+    def __init__(self, intent_records, device, multilabel, db_dir, regex_sampling, seed) -> None:
+        self.data_handler = DataHandler(intent_records, multilabel, regex_sampling, seed)
         self.optimization_logs = OptimizationLogs()
         self.vector_index = VectorIndex(db_dir, device, multilabel, self.data_handler.n_classes)
 
         self.device = device
         self.multilabel = multilabel
         self.n_classes = self.data_handler.n_classes
+        self.seed = seed
 
     def get_best_collection(self):
         model_name = self.optimization_logs.get_best_embedder()

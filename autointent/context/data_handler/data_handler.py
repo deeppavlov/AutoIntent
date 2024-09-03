@@ -5,7 +5,7 @@ from .sampling import sample_from_regex
 
 
 class DataHandler:
-    def __init__(self, intent_records: os.PathLike, multilabel: bool, regex_sampling: int = 0):
+    def __init__(self, intent_records: os.PathLike, multilabel: bool, regex_sampling: int = 0, seed: int = 0):
         if regex_sampling > 0:
             sample_from_regex(intent_records, n_shots=regex_sampling)
 
@@ -16,7 +16,7 @@ class DataHandler:
             self.utterances_test,
             self.labels_train,
             self.labels_test,
-        ) = split_sample_utterances(intent_records, multilabel)
+        ) = split_sample_utterances(intent_records, multilabel, seed)
 
         if not multilabel:
             self.regexp_patterns = [

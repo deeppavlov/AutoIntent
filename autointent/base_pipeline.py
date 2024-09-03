@@ -135,6 +135,12 @@ def main():
         default=0,
         help="Number of shots per intent to sample from regular expressions"
     )
+    parser.add_argument(
+       "--seed",
+        type=int,
+        default=0,
+        help="Affects the data partitioning"
+    )
     args = parser.parse_args()
 
     # configure the run and data
@@ -143,7 +149,7 @@ def main():
     intent_records = load_data(args.data_path, args.multilabel)
 
     # create shared objects for a whole pipeline
-    context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling)
+    context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling, args.seed)
 
     # run optimization
     available_nodes = {

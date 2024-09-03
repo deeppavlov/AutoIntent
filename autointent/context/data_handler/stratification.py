@@ -17,7 +17,7 @@ def get_sample_utterances(intent_records: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(intent_records: list[dict], multilabel: bool):
+def split_sample_utterances(intent_records: list[dict], multilabel: bool, seed: int = 0):
     """
     Return: utterances_train, utterances_test, labels_train, labels_test
 
@@ -37,7 +37,7 @@ def split_sample_utterances(intent_records: list[dict], multilabel: bool):
             in_domain_utterances,
             in_domain_labels,
             test_size=0.25,
-            random_state=0,
+            random_state=seed,
             stratify=in_domain_labels,
             shuffle=True,
         )
@@ -62,7 +62,8 @@ def split_sample_utterances(intent_records: list[dict], multilabel: bool):
     return res
 
 
-def multilabel_train_test_split(*arrays, stratify=None, test_size=0.25):
+def multilabel_train_test_split(*arrays, stratify=None, test_size=0.25, seed: int = 0):
+    """TODO test whether this function is not random"""
     if stratify is None:
         stratify = np.array(arrays[-1])
 

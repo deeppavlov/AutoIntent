@@ -14,6 +14,7 @@ scikit-multilearn = "0.2.0"
 pysqlite3-binary = "^0.5.3.post1"
 appdirs = "^1.4.4"
 sre-yield = "^1.2"
+optuna = "^4.0.0"
 
 [tool.poetry.group.dev]
 optional = true
