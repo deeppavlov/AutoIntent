@@ -7,3 +7,4 @@ eurlex.json
 .venv
 dist
 poetry.lock
+.vscode

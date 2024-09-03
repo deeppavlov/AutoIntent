@@ -31,6 +31,10 @@ pytest = "8.3.2"
 "autointent" = "autointent.base_pipeline:main"
 "clear-cache" = "autointent.cache_utils:clear_chroma_cache"
 
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
