@@ -1,32 +1,9 @@
 import itertools as it
-import os
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import _safe_indexing, indexable
 from skmultilearn.model_selection import IterativeStratification
-
-
-class DataHandler:
-    def __init__(self, intent_records: os.PathLike, multilabel: bool):
-        (
-            self.n_classes,
-            self.oos_utterances,
-            self.utterances_train,
-            self.utterances_test,
-            self.labels_train,
-            self.labels_test,
-        ) = split_sample_utterances(intent_records, multilabel)
-
-        if not multilabel:
-            self.regexp_patterns = [
-                dict(
-                    intent_id=intent["intent_id"],
-                    regexp_full_match=intent["regexp_full_match"],
-                    regexp_partial_match=intent["regexp_partial_match"],
-                )
-                for intent in intent_records
-            ]
 
 
 def get_sample_utterances(intent_records: list[dict]):

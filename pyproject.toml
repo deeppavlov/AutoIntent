@@ -13,13 +13,13 @@ scikit-learn = "1.5.1"
 scikit-multilearn = "0.2.0"
 pysqlite3-binary = "^0.5.3.post1"
 appdirs = "^1.4.4"
+sre-yield = "^1.2"
 
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
 datasets = "2.20.0"
-xeger = "0.4.0"
 
 [tool.poetry.group.test]
 optional = true

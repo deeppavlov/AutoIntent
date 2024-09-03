@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 import yaml
 
+from autointent import Context
 from autointent.cache_utils import get_db_dir
 from autointent.nodes import (
     Node,
@@ -15,7 +16,6 @@ from autointent.nodes import (
     RetrievalNode,
     ScoringNode,
 )
-from autointent import Context
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -121,11 +121,19 @@ def main():
     parser.add_argument(
         "--multilabel",
         action="store_true",
+        help="Use this flag if your data is multilabel"
     )
     parser.add_argument(
        "--device",
         type=str,
         default="cuda:0",
+        help="Specify device in torch notation"
+    )
+    parser.add_argument(
+       "--regex-sampling",
+        type=int,
+        default=0,
+        help="Number of shots per intent to sample from regular expressions"
     )
     args = parser.parse_args()
 
@@ -135,7 +143,7 @@ def main():
     intent_records = load_data(args.data_path, args.multilabel)
 
     # create shared objects for a whole pipeline
-    context = Context(intent_records, args.device, args.multilabel, db_dir)
+    context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling)
 
     # run optimization
     available_nodes = {
