@@ -2,28 +2,27 @@ from warnings import warn
 
 import numpy as np
 
-from .base import DataHandler, PredictionModule
+from .base import Context, PredictionModule, get_prediction_evaluation_data, data_has_oos_samples
 
 
 class JinoosPredictor(PredictionModule):
-    default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
+    default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
     def __init__(self, search_space: list[float] = None):
-        self.search_space = (
-            search_space
-            if search_space is not None
-            else self.default_search_space
-        )
+        self.search_space = search_space if search_space is not None else self.default_search_space
 
-    def fit(self, data_handler: DataHandler):
+    def fit(self, context: Context):
         """
         TODO: use dev split instead of test split
         """
 
-        if not self._data_has_oos_samples(data_handler):
-            warn("Your data doesn't contain out-of-scope utterances. Using JinoosPredictor imposes unnecessary computational overhead.")
+        if not data_has_oos_samples(context):
+            warn(
+                "Your data doesn't contain out-of-scope utterances."
+                "Using JinoosPredictor imposes unnecessary computational overhead."
+            )
 
-        y_true, scores = self._get_evaluation_data(data_handler)
+        y_true, scores = get_prediction_evaluation_data(context)
         pred_classes, best_scores = _predict(scores)
 
         metrics_list = []

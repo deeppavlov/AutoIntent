@@ -1,6 +1,6 @@
 def test_knn_get_counts():
     import numpy as np
-    from autointent.modules.scoring.knn import get_counts
+    from autointent.modules.scoring.knn.count_neighbors import get_counts
 
     # case 1
     labels = np.array([

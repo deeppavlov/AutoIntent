@@ -12,6 +12,7 @@ nodes:
     modules:
       - module_type: knn
         k: [3]
+        weights: [false]
       - module_type: linear
         multilabel: [true]
   - node_type: prediction

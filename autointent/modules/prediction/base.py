@@ -2,18 +2,18 @@ from typing import Callable
 
 import numpy as np
 
-from ..base import DataHandler, Module
+from ..base import Context, Module
 
 
 class PredictionModule(Module):
-    def fit(self, data_handler: DataHandler):
+    def fit(self, context: Context):
         raise NotImplementedError()
 
     def predict(self, scores: list[list[float]]):
         raise NotImplementedError()
 
-    def score(self, data_handler: DataHandler, metric_fn: Callable) -> tuple[float, np.ndarray]:
-        labels, scores = data_handler.get_prediction_evaluation_data()
+    def score(self, context: Context, metric_fn: Callable) -> tuple[float, np.ndarray]:
+        labels, scores = get_prediction_evaluation_data(context)
         predictions = self.predict(scores)
         metric_value = metric_fn(labels, predictions)
         return metric_value, predictions
@@ -21,5 +21,22 @@ class PredictionModule(Module):
     def clear_cache(self):
         pass
 
-    def _data_has_oos_samples(self, data_handler: DataHandler):
-        return (data_handler.get_best_oos_scores() is not None)
+
+def data_has_oos_samples(context: Context):
+    return context.optimization_logs.get_best_oos_scores() is not None
+
+
+def get_prediction_evaluation_data(context: Context):
+    labels = context.data_handler.labels_test
+    scores = context.optimization_logs.get_best_test_scores()
+
+    oos_scores = context.optimization_logs.get_best_oos_scores()
+    if oos_scores is not None:
+        if context.multilabel:
+            oos_labels = [[0] * context.n_classes] * len(oos_scores)
+        else:
+            oos_labels = [-1] * len(oos_scores)
+        labels = np.concatenate([labels, oos_labels])
+        scores = np.concatenate([scores, oos_scores])
+
+    return labels, scores

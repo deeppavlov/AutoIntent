@@ -2,7 +2,7 @@ import itertools as it
 
 import numpy as np
 from sentence_transformers import CrossEncoder
-from ..base import DataHandler, ScoringModule
+from ..base import Context, ScoringModule
 from .head_training import CrossEncoderWithLogreg
 
 
@@ -14,20 +14,19 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int, device="cuda", train_head=False):
-        self.model = CrossEncoder(model_name, trust_remote_code=True, device=device)
+    def __init__(self, model_name: str, k: int, train_head=False):
+        self.model_name = model_name
         self.k = k
-        self.device = device
         self.train_head = train_head
 
-    def fit(self, data_handler: DataHandler):
-        self._collection = data_handler.get_best_collection(self.device)
+    def fit(self, context: Context):
+        self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
+        self._collection = context.get_best_collection()
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
-            model.fit(data_handler.utterances_train, data_handler.labels_train)
+            model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
             self.model = model
-        
 
     def predict(self, utterances: list[str]):
         """

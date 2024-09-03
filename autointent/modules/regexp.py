@@ -2,21 +2,15 @@ import re
 from copy import deepcopy
 from typing import Any, Callable
 
-from .base import DataHandler, Module
+from .base import Context, Module
 
 
 class RegExp(Module):
-    def fit(self, data_handler: DataHandler):
-        regexp_patterns = deepcopy(data_handler.regexp_patterns)
+    def fit(self, context: Context):
+        regexp_patterns = deepcopy(context.data_handler.regexp_patterns)
         for dct in regexp_patterns:
-            dct["regexp_full_match"] = [
-                re.compile(ptn, flags=re.IGNORECASE)
-                for ptn in dct["regexp_full_match"]
-            ]
-            dct["regexp_partial_match"] = [
-                re.compile(ptn, flags=re.IGNORECASE)
-                for ptn in dct["regexp_partial_match"]
-            ]
+            dct["regexp_full_match"] = [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_full_match"]]
+            dct["regexp_partial_match"] = [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_partial_match"]]
         self.regexp_patterns = regexp_patterns
 
     def predict(self, utterances: list[str]) -> list[set]:
@@ -36,16 +30,16 @@ class RegExp(Module):
             if self._match(utterance, intent_record)
         )
 
-    def score(self, data_handler: DataHandler, metric_fn: Callable) -> tuple[float, Any]:
+    def score(self, context: Context, metric_fn: Callable) -> tuple[float, Any]:
         # TODO add parameter to a whole pipeline (or just to regexp module): whether or not to omit utterances on next stages if they were detected with regexp module
         assets = dict(
-            test_matches=self.predict(data_handler.utterances_test),
+            test_matches=self.predict(context.data_handler.utterances_test),
             oos_matches=None
-            if len(data_handler.oos_utterances) == 0
-            else self.predict(data_handler.oos_utterances),
+            if len(context.data_handler.oos_utterances) == 0
+            else self.predict(context.data_handler.oos_utterances),
         )
 
-        metric_value = metric_fn(data_handler.labels_test, assets["test_matches"])
+        metric_value = metric_fn(context.data_handler.labels_test, assets["test_matches"])
 
         return metric_value, assets
 

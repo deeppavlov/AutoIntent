@@ -5,7 +5,7 @@ from typing import Callable
 
 import torch
 
-from ..data_handler import DataHandler
+from ..context import Context
 from ..modules import Module
 
 
@@ -22,16 +22,16 @@ class Node:
         self.metric_name = metric
         self.verbose = False
 
-    def fit(self, data_handler: DataHandler):
+    def fit(self, context: Context):
         for search_space in deepcopy(self.modules_search_spaces):
             module_type = search_space.pop("module_type")
             for module_config in it.product(*search_space.values()):
                 module_config = dict(zip(search_space.keys(), module_config))
                 module: Module = self.modules_available[module_type](**module_config)
                 metric, assets = module.fit_score(
-                    data_handler, self.metrics_available[self.metric_name]
+                    context, self.metrics_available[self.metric_name]
                 )
-                data_handler.log_module_optimization(
+                context.optimization_logs.log_module_optimization(
                     self.node_type,
                     module_type,
                     module_config,

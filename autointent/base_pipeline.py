@@ -7,7 +7,6 @@ from datetime import datetime
 import numpy as np
 import yaml
 
-from autointent import DataHandler
 from autointent.cache_utils import get_db_dir
 from autointent.nodes import (
     Node,
@@ -16,6 +15,7 @@ from autointent.nodes import (
     RetrievalNode,
     ScoringNode,
 )
+from autointent import Context
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -133,7 +133,9 @@ def main():
     run_name = get_run_name(args.run_name, args.config_path)
     db_dir = get_db_dir(args.db_dir, run_name)
     intent_records = load_data(args.data_path, args.multilabel)
-    data_handler = DataHandler(intent_records, db_path=db_dir, multilabel=args.multilabel, device=args.device)
+
+    # create shared objects for a whole pipeline
+    context = Context(intent_records, args.device, args.multilabel, db_dir)
 
     # run optimization
     available_nodes = {
@@ -147,10 +149,10 @@ def main():
         node: Node = available_nodes[node_config["node_type"]](
             modules_search_spaces=node_config["modules"], metric=node_config["metric"]
         )
-        node.fit(data_handler)
+        node.fit(context)
         print("fitted!")
 
     # save results
-    logs = data_handler.dump_logs()
+    logs = context.optimization_logs.dump_logs()
     dump_logs(logs, args.logs_dir, run_name)
     print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline_config["nodes"]]))

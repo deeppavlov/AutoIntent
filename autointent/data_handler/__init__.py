@@ -1,2 +1,0 @@
-from .main import DataHandler
-from .stratified_splitting import multiclass_metadata_as_labels, multilabel_metadata_as_labels
