@@ -5,13 +5,15 @@ import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
-from .base import Context, PredictionModule, data_has_oos_samples
+from .base import Context, PredictionModule, apply_tags, data_has_oos_samples
 
 
 class TunablePredictor(PredictionModule):
     """this one is intened to use for multi label classification"""
 
     def fit(self, context: Context):
+        self.tags = context.data_handler.tags
+
         if not data_has_oos_samples(context):
             warn(
                 "Your data doesn't contain out-of-scope utterances."
@@ -27,7 +29,10 @@ class TunablePredictor(PredictionModule):
         self.thresh = thresh_optimizer.best_thresholds
 
     def predict(self, scores: list[list[float]]):
-        return (scores > self.thresh[None, :]).astype(int)
+        pred_classes = (scores > self.thresh[None, :]).astype(int)
+        if self.tags:
+            pred_classes = apply_tags(pred_classes, scores, self.tags)
+        return pred_classes
 
 
 class ThreshOptimizer:

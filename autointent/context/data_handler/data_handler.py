@@ -1,7 +1,8 @@
 import os
 
-from .stratification import split_sample_utterances
 from .sampling import sample_from_regex
+from .stratification import split_sample_utterances
+from .tags import collect_tags
 
 
 class DataHandler:
@@ -27,3 +28,5 @@ class DataHandler:
                 )
                 for intent in intent_records
             ]
+
+        self.tags = collect_tags(intent_records)

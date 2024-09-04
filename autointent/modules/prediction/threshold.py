@@ -2,15 +2,17 @@ from warnings import warn
 
 import numpy as np
 
-from .base import Context, PredictionModule, data_has_oos_samples
+from .base import Context, PredictionModule, data_has_oos_samples, apply_tags
 
 
 class ThresholdPredictor(PredictionModule):
-    def __init__(self, thresh: float, multilabel: bool = False):
+    def __init__(self, thresh: float):
         self.thresh = thresh
-        self.multilabel = multilabel
 
     def fit(self, context: Context):
+        self.multilabel = context.multilabel
+        self.tags = context.data_handler.tags
+
         if data_has_oos_samples(context):
             warn(
                 "Your data doesn't contain out-of-scope utterances."
@@ -24,4 +26,6 @@ class ThresholdPredictor(PredictionModule):
             pred_classes[best_scores < self.thresh] = -1  # out of scope
         else:
             pred_classes = (scores >= self.thresh).astype(int)
+            if self.tags:
+                pred_classes = apply_tags(pred_classes, scores, self.tags)
         return pred_classes
