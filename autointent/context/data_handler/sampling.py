@@ -24,10 +24,11 @@ def generate_from_template(template, n):
     return res
 
 
-def generate_from_templates(patterns: list[str], shots_per_pattern: list[int]):
+def generate_from_templates(patterns: list[str], n_shots: int):
+    shots_per_pattern = distribute_shots(len(patterns), n_shots)
     res = []
-    for pattern, n_shots in zip(patterns, shots_per_pattern):
-        new_samples = generate_from_template(pattern, n_shots)
+    for pattern, n in zip(patterns, shots_per_pattern):
+        new_samples = generate_from_template(pattern, n)
         res.extend(new_samples)
     return res
 
@@ -35,7 +36,5 @@ def generate_from_templates(patterns: list[str], shots_per_pattern: list[int]):
 def sample_from_regex(intent_records: list[dict], n_shots, seed=0):
     random.seed(seed)
     for intent in intent_records:
-        n_patterns = len(intent["regexp_full_match"])
-        shots_per_pattern = distribute_shots(n_patterns, n_shots)
-        new_samples = generate_from_templates(intent["regexp_full_match"], shots_per_pattern)
+        new_samples = generate_from_templates(intent["regexp_full_match"], n_shots)
         intent["sample_utterances"].extend(new_samples)

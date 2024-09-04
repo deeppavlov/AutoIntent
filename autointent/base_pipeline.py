@@ -45,20 +45,22 @@ def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
 
 def load_data(data_path: os.PathLike, multilabel: bool):
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path != "":
-        file = open(data_path)
-    else:
+    if data_path == "default":
         data_name = 'dstc3-20shot.json' if multilabel else 'banking77.json'
         file = ires.files('autointent.datafiles').joinpath(data_name).open()
+    elif data_path != "":
+        file = open(data_path)
+    else:
+        return []
     return json.load(file)
 
 
-def load_config(config_path: os.PathLike, multilabel: bool):
+def load_config(config_path: os.PathLike, mode: str):
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
         file = open(config_path)
     else:
-        config_name = 'default-multilabel-config.yaml' if multilabel else 'default-multiclass-config.yaml'
+        config_name = 'default-multilabel-config.yaml' if mode != "multiclass" else 'default-multiclass-config.yaml'
         file = ires.files('autointent.datafiles').joinpath(config_name).open()
     return yaml.safe_load(file)
 
@@ -95,9 +97,9 @@ class Pipeline:
         "prediction": PredictionNode,
     }
 
-    def __init__(self, config_path: os.PathLike, multilabel: bool, verbose: bool):
+    def __init__(self, config_path: os.PathLike, mode: str, verbose: bool):
         # TODO add config validation
-        self.config = load_config(config_path, multilabel)
+        self.config = load_config(config_path, mode)
         self.verbose = verbose
 
     def optimize(self, context: Context):
@@ -119,11 +121,18 @@ def main():
              "Omit this to use the default configuration."
     )
     parser.add_argument(
-        "--data-path",
+        "--multiclass-path",
         type=str,
         default="",
         help="Path to a json file with intent records."
-             "Omit this to use banking77 data stored within the autointent package."
+             "Set to \"default\" to use banking77 data stored within the autointent package."
+    )
+    parser.add_argument(
+        "--multilabel-path",
+        type=str,
+        default="",
+        help="Path to a json file with utterance records."
+             "Set to \"default\" to use dstc3 data stored within the autointent package."
     )
     parser.add_argument(
         "--db-dir",
@@ -144,9 +153,10 @@ def main():
         help="Name of the run prepended to optimization logs filename"
     )
     parser.add_argument(
-        "--multilabel",
-        action="store_true",
-        help="Use this flag if your data is multilabel"
+        "--mode",
+        choices=["multiclass", "multilabel", "multiclass_as_multilabel"],
+        default="multiclass",
+        help="Evaluation mode. This parameter must be consistent with provided data."
     )
     parser.add_argument(
        "--device",
@@ -158,7 +168,8 @@ def main():
        "--regex-sampling",
         type=int,
         default=0,
-        help="Number of shots per intent to sample from regular expressions"
+        help="Number of shots per intent to sample from regular expressions."
+             "This option extends sample utterances within multiclass intent records."
     )
     parser.add_argument(
        "--seed",
@@ -171,18 +182,34 @@ def main():
         action="store_true",
         help="Print to console during optimization"
     )
+    parser.add_argument(
+        "--multilabel-generation-config",
+        type=str,
+        default="",
+        help="Config string like \"[20, 40, 20, 10]\" means 20 one-label examples,"
+             "40 two-label examples, 20 three-label examples, 10 four-label examples."
+             "This option extends multilabel utterance records."
+    )
     args = parser.parse_args()
 
     # configure the run and data
     run_name = get_run_name(args.run_name, args.config_path)
     db_dir = get_db_dir(args.db_dir, run_name)
-    intent_records = load_data(args.data_path, args.multilabel)
 
     # create shared objects for a whole pipeline
-    context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling, args.seed)
+    context = Context(
+        load_data(args.multiclass_path, multilabel=False),
+        load_data(args.multilabel_path, multilabel=True),
+        args.device,
+        args.mode,
+        args.multilabel_generation_config,
+        db_dir,
+        args.regex_sampling,
+        args.seed
+    )
 
     # run optimization
-    pipeline = Pipeline(args.config_path, args.multilabel, args.verbose)
+    pipeline = Pipeline(args.config_path, args.mode, args.verbose)
     pipeline.optimize(context)
 
     # save results

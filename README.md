@@ -27,37 +27,62 @@ poetry install --with dev,test
 
 В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
 ```
-usage: autointent [-h] [--config-path CONFIG_PATH] [--data-path DATA_PATH]
-                  [--db-dir DB_DIR] [--logs-dir LOGS_DIR]
-                  [--run-name RUN_NAME] [--multilabel] [--device DEVICE]
-                  [--regex-sampling REGEX_SAMPLING]
+usage: autointent [-h] [--config-path CONFIG_PATH]
+                  [--multiclass-path MULTICLASS_PATH]
+                  [--multilabel-path MULTILABEL_PATH] [--db-dir DB_DIR]
+                  [--logs-dir LOGS_DIR] [--run-name RUN_NAME]
+                  [--mode {multiclass,multilabel,multiclass_as_multilabel}]
+                  [--device DEVICE] [--regex-sampling REGEX_SAMPLING]
+                  [--seed SEED] [--verbose]
+                  [--multilabel-generation-config MULTILABEL_GENERATION_CONFIG]
 
 options:
   -h, --help            show this help message and exit
   --config-path CONFIG_PATH
                         Path to a yaml configuration file that defines the
-                        optimization search space. Omit this to use the
-                        default configuration.
-  --data-path DATA_PATH
-                        Path to a json file with intent records. Omit this to
-                        use banking77 data stored within the autointent
-                        package.
+                        optimization search space.Omit this to use the default
+                        configuration.
+  --multiclass-path MULTICLASS_PATH
+                        Path to a json file with intent records.Set to
+                        "default" to use banking77 data stored within the
+                        autointent package.
+  --multilabel-path MULTILABEL_PATH
+                        Path to a json file with utterance records.Set to
+                        "default" to use dstc3 data stored within the
+                        autointent package.
   --db-dir DB_DIR       Location where to save chroma database file. Omit to
                         use your system's default cache directory.
   --logs-dir LOGS_DIR   Location where to save optimization logs that will be
                         saved as `<logs_dir>/<run_name>_<cur_datetime>.json`
   --run-name RUN_NAME   Name of the run prepended to optimization logs
                         filename
-  --multilabel          Use this flag if your data is multilabel
+  --mode {multiclass,multilabel,multiclass_as_multilabel}
+                        Evaluation mode. This parameter must be consistent
+                        with provided data.
   --device DEVICE       Specify device in torch notation
   --regex-sampling REGEX_SAMPLING
                         Number of shots per intent to sample from regular
                         expressions
+  --seed SEED           Affects the data partitioning
+  --verbose             Print to console during optimization
+  --multilabel-generation-config MULTILABEL_GENERATION_CONFIG
+                        Config string like "[20, 40, 20, 10]" means 20 one-
+                        label examples,40 two-label examples, 20 three-label
+                        examples, 10 four-label examples
 ```
 
-Следующей командой можно запустить оптимизацию с дефолтным конфигом и дефолтными данными (5-shot banking77 / 20-shot dstc3):
+Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
+
+Примеры использования:
 ```bash
-autointent [--multilabel]
+autointent --mode multiclass --multiclass-path default
+autointent --mode multilabel --multilabel-path default
+autointent --multiclass-path data/intent_records/ac_robotic_new.json \
+        --mode multiclass_as_multilabel \
+        --logs-dir experiments/multiclass_as_multilabel/ \
+        --run-name robotics_new_testing \
+        --regex-sampling 10 \
+        --multilabel-generation-config "[0, 4000, 1000]"
 ```
 
 Пример входных данных в директории `data/intent_records`.

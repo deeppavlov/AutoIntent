@@ -1,0 +1,50 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.991304347826087
+        ],
+        "scoring": [
+            0.9805315214839756,
+            0.9777642134239921
+        ],
+        "prediction": [
+            0.9884057971014493
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate_multilabel",
+                "metric_value": 0.991304347826087,
+                "k": 10,
+                "model_name": "deepvk/USER-bge-m3"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9805315214839756,
+                "k": 3,
+                "weights": false
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9777642134239921,
+                "multilabel": true
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.9884057971014493,
+                "thresh": 0.5
+            }
+        ]
+    }
+}
