@@ -3,6 +3,7 @@ import json
 import os
 from argparse import ArgumentParser
 from datetime import datetime
+from typing import Any
 
 import numpy as np
 import yaml
@@ -31,7 +32,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def make_report(logs: dict, nodes) -> str:
+def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes):
@@ -62,7 +63,7 @@ def load_config(config_path: os.PathLike, multilabel: bool):
     return yaml.safe_load(file)
 
 
-def dump_logs(logs, logs_dir, run_name: str):
+def dump_logs(logs: dict[str, Any], logs_dir: os.PathLike, run_name: str):
     if logs_dir == "":
         logs_dir = os.getcwd()
 
@@ -86,19 +87,42 @@ def get_run_name(run_name: str, config_path: os.PathLike):
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
     
 
+class Pipeline:
+    available_nodes = {
+        "regexp": RegExpNode,
+        "retrieval": RetrievalNode,
+        "scoring": ScoringNode,
+        "prediction": PredictionNode,
+    }
+
+    def __init__(self, config_path: os.PathLike, multilabel: bool):
+        # TODO add config validation
+        self.config = load_config(config_path, multilabel)
+
+    def optimize(self, context: Context):
+        for node_config in self.config["nodes"]:
+            node: Node = self.available_nodes[node_config["node_type"]](
+                modules_search_spaces=node_config["modules"], metric=node_config["metric"]
+            )
+            node.fit(context)
+            print("fitted!")
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument(
         "--config-path",
         type=str,
         default="",
-        help="Path to a yaml configuration file that defines the optimization search space. Omit this to use the default configuration."
+        help="Path to a yaml configuration file that defines the optimization search space."
+             "Omit this to use the default configuration."
     )
     parser.add_argument(
         "--data-path",
         type=str,
         default="",
-        help="Path to a json file with intent records. Omit this to use banking77 data stored within the autointent package."
+        help="Path to a json file with intent records."
+             "Omit this to use banking77 data stored within the autointent package."
     )
     parser.add_argument(
         "--db-dir",
@@ -152,21 +176,10 @@ def main():
     context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling, args.seed)
 
     # run optimization
-    available_nodes = {
-        "regexp": RegExpNode,
-        "retrieval": RetrievalNode,
-        "scoring": ScoringNode,
-        "prediction": PredictionNode,
-    }
-    pipeline_config = load_config(args.config_path, args.multilabel)
-    for node_config in pipeline_config["nodes"]:
-        node: Node = available_nodes[node_config["node_type"]](
-            modules_search_spaces=node_config["modules"], metric=node_config["metric"]
-        )
-        node.fit(context)
-        print("fitted!")
+    pipeline = Pipeline(args.config_path, args.multilabel)
+    pipeline.optimize(context)
 
     # save results
     logs = context.optimization_logs.dump_logs()
     dump_logs(logs, args.logs_dir, run_name)
-    print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline_config["nodes"]]))
+    print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline.config["nodes"]]))

@@ -75,3 +75,17 @@ def clear_chroma_cache():
         shutil.rmtree(cache_dirs)
         chroma_config.cache_directories.remove(cache_dirs)
     write_chroma_config(chroma_config)
+
+
+def clear_specific_cache(directory: str) -> None:
+    """TODO test this code"""
+    chroma_config = read_chroma_config()
+    if directory in chroma_config.cache_directories:
+        try:
+            shutil.rmtree(directory)
+            chroma_config.cache_directories.remove(directory)
+            write_chroma_config(chroma_config)
+        except OSError as e:
+            print(f"Error removing cache directory {directory}: {e}")
+    else:
+        print(f"Directory {directory} not found in cache")

@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import Callable
 
 import numpy as np
@@ -6,11 +7,13 @@ from ..base import Context, Module
 
 
 class PredictionModule(Module):
+    @abstractmethod
     def fit(self, context: Context):
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def predict(self, scores: list[list[float]]):
-        raise NotImplementedError()
+        pass
 
     def score(self, context: Context, metric_fn: Callable) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)

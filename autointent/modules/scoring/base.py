@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import Callable
 
 import numpy as np
@@ -22,8 +23,9 @@ class ScoringModule(Module):
 
         return metric_value, assets
 
+    @abstractmethod
     def predict(self, utterances: list[str]):
-        raise NotImplementedError()
+        pass
 
     def predict_topk(self, utterances: list[str], k=3):
         scores = self.predict(utterances)
