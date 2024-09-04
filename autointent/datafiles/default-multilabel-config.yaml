@@ -20,4 +20,3 @@ nodes:
     modules:
       - module_type: threshold
         thresh: [0.5]
-        multilabel: [true]

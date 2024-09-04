@@ -20,7 +20,7 @@ class Node:
         """
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
-        self.verbose = False
+        self.verbose = verbose
 
     def fit(self, context: Context):
         for search_space in deepcopy(self.modules_search_spaces):

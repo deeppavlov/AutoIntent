@@ -95,14 +95,15 @@ class Pipeline:
         "prediction": PredictionNode,
     }
 
-    def __init__(self, config_path: os.PathLike, multilabel: bool):
+    def __init__(self, config_path: os.PathLike, multilabel: bool, verbose: bool):
         # TODO add config validation
         self.config = load_config(config_path, multilabel)
+        self.verbose = verbose
 
     def optimize(self, context: Context):
         for node_config in self.config["nodes"]:
             node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"]
+                modules_search_spaces=node_config["modules"], metric=node_config["metric"], verbose=self.verbose
             )
             node.fit(context)
             print("fitted!")
@@ -165,6 +166,11 @@ def main():
         default=0,
         help="Affects the data partitioning"
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print to console during optimization"
+    )
     args = parser.parse_args()
 
     # configure the run and data
@@ -176,7 +182,7 @@ def main():
     context = Context(intent_records, args.device, args.multilabel, db_dir, args.regex_sampling, args.seed)
 
     # run optimization
-    pipeline = Pipeline(args.config_path, args.multilabel)
+    pipeline = Pipeline(args.config_path, args.multilabel, args.verbose)
     pipeline.optimize(context)
 
     # save results
