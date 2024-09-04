@@ -12,14 +12,16 @@ class Module(ABC):
     @abstractmethod
     def score(self, context: Context, metric_fn: Callable) -> tuple[float, Any]:
         """
-        calculates metric on test set and returns metric
-        and useful assets that represent intermediate data
+        calculates metric on test set and returns metric value
         """
         pass
 
-    def fit_score(self, context: Context, metric_fn: Callable) -> tuple[float, Any]:
-        self.fit(context)
-        return self.score(context, metric_fn)
+    @abstractmethod
+    def get_assets(self, context: Context):
+        """
+        return useful assets that represent intermediate data into context
+        """
+        pass
 
     @abstractmethod
     def clear_cache(self):

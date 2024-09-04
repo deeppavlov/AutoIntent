@@ -28,14 +28,14 @@ class Node:
             for module_config in it.product(*search_space.values()):
                 module_config = dict(zip(search_space.keys(), module_config))
                 module: Module = self.modules_available[module_type](**module_config)
-                metric, assets = module.fit_score(
-                    context, self.metrics_available[self.metric_name]
-                )
+                module.fit(context)
+                metric_value = module.score(context, self.metrics_available[self.metric_name])
+                assets = module.get_assets(context)
                 context.optimization_logs.log_module_optimization(
                     self.node_type,
                     module_type,
                     module_config,
-                    metric,
+                    metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                     self.verbose

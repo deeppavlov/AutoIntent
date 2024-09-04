@@ -18,9 +18,12 @@ class PredictionModule(Module):
 
     def score(self, context: Context, metric_fn: Callable) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)
-        predictions = self.predict(scores)
-        metric_value = metric_fn(labels, predictions)
-        return metric_value, predictions
+        self._predictions = self.predict(scores)
+        metric_value = metric_fn(labels, self._predictions)
+        return metric_value
+    
+    def get_assets(self, context: Context = None):
+        return self._predictions
 
     def clear_cache(self):
         pass

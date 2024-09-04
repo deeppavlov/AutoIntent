@@ -21,15 +21,12 @@ class VectorDBModule(RetrievalModule):
         self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
 
     def score(self, context: Context, metric_fn: Callable) -> tuple[float, str]:
-        """
-        Return
-        ---
-        - metric calculated on test set
-        - name of embedding model used
-        """
         labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
         metric_value = metric_fn(context.data_handler.labels_test, labels_pred)
-        return metric_value, self.model_name
+        return metric_value
+    
+    def get_assets(self, context: Context = None):
+        return self.model_name
 
     def clear_cache(self):
         model = self.collection._embedding_function._model
