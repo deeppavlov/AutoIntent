@@ -30,3 +30,6 @@ class DataHandler:
             ]
 
         self.tags = collect_tags(intent_records)
+
+    def has_oos_samples(self):
+        return len(self.oos_utterances) > 0

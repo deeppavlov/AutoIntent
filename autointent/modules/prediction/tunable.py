@@ -5,7 +5,7 @@ import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
-from .base import Context, PredictionModule, apply_tags, data_has_oos_samples
+from .base import Context, PredictionModule, apply_tags
 
 
 class TunablePredictor(PredictionModule):
@@ -14,7 +14,7 @@ class TunablePredictor(PredictionModule):
     def fit(self, context: Context):
         self.tags = context.data_handler.tags
 
-        if not data_has_oos_samples(context):
+        if not context.data_handler.has_oos_samples():
             warn(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using TunablePredictor imposes unnecessary computational overhead."

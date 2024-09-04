@@ -2,7 +2,7 @@ from warnings import warn
 
 import numpy as np
 
-from .base import Context, PredictionModule, get_prediction_evaluation_data, data_has_oos_samples
+from .base import Context, PredictionModule, get_prediction_evaluation_data
 
 
 class JinoosPredictor(PredictionModule):
@@ -16,7 +16,7 @@ class JinoosPredictor(PredictionModule):
         TODO: use dev split instead of test split
         """
 
-        if not data_has_oos_samples(context):
+        if not context.data_handler.has_oos_samples():
             warn(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using JinoosPredictor imposes unnecessary computational overhead."

@@ -2,7 +2,7 @@ from warnings import warn
 
 import numpy as np
 
-from .base import Context, PredictionModule, data_has_oos_samples, apply_tags
+from .base import Context, PredictionModule, apply_tags
 
 
 class ThresholdPredictor(PredictionModule):
@@ -13,7 +13,7 @@ class ThresholdPredictor(PredictionModule):
         self.multilabel = context.multilabel
         self.tags = context.data_handler.tags
 
-        if data_has_oos_samples(context):
+        if context.data_handler.has_oos_samples():
             warn(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."

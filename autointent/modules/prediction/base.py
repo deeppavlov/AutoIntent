@@ -29,10 +29,6 @@ class PredictionModule(Module):
         pass
 
 
-def data_has_oos_samples(context: Context):
-    return context.optimization_logs.get_best_oos_scores() is not None
-
-
 def get_prediction_evaluation_data(context: Context):
     labels = context.data_handler.labels_test
     scores = context.optimization_logs.get_best_test_scores()
