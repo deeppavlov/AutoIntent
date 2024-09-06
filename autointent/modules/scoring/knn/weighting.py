@@ -1,56 +1,83 @@
-from functools import partial
 from typing import Literal
 
 import numpy as np
-from chromadb import Collection
 
-from ....context import (
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
+from .count_neighbors import get_counts, get_counts_multilabel
 
 
-def retrieve_candidates(
-    collection: Collection, k: int, utterances: list[str], weights: Literal["uniform", "distance", "closest"] | bool
-) -> list[int] | list[list[int]]:
+def apply_weights(
+    labels: np.ndarray,
+    distances: np.ndarray,
+    weights: Literal["uniform", "distance", "closest"],
+    n_classes: int,
+    multilabel: bool,
+):
     """
+    Calculate probabilities
+
+    Arguments
+    ---
+
+    `labels`:
+    - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
+    - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
+
+    `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
+
     Return
     ---
-    `labels`:
-        - multiclass case: np.ndarray of shape (n_samples, n_candidates) with integer labels from `[0,n_classes-1]`
-        - multilabel case: np.ndarray of shape (n_samples, n_candidates, n_classes) with binary labels
-    `weights`:
-        - multiclass case: np.ndarray of shape (n_samples, n_candidates)
-        - multilabel case: np.ndarray of shape (n_samples, n_candidates, n_classes)
+    np.ndarray of shape (n_samples, n_classes)
     """
-    n_classes = collection.metadata["n_classes"]
-    multilabel = collection.metadata["multilabel"]
+    n_samples, n_candidates = distances.shape
 
-    query_res = collection.query(
-        query_texts=utterances,
-        n_results=k,
-        include=["metadatas", "documents", "distances"],  # one can add "embeddings"
-    )
+    if weights == "closest":
+        return closest_weighting(labels, distances, multilabel, n_classes)
 
-    if not multilabel:
-        convert = multiclass_metadata_as_labels
+    if weights == "uniform":
+        weights_ = np.ones((n_samples, n_candidates))
+
+    elif weights == "distance":
+        weights_ = 1 / (distances + 1e-5)
+
+    if multilabel:
+        counts = get_counts_multilabel(labels, weights_)
+        probs = counts / weights_.sum(axis=1, keepdims=True)
     else:
-        convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
+        counts = get_counts(labels, n_classes, weights_)
+        probs = counts / counts.sum(axis=1, keepdims=True)
 
-    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
+    return probs
 
-    if not weights:
-        return res_labels
 
-    res_weights = get_weights(
-        distances=np.array(query_res["distances"]),
-        labels=res_labels,
-        weights=weights,
-        n_classes=n_classes,
-        multilabel=multilabel,
-    )
+def closest_weighting(labels, distances, multilabel, n_classes):
+    if not multilabel:
+        labels = to_onehot(labels, n_classes)
+    probs = _closest_weighting(labels, distances)
+    return probs
 
-    return res_labels, res_weights
+
+def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
+    """
+    TODO test this function
+
+    Arguments
+    ---
+    `labels`: array of shape (n_samples, n_candidates, n_classes) with binary labels
+    `distances`: array of shape (n_samples, n_candidates, n_classes) with cosine distances
+
+    Return
+    ---
+    array of shape (n_samples, n_classes) with probabilities
+    """
+    # broadcast to (n_samples, n_candidates, n_classes)
+    broadcasted_similarities = np.broadcast_to(1 - distances[..., None], shape=labels.shape)
+    expanded_distances_view = np.where(labels != 0, broadcasted_similarities, -1)
+
+    # select closest candidate for each query-class pair
+    similarities = np.max(expanded_distances_view, axis=1)
+    probs = (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
+
+    return probs
 
 
 def to_onehot(labels: np.ndarray, n_classes):
@@ -60,70 +87,3 @@ def to_onehot(labels: np.ndarray, n_classes):
     indices = tuple(np.indices(labels.shape)) + (labels,)
     onehot_labels[indices] = 1
     return onehot_labels
-
-
-def closest_weighting(labels: np.ndarray, distances: np.ndarray):
-    """
-    TODO test this function
-
-    Arguments
-    ---
-    `labels`: array of shape (n_samples, n_candidates, n_classes) with binary labels
-    `distances`: array of shape (n_samples, n_candidates, n_classes) with float values
-
-    Return
-    ---
-    array of shape (n_samples, n_candidates, n_classes), an entry is nonzero iff a candidate is the closest neighbor for each class
-    """
-    # broadcast to (n_samples, n_candidates, n_classes)
-    broadcasted_distances = np.broadcast_to(distances[..., None], shape=labels.shape)
-    expanded_distances_view = np.where(labels != 0, broadcasted_distances, np.inf)
-
-    # select min distance for each query-class pair
-    min_distances = np.min(expanded_distances_view, axis=1, keepdims=True)
-    res_weights = 1 / (expanded_distances_view + 1e-5) * (expanded_distances_view == min_distances)
-    return res_weights
-
-
-def get_weights(
-    distances: np.ndarray,
-    labels: np.ndarray,
-    weights: Literal["uniform", "distance", "closest"] | bool,
-    n_classes: int,
-    multilabel: bool,
-):
-    """
-    TODO test this function
-
-    Arguments
-    ---
-    `distances`: array of shape (n_samples, n_candidates) with float values
-    `labels`: needed only by "closest",
-
-    Return
-    ---
-    - multiclass case: np.ndarray of shape (n_samples, n_candidates)
-    - multilabel case: np.ndarray of shape (n_samples, n_candidates, n_classes)
-    """
-    if isinstance(weights, bool) and weights:
-        weights = "distance"
-
-    n_samples, n_candidates = distances.shape
-
-    if weights == "uniform":
-        res = np.ones((n_samples, n_candidates))
-        if multilabel:  # simply repeat the weights for each class
-            res = np.broadcast_to(res[..., None], shape=(n_samples, n_candidates, n_classes))
-    elif weights == "distance":
-        res = 1 / (distances + 1e-5)
-        if multilabel:  # simply repeat the weights for each class
-            res = np.broadcast_to(res[..., None], shape=(n_samples, n_candidates, n_classes))
-    elif weights == "closest":
-        if not multilabel:
-            onehot_labels = to_onehot(labels, n_classes)
-            res = closest_weighting(onehot_labels, distances)
-            res = np.sum(res, axis=2)  # there are only one non zero value
-        else:
-            res = closest_weighting(labels, distances)
-
-    return res

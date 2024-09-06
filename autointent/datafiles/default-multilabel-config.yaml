@@ -12,7 +12,7 @@ nodes:
     modules:
       - module_type: knn
         k: [3]
-        weights: [false]
+        weights: ["uniform", "distance", "closest"]
       - module_type: linear
         multilabel: [true]
   - node_type: prediction

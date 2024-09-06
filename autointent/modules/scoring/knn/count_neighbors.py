@@ -31,4 +31,4 @@ def get_counts_multilabel(labels, weights):
     ---
     np.ndarray of shape (n_samples, n_classes) with statistics of how many times each class label occured in candidates
     """
-    return (labels * weights).sum(axis=1)
+    return (labels * weights[..., None]).sum(axis=1)

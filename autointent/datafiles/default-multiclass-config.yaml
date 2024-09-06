@@ -13,7 +13,7 @@ nodes:
     modules:
       - module_type: knn
         k: [1, 3, 5, 10]
-        weights: [false]
+        weights: ["uniform", "distance", "closest"]
       - module_type: linear
       - module_type: dnnc
         model_name:

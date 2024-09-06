@@ -1,0 +1,215 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9587628865979382,
+            0.9381443298969072
+        ],
+        "scoring": [
+            0.8488173558897244,
+            0.8488173558897244,
+            0.8495621155160629,
+            0.9080641945773527,
+            0.9091841820460239,
+            0.9091179653679652,
+            0.9349474538619276,
+            0.9369852187286397,
+            0.9364426691729322,
+            0.9637175324675322,
+            0.9685378218272953,
+            0.9659632034632034,
+            0.9890350877192984,
+            0.8491548473456368,
+            0.8461807928913193,
+            0.8196991057188426,
+            0.7869951868307131,
+            0.5588509626338574,
+            0.6039302802460698,
+            0.6072446741854637,
+            0.6170183982683983
+        ],
+        "prediction": [
+            0.6804123711340206,
+            0.7319587628865979
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9587628865979382,
+                "k": 10,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9381443298969072,
+                "k": 10,
+                "model_name": "infgrad/stella-base-en-v2"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8488173558897244,
+                "k": 1,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8488173558897244,
+                "k": 1,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8495621155160629,
+                "k": 1,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9080641945773527,
+                "k": 3,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9091841820460239,
+                "k": 3,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9091179653679652,
+                "k": 3,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9349474538619276,
+                "k": 5,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9369852187286397,
+                "k": 5,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9364426691729322,
+                "k": 5,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9637175324675322,
+                "k": 10,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9685378218272953,
+                "k": 10,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9659632034632034,
+                "k": 10,
+                "weights": "closest"
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9890350877192984
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8491548473456368,
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8461807928913193,
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8196991057188426,
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7869951868307131,
+                "model_name": "BAAI/bge-reranker-base",
+                "k": 10
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5588509626338574,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 1
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6039302802460698,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 3
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6072446741854637,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 5
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6170183982683983,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 10
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.6804123711340206,
+                "thresh": 0.5
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.7319587628865979
+            }
+        ]
+    }
+}

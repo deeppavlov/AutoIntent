@@ -1,10 +1,15 @@
+from functools import partial
 from typing import Literal
 
 import numpy as np
+from chromadb import Collection
 
+from ....context import (
+    multiclass_metadata_as_labels,
+    multilabel_metadata_as_labels,
+)
 from ..base import Context, ScoringModule
-from .count_neighbors import get_counts, get_counts_multilabel
-from .weighting import retrieve_candidates
+from .weighting import apply_weights
 
 
 class KNNScorer(ScoringModule):
@@ -25,24 +30,52 @@ class KNNScorer(ScoringModule):
         self.weights = weights
 
     def fit(self, context: Context):
+        self._multilabel = context.multilabel
         self._collection = context.get_best_collection()
         self._n_classes = context.n_classes
 
     def predict(self, utterances: list[str]):
-        labels_pred, weights = retrieve_candidates(self._collection, self.k, utterances, self.weights)
-        if not self._collection.metadata["multilabel"]:
-            counts = get_counts(labels_pred, self._n_classes, weights)
-        else:
-            counts = get_counts_multilabel(labels_pred, weights)
-        denom = counts.sum(axis=1, keepdims=True)
-        counts = counts.astype(float)
-        np.divide(
-            counts, denom, out=counts, where=denom != 0
-        )  # TODO: fix this workaround because zero count can mean OOS
-        return counts
+        labels, distances = query(self._collection, self.k, utterances)
+        probs = apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
+        return probs
 
     def clear_cache(self):
         model = self._collection._embedding_function._model
         model.to(device="cpu")
         del model
         self._collection = None
+
+
+def query(
+    collection: Collection,
+    k: int,
+    utterances: list[str],
+):
+    """
+    Return
+    ---
+
+    `labels`:
+    - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
+    - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
+
+    `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
+    """
+    n_classes = collection.metadata["n_classes"]
+    multilabel = collection.metadata["multilabel"]
+
+    query_res = collection.query(
+        query_texts=utterances,
+        n_results=k,
+        include=["metadatas", "documents", "distances"],  # one can add "embeddings"
+    )
+
+    if not multilabel:
+        convert = multiclass_metadata_as_labels
+    else:
+        convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
+
+    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
+    res_distances = np.array(query_res["distances"])
+
+    return res_labels, res_distances

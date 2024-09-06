@@ -28,7 +28,7 @@ class VectorIndex:
         collection = self.client.get_or_create_collection(
             name=db_name,
             embedding_function=emb_func,
-            metadata=dict(multilabel=self.multilabel, n_classes=self.n_classes),
+            metadata=dict(multilabel=self.multilabel, n_classes=self.n_classes) | {"hnsw:space": "cosine"},
         )
         return collection
 
