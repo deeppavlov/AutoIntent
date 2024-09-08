@@ -8,6 +8,7 @@ class Context:
         self,
         multiclass_intent_records,
         multilabel_utterance_records,
+        test_utterance_records,
         device,
         mode,
         multilabel_generation_config: str,
@@ -18,6 +19,7 @@ class Context:
         self.data_handler = DataHandler(
             multiclass_intent_records,
             multilabel_utterance_records,
+            test_utterance_records,
             mode,
             multilabel_generation_config,
             regex_sampling,

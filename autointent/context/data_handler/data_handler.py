@@ -11,6 +11,7 @@ class DataHandler:
         self,
         multiclass_intent_records: list[dict],
         multilabel_utterance_records: list[dict],
+        test_utterance_records: list[dict],
         mode: Literal["multiclass", "multilabel", "multiclass_as_multilabel"],
         multilabel_generation_config: str = "",
         regex_sampling: int = 0,
@@ -54,7 +55,7 @@ class DataHandler:
             self.utterances_test,
             self.labels_train,
             self.labels_test,
-        ) = split_sample_utterances(data, self.multilabel, seed)
+        ) = split_sample_utterances(data, test_utterance_records, self.multilabel, seed)
 
         if mode != "multilabel":
             self.regexp_patterns = [

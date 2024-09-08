@@ -117,22 +117,29 @@ def main():
         "--config-path",
         type=str,
         default="",
-        help="Path to a yaml configuration file that defines the optimization search space."
+        help="Path to a yaml configuration file that defines the optimization search space. "
              "Omit this to use the default configuration."
     )
     parser.add_argument(
         "--multiclass-path",
         type=str,
         default="",
-        help="Path to a json file with intent records."
+        help="Path to a json file with intent records. "
              "Set to \"default\" to use banking77 data stored within the autointent package."
     )
     parser.add_argument(
         "--multilabel-path",
         type=str,
         default="",
-        help="Path to a json file with utterance records."
+        help="Path to a json file with utterance records. "
              "Set to \"default\" to use dstc3 data stored within the autointent package."
+    )
+    parser.add_argument(
+        "--test-path",
+        type=str,
+        default="",
+        help="Path to a json file with utterance records. "
+             "Skip this option if you want to use a random subset of the training sample as test data."
     )
     parser.add_argument(
         "--db-dir",
@@ -168,7 +175,7 @@ def main():
        "--regex-sampling",
         type=int,
         default=0,
-        help="Number of shots per intent to sample from regular expressions."
+        help="Number of shots per intent to sample from regular expressions. "
              "This option extends sample utterances within multiclass intent records."
     )
     parser.add_argument(
@@ -200,6 +207,7 @@ def main():
     context = Context(
         load_data(args.multiclass_path, multilabel=False),
         load_data(args.multilabel_path, multilabel=True),
+        load_data(args.test_path, multilabel=True),
         args.device,
         args.mode,
         args.multilabel_generation_config,

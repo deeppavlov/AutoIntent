@@ -1,0 +1,1 @@
+poetry run autointent --multiclass-path data/intent_records/ac_robotic_new.json --test-path data/intent_records/ac_robotic_val.json --mode "multiclass_as_multilabel" --regex-sampling 20

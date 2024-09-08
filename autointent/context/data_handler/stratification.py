@@ -1,4 +1,5 @@
 import itertools as it
+from warnings import warn
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -17,9 +18,9 @@ def get_sample_utterances(intent_records: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(intent_records: list[dict], multilabel: bool, seed: int = 0):
+def split_sample_utterances(intent_records: list[dict], test_records: list[dict], multilabel: bool, seed: int = 0):
     """
-    Return: utterances_train, utterances_test, labels_train, labels_test
+    Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
 
     TODO: ensure stratified train test splitting (test set must contain all classes)
     """
@@ -33,14 +34,8 @@ def split_sample_utterances(intent_records: list[dict], multilabel: bool, seed: 
         oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if not is_in_domain]
 
         n_classes = len(set(in_domain_labels))
-        splits = train_test_split(
-            in_domain_utterances,
-            in_domain_labels,
-            test_size=0.25,
-            random_state=seed,
-            stratify=in_domain_labels,
-            shuffle=True,
-        )
+        splitter = train_test_split
+
     else:
         utterance_records = intent_records
         utterances = [dct["utterance"] for dct in utterance_records]
@@ -52,20 +47,52 @@ def split_sample_utterances(intent_records: list[dict], multilabel: bool, seed: 
         in_domain_labels = [[int(i in lab) for i in range(n_classes)] for lab in labels if len(lab) > 0]
         oos_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) == 0]
 
-        splits = multilabel_train_test_split(
+        splitter = multilabel_train_test_split
+
+    if not test_records:
+        splits = splitter(
             in_domain_utterances,
             in_domain_labels,
             test_size=0.25,
+            random_state=seed,
+            stratify=in_domain_labels,
+            shuffle=True,
         )
+        test_labels = splits[-1]
+    else:
+        test_utterances = [dct["utterance"] for dct in test_records if len(dct["labels"]) > 0]
+        if multilabel:
+            test_labels = [
+                [int(i in dct["labels"]) for i in range(n_classes)] for dct in test_records if len(dct["labels"]) > 0
+            ]
+        else:
+            test_labels = [dct["labels"][0] for dct in test_records if len(dct["labels"]) > 0]
+            if any(len(dct["labels"]) > 1 for dct in test_records):
+                warn("you provided multilabel test data in multiclass classification mode")
+
+        for dct in test_records:
+            if len(dct["labels"]) == 0:
+                oos_utterances.append(dct["utterance"])
+
+        splits = [in_domain_utterances, test_utterances, in_domain_labels, test_labels]
+
+    assert validate_test_labels(test_labels, multilabel, n_classes)
 
     res = [n_classes, oos_utterances] + splits
     return res
 
 
-def multilabel_train_test_split(*arrays, stratify=None, test_size=0.25, seed: int = 0):
-    """TODO test whether this function is not random"""
+def multilabel_train_test_split(
+    *arrays, test_size=0.25, random_state: int = 0, shuffle: bool = False, stratify: list[list[int]] = None
+):
+    """
+    TODO:
+    - test whether this function is not random
+    - implement shuffling
+    """
     if stratify is None:
-        stratify = np.array(arrays[-1])
+        return train_test_split(*arrays, test_size=test_size, random_state=random_state, shuffle=shuffle)
+    stratify = np.array(stratify)
 
     n_arrays = len(arrays)
     if n_arrays == 0:
@@ -77,3 +104,34 @@ def multilabel_train_test_split(*arrays, stratify=None, test_size=0.25, seed: in
     train, test = next(stratifier.split(arrays[0], stratify))
 
     return list(it.chain.from_iterable((_safe_indexing(a, train), _safe_indexing(a, test)) for a in arrays))
+
+
+def validate_test_labels(test_labels, multilabel, n_classes):
+    """
+    ensure that all classes are presented in the presented labels set
+    """
+    if not multilabel:
+        return is_multiclass_test_set_complete(test_labels, n_classes)
+    else:
+        return is_multilabel_test_set_complete(test_labels)
+
+
+def is_multilabel_test_set_complete(labels: list[list[int]]):
+    labels = np.array(labels)
+    labels_counts = labels.sum(axis=0)
+    return (labels_counts > 0).all()
+
+
+def is_multiclass_test_set_complete(labels: list[int], n_classes: int):
+    labels = np.array(labels)
+    labels = to_onehot(labels, n_classes)
+    return is_multilabel_test_set_complete(labels)
+
+
+def to_onehot(labels: np.ndarray, n_classes):
+    """convert nd array of ints to (n+1)d array of zeros and ones"""
+    new_shape = labels.shape + (n_classes,)
+    onehot_labels = np.zeros(shape=new_shape)
+    indices = tuple(np.indices(labels.shape)) + (labels,)
+    onehot_labels[indices] = 1
+    return onehot_labels

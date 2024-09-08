@@ -29,8 +29,9 @@ poetry install --with dev,test
 ```
 usage: autointent [-h] [--config-path CONFIG_PATH]
                   [--multiclass-path MULTICLASS_PATH]
-                  [--multilabel-path MULTILABEL_PATH] [--db-dir DB_DIR]
-                  [--logs-dir LOGS_DIR] [--run-name RUN_NAME]
+                  [--multilabel-path MULTILABEL_PATH] [--test-path TEST_PATH]
+                  [--db-dir DB_DIR] [--logs-dir LOGS_DIR]
+                  [--run-name RUN_NAME]
                   [--mode {multiclass,multilabel,multiclass_as_multilabel}]
                   [--device DEVICE] [--regex-sampling REGEX_SAMPLING]
                   [--seed SEED] [--verbose]
@@ -40,16 +41,20 @@ options:
   -h, --help            show this help message and exit
   --config-path CONFIG_PATH
                         Path to a yaml configuration file that defines the
-                        optimization search space.Omit this to use the default
-                        configuration.
+                        optimization search space. Omit this to use the
+                        default configuration.
   --multiclass-path MULTICLASS_PATH
-                        Path to a json file with intent records.Set to
+                        Path to a json file with intent records. Set to
                         "default" to use banking77 data stored within the
                         autointent package.
   --multilabel-path MULTILABEL_PATH
-                        Path to a json file with utterance records.Set to
+                        Path to a json file with utterance records. Set to
                         "default" to use dstc3 data stored within the
                         autointent package.
+  --test-path TEST_PATH
+                        Path to a json file with utterance records. Skip this
+                        option if you want to use a random subset of the
+                        training sample as test data.
   --db-dir DB_DIR       Location where to save chroma database file. Omit to
                         use your system's default cache directory.
   --logs-dir LOGS_DIR   Location where to save optimization logs that will be
@@ -62,13 +67,15 @@ options:
   --device DEVICE       Specify device in torch notation
   --regex-sampling REGEX_SAMPLING
                         Number of shots per intent to sample from regular
-                        expressions
+                        expressions. This option extends sample utterances
+                        within multiclass intent records.
   --seed SEED           Affects the data partitioning
   --verbose             Print to console during optimization
   --multilabel-generation-config MULTILABEL_GENERATION_CONFIG
                         Config string like "[20, 40, 20, 10]" means 20 one-
                         label examples,40 two-label examples, 20 three-label
-                        examples, 10 four-label examples
+                        examples, 10 four-label examples.This option extends
+                        multilabel utterance records.
 ```
 
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
@@ -83,6 +90,13 @@ autointent --multiclass-path data/intent_records/ac_robotic_new.json \
         --run-name robotics_new_testing \
         --regex-sampling 10 \
         --multilabel-generation-config "[0, 4000, 1000]"
+autointent --multiclass-path data/intent_records/ac_robotic_new.json \
+           --test-path data/intent_records/ac_robotic_val.json \
+           --mode "multiclass_as_multilabel" \
+           --regex-sampling 20
+autointent --mode multiclass \
+           --multiclass-path default \
+           --test-path data/intent_records/banking77_test.json 
 ```
 
 Пример входных данных в директории `data/intent_records`.
