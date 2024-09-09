@@ -19,10 +19,15 @@ from .scoring import (
     ScoringMetricFn,
     scoring_accuracy,
     scoring_f1,
-    scoring_neg_cross_entropy,
+    scoring_log_likelihood,
     scoring_precision,
     scoring_recall,
     scoring_roc_auc,
+    scoring_hit_rate,
+    scoring_log_likelihood,
+    scoring_map,
+    scoring_neg_coverage,
+    scoring_neg_ranking_loss,
 )
 from .regexp import (
     regexp_partial_accuracy,
