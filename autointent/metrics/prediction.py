@@ -5,7 +5,16 @@ from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_sco
 
 
 class PredictionMetricFn(Protocol):
-    def __call__(self, y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float: ...
+    def __call__(self, y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
+        """
+        Arguments
+        ---
+        - `y_true`:
+            - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
+            - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
+        - `y_pred`: same as `y_true`
+        """
+        ...
 
 
 def prediction_accuracy(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):

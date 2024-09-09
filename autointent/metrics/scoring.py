@@ -13,18 +13,18 @@ from .prediction import (
 
 
 class ScoringMetricFn(Protocol):
-    def __call__(self, labels: list[int], scores: list[list[float]]) -> float: ...
+    def __call__(self, labels: list[int], scores: list[list[float]]) -> float:
+        """
+        Arguments
+        ---
+        - `scores`: for each utterance, this list contains scores for each of `n_classes` classes
+        - `labels`: ground truth labels for each utterance
+        """
+        ...
 
 
 def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> float:
     """
-    Arguments
-    ---
-    `scores`: for each utterance, this list contains scores for each of `n_classes` classes
-    `labels`: ground truth labels for each utterance
-
-    Return
-    ---
     mean negative cross-entropy for each utterance classification result, i.e.
     ```math
     {1\\over\\ell}\\sum_{i=1}^\\ell-log(s[y[i]]),
@@ -44,13 +44,6 @@ def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> f
 
 def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
-    Arguments
-    ---
-    `scores`: for each utterance, this list contains scores for each of `n_classes` classes
-    `labels`: ground truth labels for each utterance
-
-    Return
-    ---
     macro averaged roc-auc for utterance classification task, i.e.
     ```math
     {1\\over C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])

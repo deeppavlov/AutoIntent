@@ -2,25 +2,17 @@ from typing import Protocol
 
 import numpy as np
 
-common_docstring = """
-    Arguments
-    ---
-    - `query_labels`: for each query, this list contains its class labels
-    - `candidates_labels`: for each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
-    - `k`: the number of top items to consider for each query
-
-    Return
-    ---
-    retrieval metric, averaged over all queries
-    
-
-    TODO:
-    - implement multilabel case, where query_labels: list[list[int]], i.e. each query has multiple intents
-"""
-
 
 class RetrievalMetricFn(Protocol):
-    def __call__(self, query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float: ...
+    def __call__(self, query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
+        """
+        Arguments
+        ---
+        - `query_labels`: for each query, this list contains its class labels
+        - `candidates_labels`: for each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
+        - `k`: the number of top items to consider for each query
+        """
+        ...
 
 
 def average_precision(query_label: int, candidate_labels: list[int], k: int = None) -> float:
