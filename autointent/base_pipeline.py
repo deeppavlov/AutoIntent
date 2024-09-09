@@ -86,7 +86,7 @@ class Pipeline:
         self.verbose = verbose
 
     def optimize(self, context: Context):
-        self.logs = context.optimization_logs
+        self.context = context
         for node_config in self.config["nodes"]:
             node: Node = self.available_nodes[node_config["node_type"]](
                 modules_search_spaces=node_config["modules"], metric=node_config["metric"], verbose=self.verbose
@@ -95,19 +95,18 @@ class Pipeline:
             print("fitted!")
 
     def dump(self, logs_dir: os.PathLike, run_name: str):
-        optimization_results = self.logs.dump_logs()
+        optimization_results = self.context.optimization_logs.dump()
 
+        # create appropriate directory
         if logs_dir == "":
             logs_dir = os.getcwd()
-
         logs_dir = os.path.join(logs_dir, run_name)
-
         if not os.path.exists(logs_dir):
             os.makedirs(logs_dir)
 
+        # dump config and optimization results
         logs_path = os.path.join(logs_dir, "logs.json")
         json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder)
-
         config_path = os.path.join(logs_dir, "config.yaml")
         yaml.dump(self.config, open(config_path, "w"))
 
@@ -115,6 +114,13 @@ class Pipeline:
             print(
                 make_report(optimization_results, nodes=[node_config["node_type"] for node_config in self.config["nodes"]])
             )
+
+        # dump train and test data splits
+        train_data, test_data = self.context.data_handler.dump()
+        train_path = os.path.join(logs_dir, "train_data.json")
+        test_path = os.path.join(logs_dir, "test_data.json")
+        json.dump(train_data, open(train_path, "w"), indent=4, ensure_ascii=False)
+        json.dump(test_data, open(test_path, "w"), indent=4, ensure_ascii=False)
 
 
 def main():

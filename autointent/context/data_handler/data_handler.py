@@ -69,3 +69,40 @@ class DataHandler:
 
     def has_oos_samples(self):
         return len(self.oos_utterances) > 0
+
+    def dump(self):
+        train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
+        test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)
+        oos_data = _dump_oos(self.oos_utterances)
+        test_data = test_data + oos_data
+        return train_data, test_data
+
+
+def _dump_train(utterances, labels, n_classes, multilabel):
+    if not multilabel:
+        res = [dict(intent_id=i) for i in range(n_classes)]
+        for ut, lab in zip(utterances, labels):
+            rec = res[lab]
+            sample_utterances = rec.get("sample_utterances", []) + [ut]
+            rec["sample_utterances"] = sample_utterances
+    else:
+        res = []
+        for ut, labs in zip(utterances, labels):
+            labs = [i for i in range(n_classes) if labs[i]]
+            res.append(dict(utterance=ut, labels=labs))
+    return res
+
+
+def _dump_test(utterances, labels, n_classes, multilabel):
+    res = []
+    for ut, labs in zip(utterances, labels):
+        if multilabel:
+            labs = [i for i in range(n_classes) if labs[i]]
+        else:
+            labs = [labs]
+        res.append(dict(utterance=ut, labels=labs))
+    return res
+
+
+def _dump_oos(utterances):
+    return [dict(utterance=ut, labels=[]) for ut in utterances]

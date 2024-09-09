@@ -63,7 +63,7 @@ class OptimizationLogs:
     def get_best_oos_scores(self):
         return self.cache["best_assets"]["scoring"]["oos_scores"]
 
-    def dump_logs(self):
+    def dump(self):
         res = dict(
             metrics=self.cache["metrics"],
             configs=self.cache["configs"],
