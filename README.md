@@ -238,21 +238,40 @@ Prediction:
 
 ## TODO
 
-- увеличение поддержки multilabel классификации (больше метрик, больше модулей)
+LOGGING:
+- логирование в тензорборд и тп
+- извлечение лучшего пайплайна из логов оптимизации (pipeline export)
+- возможность прерывания и возобновления оптимизации
+- кеширование запросов к collection (ибо на оптимизации k для knn и dncc можно переиспользовать много запросов)
+
+DATA:
 - тулза для генерации регулярок?
 - тулза для генерации OOS примеров?
 - тулза для расширения датасета?
-- логирование в тензорборд и тп
-- извлечение лучшего пайплайна из логов оптимизации
-- возможность прерывания и возобновления оптимизации
-- кеширование запросов к collection (ибо на оптимизации k для knn и dncc можно переиспользовать много запросов)
-- данные
-    - проблемой переобучения: следующие этапы оптимизации должны использовать другие данные нежели предыдущие
-    - кросс валидация вместо разделения на обучающую и отложенную выборку
-    - evaluation on few-shot episodes?
-- эффективное использование вычислительных ресурсов
-- много TODO в коде
+- проблема переобучения: следующие этапы оптимизации должны использовать другие данные нежели предыдущие
+- кросс валидация а не только разделение на обучающую и отложенную выборку
+- evaluation on few-shot episodes?
+
+FEATURES:
+- увеличение поддержки multilabel классификации:
+    - больше метрик из статьи про MLKNN
+    - больше модулей как MLKNN
+- labels vector representation как в статье Towards Multi-label Unknown Intent Detection
 - поддержка NLI-pretrained кросс-энкодеров
-- interactive cli config file creation (like in poetry)
-- добавить типизацию (dataclasses, pydantic, types) для intent records
+- thresholding как в статье Few-shot Learning for Multi-label Intent Detection
+
+EFFICIENCY:
+- эффективное использование вычислительных ресурсов
+- interactive cli config file creation
+    - like in poetry
+    - создание папки проекта в которую сохранится конфиг и тест и трейн данные
 - solve CUDA out of memory problem for collection.add and collection.query
+
+
+CODESTYLE:
+- добавить типизацию (dataclasses, pydantic, types)
+- переделать Node, metrics, Module
+
+TESTING:
+- много TODO в коде
+- датасеты для multilabel (eurlex, reuters etc)
