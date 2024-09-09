@@ -1,5 +1,11 @@
+from typing import Protocol
+
 import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+
+
+class PredictionMetricFn(Protocol):
+    def __call__(self, y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float: ...
 
 
 def prediction_accuracy(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
@@ -38,7 +44,7 @@ def prediction_roc_auc(y_true: list[int] | list[list[int]], y_pred: list[int] | 
         return _prediction_roc_auc_multiclass(y_true, y_pred)
     if y_pred.ndim == y_true.ndim == 2:
         return _prediction_roc_auc_multilabel(y_true, y_pred)
-    raise ValueError('shapes mismatch')
+    raise ValueError("shapes mismatch")
 
 
 def prediction_precision(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):

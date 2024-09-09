@@ -1,4 +1,5 @@
 import warnings
+from typing import Protocol
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
@@ -9,6 +10,10 @@ from .prediction import (
     prediction_precision,
     prediction_recall,
 )
+
+
+class ScoringMetricFn(Protocol):
+    def __call__(self, labels: list[int], scores: list[list[float]]) -> float: ...
 
 
 def scoring_neg_cross_entropy(labels: list[int], scores: list[list[float]]) -> float:
@@ -59,16 +64,6 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
         labels = (labels[:, None] == np.arange(n_classes)[None, :]).astype(int)
 
     return roc_auc_score(labels, scores, average="macro")
-
-    # roc_auc_scores = []
-    # for k in range(n_classes):
-    #     binarized_labels = (labels == k).astype(int)
-    #     roc_auc = roc_auc_score(binarized_labels, scores[:, k])
-    #     roc_auc_scores.append(roc_auc)
-
-    # macro_roc_auc = np.mean(roc_auc_scores)
-
-    # return macro_roc_auc
 
 
 def scoring_accuracy(labels: list[int], scores: list[list[float]]) -> float:

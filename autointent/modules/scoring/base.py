@@ -1,13 +1,13 @@
 from abc import abstractmethod
-from typing import Callable
 
 import numpy as np
 
+from ...metrics import ScoringMetricFn
 from ..base import Context, Module
 
 
 class ScoringModule(Module):
-    def score(self, context: Context, metric_fn: Callable) -> tuple[float, np.ndarray]:
+    def score(self, context: Context, metric_fn: ScoringMetricFn) -> tuple[float, np.ndarray]:
         """
         Return
         ---

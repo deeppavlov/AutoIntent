@@ -1,3 +1,5 @@
+from typing import Protocol
+
 import numpy as np
 
 common_docstring = """
@@ -17,9 +19,11 @@ common_docstring = """
 """
 
 
-def average_precision(
-    query_label: int, candidate_labels: list[int], k: int = None
-) -> float:
+class RetrievalMetricFn(Protocol):
+    def __call__(self, query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float: ...
+
+
+def average_precision(query_label: int, candidate_labels: list[int], k: int = None) -> float:
     """
     helper function for `retrieval_map`
     """
@@ -32,18 +36,12 @@ def average_precision(
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int = None
-):
-    ap_list = [
-        average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels)
-    ]
+def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int = None):
+    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels)]
     return sum(ap_list) / len(ap_list)
 
 
-def retrieval_map_numpy(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int
-) -> float:
+def retrieval_map_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
     query_labels = np.array(query_labels)
     candidates_labels = np.array(candidates_labels)
     candidates_labels = candidates_labels[:, :k]
@@ -61,9 +59,7 @@ def retrieval_map_numpy(
     return np.mean(average_precision)
 
 
-def retrieval_hit_rate(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int = None
-) -> float:
+def retrieval_hit_rate(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
     num_queries = len(query_labels)
     hit_count = 0
 
@@ -94,9 +90,7 @@ def retrieval_hit_rate_multilabel(
     return hit_count / num_queries
 
 
-def retrieval_hit_rate_numpy(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int
-) -> float:
+def retrieval_hit_rate_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
     query_labels = np.array(query_labels)
     candidates_labels = np.array(candidates_labels)
     truncated_candidates = candidates_labels[:, :k]
@@ -105,9 +99,7 @@ def retrieval_hit_rate_numpy(
     return hit_rate
 
 
-def retrieval_precision(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int = None
-) -> float:
+def retrieval_precision(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
     total_precision = 0.0
     num_queries = len(query_labels)
 
@@ -123,9 +115,7 @@ def retrieval_precision(
     return total_precision / num_queries
 
 
-def retrieval_precision_numpy(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int
-) -> float:
+def retrieval_precision_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
     query_labels = np.array(query_labels)
     candidates_labels = np.array(candidates_labels)
     top_k_candidates = candidates_labels[:, :k]

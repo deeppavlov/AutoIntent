@@ -1,10 +1,11 @@
 from abc import abstractmethod
-from typing import Callable
+
 
 import numpy as np
 
 from ...context.data_handler import Tag
 from ..base import Context, Module
+from ...metrics import PredictionMetricFn
 
 
 class PredictionModule(Module):
@@ -16,12 +17,12 @@ class PredictionModule(Module):
     def predict(self, scores: list[list[float]]):
         pass
 
-    def score(self, context: Context, metric_fn: Callable) -> tuple[float, np.ndarray]:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         metric_value = metric_fn(labels, self._predictions)
         return metric_value
-    
+
     def get_assets(self, context: Context = None):
         return self._predictions
 

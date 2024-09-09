@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Callable
 
 import numpy as np
 from chromadb import Collection
@@ -9,6 +8,7 @@ from ...context import (
     multiclass_metadata_as_labels,
     multilabel_metadata_as_labels,
 )
+from ...metrics import RetrievalMetricFn
 from .base import RetrievalModule
 
 
@@ -20,7 +20,7 @@ class VectorDBModule(RetrievalModule):
     def fit(self, context: Context):
         self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
 
-    def score(self, context: Context, metric_fn: Callable) -> tuple[float, str]:
+    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, str]:
         labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
         metric_value = metric_fn(context.data_handler.labels_test, labels_pred)
         return metric_value
