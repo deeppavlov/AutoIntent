@@ -46,8 +46,8 @@ def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
 def load_data(data_path: os.PathLike, multilabel: bool):
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
-        data_name = 'dstc3-20shot.json' if multilabel else 'banking77.json'
-        file = ires.files('autointent.datafiles').joinpath(data_name).open()
+        data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
+        file = ires.files("autointent.datafiles").joinpath(data_name).open()
     elif data_path != "":
         file = open(data_path)
     else:
@@ -60,34 +60,16 @@ def load_config(config_path: os.PathLike, mode: str):
     if config_path != "":
         file = open(config_path)
     else:
-        config_name = 'default-multilabel-config.yaml' if mode != "multiclass" else 'default-multiclass-config.yaml'
-        file = ires.files('autointent.datafiles').joinpath(config_name).open()
+        config_name = "default-multilabel-config.yaml" if mode != "multiclass" else "default-multiclass-config.yaml"
+        file = ires.files("autointent.datafiles").joinpath(config_name).open()
     return yaml.safe_load(file)
-
-
-def dump_logs(logs: dict[str, Any], logs_dir: os.PathLike, run_name: str):
-    if logs_dir == "":
-        logs_dir = os.getcwd()
-
-    if not os.path.exists(logs_dir):
-        os.makedirs(logs_dir)
-
-    logs_path = os.path.join(logs_dir, f"{run_name}.json")
-
-    json.dump(
-        logs, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder
-    )
 
 
 def get_run_name(run_name: str, config_path: os.PathLike):
     if run_name == "":
-        run_name = (
-            "example_run_name"
-            if config_path == ""
-            else os.path.basename(config_path).split('.')[0]
-        )
+        run_name = "example_run_name" if config_path == "" else os.path.basename(config_path).split(".")[0]
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
-    
+
 
 class Pipeline:
     available_nodes = {
@@ -103,12 +85,35 @@ class Pipeline:
         self.verbose = verbose
 
     def optimize(self, context: Context):
+        self.logs = context.optimization_logs
         for node_config in self.config["nodes"]:
             node: Node = self.available_nodes[node_config["node_type"]](
                 modules_search_spaces=node_config["modules"], metric=node_config["metric"], verbose=self.verbose
             )
             node.fit(context)
             print("fitted!")
+
+    def dump(self, logs_dir: os.PathLike, run_name: str):
+        optimization_results = self.logs.dump_logs()
+
+        if logs_dir == "":
+            logs_dir = os.getcwd()
+
+        logs_dir = os.path.join(logs_dir, run_name)
+
+        if not os.path.exists(logs_dir):
+            os.makedirs(logs_dir)
+
+        logs_path = os.path.join(logs_dir, "logs.json")
+        json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder)
+
+        config_path = os.path.join(logs_dir, "config.yaml")
+        yaml.dump(self.config, open(config_path, "w"))
+
+        if self.verbose:
+            print(
+                make_report(optimization_results, nodes=[node_config["node_type"] for node_config in self.config["nodes"]])
+            )
 
 
 def main():
@@ -118,40 +123,40 @@ def main():
         type=str,
         default="",
         help="Path to a yaml configuration file that defines the optimization search space. "
-             "Omit this to use the default configuration."
+        "Omit this to use the default configuration.",
     )
     parser.add_argument(
         "--multiclass-path",
         type=str,
         default="",
         help="Path to a json file with intent records. "
-             "Set to \"default\" to use banking77 data stored within the autointent package."
+        'Set to "default" to use banking77 data stored within the autointent package.',
     )
     parser.add_argument(
         "--multilabel-path",
         type=str,
         default="",
         help="Path to a json file with utterance records. "
-             "Set to \"default\" to use dstc3 data stored within the autointent package."
+        'Set to "default" to use dstc3 data stored within the autointent package.',
     )
     parser.add_argument(
         "--test-path",
         type=str,
         default="",
         help="Path to a json file with utterance records. "
-             "Skip this option if you want to use a random subset of the training sample as test data."
+        "Skip this option if you want to use a random subset of the training sample as test data.",
     )
     parser.add_argument(
         "--db-dir",
         type=str,
         default="",
-        help="Location where to save chroma database file. Omit to use your system's default cache directory."
+        help="Location where to save chroma database file. Omit to use your system's default cache directory.",
     )
     parser.add_argument(
         "--logs-dir",
         type=str,
         default="",
-        help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>.json`"
+        help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
     )
     parser.add_argument(
         "--run-name",
@@ -163,7 +168,7 @@ def main():
         "--mode",
         choices=["multiclass", "multilabel", "multiclass_as_multilabel"],
         default="multiclass",
-        help="Evaluation mode. This parameter must be consistent with provided data."
+        help="Evaluation mode. This parameter must be consistent with provided data.",
     )
     parser.add_argument(
        "--device",
@@ -172,11 +177,11 @@ def main():
         help="Specify device in torch notation"
     )
     parser.add_argument(
-       "--regex-sampling",
+        "--regex-sampling",
         type=int,
         default=0,
         help="Number of shots per intent to sample from regular expressions. "
-             "This option extends sample utterances within multiclass intent records."
+        "This option extends sample utterances within multiclass intent records.",
     )
     parser.add_argument(
        "--seed",
@@ -193,9 +198,9 @@ def main():
         "--multilabel-generation-config",
         type=str,
         default="",
-        help="Config string like \"[20, 40, 20, 10]\" means 20 one-label examples,"
-             "40 two-label examples, 20 three-label examples, 10 four-label examples."
-             "This option extends multilabel utterance records."
+        help='Config string like "[20, 40, 20, 10]" means 20 one-label examples, '
+        "40 two-label examples, 20 three-label examples, 10 four-label examples. "
+        "This option extends multilabel utterance records.",
     )
     args = parser.parse_args()
 
@@ -213,7 +218,7 @@ def main():
         args.multilabel_generation_config,
         db_dir,
         args.regex_sampling,
-        args.seed
+        args.seed,
     )
 
     # run optimization
@@ -221,6 +226,4 @@ def main():
     pipeline.optimize(context)
 
     # save results
-    logs = context.optimization_logs.dump_logs()
-    dump_logs(logs, args.logs_dir, run_name)
-    print(make_report(logs, nodes=[node_config["node_type"] for node_config in pipeline.config["nodes"]]))
+    pipeline.dump(args.logs_dir, run_name)
