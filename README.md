@@ -58,7 +58,8 @@ options:
   --db-dir DB_DIR       Location where to save chroma database file. Omit to
                         use your system's default cache directory.
   --logs-dir LOGS_DIR   Location where to save optimization logs that will be
-                        saved as `<logs_dir>/<run_name>_<cur_datetime>.json`
+                        saved as
+                        `<logs_dir>/<run_name>_<cur_datetime>/logs.json`
   --run-name RUN_NAME   Name of the run prepended to optimization logs
                         filename
   --mode {multiclass,multilabel,multiclass_as_multilabel}
@@ -73,8 +74,8 @@ options:
   --verbose             Print to console during optimization
   --multilabel-generation-config MULTILABEL_GENERATION_CONFIG
                         Config string like "[20, 40, 20, 10]" means 20 one-
-                        label examples,40 two-label examples, 20 three-label
-                        examples, 10 four-label examples.This option extends
+                        label examples, 40 two-label examples, 20 three-label
+                        examples, 10 four-label examples. This option extends
                         multilabel utterance records.
 ```
 
