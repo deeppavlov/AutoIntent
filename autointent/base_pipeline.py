@@ -10,6 +10,7 @@ import yaml
 
 from autointent import Context
 from autointent.cache_utils import get_db_dir
+from autointent.generate_name import generate_name
 from autointent.nodes import (
     Node,
     PredictionNode,
@@ -65,9 +66,9 @@ def load_config(config_path: os.PathLike, mode: str):
     return yaml.safe_load(file)
 
 
-def get_run_name(run_name: str, config_path: os.PathLike):
+def get_run_name(run_name: str):
     if run_name == "":
-        run_name = "example_run_name" if config_path == "" else os.path.basename(config_path).split(".")[0]
+        run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
 
 
@@ -205,7 +206,7 @@ def main():
     args = parser.parse_args()
 
     # configure the run and data
-    run_name = get_run_name(args.run_name, args.config_path)
+    run_name = get_run_name(args.run_name)
     db_dir = get_db_dir(args.db_dir, run_name)
 
     # create shared objects for a whole pipeline

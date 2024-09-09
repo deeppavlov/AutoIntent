@@ -1,6 +1,9 @@
 from itertools import combinations
 import random
 import xeger
+import json
+import os
+from argparse import ArgumentParser
 
 
 def sample_unique_tuples(k, n, m):
@@ -29,11 +32,20 @@ def sample_multilabel_utterances(intent_records: list[dict], n_samples, n_labels
     return res
 
 
-if __name__ == "__main__":
-    import json
-    import os
-    from argparse import ArgumentParser
+def get_multilabel_version(intent_records, config_string, seed):
+    config = json.loads(config_string)
+    res = []
+    for i in range(len(config)):
+        res.extend(sample_multilabel_utterances(
+            intent_records,
+            n_samples=int(config[i]),
+            n_labels=i+1,
+            seed=seed
+        ))
+    return res
 
+
+def main():
     parser = ArgumentParser()
     parser.add_argument("--input-path", type=str, required=True, help="path to intent records")
     parser.add_argument("--output-path", type=str, required=True)
@@ -41,19 +53,15 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
-    intents_records = json.load(open(args.input_path))
-    config = json.loads(args.config)
+    intent_records = json.load(open(args.input_path))
     
-    res = []
-    for i in range(len(config)):
-        res.extend(sample_multilabel_utterances(
-            intents_records,
-            n_samples=int(config[i]),
-            n_labels=i+1,
-            seed=args.seed
-        ))
+    res = get_multilabel_version(intent_records, args.config, args.seed)
     
     dirname = os.path.dirname(args.output_path)
     if not os.path.exists(dirname):
         os.makedirs(dirname)
     json.dump(res, open(args.output_path, 'w'), indent=4, ensure_ascii=False)
+
+
+if __name__ == "__main__":
+    main()
