@@ -17,7 +17,7 @@ from .retrieval import (
     retrieval_hit_rate_tolerant,
     retrieval_map,
     retrieval_map_macro,
-    retrieval_map_rolerant,
+    retrieval_map_tolerant,
     retrieval_mrr,
     retrieval_mrr_macro,
     retrieval_mrr_tolerant,

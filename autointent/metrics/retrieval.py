@@ -4,15 +4,37 @@ import numpy as np
 
 
 class RetrievalMetricFn(Protocol):
-    def __call__(self, query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
+    def __call__(self, query_labels: list[int] | list[list[int]], candidates_labels: list[list[int]] | list[list[list[int]]], k: int = None) -> float:
         """
         Arguments
         ---
         - `query_labels`: for each query, this list contains its class labels
         - `candidates_labels`: for each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
         - `k`: the number of top items to consider for each query
+
+        Note
+        ---
+        - multiclass case: labels are integer
+        - multilabel case: labels are binary
         """
         ...
+
+
+def macrofy(metric_fn: RetrievalMetricFn, query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
+    """
+    extend single-label `metric_fn` to a multi-label case via macro averaging
+    """
+    query_labels = np.array(query_labels)
+    candidates_labels = np.array(candidates_labels)
+
+    n_classes = query_labels.shape[1]
+    classwise_values = []
+    for i in range(n_classes):
+        binarized_query_labels = query_labels[..., i]
+        binarized_candidates_labels = candidates_labels[..., i]
+        classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))
+
+    return np.mean(classwise_values)
 
 
 def average_precision(query_label: int, candidate_labels: list[int], k: int = None) -> float:
@@ -49,24 +71,13 @@ def average_precision_tolerant(query_label: list[int], candidate_labels: list[li
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map_rolerant(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
+def retrieval_map_tolerant(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
     ap_list = [average_precision_tolerant(q, c, k) for q, c in zip(query_labels, candidates_labels)]
     return sum(ap_list) / len(ap_list)
 
 
 def retrieval_map_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-
-    n_classes = query_labels.shape[1]
-    classwise_values = []
-    for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
-        classwise_values.append(retrieval_map(binarized_query_labels, binarized_candidates_labels, k))
-
-    return np.mean(classwise_values)
+    return macrofy(retrieval_map, query_labels, candidates_labels, k)
 
 
 def retrieval_map_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
@@ -119,18 +130,7 @@ def retrieval_hit_rate_tolerant(
 
 
 def retrieval_hit_rate_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-
-    n_classes = query_labels.shape[1]
-    classwise_values = []
-    for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
-        classwise_values.append(retrieval_hit_rate(binarized_query_labels, binarized_candidates_labels, k))
-
-    return np.mean(classwise_values)
+    return macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
 
 
 def retrieval_hit_rate_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
@@ -161,13 +161,12 @@ def retrieval_precision(query_labels: list[int], candidates_labels: list[list[in
 def retrieval_precision_tolerant(
     query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None
 ) -> float:
-    """TODO test this function"""
     total_precision = 0.0
     num_queries = len(query_labels)
 
     for i in range(num_queries):
         query_label = np.array(query_labels[i])  # (n_classes,)
-        candidate_labels = np.sum(candidates_labels[i][:k], axis=0)  # (n_candidates, n_classes)
+        candidate_labels = np.array(candidates_labels[i][:k])  # (n_candidates, n_classes)
 
         relevant_items = [label for label in candidate_labels if np.sum(label * query_label) > 0]
         precision_at_k = len(relevant_items) / len(candidate_labels)
@@ -178,18 +177,7 @@ def retrieval_precision_tolerant(
 
 
 def retrieval_precision_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-
-    n_classes = query_labels.shape[1]
-    classwise_values = []
-    for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
-        classwise_values.append(retrieval_precision(binarized_query_labels, binarized_candidates_labels, k))
-
-    return np.mean(classwise_values)
+    return macrofy(retrieval_precision, query_labels, candidates_labels, k)
 
 
 def retrieval_precision_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
@@ -251,7 +239,6 @@ def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], 
 
 
 def retrieval_ndcg_tolerant(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
     ndcg_scores = []
     expanded_relevance_scores = np.array(query_labels)[:, None, :] == np.array(candidates_labels)
     relevance_scores = (expanded_relevance_scores.sum(axis=-1) != 0).astype(int)
@@ -265,18 +252,7 @@ def retrieval_ndcg_tolerant(query_labels: list[list[int]], candidates_labels: li
 
 
 def retrieval_ndcg_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-
-    n_classes = query_labels.shape[1]
-    classwise_values = []
-    for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
-        classwise_values.append(retrieval_ndcg(binarized_query_labels, binarized_candidates_labels))
-
-    return np.mean(classwise_values)
+    return macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
 def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
@@ -297,13 +273,12 @@ def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k
 
 
 def retrieval_mrr_tolerant(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
-    """TODO test this function"""
     mrr_sum = 0.0
     num_queries = len(query_labels)
 
     for i in range(num_queries):
         query_label = np.array(query_labels[i])  # (n_classes,)
-        candidate_labels = np.sum(candidates_labels[i][:k], axis=0)  # (n_candidates, n_classes)
+        candidate_labels = np.array(candidates_labels[i][:k])  # (n_candidates, n_classes)
 
         for rank, label in enumerate(candidate_labels):
             if np.sum(label * query_label) > 0:
@@ -315,15 +290,4 @@ def retrieval_mrr_tolerant(query_labels: list[int], candidates_labels: list[list
 
 
 def retrieval_mrr_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    """TODO test this function"""
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-
-    n_classes = query_labels.shape[1]
-    classwise_values = []
-    for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
-        classwise_values.append(retrieval_mrr(binarized_query_labels, binarized_candidates_labels, k))
-
-    return np.mean(classwise_values)
+    return macrofy(retrieval_mrr, query_labels, candidates_labels, k)
