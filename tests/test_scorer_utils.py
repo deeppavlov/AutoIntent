@@ -14,7 +14,8 @@ def test_knn_get_counts():
         [0,2,3],
         [1,1,3],
     ])
-    np.testing.assert_array_equal(x=get_counts(labels, n_classes), y=ground_truth)
+    weights = np.ones_like(labels)
+    np.testing.assert_array_equal(x=get_counts(labels, n_classes, weights), y=ground_truth)
 
     # case 2
     labels = np.array([
@@ -24,7 +25,8 @@ def test_knn_get_counts():
     ground_truth = np.array([
         [0,3,2],
     ])
-    np.testing.assert_array_equal(x=get_counts(labels, n_classes), y=ground_truth)
+    weights = np.ones_like(labels)
+    np.testing.assert_array_equal(x=get_counts(labels, n_classes, weights), y=ground_truth)
 
     # case 3
     labels = np.array([
@@ -38,7 +40,8 @@ def test_knn_get_counts():
         [0,0,5],
         [0,5,0],
     ])
-    np.testing.assert_array_equal(x=get_counts(labels, n_classes), y=ground_truth)
+    weights = np.ones_like(labels)
+    np.testing.assert_array_equal(x=get_counts(labels, n_classes, weights), y=ground_truth)
 
 
 def test_scoring_get_topk():
