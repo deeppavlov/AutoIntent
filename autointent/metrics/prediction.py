@@ -1,3 +1,4 @@
+from functools import wraps
 from typing import Protocol
 
 import numpy as np
@@ -17,11 +18,20 @@ class PredictionMetricFn(Protocol):
         ...
 
 
+def simple_check(func):
+    @wraps(func)
+    def wrapper(y_true, y_pred):
+        y_pred = np.array(y_pred)
+        y_true = np.array(y_true)
+        assert y_pred.ndim == y_true.ndim
+        return func(y_true, y_pred)
+
+    return wrapper
+
+
+@simple_check
 def prediction_accuracy(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
-    assert y_pred.ndim == y_true.ndim
     return np.mean(y_true == y_pred)
 
 
@@ -45,36 +55,28 @@ def _prediction_roc_auc_multilabel(y_true: list[list[int]], y_pred: list[list[in
     return roc_auc_score(y_true, y_pred, average="macro")
 
 
+@simple_check
 def prediction_roc_auc(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
     if y_pred.ndim == y_true.ndim == 1:
         return _prediction_roc_auc_multiclass(y_true, y_pred)
     if y_pred.ndim == y_true.ndim == 2:
         return _prediction_roc_auc_multilabel(y_true, y_pred)
-    raise ValueError("shapes mismatch")
 
 
+@simple_check
 def prediction_precision(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
-    assert y_pred.ndim == y_true.ndim
     return precision_score(y_true, y_pred, average="macro")
 
 
+@simple_check
 def prediction_recall(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
-    assert y_pred.ndim == y_true.ndim
     return recall_score(y_true, y_pred, average="macro")
 
 
+@simple_check
 def prediction_f1(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    y_pred = np.array(y_pred)
-    y_true = np.array(y_true)
-    assert y_pred.ndim == y_true.ndim
     return f1_score(y_true, y_pred, average="macro")
