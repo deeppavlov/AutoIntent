@@ -1,7 +1,7 @@
 # TODO: make up a better and more versatile config
 nodes:
   - node_type: retrieval
-    metric: retrieval_hit_rate_multilabel
+    metric: retrieval_hit_rate_intersecting
     modules:
       - module_type: vector_db
         k: [10]
