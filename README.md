@@ -252,21 +252,23 @@ DATA:
 - кросс валидация а не только разделение на обучающую и отложенную выборку
 - evaluation on few-shot episodes?
 
-FEATURES:
+ML FEATURES:
 - увеличение поддержки multilabel классификации:
-    - больше метрик из статьи про MLKNN
-    - больше модулей как MLKNN
-- labels vector representation как в статье Towards Multi-label Unknown Intent Detection
+    - реализовать MLKNN
+- labels vector representation
+    - статье Towards Multi-label Unknown Intent Detection
+    - статья Exploring Description-Augmented Dataless Intent Classification
 - поддержка NLI-pretrained кросс-энкодеров
 - thresholding как в статье Few-shot Learning for Multi-label Intent Detection
 
 EFFICIENCY:
 - эффективное использование вычислительных ресурсов
+- solve CUDA out of memory problem for collection.add and collection.query
+
+USER EXPERIENCE:
 - interactive cli config file creation
     - like in poetry
     - создание папки проекта в которую сохранится конфиг и тест и трейн данные
-- solve CUDA out of memory problem for collection.add and collection.query
-
 
 CODESTYLE:
 - добавить типизацию (dataclasses, pydantic, types)
