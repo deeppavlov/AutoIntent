@@ -55,9 +55,9 @@ def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k
     return sum(ap_list) / len(ap_list)
 
 
-def average_precision_tolerant(query_label: list[int], candidate_labels: list[list[int]], k: int = None) -> float:
+def average_precision_intersecting(query_label: list[int], candidate_labels: list[list[int]], k: int = None) -> float:
     """
-    helper function for `retrieval_map_tolerant`
+    helper function for `retrieval_map_intersecting`
     """
     query_label = np.array(query_label)
     candidate_labels = np.array(candidate_labels)
@@ -71,8 +71,8 @@ def average_precision_tolerant(query_label: list[int], candidate_labels: list[li
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map_tolerant(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    ap_list = [average_precision_tolerant(q, c, k) for q, c in zip(query_labels, candidates_labels)]
+def retrieval_map_intersecting(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
+    ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels)]
     return sum(ap_list) / len(ap_list)
 
 
@@ -112,7 +112,7 @@ def retrieval_hit_rate(query_labels: list[int], candidates_labels: list[list[int
     return hit_count / num_queries
 
 
-def retrieval_hit_rate_tolerant(
+def retrieval_hit_rate_intersecting(
     query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None
 ) -> float:
     """all the labels are binarized"""
@@ -158,7 +158,7 @@ def retrieval_precision(query_labels: list[int], candidates_labels: list[list[in
     return total_precision / num_queries
 
 
-def retrieval_precision_tolerant(
+def retrieval_precision_intersecting(
     query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None
 ) -> float:
     total_precision = 0.0
@@ -238,7 +238,7 @@ def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], 
     return sum(ndcg_scores) / len(ndcg_scores)
 
 
-def retrieval_ndcg_tolerant(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
+def retrieval_ndcg_intersecting(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
     ndcg_scores = []
     expanded_relevance_scores = np.array(query_labels)[:, None, :] == np.array(candidates_labels)
     relevance_scores = (expanded_relevance_scores.sum(axis=-1) != 0).astype(int)
@@ -272,7 +272,7 @@ def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k
     return mrr
 
 
-def retrieval_mrr_tolerant(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
+def retrieval_mrr_intersecting(query_labels: list[int], candidates_labels: list[list[int]], k: int = None) -> float:
     mrr_sum = 0.0
     num_queries = len(query_labels)
 

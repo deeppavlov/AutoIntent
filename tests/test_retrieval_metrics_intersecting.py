@@ -1,5 +1,5 @@
-def test_map_tolerant():
-    from autointent.metrics.retrieval import retrieval_map_tolerant
+def test_map():
+    from autointent.metrics.retrieval import retrieval_map_intersecting
     import numpy as np
 
     # case 1
@@ -9,7 +9,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 7/12
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
@@ -19,7 +19,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 7/12
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -29,7 +29,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 1.
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2b
@@ -39,7 +39,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 1.
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
@@ -50,7 +50,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 19/24
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
@@ -61,7 +61,7 @@ def test_map_tolerant():
     ]
     k = 2
     ground_truth = 0.75
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 5
@@ -71,7 +71,7 @@ def test_map_tolerant():
     ]
     k = None
     ground_truth = 0.
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 6
@@ -81,12 +81,12 @@ def test_map_tolerant():
     ]
     k = 2
     ground_truth = 0.
-    output = retrieval_map_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
 
 def test_hit_rate():
-    from autointent.metrics.retrieval import retrieval_hit_rate_tolerant
+    from autointent.metrics.retrieval import retrieval_hit_rate_intersecting
     import numpy as np
 
     # case 1
@@ -97,7 +97,7 @@ def test_hit_rate():
     k = None
 
     ground_truth = 1.
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
@@ -108,7 +108,7 @@ def test_hit_rate():
     k = None
 
     ground_truth = 1.
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -119,7 +119,7 @@ def test_hit_rate():
     k = None
 
     ground_truth = 0.
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
@@ -131,7 +131,7 @@ def test_hit_rate():
     k = None
 
     ground_truth = 1.
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
@@ -143,7 +143,7 @@ def test_hit_rate():
     k = 2
 
     ground_truth = 1.
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 5
@@ -155,12 +155,12 @@ def test_hit_rate():
     k = 1
 
     ground_truth = 0.5
-    output = retrieval_hit_rate_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
 
 def test_precision():
-    from autointent.metrics.retrieval import retrieval_precision_tolerant
+    from autointent.metrics.retrieval import retrieval_precision_intersecting
     import numpy as np
 
     # case 1
@@ -171,7 +171,7 @@ def test_precision():
     k = None
 
     ground_truth = 1/3
-    output = retrieval_precision_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
@@ -182,7 +182,7 @@ def test_precision():
     k = None
 
     ground_truth = 1.
-    output = retrieval_precision_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -193,7 +193,7 @@ def test_precision():
     k = None
 
     ground_truth = 0.
-    output = retrieval_precision_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
@@ -205,7 +205,7 @@ def test_precision():
     k = None
 
     ground_truth = 0.5
-    output = retrieval_precision_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
@@ -217,12 +217,12 @@ def test_precision():
     k = 2
 
     ground_truth = 0.25
-    output = retrieval_precision_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
 
 def test_ndcg():
-    from autointent.metrics.retrieval import retrieval_ndcg_tolerant
+    from autointent.metrics.retrieval import retrieval_ndcg_intersecting
     import numpy as np
 
     # case 1
@@ -235,7 +235,7 @@ def test_ndcg():
     dcg = 1 / np.log2(3) + 1 / np.log2(4)
     idcg = 1 / np.log2(2) + 1 / np.log2(3)
     ground_truth = dcg / idcg
-    output = retrieval_ndcg_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_ndcg_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -248,7 +248,7 @@ def test_ndcg():
     dcg = 0
     idcg = 0
     ground_truth = 0
-    output = retrieval_ndcg_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_ndcg_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
@@ -268,7 +268,7 @@ def test_ndcg():
 
     ground_truth = 0.5 * (ground_truth_1 + ground_truth_2)
 
-    output = retrieval_ndcg_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_ndcg_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
@@ -288,12 +288,12 @@ def test_ndcg():
 
     ground_truth = 0.5 * (ground_truth_1 + ground_truth_2)
 
-    output = retrieval_ndcg_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_ndcg_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
 
 def test_mrr():
-    from autointent.metrics.retrieval import retrieval_mrr_tolerant
+    from autointent.metrics.retrieval import retrieval_mrr_intersecting
     import numpy as np
 
     # case 1
@@ -304,7 +304,7 @@ def test_mrr():
     k = None
 
     ground_truth = 0.5
-    output = retrieval_mrr_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -315,7 +315,7 @@ def test_mrr():
     k = None
 
     ground_truth = 0.
-    output = retrieval_mrr_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
@@ -327,7 +327,7 @@ def test_mrr():
     k = None
 
     ground_truth = 0.75
-    output = retrieval_mrr_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
@@ -344,5 +344,5 @@ def test_mrr():
     k = 2
 
     ground_truth = 0.5
-    output = retrieval_mrr_tolerant(query_labels, candidates_labels, k)
+    output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
