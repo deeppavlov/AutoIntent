@@ -22,6 +22,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 datasets = "2.20.0"
+ruff = "^0.6.4"
 
 [tool.poetry.group.test]
 optional = true
@@ -32,10 +33,6 @@ pytest = "8.3.2"
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.main:main"
 "clear-cache" = "autointent.cache_utils:clear_chroma_cache"
-
-[tool.ruff]
-line-length = 120
-indent-width = 4
 
 [build-system]
 requires = ["poetry-core"]
