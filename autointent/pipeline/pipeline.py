@@ -1,6 +1,7 @@
 import importlib.resources as ires
 import json
 import os
+import pickle
 
 import numpy as np
 import yaml
@@ -24,6 +25,32 @@ class Pipeline:
         "prediction": PredictionNode,
     }
 
+    def serialize(self):
+        return pickle.dumps(self)
+
+    @classmethod
+    def load(cls, serialized_pipeline):
+        return pickle.loads(serialized_pipeline)
+
+    def predict(self, texts):
+        results = []
+        for text in texts:
+            current_input = text
+            for node_config in self.config["nodes"]:
+                node_type = node_config["node_type"]
+                node = self.available_nodes[node_type]
+                best_module_config = self.best_modules[node_type]
+                module = node.modules_available[best_module_config["module_type"]](
+                    **best_module_config)
+                current_input = module.predict([current_input])
+            results.append(current_input[0])
+        return results
+
+    def get_best_module_config(self, node_type):
+        # Получаем конфигурацию лучшего модуля для данного типа узла
+        node_metrics = self.context.optimization_logs.cache["metrics"][node_type]
+        best_index = np.argmax(node_metrics)
+        return self.context.optimization_logs.cache["configs"][node_type][best_index]
     def __init__(self, config_path: os.PathLike, mode: str, verbose: bool):
         # TODO add config validation
         self.config = load_config(config_path, mode)
@@ -31,12 +58,17 @@ class Pipeline:
 
     def optimize(self, context: Context):
         self.context = context
+        self.best_modules = {}
         for node_config in self.config["nodes"]:
             node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"], verbose=self.verbose
+                modules_search_spaces=node_config["modules"], metric=node_config["metric"],
+                verbose=self.verbose
             )
             node.fit(context)
             print("fitted!")
+            # Сохраняем лучший модуль для этого узла
+            self.best_modules[node_config["node_type"]] = self.get_best_module_config(
+                node_config["node_type"])
 
     def dump(self, logs_dir: os.PathLike, run_name: str):
         optimization_results = self.context.optimization_logs.dump()
