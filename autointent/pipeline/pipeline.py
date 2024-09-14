@@ -2,7 +2,8 @@ import importlib.resources as ires
 import json
 import os
 import pickle
-
+import inspect
+from ..modules.scoring.linear import LinearScorer
 import numpy as np
 import yaml
 
@@ -38,37 +39,98 @@ class Pipeline:
             current_input = text
             for node_config in self.config["nodes"]:
                 node_type = node_config["node_type"]
-                node = self.available_nodes[node_type]
-                best_module_config = self.best_modules[node_type]
-                module = node.modules_available[best_module_config["module_type"]](
-                    **best_module_config)
-                current_input = module.predict([current_input])
-            results.append(current_input[0])
+                best_module = self.best_modules[node_type]
+
+                if node_type == 'scoring':
+                    # Для модуля scoring передаем текст в виде списка кортежей
+                    current_input = best_module.predict([(current_input, '')])
+                elif node_type == 'prediction':
+                    # Для модуля prediction преобразуем вход в двумерный numpy массив
+                    current_input = np.atleast_2d(current_input)
+                    current_input = best_module.predict(current_input)
+                else:
+                    # Для других модулей оставляем как есть
+                    current_input = best_module.predict([current_input])
+
+                # Если результат - список или numpy массив, берем первый элемент
+                if isinstance(current_input, (list, np.ndarray)) and len(current_input) == 1:
+                    current_input = current_input[0]
+
+            results.append(current_input)
         return results
+
+    def load_best_modules(self, saved_modules, context):
+        self.best_modules = {}
+        for node_type, module_info in saved_modules.items():
+            node_class = self.available_nodes[node_type]
+            module_class = node_class.modules_available[module_info['module_type']]
+
+            module_init_params = inspect.signature(module_class.__init__).parameters
+            filtered_params = {k: v for k, v in module_info['parameters'].items()
+                               if k in module_init_params}
+
+            module = module_class(**filtered_params)
+
+            # Вызываем fit для инициализации модуля
+            if hasattr(module, 'fit'):
+                module.fit(context)
+
+            self.best_modules[node_type] = module
+
+    def save_best_modules(self):
+        saved_modules = {}
+        for node_type, module in self.best_modules.items():
+            # Получаем список параметров конструктора модуля
+            module_init_params = inspect.signature(type(module).__init__).parameters
+
+            # Сохраняем только те атрибуты, которые соответствуют параметрам конструктора
+            params = {k: v for k, v in module.__dict__.items()
+                      if k in module_init_params and not k.startswith('_')}
+
+            saved_modules[node_type] = {
+                'module_type': type(module).__name__,
+                'parameters': params
+            }
+        return saved_modules
 
     def get_best_module_config(self, node_type):
         # Получаем конфигурацию лучшего модуля для данного типа узла
         node_metrics = self.context.optimization_logs.cache["metrics"][node_type]
         best_index = np.argmax(node_metrics)
         return self.context.optimization_logs.cache["configs"][node_type][best_index]
+
     def __init__(self, config_path: os.PathLike, mode: str, verbose: bool):
-        # TODO add config validation
         self.config = load_config(config_path, mode)
         self.verbose = verbose
+        self.best_modules = {}  # Инициализируем best_modules как пустой словарь
+        self.context = None
 
-    def optimize(self, context: Context):
+    def optimize(self, context):
         self.context = context
-        self.best_modules = {}
         for node_config in self.config["nodes"]:
-            node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"],
+            node_type = node_config["node_type"]
+            node: Node = self.available_nodes[node_type](
+                modules_search_spaces=node_config["modules"],
+                metric=node_config["metric"],
                 verbose=self.verbose
             )
             node.fit(context)
-            print("fitted!")
-            # Сохраняем лучший модуль для этого узла
-            self.best_modules[node_config["node_type"]] = self.get_best_module_config(
-                node_config["node_type"])
+            print(f"Fitted {node_type}!")
+
+            best_config = self.get_best_module_config(node_type)
+            module_class = node.modules_available[best_config['module_type']]
+
+            module_init_params = inspect.signature(module_class.__init__).parameters
+            module_params = {k: v for k, v in best_config.items()
+                             if k in module_init_params and k != 'module_type'}
+
+            module = module_class(**module_params)
+
+            # Вызываем fit для инициализации модуля
+            if hasattr(module, 'fit'):
+                module.fit(context)
+
+            self.best_modules[node_type] = module
 
     def dump(self, logs_dir: os.PathLike, run_name: str):
         optimization_results = self.context.optimization_logs.dump()
