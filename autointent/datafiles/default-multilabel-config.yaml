@@ -11,7 +11,7 @@ nodes:
     metric: scoring_roc_auc
     modules:
       - module_type: knn
-        k: [3]
+        k: [10]
         weights: ["uniform", "distance", "closest"]
       - module_type: linear
         multilabel: [true]
@@ -19,4 +19,4 @@ nodes:
     metric: prediction_accuracy
     modules:
       - module_type: threshold
-        thresh: [0.5]
+        thresh: [0.02,0.001]

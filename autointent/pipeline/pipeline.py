@@ -133,7 +133,6 @@ class Pipeline:
 
             logger.info(f"Optimize module: {module}")
 
-            context.print_all_fields()
             if hasattr(module, 'fit'):
                 module.fit(context)
 

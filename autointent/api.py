@@ -40,19 +40,19 @@ class AutoIntentAPI:
             hyperparameters.get('seed', 0),
             self.logs_path
         )
-
+        logger.info("Checking if logs_path exists")
         if os.path.exists(self.logs_path):
-            best_modules = self.context.optimization_logs.get_best_modules()
-            if best_modules and all(best_modules.values()):
-                logger.info("Found saved optimization logs. Attempting to load...")
-                self.pipeline = Pipeline(config_path, self.mode,
-                                         verbose=hyperparameters.get('verbose', False))
-                try:
-                    self.pipeline.best_modules = self._load_best_modules(best_modules)
-                    logger.info("Successfully loaded saved pipeline.")
-                    return
-                except Exception as e:
-                    logger.warning(f"Failed to load saved pipeline: {str(e)}. Will re-optimize.")
+            logger.info("logs_path exists")
+            logger.info("Found saved optimization logs. Attempting to load...")
+            self.pipeline = Pipeline(config_path, self.mode,
+                                     verbose=hyperparameters.get('verbose', False))
+            try:
+                best_modules = self.context.optimization_logs.get_best_modules()
+                self.pipeline.best_modules = self._load_best_modules(best_modules)
+                logger.info("Successfully loaded saved pipeline.")
+                return
+            except Exception as e:
+                logger.warning(f"Failed to load saved pipeline: {str(e)}. Will re-optimize.")
 
         self.pipeline = Pipeline(config_path, self.mode,
                                  verbose=hyperparameters.get('verbose', False))
@@ -67,7 +67,16 @@ class AutoIntentAPI:
         for node_type, module_info in best_modules.items():
             node_class = self.pipeline.available_nodes[node_type]
             module_class = node_class.modules_available[module_info['module_type']]
-            loaded_modules[node_type] = module_class(**{k: v for k, v in module_info.items() if k != 'module_type'})
+            valid_params = {k: v for k, v in module_info.items()
+                            if
+                            k in module_class.__init__.__code__.co_varnames and k != 'module_type'}
+            module = module_class(**valid_params)
+
+            # Вызываем fit, если метод существует
+            if hasattr(module, 'fit'):
+                module.fit(self.context)
+
+            loaded_modules[node_type] = module
         return loaded_modules
 
     def predict(self, texts: List[str], intents_dict) -> List[Any]:
@@ -78,8 +87,11 @@ class AutoIntentAPI:
     def _save_best_modules(self, best_modules):
         saved_modules = {}
         for node_type, module_config in best_modules.items():
+            module_class = type(module_config)
+            valid_params = {k: v for k, v in module_config.__dict__.items()
+                            if k in module_class.__init__.__code__.co_varnames}
             saved_modules[node_type] = {
-                'module_type': module_config['module_type'],
-                'parameters': {k: v for k, v in module_config.items() if k != 'module_type'}
+                'module_type': module_config.__class__.__name__,
+                'parameters': valid_params
             }
         return saved_modules

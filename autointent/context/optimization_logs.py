@@ -23,18 +23,16 @@ class OptimizationLogs:
         else:
             self.cache = {
                 "best_assets": {
-                    "regexp": None,
                     "retrieval": None,
                     "scoring": {"test_scores": None, "oos_scores": None},
                     "prediction": None,
                 },
                 "metrics": {
-                    "regexp": np.array([]),
                     "retrieval": np.array([]),
                     "scoring": np.array([]),
                     "prediction": np.array([])
                 },
-                "configs": {"regexp": [], "retrieval": [], "scoring": [], "prediction": []},
+                "configs": {"retrieval": [], "scoring": [], "prediction": []},
             }
 
 
