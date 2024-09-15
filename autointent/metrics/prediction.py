@@ -90,4 +90,4 @@ def prediction_recall(y_true: list[int] | list[list[int]], y_pred: list[int] | l
 @simple_check
 def prediction_f1(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    return f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="macro", zero_division=0)

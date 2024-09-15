@@ -36,56 +36,56 @@ class Pipeline:
         return pickle.loads(serialized_pipeline)
 
     def predict(self, texts, intents_dict):
-        logger.info(f"Starting prediction for texts: {texts}")
+        logger.debug(f"Starting prediction for texts: {texts}")
         results = []
         for idx, text in enumerate(texts):
-            logger.info(f"Processing text {idx}: {text}")
+            logger.debug(f"Processing text {idx}: {text}")
             current_input = text
             for node_config in self.config["nodes"]:
                 node_type = node_config["node_type"]
                 best_module = self.best_modules[node_type]
-                logger.info(f"Processing node type: {node_type}")
-                logger.info(f"Current input before processing: {current_input}")
+                logger.debug(f"Processing node type: {node_type}")
+                logger.debug(f"Current input before processing: {current_input}")
 
                 if node_type == 'scoring':
-                    logger.info("Applying scoring module")
+                    logger.debug("Applying scoring module")
                     # Передаем текст напрямую в модуль scoring
                     current_input = best_module.predict([text])
                 elif node_type == 'prediction':
-                    logger.info("Applying prediction module")
+                    logger.debug("Applying prediction module")
                     current_input = np.atleast_2d(current_input)
-                    logger.info(f"Input shape after np.atleast_2d: {current_input.shape}")
+                    logger.debug(f"Input shape after np.atleast_2d: {current_input.shape}")
                     current_input = best_module.predict(current_input)
                 else:
-                    logger.info(f"Applying {node_type} module")
+                    logger.debug(f"Applying {node_type} module")
                     current_input = best_module.predict([current_input])
 
-                logger.info(f"Output after {node_type} module: {current_input}")
+                logger.debug(f"Output after {node_type} module: {current_input}")
 
                 if isinstance(current_input, (list, np.ndarray)) and len(current_input) == 1:
                     current_input = current_input[0]
-                    logger.info(f"Extracted first element: {current_input}")
+                    logger.debug(f"Extracted first element: {current_input}")
 
                 if node_type == 'scoring':
                     output = {intents_dict[i]: current_input[i] for i in range(len(current_input))}
                     sorted_output = dict(
                         sorted(output.items(), key=lambda item: item[1], reverse=True))
-                    logger.info(f"INTENTS: {sorted_output}")
+                    logger.debug(f"INTENTS: {sorted_output}")
                 elif node_type == 'prediction':
                     output = [intents_dict[i] for i in range(len(current_input)) if
                               current_input[i] == 1]
-                    logger.info(f"INTENTS: {output}")
+                    logger.debug(f"INTENTS: {output}")
                 else:
                     output = [intents_dict[j] for i in range(len(current_input))
                               for j in range(len(current_input[i])) if current_input[i][j] == 1]
-                    logger.info(f"INTENTS: {output}")
+                    logger.debug(f"INTENTS: {output}")
 
-            logger.info(f"Final output for text {idx}: {current_input}")
+            logger.debug(f"Final output for text {idx}: {current_input}")
             output = [intents_dict[i] for i in range(len(current_input)) if current_input[i] == 1]
-            logger.info(f"INTENTS: {output}")
+            logger.debug(f"INTENTS: {output}")
             results.append(current_input)
 
-        logger.info(f"Final results for all texts: {results}")
+        logger.debug(f"Final results for all texts: {results}")
         return results
 
     def get_best_module_config(self, node_type):
@@ -103,16 +103,16 @@ class Pipeline:
         self.context = context
         for node_config in self.config["nodes"]:
             node_type = node_config["node_type"]
-            logger.info(f"Optimizing node type: {node_type}")
-            logger.info(f"Number of test samples: {len(context.data_handler.utterances_test)}")
-            logger.info(f"Shape of test labels: {len(context.data_handler.labels_test)}")
+            logger.debug(f"Optimizing node type: {node_type}")
+            logger.debug(f"Number of test samples: {len(context.data_handler.utterances_test)}")
+            logger.debug(f"Shape of test labels: {len(context.data_handler.labels_test)}")
 
             node: Node = self.available_nodes[node_type](
                 modules_search_spaces=node_config["modules"],
                 metric=node_config["metric"],
                 verbose=self.verbose
             )
-            logger.info(f"Optimize node_type: {node_type}")
+            logger.debug(f"Optimize node_type: {node_type}")
             node.fit(context)
             print(f"Fitted {node_type}!")
 
@@ -131,7 +131,7 @@ class Pipeline:
 
             module = module_class(**module_params)
 
-            logger.info(f"Optimize module: {module}")
+            logger.debug(f"Optimize module: {module}")
 
             if hasattr(module, 'fit'):
                 module.fit(context)

@@ -42,7 +42,7 @@ class ThreshOptimizer:
     def objective(self, trial: Trial):
         thresholds = [trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)]
         y_pred = (self.probas > thresholds).astype(int)
-        score = f1_score(self.labels, y_pred, average="macro")
+        score = f1_score(self.labels, y_pred, average="macro", zero_division=0)
         return score
 
     def fit(self, probas, labels, seed):
