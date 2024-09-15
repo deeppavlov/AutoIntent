@@ -46,9 +46,11 @@ class Pipeline:
                 best_module = self.best_modules[node_type]
                 logger.info(f"Processing node type: {node_type}")
                 logger.info(f"Current input before processing: {current_input}")
+
                 if node_type == 'scoring':
                     logger.info("Applying scoring module")
-                    current_input = best_module.predict([(current_input, '')])
+                    # Передаем текст напрямую в модуль scoring
+                    current_input = best_module.predict([text])
                 elif node_type == 'prediction':
                     logger.info("Applying prediction module")
                     current_input = np.atleast_2d(current_input)
@@ -69,17 +71,17 @@ class Pipeline:
                     sorted_output = dict(
                         sorted(output.items(), key=lambda item: item[1], reverse=True))
                     logger.info(f"INTENTS: {sorted_output}")
-
                 elif node_type == 'prediction':
-                    output = [intents_dict[i] for i in range(len(current_input)) if current_input[i]==1]
+                    output = [intents_dict[i] for i in range(len(current_input)) if
+                              current_input[i] == 1]
                     logger.info(f"INTENTS: {output}")
                 else:
                     output = [intents_dict[j] for i in range(len(current_input))
-                               for j in range(len(current_input[i])) if current_input[i][j]==1]
+                              for j in range(len(current_input[i])) if current_input[i][j] == 1]
                     logger.info(f"INTENTS: {output}")
 
             logger.info(f"Final output for text {idx}: {current_input}")
-            output = [intents_dict[i] for i in range(len(current_input)) if current_input[i]==1]
+            output = [intents_dict[i] for i in range(len(current_input)) if current_input[i] == 1]
             logger.info(f"INTENTS: {output}")
             results.append(current_input)
 
