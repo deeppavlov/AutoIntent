@@ -90,15 +90,14 @@ class Pipeline:
         self.best_modules = {}
         for node_type, module_info in saved_modules.items():
             node_class = self.available_nodes[node_type]
-            module_class = node_class.modules_available[module_info['module_type']]
+            module_type_key = node_class.get_module_key(module_info['module_type'])
+            module_class = node_class.modules_available[module_type_key]
 
             module_init_params = inspect.signature(module_class.__init__).parameters
             filtered_params = {k: v for k, v in module_info['parameters'].items()
                                if k in module_init_params}
 
             module = module_class(**filtered_params)
-
-            # Вызываем fit для инициализации модуля
             if hasattr(module, 'fit'):
                 module.fit(context)
 
@@ -107,10 +106,8 @@ class Pipeline:
     def save_best_modules(self):
         saved_modules = {}
         for node_type, module in self.best_modules.items():
-            # Получаем список параметров конструктора модуля
             module_init_params = inspect.signature(type(module).__init__).parameters
 
-            # Сохраняем только те атрибуты, которые соответствуют параметрам конструктора
             params = {k: v for k, v in module.__dict__.items()
                       if k in module_init_params and not k.startswith('_')}
 
@@ -121,7 +118,6 @@ class Pipeline:
         return saved_modules
 
     def get_best_module_config(self, node_type):
-        # Получаем конфигурацию лучшего модуля для данного типа узла
         node_metrics = self.context.optimization_logs.cache["metrics"][node_type]
         best_index = np.argmax(node_metrics)
         return self.context.optimization_logs.cache["configs"][node_type][best_index]
@@ -129,7 +125,7 @@ class Pipeline:
     def __init__(self, config_path: os.PathLike, mode: str, verbose: bool):
         self.config = load_config(config_path, mode)
         self.verbose = verbose
-        self.best_modules = {}  # Инициализируем best_modules как пустой словарь
+        self.best_modules = {}
         self.context = None
 
     def optimize(self, context):
@@ -153,7 +149,6 @@ class Pipeline:
 
             module = module_class(**module_params)
 
-            # Вызываем fit для инициализации модуля
             if hasattr(module, 'fit'):
                 module.fit(context)
 
@@ -162,14 +157,12 @@ class Pipeline:
     def dump(self, logs_dir: os.PathLike, run_name: str):
         optimization_results = self.context.optimization_logs.dump()
 
-        # create appropriate directory
         if logs_dir == "":
             logs_dir = os.getcwd()
         logs_dir = os.path.join(logs_dir, run_name)
         if not os.path.exists(logs_dir):
             os.makedirs(logs_dir)
 
-        # dump config and optimization results
         logs_path = os.path.join(logs_dir, "logs.json")
         json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False,
                   cls=NumpyEncoder)
@@ -184,7 +177,6 @@ class Pipeline:
                 )
             )
 
-        # dump train and test data splits
         train_data, test_data = self.context.data_handler.dump()
         train_path = os.path.join(logs_dir, "train_data.json")
         test_path = os.path.join(logs_dir, "test_data.json")
@@ -193,7 +185,6 @@ class Pipeline:
 
 
 def load_config(config_path: os.PathLike, mode: str):
-    """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
         file = open(config_path)
     else:

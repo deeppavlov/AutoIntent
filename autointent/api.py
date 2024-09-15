@@ -40,12 +40,10 @@ class AutoIntentAPI:
             hyperparameters.get('seed', 0)
         )
 
-        # Проверяем, существует ли сохраненный лучший пайплайн
         if os.path.exists(self.best_pipeline_path):
             with open(self.best_pipeline_path, 'r') as f:
                 saved_pipeline = json.load(f)
 
-            # Проверяем, изменились ли гиперпараметры
             if saved_pipeline['hyperparameters'] == hyperparameters:
                 print("Loading saved pipeline...")
                 self.pipeline = Pipeline(config_path, self.mode,
@@ -57,7 +55,6 @@ class AutoIntentAPI:
                                  verbose=hyperparameters.get('verbose', False))
         self.pipeline.optimize(self.context)
 
-        # Сохранение лучшего пайплайна
         best_pipeline = {
             'hyperparameters': hyperparameters,
             'best_modules': self.pipeline.save_best_modules()
@@ -65,7 +62,6 @@ class AutoIntentAPI:
         with open(self.best_pipeline_path, 'w') as f:
             json.dump(best_pipeline, f)
 
-        # Сохранение результатов в логи
         logs_dir = hyperparameters.get('logs_dir', '')
         if logs_dir:
             self.pipeline.dump(logs_dir, run_name)
@@ -89,6 +85,5 @@ class AutoIntentAPI:
         for node_type, module_info in saved_modules.items():
             node_class = self.pipeline.available_nodes[node_type]
             module_class = node_class.modules_available[module_info['module_type']]
-            # Создаем экземпляр модуля
             loaded_modules[node_type] = module_class(**module_info['parameters'])
         return loaded_modules
