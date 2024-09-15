@@ -101,6 +101,10 @@ class Pipeline:
         self.context = context
         for node_config in self.config["nodes"]:
             node_type = node_config["node_type"]
+            logger.info(f"Optimizing node type: {node_type}")
+            logger.info(f"Number of test samples: {len(context.data_handler.utterances_test)}")
+            logger.info(f"Shape of test labels: {len(context.data_handler.labels_test)}")
+
             node: Node = self.available_nodes[node_type](
                 modules_search_spaces=node_config["modules"],
                 metric=node_config["metric"],

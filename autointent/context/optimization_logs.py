@@ -44,7 +44,19 @@ class OptimizationLogs:
 
         # Преобразуем списки обратно в numpy массивы там, где это необходимо
         for node_type in data['metrics']:
-            data['metrics'][node_type] = np.array(data['metrics'][node_type])
+            if isinstance(data['metrics'][node_type], list):
+                data['metrics'][node_type] = np.array(data['metrics'][node_type], dtype=float)
+            elif not isinstance(data['metrics'][node_type], np.ndarray):
+                logger.warning(
+                    f"Unexpected type for metrics of {node_type}: {type(data['metrics'][node_type])}")
+                data['metrics'][node_type] = np.array([], dtype=float)
+
+            # Проверка наличия всех необходимых ключей
+        expected_keys = ['best_assets', 'metrics', 'configs']
+        for key in expected_keys:
+            if key not in data:
+                logger.warning(f"Missing key in loaded data: {key}")
+                data[key] = {}
 
         if 'scoring' in data['best_assets']:
             for key in ['test_scores', 'oos_scores']:

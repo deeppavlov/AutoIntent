@@ -44,11 +44,15 @@ class AutoIntentAPI:
         if os.path.exists(self.logs_path):
             best_modules = self.context.optimization_logs.get_best_modules()
             if best_modules and all(best_modules.values()):
-                print("Loading saved pipeline...")
+                logger.info("Found saved optimization logs. Attempting to load...")
                 self.pipeline = Pipeline(config_path, self.mode,
                                          verbose=hyperparameters.get('verbose', False))
-                self.pipeline.best_modules = self._load_best_modules(best_modules)
-                return
+                try:
+                    self.pipeline.best_modules = self._load_best_modules(best_modules)
+                    logger.info("Successfully loaded saved pipeline.")
+                    return
+                except Exception as e:
+                    logger.warning(f"Failed to load saved pipeline: {str(e)}. Will re-optimize.")
 
         self.pipeline = Pipeline(config_path, self.mode,
                                  verbose=hyperparameters.get('verbose', False))
