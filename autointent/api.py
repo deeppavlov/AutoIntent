@@ -1,11 +1,17 @@
 import json
 import os
+import logging
+
 from typing import List, Any
 from pathlib import Path
 from .pipeline.pipeline import Pipeline
 from . import Context
 from .pipeline.utils import get_db_dir, generate_name
 from datetime import datetime
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 class AutoIntentAPI:
     def __init__(self, mode: str = "multiclass", device: str = "cuda:0"):
@@ -64,10 +70,10 @@ class AutoIntentAPI:
         if logs_dir:
             self.pipeline.dump(logs_dir, run_name)
 
-    def predict(self, texts: List[str]) -> List[Any]:
+    def predict(self, texts: List[str], intents_dict) -> List[Any]:
         if self.pipeline is None:
             raise ValueError("Pipeline is not fitted. Call fit() first.")
-        return self.pipeline.predict(texts)
+        return self.pipeline.predict(texts, intents_dict)
 
     def _save_best_modules(self, best_modules):
         saved_modules = {}

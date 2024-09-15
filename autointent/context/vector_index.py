@@ -34,7 +34,6 @@ class VectorIndex:
 
     def create_collection(self, model_name: str, data_handler: DataHandler, device=None):
         device = device if device is not None else self.device
-
         collection = self.get_collection(model_name, device)
         db_name = model_name.replace("/", "_")
 
@@ -43,11 +42,24 @@ class VectorIndex:
         else:
             metadatas = multiclass_labels_as_metadata(data_handler.labels_train)
 
-        collection.add(
-            documents=data_handler.utterances_train,
-            ids=[f"{i}-{db_name}" for i in range(len(data_handler.utterances_train))],
-            metadatas=metadatas,
-        )
+        existing_ids = set(collection.get()["ids"])
+        new_documents = []
+        new_ids = []
+        new_metadatas = []
+
+        for i, (utterance, metadata) in enumerate(zip(data_handler.utterances_train, metadatas)):
+            new_id = f"{i}-{db_name}"
+            if new_id not in existing_ids:
+                new_documents.append(utterance)
+                new_ids.append(new_id)
+                new_metadatas.append(metadata)
+
+        if new_documents:
+            collection.add(
+                documents=new_documents,
+                ids=new_ids,
+                metadatas=new_metadatas,
+            )
         return collection
 
     def delete_collection(self, model_name: str):

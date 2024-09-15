@@ -3,11 +3,13 @@ import json
 import os
 import pickle
 import inspect
-from ..modules.scoring.linear import LinearScorer
 import numpy as np
 import yaml
+import logging
 
-from .. import Context
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from ..nodes import (
     Node,
     PredictionNode,
@@ -33,30 +35,55 @@ class Pipeline:
     def load(cls, serialized_pipeline):
         return pickle.loads(serialized_pipeline)
 
-    def predict(self, texts):
+    def predict(self, texts, intents_dict):
+        logger.info(f"Starting prediction for texts: {texts}")
         results = []
-        for text in texts:
+        for idx, text in enumerate(texts):
+            logger.info(f"Processing text {idx}: {text}")
             current_input = text
             for node_config in self.config["nodes"]:
                 node_type = node_config["node_type"]
                 best_module = self.best_modules[node_type]
-
+                logger.info(f"Processing node type: {node_type}")
+                logger.info(f"Current input before processing: {current_input}")
                 if node_type == 'scoring':
-                    # Для модуля scoring передаем текст в виде списка кортежей
+                    logger.info("Applying scoring module")
                     current_input = best_module.predict([(current_input, '')])
                 elif node_type == 'prediction':
-                    # Для модуля prediction преобразуем вход в двумерный numpy массив
+                    logger.info("Applying prediction module")
                     current_input = np.atleast_2d(current_input)
+                    logger.info(f"Input shape after np.atleast_2d: {current_input.shape}")
                     current_input = best_module.predict(current_input)
                 else:
-                    # Для других модулей оставляем как есть
+                    logger.info(f"Applying {node_type} module")
                     current_input = best_module.predict([current_input])
 
-                # Если результат - список или numpy массив, берем первый элемент
+                logger.info(f"Output after {node_type} module: {current_input}")
+
                 if isinstance(current_input, (list, np.ndarray)) and len(current_input) == 1:
                     current_input = current_input[0]
+                    logger.info(f"Extracted first element: {current_input}")
 
+                if node_type == 'scoring':
+                    output = {intents_dict[i]: current_input[i] for i in range(len(current_input))}
+                    sorted_output = dict(
+                        sorted(output.items(), key=lambda item: item[1], reverse=True))
+                    logger.info(f"INTENTS: {sorted_output}")
+
+                elif node_type == 'prediction':
+                    output = [intents_dict[i] for i in range(len(current_input)) if current_input[i]==1]
+                    logger.info(f"INTENTS: {output}")
+                else:
+                    output = [intents_dict[j] for i in range(len(current_input))
+                               for j in range(len(current_input[i])) if current_input[i][j]==1]
+                    logger.info(f"INTENTS: {output}")
+
+            logger.info(f"Final output for text {idx}: {current_input}")
+            output = [intents_dict[i] for i in range(len(current_input)) if current_input[i]==1]
+            logger.info(f"INTENTS: {output}")
             results.append(current_input)
+
+        logger.info(f"Final results for all texts: {results}")
         return results
 
     def load_best_modules(self, saved_modules, context):
@@ -144,14 +171,16 @@ class Pipeline:
 
         # dump config and optimization results
         logs_path = os.path.join(logs_dir, "logs.json")
-        json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder)
+        json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False,
+                  cls=NumpyEncoder)
         config_path = os.path.join(logs_dir, "config.yaml")
         yaml.dump(self.config, open(config_path, "w"))
 
         if self.verbose:
             print(
                 make_report(
-                    optimization_results, nodes=[node_config["node_type"] for node_config in self.config["nodes"]]
+                    optimization_results,
+                    nodes=[node_config["node_type"] for node_config in self.config["nodes"]]
                 )
             )
 
