@@ -10,6 +10,13 @@ from ..modules import Module
 
 
 class Node:
+    @classmethod
+    def get_module_key(cls, module_class_name):
+        for key, value in cls.modules_available.items():
+            if value.__name__ == module_class_name:
+                return key
+        raise ValueError(f"Module class {module_class_name} not found in modules_available")
+
     metrics_available: dict[str, Callable]  # metrics functions
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str

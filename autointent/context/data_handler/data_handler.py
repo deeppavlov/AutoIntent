@@ -5,6 +5,8 @@ from .sampling import sample_from_regex
 from .stratification import split_sample_utterances
 from .tags import collect_tags
 
+import logging
+logger = logging.getLogger(__name__)
 
 class DataHandler:
     def __init__(
@@ -77,6 +79,31 @@ class DataHandler:
         test_data = test_data + oos_data
         return train_data, test_data
 
+    def print_fields(self):
+        logger.info("DataHandler fields:")
+        logger.info(f"Multilabel: {self.multilabel}")
+        logger.info(f"Number of classes: {self.n_classes}")
+        logger.info(f"Number of training utterances: {len(self.utterances_train)}")
+        logger.info(f"Number of test utterances: {len(self.utterances_test)}")
+        logger.info(f"Number of OOS utterances: {len(self.oos_utterances)}")
+        logger.info(f"Number of tags: {len(self.tags)}")
+        if hasattr(self, 'regexp_patterns'):
+            logger.info(f"Number of regexp patterns: {len(self.regexp_patterns)}")
+
+        # Вывод примеров данных
+        if self.utterances_train:
+            logger.info(f"Sample training utterance: {self.utterances_train[0]}")
+            logger.info(f"Sample training label: {self.labels_train[0]}")
+        if self.utterances_test:
+            logger.info(f"Sample test utterance: {self.utterances_test[0]}")
+            logger.info(f"Sample test label: {self.labels_test[0]}")
+        if self.oos_utterances:
+            logger.info(f"Sample OOS utterance: {self.oos_utterances[0]}")
+        if self.tags:
+            logger.info(f"Sample tag: {self.tags[0]}")
+        if hasattr(self, 'regexp_patterns') and self.regexp_patterns:
+            logger.info(f"Sample regexp pattern: {self.regexp_patterns[0]}")
+
 
 def _dump_train(utterances, labels, n_classes, multilabel):
     if not multilabel:
@@ -91,6 +118,8 @@ def _dump_train(utterances, labels, n_classes, multilabel):
             labs = [i for i in range(n_classes) if labs[i]]
             res.append(dict(utterance=ut, labels=labs))
     return res
+
+
 
 
 def _dump_test(utterances, labels, n_classes, multilabel):

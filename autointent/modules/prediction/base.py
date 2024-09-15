@@ -8,6 +8,8 @@ from ..base import Context, Module
 from ...metrics import PredictionMetricFn
 
 
+import logging
+logger = logging.getLogger(__name__)
 class PredictionModule(Module):
     @abstractmethod
     def fit(self, context: Context):
@@ -20,6 +22,9 @@ class PredictionModule(Module):
     def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
+        logger.info(f"Shape of test labels: {len(labels)}")
+        logger.info(f"Shape of predictions: {self._predictions.shape}")
+
         metric_value = metric_fn(labels, self._predictions)
         return metric_value
 
