@@ -1,61 +1,97 @@
+import json
+import os
 from pprint import pprint
-
+import numpy as np
 import logging
-
 logger = logging.getLogger(__name__)
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        return super(NumpyEncoder, self).default(obj)
+
 class OptimizationLogs:
-    """TODO continous IO with file system (to be able to restore the state of optimization)"""
+    def __init__(self, logs_path: str):
+        self.logs_path = logs_path
+        if os.path.exists(logs_path):
+            self.cache = self.load_logs()
+        else:
+            self.cache = {
+                "best_assets": {
+                    "regexp": None,
+                    "retrieval": None,
+                    "scoring": {"test_scores": None, "oos_scores": None},
+                    "prediction": None,
+                },
+                "metrics": {
+                    "regexp": np.array([]),
+                    "retrieval": np.array([]),
+                    "scoring": np.array([]),
+                    "prediction": np.array([])
+                },
+                "configs": {"regexp": [], "retrieval": [], "scoring": [], "prediction": []},
+            }
 
-    def __init__(
-        self,
-    ):
-        self.cache = dict(
-            best_assets=dict(
-                regexp=None,  # TODO: choose the format
-                retrieval=None,  # str, name of best retriever
-                scoring=dict(
-                    test_scores=None, oos_scores=None
-                ),  # dict with values of two np.ndarrays of shape (n_samples, n_classes), from best scorer
-                prediction=None,  # np.ndarray of shape (n_samples,), from best predictor
-            ),
-            metrics=dict(regexp=[], retrieval=[], scoring=[], prediction=[]),
-            configs=dict(regexp=[], retrieval=[], scoring=[], prediction=[]),
-        )
 
-    def log_module_optimization(
-        self,
-        node_type: str,
-        module_type: str,
-        module_config: dict,
-        metric_value: float,
-        metric_name: str,
-        assets,
-        verbose=False,
-    ):
-        """
-        Purposes:
-        - save optimization results in a text form (hyperparameters and corresponding metrics)
-        - update best assets
-        """
+    def load_logs(self):
+        with open(self.logs_path, 'r') as f:
+            data = json.load(f)
 
-        # "update leaderboard" if it's a new best metric
+        # Преобразуем списки обратно в numpy массивы там, где это необходимо
+        for node_type in data['metrics']:
+            data['metrics'][node_type] = np.array(data['metrics'][node_type])
+
+        if 'scoring' in data['best_assets']:
+            for key in ['test_scores', 'oos_scores']:
+                if data['best_assets']['scoring'][key] is not None:
+                    data['best_assets']['scoring'][key] = np.array(
+                        data['best_assets']['scoring'][key])
+
+        if 'prediction' in data['best_assets'] and data['best_assets']['prediction'] is not None:
+            data['best_assets']['prediction'] = np.array(data['best_assets']['prediction'])
+
+        return data
+
+    def save_logs(self):
+        with open(self.logs_path, 'w') as f:
+            json.dump(self.cache, f, indent=4, cls=NumpyEncoder)
+
+    def log_module_optimization(self, node_type, module_type, module_config, metric_value,
+                                metric_name, assets, verbose=False):
+        logger.info(f"Logging optimization for {node_type}: {module_type}")
         metrics_list = self.cache["metrics"][node_type]
-        previous_best = max(metrics_list, default=-float("inf"))
-        if metric_value > previous_best:
-            self.cache["best_assets"][node_type] = assets
 
-        # logging
-        logs = dict(
-            module_type=module_type,
-            metric_name=metric_name,
-            metric_value=metric_value,
-            **module_config,
-        )
+        if isinstance(metrics_list, np.ndarray):
+            previous_best = np.max(metrics_list) if metrics_list.size > 0 else -float("inf")
+        else:
+            previous_best = max(metrics_list, default=-float("inf"))
+
+        if metric_value > previous_best:
+            logger.info(f"New best {node_type} found. Metric value: {metric_value}")
+            self.cache["best_assets"][node_type] = assets
+        else:
+            logger.info(
+                f"Not the best {node_type}. Metric value: {metric_value}, Previous best: {previous_best}")
+
+        logs = dict(module_type=module_type, metric_name=metric_name, metric_value=metric_value,
+                    **module_config)
         self.cache["configs"][node_type].append(logs)
         if verbose:
             pprint(logs)
-        metrics_list.append(metric_value)
+
+        if isinstance(metrics_list, np.ndarray):
+            self.cache["metrics"][node_type] = np.append(metrics_list, metric_value)
+        else:
+            metrics_list.append(metric_value)
+
+        self.save_logs()
+        logger.info(
+            f"Optimization logged for {node_type}. Total configurations: {len(self.cache['configs'][node_type])}")
 
     def get_best_embedder(self):
         return self.cache["best_assets"]["retrieval"]
@@ -66,39 +102,22 @@ class OptimizationLogs:
     def get_best_oos_scores(self):
         return self.cache["best_assets"]["scoring"]["oos_scores"]
 
+    def get_best_modules(self):
+        best_modules = {}
+        for node_type in self.cache["configs"]:
+            metrics = self.cache["metrics"][node_type]
+            configs = self.cache["configs"][node_type]
+            if isinstance(metrics, np.ndarray):
+                metrics_not_empty = metrics.size > 0
+            else:
+                metrics_not_empty = bool(metrics)
+
+            if metrics_not_empty and configs:  # Проверяем, что списки не пусты
+                best_index = np.argmax(metrics)
+                best_modules[node_type] = configs[best_index]
+            else:
+                best_modules[node_type] = None  # или какое-то значение по умолчанию
+        return best_modules
+
     def dump(self):
-        res = dict(
-            metrics=self.cache["metrics"],
-            configs=self.cache["configs"],
-        )
-        return res
-
-    def print_logs(self):
-        logger.info("OptimizationLogs:")
-        logger.info("Best assets:")
-        for node_type, asset in self.cache["best_assets"].items():
-            if isinstance(asset, dict):
-                logger.info(f"  {node_type}:")
-                for key, value in asset.items():
-                    if value is not None:
-                        logger.info(f"    {key}: {type(value).__name__}")
-                    else:
-                        logger.info(f"    {key}: None")
-            else:
-                logger.info(f"  {node_type}: {asset}")
-
-        logger.info("Metrics:")
-        for node_type, metrics in self.cache["metrics"].items():
-            if metrics:
-                logger.info(
-                    f"  {node_type}: min={min(metrics):.4f}, max={max(metrics):.4f}, count={len(metrics)}")
-            else:
-                logger.info(f"  {node_type}: No metrics recorded")
-
-        logger.info("Configs:")
-        for node_type, configs in self.cache["configs"].items():
-            logger.info(f"  {node_type}: {len(configs)} configurations")
-            if configs:
-                logger.info("  Last config:")
-                pprint(configs[-1], indent=4)
-
+        return dict(metrics=self.cache["metrics"], configs=self.cache["configs"])

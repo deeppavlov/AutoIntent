@@ -86,42 +86,6 @@ class Pipeline:
         logger.info(f"Final results for all texts: {results}")
         return results
 
-    def load_best_modules(self, saved_modules, context):
-        self.best_modules = {}
-        for node_type, module_info in saved_modules.items():
-            node_class = self.available_nodes[node_type]
-            module_type_key = node_class.get_module_key(module_info['module_type'])
-            module_class = node_class.modules_available[module_type_key]
-
-            module_init_params = inspect.signature(module_class.__init__).parameters
-            filtered_params = {k: v for k, v in module_info['parameters'].items()
-                               if k in module_init_params}
-
-            module = module_class(**filtered_params)
-
-            logger.info(f"Loading module: {node_type}")
-
-            context.print_all_fields()
-
-            if hasattr(module, 'fit'):
-                module.fit(context)
-
-            self.best_modules[node_type] = module
-
-    def save_best_modules(self):
-        saved_modules = {}
-        for node_type, module in self.best_modules.items():
-            module_init_params = inspect.signature(type(module).__init__).parameters
-
-            params = {k: v for k, v in module.__dict__.items()
-                      if k in module_init_params and not k.startswith('_')}
-
-            saved_modules[node_type] = {
-                'module_type': type(module).__name__,
-                'parameters': params
-            }
-        return saved_modules
-
     def get_best_module_config(self, node_type):
         node_metrics = self.context.optimization_logs.cache["metrics"][node_type]
         best_index = np.argmax(node_metrics)
@@ -146,7 +110,13 @@ class Pipeline:
             node.fit(context)
             print(f"Fitted {node_type}!")
 
-            best_config = self.get_best_module_config(node_type)
+            best_modules = context.optimization_logs.get_best_modules()
+            best_config = best_modules.get(node_type)
+
+            if best_config is None:
+                logger.warning(f"No best config found for {node_type}. Skipping module creation.")
+                continue
+
             module_class = node.modules_available[best_config['module_type']]
 
             module_init_params = inspect.signature(module_class.__init__).parameters

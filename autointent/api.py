@@ -19,7 +19,7 @@ class AutoIntentAPI:
         self.device = device
         self.pipeline = None
         self.context = None
-        self.best_pipeline_path = Path("best_pipeline.json")
+        self.logs_path = Path("optimization_logs.json")
 
     def fit(self, multiclass_data: List[Any], multilabel_data: List[Any], test_data: List[Any],
             hyperparameters: dict):
@@ -37,34 +37,34 @@ class AutoIntentAPI:
             hyperparameters.get('multilabel_generation_config', ''),
             db_dir,
             hyperparameters.get('regex_sampling', 0),
-            hyperparameters.get('seed', 0)
+            hyperparameters.get('seed', 0),
+            self.logs_path
         )
 
-        if os.path.exists(self.best_pipeline_path):
-            with open(self.best_pipeline_path, 'r') as f:
-                saved_pipeline = json.load(f)
-
-            if saved_pipeline['hyperparameters'] == hyperparameters:
+        if os.path.exists(self.logs_path):
+            best_modules = self.context.optimization_logs.get_best_modules()
+            if best_modules and all(best_modules.values()):
                 print("Loading saved pipeline...")
                 self.pipeline = Pipeline(config_path, self.mode,
                                          verbose=hyperparameters.get('verbose', False))
-                self.pipeline.load_best_modules(saved_pipeline['best_modules'], self.context)
+                self.pipeline.best_modules = self._load_best_modules(best_modules)
                 return
 
         self.pipeline = Pipeline(config_path, self.mode,
                                  verbose=hyperparameters.get('verbose', False))
         self.pipeline.optimize(self.context)
 
-        best_pipeline = {
-            'hyperparameters': hyperparameters,
-            'best_modules': self.pipeline.save_best_modules()
-        }
-        with open(self.best_pipeline_path, 'w') as f:
-            json.dump(best_pipeline, f)
-
         logs_dir = hyperparameters.get('logs_dir', '')
         if logs_dir:
             self.pipeline.dump(logs_dir, run_name)
+
+    def _load_best_modules(self, best_modules):
+        loaded_modules = {}
+        for node_type, module_info in best_modules.items():
+            node_class = self.pipeline.available_nodes[node_type]
+            module_class = node_class.modules_available[module_info['module_type']]
+            loaded_modules[node_type] = module_class(**{k: v for k, v in module_info.items() if k != 'module_type'})
+        return loaded_modules
 
     def predict(self, texts: List[str], intents_dict) -> List[Any]:
         if self.pipeline is None:
@@ -79,11 +79,3 @@ class AutoIntentAPI:
                 'parameters': {k: v for k, v in module_config.items() if k != 'module_type'}
             }
         return saved_modules
-
-    def _load_best_modules(self, saved_modules):
-        loaded_modules = {}
-        for node_type, module_info in saved_modules.items():
-            node_class = self.pipeline.available_nodes[node_type]
-            module_class = node_class.modules_available[module_info['module_type']]
-            loaded_modules[node_type] = module_class(**module_info['parameters'])
-        return loaded_modules

@@ -17,6 +17,7 @@ class Context:
         db_dir,
         regex_sampling,
         seed,
+        logs_path: str,
     ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,
@@ -27,7 +28,7 @@ class Context:
             regex_sampling,
             seed,
         )
-        self.optimization_logs = OptimizationLogs()
+        self.optimization_logs = OptimizationLogs(logs_path)
         self.vector_index = VectorIndex(db_dir, device, self.data_handler.multilabel, self.data_handler.n_classes)
 
         self.device = device
@@ -35,21 +36,19 @@ class Context:
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
 
+    def get_best_collection(self):
+        model_name = self.optimization_logs.get_best_embedder()
+        logger.info(f"Best embedder model name: {model_name}")
+        if model_name is None:
+            logger.warning("No best embedder found in optimization logs")
+            return None
+        return self.vector_index.get_collection(model_name)
+
     def print_all_fields(self):
         logger.info("Context fields:")
         logger.info(f"Device: {self.device}")
         logger.info(f"Multilabel: {self.multilabel}")
         logger.info(f"Number of classes: {self.n_classes}")
         logger.info(f"Seed: {self.seed}")
-        logger.info("Data Handler fields:")
         self.data_handler.print_fields()
-        logger.info("Optimization Logs:")
-        self.optimization_logs.print_logs()
-        logger.info("Vector Index:")
         self.vector_index.print_info()
-
-
-    def get_best_collection(self):
-        model_name = self.optimization_logs.get_best_embedder()
-        print(model_name)
-        return self.vector_index.get_collection(model_name)
