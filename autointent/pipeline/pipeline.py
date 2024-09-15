@@ -98,6 +98,11 @@ class Pipeline:
                                if k in module_init_params}
 
             module = module_class(**filtered_params)
+
+            logger.info(f"Loading module: {node_type}")
+
+            context.print_all_fields()
+
             if hasattr(module, 'fit'):
                 module.fit(context)
 
@@ -137,6 +142,7 @@ class Pipeline:
                 metric=node_config["metric"],
                 verbose=self.verbose
             )
+            logger.info(f"Optimize node_type: {node_type}")
             node.fit(context)
             print(f"Fitted {node_type}!")
 
@@ -149,6 +155,9 @@ class Pipeline:
 
             module = module_class(**module_params)
 
+            logger.info(f"Optimize module: {module}")
+
+            context.print_all_fields()
             if hasattr(module, 'fit'):
                 module.fit(context)
 

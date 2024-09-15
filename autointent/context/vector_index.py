@@ -1,11 +1,12 @@
 import os
-
+import logging
 from chromadb import PersistentClient
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 from .data_handler import DataHandler
 
+logger = logging.getLogger(__name__)
 
 class VectorIndex:
     def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes):
@@ -65,6 +66,32 @@ class VectorIndex:
     def delete_collection(self, model_name: str):
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
+
+    def print_info(self):
+        logger.info("VectorIndex Information:")
+        logger.info(f"Device: {self.device}")
+        logger.info(f"Multilabel: {self.multilabel}")
+        logger.info(f"Number of classes: {self.n_classes}")
+
+        collections = self.client.list_collections()
+        logger.info(f"Number of collections: {len(collections)}")
+
+        for collection in collections:
+            collection_name = collection.name
+            collection_obj = self.client.get_collection(collection_name)
+            count = collection_obj.count()
+            metadata = collection_obj.metadata
+            logger.info(f"Collection: {collection_name}")
+            logger.info(f"  Number of items: {count}")
+            logger.info(f"  Metadata: {metadata}")
+
+            # Примеры данных (если есть)
+            if count > 0:
+                sample = collection_obj.get(limit=1)
+                logger.info("  Sample item:")
+                logger.info(f"    ID: {sample['ids'][0]}")
+                logger.info(f"    Document: {sample['documents'][0]}")
+                logger.info(f"    Metadata: {sample['metadatas'][0]}")
 
 
 def multiclass_labels_as_metadata(labels_list: list[int]):

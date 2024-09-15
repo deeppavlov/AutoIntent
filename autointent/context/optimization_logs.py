@@ -1,5 +1,8 @@
 from pprint import pprint
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class OptimizationLogs:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
@@ -69,3 +72,33 @@ class OptimizationLogs:
             configs=self.cache["configs"],
         )
         return res
+
+    def print_logs(self):
+        logger.info("OptimizationLogs:")
+        logger.info("Best assets:")
+        for node_type, asset in self.cache["best_assets"].items():
+            if isinstance(asset, dict):
+                logger.info(f"  {node_type}:")
+                for key, value in asset.items():
+                    if value is not None:
+                        logger.info(f"    {key}: {type(value).__name__}")
+                    else:
+                        logger.info(f"    {key}: None")
+            else:
+                logger.info(f"  {node_type}: {asset}")
+
+        logger.info("Metrics:")
+        for node_type, metrics in self.cache["metrics"].items():
+            if metrics:
+                logger.info(
+                    f"  {node_type}: min={min(metrics):.4f}, max={max(metrics):.4f}, count={len(metrics)}")
+            else:
+                logger.info(f"  {node_type}: No metrics recorded")
+
+        logger.info("Configs:")
+        for node_type, configs in self.cache["configs"].items():
+            logger.info(f"  {node_type}: {len(configs)} configurations")
+            if configs:
+                logger.info("  Last config:")
+                pprint(configs[-1], indent=4)
+

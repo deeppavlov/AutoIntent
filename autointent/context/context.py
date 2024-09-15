@@ -1,7 +1,9 @@
 from .data_handler import DataHandler
 from .optimization_logs import OptimizationLogs
 from .vector_index import VectorIndex
+import logging
 
+logger = logging.getLogger(__name__)
 
 class Context:
     def __init__(
@@ -33,6 +35,21 @@ class Context:
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
 
+    def print_all_fields(self):
+        logger.info("Context fields:")
+        logger.info(f"Device: {self.device}")
+        logger.info(f"Multilabel: {self.multilabel}")
+        logger.info(f"Number of classes: {self.n_classes}")
+        logger.info(f"Seed: {self.seed}")
+        logger.info("Data Handler fields:")
+        self.data_handler.print_fields()
+        logger.info("Optimization Logs:")
+        self.optimization_logs.print_logs()
+        logger.info("Vector Index:")
+        self.vector_index.print_info()
+
+
     def get_best_collection(self):
         model_name = self.optimization_logs.get_best_embedder()
+        print(model_name)
         return self.vector_index.get_collection(model_name)
