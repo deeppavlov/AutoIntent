@@ -6,6 +6,12 @@ from ..base import Context, ScoringModule
 from .head_training import CrossEncoderWithLogreg
 
 class DNNCScorer(ScoringModule):
+    """
+    TODO:
+    - think about other cross-encoder settings
+    - implement training of cross-encoder with sentence_encoders utils
+    - inspect batch size of model.predict?
+    """
 
     def __init__(self, model_name: str, k: int, train_head=False):
         self.model_name = model_name
@@ -22,6 +28,11 @@ class DNNCScorer(ScoringModule):
             self.model = model
 
     def predict(self, utterances: list[str]):
+        """
+        Return
+        ---
+        `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
+        """
 
         query_res = self._collection.query(
             query_texts=utterances,
@@ -47,6 +58,17 @@ class DNNCScorer(ScoringModule):
     def _get_cross_encoder_scores(
         self, utterances: list[str], candidates: list[list[str]]
     ):
+        """
+        Arguments
+        ---
+        `utterances`: list of query utterances
+        `candidates`: for each query, this list contains a list of the k the closest sample utterances (from retrieval module)
+
+        Return
+        ---
+        for each query, return a list of a corresponding cross encoder scores for the k the closest sample utterances
+        """
+
         assert len(utterances) == len(candidates)
 
         text_pairs = [
@@ -66,6 +88,17 @@ class DNNCScorer(ScoringModule):
         return cross_encoder_scores
 
     def _build_result(self, scores: list[list[float]], labels: list[list[int]]):
+        """
+        Arguments
+        ---
+        `scores`: for each query utterance, cross encoder scores of its k closest utterances
+        `labels`: corresponding intent labels
+
+        Return
+        ---
+        `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
+        """
+
         scores = np.array(scores)
         labels = np.array(labels, dtype=int)
         n_classes = self._collection.metadata["n_classes"]

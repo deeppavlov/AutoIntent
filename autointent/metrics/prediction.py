@@ -32,12 +32,14 @@ def simple_check(func):
 
 @simple_check
 def prediction_accuracy(y_true, y_pred):
+    """supports multiclass and multilabel"""
+
     logger.info(f"Shape of y_true: {y_true.shape}")
     logger.info(f"Shape of y_pred: {y_pred.shape}")
 
     if y_true.shape != y_pred.shape:
         logger.warning("Shapes of y_true and y_pred do not match!")
-        # Обрезаем до меньшего размера
+
         min_samples = min(y_true.shape[0], y_pred.shape[0])
         y_true = y_true[:min_samples]
         y_pred = y_pred[:min_samples]

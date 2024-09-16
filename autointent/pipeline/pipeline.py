@@ -49,7 +49,6 @@ class Pipeline:
 
                 if node_type == 'scoring':
                     logger.debug("Applying scoring module")
-                    # Передаем текст напрямую в модуль scoring
                     current_input = best_module.predict([text])
                 elif node_type == 'prediction':
                     logger.debug("Applying prediction module")
@@ -94,6 +93,8 @@ class Pipeline:
         return self.context.optimization_logs.cache["configs"][node_type][best_index]
 
     def __init__(self, config_path: os.PathLike, mode: str, verbose: bool):
+        # TODO add config validation
+
         self.config = load_config(config_path, mode)
         self.verbose = verbose
         self.best_modules = {}
@@ -169,6 +170,8 @@ class Pipeline:
 
 
 def load_config(config_path: os.PathLike, mode: str):
+    """load config from the given path or load default config which is distributed along with the autointent package"""
+
     if config_path != "":
         file = open(config_path)
     else:

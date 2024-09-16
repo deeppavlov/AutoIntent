@@ -72,7 +72,6 @@ class AutoIntentAPI:
                             k in module_class.__init__.__code__.co_varnames and k != 'module_type'}
             module = module_class(**valid_params)
 
-            # Вызываем fit, если метод существует
             if hasattr(module, 'fit'):
                 module.fit(self.context)
 

@@ -90,7 +90,6 @@ class DataHandler:
         if hasattr(self, 'regexp_patterns'):
             logger.info(f"Number of regexp patterns: {len(self.regexp_patterns)}")
 
-        # Вывод примеров данных
         if self.utterances_train:
             logger.info(f"Sample training utterance: {self.utterances_train[0]}")
             logger.info(f"Sample training label: {self.labels_train[0]}")
@@ -118,9 +117,7 @@ def _dump_train(utterances, labels, n_classes, multilabel):
             labs = [i for i in range(n_classes) if labs[i]]
             res.append(dict(utterance=ut, labels=labs))
     return res
-
-
-
+    
 
 def _dump_test(utterances, labels, n_classes, multilabel):
     res = []

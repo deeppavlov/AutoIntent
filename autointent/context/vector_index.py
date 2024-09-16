@@ -85,7 +85,6 @@ class VectorIndex:
             logger.info(f"  Number of items: {count}")
             logger.info(f"  Metadata: {metadata}")
 
-            # Примеры данных (если есть)
             if count > 0:
                 sample = collection_obj.get(limit=1)
                 logger.info("  Sample item:")

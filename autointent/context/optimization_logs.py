@@ -16,6 +16,8 @@ class NumpyEncoder(json.JSONEncoder):
         return super(NumpyEncoder, self).default(obj)
 
 class OptimizationLogs:
+    """TODO continous IO with file system (to be able to restore the state of optimization)"""
+
     def __init__(self, logs_path: str):
         self.logs_path = logs_path
         if os.path.exists(logs_path):
@@ -40,7 +42,6 @@ class OptimizationLogs:
         with open(self.logs_path, 'r') as f:
             data = json.load(f)
 
-        # Преобразуем списки обратно в numpy массивы там, где это необходимо
         for node_type in data['metrics']:
             if isinstance(data['metrics'][node_type], list):
                 data['metrics'][node_type] = np.array(data['metrics'][node_type], dtype=float)
@@ -49,7 +50,6 @@ class OptimizationLogs:
                     f"Unexpected type for metrics of {node_type}: {type(data['metrics'][node_type])}")
                 data['metrics'][node_type] = np.array([], dtype=float)
 
-            # Проверка наличия всех необходимых ключей
         expected_keys = ['best_assets', 'metrics', 'configs']
         for key in expected_keys:
             if key not in data:
@@ -73,6 +73,11 @@ class OptimizationLogs:
 
     def log_module_optimization(self, node_type, module_type, module_config, metric_value,
                                 metric_name, assets, verbose=False):
+        """
+        Purposes:
+        - save optimization results in a text form (hyperparameters and corresponding metrics)
+        - update best assets
+        """
         logger.info(f"Logging optimization for {node_type}: {module_type}")
         metrics_list = self.cache["metrics"][node_type]
 
@@ -122,11 +127,11 @@ class OptimizationLogs:
             else:
                 metrics_not_empty = bool(metrics)
 
-            if metrics_not_empty and configs:  # Проверяем, что списки не пусты
+            if metrics_not_empty and configs:
                 best_index = np.argmax(metrics)
                 best_modules[node_type] = configs[best_index]
             else:
-                best_modules[node_type] = None  # или какое-то значение по умолчанию
+                best_modules[node_type] = None
         return best_modules
 
     def dump(self):
