@@ -1,0 +1,118 @@
+- role: system
+  content: |
+    You will be provided with a set of example utterances and the name of the common topic (intent class) of these utterances. Your task is to generate more examples that fit within the same intent class.
+    
+    Note:
+    - You can generate similar utterances with only slot values changed
+    - You can generate completely different utterance from the same intent class
+    - Intent name can be missed, then you should infer from example utterances only
+    - Example utterances can be missed, then you should infer from intent name only
+- role: user
+  content: |
+    Intent Class: ordering_pizza
+
+    Example Utterances:
+    I want to order a large pepperoni pizza.
+    Can I get a medium cheese pizza with extra olives?
+    Please deliver a small veggie pizza to my address.
+
+    Please generate 3 more examples for the provided intent class.
+- role: assistant
+  content: |
+    I'd like to order a large margherita pizza.
+    Can you deliver a medium Hawaiian pizza with extra pineapple?
+    Please send a small BBQ chicken pizza to my home.
+- role: user
+  content: |
+    Intent Class: booking a hotel
+
+    Example Utterances:
+    I need to book a room for two nights in New York.
+
+    Please generate 2 more examples for the provided intent class.
+- role: assistant
+  content: |
+    Can you reserve a deluxe room for my trip to Tokyo?
+    I need to book a hotel room with a mountain view in Denver.
+- role: user
+  content: |
+    Intent Class:
+
+    Example Utterances:
+    What is the weather like today?
+
+    Please generate 2 more examples for the provided intent class.
+- role: assistant
+  content: |
+    Can you tell me the forecast for tomorrow?
+    Is it going to rain this weekend?
+- role: user
+  content: |
+    Intent Class: Scheduling a Meeting
+    
+    Example Utterances:
+
+    Please generate 3 more examples for the provided intent class.
+- role: assistant
+  content: |
+    I need to schedule a meeting for next Tuesday.
+    Can you set up a conference call for tomorrow afternoon?
+    Please arrange a meeting with the marketing team next week.
+- role: user
+  content: |
+    Intent Class: {intent_name}
+
+    Example Utterances:
+    {example_utterances}
+
+    Please generate {n_examples} more examples for the provided intent class.
+
+# ### Intent Class: Asking for Directions
+# **Example Utterances:**
+# 1. "How do I get to the nearest coffee shop?"
+# 2. "Can you give me directions to the airport?"
+# 3. "What is the best route to the museum from here?"
+
+# ### Intent Class: Making a Restaurant Reservation
+# **Example Utterances:**
+# 1. "I want to make a reservation for dinner tonight."
+# 2. "Can you book a table for two at the Italian restaurant?"
+# 3. "Please reserve a table for four at the steakhouse for Saturday evening."
+
+# ### Intent Class: Requesting Technical Support
+# **Example Utterances:**
+# 1. "I'm having trouble with my laptop."
+# 2. "Can you help me fix my Wi-Fi connection?"
+# 3. "My software is not working properly, can you assist?"
+
+# ### Intent Class: Inquiring About Product Availability
+# **Example Utterances:**
+# 1. "Do you have the new iPhone in stock?"
+# 2. "Is the blue shirt available in size medium?"
+# 3. "Can you check if the latest book by John Doe is available?"
+
+# ### Intent Class: Requesting Account Information
+# **Example Utterances:**
+# 1. "What is my current account balance?"
+# 2. "Can you tell me my recent transactions?"
+# 3. "I need to check my account statement for last month."
+
+# ### Intent Class: Booking a Flight
+# **Example Utterances:**
+# 1. "I want to book a flight to Los Angeles."
+# 2. "Can you find me a flight to Paris next week?"
+# 3. "Please book a round-trip flight to New York for next month."
+
+# ### Intent Class: Requesting Movie Recommendations
+# **Example Utterances:**
+# 1. "Can you recommend a good action movie?"
+# 2. "What are some highly rated comedies?"
+# 3. "I'm in the mood for a romantic film, any suggestions?"
+
+# ### Intent Class: Ordering Groceries
+# **Example Utterances:**
+# 1. "I need to order some milk and bread."
+# 2. "Can you add apples and bananas to my grocery list?"
+# 3. "Please order a dozen eggs and a pack of butter."
+
+# You can use these intent names and example utterances to further train or test your language model for generating more examples within each intent class.

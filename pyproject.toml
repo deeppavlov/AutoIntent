@@ -16,6 +16,7 @@ appdirs = "^1.4.4"
 sre-yield = "^1.2"
 optuna = "^4.0.0"
 xeger = "^0.4.0"
+openai = "^1.45.1"
 
 [tool.poetry.group.dev]
 optional = true
@@ -32,6 +33,7 @@ pytest = "8.3.2"
 [tool.poetry.scripts]
 "autointent" = "autointent.base_pipeline:main"
 "clear-cache" = "autointent.cache_utils:clear_chroma_cache"
+"generate-utterances" = "autointent.generation.generate_utterances:main"
 
 [tool.ruff]
 line-length = 120
