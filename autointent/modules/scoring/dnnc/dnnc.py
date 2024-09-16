@@ -5,7 +5,6 @@ from sentence_transformers import CrossEncoder
 from ..base import Context, ScoringModule
 from .head_training import CrossEncoderWithLogreg
 
-
 class DNNCScorer(ScoringModule):
     """
     TODO:
@@ -34,6 +33,7 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
+
         query_res = self._collection.query(
             query_texts=utterances,
             n_results=self.k,
@@ -44,11 +44,13 @@ class DNNCScorer(ScoringModule):
             utterances, query_res["documents"]
         )
 
-        labels_pred = [
-            [cand["intent_id"] for cand in candidates]
-            for candidates in query_res["metadatas"]
-        ]
-
+        labels_pred = []
+        for i, candidates in enumerate(query_res["metadatas"]):
+            try:
+                intent_ids = [int(next((k for k, v in cand.items() if v == 1), -1)) for cand in candidates]
+                labels_pred.append(intent_ids)
+            except Exception as e:
+                raise
         res = self._build_result(cross_encoder_scores, labels_pred)
 
         return res
@@ -66,6 +68,7 @@ class DNNCScorer(ScoringModule):
         ---
         for each query, return a list of a corresponding cross encoder scores for the k the closest sample utterances
         """
+
         assert len(utterances) == len(candidates)
 
         text_pairs = [
@@ -95,12 +98,12 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        scores = np.array(scores)
-        labels = np.array(labels)
-        n_classes = self._collection.metadata["n_classes"]
 
+        scores = np.array(scores)
+        labels = np.array(labels, dtype=int)
+        n_classes = self._collection.metadata["n_classes"]
         return build_result(scores, labels, n_classes)
-    
+
     def clear_cache(self):
         model = self._collection._embedding_function._model
         model.to(device='cpu')
@@ -110,9 +113,11 @@ class DNNCScorer(ScoringModule):
 
 def build_result(scores: np.ndarray, labels: np.ndarray, n_classes: int):
     res = np.zeros((len(scores), n_classes))
-    best_neighbors = np.argmax(scores, axis=1)
-    idx_helper = np.arange(len(res))
-    best_classes = labels[idx_helper, best_neighbors]
-    best_scores = scores[idx_helper, best_neighbors]
-    res[idx_helper, best_classes] = best_scores
+
+    for i in range(len(scores)):
+        for j in range(len(scores[i])):
+            class_label = labels[i, j]
+            res[i, class_label] = max(res[i, class_label], scores[i, j])
+
     return res
+

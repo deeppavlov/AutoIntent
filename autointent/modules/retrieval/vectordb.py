@@ -17,6 +17,8 @@ class VectorDBModule(RetrievalModule):
         self.model_name = model_name
         self.k = k
 
+    def predict(self, utterances: list[str]):
+        return retrieve_candidates(self.collection, self.k, utterances)
     def fit(self, context: Context):
         self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
 

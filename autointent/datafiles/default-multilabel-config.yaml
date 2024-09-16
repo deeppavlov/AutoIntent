@@ -10,13 +10,14 @@ nodes:
   - node_type: scoring
     metric: scoring_roc_auc
     modules:
-      - module_type: knn
-        k: [3]
-        weights: ["uniform", "distance", "closest"]
-      - module_type: linear
-        multilabel: [true]
+      - module_type: dnnc
+        model_name:
+          - BAAI/bge-reranker-base
+          - cross-encoder/ms-marco-MiniLM-L-6-v2
+        k: [ 10 ]
+
   - node_type: prediction
     metric: prediction_accuracy
     modules:
       - module_type: threshold
-        thresh: [0.5]
+        thresh: [0.02,0.001]

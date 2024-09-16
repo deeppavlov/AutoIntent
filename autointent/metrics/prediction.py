@@ -4,7 +4,8 @@ from typing import Protocol
 import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
-
+import logging
+logger = logging.getLogger(__name__)
 class PredictionMetricFn(Protocol):
     def __call__(self, y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
         """
@@ -30,8 +31,20 @@ def simple_check(func):
 
 
 @simple_check
-def prediction_accuracy(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
+def prediction_accuracy(y_true, y_pred):
     """supports multiclass and multilabel"""
+
+    logger.info(f"Shape of y_true: {y_true.shape}")
+    logger.info(f"Shape of y_pred: {y_pred.shape}")
+
+    if y_true.shape != y_pred.shape:
+        logger.warning("Shapes of y_true and y_pred do not match!")
+
+        min_samples = min(y_true.shape[0], y_pred.shape[0])
+        y_true = y_true[:min_samples]
+        y_pred = y_pred[:min_samples]
+        logger.info(f"Adjusted shapes - y_true: {y_true.shape}, y_pred: {y_pred.shape}")
+
     return np.mean(y_true == y_pred)
 
 
@@ -79,4 +92,4 @@ def prediction_recall(y_true: list[int] | list[list[int]], y_pred: list[int] | l
 @simple_check
 def prediction_f1(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]):
     """supports multiclass and multilabel"""
-    return f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="macro", zero_division=0)
