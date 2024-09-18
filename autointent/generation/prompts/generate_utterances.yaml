@@ -7,45 +7,46 @@
     - You can generate completely different utterance from the same intent class
     - Intent name can be missed, then you should infer from example utterances only
     - Example utterances can be missed, then you should infer from intent name only
+    {extra_instructions}
 - role: user
   content: |
     Intent Class: ordering_pizza
 
     Example Utterances:
-    I want to order a large pepperoni pizza.
-    Can I get a medium cheese pizza with extra olives?
-    Please deliver a small veggie pizza to my address.
+    1. I want to order a large pepperoni pizza.
+    2. Can I get a medium cheese pizza with extra olives?
+    3. Please deliver a small veggie pizza to my address.
 
     Please generate 3 more examples for the provided intent class.
 - role: assistant
   content: |
-    I'd like to order a large margherita pizza.
-    Can you deliver a medium Hawaiian pizza with extra pineapple?
-    Please send a small BBQ chicken pizza to my home.
+    1. I'd like to order a large margherita pizza.
+    2. Can you deliver a medium Hawaiian pizza with extra pineapple?
+    3. Please send a small BBQ chicken pizza to my home.
 - role: user
   content: |
     Intent Class: booking a hotel
 
     Example Utterances:
-    I need to book a room for two nights in New York.
+    1. I need to book a room for two nights in New York.
 
     Please generate 2 more examples for the provided intent class.
 - role: assistant
   content: |
-    Can you reserve a deluxe room for my trip to Tokyo?
-    I need to book a hotel room with a mountain view in Denver.
+    1. Can you reserve a deluxe room for my trip to Tokyo?
+    2. I need to book a hotel room with a mountain view in Denver.
 - role: user
   content: |
     Intent Class:
 
     Example Utterances:
-    What is the weather like today?
+    1. What is the weather like today?
 
     Please generate 2 more examples for the provided intent class.
 - role: assistant
   content: |
-    Can you tell me the forecast for tomorrow?
-    Is it going to rain this weekend?
+    1. Can you tell me the forecast for tomorrow?
+    2. Is it going to rain this weekend?
 - role: user
   content: |
     Intent Class: Scheduling a Meeting
@@ -55,9 +56,9 @@
     Please generate 3 more examples for the provided intent class.
 - role: assistant
   content: |
-    I need to schedule a meeting for next Tuesday.
-    Can you set up a conference call for tomorrow afternoon?
-    Please arrange a meeting with the marketing team next week.
+    1. I need to schedule a meeting for next Tuesday.
+    2. Can you set up a conference call for tomorrow afternoon?
+    3. Please arrange a meeting with the marketing team next week.
 - role: user
   content: |
     Intent Class: {intent_name}
