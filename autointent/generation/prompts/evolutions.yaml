@@ -1,0 +1,112 @@
+# reasoning, concretizing, in_breadth, turn to formal, turn to informal, turn to joke, turn to silly and goofy one
+
+base_instruction: |
+  I want you to act as a rewriter.
+  You will be provided with an utterance and the topic (name of intent class) of the utterance.
+  You MUST complicate the utterance using the following method:
+reasoning: |
+  - role: system
+    content: |
+      {base_instruction}
+      1. If the utterance can be understood and answered with just a few simple thinking processes, you can rewrite it to explicitly request multiple-step reasoning.
+      2. Rewritten utterance should require readers to make multiple logical connections or inferences.
+      3. Rewritten utterance should be concise and understandable by humans.
+      4. Rewritten utterance must be fully answerable. 
+      5. Rewritten utterance should not contain more than 10 words.
+  - role: user
+    content: |
+      Intent Class:
+      Asking for Directions
+
+      Utterance:
+      How do I get to the nearest coffee shop?
+  - role: assistant
+    content: |
+      If there are some place where I can buy a coffee, how can I get there?
+  - role: user
+    content: |
+      Intent Class:
+      requesting technical support
+
+      Utterance:
+      I want to get help from technical support for my laptop.
+  - role: assistant
+    content: |
+      I don't know what's happening with my laptop.
+    - role: user
+    content: |
+      Intent Class:
+      {intent_name}
+
+      Utterance:
+      {utterance}
+concretizing: |
+  - role: system
+    content: |
+      {base_instruction}
+      1. Rewrite the utterance by replacing general inquiries with more specific ones.
+      2. Rewritten utterance should be concise and understandable by humans.
+      3. Rewritten utterance must be fully answerable.  
+      4. Rewritten utterance should not contain more than 10 words.
+  - role: user
+    content: |
+      Intent Class:
+      Reserve Restaurant
+
+      Utterance:
+      I want to make a reservation for dinner tonight.
+  - role: assistant
+    content: |
+      I want to reserve a table for 4 persons at 9 pm.
+  - role: user
+    content: |
+      Intent Class:
+      requesting technical support
+
+      Utterance:
+      I'm having trouble with my laptop.
+  - role: assistant
+    content: |
+      My laptop is constantly rebooting and overheating.
+    - role: user
+    content: |
+      Intent Class:
+      {intent_name}
+
+      Utterance:
+      {utterance}
+abstract:
+  - role: system
+    content: |
+      {base_instruction}
+      1. Rewrite the utterance by removing specific inquiries or replacing with more generic.
+      2. Rewritten utterance should be concise and understandable by humans.
+      3. Rewritten utterance must be fully answerable.  
+      4. Rewritten utterance should not contain more than 10 words.
+  - role: user
+    content: |
+      Intent Class:
+      Reserve Restaurant
+
+      Utterance:
+      I want to reserve a table for 4 persons at 9 pm.
+  - role: assistant
+    content: |
+      Please, reserve a table for be.
+  - role: user
+    content: |
+      Intent Class:
+      requesting technical support
+
+      Utterance:
+      My Lenovo laptop is constantly rebooting and overheating.
+  - role: assistant
+    content: |
+      I'm having trouble with my laptop.
+    - role: user
+    content: |
+      Intent Class:
+      {intent_name}
+
+      Utterance:
+      {utterance}
