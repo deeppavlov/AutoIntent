@@ -14,6 +14,9 @@ def read_json_dataset(file_path: os.PathLike):
 
 
 def save_json_dataset(file_path: os.PathLike, intents: list[dict[str, Any]]):
+    dirname = os.path.dirname(file_path)
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
     with open(file_path, 'w') as file:
         json.dump(intents, file, indent=4, ensure_ascii=False)
 
@@ -21,16 +24,17 @@ def save_json_dataset(file_path: os.PathLike, intents: list[dict[str, Any]]):
 class UtteranceGenerator:
     def __init__(self, generator: Generator):
         self.generator = generator
-        self.prompt_template = load_prompt("generate_utterances.yaml")
+        self.prompt_template_yaml = load_prompt("generate_utterances.yaml")
 
 
     def _generate(self, intent_name: str, example_utterances: list[str], n_examples: int) -> list[str]:
-        messages = safe_format(
-            self.prompt_template,
+        messages_yaml = safe_format(
+            self.prompt_template_yaml,
             intent_name=intent_name, 
-            example_utterances="\n".join(example_utterances),
+            example_utterances="\n    ".join(example_utterances),
             n_examples=n_examples
         )
+        messages = yaml.safe_load(messages_yaml)
         response_text = self.generator.get_chat_completion(messages)
         return response_text.split("\n")
         

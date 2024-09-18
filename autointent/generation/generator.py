@@ -15,12 +15,13 @@ class Generator:
     def get_chat_completion(self, messages: list[dict[str, str]]) -> str:
         response = self.client.chat.completions.create(
             messages=messages,
+            model=self.model_name,
             max_tokens=150,
             n=1,
             stop=None,
             temperature=0.7,
         )
-        return response.choices[0].message
+        return response.choices[0].message.content
 
 # def get_chat_completion(sampling_params: dict[str, Any]):
 #     if "temperature" not in sampling_params:
