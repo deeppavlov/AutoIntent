@@ -126,8 +126,8 @@ def main():
     parser.add_argument('--output-path', type=str, required=True, help="Where to save result")
     parser.add_argument('--n-shots', type=int, required=True, help="Number of utterances to generate for each intent")
     parser.add_argument('--custom-instruction', type=str, action="append", help="Add extra instructions to default prompt. You can use this argument multiple times to add multiple instructions")
-    parser.add_argument('--length', choices=["none", "same", "longer", "shorter"], default="none", help="How to extend the prompt with length instruction")
-    parser.add_argument('--style', choices=["none", "formal", "informal", "playful"], default="none", help="How to extend the prompt with style instruction")
+    parser.add_argument('--length', choices=LengthType.__args__, default="none", help="How to extend the prompt with length instruction")
+    parser.add_argument('--style', choices=StyleType.__args__, default="none", help="How to extend the prompt with style instruction")
     parser.add_argument('--same-punctuation', action="store_true", help="Whether to extend the prompt with punctuation instruction")
     args = parser.parse_args()
 
