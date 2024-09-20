@@ -1,0 +1,34 @@
+- role: system
+  content: |
+    {base_instruction}
+    1. Rewrite the utterance by removing specific inquiries or replacing with more generic.
+    2. Rewritten utterance should be concise and understandable by humans.
+    3. Rewritten utterance must be fully answerable.
+    4. Rewritten utterance should not contain more than 10 words.
+- role: user
+  content: |
+    Intent Class:
+    Reserve Restaurant
+
+    Utterance:
+    I want to reserve a table for 4 persons at 9 pm.
+- role: assistant
+  content: |
+    Please, reserve a table for be.
+- role: user
+  content: |
+    Intent Class:
+    requesting technical support
+
+    Utterance:
+    My Lenovo laptop is constantly rebooting and overheating.
+- role: assistant
+  content: |
+    I'm having trouble with my laptop.
+- role: user
+  content: |
+    Intent Class:
+    {intent_name}
+
+    Utterance:
+    {utterance}

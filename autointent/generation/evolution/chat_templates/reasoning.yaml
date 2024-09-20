@@ -1,0 +1,35 @@
+- role: system
+  content: |
+    {base_instruction}
+    1. If the utterance can be understood and answered with just a few simple thinking processes, you can rewrite it to explicitly request multiple-step reasoning.
+    2. Rewritten utterance should require readers to make multiple logical connections or inferences.
+    3. Rewritten utterance should be concise and understandable by humans.
+    4. Rewritten utterance must be fully answerable.
+    5. Rewritten utterance should not contain more than 10 words.
+- role: user
+  content: |
+    Intent Class:
+    Asking for Directions
+
+    Utterance:
+    How do I get to the nearest coffee shop?
+- role: assistant
+  content: |
+    If there are some place where I can buy a coffee, how can I get there?
+- role: user
+  content: |
+    Intent Class:
+    requesting technical support
+
+    Utterance:
+    I want to get help from technical support for my laptop.
+- role: assistant
+  content: |
+    I don't know what's happening with my laptop.
+- role: user
+  content: |
+    Intent Class:
+    {intent_name}
+
+    Utterance:
+    {utterance}

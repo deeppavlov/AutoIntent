@@ -1,0 +1,3 @@
+I want you to act as a rewriter.
+    You will be provided with an utterance and the topic (name of intent class) of the utterance.
+    You MUST complicate the utterance using the following method:
