@@ -3,7 +3,7 @@ from .optimization_logs import OptimizationLogs
 from .vector_index import VectorIndex
 
 
-class Context:
+class Context:  ## TODO: pydantic
     def __init__(
         self,
         multiclass_intent_records,

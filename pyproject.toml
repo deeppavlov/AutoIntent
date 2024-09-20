@@ -2,7 +2,7 @@
 name = "autointent"
 version = "0.2.1-alpha1"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
-authors = ["voorhs <ilya_alekseev_2016@list.ru>"]
+authors = ["voorhs <ilya_alekseev_2016@list.ru>"] ## TODO: как мне стать автором?
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -11,7 +11,7 @@ sentence-transformers = "3.0.1"
 chromadb = "0.5.5"
 scikit-learn = "1.5.1"
 scikit-multilearn = "0.2.0"
-pysqlite3-binary = "^0.5.3.post1"
+pysqlite3-binary = "^0.5.3.post1" ## TODO: почему не стандартная, для чего используется
 appdirs = "^1.4.4"
 sre-yield = "^1.2"
 optuna = "^4.0.0"

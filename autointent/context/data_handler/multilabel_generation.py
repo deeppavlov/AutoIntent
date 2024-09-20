@@ -7,7 +7,7 @@ import xeger
 from .stratification import get_sample_utterances
 
 
-def sample_unique_tuples(k, n, m):
+def sample_unique_tuples(k, n, m): ## TODO: плохая сигнатура
     all_combinations = list(combinations(range(n), k))
     random.shuffle(all_combinations)
     return all_combinations[:m]

@@ -9,7 +9,7 @@ from .tags import collect_tags
 class DataHandler:
     def __init__(
         self,
-        multiclass_intent_records: list[dict],
+        multiclass_intent_records: list[dict], ## TODO: у рекордов должен быть отдельный датамодель и импорт соответствующий
         multilabel_utterance_records: list[dict],
         test_utterance_records: list[dict],
         mode: Literal["multiclass", "multilabel", "multiclass_as_multilabel"],
@@ -59,7 +59,7 @@ class DataHandler:
 
         if mode != "multilabel":
             self.regexp_patterns = [
-                dict(
+                dict(  ## TODO: добавить отдельную датамодель
                     intent_id=intent["intent_id"],
                     regexp_full_match=intent["regexp_full_match"],
                     regexp_partial_match=intent["regexp_partial_match"],
@@ -89,7 +89,7 @@ def _dump_train(utterances, labels, n_classes, multilabel):
         res = []
         for ut, labs in zip(utterances, labels):
             labs = [i for i in range(n_classes) if labs[i]]
-            res.append(dict(utterance=ut, labels=labs))
+            res.append(dict(utterance=ut, labels=labs)) ## TODO: добавить отдельную датамодель
     return res
 
 
@@ -100,9 +100,9 @@ def _dump_test(utterances, labels, n_classes, multilabel):
             labs = [i for i in range(n_classes) if labs[i]]
         else:
             labs = [labs]
-        res.append(dict(utterance=ut, labels=labs))
+        res.append(dict(utterance=ut, labels=labs))## TODO: добавить отдельную датамодель
     return res
 
 
 def _dump_oos(utterances):
-    return [dict(utterance=ut, labels=[]) for ut in utterances]
+    return [dict(utterance=ut, labels=[]) for ut in utterances]## TODO: добавить отдельную датамодель

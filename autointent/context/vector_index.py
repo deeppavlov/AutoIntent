@@ -8,14 +8,14 @@ from .data_handler import DataHandler
 
 
 class VectorIndex:
-    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes):
+    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes): ## TODO: лучше pathlib.Path
         self.device = device
         self.multilabel = multilabel
         self.n_classes = n_classes
 
         settings = Settings(
             chroma_segment_cache_policy="LRU",
-            chroma_memory_limit_bytes=2 * 1024 * 1024 * 1024,  # 2 GB
+            chroma_memory_limit_bytes=2 * 1024 * 1024 * 1024,  # 2 GB  ## TODO: добавить возможно сть конфгурации
         )
         self.client = PersistentClient(path=db_dir, settings=settings)
 

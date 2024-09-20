@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass  ## TODO: почему не pydantic?
 class Tag:
     """
     If two intent classes have common tag they can't be both assigned to one sample

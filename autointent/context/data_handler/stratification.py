@@ -76,7 +76,7 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
 
         splits = [in_domain_utterances, test_utterances, in_domain_labels, test_labels]
 
-    assert validate_test_labels(test_labels, multilabel, n_classes)
+    assert validate_test_labels(test_labels, multilabel, n_classes)  ## TODO: добавить описание в случае ошибки
 
     res = [n_classes, oos_utterances] + splits
     return res
