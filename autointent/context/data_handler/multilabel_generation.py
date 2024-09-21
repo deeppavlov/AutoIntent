@@ -50,5 +50,5 @@ def generate_multilabel_version(intent_records, config_string, seed):
 
 def convert_to_multilabel_format(intent_records):
     utterances, labels = get_sample_utterances(intent_records)
-    res = [dict(utterance=ut, labels=[lab]) for ut, lab in zip(utterances, labels)]
+    res = [dict(utterance=ut, labels=[lab] if lab != -1 else []) for ut, lab in zip(utterances, labels)]
     return res
