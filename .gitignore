@@ -8,3 +8,4 @@ eurlex.json
 dist
 poetry.lock
 .vscode
+.env
