@@ -6,7 +6,7 @@ poetry run autointent \
     --multiclass-path experiments/minimal-run-test/data/clinc_subset.json \
     --logs-dir experiments/minimal-run-test/logs \
     --mode multiclass \
-    --device "cpu" \
+    --device "cpus" \
     --verbose \
     --run-name multiclass-cpu
 
