@@ -2,11 +2,11 @@
 
 # Run the first command
 poetry run autointent \
-    --config-path experiments/minimal-run-test/configs/multiclass.yaml \
-    --multiclass-path experiments/minimal-run-test/data/clinc_subset.json \
-    --logs-dir experiments/minimal-run-test/logs \
+    --config-path tests/minimal-optimization/configs/multiclass.yaml \
+    --multiclass-path tests/minimal-optimization/data/clinc_subset.json \
+    --logs-dir tests/minimal-optimization/logs \
     --mode multiclass \
-    --device "cpus" \
+    --device "cpu" \
     --verbose \
     --run-name multiclass-cpu
 
@@ -21,9 +21,9 @@ fi
 
 # Run the second command
 poetry run autointent \
-    --config-path experiments/minimal-run-test/configs/multilabel.yaml \
-    --multiclass-path experiments/minimal-run-test/data/clinc_subset.json \
-    --logs-dir experiments/minimal-run-test/logs \
+    --config-path tests/minimal-optimization/configs/multilabel.yaml \
+    --multiclass-path tests/minimal-optimization/data/clinc_subset.json \
+    --logs-dir tests/minimal-optimization/logs \
     --mode multiclass_as_multilabel \
     --device "cpu" \
     --verbose \
