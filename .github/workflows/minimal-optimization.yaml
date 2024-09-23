@@ -32,6 +32,4 @@ jobs:
 
     - name: Run tests
       run: |
-        SCRIPT_PATH="tests/minimal-optimization/run.bash"
-        chmod +x $SCRIPT_PATH
-        bash $SCRIPT_PATH
+        poetry run pytest tests

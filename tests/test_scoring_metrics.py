@@ -1,5 +1,5 @@
-def test_neg_cross_entropy():
-    from autointent.metrics.scoring import scoring_neg_cross_entropy
+def test_nll():
+    from autointent.metrics.scoring import scoring_log_likelihood
     import numpy as np
 
     # case 1
@@ -8,7 +8,7 @@ def test_neg_cross_entropy():
         [.1,.3,.5,.1],
     ]
     ground_truth = np.log(.1)
-    output = scoring_neg_cross_entropy(labels, scores)
+    output = scoring_log_likelihood(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
@@ -20,7 +20,7 @@ def test_neg_cross_entropy():
         [.1,.3,.5,.1],
     ]
     ground_truth = np.mean([np.log(.1),np.log(.3),np.log(.5),np.log(.1),])
-    output = scoring_neg_cross_entropy(labels, scores)
+    output = scoring_log_likelihood(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
 
