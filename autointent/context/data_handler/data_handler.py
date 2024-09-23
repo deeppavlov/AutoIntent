@@ -1,10 +1,10 @@
+import logging
 from typing import Literal
 
 from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
 from .sampling import sample_from_regex
 from .stratification import split_sample_utterances
 from .tags import collect_tags
-from ...logger import setup_logging, LoggingLevelType
 
 
 class DataHandler:
@@ -17,9 +17,8 @@ class DataHandler:
         multilabel_generation_config: str = "",
         regex_sampling: int = 0,
         seed: int = 0,
-        log_level: LoggingLevelType = "INFO"
     ):
-        logger = setup_logging(log_level, __name__)
+        logger = logging.getLogger(__name__)
 
         if not multiclass_intent_records and not multilabel_utterance_records:
             msg = "No data provided, both `multiclass_intent_records` and `multilabel_utterance_records` are empty"

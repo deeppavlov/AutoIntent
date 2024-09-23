@@ -1,11 +1,10 @@
+import logging
 import itertools as it
 
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils import _safe_indexing, indexable
 from skmultilearn.model_selection import IterativeStratification
-
-from ...logger import setup_logging, LoggingLevelType
 
 
 def get_sample_utterances(intent_records: list[dict]):
@@ -19,11 +18,11 @@ def get_sample_utterances(intent_records: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(intent_records: list[dict], test_records: list[dict], multilabel: bool, seed: int = 0, log_level: LoggingLevelType = "INFO"):
+def split_sample_utterances(intent_records: list[dict], test_records: list[dict], multilabel: bool, seed: int = 0):
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
     """
-    logger = setup_logging(log_level, __name__)
+    logger = logging.getLogger(__name__)
 
     if not multilabel:
         logger.debug("parsing multiclass intent records...")

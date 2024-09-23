@@ -1,3 +1,4 @@
+import logging
 import importlib.resources as ires
 import json
 import os
@@ -99,7 +100,9 @@ def main():
         "This option extends multilabel utterance records.",
     )
     args = parser.parse_args()
-    logger = setup_logging(args.log_level, __name__)
+    
+    setup_logging(args.log_level)
+    logger = logging.getLogger(__name__)
 
     # configure the run and data
     run_name = get_run_name(args.run_name)
@@ -119,11 +122,10 @@ def main():
         db_dir,
         args.regex_sampling,
         args.seed,
-        log_level=args.log_level
     )
 
     # run optimization
-    pipeline = Pipeline(args.config_path, args.mode, args.log_level)
+    pipeline = Pipeline(args.config_path, args.mode)
     pipeline.optimize(context)
 
     # save results

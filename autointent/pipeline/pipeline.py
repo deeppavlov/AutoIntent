@@ -1,6 +1,7 @@
 import importlib.resources as ires
 import json
 import os
+import logging
 from logging import Logger
 
 import numpy as np
@@ -15,7 +16,7 @@ from ..nodes import (
     ScoringNode,
 )
 from .utils import NumpyEncoder
-from ..logger import setup_logging, LoggingLevelType
+
 
 class Pipeline:
     available_nodes = {
@@ -25,10 +26,9 @@ class Pipeline:
         "prediction": PredictionNode,
     }
 
-    def __init__(self, config_path: os.PathLike, mode: str, log_level: LoggingLevelType):
+    def __init__(self, config_path: os.PathLike, mode: str):
         # TODO add config validation
-        self._logger = setup_logging(log_level, __name__)
-        self.log_level = log_level
+        self._logger = logging.getLogger(__name__)
 
         self._logger.debug("loading optimization search space config...")
         self.config = load_config(config_path, mode, self._logger)
@@ -37,7 +37,7 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         for node_config in self.config["nodes"]:
-            node_logger = setup_logging(self.log_level, node_config["node_type"])
+            node_logger = logging.getLogger(node_config["node_type"])
             node: Node = self.available_nodes[node_config["node_type"]](
                 modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger = node_logger
             )

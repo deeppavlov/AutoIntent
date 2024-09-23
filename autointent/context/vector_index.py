@@ -1,16 +1,16 @@
 import os
+import logging
 
 from chromadb import PersistentClient
 from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 from .data_handler import DataHandler
-from ..logger import setup_logging, LoggingLevelType
 
 
 class VectorIndex:
-    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes: int, log_level: LoggingLevelType):
-        self._logger = setup_logging(log_level, __name__)
+    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes: int):
+        self._logger = logging.getLogger(__name__)
 
         self.device = device
         self.multilabel = multilabel

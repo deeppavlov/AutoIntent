@@ -1,9 +1,12 @@
 from autointent import Context
 from autointent.pipeline import Pipeline
 from autointent.pipeline.main import get_run_name, get_db_dir, load_data
+from autointent.logger import setup_logging
 
 
 def test_multiclass():
+    setup_logging("DEBUG")
+
     # configure the run and data
     run_name = get_run_name("multiclass-cpu")
     db_dir = get_db_dir("", run_name)
@@ -20,14 +23,12 @@ def test_multiclass():
         db_dir=db_dir,
         regex_sampling=0,
         seed=0,
-        log_level="DEBUG",
     )
 
     # run optimization
     pipeline = Pipeline(
         config_path="tests/minimal-optimization/configs/multiclass.yaml",
         mode="multiclass",
-        log_level="DEBUG",
     )
     pipeline.optimize(context)
 
@@ -36,6 +37,8 @@ def test_multiclass():
 
 
 def test_multilabel():
+    setup_logging("DEBUG")
+
     # configure the run and data
     run_name = get_run_name("multilabel-cpu")
     db_dir = get_db_dir("", run_name)
@@ -52,14 +55,12 @@ def test_multilabel():
         db_dir=db_dir,
         regex_sampling=0,
         seed=0,
-        log_level="DEBUG",
     )
 
     # run optimization
     pipeline = Pipeline(
         config_path="tests/minimal-optimization/configs/multilabel.yaml",
         mode="multiclass_as_multilabel",
-        log_level="DEBUG",
     )
     pipeline.optimize(context)
 

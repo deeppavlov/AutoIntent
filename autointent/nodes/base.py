@@ -2,12 +2,12 @@ import gc
 import itertools as it
 from copy import deepcopy
 from typing import Callable
+from logging import Logger
 
 import torch
 
 from ..context import Context
 from ..modules import Module
-from ..logger import Logger
 
 
 class Node:

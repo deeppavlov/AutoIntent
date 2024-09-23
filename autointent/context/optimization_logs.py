@@ -1,4 +1,4 @@
-from ..logger import setup_logging, LoggingLevelType
+from ..logger import get_logger
 import logging
 from pprint import pformat
 
@@ -6,11 +6,9 @@ from pprint import pformat
 class OptimizationLogs:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
-    def __init__(
-        self, log_level: LoggingLevelType
-    ):
-        self._logger = setup_logging(log_level, __name__, PPrintFormatter())
-        
+    def __init__(self):
+        self._logger = get_logger(__name__, formatter=PPrintFormatter())
+
         self.cache = dict(
             best_assets=dict(
                 regexp=None,  # TODO: choose the format
