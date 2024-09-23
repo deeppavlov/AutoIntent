@@ -2,6 +2,7 @@ from .data_handler import DataHandler
 from .optimization_logs import OptimizationLogs
 from .vector_index import VectorIndex
 
+from ..logger import LoggingLevelType
 
 class Context:
     def __init__(
@@ -15,6 +16,7 @@ class Context:
         db_dir,
         regex_sampling,
         seed,
+        log_level: LoggingLevelType
     ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,
@@ -24,9 +26,10 @@ class Context:
             multilabel_generation_config,
             regex_sampling,
             seed,
+            log_level
         )
-        self.optimization_logs = OptimizationLogs()
-        self.vector_index = VectorIndex(db_dir, device, self.data_handler.multilabel, self.data_handler.n_classes)
+        self.optimization_logs = OptimizationLogs(log_level)
+        self.vector_index = VectorIndex(db_dir, device, self.data_handler.multilabel, self.data_handler.n_classes, log_level)
 
         self.device = device
         self.multilabel = self.data_handler.multilabel
