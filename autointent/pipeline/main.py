@@ -83,11 +83,6 @@ def main():
         default=0,
         help="Affects the data partitioning"
     )
-    # parser.add_argument(
-    #     "--verbose",
-    #     action="store_true",
-    #     help="Print to console during optimization"
-    # )
     parser.add_argument(
         '--log-level',
         type=str,
