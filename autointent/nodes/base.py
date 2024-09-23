@@ -7,7 +7,7 @@ import torch
 
 from ..context import Context
 from ..modules import Module
-from ..logger import setup_logging, LoggingLevelType
+from ..logger import Logger
 
 
 class Node:
@@ -15,14 +15,13 @@ class Node:
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str, log_level: LoggingLevelType):
+    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
         """
-        self._logger = setup_logging(log_level, __name__)
+        self._logger = logger
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
-        self.log_level = log_level
 
     def fit(self, context: Context):
         self._logger.info(f"starting {self.node_type} node optimization...")

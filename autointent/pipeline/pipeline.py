@@ -37,8 +37,9 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         for node_config in self.config["nodes"]:
+            node_logger = setup_logging(self.log_level, node_config["node_type"])
             node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"], log_level = self.log_level
+                modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger = node_logger
             )
             node.fit(context)
 
