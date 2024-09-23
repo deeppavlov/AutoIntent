@@ -20,13 +20,14 @@ def test_multiclass():
         db_dir=db_dir,
         regex_sampling=0,
         seed=0,
+        log_level="DEBUG",
     )
 
     # run optimization
     pipeline = Pipeline(
         config_path="tests/minimal-optimization/configs/multiclass.yaml",
         mode="multiclass",
-        verbose=True
+        log_level="DEBUG",
     )
     pipeline.optimize(context)
 
@@ -51,13 +52,14 @@ def test_multilabel():
         db_dir=db_dir,
         regex_sampling=0,
         seed=0,
+        log_level="DEBUG",
     )
 
     # run optimization
     pipeline = Pipeline(
         config_path="tests/minimal-optimization/configs/multilabel.yaml",
         mode="multiclass_as_multilabel",
-        verbose=True
+        log_level="DEBUG",
     )
     pipeline.optimize(context)
 

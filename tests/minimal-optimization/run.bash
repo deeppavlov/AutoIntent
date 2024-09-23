@@ -7,7 +7,7 @@ poetry run autointent \
     --logs-dir tests/minimal-optimization/logs \
     --mode multiclass \
     --device "cpu" \
-    --verbose \
+    --log-level "DEBUG" \
     --run-name multiclass-cpu
 
 # Capture the exit code of the first command
@@ -26,7 +26,7 @@ poetry run autointent \
     --logs-dir tests/minimal-optimization/logs \
     --mode multiclass_as_multilabel \
     --device "cpu" \
-    --verbose \
+    --log-level "DEBUG" \
     --run-name multilabel-cpu
 
 # Capture the exit code of the second command
