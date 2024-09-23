@@ -13,7 +13,7 @@ class ThresholdPredictor(PredictionModule):
         self.multilabel = context.multilabel
         self.tags = context.data_handler.tags
 
-        if context.data_handler.has_oos_samples():
+        if not context.data_handler.has_oos_samples():
             warn(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."

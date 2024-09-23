@@ -1,0 +1,104 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0,
+            1.0
+        ],
+        "scoring": [
+            1.0,
+            1.0,
+            1.0,
+            0.9166666666666666,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "prediction": [
+            0.8333333333333334,
+            0.8333333333333334
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9166666666666666,
+                "k": 10,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 10,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 10,
+                "weights": "closest"
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "multilabel": true
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.8333333333333334,
+                "thresh": 0.5
+            },
+            {
+                "module_type": "tunable",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.8333333333333334
+            }
+        ]
+    }
+}
