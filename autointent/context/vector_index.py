@@ -5,14 +5,18 @@ from chromadb.config import Settings
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 from .data_handler import DataHandler
+from ..logger import setup_logging, LoggingLevelType
 
 
 class VectorIndex:
-    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes):
+    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes: int, log_level: LoggingLevelType):
+        self._logger = setup_logging(log_level, __name__)
+
         self.device = device
         self.multilabel = multilabel
         self.n_classes = n_classes
 
+        self._logger.debug("connecting to Chroma DB client...")
         settings = Settings(
             chroma_segment_cache_policy="LRU",
             chroma_memory_limit_bytes=2 * 1024 * 1024 * 1024,  # 2 GB
@@ -21,6 +25,7 @@ class VectorIndex:
 
     def get_collection(self, model_name: str, device=None):
         device = device if device is not None else self.device
+        self._logger.info(f"spawning sentence transformer instance of {model_name} on {device=}...")
         emb_func = SentenceTransformerEmbeddingFunction(
             model_name=model_name, trust_remote_code=True, device=device, tokenizer_kwargs=dict(truncation=True)
         )
@@ -43,6 +48,7 @@ class VectorIndex:
         else:
             metadatas = multiclass_labels_as_metadata(data_handler.labels_train)
 
+        self._logger.debug("adding train utterances to vector index...")
         collection.add(
             documents=data_handler.utterances_train,
             ids=[f"{i}-{db_name}" for i in range(len(data_handler.utterances_train))],
@@ -51,6 +57,7 @@ class VectorIndex:
         return collection
 
     def delete_collection(self, model_name: str):
+        self._logger.debug(f"deleting collection for {model_name}...")
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
 

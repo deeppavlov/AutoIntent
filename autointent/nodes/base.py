@@ -7,6 +7,7 @@ import torch
 
 from ..context import Context
 from ..modules import Module
+from ..logger import setup_logging, LoggingLevelType
 
 
 class Node:
@@ -14,22 +15,32 @@ class Node:
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str, verbose: bool = False):
+    def __init__(self, modules_search_spaces: list[dict], metric: str, log_level: LoggingLevelType):
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
         """
+        self._logger = setup_logging(log_level, __name__)
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
-        self.verbose = verbose
+        self.log_level = log_level
 
     def fit(self, context: Context):
+        self._logger.info(f"starting {self.node_type} node optimization...")
+
         for search_space in deepcopy(self.modules_search_spaces):
             module_type = search_space.pop("module_type")
             for module_config in it.product(*search_space.values()):
                 module_config = dict(zip(search_space.keys(), module_config))
+                
+                self._logger.debug(f"initializing {module_type} module...")
                 module: Module = self.modules_available[module_type](**module_config)
+
+                self._logger.debug(f"optimizing {module_type} module...")
                 module.fit(context)
+
+                self._logger.debug(f"scoring {module_type} module...")
                 metric_value = module.score(context, self.metrics_available[self.metric_name])
+
                 assets = module.get_assets(context)
                 context.optimization_logs.log_module_optimization(
                     self.node_type,
@@ -38,8 +49,8 @@ class Node:
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
-                    self.verbose
                 )
                 module.clear_cache()
                 gc.collect()
                 torch.cuda.empty_cache()
+        self._logger.info(f"{self.node_type} node optimization is finished!")

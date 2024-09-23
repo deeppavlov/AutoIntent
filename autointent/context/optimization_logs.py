@@ -1,12 +1,16 @@
-from pprint import pprint
+from ..logger import setup_logging, LoggingLevelType
+import logging
+from pprint import pformat
 
 
 class OptimizationLogs:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
     def __init__(
-        self,
+        self, log_level: LoggingLevelType
     ):
+        self._logger = setup_logging(log_level, __name__, PPrintFormatter())
+        
         self.cache = dict(
             best_assets=dict(
                 regexp=None,  # TODO: choose the format
@@ -28,7 +32,6 @@ class OptimizationLogs:
         metric_value: float,
         metric_name: str,
         assets,
-        verbose=False,
     ):
         """
         Purposes:
@@ -50,8 +53,7 @@ class OptimizationLogs:
             **module_config,
         )
         self.cache["configs"][node_type].append(logs)
-        if verbose:
-            pprint(logs)
+        self._logger.info(logs)
         metrics_list.append(metric_value)
 
     def get_best_embedder(self):
@@ -69,3 +71,15 @@ class OptimizationLogs:
             configs=self.cache["configs"],
         )
         return res
+
+
+class PPrintFormatter(logging.Formatter):
+    def __init__(self):
+        super().__init__(fmt="{asctime} - {name} - {levelname} - {message}", style='{')
+
+    def format(self, record):
+        if isinstance(record.msg, dict):
+            format_msg = "module scoring results:\n"
+            dct_to_str = pformat(record.msg)
+            record.msg = format_msg + dct_to_str
+        return super().format(record)
