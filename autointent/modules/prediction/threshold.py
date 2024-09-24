@@ -1,4 +1,4 @@
-from warnings import warn
+import logging
 
 import numpy as np
 
@@ -14,7 +14,8 @@ class ThresholdPredictor(PredictionModule):
         self.tags = context.data_handler.tags
 
         if not context.data_handler.has_oos_samples():
-            warn(
+            logger = logging.getLogger(__name__)
+            logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."
             )
