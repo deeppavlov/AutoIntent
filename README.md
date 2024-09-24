@@ -34,7 +34,8 @@ usage: autointent [-h] [--config-path CONFIG_PATH]
                   [--run-name RUN_NAME]
                   [--mode {multiclass,multilabel,multiclass_as_multilabel}]
                   [--device DEVICE] [--regex-sampling REGEX_SAMPLING]
-                  [--seed SEED] [--verbose]
+                  [--seed SEED]
+                  [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
                   [--multilabel-generation-config MULTILABEL_GENERATION_CONFIG]
 
 options:
@@ -71,7 +72,8 @@ options:
                         expressions. This option extends sample utterances
                         within multiclass intent records.
   --seed SEED           Affects the data partitioning
-  --verbose             Print to console during optimization
+  --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
+                        Set the logging level
   --multilabel-generation-config MULTILABEL_GENERATION_CONFIG
                         Config string like "[20, 40, 20, 10]" means 20 one-
                         label examples, 40 two-label examples, 20 three-label

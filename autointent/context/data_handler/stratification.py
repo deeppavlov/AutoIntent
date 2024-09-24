@@ -1,5 +1,5 @@
+import logging
 import itertools as it
-from warnings import warn
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -21,11 +21,12 @@ def get_sample_utterances(intent_records: list[dict]):
 def split_sample_utterances(intent_records: list[dict], test_records: list[dict], multilabel: bool, seed: int = 0):
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
-
-    TODO: ensure stratified train test splitting (test set must contain all classes)
     """
+    logger = logging.getLogger(__name__)
 
     if not multilabel:
+        logger.debug("parsing multiclass intent records...")
+
         utterances, labels = get_sample_utterances(intent_records)
         in_domain_mask = np.array(labels) != -1
 
@@ -37,6 +38,8 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         splitter = train_test_split
 
     else:
+        logger.debug("parsing multilabel utterance records...")
+
         utterance_records = intent_records
         utterances = [dct["utterance"] for dct in utterance_records]
         labels = [dct["labels"] for dct in utterance_records]
@@ -50,6 +53,8 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         splitter = multilabel_train_test_split
 
     if not test_records:
+        logger.debug("test utterances are not provided, using train test splitting...")
+
         splits = splitter(
             in_domain_utterances,
             in_domain_labels,
@@ -60,6 +65,8 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         )
         test_labels = splits[-1]
     else:
+        logger.debug("parsing test utterance records...")
+
         test_utterances = [dct["utterance"] for dct in test_records if len(dct["labels"]) > 0]
         if multilabel:
             test_labels = [
@@ -68,7 +75,7 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         else:
             test_labels = [dct["labels"][0] for dct in test_records if len(dct["labels"]) > 0]
             if any(len(dct["labels"]) > 1 for dct in test_records):
-                warn("you provided multilabel test data in multiclass classification mode")
+                logger.warning("you provided multilabel test data in multiclass classification mode, all the labels except the first will be ignored")
 
         for dct in test_records:
             if len(dct["labels"]) == 0:
@@ -76,7 +83,11 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
 
         splits = [in_domain_utterances, test_utterances, in_domain_labels, test_labels]
 
-    assert validate_test_labels(test_labels, multilabel, n_classes)
+    is_valid = validate_test_labels(test_labels, multilabel, n_classes)
+    if not is_valid:
+        msg = "for some reason test set doesn't contain some classes examples"
+        logger.error(msg)
+        raise ValueError(msg)
 
     res = [n_classes, oos_utterances] + splits
     return res

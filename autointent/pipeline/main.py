@@ -1,3 +1,4 @@
+import logging
 import importlib.resources as ires
 import json
 import os
@@ -7,6 +8,7 @@ from datetime import datetime
 from .. import Context
 from .utils import get_db_dir, generate_name
 from .pipeline import Pipeline
+from ..logger import setup_logging, LoggingLevelType
 
 
 def main():
@@ -83,9 +85,11 @@ def main():
         help="Affects the data partitioning"
     )
     parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Print to console during optimization"
+        '--log-level',
+        type=str,
+        default='ERROR',
+        choices=LoggingLevelType.__args__,
+        help='Set the logging level'
     )
     parser.add_argument(
         "--multilabel-generation-config",
@@ -96,10 +100,16 @@ def main():
         "This option extends multilabel utterance records.",
     )
     args = parser.parse_args()
+    
+    setup_logging(args.log_level)
+    logger = logging.getLogger(__name__)
 
     # configure the run and data
     run_name = get_run_name(args.run_name)
     db_dir = get_db_dir(args.db_dir, run_name)
+
+    logger.debug(f"Run Name: {run_name}")
+    logger.debug(f"Chroma DB path: {db_dir}")
 
     # create shared objects for a whole pipeline
     context = Context(
@@ -115,7 +125,7 @@ def main():
     )
 
     # run optimization
-    pipeline = Pipeline(args.config_path, args.mode, args.verbose)
+    pipeline = Pipeline(args.config_path, args.mode)
     pipeline.optimize(context)
 
     # save results

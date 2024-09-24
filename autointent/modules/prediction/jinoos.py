@@ -1,4 +1,4 @@
-from warnings import warn
+import logging
 
 import numpy as np
 
@@ -17,7 +17,8 @@ class JinoosPredictor(PredictionModule):
         """
 
         if not context.data_handler.has_oos_samples():
-            warn(
+            logger = logging.getLogger(__name__)
+            logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using JinoosPredictor imposes unnecessary computational overhead."
             )
