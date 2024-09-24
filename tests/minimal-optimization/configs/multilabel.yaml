@@ -19,5 +19,5 @@ nodes:
     metric: prediction_accuracy
     modules:
       - module_type: threshold
-        thresh: [0.5]
+        thresh: [0.5, [0.5, 0.5, 0.5]]
       - module_type: tunable
