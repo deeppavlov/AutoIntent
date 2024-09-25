@@ -1,0 +1,52 @@
+[
+    {
+        "intent_id": 0,
+        "intent_name": "accept_reservations",
+        "sample_utterances": [
+            "can i make a reservation for redrobin",
+            "is it possible to make a reservation at redrobin",
+            "does redrobin take reservations",
+            "are reservations taken at redrobin",
+            "does redrobin do reservations"
+        ],
+        "regexp_full_match": [],
+        "regexp_partial_match": []
+    },
+    {
+        "intent_id": 1,
+        "intent_name": "account_blocked",
+        "sample_utterances": [
+            "why is there a hold on my american saving bank account",
+            "i am nost sure why my account is blocked",
+            "why is there a hold on my capital one checking account",
+            "i think my account is blocked but i do not know the reason",
+            "can you tell me why is my bank account frozen"
+        ],
+        "regexp_full_match": [],
+        "regexp_partial_match": []
+    },
+    {
+        "intent_id": 2,
+        "intent_name": "alarm",
+        "sample_utterances": [
+            "wake me up at noon tomorrow",
+            "set my alarm for getting up",
+            "make sure my alarm is set for three thirty in the morning",
+            "please set an alarm for mid day",
+            "have an alarm set for three in the morning"
+        ],
+        "regexp_full_match": [],
+        "regexp_partial_match": []
+    },
+    {
+        "intent_id": -1,
+        "intent_name": "ood",
+        "sample_utterances": [
+            "how much is an overdraft fee for bank",
+            "why are exponents preformed before multiplication in the order of operations",
+            "what size wipers does this car take"
+        ],
+        "regexp_full_match": [],
+        "regexp_partial_match": []
+    }
+]

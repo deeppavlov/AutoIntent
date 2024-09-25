@@ -1,0 +1,181 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0,
+            1.0
+        ],
+        "scoring": [
+            1.0,
+            1.0,
+            1.0,
+            0.75,
+            1.0,
+            1.0,
+            1.0,
+            0.6666666666666666,
+            1.0,
+            0.6666666666666666,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+        ],
+        "prediction": [
+            0.5714285714285714,
+            0.5714285714285714,
+            0.5714285714285714
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 1.0,
+                "k": 10,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 5,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.75,
+                "k": 10,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 10,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "k": 10,
+                "weights": "closest"
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6666666666666666,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 1,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 1,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6666666666666666,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 3,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "k": 3,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0",
+                "k": 1,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0",
+                "k": 1,
+                "train_head": true
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0",
+                "k": 3,
+                "train_head": false
+            },
+            {
+                "module_type": "dnnc",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 1.0,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0",
+                "k": 3,
+                "train_head": true
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.5714285714285714,
+                "thresh": 0.5
+            },
+            {
+                "module_type": "argmax",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.5714285714285714
+            },
+            {
+                "module_type": "jinoos",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.5714285714285714
+            }
+        ]
+    }
+}
