@@ -1,65 +1,66 @@
-def test_nll():
-    from autointent.metrics.scoring import scoring_log_likelihood
-    import numpy as np
+from autointent.metrics.scoring import scoring_roc_auc, scoring_log_likelihood
+import numpy as np
+import pytest
 
-    # case 1
-    labels = [0]
-    scores = [
-        [.1,.3,.5,.1],
-    ]
-    ground_truth = np.log(.1)
+
+@pytest.mark.parametrize(
+    "labels, scores, ground_truth",
+    [
+        ([0], [[0.1, 0.3, 0.5, 0.1]], np.log(0.1)),
+        (
+            [0, 1, 2, 3],
+            [[0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1]],
+            np.mean(
+                [
+                    np.log(0.1),
+                    np.log(0.3),
+                    np.log(0.5),
+                    np.log(0.1),
+                ]
+            ),
+        ),
+    ],
+)
+def test_neg_cross_entropy(labels, scores, ground_truth):
     output = scoring_log_likelihood(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
-    # case 2
-    labels = [0,1,2,3]
-    scores = [
-        [.1,.3,.5,.1],
-        [.1,.3,.5,.1],
-        [.1,.3,.5,.1],
-        [.1,.3,.5,.1],
-    ]
-    ground_truth = np.mean([np.log(.1),np.log(.3),np.log(.5),np.log(.1),])
-    output = scoring_log_likelihood(labels, scores)
-    np.testing.assert_almost_equal(output, ground_truth)
 
-
-def test_roc_auc():
-    from autointent.metrics.scoring import scoring_roc_auc
-    import numpy as np
-
-    # case 1
-    labels = [0,1,2,3]
-    scores = [
-        [.5,.3,.1,.1],
-        [.1,.5,.3,.1],
-        [.1,.3,.5,.1],
-        [.1,.3,.1,.5],
-    ]
-    ground_truth = 1.
-    output = scoring_roc_auc(labels, scores)
-    np.testing.assert_almost_equal(output, ground_truth)
-
-    # case 2
-    labels = [0,1,2,3]
-    scores = [
-        [.5,.3,.1,.1],
-        [.4,.1,.3,.2],
-        [.1,.3,.5,.1],
-        [.1,.3,.1,.5],
-    ]
-    ground_truth = 0.75
-    output = scoring_roc_auc(labels, scores)
-    np.testing.assert_almost_equal(output, ground_truth)
-
-    # case 3
-    labels = [0,1,2,3]
-    scores = [
-        [.5,.3,.1,.1],
-        [.4,.2,.3,.1],
-        [.1,.1,.5,.3],
-        [.1,.3,.1,.5],
-    ]
-    ground_truth = 10/12
+@pytest.mark.parametrize(
+    "labels, scores, ground_truth",
+    [
+        (
+            [0, 1, 2, 3],
+            [
+                [0.5, 0.3, 0.1, 0.1],
+                [0.1, 0.5, 0.3, 0.1],
+                [0.1, 0.3, 0.5, 0.1],
+                [0.1, 0.3, 0.1, 0.5],
+            ],
+            1.0,
+        ),
+        (
+            [0, 1, 2, 3],
+            [
+                [0.5, 0.3, 0.1, 0.1],
+                [0.4, 0.1, 0.3, 0.2],
+                [0.1, 0.3, 0.5, 0.1],
+                [0.1, 0.3, 0.1, 0.5],
+            ],
+            0.75,
+        ),
+        (
+            [0, 1, 2, 3],
+            [
+                [0.5, 0.3, 0.1, 0.1],
+                [0.4, 0.2, 0.3, 0.1],
+                [0.1, 0.1, 0.5, 0.3],
+                [0.1, 0.3, 0.1, 0.5],
+            ],
+            10 / 12,
+        ),
+    ],
+)
+def test_roc_auc(labels, scores, ground_truth):
     output = scoring_roc_auc(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)

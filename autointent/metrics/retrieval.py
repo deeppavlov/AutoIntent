@@ -246,6 +246,7 @@ def retrieval_ndcg_intersecting(query_labels: list[list[int]], candidates_labels
     for rel_scores in relevance_scores:
         cur_dcg = dcg(rel_scores, k)
         cur_idcg = idcg(rel_scores, k)
+        print(cur_dcg, cur_idcg)
         ndcg_scores.append(0.0 if cur_idcg == 0 else cur_dcg / cur_idcg)
 
     return sum(ndcg_scores) / len(ndcg_scores)
