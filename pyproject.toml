@@ -40,3 +40,11 @@ indent-width = 4
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra" # `--cov` option breaks pycharm's test debugger
+testpaths = [
+    "tests",
+]
+pythonpath = "autointent"
