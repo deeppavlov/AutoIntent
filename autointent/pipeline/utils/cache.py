@@ -72,7 +72,8 @@ def clear_chroma_cache():
     # TODO: test on all platforms 
     chroma_config = read_chroma_config()
     for cache_dirs in chroma_config.cache_directories:
-        shutil.rmtree(cache_dirs)
+        if os.path.exists(cache_dirs):
+            shutil.rmtree(cache_dirs)
         chroma_config.cache_directories.remove(cache_dirs)
     write_chroma_config(chroma_config)
 
