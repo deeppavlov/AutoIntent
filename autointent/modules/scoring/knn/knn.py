@@ -1,13 +1,8 @@
-from functools import partial
-from typing import Literal
+from typing import Literal, Callable
 
 import numpy as np
 from chromadb import Collection
 
-from ....context import (
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
 from ..base import Context, ScoringModule
 from .weighting import apply_weights
 
@@ -33,9 +28,10 @@ class KNNScorer(ScoringModule):
         self._multilabel = context.multilabel
         self._collection = context.get_best_collection()
         self._n_classes = context.n_classes
+        self._converter = context.vector_index.metadata_as_labels
 
     def predict(self, utterances: list[str]):
-        labels, distances = query(self._collection, self.k, utterances)
+        labels, distances = query(self._collection, self.k, utterances, self._converter)
         probs = apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
         return probs
 
@@ -50,6 +46,7 @@ def query(
     collection: Collection,
     k: int,
     utterances: list[str],
+    converter: Callable
 ):
     """
     Return
@@ -61,21 +58,13 @@ def query(
 
     `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
     """
-    n_classes = collection.metadata["n_classes"]
-    multilabel = collection.metadata["multilabel"]
-
     query_res = collection.query(
         query_texts=utterances,
         n_results=k,
         include=["metadatas", "documents", "distances"],  # one can add "embeddings"
     )
 
-    if not multilabel:
-        convert = multiclass_metadata_as_labels
-    else:
-        convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
-
-    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
+    res_labels = np.array([converter(candidates) for candidates in query_res["metadatas"]])
     res_distances = np.array(query_res["distances"])
 
     return res_labels, res_distances

@@ -4,11 +4,13 @@ import json
 import os
 from argparse import ArgumentParser
 from datetime import datetime
+from typing import Literal
 
 from .. import Context
 from .utils import get_db_dir, generate_name
 from .pipeline import Pipeline
-from ..logger import setup_logging, LoggingLevelType
+
+LoggingLevelType = Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
 
 def main():
@@ -101,8 +103,7 @@ def main():
     )
     args = parser.parse_args()
     
-    setup_logging(args.log_level)
-    logger = logging.getLogger(__name__)
+    logger = setup_logging(args.log_level)
 
     # configure the run and data
     run_name = get_run_name(args.run_name)
@@ -148,3 +149,13 @@ def get_run_name(run_name: str):
     if run_name == "":
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
+
+
+def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
+    logging.basicConfig(
+        level=level,
+        format='{asctime} - {name} - {levelname} - {message}',
+        style="{",
+        handlers=[logging.StreamHandler()]
+    )
+    return logging.getLogger(__name__)

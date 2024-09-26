@@ -6,8 +6,8 @@ from logging import Logger
 
 import torch
 
-from ..context import Context
 from ..modules import Module
+from ..modules.base import Context
 
 
 class Node:

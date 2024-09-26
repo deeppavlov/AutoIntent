@@ -1,7 +1,6 @@
 from autointent import Context
 from autointent.pipeline import Pipeline
-from autointent.pipeline.main import get_run_name, get_db_dir, load_data
-from autointent.logger import setup_logging
+from autointent.pipeline.main import get_run_name, get_db_dir, load_data, setup_logging
 
 
 def test_multiclass():
