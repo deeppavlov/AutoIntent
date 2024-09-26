@@ -43,7 +43,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-ra" # --cov break pycharm test debugger
+addopts = "-ra" # `--cov` option breaks pycharm's test debugger
 testpaths = [
     "tests",
 ]
