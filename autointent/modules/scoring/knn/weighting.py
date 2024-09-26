@@ -58,12 +58,10 @@ def closest_weighting(labels, distances, multilabel, n_classes):
 
 def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
     """
-    TODO test this function
-
     Arguments
     ---
     `labels`: array of shape (n_samples, n_candidates, n_classes) with binary labels
-    `distances`: array of shape (n_samples, n_candidates, n_classes) with cosine distances
+    `distances`: array of shape (n_samples, n_candidates) with cosine distances
 
     Return
     ---

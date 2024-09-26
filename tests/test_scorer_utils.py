@@ -2,6 +2,7 @@ import numpy as np
 from autointent.modules.scoring.knn.count_neighbors import get_counts
 from autointent.modules.scoring.base import get_topk
 from autointent.modules.scoring.dnnc import build_result
+from autointent.modules.scoring.knn.weighting import closest_weighting
 import pytest
 
 
@@ -126,3 +127,75 @@ def test_scoring_get_topk(scores, k, ground_truth):
 )
 def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
     np.testing.assert_array_equal(x=build_result(scores, labels, n_classes), y=ground_truth)
+
+
+@pytest.mark.parametrize(
+    ["labels", "distances", "multilabel", "n_classes", "ground_truth"],
+    [
+        (
+            np.array([[0, 2]]),
+            np.array([[0.5, 0.3]]),
+            False,
+            3,
+            [[0.75, 0, 0.85]]
+        ),
+        (
+            np.array([[0, 2, 0, 2]]),
+            np.array([[0.5, 0.3, 0.1, 0.5]]),
+            False,
+            3,
+            [[0.95, 0, 0.85]]
+        ),
+        (
+            np.array([
+                [0, 2, 0, 2],
+                [0, 2, 0, 2],
+            ]),
+            np.array([
+                [0.5, 0.3, 0.1, 0.5],
+                [0.5, 0.3, 0.1, 0.1],
+            ]),
+            False,
+            3,
+            [
+                [0.95, 0, 0.85],
+                [0.95, 0, 0.95],
+            ]
+        ),
+        (
+            np.array([
+                [[1,0,0], [0,0,1]]
+            ]),
+            np.array([[0.5, 0.3]]),
+            True,
+            3,
+            [
+                [0.75, 0, 0.85],
+            ]
+        ),
+        (
+            np.array([
+                [[1,0,1], [0,0,1]]
+            ]),
+            np.array([[0.5, 0.3]]),
+            True,
+            3,
+            [
+                [0.75, 0, 0.85],
+            ]
+        ),
+        (
+            np.array([
+                [[1,0,0], [1,0,1]]
+            ]),
+            np.array([[0.5, 0.3]]),
+            True,
+            3,
+            [
+                [0.85, 0, 0.85],
+            ]
+        ),
+    ]
+)
+def test_closest_weighting(labels, distances, multilabel, n_classes, ground_truth):
+    np.testing.assert_array_equal(x=closest_weighting(labels, distances, multilabel, n_classes), y=ground_truth)
