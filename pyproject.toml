@@ -16,6 +16,7 @@ appdirs = "^1.4.4"
 sre-yield = "^1.2"
 optuna = "^4.0.0"
 xeger = "^0.4.0"
+pathlib = "^1.0.1"
 
 
 [tool.poetry.group.dev]

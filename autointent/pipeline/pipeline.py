@@ -1,8 +1,10 @@
 import importlib.resources as ires
 import json
 import logging
-import os
+from collections.abc import Callable
 from logging import Logger
+from pathlib import Path
+from typing import ClassVar
 
 import numpy as np
 import yaml
@@ -14,14 +16,14 @@ from .utils import NumpyEncoder
 
 
 class Pipeline:
-    available_nodes = {
+    available_nodes: ClassVar[dict[str, Callable]] = {
         "regexp": RegExpNode,
         "retrieval": RetrievalNode,
         "scoring": ScoringNode,
         "prediction": PredictionNode,
     }
 
-    def __init__(self, config_path: os.PathLike, mode: str):
+    def __init__(self, config_path: str, mode: str):
         # TODO add config validation
         self._logger = logging.getLogger(__name__)
 
@@ -38,46 +40,50 @@ class Pipeline:
             )
             node.fit(context)
 
-    def dump(self, logs_dir: os.PathLike, run_name: str):
+    def dump(self, logs_dir: str, run_name: str):
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_logs.dump()
 
         # create appropriate directory
-        if logs_dir == "":
-            logs_dir = os.getcwd()
-        logs_dir = os.path.join(logs_dir, run_name)
-        if not os.path.exists(logs_dir):
-            os.makedirs(logs_dir)
+        logs_dir = Path.cwd() if logs_dir == "" else Path(logs_dir)
+        logs_dir = logs_dir / run_name
+        logs_dir.mkdir(parents=True)
 
         # dump config and optimization results
-        logs_path = os.path.join(logs_dir, "logs.json")
-        json.dump(optimization_results, open(logs_path, "w"), indent=4, ensure_ascii=False, cls=NumpyEncoder)
-        config_path = os.path.join(logs_dir, "config.yaml")
-        yaml.dump(self.config, open(config_path, "w"))
+        logs_path = logs_dir / "logs.json"
+        with logs_path.open("w") as file:
+            json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
+        config_path = logs_dir / "config.yaml"
+        with config_path.open("w") as file:
+            yaml.dump(self.config, file)
 
         nodes = [node_config["node_type"] for node_config in self.config["nodes"]]
         self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
         train_data, test_data = self.context.data_handler.dump()
-        train_path = os.path.join(logs_dir, "train_data.json")
-        test_path = os.path.join(logs_dir, "test_data.json")
-        json.dump(train_data, open(train_path, "w"), indent=4, ensure_ascii=False)
-        json.dump(test_data, open(test_path, "w"), indent=4, ensure_ascii=False)
+        train_path = logs_dir / "train_data.json"
+        test_path = logs_dir / "test_data.json"
+        with train_path.open("w") as file:
+            json.dump(train_data, file, indent=4, ensure_ascii=False)
+        with test_path.open("w") as file:
+            json.dump(test_data, file, indent=4, ensure_ascii=False)
 
-        self._logger.info("logs and other assets are saved to " + logs_dir)
+        self._logger.info("logs and other assets are saved to %s", logs_dir)
 
 
-def load_config(config_path: os.PathLike, mode: str, logger: Logger):
+def load_config(config_path: str, mode: str, logger: Logger):
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
-        logger.debug(f"loading optimization search space config from {config_path}...)")
-        file = open(config_path)
+        logger.debug("loading optimization search space config from %s...)", config_path)
+        with Path(config_path).open() as file:
+            file_content = file.read()
     else:
         logger.debug("loading default optimization search space config...")
         config_name = "default-multilabel-config.yaml" if mode != "multiclass" else "default-multiclass-config.yaml"
-        file = ires.files("autointent.datafiles").joinpath(config_name).open()
-    return yaml.safe_load(file)
+        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
+            file_content = file.read()
+    return yaml.safe_load(file_content)
 
 
 def make_report(logs: dict[str], nodes: list[str]) -> str:

@@ -1,9 +1,9 @@
 import importlib.resources as ires
 import json
 import logging
-import os
 from argparse import ArgumentParser
 from datetime import datetime
+from pathlib import Path
 
 from autointent import Context
 from autointent.logger import LoggingLevelType, setup_logging
@@ -52,7 +52,8 @@ def main():
         "--logs-dir",
         type=str,
         default="",
-        help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
+        help="Location where to save optimization logs that will be saved as "
+         "`<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
     )
     parser.add_argument(
         "--run-name", type=str, default="", help="Name of the run prepended to optimization logs filename"
@@ -92,8 +93,8 @@ def main():
     run_name = get_run_name(args.run_name)
     db_dir = get_db_dir(args.db_dir, run_name)
 
-    logger.debug(f"Run Name: {run_name}")
-    logger.debug(f"Chroma DB path: {db_dir}")
+    logger.debug("Run Name: %s", run_name)
+    logger.debug("Chroma DB path: %s", db_dir)
 
     # create shared objects for a whole pipeline
     context = Context(
@@ -116,19 +117,18 @@ def main():
     pipeline.dump(args.logs_dir, run_name)
 
 
-def load_data(data_path: os.PathLike, multilabel: bool):
+def load_data(data_path: str, multilabel: bool):
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
         file = ires.files("autointent.datafiles").joinpath(data_name).open()
     elif data_path != "":
-        file = open(data_path)
-    else:
-        return []
-    return json.load(file)
+        with Path(data_path).open() as file:
+            return json.load(file)
+    return []
 
 
 def get_run_name(run_name: str):
     if run_name == "":
         run_name = generate_name()
-    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"
+    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
