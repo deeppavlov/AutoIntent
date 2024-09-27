@@ -37,7 +37,7 @@ class KNNScorer(ScoringModule):
         return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self):
-        model = self._collection._embedding_function._model
+        model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
         self._collection = None
