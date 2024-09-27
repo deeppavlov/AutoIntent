@@ -24,6 +24,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 datasets = "2.20.0"
+tach = "^0.11.3"
 
 [tool.poetry.group.test]
 optional = true

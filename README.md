@@ -215,9 +215,10 @@ autointent --mode multiclass \
 - `regexp_partial_accuracy`
 - `regexp_partial_precision`
 
+### Multi-class классификация
+
 Retrieval:
 - `retrieval_hit_rate`
-- `retrieval_hit_rate_multilabel`
 - `retrieval_map`
 - `retrieval_mrr`
 - `retrieval_ndcg`
@@ -226,7 +227,7 @@ Retrieval:
 Scoring:
 - `scoring_accuracy`
 - `scoring_f1`
-- `scoring_neg_cross_entropy`
+- `scoring_log_likelihood`
 - `scoring_precision`
 - `scoring_recall`
 - `scoring_roc_auc`
@@ -238,44 +239,43 @@ Prediction:
 - `prediction_recall`
 - `prediction_roc_auc`
 
-## TODO
+### Multi-label классификация
 
-LOGGING:
-- логирование в тензорборд и тп
-- извлечение лучшего пайплайна из логов оптимизации (pipeline export)
-- возможность прерывания и возобновления оптимизации
-- кеширование запросов к collection (ибо на оптимизации k для knn и dncc можно переиспользовать много запросов)
+Retrieval:
+- все те же метрики, но в формате макро усреднения (к названию метрики нужно добавить `_intersecting`):
+    - `retrieval_hit_rate_intersecting`
+    - `retrieval_map_intersecting`
+    - `retrieval_mrr_intersecting`
+    - `retrieval_ndcg_intersecting`
+    - `retrieval_precision_intersecting`
+- все те же метрики, но над бинарными метками, где 0 или 1 определяется тем, есть ли хотя бы одна общая метка (к названию метрики нужно добавить `_macro`):
+    - `retrieval_hit_rate_macro`
+    - `retrieval_map_macro`
+    - `retrieval_mrr_macro`
+    - `retrieval_ndcg_macro`
+    - `retrieval_precision_macro`
+Scoring:
+- все те же, но в формате макро усреднения (под теми же названиями):
+    - `scoring_accuracy`
+    - `scoring_f1`
+    - `scoring_log_likelihood`
+    - `scoring_precision`
+    - `scoring_recall`
+    - `scoring_roc_auc`
+- `scoring_neg_ranking_loss`
+- `scoring_neg_coverage`
+- `scoring_hit_rate`
 
-DATA:
-- тулза для генерации регулярок?
-- тулза для генерации OOS примеров?
-- тулза для расширения датасета?
-- проблема переобучения: следующие этапы оптимизации должны использовать другие данные нежели предыдущие
-- кросс валидация а не только разделение на обучающую и отложенную выборку
-- evaluation on few-shot episodes?
+Prediction:
+- все те же, но в формате макро усреднения (под теми же названиями)
+    - `prediction_accuracy`
+    - `prediction_f1`
+    - `prediction_precision`
+    - `prediction_recall`
+    - `prediction_roc_auc`
 
-ML FEATURES:
-- увеличение поддержки multilabel классификации:
-    - реализовать MLKNN
-- labels vector representation
-    - статье Towards Multi-label Unknown Intent Detection
-    - статья Exploring Description-Augmented Dataless Intent Classification
-- поддержка NLI-pretrained кросс-энкодеров
-- thresholding как в статье Few-shot Learning for Multi-label Intent Detection
+## Contrib
 
-EFFICIENCY:
-- эффективное использование вычислительных ресурсов
-- solve CUDA out of memory problem for collection.add and collection.query
+Устройство проекта:
 
-USER EXPERIENCE:
-- interactive cli config file creation
-    - like in poetry
-    - создание папки проекта в которую сохранится конфиг и тест и трейн данные
-
-CODESTYLE:
-- добавить типизацию (dataclasses, pydantic, types)
-- переделать Node, metrics, Module
-
-TESTING:
-- много TODO в коде
-- датасеты для multilabel (eurlex, reuters etc)
+![](assets/dependency-graph.png)

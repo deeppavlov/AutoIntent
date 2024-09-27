@@ -2,8 +2,6 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
-from autointent.context import multiclass_metadata_as_labels, multilabel_metadata_as_labels
-
 from .base import Context, ScoringModule
 
 
@@ -32,12 +30,11 @@ class LinearScorer(ScoringModule):
         dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
 
+        labels = context.vector_index.metadata_as_labels(dataset["metadatas"])
         if self.multilabel:
-            labels = multilabel_metadata_as_labels(dataset["metadatas"], context.n_classes)
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            labels = multiclass_metadata_as_labels(dataset["metadatas"])
             clf = LogisticRegressionCV(cv=3, n_jobs=8)
 
         clf.fit(features, labels)

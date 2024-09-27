@@ -1,14 +1,12 @@
 import logging
 from pprint import pformat
 
-from autointent.logger import get_logger
-
 
 class OptimizationLogs:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
     def __init__(self):
-        self._logger = get_logger(__name__, formatter=PPrintFormatter())
+        self._logger = self._get_logger()
 
         self.cache = {
             "best_assets": {
@@ -69,6 +67,16 @@ class OptimizationLogs:
             "metrics": self.cache["metrics"],
             "configs": self.cache["configs"],
         }
+
+    def _get_logger(self):
+        logger = logging.getLogger(__name__)
+
+        formatter = PPrintFormatter()
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+
+        return logger
 
 
 class PPrintFormatter(logging.Formatter):
