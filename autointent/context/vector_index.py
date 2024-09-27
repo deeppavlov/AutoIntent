@@ -56,7 +56,7 @@ class VectorIndex:
         self._logger.debug("deleting collection for %s...", model_name)
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
-    
+
     def metadata_as_labels(self, metadata: list[dict]):
         if self.multilabel:
             return _multilabel_metadata_as_labels(metadata, self.n_classes)
