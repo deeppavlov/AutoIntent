@@ -11,7 +11,8 @@ class ArgmaxPredictor(PredictionModule):
             logger = logging.getLogger(__name__)
             logger.warning(
                 "Your data contains out-of-scope utterances, but ArgmaxPredictor "
-                "cannot detect them. Consider different predictor")
+                "cannot detect them. Consider different predictor"
+            )
 
     def predict(self, scores: list[list[float]]):
         return np.argmax(scores, axis=1)

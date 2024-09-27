@@ -6,27 +6,24 @@ from .prediction import (
     prediction_recall,
     prediction_roc_auc,
 )
-from .regexp import (
-    regexp_partial_accuracy,
-    regexp_partial_precision
-)
+from .regexp import regexp_partial_accuracy, regexp_partial_precision
 from .retrieval import (
     RetrievalMetricFn,
     retrieval_hit_rate,
-    retrieval_hit_rate_macro,
     retrieval_hit_rate_intersecting,
+    retrieval_hit_rate_macro,
     retrieval_map,
-    retrieval_map_macro,
     retrieval_map_intersecting,
+    retrieval_map_macro,
     retrieval_mrr,
-    retrieval_mrr_macro,
     retrieval_mrr_intersecting,
+    retrieval_mrr_macro,
     retrieval_ndcg,
-    retrieval_ndcg_macro,
     retrieval_ndcg_intersecting,
+    retrieval_ndcg_macro,
     retrieval_precision,
-    retrieval_precision_macro,
     retrieval_precision_intersecting,
+    retrieval_precision_macro,
 )
 from .scoring import (
     ScoringMetricFn,

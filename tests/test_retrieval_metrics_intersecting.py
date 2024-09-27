@@ -11,7 +11,7 @@ from autointent.metrics.retrieval import (
 
 
 @pytest.mark.parametrize(
-    "query_labels, candidates_labels, k, ground_truth",
+    ("query_labels", "candidates_labels", "k", "ground_truth"),
     [
         ([[0, 1, 0]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 7 / 12),
         ([[1, 1, 0]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 7 / 12),
@@ -29,7 +29,7 @@ def test_map(query_labels, candidates_labels, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "query_labels, candidates_labels, k, ground_truth",
+    ("query_labels", "candidates_labels", "k", "ground_truth"),
     [
         ([[0, 1, 0]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 1.0),
         ([[1, 1, 0]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 1.0),
@@ -47,7 +47,7 @@ def test_hit_rate(query_labels, candidates_labels, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "query_labels, candidates_labels, k, ground_truth",
+    ("query_labels", "candidates_labels", "k", "ground_truth"),
     [
         ([[0, 0, 1]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 1 / 3),
         ([[0, 1, 1]], [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]], None, 1),
@@ -62,7 +62,7 @@ def test_precision(query_labels, candidates_labels, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "query_labels, candidates_labels, k, ground_truth",
+    ("query_labels", "candidates_labels", "k", "ground_truth"),
     [
         (
             [[0, 1, 1]],
@@ -91,7 +91,7 @@ def test_ndcg(query_labels, candidates_labels, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "query_labels, candidates_labels, k, ground_truth",
+    ("query_labels", "candidates_labels", "k", "ground_truth"),
     [
         ([[0, 1, 1]], [[[1, 0, 0], [0, 1, 0], [1, 0, 1]]], None, 0.5),
         ([[0, 1, 1]], [[[1, 0, 0], [1, 0, 0], [1, 0, 0]]], None, 0.0),

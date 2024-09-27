@@ -13,16 +13,16 @@ import sys
 sys.path.append("/home/voorhs/repos/AutoIntent")
 
 import itertools as it
-
-from sentence_transformers import InputExample, CrossEncoder
-from torch import nn
-import torch
-import torch.nn.functional as F
-from transformers import AutoModelForSequenceClassification
 from random import shuffle
 
+import torch
+import torch.nn.functional as F
+from sentence_transformers import CrossEncoder, InputExample
+from torch import nn
+from transformers import AutoModelForSequenceClassification
 
-def construct_samples(texts, labels, balancing_factor: int = None) -> list[InputExample]:
+
+def construct_samples(texts, labels, balancing_factor: int | None = None) -> list[InputExample]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -34,10 +34,10 @@ def construct_samples(texts, labels, balancing_factor: int = None) -> list[Input
     shuffle(samples[1])
 
     if balancing_factor is not None:
-        i_min = min([0,1], key=lambda i: len(samples[i]))
+        i_min = min([0, 1], key=lambda i: len(samples[i]))
         i_max = 1 - i_min
         min_length = len(samples[i_min])
-        res = samples[i_min][:min_length] + samples[i_max][:min_length * balancing_factor]
+        res = samples[i_min][:min_length] + samples[i_max][: min_length * balancing_factor]
     else:
         res = samples[0] + samples[1]
 
@@ -55,7 +55,7 @@ def freeze_encoder(model: AutoModelForSequenceClassification):
 
 
 class LogLoss(nn.Module):
-    def __init__(self, model: CrossEncoder, label_smoothing = 0.):
+    def __init__(self, model: CrossEncoder, label_smoothing=0.0):
         super().__init__()
 
         self.model = model
@@ -70,8 +70,8 @@ class LogLoss(nn.Module):
         """
         labels = labels.float()
         smoothed_targets = labels * (1 - self.label_smoothing) + 0.5 * self.label_smoothing
-        loss = F.binary_cross_entropy_with_logits(sentence_features, smoothed_targets)
-        return loss
+        return F.binary_cross_entropy_with_logits(sentence_features, smoothed_targets)
+
 
 if __name__ == "__main__":
     import json
@@ -101,10 +101,7 @@ if __name__ == "__main__":
     # Define our Cross-Encoder
     train_batch_size = 16
     num_epochs = 4
-    model_save_path = (
-        "experiments/cross-encoder-training/logs/"
-        + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    )
+    model_save_path = "experiments/cross-encoder-training/logs/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     model = CrossEncoder("llmrails/ember-v1", num_labels=1)
     freeze_encoder(model.model)
@@ -113,9 +110,7 @@ if __name__ == "__main__":
     logger.info("Read banking77 train dataset")
     dataset_path = "data/intent_records/banking77.json"
     intent_records = json.load(open(dataset_path))
-    (n_classes, utterances_train, utterances_test, labels_train, labels_test) = (
-        split_sample_utterances(intent_records)
-    )
+    (n_classes, utterances_train, utterances_test, labels_train, labels_test) = split_sample_utterances(intent_records)
 
     train_samples = construct_samples(utterances_train, labels_train, balancing_factor=1)
     test_samples = construct_samples(utterances_test, labels_test, balancing_factor=1)
@@ -130,9 +125,7 @@ if __name__ == "__main__":
     )
 
     # We add an evaluator, which evaluates the performance during training
-    evaluator = CEBinaryClassificationEvaluator.from_input_examples(
-        test_samples, name="test"
-    )
+    evaluator = CEBinaryClassificationEvaluator.from_input_examples(test_samples, name="test")
     evaluator(model)
 
     # Configure the training (10% of train data for warm-up)
@@ -147,7 +140,7 @@ if __name__ == "__main__":
         warmup_steps=warmup_steps,
         output_path=model_save_path,
         optimizer_params={"lr": 2e-5},
-        loss_fct=LogLoss(model, label_smoothing=0.2)
+        loss_fct=LogLoss(model, label_smoothing=0.2),
     )
 
     ##### Load model and eval on test set

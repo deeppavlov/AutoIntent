@@ -3,12 +3,9 @@ from functools import partial
 import numpy as np
 from chromadb import Collection
 
-from ...context import (
-    Context,
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
-from ...metrics import RetrievalMetricFn
+from autointent.context import Context, multiclass_metadata_as_labels, multilabel_metadata_as_labels
+from autointent.metrics import RetrievalMetricFn
+
 from .base import RetrievalModule
 
 
@@ -22,14 +19,13 @@ class VectorDBModule(RetrievalModule):
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, str]:
         labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
-        metric_value = metric_fn(context.data_handler.labels_test, labels_pred)
-        return metric_value
-    
-    def get_assets(self, context: Context = None):
+        return metric_fn(context.data_handler.labels_test, labels_pred)
+
+    def get_assets(self):
         return self.model_name
 
     def clear_cache(self):
-        model = self.collection._embedding_function._model
+        model = self.collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
         self.collection = None
@@ -61,5 +57,4 @@ def retrieve_candidates(
     else:
         convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
 
-    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
-    return res_labels
+    return np.array([convert(candidates) for candidates in query_res["metadatas"]])

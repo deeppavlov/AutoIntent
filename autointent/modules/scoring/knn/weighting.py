@@ -52,8 +52,7 @@ def apply_weights(
 def closest_weighting(labels, distances, multilabel, n_classes):
     if not multilabel:
         labels = to_onehot(labels, n_classes)
-    probs = _closest_weighting(labels, distances)
-    return probs
+    return _closest_weighting(labels, distances)
 
 
 def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
@@ -73,15 +72,14 @@ def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
 
     # select closest candidate for each query-class pair
     similarities = np.max(expanded_distances_view, axis=1)
-    probs = (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
+    return (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
 
-    return probs
 
 
 def to_onehot(labels: np.ndarray, n_classes):
     """convert nd array of ints to (n+1)d array of zeros and ones"""
-    new_shape = labels.shape + (n_classes,)
+    new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
-    indices = tuple(np.indices(labels.shape)) + (labels,)
+    indices = (*tuple(np.indices(labels.shape)), labels)
     onehot_labels[indices] = 1
     return onehot_labels

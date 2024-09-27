@@ -9,5 +9,5 @@ dist
 poetry.lock
 .vscode
 .env
+tests/minimal-optimization/logs
 
-/tests/minimal-optimization/logs/

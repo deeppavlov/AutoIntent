@@ -1,6 +1,5 @@
 import random
 
-
 adjectives = [
     "adorable",
     "adventurous",

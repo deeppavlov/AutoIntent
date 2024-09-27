@@ -16,6 +16,8 @@ appdirs = "^1.4.4"
 sre-yield = "^1.2"
 optuna = "^4.0.0"
 xeger = "^0.4.0"
+pathlib = "^1.0.1"
+
 
 [tool.poetry.group.dev]
 optional = true
@@ -29,6 +31,12 @@ optional = true
 [tool.poetry.group.test.dependencies]
 pytest = "8.3.2"
 
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.6.8"
+
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.main:main"
 "clear-cache" = "autointent.pipeline.utils.cache:clear_chroma_cache"
@@ -36,6 +44,21 @@ pytest = "8.3.2"
 [tool.ruff]
 line-length = 120
 indent-width = 4
+
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D", "TD", "ANN", "FIX", "S311",  "COM812", "ISC001", "ERA001", "FBT"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
+"experiments/*" = ["ALL"]
+"scripts/*" = ["ALL"]
+
+[tool.ruff.lint.pylint]
+max-args = 10
 
 [build-system]
 requires = ["poetry-core"]

@@ -4,6 +4,8 @@ import numpy as np
 
 from .base import Context, PredictionModule, apply_tags
 
+logger = logging.getLogger(__name__)
+
 
 class ThresholdPredictor(PredictionModule):
     def __init__(self, thresh: float):
@@ -14,11 +16,13 @@ class ThresholdPredictor(PredictionModule):
         self.tags = context.data_handler.tags
 
         if isinstance(self.thresh, list):
-            assert len(self.thresh) == context.n_classes
+            if len(self.thresh) != context.n_classes:
+                msg = "Wrong number of thresholds provided doesn't match with number of classes"
+                logger.error(msg)
+                raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
         if not context.data_handler.has_oos_samples():
-            logger = logging.getLogger(__name__)
             logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."
@@ -38,7 +42,7 @@ def multiclass_predict(scores: list[list[float]], thresh: float | np.ndarray):
     """
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
-    
+
     if isinstance(thresh, float):
         pred_classes[best_scores < thresh] = -1  # out of scope
     else:
@@ -54,10 +58,7 @@ def multilabel_predict(scores: list[list[float]], thresh: float | np.ndarray, ta
     ---
     array of binary labels, shape (n_samples, n_classes)
     """
-    if isinstance(thresh, float):
-        res = (scores >= thresh).astype(int)
-    else:
-        res = (scores >= thresh[None, :]).astype(int)
+    res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
     return res

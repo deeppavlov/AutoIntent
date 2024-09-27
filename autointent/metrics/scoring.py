@@ -1,15 +1,12 @@
-import warnings
+import logging
 from typing import Protocol
 
 import numpy as np
-from sklearn.metrics import roc_auc_score, coverage_error, label_ranking_loss, label_ranking_average_precision_score
+from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
-from .prediction import (
-    prediction_accuracy,
-    prediction_f1,
-    prediction_precision,
-    prediction_recall,
-)
+from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
+
+logger = logging.getLogger(__name__)
 
 
 class ScoringMetricFn(Protocol):
@@ -49,7 +46,9 @@ def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[lis
     labels_array = np.array(labels)
 
     if np.any((scores_array <= 0) | (scores_array > 1)):
-        warnings.warn("One or more scores are not from [0,1]")
+        msg = "One or more scores are not from [0,1]. It is incompatible with `scoring_log_likelihood` metric"
+        logger.error(msg)
+        raise ValueError(msg)
 
     if labels_array.ndim == 1:
         relevant_scores = scores_array[np.arange(len(labels_array)), labels_array]
@@ -80,72 +79,48 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
     return roc_auc_score(labels, scores, average="macro")
 
 
-def scoring_accuracy(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
-    """
-    supports multiclass and multilabel
-    """
+def calculate_prediction_metric(
+    func: PredictionMetricFn, labels: list[int] | list[list[int]], scores: list[list[float]]
+) -> float:
     scores = np.array(scores)
     labels = np.array(labels)
 
     if labels.ndim == 1:
         pred_labels = np.argmax(scores, axis=1)
-        res = prediction_accuracy(labels, pred_labels)
+        res = func(labels, pred_labels)
     else:
-        pred_labels = (scores > 0.5).astype(int)
-        res = prediction_accuracy(labels, pred_labels)
+        pred_labels = (scores > 0.5).astype(int)  # noqa: PLR2004
+        res = func(labels, pred_labels)
 
     return res
+
+
+def scoring_accuracy(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+    """
+    supports multiclass and multilabel
+    """
+    return calculate_prediction_metric(prediction_accuracy, labels, scores)
 
 
 def scoring_f1(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multiclass and multilabel
     """
-    scores = np.array(scores)
-    labels = np.array(labels)
-
-    if labels.ndim == 1:
-        pred_labels = np.argmax(scores, axis=1)
-        res = prediction_f1(labels, pred_labels)
-    else:
-        pred_labels = (scores > 0.5).astype(int)
-        res = prediction_f1(labels, pred_labels)
-
-    return res
+    return calculate_prediction_metric(prediction_f1, labels, scores)
 
 
 def scoring_precision(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multiclass and multilabel
     """
-    scores = np.array(scores)
-    labels = np.array(labels)
-
-    if labels.ndim == 1:
-        pred_labels = np.argmax(scores, axis=1)
-        res = prediction_precision(labels, pred_labels)
-    else:
-        pred_labels = (scores > 0.5).astype(int)
-        res = prediction_precision(labels, pred_labels)
-
-    return res
+    return calculate_prediction_metric(prediction_precision, labels, scores)
 
 
 def scoring_recall(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multiclass and multilabel
     """
-    scores = np.array(scores)
-    labels = np.array(labels)
-
-    if labels.ndim == 1:
-        pred_labels = np.argmax(scores, axis=1)
-        res = prediction_recall(labels, pred_labels)
-    else:
-        pred_labels = (scores > 0.5).astype(int)
-        res = prediction_recall(labels, pred_labels)
-
-    return res
+    return calculate_prediction_metric(prediction_recall, labels, scores)
 
 
 def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]):
@@ -171,7 +146,7 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
     in order to cover all the proper labels of the instance
 
     the ideal value is 1, the worst is 0
-    
+
     the result is the same as after executing the following code:
     ```
     scores = np.array(scores)
@@ -188,9 +163,7 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
     """
 
     n_classes = len(labels[0])
-    res = 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
-    
-    return res
+    return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
 
 
 def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]]):
@@ -210,7 +183,7 @@ def scoring_map(labels: list[list[int]], scores: list[list[float]]):
     supports multilabel
 
     mean average precision score
-    
+
     the ideal value is 1, the worst is 0
     """
     return label_ranking_average_precision_score(labels, scores)

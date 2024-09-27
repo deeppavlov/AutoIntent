@@ -14,10 +14,9 @@ def get_counts(labels, n_classes, weights):
     """
     n_queries = labels.shape[0]
     labels += n_classes * np.arange(n_queries)[:, None]
-    counts = np.bincount(labels.ravel(), minlength=n_classes * n_queries, weights=weights.ravel()).reshape(
+    return np.bincount(labels.ravel(), minlength=n_classes * n_queries, weights=weights.ravel()).reshape(
         n_queries, n_classes
     )
-    return counts
 
 
 def get_counts_multilabel(labels, weights):

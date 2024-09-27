@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from chromadb import PersistentClient
 from chromadb.config import Settings
@@ -25,17 +25,16 @@ class VectorIndex:
 
     def get_collection(self, model_name: str, device=None):
         device = device if device is not None else self.device
-        self._logger.info(f"spawning sentence transformer instance of {model_name} on {device=}...")
+        self._logger.info("spawning sentence transformer instance of %s on %s...", model_name, device)
         emb_func = SentenceTransformerEmbeddingFunction(
-            model_name=model_name, trust_remote_code=True, device=device, tokenizer_kwargs=dict(truncation=True)
+            model_name=model_name, trust_remote_code=True, device=device, tokenizer_kwargs={"truncation": True}
         )
         db_name = model_name.replace("/", "_")
-        collection = self.client.get_or_create_collection(
+        return self.client.get_or_create_collection(
             name=db_name,
             embedding_function=emb_func,
-            metadata=dict(multilabel=self.multilabel, n_classes=self.n_classes) | {"hnsw:space": "cosine"},
+            metadata={"multilabel": self.multilabel, "n_classes": self.n_classes} | {"hnsw:space": "cosine"},
         )
-        return collection
 
     def create_collection(self, model_name: str, data_handler: DataHandler, device=None):
         device = device if device is not None else self.device
@@ -57,7 +56,7 @@ class VectorIndex:
         return collection
 
     def delete_collection(self, model_name: str):
-        self._logger.debug(f"deleting collection for {model_name}...")
+        self._logger.debug("deleting collection for %s...", model_name)
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
 

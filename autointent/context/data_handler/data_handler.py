@@ -26,7 +26,7 @@ class DataHandler:
             raise ValueError(msg)
 
         if regex_sampling > 0:
-            logger.debug(f"sampling {regex_sampling} utterances from regular expressions for each intent class...")
+            logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
             sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
 
         if multilabel_generation_config != "":
@@ -74,14 +74,14 @@ class DataHandler:
         if mode != "multilabel":
             logger.debug("collection regexp patterns from multiclass intent records")
             self.regexp_patterns = [
-                dict(
-                    intent_id=intent["intent_id"],
-                    regexp_full_match=intent["regexp_full_match"],
-                    regexp_partial_match=intent["regexp_partial_match"],
-                )
+                {
+                    "intent_id": intent["intent_id"],
+                    "regexp_full_match": intent["regexp_full_match"],
+                    "regexp_partial_match": intent["regexp_partial_match"],
+                }
                 for intent in multiclass_intent_records
             ]
-        
+
         self._logger = logger
 
     def has_oos_samples(self):
@@ -98,29 +98,26 @@ class DataHandler:
 
 def _dump_train(utterances, labels, n_classes, multilabel):
     if not multilabel:
-        res = [dict(intent_id=i) for i in range(n_classes)]
-        for ut, lab in zip(utterances, labels):
+        res = [{"intent_id": i} for i in range(n_classes)]
+        for ut, lab in zip(utterances, labels, strict=False):
             rec = res[lab]
-            sample_utterances = rec.get("sample_utterances", []) + [ut]
+            sample_utterances = [*rec.get("sample_utterances", []), ut]
             rec["sample_utterances"] = sample_utterances
     else:
         res = []
-        for ut, labs in zip(utterances, labels):
-            labs = [i for i in range(n_classes) if labs[i]]
-            res.append(dict(utterance=ut, labels=labs))
+        for ut, labs in zip(utterances, labels, strict=False):
+            labs_converted = [i for i in range(n_classes) if labs[i]]
+            res.append({"utterance": ut, "labels": labs_converted})
     return res
 
 
 def _dump_test(utterances, labels, n_classes, multilabel):
     res = []
-    for ut, labs in zip(utterances, labels):
-        if multilabel:
-            labs = [i for i in range(n_classes) if labs[i]]
-        else:
-            labs = [labs]
-        res.append(dict(utterance=ut, labels=labs))
+    for ut, labs in zip(utterances, labels, strict=False):
+        labs_converted = [i for i in range(n_classes) if labs[i]] if multilabel else [labs]
+        res.append({"utterance": ut, "labels": labs_converted})
     return res
 
 
 def _dump_oos(utterances):
-    return [dict(utterance=ut, labels=[]) for ut in utterances]
+    return [{"utterance": ut, "labels": []} for ut in utterances]

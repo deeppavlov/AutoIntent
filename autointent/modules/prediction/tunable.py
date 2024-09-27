@@ -28,7 +28,7 @@ class TunablePredictor(PredictionModule):
             probas=context.optimization_logs.get_best_test_scores(),
             labels=context.data_handler.labels_test,
             seed=context.seed,
-            tags=self.tags
+            tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
 
@@ -49,8 +49,7 @@ class ThreshOptimizer:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        score = f1_score(self.labels, y_pred, average="macro")
-        return score
+        return f1_score(self.labels, y_pred, average="macro")
 
     def fit(self, probas, labels, seed, tags):
         self.probas = probas
@@ -62,4 +61,3 @@ class ThreshOptimizer:
         study.optimize(self.objective, n_trials=self.n_classes * 10)
 
         self.best_thresholds = np.array([study.best_params[f"threshold_{i}"] for i in range(self.n_classes)])
-        print(self.best_thresholds)

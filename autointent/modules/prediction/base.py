@@ -1,11 +1,10 @@
 from abc import abstractmethod
 
-
 import numpy as np
 
-from ...context.data_handler import Tag
-from ..base import Context, Module
-from ...metrics import PredictionMetricFn
+from autointent.context.data_handler import Tag
+from autointent.metrics import PredictionMetricFn
+from autointent.modules.base import Context, Module
 
 
 class PredictionModule(Module):
@@ -20,10 +19,9 @@ class PredictionModule(Module):
     def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
-        metric_value = metric_fn(labels, self._predictions)
-        return metric_value
+        return metric_fn(labels, self._predictions)
 
-    def get_assets(self, context: Context = None):
+    def get_assets(self):
         return self._predictions
 
     def clear_cache(self):
@@ -36,10 +34,7 @@ def get_prediction_evaluation_data(context: Context):
 
     oos_scores = context.optimization_logs.get_best_oos_scores()
     if oos_scores is not None:
-        if context.multilabel:
-            oos_labels = [[0] * context.n_classes] * len(oos_scores)
-        else:
-            oos_labels = [-1] * len(oos_scores)
+        oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)
         labels = np.concatenate([labels, oos_labels])
         scores = np.concatenate([scores, oos_scores])
 
@@ -50,7 +45,8 @@ def apply_tags(labels: np.ndarray, scores: np.ndarray, tags: list[Tag]):
     """
     this function is intended to be used with multilabel predictor
 
-    If some intent classes have common tag (i.e. they are mutually exclusive) and were assigned to one sample, leave only that class that has the highest score.
+    If some intent classes have common tag (i.e. they are mutually exclusive) \
+    and were assigned to one sample, leave only that class that has the highest score.
 
     Arguments
     ---

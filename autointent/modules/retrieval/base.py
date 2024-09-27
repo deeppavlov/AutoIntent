@@ -1,4 +1,4 @@
-from ..base import Module
+from autointent.modules.base import Module
 
 
 class RetrievalModule(Module):

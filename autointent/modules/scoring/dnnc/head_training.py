@@ -1,6 +1,7 @@
 """
 This examples trains a CrossEncoder for the STSbenchmark task. A CrossEncoder takes a sentence pair
-as input and outputs a label. Here, it output a continuous labels 0...1 to indicate the similarity between the input pair.
+as input and outputs a label. Here, it output a continuous labels 0...1 to indicate
+the similarity between the input pair.
 
 It does NOT produce a sentence embedding and does NOT work for individual sentences.
 
@@ -9,6 +10,7 @@ python training_stsbenchmark.py
 """
 
 import itertools as it
+import logging
 from random import shuffle
 
 import numpy as np
@@ -16,16 +18,16 @@ import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 
+logger = logging.getLogger(__name__)
 
-def construct_samples(
-    texts, labels, balancing_factor: int = None
-) -> tuple[list[dict], list[dict]]:
+
+def construct_samples(texts, labels, balancing_factor: int | None = None) -> tuple[list[dict], list[dict]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
         pair = [text1, text2]
         label = int(labels[i] == labels[j])
-        sample = dict(texts=pair, label=label)
+        sample = {"texts": pair, "label": label}
         samples[label].append(sample)
     shuffle(samples[0])
     shuffle(samples[1])
@@ -34,10 +36,7 @@ def construct_samples(
         i_min = min([0, 1], key=lambda i: len(samples[i]))
         i_max = 1 - i_min
         min_length = len(samples[i_min])
-        samples = (
-            samples[i_min][:min_length]
-            + samples[i_max][: min_length * balancing_factor]
-        )
+        samples = samples[i_min][:min_length] + samples[i_max][: min_length * balancing_factor]
     else:
         samples = samples[0] + samples[1]
 
@@ -56,12 +55,10 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs):
         logits_list = []
 
-        def hook_function(module, input, output):
-            logits_list.append(input[0].cpu().numpy())
+        def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001
+            logits_list.append(input_tensor[0].cpu().numpy())
 
-        handler = self.cross_encoder.model.classifier.register_forward_hook(
-            hook_function
-        )
+        handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
 
         for i in range(0, len(pairs), self.batch_size):
             batch = pairs[i : i + self.batch_size]
@@ -69,9 +66,8 @@ class CrossEncoderWithLogreg:
 
         handler.remove()
 
-        features = np.concatenate(logits_list, axis=0)
+        return np.concatenate(logits_list, axis=0)
 
-        return features
 
     def _fit(self, pairs: list[tuple[str, str]], labels: list[int]):
         """
@@ -81,7 +77,10 @@ class CrossEncoderWithLogreg:
         - `labels`: binary labels (1 = same class, 0 = different classes)
         """
         n_samples = len(pairs)
-        assert n_samples == len(labels)
+        if n_samples != len(labels):
+            msg = "Something went wrong"
+            logger.error(msg)
+            raise ValueError(msg)
 
         features = self.get_features(pairs)
 
