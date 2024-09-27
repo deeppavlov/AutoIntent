@@ -3,11 +3,14 @@ import itertools as it
 from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
+from typing import TYPE_CHECKING
 
 import torch
 
-from ..context import Context
-from ..modules import Module
+from autointent.context import Context
+
+if TYPE_CHECKING:
+    from autointent.modules import Module
 
 
 class Node:

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
-from ..context import Context
+from autointent.context import Context
 
 
 class Module(ABC):

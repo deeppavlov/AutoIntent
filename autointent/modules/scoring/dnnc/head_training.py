@@ -17,13 +17,13 @@ from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 
 
-def construct_samples(texts, labels, balancing_factor: int = None) -> tuple[list[dict], list[dict]]:
+def construct_samples(texts, labels, balancing_factor: int | None = None) -> tuple[list[dict], list[dict]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
         pair = [text1, text2]
         label = int(labels[i] == labels[j])
-        sample = dict(texts=pair, label=label)
+        sample = {"texts": pair, "label": label}
         samples[label].append(sample)
     shuffle(samples[0])
     shuffle(samples[1])
@@ -62,9 +62,8 @@ class CrossEncoderWithLogreg:
 
         handler.remove()
 
-        features = np.concatenate(logits_list, axis=0)
+        return np.concatenate(logits_list, axis=0)
 
-        return features
 
     def _fit(self, pairs: list[tuple[str, str]], labels: list[int]):
         """

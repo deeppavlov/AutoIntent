@@ -45,9 +45,8 @@ def _prediction_roc_auc_multiclass(y_true: list[int], y_pred: list[int]):
         roc_auc = roc_auc_score(binarized_true, binarized_pred)
         roc_auc_scores.append(roc_auc)
 
-    macro_roc_auc = np.mean(roc_auc_scores)
+    return np.mean(roc_auc_scores)
 
-    return macro_roc_auc
 
 
 def _prediction_roc_auc_multilabel(y_true: list[list[int]], y_pred: list[list[int]]):
@@ -62,6 +61,7 @@ def prediction_roc_auc(y_true: list[int] | list[list[int]], y_pred: list[int] | 
         return _prediction_roc_auc_multiclass(y_true, y_pred)
     if y_pred.ndim == y_true.ndim == 2:
         return _prediction_roc_auc_multilabel(y_true, y_pred)
+    return None
 
 
 @simple_check

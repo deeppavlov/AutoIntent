@@ -3,7 +3,8 @@ import itertools as it
 import numpy as np
 from sentence_transformers import CrossEncoder
 
-from ..base import Context, ScoringModule
+from autointent.modules.scoring.base import Context, ScoringModule
+
 from .head_training import CrossEncoderWithLogreg
 
 
@@ -45,9 +46,8 @@ class DNNCScorer(ScoringModule):
 
         labels_pred = [[cand["intent_id"] for cand in candidates] for candidates in query_res["metadatas"]]
 
-        res = self._build_result(cross_encoder_scores, labels_pred)
+        return self._build_result(cross_encoder_scores, labels_pred)
 
-        return res
 
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]):
         """
@@ -69,11 +69,10 @@ class DNNCScorer(ScoringModule):
         assert len(flattened_text_pairs) == len(utterances) * len(candidates[0])
 
         flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
-        cross_encoder_scores = [
+        return [
             flattened_cross_encoder_scores[i : i + self.k]
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
-        return cross_encoder_scores
 
     def _build_result(self, scores: list[list[float]], labels: list[list[int]]):
         """

@@ -2,8 +2,8 @@ from abc import abstractmethod
 
 import numpy as np
 
-from ...metrics import ScoringMetricFn
-from ..base import Context, Module
+from autointent.metrics import ScoringMetricFn
+from autointent.modules.base import Context, Module
 
 
 class ScoringModule(Module):
@@ -15,14 +15,13 @@ class ScoringModule(Module):
         - predicted scores of test set and oos utterances
         """
         self._test_scores = self.predict(context.data_handler.utterances_test)
-        metric_value = metric_fn(context.data_handler.labels_test, self._test_scores)
-        return metric_value
+        return metric_fn(context.data_handler.labels_test, self._test_scores)
 
     def get_assets(self, context: Context):
         oos_scores = None
         if context.data_handler.has_oos_samples():
             oos_scores = self.predict(context.data_handler.oos_utterances)
-        return dict(test_scores=self._test_scores, oos_scores=oos_scores)
+        return {"test_scores": self._test_scores, "oos_scores": oos_scores}
 
     @abstractmethod
     def predict(self, utterances: list[str]):

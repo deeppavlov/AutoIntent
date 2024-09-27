@@ -11,8 +11,7 @@ from nltk.tokenize import word_tokenize
 def preprocess(text, language):
     tokens = word_tokenize(text, language=language)
     tokens = ["".join([c.lower() for c in word if c.isalnum()]) for word in tokens]
-    tokens = [word for word in tokens if len(word) > 0]
-    return tokens
+    return [word for word in tokens if len(word) > 0]
 
 
 def gen_collocations(text: str, language, n_collocs=3):

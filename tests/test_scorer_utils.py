@@ -8,7 +8,7 @@ from autointent.modules.scoring.knn.weighting import closest_weighting
 
 
 @pytest.mark.parametrize(
-    "labels, n_classes, ground_truth",
+    ("labels", "n_classes", "ground_truth"),
     [
         (
             np.array(
@@ -65,7 +65,7 @@ def test_knn_get_counts(labels, n_classes, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "scores, k, ground_truth",
+    ("scores", "k", "ground_truth"),
     [
         (
             np.array(
@@ -98,7 +98,7 @@ def test_scoring_get_topk(scores, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "scores, labels, n_classes, ground_truth",
+    ("scores", "labels", "n_classes", "ground_truth"),
     [
         (
             np.array(
@@ -131,7 +131,7 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
 
 
 @pytest.mark.parametrize(
-    ["labels", "distances", "multilabel", "n_classes", "ground_truth"],
+    ("labels", "distances", "multilabel", "n_classes", "ground_truth"),
     [
         (np.array([[0, 2]]), np.array([[0.5, 0.3]]), False, 3, [[0.75, 0, 0.85]]),
         (np.array([[0, 2, 0, 2]]), np.array([[0.5, 0.3, 0.1, 0.5]]), False, 3, [[0.95, 0, 0.85]]),

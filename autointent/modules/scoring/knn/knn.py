@@ -4,11 +4,9 @@ from typing import Literal
 import numpy as np
 from chromadb import Collection
 
-from ....context import (
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
-from ..base import Context, ScoringModule
+from autointent.context import multiclass_metadata_as_labels, multilabel_metadata_as_labels
+from autointent.modules.scoring.base import Context, ScoringModule
+
 from .weighting import apply_weights
 
 
@@ -36,8 +34,7 @@ class KNNScorer(ScoringModule):
 
     def predict(self, utterances: list[str]):
         labels, distances = query(self._collection, self.k, utterances)
-        probs = apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
-        return probs
+        return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self):
         model = self._collection._embedding_function._model

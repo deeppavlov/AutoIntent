@@ -91,12 +91,11 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         logger.error(msg)
         raise ValueError(msg)
 
-    res = [n_classes, oos_utterances] + splits
-    return res
+    return [n_classes, oos_utterances, *splits]
 
 
 def multilabel_train_test_split(
-    *arrays, test_size=0.25, random_state: int = 0, shuffle: bool = False, stratify: list[list[int]] = None
+    *arrays, test_size=0.25, random_state: int = 0, shuffle: bool = False, stratify: list[list[int]] | None = None
 ):
     """
     TODO:
@@ -109,7 +108,8 @@ def multilabel_train_test_split(
 
     n_arrays = len(arrays)
     if n_arrays == 0:
-        raise ValueError("At least one array required as input")
+        msg = "At least one array required as input"
+        raise ValueError(msg)
 
     arrays = indexable(*arrays)
 
@@ -142,8 +142,8 @@ def is_multiclass_test_set_complete(labels: list[int], n_classes: int):
 
 def to_onehot(labels: np.ndarray, n_classes):
     """convert nd array of ints to (n+1)d array of zeros and ones"""
-    new_shape = labels.shape + (n_classes,)
+    new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
-    indices = tuple(np.indices(labels.shape)) + (labels,)
+    indices = (*tuple(np.indices(labels.shape)), labels)
     onehot_labels[indices] = 1
     return onehot_labels

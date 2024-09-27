@@ -14,15 +14,13 @@ class ChromaConfig:
 def get_chroma_cache_dir():
     """Get system's default cache dir."""
     cache_dir = user_cache_dir("autointent")
-    res = os.path.join(cache_dir, "chroma")
-    return res
+    return os.path.join(cache_dir, "chroma")
 
 
 def get_chroma_config_path():
     """Get system's default config dir."""
     config_dir = user_config_dir("autointent")
-    res = os.path.join(config_dir, "chromadb.json")
-    return res
+    return os.path.join(config_dir, "chromadb.json")
 
 
 def read_chroma_config():
@@ -30,8 +28,7 @@ def read_chroma_config():
     if not os.path.exists(path):
         return ChromaConfig()
     with open(path) as file:
-        config = ChromaConfig(**json.load(file))
-    return config
+        return ChromaConfig(**json.load(file))
 
 
 def write_chroma_config(config: ChromaConfig):
@@ -86,7 +83,7 @@ def clear_specific_cache(directory: str) -> None:
             shutil.rmtree(directory)
             chroma_config.cache_directories.remove(directory)
             write_chroma_config(chroma_config)
-        except OSError as e:
-            print(f"Error removing cache directory {directory}: {e}")
+        except OSError:
+            pass
     else:
-        print(f"Directory {directory} not found in cache")
+        pass

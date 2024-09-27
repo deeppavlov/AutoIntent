@@ -2,7 +2,6 @@ import json
 import os
 from argparse import ArgumentParser
 from collections import defaultdict
-from pprint import pprint
 from random import seed, shuffle
 
 
@@ -30,9 +29,6 @@ def main():
     os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
     json.dump(res, open(args.output_path, "w"), indent=4, ensure_ascii=False)
 
-    print("Total number of utterances:", len(shots_ids))
-    print("Total counts:")
-    pprint(dict(shots_per_class_gathered))
 
 
 def update_counter(counter: defaultdict, labels: list[int]):

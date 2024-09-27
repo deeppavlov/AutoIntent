@@ -7,14 +7,9 @@ from logging import Logger
 import numpy as np
 import yaml
 
-from .. import Context
-from ..nodes import (
-    Node,
-    PredictionNode,
-    RegExpNode,
-    RetrievalNode,
-    ScoringNode,
-)
+from autointent import Context
+from autointent.nodes import Node, PredictionNode, RegExpNode, RetrievalNode, ScoringNode
+
 from .utils import NumpyEncoder
 
 

@@ -1,5 +1,6 @@
-from ..metrics import regexp_partial_accuracy, regexp_partial_precision
-from ..modules import RegExp
+from autointent.metrics import regexp_partial_accuracy, regexp_partial_precision
+from autointent.modules import RegExp
+
 from .base import Node
 
 

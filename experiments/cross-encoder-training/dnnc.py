@@ -22,7 +22,7 @@ from torch import nn
 from transformers import AutoModelForSequenceClassification
 
 
-def construct_samples(texts, labels, balancing_factor: int = None) -> list[InputExample]:
+def construct_samples(texts, labels, balancing_factor: int | None = None) -> list[InputExample]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -70,8 +70,7 @@ class LogLoss(nn.Module):
         """
         labels = labels.float()
         smoothed_targets = labels * (1 - self.label_smoothing) + 0.5 * self.label_smoothing
-        loss = F.binary_cross_entropy_with_logits(sentence_features, smoothed_targets)
-        return loss
+        return F.binary_cross_entropy_with_logits(sentence_features, smoothed_targets)
 
 
 if __name__ == "__main__":

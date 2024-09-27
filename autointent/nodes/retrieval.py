@@ -1,4 +1,4 @@
-from ..metrics import (
+from autointent.metrics import (
     retrieval_hit_rate,
     retrieval_hit_rate_intersecting,
     retrieval_hit_rate_macro,
@@ -15,7 +15,8 @@ from ..metrics import (
     retrieval_precision_intersecting,
     retrieval_precision_macro,
 )
-from ..modules import VectorDBModule
+from autointent.modules import VectorDBModule
+
 from .base import Node
 
 

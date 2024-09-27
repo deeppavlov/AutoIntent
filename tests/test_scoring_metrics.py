@@ -5,7 +5,7 @@ from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood,
 
 
 @pytest.mark.parametrize(
-    "labels, scores, ground_truth",
+    ("labels", "scores", "ground_truth"),
     [
         ([0], [[0.1, 0.3, 0.5, 0.1]], np.log(0.1)),
         (
@@ -33,7 +33,7 @@ def test_neg_cross_entropy(labels, scores, ground_truth):
 
 
 @pytest.mark.parametrize(
-    "labels, scores, ground_truth",
+    ("labels", "scores", "ground_truth"),
     [
         (
             [0, 1, 2, 3],
@@ -73,7 +73,7 @@ def test_roc_auc(labels, scores, ground_truth):
 
 
 @pytest.mark.parametrize(
-    ["labels", "scores", "ground_truth"],
+    ("labels", "scores", "ground_truth"),
     [
         (
             [
@@ -191,7 +191,7 @@ def test_hit_rate(labels, scores, ground_truth):
 
 
 @pytest.mark.parametrize(
-    ["labels", "scores", "ground_truth"],
+    ("labels", "scores", "ground_truth"),
     [
         (
             [

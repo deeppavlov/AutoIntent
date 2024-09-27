@@ -2,7 +2,8 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
-from ...context import multiclass_metadata_as_labels, multilabel_metadata_as_labels
+from autointent.context import multiclass_metadata_as_labels, multilabel_metadata_as_labels
+
 from .base import Context, ScoringModule
 
 

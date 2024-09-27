@@ -54,10 +54,7 @@ def multilabel_predict(scores: list[list[float]], thresh: float | np.ndarray, ta
     ---
     array of binary labels, shape (n_samples, n_classes)
     """
-    if isinstance(thresh, float):
-        res = (scores >= thresh).astype(int)
-    else:
-        res = (scores >= thresh[None, :]).astype(int)
+    res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
     return res

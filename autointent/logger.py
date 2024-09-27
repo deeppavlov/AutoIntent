@@ -14,7 +14,7 @@ def setup_logging(level: LoggingLevelType = None):
     )
 
 
-def get_logger(name: str, level: LoggingLevelType = None, formatter: Formatter = None):
+def get_logger(name: str, level: LoggingLevelType = None, formatter: Formatter | None = None):
     logger = logging.getLogger(name)
 
     if level is not None:

@@ -2,9 +2,9 @@ from abc import abstractmethod
 
 import numpy as np
 
-from ...context.data_handler import Tag
-from ...metrics import PredictionMetricFn
-from ..base import Context, Module
+from autointent.context.data_handler import Tag
+from autointent.metrics import PredictionMetricFn
+from autointent.modules.base import Context, Module
 
 
 class PredictionModule(Module):
@@ -19,8 +19,7 @@ class PredictionModule(Module):
     def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
-        metric_value = metric_fn(labels, self._predictions)
-        return metric_value
+        return metric_fn(labels, self._predictions)
 
     def get_assets(self, context: Context = None):
         return self._predictions
@@ -35,10 +34,7 @@ def get_prediction_evaluation_data(context: Context):
 
     oos_scores = context.optimization_logs.get_best_oos_scores()
     if oos_scores is not None:
-        if context.multilabel:
-            oos_labels = [[0] * context.n_classes] * len(oos_scores)
-        else:
-            oos_labels = [-1] * len(oos_scores)
+        oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)
         labels = np.concatenate([labels, oos_labels])
         scores = np.concatenate([scores, oos_scores])
 

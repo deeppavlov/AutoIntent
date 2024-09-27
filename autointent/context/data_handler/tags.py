@@ -19,5 +19,4 @@ def collect_tags(intent_records: list[dict]):
             continue
         for tag_name in dct["tags"]:
             tagwise_intent_ids[tag_name].append(dct["intent_id"])
-    res = [Tag(tag_name, intent_ids) for tag_name, intent_ids in tagwise_intent_ids.items()]
-    return res
+    return [Tag(tag_name, intent_ids) for tag_name, intent_ids in tagwise_intent_ids.items()]

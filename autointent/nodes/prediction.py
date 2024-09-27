@@ -1,11 +1,12 @@
-from ..metrics import (
+from autointent.metrics import (
     prediction_accuracy,
     prediction_f1,
     prediction_precision,
     prediction_recall,
     prediction_roc_auc,
 )
-from ..modules import ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor
+from autointent.modules import ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor
+
 from .base import Node
 
 

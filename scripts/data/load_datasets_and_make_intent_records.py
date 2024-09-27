@@ -25,19 +25,19 @@ def tokenize(text, language):
     # doc = nlp(text)
 
     # tokens = [token.text for token in doc]
-    tokens = word_tokenize(text, language)
+    return word_tokenize(text, language)
 
-    return tokens
 
 
 def preprocess(text, language):
     tokens = tokenize(text, language=language)
     tokens = ["".join([c.lower() for c in word if c.isalnum()]) for word in tokens]
-    tokens = [word for word in tokens if len(word) > 0]
-    return tokens
+    return [word for word in tokens if len(word) > 0]
 
 
-def find_ngrams(text: str, language, n_unigrams=1, n_bigrams=1, n_trigrams=1, stopwords_set=set()):
+def find_ngrams(text: str, language, n_unigrams=1, n_bigrams=1, n_trigrams=1, stopwords_set=None):
+    if stopwords_set is None:
+        stopwords_set = set()
     tokens = preprocess(text, language=language)
 
     # from collections import Counter
@@ -348,7 +348,8 @@ if __name__ == "__main__":
         elif args.language == "english":
             intent_dataset = load_dataset("PolyAI/banking77")
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_banking77(
             intent_dataset["train"],
@@ -364,7 +365,8 @@ if __name__ == "__main__":
             intent_dataset = load_dataset("cmaldona/All-Generalization-OOD-CLINC150")
             func = get_ru_clinc150
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = func(
             intent_dataset["train"],
@@ -380,7 +382,8 @@ if __name__ == "__main__":
             intent_dataset = load_dataset("benayas/snips")
             label_col = "category"
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_snips(
             intent_dataset["train"],
@@ -410,7 +413,8 @@ if __name__ == "__main__":
                 add_ngrams=args.add_ngrams,
             )
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
     elif args.dataset == "minds14":
         intent_dataset = load_dataset("PolyAI/minds14", "ru-RU")
         if args.language == "russian":
@@ -418,7 +422,8 @@ if __name__ == "__main__":
         elif args.language == "english":
             text_col = "english_transcription"
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_minds14(
             intent_dataset["train"],

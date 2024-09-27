@@ -24,13 +24,13 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import train_test_split
 
 
-def construct_samples(texts, labels, balancing_factor: int = None) -> tuple[list[dict], list[dict]]:
+def construct_samples(texts, labels, balancing_factor: int | None = None) -> tuple[list[dict], list[dict]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
         pair = [text1, text2]
         label = int(labels[i] == labels[j])
-        sample = dict(texts=pair, label=label)
+        sample = {"texts": pair, "label": label}
         samples[label].append(sample)
     shuffle(samples[0])
     shuffle(samples[1])
@@ -78,9 +78,8 @@ class CrossEncoderWithLogreg:
 
         handler.remove()
 
-        features = np.concatenate(logits_list, axis=0)
+        return np.concatenate(logits_list, axis=0)
 
-        return features
 
     def fit(self, pairs, labels):
         n_samples = len(pairs)
@@ -105,20 +104,18 @@ class CrossEncoderWithLogreg:
         f1, prec, rec, thresh2 = find_best_f1_and_threshold(probas, labels)
 
         if self.verbose:
-            print(f"Best accuracy: {acc:2.2f} (threshold {thresh1:.2f})")
-            print(f"Best f1: {f1:2.2f} (threshold {thresh2:.2f})")
-            print(f"Best precision: {prec:2.2f}")
-            print(f"Best recall: {rec:2.2f}")
+            pass
 
         if dump_logs:
-            return dict(
-                best_accuracy=acc,
-                optimal_thresh_acc=thresh1,
-                best_f1=f1,
-                optimal_thresh_f1=thresh2,
-                best_precision=prec,
-                best_recall=rec,
-            )
+            return {
+                "best_accuracy": acc,
+                "optimal_thresh_acc": thresh1,
+                "best_f1": f1,
+                "optimal_thresh_f1": thresh2,
+                "best_precision": prec,
+                "best_recall": rec,
+            }
+        return None
 
     def save_model(self, path: os.PathLike):
         joblib.dump(self._clf, path)
