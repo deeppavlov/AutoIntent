@@ -1,2 +1,2 @@
-from .base import RetrievalModule
-from .vectordb import VectorDBModule
+from .base import RetrievalModule # noqa: F401
+from .vectordb import VectorDBModule  # noqa: F401
