@@ -14,7 +14,8 @@ class RetrievalMetricFn(Protocol):
         Arguments
         ---
         - `query_labels`: for each query, this list contains its class labels
-        - `candidates_labels`: for each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
+        - `candidates_labels`: for each query, these lists contain class labels of items ranked by a retrieval model \
+            (from most to least relevant)
         - `k`: the number of top items to consider for each query
 
         Note
@@ -26,7 +27,10 @@ class RetrievalMetricFn(Protocol):
 
 
 def macrofy(
-    metric_fn: RetrievalMetricFn, query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
+    metric_fn: RetrievalMetricFn,
+    query_labels: list[list[int]],
+    candidates_labels: list[list[list[int]]],
+    k: int | None = None,
 ):
     """
     extend single-label `metric_fn` to a multi-label case via macro averaging
@@ -62,7 +66,9 @@ def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k
     return sum(ap_list) / len(ap_list)
 
 
-def average_precision_intersecting(query_label: list[int], candidate_labels: list[list[int]], k: int | None = None) -> float:
+def average_precision_intersecting(
+    query_label: list[int], candidate_labels: list[list[int]], k: int | None = None
+) -> float:
     """
     helper function for `retrieval_map_intersecting`
     """
@@ -78,7 +84,9 @@ def average_precision_intersecting(query_label: list[int], candidate_labels: lis
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map_intersecting(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_map_intersecting(
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
+):
     ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=False)]
     return sum(ap_list) / len(ap_list)
 
@@ -136,7 +144,9 @@ def retrieval_hit_rate_intersecting(
     return hit_count / num_queries
 
 
-def retrieval_hit_rate_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_hit_rate_macro(
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
+):
     return macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
 
 
@@ -182,7 +192,9 @@ def retrieval_precision_intersecting(
     return total_precision / num_queries
 
 
-def retrieval_precision_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_precision_macro(
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
+):
     return macrofy(retrieval_precision, query_labels, candidates_labels, k)
 
 
@@ -243,7 +255,9 @@ def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], 
     return sum(ndcg_scores) / len(ndcg_scores)
 
 
-def retrieval_ndcg_intersecting(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_ndcg_intersecting(
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
+):
     ndcg_scores = []
     expanded_relevance_scores = np.array(query_labels)[:, None, :] == np.array(candidates_labels)
     relevance_scores = (expanded_relevance_scores.sum(axis=-1) != 0).astype(int)
@@ -276,7 +290,9 @@ def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k
     return mrr_sum / num_queries
 
 
-def retrieval_mrr_intersecting(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+def retrieval_mrr_intersecting(
+    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
+) -> float:
     mrr_sum = 0.0
     num_queries = len(query_labels)
 

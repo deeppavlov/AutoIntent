@@ -1,8 +1,11 @@
+import logging
 from functools import wraps
 from typing import Protocol
 
 import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+
+logger = logging.getLogger(__name__)
 
 
 class PredictionMetricFn(Protocol):
@@ -23,7 +26,10 @@ def simple_check(func):
     def wrapper(y_true, y_pred):
         y_pred = np.array(y_pred)
         y_true = np.array(y_true)
-        assert y_pred.ndim == y_true.ndim
+        if y_pred.ndim != y_true.ndim:
+            msg = "Something went wrong with labels dimensions"
+            logger.error(msg)
+            raise ValueError(msg)
         return func(y_true, y_pred)
 
     return wrapper
@@ -59,7 +65,7 @@ def prediction_roc_auc(y_true: list[int] | list[list[int]], y_pred: list[int] | 
     """supports multiclass and multilabel"""
     if y_pred.ndim == y_true.ndim == 1:
         return _prediction_roc_auc_multiclass(y_true, y_pred)
-    if y_pred.ndim == y_true.ndim == 2:
+    if y_pred.ndim == y_true.ndim == 2:  # noqa: PLR2004
         return _prediction_roc_auc_multilabel(y_true, y_pred)
     return None
 
