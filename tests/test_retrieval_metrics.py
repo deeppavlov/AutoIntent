@@ -5,40 +5,32 @@ def test_map():
     # case 1
     query_labels = [1]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
-    ground_truth = 7/12
+    ground_truth = 7 / 12
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
     query_labels = [3]
-    candidates_labels = [
-        [3,1,1]
-    ]
+    candidates_labels = [[3, 1, 1]]
     k = None
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = None
-    ground_truth = 19/24
+    ground_truth = 19 / 24
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = 2
     ground_truth = 0.75
     output = retrieval_map(query_labels, candidates_labels, k)
@@ -47,33 +39,34 @@ def test_map():
     # case 5
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 6
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = 2
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 7
-    query_labels = [3,1]
+    query_labels = [3, 1]
     candidates_labels = [
-        [2,1,1],
-        [2,4,4],
+        [2, 1, 1],
+        [2, 4, 4],
     ]
     k = None
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
+
 
 def test_hit_rate():
     from autointent.metrics.retrieval import retrieval_hit_rate
@@ -82,60 +75,52 @@ def test_hit_rate():
     # case 1
     query_labels = [1]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = 2
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 5
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = 1
 
     ground_truth = 0.5
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
+
 
 def test_precision():
     from autointent.metrics.retrieval import retrieval_precision
@@ -144,31 +129,28 @@ def test_precision():
     # case 1
     query_labels = [1]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
-    ground_truth = 2/3
+    ground_truth = 2 / 3
     output = retrieval_precision(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_precision(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = None
 
     ground_truth = 0.5
@@ -176,11 +158,8 @@ def test_precision():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = 2
 
     ground_truth = 0.5
@@ -195,7 +174,7 @@ def test_ndcg():
     # case 1
     query_labels = [1]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
@@ -208,7 +187,7 @@ def test_ndcg():
     # case 2
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
@@ -219,11 +198,8 @@ def test_ndcg():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = None
 
     dcg_1 = 1 / np.log2(3) + 1 / np.log2(4)
@@ -239,11 +215,8 @@ def test_ndcg():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = 2
 
     dcg_1 = 1 / np.log2(3)
@@ -266,7 +239,7 @@ def test_mrr():
     # case 1
     query_labels = [1]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
@@ -277,20 +250,17 @@ def test_mrr():
     # case 2
     query_labels = [3]
     candidates_labels = [
-        [2,1,1],
+        [2, 1, 1],
     ]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_mrr(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,1,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 1, 1], [3, 1, 1]]
     k = None
 
     ground_truth = 0.75
@@ -298,11 +268,8 @@ def test_mrr():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,2,1],
-        [3,1,1]
-    ]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 2, 1], [3, 1, 1]]
     k = 2
 
     ground_truth = 0.5

@@ -38,12 +38,7 @@ def generate_multilabel_version(intent_records, config_string, seed):
     config = json.loads(config_string)
     res = []
     for i in range(len(config)):
-        new_records = sample_multilabel_utterances(
-            intent_records,
-            n_samples=int(config[i]),
-            n_labels=i + 1,
-            seed=seed
-        )
+        new_records = sample_multilabel_utterances(intent_records, n_samples=int(config[i]), n_labels=i + 1, seed=seed)
         res.extend(new_records)
     return res
 

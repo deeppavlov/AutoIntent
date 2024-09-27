@@ -75,7 +75,9 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         else:
             test_labels = [dct["labels"][0] for dct in test_records if len(dct["labels"]) > 0]
             if any(len(dct["labels"]) > 1 for dct in test_records):
-                logger.warning("you provided multilabel test data in multiclass classification mode, all the labels except the first will be ignored")
+                logger.warning(
+                    "you provided multilabel test data in multiclass classification mode, all the labels except the first will be ignored"
+                )
 
         for dct in test_records:
             if len(dct["labels"]) == 0:

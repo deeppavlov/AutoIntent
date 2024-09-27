@@ -40,22 +40,15 @@ class DNNCScorer(ScoringModule):
             include=["metadatas", "documents"],  # one can add "embeddings", "distances"
         )
 
-        cross_encoder_scores = self._get_cross_encoder_scores(
-            utterances, query_res["documents"]
-        )
+        cross_encoder_scores = self._get_cross_encoder_scores(utterances, query_res["documents"])
 
-        labels_pred = [
-            [cand["intent_id"] for cand in candidates]
-            for candidates in query_res["metadatas"]
-        ]
+        labels_pred = [[cand["intent_id"] for cand in candidates] for candidates in query_res["metadatas"]]
 
         res = self._build_result(cross_encoder_scores, labels_pred)
 
         return res
 
-    def _get_cross_encoder_scores(
-        self, utterances: list[str], candidates: list[list[str]]
-    ):
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]):
         """
         Arguments
         ---
@@ -68,10 +61,7 @@ class DNNCScorer(ScoringModule):
         """
         assert len(utterances) == len(candidates)
 
-        text_pairs = [
-            [[query, cand] for cand in docs]
-            for query, docs in zip(utterances, candidates)
-        ]
+        text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates)]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 
@@ -100,10 +90,10 @@ class DNNCScorer(ScoringModule):
         n_classes = self._collection.metadata["n_classes"]
 
         return build_result(scores, labels, n_classes)
-    
+
     def clear_cache(self):
         model = self._collection._embedding_function._model
-        model.to(device='cpu')
+        model.to(device="cpu")
         del model
         self._collection = None
 

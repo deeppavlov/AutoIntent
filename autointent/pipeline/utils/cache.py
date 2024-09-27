@@ -69,7 +69,7 @@ def get_db_dir(db_dir: os.PathLike, run_name: str):
 
 
 def clear_chroma_cache():
-    # TODO: test on all platforms 
+    # TODO: test on all platforms
     chroma_config = read_chroma_config()
     for cache_dirs in chroma_config.cache_directories:
         shutil.rmtree(cache_dirs)

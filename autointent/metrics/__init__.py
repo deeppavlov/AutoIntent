@@ -6,10 +6,7 @@ from .prediction import (
     prediction_recall,
     prediction_roc_auc,
 )
-from .regexp import (
-    regexp_partial_accuracy,
-    regexp_partial_precision
-)
+from .regexp import regexp_partial_accuracy, regexp_partial_precision
 from .retrieval import (
     RetrievalMetricFn,
     retrieval_hit_rate,

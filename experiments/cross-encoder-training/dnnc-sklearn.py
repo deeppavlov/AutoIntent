@@ -23,9 +23,7 @@ from sklearn.model_selection import train_test_split
 import joblib
 
 
-def construct_samples(
-    texts, labels, balancing_factor: int = None
-) -> tuple[list[dict], list[dict]]:
+def construct_samples(texts, labels, balancing_factor: int = None) -> tuple[list[dict], list[dict]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -40,10 +38,7 @@ def construct_samples(
         i_min = min([0, 1], key=lambda i: len(samples[i]))
         i_max = 1 - i_min
         min_length = len(samples[i_min])
-        samples = (
-            samples[i_min][:min_length]
-            + samples[i_max][: min_length * balancing_factor]
-        )
+        samples = samples[i_min][:min_length] + samples[i_max][: min_length * balancing_factor]
     else:
         samples = samples[0] + samples[1]
 
@@ -74,9 +69,7 @@ class CrossEncoderWithLogreg:
         def hook_function(module, input, output):
             logits_list.append(input[0].cpu().numpy())
 
-        handler = self.cross_encoder.model.classifier.register_forward_hook(
-            hook_function
-        )
+        handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
 
         for i in range(0, len(pairs), self.batch_size):
             batch = pairs[i : i + self.batch_size]
@@ -125,10 +118,10 @@ class CrossEncoderWithLogreg:
                 best_precision=prec,
                 best_recall=rec,
             )
-    
+
     def save_model(self, path: os.PathLike):
         joblib.dump(self._clf, path)
-    
+
     def load_model(self, path: os.PathLike):
         self._clf = joblib.load(path)
 
@@ -198,36 +191,24 @@ def find_best_f1_and_threshold(scores, labels, high_score_more_similar: bool = T
 
 if __name__ == "__main__":
     import json
-    
+
     from argparse import ArgumentParser
     from datetime import datetime
 
     from autointent.data_handler import get_sample_utterances
 
     parser = ArgumentParser()
-    parser.add_argument(
-        "--model-name",
-        type=str,
-        default="llmrails/ember-v1"
-    )
+    parser.add_argument("--model-name", type=str, default="llmrails/ember-v1")
     parser.add_argument(
         "--logs-dir",
         type=str,
         default="experiments/cross-encoder-training/logs-sklearn",
     )
-    parser.add_argument(
-        "--run-name",
-        type=str,
-        default=""
-    )
-    parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=16
-    )
+    parser.add_argument("--run-name", type=str, default="")
+    parser.add_argument("--batch-size", type=int, default=16)
     args = parser.parse_args()
 
-    run_name = args.run_name if args.run_name != "" else args.model_name.replace('/', '_')
+    run_name = args.run_name if args.run_name != "" else args.model_name.replace("/", "_")
     run_name = run_name + "_" + datetime.now().strftime("%m-%d-%Y_%H:%M:%S")
 
     run_dir = os.path.join(args.logs_dir, run_name)
@@ -243,9 +224,7 @@ if __name__ == "__main__":
     intent_records = json.load(open(dataset_path))
 
     utterances, labels = get_sample_utterances(intent_records)
-    texts_train, texts_test, labels_train, labels_test = construct_samples(
-        utterances, labels, balancing_factor=3
-    )
+    texts_train, texts_test, labels_train, labels_test = construct_samples(utterances, labels, balancing_factor=3)
 
     # train
     with torch.no_grad():

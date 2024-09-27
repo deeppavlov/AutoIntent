@@ -24,7 +24,7 @@ class VectorDBModule(RetrievalModule):
         labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
         metric_value = metric_fn(context.data_handler.labels_test, labels_pred)
         return metric_value
-    
+
     def get_assets(self, context: Context = None):
         return self.model_name
 

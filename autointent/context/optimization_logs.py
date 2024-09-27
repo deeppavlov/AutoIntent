@@ -73,7 +73,7 @@ class OptimizationLogs:
 
 class PPrintFormatter(logging.Formatter):
     def __init__(self):
-        super().__init__(fmt="{asctime} - {name} - {levelname} - {message}", style='{')
+        super().__init__(fmt="{asctime} - {name} - {levelname} - {message}", style="{")
 
     def format(self, record):
         if isinstance(record.msg, dict):

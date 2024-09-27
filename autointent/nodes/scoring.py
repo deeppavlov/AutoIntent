@@ -8,7 +8,7 @@ from ..metrics import (
     scoring_neg_ranking_loss,
     scoring_neg_coverage,
     scoring_hit_rate,
-    scoring_map
+    scoring_map,
 )
 from ..modules import DNNCScorer, KNNScorer, LinearScorer
 from .base import Node

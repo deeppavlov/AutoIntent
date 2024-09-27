@@ -191,7 +191,7 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
 
     n_classes = len(labels[0])
     res = 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
-    
+
     return res
 
 
@@ -212,7 +212,7 @@ def scoring_map(labels: list[list[int]], scores: list[list[float]]):
     supports multilabel
 
     mean average precision score
-    
+
     the ideal value is 1, the worst is 0
     """
     return label_ranking_average_precision_score(labels, scores)

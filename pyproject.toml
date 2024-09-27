@@ -17,6 +17,7 @@ sre-yield = "^1.2"
 optuna = "^4.0.0"
 xeger = "^0.4.0"
 
+
 [tool.poetry.group.dev]
 optional = true
 
@@ -28,6 +29,12 @@ optional = true
 
 [tool.poetry.group.test.dependencies]
 pytest = "8.3.2"
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.6.8"
 
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.main:main"

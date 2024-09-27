@@ -3,84 +3,70 @@ def test_map():
     import numpy as np
 
     # case 1
-    query_labels = [[0,1,0]]
+    query_labels = [[0, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
-    ground_truth = 7/12
+    ground_truth = 7 / 12
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
-    query_labels = [[1,1,0]]
+    query_labels = [[1, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
-    ground_truth = 7/12
+    ground_truth = 7 / 12
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
-    query_labels = [[0,0,1]]
-    candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[0, 0, 1]]
+    candidates_labels = [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]]
     k = None
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2b
-    query_labels = [[1,0,1]]
-    candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[1, 0, 1]]
+    candidates_labels = [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]]
     k = None
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [[0,1,0],[0,0,1]]
-    candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
-        [[0,0,1],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[0, 1, 0], [0, 0, 1]]
+    candidates_labels = [[[0, 0, 1], [0, 1, 0], [0, 1, 0]], [[0, 0, 1], [0, 1, 0], [0, 1, 0]]]
     k = None
-    ground_truth = 19/24
+    ground_truth = 19 / 24
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [[0,1,0],[0,0,1]]
-    candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
-        [[0,0,1],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[0, 1, 0], [0, 0, 1]]
+    candidates_labels = [[[0, 0, 1], [0, 1, 0], [0, 1, 0]], [[0, 0, 1], [0, 1, 0], [0, 1, 0]]]
     k = 2
     ground_truth = 0.75
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 5
-    query_labels = [[1,0,1]]
-    candidates_labels = [
-        [[0,0,0],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[1, 0, 1]]
+    candidates_labels = [[[0, 0, 0], [0, 1, 0], [0, 1, 0]]]
     k = None
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 6
-    query_labels = [[1,0,1]]
-    candidates_labels = [
-        [[0,0,0],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[1, 0, 1]]
+    candidates_labels = [[[0, 0, 0], [0, 1, 0], [0, 1, 0]]]
     k = 2
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -90,67 +76,65 @@ def test_hit_rate():
     import numpy as np
 
     # case 1
-    query_labels = [[0,1,0]]
+    query_labels = [[0, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
-    query_labels = [[1,1,0]]
+    query_labels = [[1, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
-    query_labels = [[1,0,0]]
-    candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]]
-    ]
+    query_labels = [[1, 0, 0]]
+    candidates_labels = [[[0, 0, 1], [0, 1, 0], [0, 1, 0]]]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [[0,0,1],[0,1,0]]
+    query_labels = [[0, 0, 1], [0, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
-        [[0,1,0],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
+        [[0, 1, 0], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [[0,0,1],[0,1,0]]
+    query_labels = [[0, 0, 1], [0, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
-        [[0,1,0],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
+        [[0, 1, 0], [0, 1, 0], [0, 1, 0]],
     ]
     k = 2
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 5
-    query_labels = [[0,1,0],[0,1,0]]
+    query_labels = [[0, 1, 0], [0, 1, 0]]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
-        [[0,1,0],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
+        [[0, 1, 0], [0, 1, 0], [0, 1, 0]],
     ]
     k = 1
 
@@ -164,43 +148,49 @@ def test_precision():
     import numpy as np
 
     # case 1
-    query_labels = [[0,0,1],]
+    query_labels = [
+        [0, 0, 1],
+    ]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
 
-    ground_truth = 1/3
+    ground_truth = 1 / 3
     output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 1b
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[0,0,1],[0,1,0],[0,1,0]],
+        [[0, 0, 1], [0, 1, 0], [0, 1, 0]],
     ]
     k = None
 
-    ground_truth = 1.
+    ground_truth = 1.0
     output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[1,0,0],[1,0,0]],
+        [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
     ]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [[1,0,1],[0,1,1]]
+    query_labels = [[1, 0, 1], [0, 1, 1]]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[0,0,1]],
-        [[1,0,0],[1,0,0],[0,0,1]],
+        [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        [[1, 0, 0], [1, 0, 0], [0, 0, 1]],
     ]
     k = None
 
@@ -209,10 +199,10 @@ def test_precision():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [[1,0,1],[0,1,1]]
+    query_labels = [[1, 0, 1], [0, 1, 1]]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[0,0,1]],
-        [[1,0,0],[1,0,0],[0,0,1]],
+        [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        [[1, 0, 0], [1, 0, 0], [0, 0, 1]],
     ]
     k = 2
 
@@ -226,9 +216,11 @@ def test_ndcg():
     import numpy as np
 
     # case 1
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[1,0,1]],
+        [[1, 0, 0], [0, 1, 0], [1, 0, 1]],
     ]
     k = None
 
@@ -239,9 +231,11 @@ def test_ndcg():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[1,0,0],[1,0,0]],
+        [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
     ]
     k = None
 
@@ -252,10 +246,10 @@ def test_ndcg():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [[0,1,1],[0,1,1]]
+    query_labels = [[0, 1, 1], [0, 1, 1]]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[0,0,1]],
-        [[0,1,0],[1,0,0],[1,0,0]],
+        [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        [[0, 1, 0], [1, 0, 0], [1, 0, 0]],
     ]
     k = None
 
@@ -272,10 +266,10 @@ def test_ndcg():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [[0,1,1],[0,1,1]]
+    query_labels = [[0, 1, 1], [0, 1, 1]]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[0,0,1]],
-        [[0,1,0],[1,0,0],[1,0,0]],
+        [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+        [[0, 1, 0], [1, 0, 0], [1, 0, 0]],
     ]
     k = 2
 
@@ -297,9 +291,11 @@ def test_mrr():
     import numpy as np
 
     # case 1
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[0,1,0],[1,0,1]],
+        [[1, 0, 0], [0, 1, 0], [1, 0, 1]],
     ]
     k = None
 
@@ -308,21 +304,26 @@ def test_mrr():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 2
-    query_labels = [[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[1,0,0],[1,0,0]],
+        [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
     ]
     k = None
 
-    ground_truth = 0.
+    ground_truth = 0.0
     output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 3
-    query_labels = [[0,1,1],[0,1,1],]
+    query_labels = [
+        [0, 1, 1],
+        [0, 1, 1],
+    ]
     candidates_labels = [
-        [[1,0,0],[1,1,0],[1,0,1]],
-        [[1,0,1],[1,1,0],[1,0,1]],
+        [[1, 0, 0], [1, 1, 0], [1, 0, 1]],
+        [[1, 0, 1], [1, 1, 0], [1, 0, 1]],
     ]
     k = None
 
@@ -331,15 +332,15 @@ def test_mrr():
     np.testing.assert_almost_equal(output, ground_truth)
 
     # case 4
-    query_labels = [1,3]
-    candidates_labels = [
-        [2,2,1],
-        [3,1,1]
+    query_labels = [1, 3]
+    candidates_labels = [[2, 2, 1], [3, 1, 1]]
+    query_labels = [
+        [0, 0, 1],
+        [0, 1, 1],
     ]
-    query_labels = [[0,0,1],[0,1,1],]
     candidates_labels = [
-        [[1,0,0],[1,1,0],[1,0,1]],
-        [[1,0,1],[1,1,0],[1,0,1]],
+        [[1, 0, 0], [1, 1, 0], [1, 0, 1]],
+        [[1, 0, 1], [1, 1, 0], [1, 0, 1]],
     ]
     k = 2
 

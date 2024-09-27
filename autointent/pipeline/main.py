@@ -54,10 +54,7 @@ def main():
         help="Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
     )
     parser.add_argument(
-        "--run-name",
-        type=str,
-        default="",
-        help="Name of the run prepended to optimization logs filename"
+        "--run-name", type=str, default="", help="Name of the run prepended to optimization logs filename"
     )
     parser.add_argument(
         "--mode",
@@ -65,12 +62,7 @@ def main():
         default="multiclass",
         help="Evaluation mode. This parameter must be consistent with provided data.",
     )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="cuda:0",
-        help="Specify device in torch notation"
-    )
+    parser.add_argument("--device", type=str, default="cuda:0", help="Specify device in torch notation")
     parser.add_argument(
         "--regex-sampling",
         type=int,
@@ -78,18 +70,9 @@ def main():
         help="Number of shots per intent to sample from regular expressions. "
         "This option extends sample utterances within multiclass intent records.",
     )
+    parser.add_argument("--seed", type=int, default=0, help="Affects the data partitioning")
     parser.add_argument(
-        "--seed",
-        type=int,
-        default=0,
-        help="Affects the data partitioning"
-    )
-    parser.add_argument(
-        '--log-level',
-        type=str,
-        default='ERROR',
-        choices=LoggingLevelType.__args__,
-        help='Set the logging level'
+        "--log-level", type=str, default="ERROR", choices=LoggingLevelType.__args__, help="Set the logging level"
     )
     parser.add_argument(
         "--multilabel-generation-config",
@@ -100,7 +83,7 @@ def main():
         "This option extends multilabel utterance records.",
     )
     args = parser.parse_args()
-    
+
     setup_logging(args.log_level)
     logger = logging.getLogger(__name__)
 

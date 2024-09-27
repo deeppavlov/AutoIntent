@@ -2,7 +2,7 @@ def regexp_partial_accuracy(y_true: list[int], y_pred: list[set[int]]):
     correct = sum(true in pred for true, pred in zip(y_true, y_pred))
     total = len(y_true)
     if total == 0:
-        return -1       # TODO think about it
+        return -1  # TODO think about it
     return correct / total
 
 

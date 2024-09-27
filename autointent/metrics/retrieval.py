@@ -4,7 +4,12 @@ import numpy as np
 
 
 class RetrievalMetricFn(Protocol):
-    def __call__(self, query_labels: list[int] | list[list[int]], candidates_labels: list[list[int]] | list[list[list[int]]], k: int = None) -> float:
+    def __call__(
+        self,
+        query_labels: list[int] | list[list[int]],
+        candidates_labels: list[list[int]] | list[list[list[int]]],
+        k: int = None,
+    ) -> float:
         """
         Arguments
         ---
@@ -20,7 +25,9 @@ class RetrievalMetricFn(Protocol):
         ...
 
 
-def macrofy(metric_fn: RetrievalMetricFn, query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
+def macrofy(
+    metric_fn: RetrievalMetricFn, query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None
+):
     """
     extend single-label `metric_fn` to a multi-label case via macro averaging
     """

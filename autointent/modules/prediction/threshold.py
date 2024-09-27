@@ -38,7 +38,7 @@ def multiclass_predict(scores: list[list[float]], thresh: float | np.ndarray):
     """
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
-    
+
     if isinstance(thresh, float):
         pred_classes[best_scores < thresh] = -1  # out of scope
     else:

@@ -17,9 +17,7 @@ from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 
 
-def construct_samples(
-    texts, labels, balancing_factor: int = None
-) -> tuple[list[dict], list[dict]]:
+def construct_samples(texts, labels, balancing_factor: int = None) -> tuple[list[dict], list[dict]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -34,10 +32,7 @@ def construct_samples(
         i_min = min([0, 1], key=lambda i: len(samples[i]))
         i_max = 1 - i_min
         min_length = len(samples[i_min])
-        samples = (
-            samples[i_min][:min_length]
-            + samples[i_max][: min_length * balancing_factor]
-        )
+        samples = samples[i_min][:min_length] + samples[i_max][: min_length * balancing_factor]
     else:
         samples = samples[0] + samples[1]
 
@@ -59,9 +54,7 @@ class CrossEncoderWithLogreg:
         def hook_function(module, input, output):
             logits_list.append(input[0].cpu().numpy())
 
-        handler = self.cross_encoder.model.classifier.register_forward_hook(
-            hook_function
-        )
+        handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
 
         for i in range(0, len(pairs), self.batch_size):
             batch = pairs[i : i + self.batch_size]

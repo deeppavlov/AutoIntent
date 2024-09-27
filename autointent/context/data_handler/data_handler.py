@@ -81,7 +81,7 @@ class DataHandler:
                 )
                 for intent in multiclass_intent_records
             ]
-        
+
         self._logger = logger
 
     def has_oos_samples(self):

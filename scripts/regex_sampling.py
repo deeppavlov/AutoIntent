@@ -12,7 +12,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     intent_records = json.load(open(args.data_path))
-    
+
     sample_from_regex(intent_records, args.n_shots)
 
     json.dump(intent_records, open(args.output_path, "w"), indent=4, ensure_ascii=False)

@@ -8,7 +8,6 @@ from nltk.collocations import (
 from nltk.tokenize import word_tokenize
 
 
-
 def preprocess(text, language):
     tokens = word_tokenize(text, language=language)
     tokens = ["".join([c.lower() for c in word if c.isalnum()]) for word in tokens]
@@ -27,8 +26,8 @@ def gen_collocations(text: str, language, n_collocs=3):
     trigram_finder = TrigramCollocationFinder.from_words(tokens)
     trigrams = trigram_finder.nbest(trigram_measures.student_t, n_collocs)
 
-    bigrams = [' '.join(tup) for tup in bigrams]
-    trigrams = [' '.join(tup) for tup in trigrams]
+    bigrams = [" ".join(tup) for tup in bigrams]
+    trigrams = [" ".join(tup) for tup in trigrams]
 
     return bigrams, trigrams
 
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("--language", type=str, required=True)
     args = parser.parse_args()
 
-    nltk.download('punkt_tab')
+    nltk.download("punkt_tab")
 
     intent_records = json.load(open(args.input_path))
 
@@ -53,7 +52,7 @@ if __name__ == "__main__":
         text = "\n\n".join(intent["sample_utterances"])
         bigrams, trigrams = gen_collocations(text, language=args.language, n_collocs=args.n_collocs)
         intent["regexp_partial_match"] = bigrams + trigrams
-    
+
     output_dir = os.path.dirname(args.output_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

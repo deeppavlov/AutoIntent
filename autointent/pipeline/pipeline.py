@@ -39,7 +39,7 @@ class Pipeline:
         for node_config in self.config["nodes"]:
             node_logger = logging.getLogger(node_config["node_type"])
             node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger = node_logger
+                modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger=node_logger
             )
             node.fit(context)
 

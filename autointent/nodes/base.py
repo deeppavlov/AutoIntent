@@ -30,7 +30,7 @@ class Node:
             module_type = search_space.pop("module_type")
             for module_config in it.product(*search_space.values()):
                 module_config = dict(zip(search_space.keys(), module_config))
-                
+
                 self._logger.debug(f"initializing {module_type} module...")
                 module: Module = self.modules_available[module_type](**module_config)
 

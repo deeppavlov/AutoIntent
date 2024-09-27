@@ -28,7 +28,7 @@ class TunablePredictor(PredictionModule):
             probas=context.optimization_logs.get_best_test_scores(),
             labels=context.data_handler.labels_test,
             seed=context.seed,
-            tags=self.tags
+            tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
 
