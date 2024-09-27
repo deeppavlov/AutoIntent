@@ -31,7 +31,8 @@ class RegExp(Module):
         }
 
     def score(self, context: Context, metric_fn: Callable) -> tuple[float, Any]:
-        # TODO add parameter to a whole pipeline (or just to regexp module): whether or not to omit utterances on next stages if they were detected with regexp module
+        # TODO add parameter to a whole pipeline (or just to regexp module):
+        # whether or not to omit utterances on next stages if they were detected with regexp module
         assets = {
             "test_matches": self.predict(context.data_handler.utterances_test),
             "oos_matches": None

@@ -21,7 +21,7 @@ class PredictionModule(Module):
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
 
-    def get_assets(self, context: Context = None):
+    def get_assets(self):
         return self._predictions
 
     def clear_cache(self):
@@ -45,7 +45,8 @@ def apply_tags(labels: np.ndarray, scores: np.ndarray, tags: list[Tag]):
     """
     this function is intended to be used with multilabel predictor
 
-    If some intent classes have common tag (i.e. they are mutually exclusive) and were assigned to one sample, leave only that class that has the highest score.
+    If some intent classes have common tag (i.e. they are mutually exclusive) \
+    and were assigned to one sample, leave only that class that has the highest score.
 
     Arguments
     ---

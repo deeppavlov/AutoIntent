@@ -1,11 +1,13 @@
 import itertools as it
+import logging
 
 import numpy as np
 from sentence_transformers import CrossEncoder
 
-from autointent.modules.scoring.base import Context, ScoringModule
-
+from ..base import Context, ScoringModule
 from .head_training import CrossEncoderWithLogreg
+
+logger = logging.getLogger(__name__)
 
 
 class DNNCScorer(ScoringModule):
@@ -16,7 +18,7 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int, train_head=False):
+    def __init__(self, model_name: str, k: int, train_head: bool = False):
         self.model_name = model_name
         self.k = k
         self.train_head = train_head
@@ -54,19 +56,26 @@ class DNNCScorer(ScoringModule):
         Arguments
         ---
         `utterances`: list of query utterances
-        `candidates`: for each query, this list contains a list of the k the closest sample utterances (from retrieval module)
+        `candidates`: for each query, this list contains a list of the k the closest sample utterances \
+            (from retrieval module)
 
         Return
         ---
         for each query, return a list of a corresponding cross encoder scores for the k the closest sample utterances
         """
-        assert len(utterances) == len(candidates)
+        if len(utterances) != len(candidates):
+            msg = "Number of utterances doesn't match number of retrieved candidates"
+            logger.error(msg)
+            raise ValueError(msg)
 
         text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 
-        assert len(flattened_text_pairs) == len(utterances) * len(candidates[0])
+        if len(flattened_text_pairs) != len(utterances) * len(candidates[0]):
+            msg = "Number of candidates for each query utterance cannot vary"
+            logger.error(msg)
+            raise ValueError(msg)
 
         flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
         return [
@@ -92,7 +101,7 @@ class DNNCScorer(ScoringModule):
         return build_result(scores, labels, n_classes)
 
     def clear_cache(self):
-        model = self._collection._embedding_function._model
+        model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
         self._collection = None

@@ -17,7 +17,7 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def get_assets(self, context: Context):
+    def get_assets(self):
         """
         return useful assets that represent intermediate data into context
         """

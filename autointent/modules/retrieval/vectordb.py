@@ -21,11 +21,11 @@ class VectorDBModule(RetrievalModule):
         labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
         return metric_fn(context.data_handler.labels_test, labels_pred)
 
-    def get_assets(self, context: Context = None):
+    def get_assets(self):
         return self.model_name
 
     def clear_cache(self):
-        model = self.collection._embedding_function._model
+        model = self.collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
         self.collection = None

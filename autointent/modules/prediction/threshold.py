@@ -4,6 +4,8 @@ import numpy as np
 
 from .base import Context, PredictionModule, apply_tags
 
+logger = logging.getLogger(__name__)
+
 
 class ThresholdPredictor(PredictionModule):
     def __init__(self, thresh: float):
@@ -14,11 +16,13 @@ class ThresholdPredictor(PredictionModule):
         self.tags = context.data_handler.tags
 
         if isinstance(self.thresh, list):
-            assert len(self.thresh) == context.n_classes
+            if len(self.thresh) != context.n_classes:
+                msg = "Wrong number of thresholds provided doesn't match with number of classes"
+                logger.error(msg)
+                raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
         if not context.data_handler.has_oos_samples():
-            logger = logging.getLogger(__name__)
             logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."
