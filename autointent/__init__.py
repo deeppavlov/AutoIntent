@@ -1,6 +1,6 @@
 import sys
 
-from .context import Context  # noqa: F401
+from .context import Context
 
 __import__("pysqlite3")
 

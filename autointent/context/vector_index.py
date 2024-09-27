@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from chromadb import PersistentClient
 from chromadb.config import Settings

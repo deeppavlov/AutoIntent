@@ -27,7 +27,7 @@ def generate_from_template(template, n):
 def generate_from_templates(patterns: list[str], n_shots: int):
     shots_per_pattern = distribute_shots(len(patterns), n_shots)
     res = []
-    for pattern, n in zip(patterns, shots_per_pattern):
+    for pattern, n in zip(patterns, shots_per_pattern, strict=False):
         new_samples = generate_from_template(pattern, n)
         res.extend(new_samples)
     return res

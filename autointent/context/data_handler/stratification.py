@@ -1,5 +1,5 @@
-import logging
 import itertools as it
+import logging
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -10,7 +10,7 @@ from skmultilearn.model_selection import IterativeStratification
 def get_sample_utterances(intent_records: list[dict]):
     """get plain list of all sample utterances and their intent labels"""
     utterances = [intent["sample_utterances"] for intent in intent_records]
-    labels = [[intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances)]
+    labels = [[intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances, strict=False)]
 
     utterances = list(it.chain.from_iterable(utterances))
     labels = list(it.chain.from_iterable(labels))
@@ -30,9 +30,9 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         utterances, labels = get_sample_utterances(intent_records)
         in_domain_mask = np.array(labels) != -1
 
-        in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if is_in_domain]
-        in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask) if is_in_domain]
-        oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask) if not is_in_domain]
+        in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if is_in_domain]
+        in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask, strict=False) if is_in_domain]
+        oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if not is_in_domain]
 
         n_classes = len(set(in_domain_labels))
         splitter = train_test_split
@@ -46,9 +46,9 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
 
         n_classes = len(set(it.chain.from_iterable(labels)))
 
-        in_domain_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) > 0]
+        in_domain_utterances = [ut for ut, lab in zip(utterances, labels, strict=False) if len(lab) > 0]
         in_domain_labels = [[int(i in lab) for i in range(n_classes)] for lab in labels if len(lab) > 0]
-        oos_utterances = [ut for ut, lab in zip(utterances, labels) if len(lab) == 0]
+        oos_utterances = [ut for ut, lab in zip(utterances, labels, strict=False) if len(lab) == 0]
 
         splitter = multilabel_train_test_split
 
@@ -125,8 +125,7 @@ def validate_test_labels(test_labels, multilabel, n_classes):
     """
     if not multilabel:
         return is_multiclass_test_set_complete(test_labels, n_classes)
-    else:
-        return is_multilabel_test_set_complete(test_labels)
+    return is_multilabel_test_set_complete(test_labels)
 
 
 def is_multilabel_test_set_complete(labels: list[list[int]]):

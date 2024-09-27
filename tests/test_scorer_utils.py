@@ -1,9 +1,10 @@
 import numpy as np
-from autointent.modules.scoring.knn.count_neighbors import get_counts
+import pytest
+
 from autointent.modules.scoring.base import get_topk
 from autointent.modules.scoring.dnnc import build_result
+from autointent.modules.scoring.knn.count_neighbors import get_counts
 from autointent.modules.scoring.knn.weighting import closest_weighting
-import pytest
 
 
 @pytest.mark.parametrize(

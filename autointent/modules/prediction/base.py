@@ -1,11 +1,10 @@
 from abc import abstractmethod
 
-
 import numpy as np
 
 from ...context.data_handler import Tag
-from ..base import Context, Module
 from ...metrics import PredictionMetricFn
+from ..base import Context, Module
 
 
 class PredictionModule(Module):

@@ -1,7 +1,7 @@
 import importlib.resources as ires
 import json
-import os
 import logging
+import os
 from logging import Logger
 
 import numpy as np
@@ -88,7 +88,7 @@ def load_config(config_path: os.PathLike, mode: str, logger: Logger):
 def make_report(logs: dict[str], nodes: list[str]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
-    for i, node in zip(ids, nodes):
+    for i, node in zip(ids, nodes, strict=False):
         cur_config = logs["configs"][node][i]
         cur_config["metric_value"] = logs["metrics"][node][i]
         configs.append(cur_config)

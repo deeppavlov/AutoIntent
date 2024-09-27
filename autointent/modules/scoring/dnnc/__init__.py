@@ -1,1 +1,1 @@
-from .dnnc import DNNCScorer, build_result  # noqa: F401
+from .dnnc import DNNCScorer, build_result

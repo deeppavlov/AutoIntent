@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from ..context import Context
 
@@ -14,16 +15,13 @@ class Module(ABC):
         """
         calculates metric on test set and returns metric value
         """
-        pass
 
     @abstractmethod
     def get_assets(self, context: Context):
         """
         return useful assets that represent intermediate data into context
         """
-        pass
 
     @abstractmethod
     def clear_cache(self):
         """clear GPU/CPU memory"""
-        pass

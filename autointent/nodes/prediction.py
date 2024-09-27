@@ -5,7 +5,7 @@ from ..metrics import (
     prediction_recall,
     prediction_roc_auc,
 )
-from ..modules import ThresholdPredictor, ArgmaxPredictor, JinoosPredictor, TunablePredictor
+from ..modules import ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor
 from .base import Node
 
 

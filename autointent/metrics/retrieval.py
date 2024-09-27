@@ -58,7 +58,7 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int = No
 
 
 def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int = None):
-    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels)]
+    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=False)]
     return sum(ap_list) / len(ap_list)
 
 
@@ -79,7 +79,7 @@ def average_precision_intersecting(query_label: list[int], candidate_labels: lis
 
 
 def retrieval_map_intersecting(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int = None):
-    ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels)]
+    ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=False)]
     return sum(ap_list) / len(ap_list)
 
 

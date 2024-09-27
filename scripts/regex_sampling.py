@@ -1,6 +1,5 @@
 from autointent.context.data_handler.sampling import sample_from_regex
 
-
 if __name__ == "__main__":
     import json
     from argparse import ArgumentParser

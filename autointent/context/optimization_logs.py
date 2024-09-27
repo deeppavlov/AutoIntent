@@ -1,6 +1,7 @@
-from ..logger import get_logger
 import logging
 from pprint import pformat
+
+from ..logger import get_logger
 
 
 class OptimizationLogs:

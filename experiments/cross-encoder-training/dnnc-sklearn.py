@@ -13,14 +13,15 @@ import sys
 sys.path.append("/home/voorhs/repos/AutoIntent")
 
 import itertools as it
-from random import shuffle
 import os
+from random import shuffle
+
+import joblib
 import numpy as np
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import train_test_split
-import joblib
 
 
 def construct_samples(texts, labels, balancing_factor: int = None) -> tuple[list[dict], list[dict]]:
@@ -128,7 +129,7 @@ class CrossEncoderWithLogreg:
 
 def find_best_acc_and_threshold(scores, labels, high_score_more_similar: bool = True):
     assert len(scores) == len(labels)
-    rows = list(zip(scores, labels))
+    rows = list(zip(scores, labels, strict=False))
 
     rows = sorted(rows, key=lambda x: x[0], reverse=high_score_more_similar)
 
@@ -159,7 +160,7 @@ def find_best_f1_and_threshold(scores, labels, high_score_more_similar: bool = T
     scores = np.asarray(scores)
     labels = np.asarray(labels)
 
-    rows = list(zip(scores, labels))
+    rows = list(zip(scores, labels, strict=False))
 
     rows = sorted(rows, key=lambda x: x[0], reverse=high_score_more_similar)
 
@@ -191,7 +192,6 @@ def find_best_f1_and_threshold(scores, labels, high_score_more_similar: bool = T
 
 if __name__ == "__main__":
     import json
-
     from argparse import ArgumentParser
     from datetime import datetime
 

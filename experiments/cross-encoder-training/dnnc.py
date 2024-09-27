@@ -13,13 +13,13 @@ import sys
 sys.path.append("/home/voorhs/repos/AutoIntent")
 
 import itertools as it
+from random import shuffle
 
-from sentence_transformers import InputExample, CrossEncoder
-from torch import nn
 import torch
 import torch.nn.functional as F
+from sentence_transformers import CrossEncoder, InputExample
+from torch import nn
 from transformers import AutoModelForSequenceClassification
-from random import shuffle
 
 
 def construct_samples(texts, labels, balancing_factor: int = None) -> list[InputExample]:

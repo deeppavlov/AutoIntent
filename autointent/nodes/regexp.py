@@ -1,4 +1,4 @@
-from ..metrics import regexp_partial_precision, regexp_partial_accuracy
+from ..metrics import regexp_partial_accuracy, regexp_partial_precision
 from ..modules import RegExp
 from .base import Node
 

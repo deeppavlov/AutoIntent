@@ -1,12 +1,13 @@
-from autointent.metrics.retrieval import (
-    retrieval_map,
-    retrieval_hit_rate,
-    retrieval_precision,
-    retrieval_ndcg,
-    retrieval_mrr,
-)
 import numpy as np
 import pytest
+
+from autointent.metrics.retrieval import (
+    retrieval_hit_rate,
+    retrieval_map,
+    retrieval_mrr,
+    retrieval_ndcg,
+    retrieval_precision,
+)
 
 
 @pytest.mark.parametrize(

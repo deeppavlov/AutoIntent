@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 
 from appdirs import user_cache_dir, user_config_dir
 

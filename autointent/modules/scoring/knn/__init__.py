@@ -1,1 +1,1 @@
-from .knn import KNNScorer  # noqa: F401
+from .knn import KNNScorer

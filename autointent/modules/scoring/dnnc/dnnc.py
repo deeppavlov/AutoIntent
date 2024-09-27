@@ -2,6 +2,7 @@ import itertools as it
 
 import numpy as np
 from sentence_transformers import CrossEncoder
+
 from ..base import Context, ScoringModule
 from .head_training import CrossEncoderWithLogreg
 
@@ -61,7 +62,7 @@ class DNNCScorer(ScoringModule):
         """
         assert len(utterances) == len(candidates)
 
-        text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates)]
+        text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 

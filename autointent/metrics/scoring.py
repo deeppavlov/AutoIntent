@@ -2,7 +2,7 @@ import warnings
 from typing import Protocol
 
 import numpy as np
-from sklearn.metrics import roc_auc_score, coverage_error, label_ranking_loss, label_ranking_average_precision_score
+from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
 from .prediction import (
     prediction_accuracy,

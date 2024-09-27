@@ -1,9 +1,10 @@
-from itertools import combinations
-import random
-import xeger
 import json
 import os
+import random
 from argparse import ArgumentParser
+from itertools import combinations
+
+import xeger
 
 
 def sample_unique_tuples(k, n, m):

@@ -1,14 +1,14 @@
-import logging
 import importlib.resources as ires
 import json
+import logging
 import os
 from argparse import ArgumentParser
 from datetime import datetime
 
 from .. import Context
-from .utils import get_db_dir, generate_name
+from ..logger import LoggingLevelType, setup_logging
 from .pipeline import Pipeline
-from ..logger import setup_logging, LoggingLevelType
+from .utils import generate_name, get_db_dir
 
 
 def main():

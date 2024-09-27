@@ -1,2 +1,2 @@
-from .data_handler import DataHandler  # noqa: F401
-from .tags import Tag  # noqa: F401
+from .data_handler import DataHandler
+from .tags import Tag

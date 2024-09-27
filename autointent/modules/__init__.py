@@ -1,5 +1,11 @@
-from .base import Module  # noqa: F401
-from .retrieval import RetrievalModule, VectorDBModule  # noqa: F401
-from .scoring import ScoringModule, KNNScorer, LinearScorer, DNNCScorer  # noqa: F401
-from .prediction import PredictionModule, ThresholdPredictor, ArgmaxPredictor, JinoosPredictor, TunablePredictor  # noqa: F401
-from .regexp import RegExp  # noqa: F401
+from .base import Module
+from .prediction import (
+    ArgmaxPredictor,
+    JinoosPredictor,
+    PredictionModule,
+    ThresholdPredictor,
+    TunablePredictor,
+)
+from .regexp import RegExp
+from .retrieval import RetrievalModule, VectorDBModule
+from .scoring import DNNCScorer, KNNScorer, LinearScorer, ScoringModule

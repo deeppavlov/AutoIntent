@@ -1,6 +1,7 @@
-from autointent.metrics.scoring import scoring_roc_auc, scoring_log_likelihood, scoring_hit_rate, scoring_neg_coverage
 import numpy as np
 import pytest
+
+from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood, scoring_neg_coverage, scoring_roc_auc
 
 
 @pytest.mark.parametrize(
