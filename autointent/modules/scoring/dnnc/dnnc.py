@@ -4,7 +4,8 @@ import logging
 import numpy as np
 from sentence_transformers import CrossEncoder
 
-from ..base import Context, ScoringModule
+from autointent.modules.scoring.base import Context, ScoringModule
+
 from .head_training import CrossEncoderWithLogreg
 
 logger = logging.getLogger(__name__)
