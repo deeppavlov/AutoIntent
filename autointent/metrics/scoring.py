@@ -27,8 +27,6 @@ class ScoringMetricFn(Protocol):
 
 def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
     """
-    TODO test multilabel case
-
     supports multiclass and multilabel
 
     Multiclass case
@@ -152,8 +150,6 @@ def scoring_recall(labels: list[int] | list[list[int]], scores: list[list[float]
 
 def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]):
     """
-    TODO test this function
-
     supports multilabel
 
     calculates fraction of cases when the top-ranked label is in the set of proper labels of the instance
@@ -169,25 +165,27 @@ def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]):
 
 def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
     """
-    TODO test this function
-
     supports multilabel
 
     evaluates how far we need, on the average, to go down the list of labels
     in order to cover all the proper labels of the instance
 
     the ideal value is 1, the worst is 0
-    """
-    # scores = np.array(scores)
-    # labels = np.array(labels)
 
-    # n_classes = scores.shape[1]
-    # from scipy.stats import rankdata
-    # int_ranks = rankdata(scores, axis=1)  # int ranks are from [1, n_classes]
-    # filtered_ranks = int_ranks * labels  # guarantee that 0 labels wont have max rank
-    # max_ranks = np.max(filtered_ranks, axis=1)
-    # float_ranks = (max_ranks - 1) / (n_classes - 1)  # float ranks are from [0,1]
-    # res = 1 - np.mean(float_ranks)
+    the result is the same as after executing the following code:
+    ```
+    scores = np.array(scores)
+    labels = np.array(labels)
+
+    n_classes = scores.shape[1]
+    from scipy.stats import rankdata
+    int_ranks = rankdata(scores, axis=1)  # int ranks are from [1, n_classes]
+    filtered_ranks = int_ranks * labels  # guarantee that 0 labels wont have max rank
+    max_ranks = np.max(filtered_ranks, axis=1)
+    float_ranks = (max_ranks - 1) / (n_classes - 1)  # float ranks are from [0,1]
+    res = 1 - np.mean(float_ranks)
+    ```
+    """
 
     n_classes = len(labels[0])
     res = 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
