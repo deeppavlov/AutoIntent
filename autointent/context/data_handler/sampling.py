@@ -1,3 +1,4 @@
+import contextlib
 import random
 
 import sre_yield
@@ -15,12 +16,8 @@ def distribute_shots(n, k):
 def generate_from_template(template, n):
     """generate `n` samples from `template`, or fewer if its impossible"""
     iterator = iter(sre_yield.AllStrings(template))
-    res = []
-    for _ in range(n):
-        try:
-            res.append(next(iterator))
-        except StopIteration:
-            break
+    with contextlib.suppress(StopIteration):
+        res = [next(iterator) for _ in range(n)]
     return res
 
 

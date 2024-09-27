@@ -25,7 +25,7 @@ class VectorIndex:
 
     def get_collection(self, model_name: str, device=None):
         device = device if device is not None else self.device
-        self._logger.info(f"spawning sentence transformer instance of {model_name} on {device=}...")
+        self._logger.info("spawning sentence transformer instance of %s on %s...", model_name, device)
         emb_func = SentenceTransformerEmbeddingFunction(
             model_name=model_name, trust_remote_code=True, device=device, tokenizer_kwargs={"truncation": True}
         )
@@ -56,7 +56,7 @@ class VectorIndex:
         return collection
 
     def delete_collection(self, model_name: str):
-        self._logger.debug(f"deleting collection for {model_name}...")
+        self._logger.debug("deleting collection for %s...", model_name)
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
 

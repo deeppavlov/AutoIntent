@@ -30,7 +30,9 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         utterances, labels = get_sample_utterances(intent_records)
         in_domain_mask = np.array(labels) != -1
 
-        in_domain_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if is_in_domain]
+        in_domain_utterances = [
+            ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if is_in_domain
+        ]
         in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask, strict=False) if is_in_domain]
         oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if not is_in_domain]
 
@@ -76,7 +78,8 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
             test_labels = [dct["labels"][0] for dct in test_records if len(dct["labels"]) > 0]
             if any(len(dct["labels"]) > 1 for dct in test_records):
                 logger.warning(
-                    "you provided multilabel test data in multiclass classification mode, all the labels except the first will be ignored"
+                    "you provided multilabel test data in multiclass classification mode, "
+                    "all the labels except the first one in each list will be ignored"
                 )
 
         for dct in test_records:

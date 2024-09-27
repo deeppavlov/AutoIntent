@@ -26,7 +26,7 @@ class DataHandler:
             raise ValueError(msg)
 
         if regex_sampling > 0:
-            logger.debug(f"sampling {regex_sampling} utterances from regular expressions for each intent class...")
+            logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
             sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
 
         if multilabel_generation_config != "":
@@ -106,16 +106,16 @@ def _dump_train(utterances, labels, n_classes, multilabel):
     else:
         res = []
         for ut, labs in zip(utterances, labels, strict=False):
-            labs = [i for i in range(n_classes) if labs[i]]
-            res.append({"utterance": ut, "labels": labs})
+            labs_converted = [i for i in range(n_classes) if labs[i]]
+            res.append({"utterance": ut, "labels": labs_converted})
     return res
 
 
 def _dump_test(utterances, labels, n_classes, multilabel):
     res = []
     for ut, labs in zip(utterances, labels, strict=False):
-        labs = [i for i in range(n_classes) if labs[i]] if multilabel else [labs]
-        res.append({"utterance": ut, "labels": labs})
+        labs_converted = [i for i in range(n_classes) if labs[i]] if multilabel else [labs]
+        res.append({"utterance": ut, "labels": labs_converted})
     return res
 
 
