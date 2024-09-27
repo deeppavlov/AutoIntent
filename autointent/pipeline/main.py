@@ -4,12 +4,14 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
+from typing import Literal
 
 from autointent import Context
-from autointent.logger import LoggingLevelType, setup_logging
 
 from .pipeline import Pipeline
 from .utils import generate_name, get_db_dir
+
+LoggingLevelType = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 
 def main():
@@ -53,7 +55,7 @@ def main():
         type=str,
         default="",
         help="Location where to save optimization logs that will be saved as "
-         "`<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
+        "`<logs_dir>/<run_name>_<cur_datetime>/logs.json`",
     )
     parser.add_argument(
         "--run-name", type=str, default="", help="Name of the run prepended to optimization logs filename"
@@ -132,3 +134,13 @@ def get_run_name(run_name: str):
     if run_name == "":
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
+
+
+def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
+    logging.basicConfig(
+        level=level,
+        format="{asctime} - {name} - {levelname} - {message}",
+        style="{",
+        handlers=[logging.StreamHandler()],
+    )
+    return logging.getLogger(__name__)

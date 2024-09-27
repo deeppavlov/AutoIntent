@@ -42,10 +42,7 @@ class VectorIndex:
         collection = self.get_collection(model_name, device)
         db_name = model_name.replace("/", "_")
 
-        if self.multilabel:
-            metadatas = multilabel_labels_as_metadata(data_handler.labels_train)
-        else:
-            metadatas = multiclass_labels_as_metadata(data_handler.labels_train)
+        metadatas = self.labels_as_metadata(data_handler.labels_train)
 
         self._logger.debug("adding train utterances to vector index...")
         collection.add(
@@ -60,19 +57,26 @@ class VectorIndex:
         db_name = model_name.replace("/", "_")
         self.client.delete_collection(db_name)
 
+    def metadata_as_labels(self, metadata: list[dict]):
+        if self.multilabel:
+            return _multilabel_metadata_as_labels(metadata, self.n_classes)
+        return _multiclass_metadata_as_labels(metadata)
 
-def multiclass_labels_as_metadata(labels_list: list[int]):
-    return [{"intent_id": lab} for lab in labels_list]
+    def labels_as_metadata(self, metadata: list[dict]):
+        if self.multilabel:
+            return _multilabel_labels_as_metadata(metadata)
+        return _multiclass_labels_as_metadata(metadata)
 
 
-def multilabel_labels_as_metadata(labels_list: list[list[int]]):
+def _multiclass_labels_as_metadata(labels_list: list[int]):
+        return [{"intent_id": lab} for lab in labels_list]
+
+def _multilabel_labels_as_metadata(labels_list: list[list[int]]):
     """labels_list is already in binary format"""
     return [{str(i): lab for i, lab in enumerate(labs)} for labs in labels_list]
 
-
-def multiclass_metadata_as_labels(metadata: list[dict]):
+def _multiclass_metadata_as_labels(metadata: list[dict]):
     return [dct["intent_id"] for dct in metadata]
 
-
-def multilabel_metadata_as_labels(metadata: list[dict], n_classes):
+def _multilabel_metadata_as_labels(metadata: list[dict], n_classes):
     return [[dct[str(i)] for i in range(n_classes)] for dct in metadata]
