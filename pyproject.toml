@@ -54,6 +54,8 @@ ignore = ["D", "TD", "ANN", "FIX", "S311",  "COM812", "ISC001", "ERA001", "FBT",
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
+"experiments/*" = ["ALL"]
+"scripts/*" = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 10
