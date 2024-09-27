@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import ClassVar
+
 from autointent.metrics import (
     scoring_accuracy,
     scoring_f1,
@@ -16,7 +19,7 @@ from .base import Node
 
 
 class ScoringNode(Node):
-    metrics_available = {
+    metrics_available: ClassVar[dict[str, Callable]] = {
         "scoring_log_likelihood": scoring_log_likelihood,
         "scoring_roc_auc": scoring_roc_auc,
         "scoring_accuracy": scoring_accuracy,
@@ -29,6 +32,6 @@ class ScoringNode(Node):
         "scoring_map": scoring_map,
     }
 
-    modules_available = {"knn": KNNScorer, "linear": LinearScorer, "dnnc": DNNCScorer}
+    modules_available: ClassVar[dict[str, Callable]] = {"knn": KNNScorer, "linear": LinearScorer, "dnnc": DNNCScorer}
 
     node_type = "scoring"

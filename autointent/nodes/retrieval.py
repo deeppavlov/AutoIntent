@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import ClassVar
+
 from autointent.metrics import (
     retrieval_hit_rate,
     retrieval_hit_rate_intersecting,
@@ -21,7 +24,7 @@ from .base import Node
 
 
 class RetrievalNode(Node):
-    metrics_available = {
+    metrics_available: ClassVar[dict[str, Callable]] = {
         "retrieval_hit_rate": retrieval_hit_rate,
         "retrieval_hit_rate_macro": retrieval_hit_rate_macro,
         "retrieval_hit_rate_intersecting": retrieval_hit_rate_intersecting,
@@ -39,6 +42,6 @@ class RetrievalNode(Node):
         "retrieval_precision_intersecting": retrieval_precision_intersecting,
     }
 
-    modules_available = {"vector_db": VectorDBModule}
+    modules_available: ClassVar[dict[str, Callable]] = {"vector_db": VectorDBModule}
 
     node_type = "retrieval"

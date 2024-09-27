@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import ClassVar
+
 from autointent.metrics import (
     prediction_accuracy,
     prediction_f1,
@@ -11,7 +14,7 @@ from .base import Node
 
 
 class PredictionNode(Node):
-    metrics_available = {
+    metrics_available: ClassVar[dict[str, Callable]] = {
         "prediction_accuracy": prediction_accuracy,
         "prediction_precision": prediction_precision,
         "prediction_recall": prediction_recall,
@@ -19,7 +22,7 @@ class PredictionNode(Node):
         "prediction_roc_auc": prediction_roc_auc,
     }
 
-    modules_available = {
+    modules_available: ClassVar[dict[str, Callable]] = {
         "threshold": ThresholdPredictor,
         "argmax": ArgmaxPredictor,
         "jinoos": JinoosPredictor,
