@@ -44,6 +44,19 @@ ruff = "^0.6.8"
 line-length = 120
 indent-width = 4
 
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D", "TD", "ANN", "FIX", "S311"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
+
+[tool.ruff.lint.pylint]
+max-args = 10
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
