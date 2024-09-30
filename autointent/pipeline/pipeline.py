@@ -42,7 +42,7 @@ class Pipeline:
 
     def dump(self, logs_dir: str, run_name: str):
         self._logger.debug("dumping logs...")
-        optimization_results = self.context.optimization_logs.dump()
+        optimization_results = self.context.optimization_info.dump()
 
         # create appropriate directory
         logs_dir = Path.cwd() if logs_dir == "" else Path(logs_dir)

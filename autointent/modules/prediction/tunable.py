@@ -5,7 +5,7 @@ import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
-from .base import Context, PredictionModule
+from .base import Context, PredictionModule, get_prediction_evaluation_data
 from .threshold import multiclass_predict, multilabel_predict
 
 
@@ -24,9 +24,10 @@ class TunablePredictor(PredictionModule):
             )
 
         thresh_optimizer = ThreshOptimizer(n_classes=context.n_classes, multilabel=context.multilabel)
+        labels, scores = get_prediction_evaluation_data(context)
         thresh_optimizer.fit(
-            probas=context.optimization_logs.get_best_test_scores(),
-            labels=context.data_handler.labels_test,
+            probas=scores,
+            labels=labels,
             seed=context.seed,
             tags=self.tags,
         )

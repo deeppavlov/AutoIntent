@@ -17,6 +17,7 @@ sre-yield = "^1.2"
 optuna = "^4.0.0"
 xeger = "^0.4.0"
 pathlib = "^1.0.1"
+pydantic = "^2.9.2"
 
 
 [tool.poetry.group.dev]
@@ -25,6 +26,8 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 datasets = "2.20.0"
 tach = "^0.11.3"
+ipykernel = "^6.29.5"
+ipywidgets = "^8.1.5"
 
 [tool.poetry.group.test]
 optional = true

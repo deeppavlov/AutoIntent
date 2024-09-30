@@ -1,25 +1,78 @@
 import logging
 from pprint import pformat
+from typing import Any
+
+import numpy as np
+from pydantic import BaseModel, Field
 
 
-class OptimizationLogs:
+class ScorerOutputs(BaseModel):
+    test_scores: np.ndarray | None = Field(None, description="Scorer outputs for test utterances")
+    oos_scores: np.ndarray | None = Field(None, description="Scorer outputs for out-of-scope utterances")
+
+
+class Artifacts(BaseModel):
+    """
+    Modules hyperparams and outputs. The best ones are transmitted between nodes of the pipeline
+    """
+    regexp: list[None] = Field(
+        None,
+        description="TODO",
+    )
+    retrieval: list[str] = Field(
+        [],
+        description="Name of the embedding model chosen after retrieval optimization",
+    )
+    scoring: list[ScorerOutputs] = Field(
+        [],
+        description="Outputs from best scorer, numpy arrays of shape (n_samples, n_classes)",
+    )
+    prediction: list[np.ndarray] = Field(
+        [],
+        description="Outputs from best predictor, numpy array of shape (n_samples,) or "
+        "(n_samples, n_classes) depending on classification mode (multi-class or multi-label)",
+    )
+
+
+class MetricsValues(BaseModel):
+    """
+    Concise representation of optimization results. Metric values for each module tested
+    """
+    regexp: list[str] = []
+    retrieval: list[str] = []
+    scoring: list[str] = []
+    prediction: list[str] = []
+
+
+class Trial(BaseModel):
+    """
+    Detailed representation of one optimization trial
+    """
+    module_type: str
+    module_params: dict[str, Any]
+    metric_name: str
+    metric_value: float
+    # module_name
+
+class Trials(BaseModel):
+    """
+    Detailed representation of optimization results
+    """
+    regexp: list[Trial] = []
+    retrieval: list[Trial] = []
+    scoring: list[Trial] = []
+    prediction: list[Trial] = []
+
+
+class OptimizationInfo:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
     def __init__(self):
         self._logger = self._get_logger()
 
-        self.cache = {
-            "best_assets": {
-                "regexp": None,  # TODO: choose the format
-                "retrieval": None,  # str, name of best retriever
-                "scoring": {
-                    "test_scores": None, "oos_scores": None
-                },  # dict with values of two np.ndarrays of shape (n_samples, n_classes), from best scorer
-                "prediction": None,  # np.ndarray of shape (n_samples,), from best predictor
-            },
-            "metrics": {"regexp": [], "retrieval": [], "scoring": [], "prediction": []},
-            "configs": {"regexp": [], "retrieval": [], "scoring": [], "prediction": []},
-        }
+        self.artifacts = Artifacts()
+        self.metrics_values = MetricsValues()
+        self.trials_info = Trials()
 
     def log_module_optimization(
         self,
@@ -43,14 +96,14 @@ class OptimizationLogs:
             self.cache["best_assets"][node_type] = assets
 
         # logging
-        logs = dict(
+        trial_info = dict(
             module_type=module_type,
             metric_name=metric_name,
             metric_value=metric_value,
             **module_config,
         )
-        self.cache["configs"][node_type].append(logs)
-        self._logger.info(logs)
+        self.cache["trials"][node_type].append(trial_info)
+        self._logger.info(trial_info)
         metrics_list.append(metric_value)
 
     def get_best_embedder(self):
