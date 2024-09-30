@@ -13,12 +13,22 @@ def test_base_mlknn():
     db_dir = get_db_dir("", run_name)
 
     data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    utterance = [
+        {
+            "utterance": "why is there a hold on my american saving bank account",
+            "labels": [1],
+        },
+        {
+            "utterance": "i am nost sure why my account is blocked",
+            "labels": [0],
+        },
+    ]
     context = Context(
         multiclass_intent_records=data,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
+        multilabel_utterance_records=utterance,
+        test_utterance_records=utterance,
         device="cpu",
-        mode="multiclass",
+        mode="multilabel",
         multilabel_generation_config="",
         db_dir=db_dir,
         regex_sampling=0,
@@ -31,7 +41,7 @@ def test_base_mlknn():
 
     context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
     scorer.fit(context)
-    assert scorer.score(context, scoring_roc_auc) == 1
+    assert scorer.score(context, scoring_roc_auc) == 0.5
     predictions = scorer.predict(
         np.array(
             [
@@ -44,5 +54,5 @@ def test_base_mlknn():
         )
     )
     assert (
-        predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])
+        predictions == np.array([[1.0, 1.0,], [1.0, 1.0,], [1.0, 1.0], [1.0, 1.0], [1.0, 1.0]])
     ).all()
