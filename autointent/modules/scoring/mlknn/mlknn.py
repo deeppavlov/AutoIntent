@@ -1,5 +1,3 @@
-from typing import Any
-
 import numpy as np
 from chromadb.types import Collection
 from numpy.typing import NDArray
