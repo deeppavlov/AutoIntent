@@ -1,7 +1,7 @@
 import numpy as np
 
 from autointent import Context
-from autointent.metrics import scoring_roc_auc
+from autointent.metrics import scoring_roc_auc, scoring_log_likelihood, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
@@ -16,11 +16,11 @@ def test_base_mlknn():
     utterance = [
         {
             "utterance": "why is there a hold on my american saving bank account",
-            "labels": [1],
+            "labels": [0, 1, 2],
         },
         {
             "utterance": "i am nost sure why my account is blocked",
-            "labels": [0],
+            "labels": [0, 3],
         },
     ]
     context = Context(
@@ -41,7 +41,7 @@ def test_base_mlknn():
 
     context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
     scorer.fit(context)
-    assert scorer.score(context, scoring_roc_auc) == 0.5
+    np.testing.assert_almost_equal(0.75, scorer.score(context, scoring_f1))
     predictions = scorer.predict(
         np.array(
             [
@@ -54,5 +54,5 @@ def test_base_mlknn():
         )
     )
     assert (
-        predictions == np.array([[1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 1.0]])
+        predictions == np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
     ).all()

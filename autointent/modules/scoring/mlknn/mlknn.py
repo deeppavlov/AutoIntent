@@ -29,7 +29,6 @@ class MLKnnScorer(ScoringModule):
         dataset = self._collection.get(include=["embeddings", "metadatas"])
         features = np.array(dataset["embeddings"])
         labels = np.array(self._converter(dataset["metadatas"]))
-
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond(features, labels)
 
