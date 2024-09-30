@@ -28,7 +28,7 @@ def test_base_mlknn():
         multilabel_utterance_records=utterance,
         test_utterance_records=utterance,
         device="cpu",
-        mode="multilabel",
+        mode="multiclass_as_multilabel",
         multilabel_generation_config="",
         db_dir=db_dir,
         regex_sampling=0,
@@ -42,7 +42,7 @@ def test_base_mlknn():
     context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
     scorer.fit(context)
     np.testing.assert_almost_equal(0.75, scorer.score(context, scoring_f1))
-    predictions = scorer.predict(
+    predictions = scorer.predict_labels(
         np.array(
             [
                 "why is there a hold on my american saving bank account",

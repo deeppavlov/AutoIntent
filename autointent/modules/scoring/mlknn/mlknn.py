@@ -82,27 +82,17 @@ class MLKnnScorer(ScoringModule):
             [self._converter(candidates[self.ignore_first_neighbours :]) for candidates in query_res["metadatas"]]
         )
 
-    def predict(self, utterances: list[str]) -> NDArray[np.int64]:
+    def predict_labels(self, utterances: list[str]) -> NDArray[np.int64]:
+        probas = self.predict(utterances)
+        thresh = 0.5
+        return (probas > thresh).astype(int)
+
+    def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         result = np.zeros((len(utterances), self._n_classes), dtype=int)
-        neighbors = self._get_neighbors(texts=utterances)
+        neighbors_labels = self._get_neighbors(texts=utterances)
 
-        for i in range(len(utterances)):
-            deltas = np.sum(np.array(neighbors[i]), axis=0).astype(int)
-
-            for label in range(self._n_classes):
-                p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
-                p_false = self._prior_prob_false[label] * self._cond_prob_false[label, deltas[label]]
-                result[i, label] = int(p_true >= p_false)
-
-        return result
-
-    def predict_proba(self, x: list[str]) -> NDArray[np.float64]:
-        result = np.zeros((len(x), self._n_classes), dtype=float)
-        np_x = np.array(x)
-        neighbors = self._get_neighbors(np_x)
-
-        for instance in range(np_x.shape[0]):
-            deltas = np.sum(self.encoder.transform(np.array(neighbors[instance]).reshape(-1, 1)), axis=0).astype(int)
+        for instance in range(neighbors_labels.shape[0]):
+            deltas = np.sum(neighbors_labels[instance], axis=0).astype(int)
 
             for label in range(self._n_classes):
                 p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
