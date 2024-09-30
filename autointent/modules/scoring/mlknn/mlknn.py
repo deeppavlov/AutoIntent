@@ -1,7 +1,6 @@
 import numpy as np
 from chromadb.types import Collection
 from numpy.typing import NDArray
-from sklearn.preprocessing import OneHotEncoder
 
 from autointent.modules.scoring.base import Context, ScoringModule
 
@@ -11,7 +10,6 @@ class MLKnnScorer(ScoringModule):
     _collection: Collection
     _n_classes: int
     _converter: callable
-    encoder: OneHotEncoder
     _prior_prob_true: NDArray[np.float64]
     _prior_prob_false: NDArray[np.float64]
     _cond_prob_true: NDArray[np.float64]
@@ -28,13 +26,12 @@ class MLKnnScorer(ScoringModule):
         self._n_classes = context.n_classes
         self._converter = context.vector_index.metadata_as_labels
 
-        self.encoder = OneHotEncoder(sparse_output=False)
-        train_labels = context.data_handler.labels_train
-        labels = self.encoder.fit_transform(np.array(train_labels).reshape(-1, 1))
+        dataset = self._collection.get(include=["embeddings", "metadatas"])
+        features = np.array(dataset["embeddings"])
+        labels = np.array(self._converter(dataset["metadatas"]))
+
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(labels)
-        self._cond_prob_true, self._cond_prob_false = self._compute_cond(
-            np.array(context.data_handler.utterances_train), labels
-        )
+        self._cond_prob_true, self._cond_prob_false = self._compute_cond(features, labels)
 
     def _compute_prior(self, y: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         prior_prob_true = (self.s + y.sum(axis=0)) / (self.s * 2 + y.shape[0])
@@ -47,12 +44,12 @@ class MLKnnScorer(ScoringModule):
         c = np.zeros((self._n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
-        neighbors = self._get_neighbors(x)
+        neighbors = self._get_neighbors(embeddings=x)
 
-        for instance in range(x.shape[0]):
-            deltas = y[neighbors[instance]].sum(axis=0).astype(int)
+        for i in range(x.shape[0]):
+            deltas = y[neighbors[i]].sum(axis=0).astype(int)
             for label in range(self._n_classes):
-                if y[instance, label] == 1:
+                if y[i, label] == 1:
                     c[label, deltas[label]] += 1
                 else:
                     cn[label, deltas[label]] += 1
@@ -65,25 +62,32 @@ class MLKnnScorer(ScoringModule):
 
         return cond_prob_true, cond_prob_false
 
-    def _get_neighbors(self, x: NDArray[np.str_]) -> NDArray[np.int64]:
+    def _get_neighbors(
+            self,
+            embeddings: NDArray[np.str_] | None = None,
+            texts: list[str] | None = None,
+        ) -> NDArray[np.int64]:
         query_res = self._collection.query(
-            query_texts=x, n_results=self.k + self.ignore_first_neighbours, include=["metadatas"]
+            query_embeddings=embeddings,
+            query_texts=texts,
+            n_results=self.k + self.ignore_first_neighbours,
+            include=["metadatas"]
         )
         return np.array(
             [self._converter(candidates[self.ignore_first_neighbours :]) for candidates in query_res["metadatas"]]
         )
 
-    def predict(self, x: NDArray[np.str_]) -> NDArray[np.int64]:
-        result = np.zeros((len(x), self._n_classes), dtype=int)
-        neighbors = self._get_neighbors(x)
+    def predict(self, utterances: list[str]) -> NDArray[np.int64]:
+        result = np.zeros((len(utterances), self._n_classes), dtype=int)
+        neighbors = self._get_neighbors(texts=utterances)
 
-        for instance in range(len(x)):
-            deltas = np.sum(self.encoder.transform(np.array(neighbors[instance]).reshape(-1, 1)), axis=0).astype(int)
+        for i in range(len(utterances)):
+            deltas = np.sum(np.array(neighbors[i]), axis=0).astype(int)
 
             for label in range(self._n_classes):
                 p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
                 p_false = self._prior_prob_false[label] * self._cond_prob_false[label, deltas[label]]
-                result[instance, label] = int(p_true >= p_false)
+                result[i, label] = int(p_true >= p_false)
 
         return result
 
