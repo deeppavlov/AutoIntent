@@ -2,6 +2,7 @@ from abc import abstractmethod
 
 import numpy as np
 
+from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
 from autointent.modules.base import Context, Module
 
@@ -21,8 +22,8 @@ class ScoringModule(Module):
             self._oos_scores = self.predict(context.data_handler.oos_utterances)
         return res
 
-    def get_assets(self):
-        return {"test_scores": self._test_scores, "oos_scores": self._oos_scores}
+    def get_assets(self) -> ScorerArtifact:
+        return ScorerArtifact(test_scores=self._test_scores, oos_scores=self._oos_scores)
 
     @abstractmethod
     def predict(self, utterances: list[str]):
