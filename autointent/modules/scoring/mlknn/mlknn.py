@@ -62,15 +62,15 @@ class MLKnnScorer(ScoringModule):
         return cond_prob_true, cond_prob_false
 
     def _get_neighbors(
-            self,
-            embeddings: NDArray[np.str_] | None = None,
-            texts: list[str] | None = None,
-        ) -> NDArray[np.int64]:
+        self,
+        embeddings: NDArray[np.str_] | None = None,
+        texts: list[str] | None = None,
+    ) -> NDArray[np.int64]:
         query_res = self._collection.query(
             query_embeddings=embeddings,
             query_texts=texts,
             n_results=self.k + self.ignore_first_neighbours,
-            include=["metadatas"]
+            include=["metadatas"],
         )
         return np.array(
             [self._converter(candidates[self.ignore_first_neighbours :]) for candidates in query_res["metadatas"]]

@@ -1,7 +1,7 @@
 import numpy as np
 
 from autointent import Context
-from autointent.metrics import scoring_roc_auc, scoring_log_likelihood, scoring_f1
+from autointent.metrics import scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
@@ -53,6 +53,4 @@ def test_base_mlknn():
             ]
         )
     )
-    assert (
-        predictions == np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])
-    ).all()
+    assert (predictions == np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])).all()
