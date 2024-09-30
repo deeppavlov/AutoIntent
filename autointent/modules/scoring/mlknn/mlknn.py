@@ -43,15 +43,14 @@ class MLKnnScorer(ScoringModule):
         c = np.zeros((self._n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
-        neighbors = self._get_neighbors(embeddings=x)
+        neighbors_labels = self._get_neighbors(embeddings=x)
 
         for i in range(x.shape[0]):
-            deltas = y[neighbors[i]].sum(axis=0).astype(int)
-            for label in range(self._n_classes):
-                if y[i, label] == 1:
-                    c[label, deltas[label]] += 1
-                else:
-                    cn[label, deltas[label]] += 1
+            deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
+            idx_helper = np.arange(self._n_classes)
+            deltas_idx = deltas[idx_helper]
+            c[idx_helper, deltas_idx] += y[i]
+            cn[idx_helper, deltas_idx] += (1 - y[i])
 
         c_sum = c.sum(axis=1)
         cn_sum = cn.sum(axis=1)
@@ -66,6 +65,13 @@ class MLKnnScorer(ScoringModule):
         embeddings: NDArray[np.str_] | None = None,
         texts: list[str] | None = None,
     ) -> NDArray[np.int64]:
+        """
+        retrieve nearest neighbors and return their labels in binary format
+
+        Return
+        ---
+        array of shape (n_queries, n_candidates, n_classes)
+        """
         query_res = self._collection.query(
             query_embeddings=embeddings,
             query_texts=texts,
