@@ -1,7 +1,7 @@
 import numpy as np
 
 from autointent import Context
-from autointent.metrics import scoring_roc_auc
+from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
 from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
 
@@ -24,11 +24,22 @@ def test_base_knn():
         seed=0,
     )
 
-    vector_db = VectorDBModule(k=3, model_name="sergeyzh/rubert-tiny-turbo")
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+    vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
+    metric_value = vector_db.score(context, retrieval_hit_rate)
+    artifact = vector_db.get_assets()
+    context.optimization_info.log_module_optimization(
+        node_type="retrieval",
+        module_type="vector_db",
+        module_params=retrieval_params,
+        metric_value=metric_value,
+        metric_name="retrieval_hit_rate_macro",
+        artifact=artifact,
+    )
+
     scorer = KNNScorer(k=3, weights="distance")
 
-    context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
     scorer.fit(context)
     assert scorer.score(context, scoring_roc_auc) == 1
     predictions = scorer.predict(

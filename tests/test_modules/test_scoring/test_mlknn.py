@@ -1,7 +1,7 @@
 import numpy as np
 
 from autointent import Context
-from autointent.metrics import scoring_f1
+from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
@@ -35,13 +35,24 @@ def test_base_mlknn():
         seed=0,
     )
 
-    vector_db = VectorDBModule(k=3, model_name="sergeyzh/rubert-tiny-turbo")
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+    vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    scorer = MLKnnScorer(k=3)
+    metric_value = vector_db.score(context, retrieval_hit_rate_macro)
+    artifact = vector_db.get_assets()
+    context.optimization_info.log_module_optimization(
+        node_type="retrieval",
+        module_type="vector_db",
+        module_params=retrieval_params,
+        metric_value=metric_value,
+        metric_name="retrieval_hit_rate_macro",
+        artifact=artifact,
+    )
 
-    context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
+    scorer = MLKnnScorer(k=3)
     scorer.fit(context)
     np.testing.assert_almost_equal(0.6663752913752914, scorer.score(context, scoring_f1))
+
     predictions = scorer.predict_labels(
         [
             "why is there a hold on my american saving bank account",
