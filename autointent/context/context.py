@@ -1,5 +1,5 @@
 from .data_handler import DataHandler
-from .optimization_logs import OptimizationLogs
+from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
 
 
@@ -25,7 +25,7 @@ class Context:
             regex_sampling,
             seed,
         )
-        self.optimization_logs = OptimizationLogs()
+        self.optimization_info = OptimizationInfo()
         self.vector_index = VectorIndex(db_dir, device, self.data_handler.multilabel, self.data_handler.n_classes)
 
         self.device = device
@@ -34,5 +34,5 @@ class Context:
         self.seed = seed
 
     def get_best_collection(self):
-        model_name = self.optimization_logs.get_best_embedder()
+        model_name = self.optimization_info.get_best_embedder()
         return self.vector_index.get_collection(model_name)

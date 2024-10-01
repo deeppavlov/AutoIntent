@@ -30,9 +30,9 @@ class PredictionModule(Module):
 
 def get_prediction_evaluation_data(context: Context):
     labels = context.data_handler.labels_test
-    scores = context.optimization_logs.get_best_test_scores()
+    scores = context.optimization_info.get_best_test_scores()
 
-    oos_scores = context.optimization_logs.get_best_oos_scores()
+    oos_scores = context.optimization_info.get_best_oos_scores()
     if oos_scores is not None:
         oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)
         labels = np.concatenate([labels, oos_labels])
