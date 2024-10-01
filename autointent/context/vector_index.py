@@ -1,5 +1,4 @@
 import logging
-import os
 
 from chromadb import PersistentClient
 from chromadb.config import Settings
@@ -9,9 +8,10 @@ from .data_handler import DataHandler
 
 
 class VectorIndex:
-    def __init__(self, db_dir: os.PathLike, device: str, multilabel: bool, n_classes: int):
+    def __init__(self, db_dir: str, device: str, multilabel: bool, n_classes: int):
         self._logger = logging.getLogger(__name__)
 
+        self.db_dir = db_dir
         self.device = device
         self.multilabel = multilabel
         self.n_classes = n_classes

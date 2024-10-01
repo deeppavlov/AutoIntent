@@ -1,3 +1,5 @@
+from typing import Any
+
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
@@ -36,3 +38,14 @@ class Context:
     def get_best_collection(self):
         model_name = self.optimization_info.get_best_embedder()
         return self.vector_index.get_collection(model_name)
+
+    def dump(self) -> dict[str, Any]:
+        optim_logs = self.optimization_info.dump()
+        optim_logs["metadata"] = {
+            "device": self.device,
+            "multilabel": self.multilabel,
+            "n_classes": self.n_classes,
+            "seed": self.seed,
+            "db_dir": self.vector_index.db_dir
+        }
+        return optim_logs

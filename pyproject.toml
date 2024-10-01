@@ -42,7 +42,8 @@ optional = true
 ruff = "^0.6.8"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.main:main"
+"autointent" = "autointent.pipeline.optimization:main"
+"autointent-inference" = "autointent.pipeline.inference:main"
 "clear-cache" = "autointent.pipeline.utils.cache:clear_chroma_cache"
 
 [tool.ruff]

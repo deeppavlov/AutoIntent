@@ -4,7 +4,7 @@ from autointent import Context
 from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
-from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
+from autointent.pipeline.optimization import get_db_dir, get_run_name, load_data, setup_logging
 
 
 def test_base_mlknn():

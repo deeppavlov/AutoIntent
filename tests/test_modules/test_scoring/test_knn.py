@@ -3,7 +3,7 @@ import numpy as np
 from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
-from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
+from autointent.pipeline.optimization import get_db_dir, get_run_name, load_data, setup_logging
 
 
 def test_base_knn():
