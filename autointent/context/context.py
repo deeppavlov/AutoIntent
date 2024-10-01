@@ -40,7 +40,6 @@ class Context:
         return self.vector_index.get_collection(model_name)
 
     def get_inference_config(self) -> dict[str, Any]:
-        best_trials = self.optimization_info.get_best_modules()
         return {
             "metadata": {
                 "device": self.device,
@@ -49,8 +48,5 @@ class Context:
                 "seed": self.seed,
                 "db_dir": self.vector_index.db_dir,
             },
-            "modules": [
-                {"module_type": trial.module_type, "module_params": trial.module_params}
-                for trial in best_trials
-            ]
+            "modules": self.optimization_info.get_best_modules()
         }
