@@ -83,17 +83,16 @@ class OptimizationInfo:
             "configs": self.trials.model_dump(),
         }
 
-    def get_best_modules(self) -> list[dict[str, Any]]:
+    def get_best_trials(self) -> list[dict[str, Any]]:
         node_types = ["regexp", "retrieval", "scoring", "prediction"]
         trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
-        res = []
+        res = {nt: {} for nt in node_types}
         for idx, node_type in zip(trial_ids, node_types, strict=True):
             if idx is None:
                 continue
             trial = self.trials[node_type][idx]
-            res.append({
-                "node_type": node_type,
+            res[node_type] = {
                 "module_type": trial.module_type,
                 "module_params": trial.module_params
-            })
+            }
         return res
