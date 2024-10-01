@@ -12,7 +12,7 @@ def test_base_mlknn():
     run_name = get_run_name("multiclass-cpu")
     db_dir = get_db_dir("", run_name)
 
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    data = load_data("../../minimal-optimization/data/clinc_subset.json", multilabel=False)
     utterance = [
         {
             "utterance": "why is there a hold on my american saving bank account",
@@ -41,16 +41,14 @@ def test_base_mlknn():
 
     context.optimization_logs.cache["best_assets"]["retrieval"] = "sergeyzh/rubert-tiny-turbo"
     scorer.fit(context)
-    np.testing.assert_almost_equal(0.75, scorer.score(context, scoring_f1))
+    np.testing.assert_almost_equal(0.6663752913752914, scorer.score(context, scoring_f1))
     predictions = scorer.predict_labels(
-        np.array(
-            [
-                "why is there a hold on my american saving bank account",
-                "i am nost sure why my account is blocked",
-                "why is there a hold on my capital one checking account",
-                "i think my account is blocked but i do not know the reason",
-                "can you tell me why is my bank account frozen",
-            ]
-        )
+        [
+            "why is there a hold on my american saving bank account",
+            "i am nost sure why my account is blocked",
+            "why is there a hold on my capital one checking account",
+            "i think my account is blocked but i do not know the reason",
+            "can you tell me why is my bank account frozen",
+        ]
     )
-    assert (predictions == np.array([[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]])).all()
+    assert (predictions == np.array([[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]])).all()

@@ -50,7 +50,7 @@ class MLKnnScorer(ScoringModule):
             idx_helper = np.arange(self._n_classes)
             deltas_idx = deltas[idx_helper]
             c[idx_helper, deltas_idx] += y[i]
-            cn[idx_helper, deltas_idx] += (1 - y[i])
+            cn[idx_helper, deltas_idx] += 1 - y[i]
 
         c_sum = c.sum(axis=1)
         cn_sum = cn.sum(axis=1)
@@ -82,13 +82,12 @@ class MLKnnScorer(ScoringModule):
             [self._converter(candidates[self.ignore_first_neighbours :]) for candidates in query_res["metadatas"]]
         )
 
-    def predict_labels(self, utterances: list[str]) -> NDArray[np.int64]:
+    def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
         probas = self.predict(utterances)
-        thresh = 0.5
         return (probas > thresh).astype(int)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        result = np.zeros((len(utterances), self._n_classes), dtype=int)
+        result = np.zeros((len(utterances), self._n_classes), dtype=float)
         neighbors_labels = self._get_neighbors(texts=utterances)
 
         for instance in range(neighbors_labels.shape[0]):
