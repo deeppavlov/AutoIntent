@@ -13,7 +13,7 @@ from autointent.metrics import (
     scoring_recall,
     scoring_roc_auc,
 )
-from autointent.modules import DNNCScorer, KNNScorer, LinearScorer
+from autointent.modules import DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer
 
 from .base import Node
 
@@ -32,6 +32,11 @@ class ScoringNode(Node):
         "scoring_map": scoring_map,
     }
 
-    modules_available: ClassVar[dict[str, Callable]] = {"knn": KNNScorer, "linear": LinearScorer, "dnnc": DNNCScorer}
+    modules_available: ClassVar[dict[str, Callable]] = {
+        "knn": KNNScorer,
+        "linear": LinearScorer,
+        "dnnc": DNNCScorer,
+        "mlknn": MLKnnScorer
+    }
 
     node_type = "scoring"
