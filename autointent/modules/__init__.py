@@ -8,4 +8,4 @@ from .prediction import (
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DNNCScorer, KNNScorer, LinearScorer, ScoringModule
+from .scoring import DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule

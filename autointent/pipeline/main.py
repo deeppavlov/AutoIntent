@@ -123,7 +123,8 @@ def load_data(data_path: str, multilabel: bool):
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
-        file = ires.files("autointent.datafiles").joinpath(data_name).open()
+        with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
+            return json.load(file)
     elif data_path != "":
         with Path(data_path).open() as file:
             return json.load(file)

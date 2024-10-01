@@ -1,0 +1,118 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9642857142857143,
+            0.9821428571428571
+        ],
+        "scoring": [
+            0.9543212433221266,
+            0.955960504458885,
+            0.9341377172888645,
+            0.962202923466712,
+            0.9665722851446197,
+            0.9328125403178066,
+            0.9691864786553228,
+            0.9532654363839668,
+            0.946889159146968
+        ],
+        "prediction": [
+            0.9175824175824175,
+            0.907967032967033
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9642857142857143,
+                "k": 10,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2"
+            },
+            {
+                "module_type": "vector_db",
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9821428571428571,
+                "k": 10,
+                "model_name": "avsolatorio/GIST-small-Embedding-v0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9543212433221266,
+                "k": 5,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.955960504458885,
+                "k": 5,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9341377172888645,
+                "k": 5,
+                "weights": "closest"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.962202923466712,
+                "k": 10,
+                "weights": "uniform"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9665722851446197,
+                "k": 10,
+                "weights": "distance"
+            },
+            {
+                "module_type": "knn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9328125403178066,
+                "k": 10,
+                "weights": "closest"
+            },
+            {
+                "module_type": "linear",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9691864786553228,
+                "multilabel": true
+            },
+            {
+                "module_type": "mlknn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9532654363839668,
+                "k": 5
+            },
+            {
+                "module_type": "mlknn",
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.946889159146968,
+                "k": 20
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.9175824175824175,
+                "thresh": 0.5
+            },
+            {
+                "module_type": "tunable",
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.907967032967033
+            }
+        ]
+    }
+}

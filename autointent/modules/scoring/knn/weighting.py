@@ -75,7 +75,6 @@ def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
     return (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
 
 
-
 def to_onehot(labels: np.ndarray, n_classes):
     """convert nd array of ints to (n+1)d array of zeros and ones"""
     new_shape = (*labels.shape, n_classes)

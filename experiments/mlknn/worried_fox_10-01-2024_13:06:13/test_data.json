@@ -1,0 +1,358 @@
+[
+    {
+        "utterance": "yes",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "thank you good bye",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "what area is it in",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "yes im looking for a traditional restaurant in the expensive price range",
+        "labels": [
+            1,
+            6
+        ]
+    },
+    {
+        "utterance": "im trying to find a vegetarian restaurant and i dont care regarding the price range",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "chesterton",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "does it have a television",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "hi im looking for a pub",
+        "labels": [
+            5,
+            6
+        ]
+    },
+    {
+        "utterance": "and what is the address and phone number",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "number",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "im looking for a pub with and internet connection",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "price",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "thank you good bye",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "no no",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "uh what are some other eareas",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "thank you good bye",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "thank you good bye",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "end of system audio no im looking for a seafood restaurant",
+        "labels": [
+            6,
+            7
+        ]
+    },
+    {
+        "utterance": "ok what is the address phone number and price",
+        "labels": [
+            0,
+            10
+        ]
+    },
+    {
+        "utterance": "yeah lets have you got anything in the mediterranean food in the area",
+        "labels": [
+            1,
+            6
+        ]
+    },
+    {
+        "utterance": "next type of food cherry hinton area",
+        "labels": [
+            6,
+            9
+        ]
+    },
+    {
+        "utterance": "breathing ok thank you goodbye",
+        "labels": [
+            2,
+            12
+        ]
+    },
+    {
+        "utterance": "next choice",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "no",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "yes",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "ok thank you goodbye",
+        "labels": [
+            0,
+            2,
+            12
+        ]
+    },
+    {
+        "utterance": "yes",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "noise ah hi i am looking for an",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "okay and uh",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "no",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "ok thank you",
+        "labels": [
+            0,
+            12
+        ]
+    },
+    {
+        "utterance": "no",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "what about mediterranean",
+        "labels": [
+            6,
+            9
+        ]
+    },
+    {
+        "utterance": "hi im looking for a mediterranean restaurant in the rosemary area",
+        "labels": [
+            5,
+            6
+        ]
+    },
+    {
+        "utterance": "alright thank you good bye",
+        "labels": [
+            2,
+            12
+        ]
+    },
+    {
+        "utterance": "ok i need the phone number and the area",
+        "labels": [
+            0,
+            10
+        ]
+    },
+    {
+        "utterance": "ok thank you good bye",
+        "labels": [
+            0,
+            2,
+            12
+        ]
+    },
+    {
+        "utterance": "is it in the cheap price range",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "what about contemporary restaurant",
+        "labels": [
+            6,
+            9
+        ]
+    },
+    {
+        "utterance": "repeat",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "is it located in addenbrookes area",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "is it in the city center jesus christ this is ridiculous",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "is it burger gourmet",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "repeat",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "um is it free",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "hello i am looking for cheap restaurant in addenbrookes area",
+        "labels": [
+            5,
+            6
+        ]
+    },
+    {
+        "utterance": "can we start again",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "hi im looking for cafe",
+        "labels": [
+            5,
+            6
+        ]
+    },
+    {
+        "utterance": "not spanish food not spanish food fast",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "repeat",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "repeat",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "repeat",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "start over",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "uh cheap or moderate",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "id like to start over please",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "i didnt ask for a moderate price range i need a pub with internet and tv",
+        "labels": [
+            4,
+            6
+        ]
+    }
+]
