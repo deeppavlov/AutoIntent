@@ -42,14 +42,14 @@ class Pipeline:
 
     def dump(self, logs_dir: str, run_name: str):
         self._logger.debug("dumping logs...")
-        optimization_results = self.context.dump()
+        optimization_results = self.context.optimization_info.dump_evaluation_results()
 
         # create appropriate directory
         logs_dir = Path.cwd() if logs_dir == "" else Path(logs_dir)
         logs_dir = logs_dir / run_name
         logs_dir.mkdir(parents=True)
 
-        # dump config and optimization results
+        # dump search space and evaluation results
         logs_path = logs_dir / "logs.json"
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
@@ -70,6 +70,12 @@ class Pipeline:
             json.dump(test_data, file, indent=4, ensure_ascii=False)
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
+
+        # dump optimization results (config for inference)
+        inference_config = self.context.get_inference_config()
+        inference_config_path = logs_dir / "inference_config.yaml"
+        with inference_config_path.open("w") as file:
+            yaml.dump(inference_config, file)
 
 
 def load_config(config_path: str, mode: str, logger: Logger):
