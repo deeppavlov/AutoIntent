@@ -4,7 +4,7 @@ import logging
 from collections.abc import Callable
 from logging import Logger
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 import yaml
@@ -23,14 +23,14 @@ class Pipeline:
         "prediction": PredictionNode,
     }
 
-    def __init__(self, config_path: str, mode: str):
+    def __init__(self, config_path: str, mode: str) -> None:
         # TODO add config validation
         self._logger = logging.getLogger(__name__)
 
         self._logger.debug("loading optimization search space config...")
         self.config = load_config(config_path, mode, self._logger)
 
-    def optimize(self, context: Context):
+    def optimize(self, context: Context) -> None:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         for node_config in self.config["nodes"]:
@@ -40,7 +40,7 @@ class Pipeline:
             )
             node.fit(context)
 
-    def dump(self, logs_dir: str, run_name: str):
+    def dump(self, logs_dir: str, run_name: str) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump()
 
@@ -72,7 +72,7 @@ class Pipeline:
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 
 
-def load_config(config_path: str, mode: str, logger: Logger):
+def load_config(config_path: str, mode: str, logger: Logger) -> dict[str, Any]:
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
         logger.debug("loading optimization search space config from %s...)", config_path)

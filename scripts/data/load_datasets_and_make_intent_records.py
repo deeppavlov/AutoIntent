@@ -28,7 +28,6 @@ def tokenize(text, language):
     return word_tokenize(text, language)
 
 
-
 def preprocess(text, language):
     tokens = tokenize(text, language=language)
     tokens = ["".join([c.lower() for c in word if c.isalnum()]) for word in tokens]

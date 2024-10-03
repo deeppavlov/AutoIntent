@@ -43,12 +43,7 @@ class KNNScorer(ScoringModule):
         self._collection = None
 
 
-def query(
-    collection: Collection,
-    k: int,
-    utterances: list[str],
-    converter: Callable
-):
+def query(collection: Collection, k: int, utterances: list[str], converter: Callable):
     """
     Return
     ---

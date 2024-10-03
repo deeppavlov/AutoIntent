@@ -12,19 +12,19 @@ class ChromaConfig:
     cache_directories: list[str] = field(default_factory=list)
 
 
-def get_chroma_cache_dir():
+def get_chroma_cache_dir() -> Path:
     """Get system's default cache dir."""
     cache_dir = user_cache_dir("autointent")
     return Path(cache_dir) / "chroma"
 
 
-def get_chroma_config_path():
+def get_chroma_config_path() -> Path:
     """Get system's default config dir."""
     config_dir = user_config_dir("autointent")
     return Path(config_dir) / "chromadb.json"
 
 
-def read_chroma_config():
+def read_chroma_config() -> ChromaConfig:
     path = get_chroma_config_path()
     if not path.exists():
         return ChromaConfig()
@@ -32,14 +32,14 @@ def read_chroma_config():
         return ChromaConfig(**json.load(file))
 
 
-def write_chroma_config(config: ChromaConfig):
+def write_chroma_config(config: ChromaConfig) -> None:
     path = get_chroma_config_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w") as file:
         json.dump(asdict(config), file, ensure_ascii=False, indent=4)
 
 
-def add_cache_directory(directory: Path):
+def add_cache_directory(directory: str) -> None:
     """Save path into chroma config in order to remove it from cache later."""
     chroma_config = read_chroma_config()
 
@@ -50,7 +50,7 @@ def add_cache_directory(directory: Path):
     write_chroma_config(chroma_config)
 
 
-def get_db_dir(db_dir: os.PathLike, run_name: str) -> str:
+def get_db_dir(db_dir: str, run_name: str) -> str:
     """
     Get the directory path for chroma db file.
     Use default cache dir if not provided.
@@ -59,14 +59,14 @@ def get_db_dir(db_dir: os.PathLike, run_name: str) -> str:
 
     if db_dir == "":
         cache_dir = get_chroma_cache_dir()
-        db_dir = cache_dir / run_name
+        db_dir = os.path.join(cache_dir, run_name)  # noqa: PTH118
 
     add_cache_directory(db_dir)
 
-    return str(db_dir)
+    return db_dir
 
 
-def clear_chroma_cache():
+def clear_chroma_cache() -> None:
     # TODO: test on all platforms
     chroma_config = read_chroma_config()
     for cache_dirs in chroma_config.cache_directories:

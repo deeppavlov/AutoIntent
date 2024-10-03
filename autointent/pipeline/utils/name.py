@@ -338,7 +338,7 @@ nouns = [
 ]
 
 
-def generate_name():
+def generate_name() -> str:
     adjective = random.choice(adjectives)
     noun = random.choice(nouns)
     return f"{adjective}_{noun}"

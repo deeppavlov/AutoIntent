@@ -1,3 +1,5 @@
+from chromadb import Collection
+
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
@@ -9,7 +11,7 @@ class Context:
         multiclass_intent_records,
         multilabel_utterance_records,
         test_utterance_records,
-        device,
+        device: str,
         mode,
         multilabel_generation_config: str,
         db_dir,
@@ -33,6 +35,6 @@ class Context:
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
 
-    def get_best_collection(self):
+    def get_best_collection(self) -> Collection:
         model_name = self.optimization_info.get_best_embedder()
         return self.vector_index.get_collection(model_name)

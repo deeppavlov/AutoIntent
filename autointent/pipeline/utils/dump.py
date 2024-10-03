@@ -6,7 +6,7 @@ import numpy as np
 class NumpyEncoder(json.JSONEncoder):
     """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""
 
-    def default(self, obj):
+    def default(self, obj) -> str:
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):

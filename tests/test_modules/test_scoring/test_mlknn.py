@@ -12,7 +12,7 @@ def test_base_mlknn():
     run_name = get_run_name("multiclass-cpu")
     db_dir = get_db_dir("", run_name)
 
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
     utterance = [
         {
             "utterance": "why is there a hold on my american saving bank account",

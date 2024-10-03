@@ -68,7 +68,6 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-
     def _fit(self, pairs: list[tuple[str, str]], labels: list[int]):
         """
         Arguments

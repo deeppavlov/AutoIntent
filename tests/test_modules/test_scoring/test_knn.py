@@ -11,7 +11,7 @@ def test_base_knn():
     run_name = get_run_name("multiclass-cpu")
     db_dir = get_db_dir("", run_name)
 
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
     context = Context(
         multiclass_intent_records=data,
         multilabel_utterance_records=[],

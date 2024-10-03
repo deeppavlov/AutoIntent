@@ -4,17 +4,16 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from autointent import Context
-
-from .pipeline import Pipeline
-from .utils import generate_name, get_db_dir
+from autointent.pipeline import Pipeline
+from autointent.pipeline.utils import generate_name, get_db_dir
 
 LoggingLevelType = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser()
     parser.add_argument(
         "--config-path",
@@ -88,7 +87,7 @@ def main():
     )
     args = parser.parse_args()
 
-    setup_logging(args.log_level)
+    setup_logging(args.log_level)  # TODO standardize logging
     logger = logging.getLogger(__name__)
 
     # configure the run and data
@@ -119,7 +118,7 @@ def main():
     pipeline.dump(args.logs_dir, run_name)
 
 
-def load_data(data_path: str, multilabel: bool):
+def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
@@ -131,13 +130,13 @@ def load_data(data_path: str, multilabel: bool):
     return []
 
 
-def get_run_name(run_name: str):
+def get_run_name(run_name: str) -> str:
     if run_name == "":
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
 
 
-def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
+def setup_logging(level: LoggingLevelType | None = None) -> logging.Logger:
     logging.basicConfig(
         level=level,
         format="{asctime} - {name} - {levelname} - {message}",

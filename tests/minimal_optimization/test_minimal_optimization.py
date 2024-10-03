@@ -11,7 +11,7 @@ def test_multiclass():
     db_dir = get_db_dir("", run_name)
 
     # create shared objects for a whole pipeline
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
     context = Context(
         multiclass_intent_records=data,
         multilabel_utterance_records=[],
@@ -26,13 +26,13 @@ def test_multiclass():
 
     # run optimization
     pipeline = Pipeline(
-        config_path="tests/minimal-optimization/configs/multiclass.yaml",
+        config_path="tests/minimal_optimization/configs/multiclass.yaml",
         mode="multiclass",
     )
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir="tests/minimal-optimization/logs", run_name=run_name)
+    pipeline.dump(logs_dir="tests/minimal_optimization/logs", run_name=run_name)
 
 
 def test_multilabel():
@@ -43,7 +43,7 @@ def test_multilabel():
     db_dir = get_db_dir("", run_name)
 
     # create shared objects for a whole pipeline
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
+    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
     context = Context(
         multiclass_intent_records=data,
         multilabel_utterance_records=[],
@@ -58,10 +58,10 @@ def test_multilabel():
 
     # run optimization
     pipeline = Pipeline(
-        config_path="tests/minimal-optimization/configs/multilabel.yaml",
+        config_path="tests/minimal_optimization/configs/multilabel.yaml",
         mode="multiclass_as_multilabel",
     )
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir="tests/minimal-optimization/logs", run_name=run_name)
+    pipeline.dump(logs_dir="tests/minimal_optimization/logs", run_name=run_name)

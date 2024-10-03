@@ -4,7 +4,7 @@ import random
 import sre_yield
 
 
-def distribute_shots(n, k):
+def distribute_shots(n: int, k: int) -> list[int]:
     """randomly distribute `k` samples among `n` bins"""
     samples_per_bin = [0] * n
     for _ in range(k):
@@ -13,7 +13,7 @@ def distribute_shots(n, k):
     return samples_per_bin
 
 
-def generate_from_template(template, n):
+def generate_from_template(template: str, n: int) -> list[str]:
     """generate `n` samples from `template`, or fewer if its impossible"""
     iterator = iter(sre_yield.AllStrings(template))
     with contextlib.suppress(StopIteration):
@@ -21,7 +21,7 @@ def generate_from_template(template, n):
     return res
 
 
-def generate_from_templates(patterns: list[str], n_shots: int):
+def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
     shots_per_pattern = distribute_shots(len(patterns), n_shots)
     res = []
     for pattern, n in zip(patterns, shots_per_pattern, strict=False):
@@ -30,8 +30,9 @@ def generate_from_templates(patterns: list[str], n_shots: int):
     return res
 
 
-def sample_from_regex(intent_records: list[dict], n_shots, seed=0):
+def sample_from_regex(intent_records: list[dict], n_shots: int, seed: int = 0) -> list[dict]:
     random.seed(seed)
     for intent in intent_records:
         new_samples = generate_from_templates(intent["regexp_full_match"], n_shots)
         intent["sample_utterances"].extend(new_samples)
+    return intent_records
