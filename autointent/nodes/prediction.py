@@ -1,32 +1,15 @@
 from collections.abc import Callable
 from typing import ClassVar
 
-from autointent.metrics import (
-    prediction_accuracy,
-    prediction_f1,
-    prediction_precision,
-    prediction_recall,
-    prediction_roc_auc,
-)
-from autointent.modules import ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor
+from autointent.metrics import PREDICTION_METRICS_MULTICLASS, PREDICTION_METRICS_MULTILABEL
+from autointent.modules import PREDICTION_MODULES_MULTICLASS, PREDICTION_MODULES_MULTILABEL
 
 from .base import Node
 
 
 class PredictionNode(Node):
-    metrics_available: ClassVar[dict[str, Callable]] = {
-        "prediction_accuracy": prediction_accuracy,
-        "prediction_precision": prediction_precision,
-        "prediction_recall": prediction_recall,
-        "prediction_f1": prediction_f1,
-        "prediction_roc_auc": prediction_roc_auc,
-    }
+    metrics_available: ClassVar[dict[str, Callable]] = PREDICTION_METRICS_MULTICLASS | PREDICTION_METRICS_MULTILABEL
 
-    modules_available: ClassVar[dict[str, Callable]] = {
-        "threshold": ThresholdPredictor,
-        "argmax": ArgmaxPredictor,
-        "jinoos": JinoosPredictor,
-        "tunable": TunablePredictor,
-    }
+    modules_available: ClassVar[dict[str, Callable]] = PREDICTION_MODULES_MULTICLASS | PREDICTION_MODULES_MULTILABEL
 
     node_type = "prediction"
