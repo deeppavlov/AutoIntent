@@ -4,19 +4,16 @@ from abc import ABC
 from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
-from typing import TYPE_CHECKING
 
 import torch
 
 from autointent.context import Context
-
-if TYPE_CHECKING:
-    from autointent.modules import Module
+from autointent.modules import Module
 
 
 class Node(ABC):
     metrics_available: dict[str, Callable]  # metrics functions
-    modules_available: dict[str, Callable]  # modules constructors
+    modules_available: dict[str, type[Module]]  # modules constructors
     node_type: str
 
 
@@ -39,7 +36,7 @@ class OptimizationNode(Node):
                 module_kwargs = dict(zip(search_space.keys(), module_config, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module: Module = self.modules_available[module_type](**module_kwargs)
+                module = self.modules_available[module_type](**module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
                 module.fit(context)
