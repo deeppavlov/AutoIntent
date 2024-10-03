@@ -4,10 +4,10 @@ from typing import ClassVar
 from autointent.metrics import PREDICTION_METRICS_MULTICLASS, PREDICTION_METRICS_MULTILABEL
 from autointent.modules import PREDICTION_MODULES_MULTICLASS, PREDICTION_MODULES_MULTILABEL
 
-from .base import Node
+from .base import InferenceNode, OptimizationNode
 
 
-class PredictionNode(Node):
+class PredictionNode(InferenceNode, OptimizationNode):
     metrics_available: ClassVar[dict[str, Callable]] = PREDICTION_METRICS_MULTICLASS | PREDICTION_METRICS_MULTILABEL
 
     modules_available: ClassVar[dict[str, Callable]] = PREDICTION_MODULES_MULTICLASS | PREDICTION_MODULES_MULTILABEL

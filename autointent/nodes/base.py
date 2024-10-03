@@ -1,5 +1,6 @@
 import gc
 import itertools as it
+from abc import ABC
 from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
@@ -13,12 +14,14 @@ if TYPE_CHECKING:
     from autointent.modules import Module
 
 
-class Node:
+class Node(ABC):
     metrics_available: dict[str, Callable]  # metrics functions
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
+
+class OptimizationNode(Node):
+    def configure_optimization(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values \
             (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
@@ -57,3 +60,11 @@ class Node:
                 gc.collect()
                 torch.cuda.empty_cache()
         self._logger.info("%s node optimization is finished!", self.node_type)
+
+
+class InferenceNode(Node):
+    def configure_inference(self):
+        ...
+
+    def load(self):
+        ...
