@@ -1,6 +1,10 @@
 import logging
 
 import numpy as np
+import numpy.typing as npt
+from typing import Any
+
+from autointent.context.data_handler.tags import Tag
 
 from .base import Context, PredictionModule, apply_tags
 
@@ -8,10 +12,11 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdPredictor(PredictionModule):
-    def __init__(self, thresh: float):
+
+    def __init__(self, thresh: float | list[float]) -> None:
         self.thresh = thresh
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self.multilabel = context.multilabel
         self.tags = context.data_handler.tags
 
@@ -28,13 +33,15 @@ class ThresholdPredictor(PredictionModule):
                 "Using ThresholdPredictor imposes unnecessary quality degradation."
             )
 
-    def predict(self, scores: list[list[float]]):
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
 
-def multiclass_predict(scores: list[list[float]], thresh: float | np.ndarray):
+def multiclass_predict(
+    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]
+) -> npt.NDArray[Any]:
     """
     Return
     ---
@@ -52,13 +59,19 @@ def multiclass_predict(scores: list[list[float]], thresh: float | np.ndarray):
     return pred_classes
 
 
-def multilabel_predict(scores: list[list[float]], thresh: float | np.ndarray, tags):
+def multilabel_predict(
+    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any], tags: list[Tag] | None
+) -> npt.NDArray[Any]:
     """
     Return
     ---
     array of binary labels, shape (n_samples, n_classes)
     """
-    res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
+    res = (
+        (scores >= thresh).astype(int)
+        if isinstance(thresh, float)
+        else (scores >= thresh[None, :]).astype(int)
+    )
     if tags:
         res = apply_tags(res, scores, tags)
     return res

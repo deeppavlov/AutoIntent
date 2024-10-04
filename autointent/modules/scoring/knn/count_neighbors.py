@@ -1,7 +1,10 @@
 import numpy as np
+from numpy.typing import NDArray
 
 
-def get_counts(labels, n_classes, weights):
+def get_counts(
+    labels: NDArray[np.int_], n_classes: int, weights: NDArray[np.float_]
+) -> NDArray[np.float_]:
     """
     Arguments
     ---
@@ -19,7 +22,9 @@ def get_counts(labels, n_classes, weights):
     )
 
 
-def get_counts_multilabel(labels, weights):
+def get_counts_multilabel(
+    labels: NDArray[np.int_], weights: NDArray[np.float_]
+) -> NDArray[np.float_]:
     """
     Arguments
     ---

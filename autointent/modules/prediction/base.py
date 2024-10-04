@@ -1,6 +1,8 @@
 from abc import abstractmethod
 
 import numpy as np
+import numpy.typing as npt
+from typing import Any
 
 from autointent.context.data_handler import Tag
 from autointent.metrics import PredictionMetricFn
@@ -13,22 +15,26 @@ class PredictionModule(Module):
         pass
 
     @abstractmethod
-    def predict(self, scores: list[list[float]]):
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
+    def score(
+        self, context: Context, metric_fn: PredictionMetricFn
+    ) -> tuple[float, npt.NDArray[Any]]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
-        return metric_fn(labels, self._predictions)
+        return metric_fn(labels, self._predictions), self._predictions
 
-    def get_assets(self):
+    def get_assets(self) -> npt.NDArray[Any]:
         return self._predictions
 
     def clear_cache(self):
         pass
 
 
-def get_prediction_evaluation_data(context: Context):
+def get_prediction_evaluation_data(
+    context: Context,
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     labels = context.data_handler.labels_test
     scores = context.optimization_info.get_best_test_scores()
 
@@ -41,7 +47,9 @@ def get_prediction_evaluation_data(context: Context):
     return labels, scores
 
 
-def apply_tags(labels: np.ndarray, scores: np.ndarray, tags: list[Tag]):
+def apply_tags(
+    labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]
+) -> npt.NDArray[Any]:
     """
     this function is intended to be used with multilabel predictor
 

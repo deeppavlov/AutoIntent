@@ -3,20 +3,22 @@ from chromadb import Collection
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
+from typing import Literal, Any
 
 
 class Context:
+
     def __init__(
         self,
-        multiclass_intent_records,
-        multilabel_utterance_records,
-        test_utterance_records,
+        multiclass_intent_records: list[dict[str, Any]],
+        multilabel_utterance_records: list[dict[str, Any]],
+        test_utterance_records: list[dict[str, Any]],
         device: str,
-        mode,
+        mode: Literal["multiclass", "multilabel", "multiclass_as_multilabel"],
         multilabel_generation_config: str,
-        db_dir,
-        regex_sampling,
-        seed,
+        db_dir: str,
+        regex_sampling: int,
+        seed: int,
     ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,

@@ -25,7 +25,14 @@ def split_sample_utterances(
     test_records: list[dict],
     multilabel: bool,
     seed: int = 0,
-) -> list[int | list[str] | list[str | int] | list[list[int] | int]]:
+) -> tuple[
+    int,
+    list[Any],
+    npt.NDArray[Any],
+    npt.NDArray[Any],
+    npt.NDArray[Any],
+    npt.NDArray[Any],
+]:
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
     """
@@ -101,7 +108,7 @@ def split_sample_utterances(
         logger.error(msg)
         raise ValueError(msg)
 
-    return [n_classes, oos_utterances, *splits]
+    return n_classes, oos_utterances, *splits
 
 
 def multilabel_train_test_split(

@@ -17,11 +17,15 @@ import numpy as np
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
+from typing import Any
+import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
 
-def construct_samples(texts, labels, balancing_factor: int | None = None) -> tuple[list[dict], list[dict]]:
+def construct_samples(
+    texts: list[str], labels: list[Any], balancing_factor: int | None = None
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -46,14 +50,18 @@ def construct_samples(texts, labels, balancing_factor: int | None = None) -> tup
 
 
 class CrossEncoderWithLogreg:
-    def __init__(self, model: CrossEncoder, batch_size=16, verbose=False):
+    # TODO refactor
+
+    def __init__(
+        self, model: CrossEncoder, batch_size: int = 16, verbose: bool = False
+    ) -> None:
         self.cross_encoder = model
         self.batch_size = batch_size
         self.verbose = verbose
 
     @torch.no_grad()
-    def get_features(self, pairs):
-        logits_list = []
+    def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+        logits_list: list[npt.NDArray[Any]] = []
 
         def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001
             logits_list.append(input_tensor[0].cpu().numpy())

@@ -1,6 +1,8 @@
 from abc import abstractmethod
 
 import numpy as np
+from typing import Any
+import numpy.typing as npt
 
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
@@ -8,7 +10,10 @@ from autointent.modules.base import Context, Module
 
 
 class ScoringModule(Module):
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> tuple[float, np.ndarray]:
+
+    def score(
+        self, context: Context, metric_fn: ScoringMetricFn
+    ) -> tuple[float, npt.NDArray[Any]]:
         """
         Return
         ---
@@ -20,21 +25,21 @@ class ScoringModule(Module):
         self._oos_scores = None
         if context.data_handler.has_oos_samples():
             self._oos_scores = self.predict(context.data_handler.oos_utterances)
-        return res
+        return res, self._test_scores
 
     def get_assets(self) -> ScorerArtifact:
         return ScorerArtifact(test_scores=self._test_scores, oos_scores=self._oos_scores)
 
     @abstractmethod
-    def predict(self, utterances: list[str]):
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         pass
 
-    def predict_topk(self, utterances: list[str], k=3):
+    def predict_topk(self, utterances: list[str], k: int = 3) -> npt.NDArray[Any]:
         scores = self.predict(utterances)
         return get_topk(scores, k)
 
 
-def get_topk(scores, k):
+def get_topk(scores: npt.NDArray[Any], k: int) -> npt.NDArray[Any]:
     """
     Argument
     ---

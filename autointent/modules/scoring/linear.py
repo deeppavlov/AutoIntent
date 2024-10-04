@@ -3,6 +3,8 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from .base import Context, ScoringModule
+import numpy.typing as npt
+from typing import Any
 
 
 class LinearScorer(ScoringModule):
@@ -22,10 +24,10 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    def __init__(self, multilabel=False):
+    def __init__(self, multilabel: bool = False) -> None:
         self.multilabel = multilabel
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         collection = context.get_best_collection()
         dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
@@ -42,14 +44,14 @@ class LinearScorer(ScoringModule):
         self._clf = clf
         self._emb_func = collection._embedding_function  # noqa: SLF001
 
-    def predict(self, utterances: list[str]):
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._emb_func(utterances)
         probas = self._clf.predict_proba(features)
         if self.multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
         return probas
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         model = self._emb_func._model  # noqa: SLF001
         model.to(device="cpu")
         del model

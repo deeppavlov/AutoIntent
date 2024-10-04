@@ -1,13 +1,16 @@
 from typing import Protocol
 
 import numpy as np
+import numpy.typing as npt
+from typing import Any
 
 
 class RetrievalMetricFn(Protocol):
+
     def __call__(
         self,
-        query_labels: list[int] | list[list[int]],
-        candidates_labels: list[list[int]] | list[list[list[int]]],
+        query_labels: list[int],
+        candidates_labels: list[list[int]],
         k: int | None = None,
     ) -> float:
         """
@@ -31,18 +34,18 @@ def macrofy(
     query_labels: list[list[int]],
     candidates_labels: list[list[list[int]]],
     k: int | None = None,
-):
+) -> float:
     """
     extend single-label `metric_fn` to a multi-label case via macro averaging
     """
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
+    query_labels_ = np.array(query_labels)
+    candidates_labels_ = np.array(candidates_labels)
 
-    n_classes = query_labels.shape[1]
-    classwise_values = []
+    n_classes = query_labels_.shape[1]
+    classwise_values: list[float] = []
     for i in range(n_classes):
-        binarized_query_labels = query_labels[..., i]
-        binarized_candidates_labels = candidates_labels[..., i]
+        binarized_query_labels = query_labels_[..., i]
+        binarized_candidates_labels = candidates_labels_[..., i]
         classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))
 
     return np.mean(classwise_values)
@@ -61,9 +64,14 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int | No
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None):
-    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=False)]
-    return sum(ap_list) / len(ap_list)
+def retrieval_map(
+    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
+) -> float:
+    ap_list = [
+        average_precision(q, c, k)
+        for q, c in zip(query_labels, candidates_labels, strict=True)
+    ]
+    return np.mean(ap_list)
 
 
 def average_precision_intersecting(
@@ -72,34 +80,40 @@ def average_precision_intersecting(
     """
     helper function for `retrieval_map_intersecting`
     """
-    query_label = np.array(query_label)
-    candidate_labels = np.array(candidate_labels)
+    query_label_ = np.array(query_label)
+    candidate_labels_ = np.array(candidate_labels)
 
     num_relevant = 0
     sum_precision = 0.0
-    for i, label in enumerate(candidate_labels[:k]):
-        if np.sum(label * query_label) > 0:
+    for i, label in enumerate(candidate_labels_[:k]):
+        if np.sum(label * query_label_) > 0:
             num_relevant += 1
             sum_precision += num_relevant / (i + 1)
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
 def retrieval_map_intersecting(
-    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
-):
+    query_labels: list[list[int]],
+    candidates_labels: list[list[list[int]]],
+    k: int | None = None,
+) -> float:
     ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=False)]
     return sum(ap_list) / len(ap_list)
 
 
-def retrieval_map_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_map_macro(
+    query_labels: list[list[int]],
+    candidates_labels: list[list[list[int]]],
+    k: int | None = None,
+) -> float:
     return macrofy(retrieval_map, query_labels, candidates_labels, k)
 
 
 def retrieval_map_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-    candidates_labels = candidates_labels[:, :k]
-    relevance_mask = candidates_labels == query_labels[:, None]
+    query_labels_ = np.array(query_labels)
+    candidates_labels_ = np.array(candidates_labels)
+    candidates_labels_ = candidates_labels_[:, :k]
+    relevance_mask = candidates_labels == query_labels_[:, None]
     cumulative_relevant = np.cumsum(relevance_mask, axis=1)
     precision_at_k = cumulative_relevant * relevance_mask / np.arange(1, k + 1)
     sum_precision = np.sum(precision_at_k, axis=1)
@@ -145,16 +159,18 @@ def retrieval_hit_rate_intersecting(
 
 
 def retrieval_hit_rate_macro(
-    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
-):
+    query_labels: list[list[int]],
+    candidates_labels: list[list[list[int]]],
+    k: int | None = None,
+) -> float:
     return macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
 
 
 def retrieval_hit_rate_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-    truncated_candidates = candidates_labels[:, :k]
-    hit_mask = np.isin(query_labels[:, None], truncated_candidates).any(axis=1)
+    query_labels_ = np.array(query_labels)
+    candidates_labels_ = np.array(candidates_labels)
+    truncated_candidates = candidates_labels_[:, :k]
+    hit_mask = np.isin(query_labels_[:, None], truncated_candidates).any(axis=1)
     return hit_mask.mean()
 
 
@@ -193,22 +209,26 @@ def retrieval_precision_intersecting(
 
 
 def retrieval_precision_macro(
-    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
-):
+    query_labels: list[list[int]],
+    candidates_labels: list[list[list[int]]],
+    k: int | None = None,
+) -> float:
     return macrofy(retrieval_precision, query_labels, candidates_labels, k)
 
 
-def retrieval_precision_numpy(query_labels: list[int], candidates_labels: list[list[int]], k: int) -> float:
-    query_labels = np.array(query_labels)
-    candidates_labels = np.array(candidates_labels)
-    top_k_candidates = candidates_labels[:, :k]
-    matches = (top_k_candidates == query_labels[:, None]).astype(int)
+def retrieval_precision_numpy(
+    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
+) -> float:
+    query_labels_ = np.array(query_labels)
+    candidates_labels_ = np.array(candidates_labels)
+    top_k_candidates = candidates_labels_[:, :k]
+    matches = (top_k_candidates == query_labels_[:, None]).astype(int)
     relevant_counts = np.sum(matches, axis=1)
     precision_at_k = relevant_counts / k
     return np.mean(precision_at_k)
 
 
-def dcg(relevance_scores, k):
+def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     Calculate the Discounted Cumulative Gain (DCG) at position k.
 
@@ -226,7 +246,7 @@ def dcg(relevance_scores, k):
     return np.sum(relevance_scores / discounts)
 
 
-def idcg(relevance_scores, k):
+def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     Calculate the Ideal Discounted Cumulative Gain (IDCG) at position k.
 
@@ -243,8 +263,10 @@ def idcg(relevance_scores, k):
     return dcg(ideal_scores, k)
 
 
-def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None):
-    ndcg_scores = []
+def retrieval_ndcg(
+    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
+) -> float:
+    ndcg_scores: list[float] = []
     relevance_scores = np.array(query_labels)[:, None] == np.array(candidates_labels)
 
     for rel_scores in relevance_scores:
@@ -256,9 +278,9 @@ def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], 
 
 
 def retrieval_ndcg_intersecting(
-    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None
-):
-    ndcg_scores = []
+    query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int
+) -> float:
+    ndcg_scores: list[float] = []
     expanded_relevance_scores = np.array(query_labels)[:, None, :] == np.array(candidates_labels)
     relevance_scores = (expanded_relevance_scores.sum(axis=-1) != 0).astype(int)
 

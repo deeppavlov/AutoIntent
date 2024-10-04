@@ -2,6 +2,7 @@ import numpy as np
 
 from .data_models import Artifact, Artifacts, NDArray, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
+from typing import Any
 
 
 class OptimizationInfo:
@@ -18,7 +19,7 @@ class OptimizationInfo:
         self,
         node_type: str,
         module_type: str,
-        module_params: dict,
+        module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
         artifact: Artifact,

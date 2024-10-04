@@ -14,5 +14,5 @@ class ArgmaxPredictor(PredictionModule):
                 "cannot detect them. Consider different predictor"
             )
 
-    def predict(self, scores: list[list[float]]):
+    def predict(self, scores: list[list[float]]) -> list[int]:
         return np.argmax(scores, axis=1)

@@ -69,27 +69,27 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
     {1\\over C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
     ```
     """
-    scores = np.array(scores)
-    labels = np.array(labels)
+    scores_ = np.array(scores)
+    labels_ = np.array(labels)
 
-    n_classes = scores.shape[1]
-    if labels.ndim == 1:
-        labels = (labels[:, None] == np.arange(n_classes)[None, :]).astype(int)
+    n_classes = scores_.shape[1]
+    if labels_.ndim == 1:
+        labels_ = (labels_[:, None] == np.arange(n_classes)[None, :]).astype(int)
 
-    return roc_auc_score(labels, scores, average="macro")
+    return roc_auc_score(labels_, scores_, average="macro")
 
 
 def calculate_prediction_metric(
     func: PredictionMetricFn, labels: list[int] | list[list[int]], scores: list[list[float]]
 ) -> float:
-    scores = np.array(scores)
-    labels = np.array(labels)
+    scores_ = np.array(scores)
+    labels_ = np.array(labels)
 
-    if labels.ndim == 1:
+    if labels_.ndim == 1:
         pred_labels = np.argmax(scores, axis=1)
         res = func(labels, pred_labels)
     else:
-        pred_labels = (scores > 0.5).astype(int)  # noqa: PLR2004
+        pred_labels = (scores_ > 0.5).astype(int)  # noqa: PLR2004
         res = func(labels, pred_labels)
 
     return res
@@ -123,22 +123,22 @@ def scoring_recall(labels: list[int] | list[list[int]], scores: list[list[float]
     return calculate_prediction_metric(prediction_recall, labels, scores)
 
 
-def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]):
+def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multilabel
 
     calculates fraction of cases when the top-ranked label is in the set of proper labels of the instance
     """
-    scores = np.array(scores)
-    labels = np.array(labels)
+    scores_ = np.array(scores)
+    labels_ = np.array(labels)
 
-    top_ranked_labels = np.argmax(scores, axis=1)
-    is_in = labels[np.arange(len(labels)), top_ranked_labels]
+    top_ranked_labels = np.argmax(scores_, axis=1)
+    is_in = labels_[np.arange(len(labels)), top_ranked_labels]
 
     return np.mean(is_in)
 
 
-def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
+def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multilabel
 
@@ -166,7 +166,9 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]):
     return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
 
 
-def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]]):
+def scoring_neg_ranking_loss(
+    labels: list[list[int]], scores: list[list[float]]
+) -> float:
     """
     supports multilabel
 
@@ -178,7 +180,7 @@ def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]])
     return -label_ranking_loss(labels, scores)
 
 
-def scoring_map(labels: list[list[int]], scores: list[list[float]]):
+def scoring_map(labels: list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multilabel
 

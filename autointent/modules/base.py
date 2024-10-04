@@ -3,6 +3,7 @@ from collections.abc import Callable
 from typing import Any
 
 from autointent.context import Context
+from autointent.context.optimization_info.data_models import Artifact
 
 
 class Module(ABC):
@@ -11,17 +12,19 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def score(self, context: Context, metric_fn: Callable) -> tuple[float, Any]:
+    def score(
+        self, context: Context, metric_fn: Callable[[Any], Any]
+    ) -> tuple[float, Any]:
         """
         calculates metric on test set and returns metric value
         """
 
     @abstractmethod
-    def get_assets(self):
+    def get_assets(self) -> Artifact:
         """
         return useful assets that represent intermediate data into context
         """
 
     @abstractmethod
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         """clear GPU/CPU memory"""
