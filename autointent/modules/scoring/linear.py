@@ -1,10 +1,11 @@
+from typing import Any
+
 import numpy as np
+import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from .base import Context, ScoringModule
-import numpy.typing as npt
-from typing import Any
 
 
 class LinearScorer(ScoringModule):

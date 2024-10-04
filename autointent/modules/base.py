@@ -12,9 +12,7 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def score(
-        self, context: Context, metric_fn: Callable[[Any], Any]
-    ) -> tuple[float, Any]:
+    def score(self, context: Context, metric_fn: Callable[[Any], Any]) -> tuple[float, Any]:
         """
         calculates metric on test set and returns metric value
         """

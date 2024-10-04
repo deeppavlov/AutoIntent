@@ -1,13 +1,13 @@
+from typing import Any, Literal
+
 from chromadb import Collection
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
-from typing import Literal, Any
 
 
 class Context:
-
     def __init__(
         self,
         multiclass_intent_records: list[dict[str, Any]],

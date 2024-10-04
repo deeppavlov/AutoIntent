@@ -1,8 +1,8 @@
 import logging
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing import Any
 
 from autointent.context.data_handler.tags import Tag
 
@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdPredictor(PredictionModule):
-
     def __init__(self, thresh: float | list[float]) -> None:
         self.thresh = thresh
 
@@ -39,9 +38,7 @@ class ThresholdPredictor(PredictionModule):
         return multiclass_predict(scores, self.thresh)
 
 
-def multiclass_predict(
-    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]
-) -> npt.NDArray[Any]:
+def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
     """
     Return
     ---
@@ -67,11 +64,7 @@ def multilabel_predict(
     ---
     array of binary labels, shape (n_samples, n_classes)
     """
-    res = (
-        (scores >= thresh).astype(int)
-        if isinstance(thresh, float)
-        else (scores >= thresh[None, :]).astype(int)
-    )
+    res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
     return res

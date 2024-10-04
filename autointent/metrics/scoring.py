@@ -166,9 +166,7 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> 
     return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
 
 
-def scoring_neg_ranking_loss(
-    labels: list[list[int]], scores: list[list[float]]
-) -> float:
+def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]]) -> float:
     """
     supports multilabel
 

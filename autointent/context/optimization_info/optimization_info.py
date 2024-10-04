@@ -1,8 +1,9 @@
+from typing import Any
+
 import numpy as np
 
 from .data_models import Artifact, Artifacts, NDArray, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
-from typing import Any
 
 
 class OptimizationInfo:

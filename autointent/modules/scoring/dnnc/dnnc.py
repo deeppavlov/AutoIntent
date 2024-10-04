@@ -1,8 +1,8 @@
 import itertools as it
 import logging
+from typing import Any
 
 import numpy as np
-from typing import Any
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 
@@ -53,9 +53,7 @@ class DNNCScorer(ScoringModule):
 
         return self._build_result(cross_encoder_scores, labels_pred)
 
-    def _get_cross_encoder_scores(
-        self, utterances: list[str], candidates: list[list[str]]
-    ) -> list[list[float]]:
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
         Arguments
         ---
@@ -87,9 +85,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(
-        self, scores: list[list[float]], labels: list[list[int]]
-    ) -> npt.NDArray[Any]:
+    def _build_result(self, scores: list[list[float]], labels: list[list[int]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---
@@ -111,9 +107,7 @@ class DNNCScorer(ScoringModule):
         self._collection = None
 
 
-def build_result(
-    scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int
-) -> npt.NDArray[Any]:
+def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
     res = np.zeros((len(scores), n_classes))
     best_neighbors = np.argmax(scores, axis=1)
     idx_helper = np.arange(len(res))

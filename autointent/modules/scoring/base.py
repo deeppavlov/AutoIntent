@@ -1,7 +1,7 @@
 from abc import abstractmethod
+from typing import Any
 
 import numpy as np
-from typing import Any
 import numpy.typing as npt
 
 from autointent.context.optimization_info import ScorerArtifact
@@ -10,10 +10,7 @@ from autointent.modules.base import Context, Module
 
 
 class ScoringModule(Module):
-
-    def score(
-        self, context: Context, metric_fn: ScoringMetricFn
-    ) -> tuple[float, npt.NDArray[Any]]:
+    def score(self, context: Context, metric_fn: ScoringMetricFn) -> tuple[float, npt.NDArray[Any]]:
         """
         Return
         ---

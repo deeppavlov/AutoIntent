@@ -12,13 +12,13 @@ python training_stsbenchmark.py
 import itertools as it
 import logging
 from random import shuffle
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
-from typing import Any
-import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +52,7 @@ def construct_samples(
 class CrossEncoderWithLogreg:
     # TODO refactor
 
-    def __init__(
-        self, model: CrossEncoder, batch_size: int = 16, verbose: bool = False
-    ) -> None:
+    def __init__(self, model: CrossEncoder, batch_size: int = 16, verbose: bool = False) -> None:
         self.cross_encoder = model
         self.batch_size = batch_size
         self.verbose = verbose

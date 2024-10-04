@@ -1,11 +1,11 @@
 import logging
+from collections.abc import Callable
 from functools import wraps
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
-from typing import Callable, Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +23,9 @@ class PredictionMetricFn(Protocol):
         ...
 
 
-def simple_check(
-    func: Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]
-) -> PredictionMetricFn:
+def simple_check(func: Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]) -> PredictionMetricFn:
     @wraps(func)
-    def wrapper(
-        y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]
-    ) -> float:
+    def wrapper(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
         y_pred_ = np.array(y_pred)
         y_true_ = np.array(y_true)
         if y_pred_.ndim != y_true_.ndim:
@@ -47,9 +43,7 @@ def prediction_accuracy(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> f
     return np.mean(y_true == y_pred)
 
 
-def _prediction_roc_auc_multiclass(
-    y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]
-) -> float:
+def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass"""
     n_classes = len(np.unique(y_true))
     roc_auc_scores: list[float] = []
@@ -61,9 +55,7 @@ def _prediction_roc_auc_multiclass(
     return np.mean(roc_auc_scores)
 
 
-def _prediction_roc_auc_multilabel(
-    y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]
-) -> float:
+def _prediction_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multilabel"""
     return roc_auc_score(y_true, y_pred, average="macro")
 

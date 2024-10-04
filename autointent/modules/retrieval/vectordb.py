@@ -1,19 +1,18 @@
 from collections.abc import Callable
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from chromadb import Collection
 
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.metrics import RetrievalMetricFn
-from typing import Any
 
 from .base import RetrievalModule
-import numpy.typing as npt
 
 
 class VectorDBModule(RetrievalModule):
-
     def __init__(self, k: int, model_name: str) -> None:
         self.model_name = model_name
         self.k = k

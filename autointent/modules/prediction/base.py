@@ -1,8 +1,8 @@
 from abc import abstractmethod
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing import Any
 
 from autointent.context.data_handler import Tag
 from autointent.metrics import PredictionMetricFn
@@ -18,9 +18,7 @@ class PredictionModule(Module):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(
-        self, context: Context, metric_fn: PredictionMetricFn
-    ) -> tuple[float, npt.NDArray[Any]]:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, npt.NDArray[Any]]:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions), self._predictions
@@ -47,9 +45,7 @@ def get_prediction_evaluation_data(
     return labels, scores
 
 
-def apply_tags(
-    labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]
-) -> npt.NDArray[Any]:
+def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
     """
     this function is intended to be used with multilabel predictor
 

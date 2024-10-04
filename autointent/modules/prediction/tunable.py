@@ -1,10 +1,10 @@
 import logging
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
-import numpy.typing as npt
-from typing import Any
 from sklearn.metrics import f1_score
 
 from autointent.context.data_handler.tags import Tag
@@ -44,7 +44,6 @@ class TunablePredictor(PredictionModule):
 
 
 class ThreshOptimizer:
-
     def __init__(self, n_classes: int, multilabel: bool) -> None:
         self.n_classes = n_classes
         self.multilabel = multilabel

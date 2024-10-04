@@ -1,12 +1,10 @@
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 import numpy.typing as npt
-from typing import Any
 
 
 class RetrievalMetricFn(Protocol):
-
     def __call__(
         self,
         query_labels: list[int],
@@ -64,13 +62,8 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int | No
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
-) -> float:
-    ap_list = [
-        average_precision(q, c, k)
-        for q, c in zip(query_labels, candidates_labels, strict=True)
-    ]
+def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
     return np.mean(ap_list)
 
 
@@ -263,9 +256,7 @@ def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     return dcg(ideal_scores, k)
 
 
-def retrieval_ndcg(
-    query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None
-) -> float:
+def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
     ndcg_scores: list[float] = []
     relevance_scores = np.array(query_labels)[:, None] == np.array(candidates_labels)
 

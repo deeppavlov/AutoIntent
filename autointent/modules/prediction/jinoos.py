@@ -1,9 +1,8 @@
 import logging
+from typing import Any
 
 import numpy as np
-
 import numpy.typing as npt
-from typing import Any
 
 from .base import Context, PredictionModule, get_prediction_evaluation_data
 
@@ -11,7 +10,6 @@ default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 
 class JinoosPredictor(PredictionModule):
-
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else default_search_space
 
@@ -49,9 +47,7 @@ def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[An
     return pred_classes, best_scores
 
 
-def _detect_oos(
-    classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float
-) -> npt.NDArray[Any]:
+def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
     classes[scores < thresh] = -1  # out of scope
     return classes
 
