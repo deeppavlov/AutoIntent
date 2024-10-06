@@ -2,14 +2,15 @@ from typing import Any
 
 import numpy as np
 
-from .data_models import Artifact, Artifacts, NDArray, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
+from numpy.typing import NDArray
 
 
 class OptimizationInfo:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._logger = get_logger()
 
         self.artifacts = Artifacts()

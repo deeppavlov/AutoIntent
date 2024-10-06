@@ -27,7 +27,7 @@ class Node:
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self._logger.info("starting %s node optimization...", self.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):

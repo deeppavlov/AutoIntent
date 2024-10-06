@@ -1,12 +1,15 @@
 import logging
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
-from .base import Context, PredictionModule
+from .base import PredictionModule
+from autointent import Context
 
 
 class ArgmaxPredictor(PredictionModule):
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         if context.data_handler.has_oos_samples():
             logger = logging.getLogger(__name__)
             logger.warning(
@@ -14,5 +17,5 @@ class ArgmaxPredictor(PredictionModule):
                 "cannot detect them. Consider different predictor"
             )
 
-    def predict(self, scores: list[list[float]]) -> list[int]:
-        return np.argmax(scores, axis=1)
+    def predict(self, scores: NDArray[Any]) -> NDArray[Any]:
+        return np.argmax(scores, axis=1)  # type: ignore[no-any-return]

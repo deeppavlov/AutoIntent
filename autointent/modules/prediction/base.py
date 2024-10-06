@@ -4,14 +4,15 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
+from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.metrics import PredictionMetricFn
-from autointent.modules.base import Context, Module
+from autointent.modules.base import Module
 
 
 class PredictionModule(Module):
     @abstractmethod
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         pass
 
     @abstractmethod
@@ -26,7 +27,7 @@ class PredictionModule(Module):
     def get_assets(self) -> npt.NDArray[Any]:
         return self._predictions
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         pass
 
 

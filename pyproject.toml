@@ -107,4 +107,15 @@ plugins = [
 ]
 mypy_path = "autointent"
 
+[[tool.mypy.overrides]]
+module = [
+    "scipy",
+    "sklearn",
+    "sklearn.*",
+    "xeger",
+    "appdirs",
+    "sre_yield",
+]
+ignore_missing_imports = true
+
 

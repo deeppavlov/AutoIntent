@@ -5,7 +5,8 @@ import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
-from .base import Context, ScoringModule
+from .base import ScoringModule
+from ... import Context
 
 
 class LinearScorer(ScoringModule):
@@ -50,7 +51,7 @@ class LinearScorer(ScoringModule):
         probas = self._clf.predict_proba(features)
         if self.multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
-        return probas
+        return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
         model = self._emb_func._model  # noqa: SLF001

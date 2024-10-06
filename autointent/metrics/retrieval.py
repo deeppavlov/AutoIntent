@@ -46,7 +46,7 @@ def macrofy(
         binarized_candidates_labels = candidates_labels_[..., i]
         classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))
 
-    return np.mean(classwise_values)
+    return np.mean(classwise_values)  # type: ignore
 
 
 def average_precision(query_label: int, candidate_labels: list[int], k: int | None = None) -> float:
@@ -64,7 +64,7 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int | No
 
 def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
     ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
-    return np.mean(ap_list)
+    return np.mean(ap_list)  # type: ignore
 
 
 def average_precision_intersecting(
@@ -117,7 +117,7 @@ def retrieval_map_numpy(query_labels: list[int], candidates_labels: list[list[in
         out=np.zeros_like(sum_precision),
         where=num_relevant != 0,
     )
-    return np.mean(average_precision)
+    return np.mean(average_precision)  # type: ignore
 
 
 def retrieval_hit_rate(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
@@ -164,7 +164,7 @@ def retrieval_hit_rate_numpy(query_labels: list[int], candidates_labels: list[li
     candidates_labels_ = np.array(candidates_labels)
     truncated_candidates = candidates_labels_[:, :k]
     hit_mask = np.isin(query_labels_[:, None], truncated_candidates).any(axis=1)
-    return hit_mask.mean()
+    return hit_mask.mean()  # type: ignore
 
 
 def retrieval_precision(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
@@ -218,7 +218,7 @@ def retrieval_precision_numpy(
     matches = (top_k_candidates == query_labels_[:, None]).astype(int)
     relevant_counts = np.sum(matches, axis=1)
     precision_at_k = relevant_counts / k
-    return np.mean(precision_at_k)
+    return np.mean(precision_at_k)  # type: ignore
 
 
 def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
@@ -236,7 +236,7 @@ def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     relevance_scores = relevance_scores[:k]
     discounts = np.log2(np.arange(2, len(relevance_scores) + 2))
-    return np.sum(relevance_scores / discounts)
+    return np.sum(relevance_scores / discounts)  # type: ignore
 
 
 def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
@@ -283,7 +283,7 @@ def retrieval_ndcg_intersecting(
     return sum(ndcg_scores) / len(ndcg_scores)
 
 
-def retrieval_ndcg_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_ndcg_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None) -> float:
     return macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
@@ -321,5 +321,5 @@ def retrieval_mrr_intersecting(
     return mrr_sum / num_queries
 
 
-def retrieval_mrr_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None):
+def retrieval_mrr_macro(query_labels: list[list[int]], candidates_labels: list[list[list[int]]], k: int | None = None) -> float:
     return macrofy(retrieval_mrr, query_labels, candidates_labels, k)

@@ -40,12 +40,12 @@ class Pipeline:
             )
             node.fit(context)
 
-    def dump(self, logs_dir: str, run_name: str) -> None:
+    def dump(self, logs_dir_: str, run_name: str) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump()
 
         # create appropriate directory
-        logs_dir = Path.cwd() if logs_dir == "" else Path(logs_dir)
+        logs_dir = Path.cwd() if logs_dir_ == "" else Path(logs_dir_)
         logs_dir = logs_dir / run_name
         logs_dir.mkdir(parents=True)
 
@@ -86,7 +86,7 @@ def load_config(config_path: str, mode: str, logger: Logger) -> dict[str, Any]:
     return yaml.safe_load(file_content)
 
 
-def make_report(logs: dict[str], nodes: list[str]) -> str:
+def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes, strict=False):

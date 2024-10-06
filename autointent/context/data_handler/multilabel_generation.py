@@ -17,7 +17,7 @@ def sample_unique_tuples(k: int, n: int, m: int) -> list[tuple[int, ...]]:
 def sample_utterance_from_regexp(intent_record: dict, x: xeger.Xeger) -> str:
     n_templates = len(intent_record["regexp_full_match"])
     i_template = random.randint(0, n_templates - 1)
-    res = x.xeger(intent_record["regexp_full_match"][i_template])
+    res: str = x.xeger(intent_record["regexp_full_match"][i_template])
     return res.strip()
 
 

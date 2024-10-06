@@ -61,7 +61,7 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
-        def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001
+        def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001 # type: ignore
             logits_list.append(input_tensor[0].cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
@@ -74,7 +74,7 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-    def _fit(self, pairs: list[tuple[str, str]], labels: list[int]):
+    def _fit(self, pairs: list[tuple[str, str]], labels: list[int]) -> None:
         """
         Arguments
         ---
@@ -94,7 +94,7 @@ class CrossEncoderWithLogreg:
 
         self._clf = clf
 
-    def fit(self, utterances: list[str], labels: list[int]):
+    def fit(self, utterances: list[str], labels: list[int])     -> None:
         """
         Construct train samples for binary classifier over cross-encoder features
 
@@ -106,7 +106,7 @@ class CrossEncoderWithLogreg:
         pairs, labels = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels)
 
-    def predict(self, pairs):
+    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
         Return probabilities of two utterances having the same intent label
         """

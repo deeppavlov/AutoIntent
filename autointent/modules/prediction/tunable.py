@@ -9,8 +9,9 @@ from sklearn.metrics import f1_score
 
 from autointent.context.data_handler.tags import Tag
 
-from .base import Context, PredictionModule, get_prediction_evaluation_data
+from .base import PredictionModule, get_prediction_evaluation_data
 from .threshold import multiclass_predict, multilabel_predict
+from autointent import Context
 
 
 class TunablePredictor(PredictionModule):
@@ -54,7 +55,7 @@ class ThreshOptimizer:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        return f1_score(self.labels, y_pred, average="macro")
+        return f1_score(self.labels, y_pred, average="macro")  # type: ignore[no-any-return]
 
     def fit(
         self,

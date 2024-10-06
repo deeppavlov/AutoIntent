@@ -4,7 +4,8 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from .base import Context, PredictionModule, get_prediction_evaluation_data
+from .base import PredictionModule, get_prediction_evaluation_data
+from autointent import Context
 
 default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
@@ -77,4 +78,4 @@ def jinoos_score(y_true: list[int], y_pred: list[int]) -> float:
     total_oos = np.sum(~in_domain_mask)
     accuracy_oos = correct_oos / total_oos
 
-    return accuracy_in_domain + accuracy_oos
+    return accuracy_in_domain + accuracy_oos  # type: ignore[no-any-return]

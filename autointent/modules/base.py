@@ -8,7 +8,7 @@ from autointent.context.optimization_info.data_models import Artifact
 
 class Module(ABC):
     @abstractmethod
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         pass
 
     @abstractmethod

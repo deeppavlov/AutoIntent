@@ -6,7 +6,8 @@ import numpy.typing as npt
 
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
-from autointent.modules.base import Context, Module
+from autointent.modules.base import Module
+from autointent import Context
 
 
 class ScoringModule(Module):

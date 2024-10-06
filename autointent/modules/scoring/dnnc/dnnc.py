@@ -6,7 +6,8 @@ import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 
-from autointent.modules.scoring.base import Context, ScoringModule
+from autointent import Context
+from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
 
@@ -104,7 +105,6 @@ class DNNCScorer(ScoringModule):
         model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self._collection = None
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

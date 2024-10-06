@@ -1,15 +1,18 @@
+from typing import Callable, Any
+
 import numpy as np
-from chromadb.types import Collection
+from chromadb.api.models.Collection import Collection
 from numpy.typing import NDArray
 
-from autointent.modules.scoring.base import Context, ScoringModule
+from autointent import Context
+from autointent.modules.scoring.base import ScoringModule
 
 
 class MLKnnScorer(ScoringModule):
     _multilabel: bool
     _collection: Collection
     _n_classes: int
-    _converter: callable
+    _converter: Callable[[Any], Any]
     _prior_prob_true: NDArray[np.float64]
     _prior_prob_false: NDArray[np.float64]
     _cond_prob_true: NDArray[np.float64]
@@ -104,4 +107,3 @@ class MLKnnScorer(ScoringModule):
         model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self._collection = None

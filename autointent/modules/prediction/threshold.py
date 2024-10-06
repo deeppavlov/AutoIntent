@@ -6,7 +6,8 @@ import numpy.typing as npt
 
 from autointent.context.data_handler.tags import Tag
 
-from .base import Context, PredictionModule, apply_tags
+from .base import PredictionModule, apply_tags
+from autointent import Context
 
 logger = logging.getLogger(__name__)
 

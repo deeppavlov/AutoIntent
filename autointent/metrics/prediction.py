@@ -40,7 +40,7 @@ def simple_check(func: Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]) ->
 @simple_check
 def prediction_accuracy(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return np.mean(y_true == y_pred)
+    return np.mean(y_true == y_pred)  # type: ignore[no-any-return]
 
 
 def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
@@ -52,12 +52,12 @@ def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray
         binarized_pred = (y_pred == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
-    return np.mean(roc_auc_scores)
+    return np.mean(roc_auc_scores)  # type: ignore[no-any-return]
 
 
 def _prediction_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multilabel"""
-    return roc_auc_score(y_true, y_pred, average="macro")
+    return roc_auc_score(y_true, y_pred, average="macro")  # type: ignore
 
 
 @simple_check
@@ -75,16 +75,16 @@ def prediction_roc_auc(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> fl
 @simple_check
 def prediction_precision(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return precision_score(y_true, y_pred, average="macro")
+    return precision_score(y_true, y_pred, average="macro")  # type: ignore
 
 
 @simple_check
 def prediction_recall(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return recall_score(y_true, y_pred, average="macro")
+    return recall_score(y_true, y_pred, average="macro")  # type: ignore
 
 
 @simple_check
 def prediction_f1(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="macro")  # type: ignore
