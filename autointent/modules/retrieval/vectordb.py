@@ -20,14 +20,14 @@ class VectorDBModule(RetrievalModule):
     def fit(self, context: Context) -> None:
         self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, str]:
+    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, npt.NDArray[Any]]:
         labels_pred = retrieve_candidates(
             self.collection,
             self.k,
             context.data_handler.utterances_test,
             converter=context.vector_index.metadata_as_labels,
         )
-        return metric_fn(context.data_handler.labels_test, labels_pred)
+        return metric_fn(context.data_handler.labels_test, labels_pred), labels_pred
 
     def get_assets(self) -> RetrieverArtifact:
         return RetrieverArtifact(embedder_name=self.model_name)

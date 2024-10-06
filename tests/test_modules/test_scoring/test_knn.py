@@ -27,7 +27,7 @@ def test_base_knn():
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate)
+    metric_value, _ = vector_db.score(context, retrieval_hit_rate)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(
         node_type="retrieval",
@@ -41,7 +41,8 @@ def test_base_knn():
     scorer = KNNScorer(k=3, weights="distance")
 
     scorer.fit(context)
-    assert scorer.score(context, scoring_roc_auc) == 1
+    score, _ = scorer.score(context, scoring_roc_auc)
+    assert score == 1
     predictions = scorer.predict(
         [
             "why is there a hold on my american saving bank account",

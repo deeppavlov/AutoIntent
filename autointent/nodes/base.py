@@ -42,7 +42,7 @@ class Node:
                 module.fit(context)
 
                 self._logger.debug("scoring %s module...", module_type)
-                metric_value = module.score(context, self.metrics_available[self.metric_name])
+                metric_value, _ = module.score(context, self.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
                 context.optimization_info.log_module_optimization(
