@@ -99,9 +99,9 @@ def main() -> None:
 
     # create shared objects for a whole pipeline
     context = Context(
-        load_data(args.multiclass_path, multilabel=False),
-        load_data(args.multilabel_path, multilabel=True),
-        load_data(args.test_path, multilabel=True),
+        load_data(args.multiclass_path),
+        load_data(args.multilabel_path),
+        load_data(args.test_path),
         args.device,
         args.mode,
         args.multilabel_generation_config,
@@ -118,16 +118,14 @@ def main() -> None:
     pipeline.dump(args.logs_dir, run_name)
 
 
-def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
+def load_data(data_path: str) -> list[dict[str, Any]]:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path == "default":
-        data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
-        with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return json.load(file)
-    elif data_path != "":
-        with Path(data_path).open() as file:
-            return json.load(file)
-    return []
+    path = Path(data_path)
+    if not path.exists():
+        msg = "Path not exists"
+        raise ValueError(msg)
+    with Path(data_path).open() as file:
+        return json.load(file)
 
 
 def get_run_name(run_name: str) -> str:

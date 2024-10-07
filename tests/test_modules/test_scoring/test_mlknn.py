@@ -4,15 +4,11 @@ from autointent import Context
 from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
-from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
 
 
-def test_base_mlknn():
-    setup_logging("DEBUG")
-    run_name = get_run_name("multiclass-cpu")
-    db_dir = get_db_dir("", run_name)
+def test_base_mlknn(setup_environment, load_clinic_subset):
+    run_name, db_dir = setup_environment
 
-    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
     utterance = [
         {
             "utterance": "why is there a hold on my american saving bank account",
@@ -24,7 +20,7 @@ def test_base_mlknn():
         },
     ]
     context = Context(
-        multiclass_intent_records=data,
+        multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=utterance,
         test_utterance_records=utterance,
         device="cpu",

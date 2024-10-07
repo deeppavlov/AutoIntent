@@ -1,23 +1,25 @@
+import pathlib
+
+import pytest
+
 from autointent import Context
 from autointent.pipeline import Pipeline
-from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
 
 
-def test_multiclass():
-    setup_logging("DEBUG")
+@pytest.mark.parametrize("mode, config_name", [
+    ("multiclass", "multiclass.yaml"),
+    ("multiclass_as_multilabel", "multilabel.yaml")
+])
+def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name):
+    run_name, db_dir = setup_environment
 
-    # configure the run and data
-    run_name = get_run_name("multiclass-cpu")
-    db_dir = get_db_dir("", run_name)
-
-    # create shared objects for a whole pipeline
-    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
+    cur_path = pathlib.Path(__file__).parent.resolve()
     context = Context(
-        multiclass_intent_records=data,
+        multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=[],
         test_utterance_records=[],
         device="cpu",
-        mode="multiclass",
+        mode=mode,  # type: ignore
         multilabel_generation_config="",
         db_dir=db_dir,
         regex_sampling=0,
@@ -26,42 +28,10 @@ def test_multiclass():
 
     # run optimization
     pipeline = Pipeline(
-        config_path="tests/minimal_optimization/configs/multiclass.yaml",
-        mode="multiclass",
+        config_path=str(cur_path / "configs" / config_name),
+        mode=mode,
     )
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir="tests/minimal_optimization/logs", run_name=run_name)
-
-
-def test_multilabel():
-    setup_logging("DEBUG")
-
-    # configure the run and data
-    run_name = get_run_name("multilabel-cpu")
-    db_dir = get_db_dir("", run_name)
-
-    # create shared objects for a whole pipeline
-    data = load_data("tests/minimal_optimization/data/clinc_subset.json", multilabel=False)
-    context = Context(
-        multiclass_intent_records=data,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
-        device="cpu",
-        mode="multiclass_as_multilabel",
-        multilabel_generation_config="",
-        db_dir=db_dir,
-        regex_sampling=0,
-        seed=0,
-    )
-
-    # run optimization
-    pipeline = Pipeline(
-        config_path="tests/minimal_optimization/configs/multilabel.yaml",
-        mode="multiclass_as_multilabel",
-    )
-    pipeline.optimize(context)
-
-    # save results
-    pipeline.dump(logs_dir="tests/minimal_optimization/logs", run_name=run_name)
+    pipeline.dump(logs_dir=str(cur_path / "logs"), run_name=run_name)
