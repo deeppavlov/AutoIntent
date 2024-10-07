@@ -90,7 +90,7 @@ omit = [
 
 [tool.coverage.paths]
 source = [
-    "src/",
+    "autointent/",
 ]
 
 [tool.coverage.report]

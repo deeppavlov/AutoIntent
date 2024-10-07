@@ -170,3 +170,5 @@ eurlex.json
 dist
 .vscode
 tests/minimal_optimization/logs
+*.bin
+*.sqlite3

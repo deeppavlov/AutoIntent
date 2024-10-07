@@ -52,7 +52,7 @@ def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray
         binarized_pred = (y_pred == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
-    return np.mean(roc_auc_scores)  # type: ignore[no-any-return]
+    return np.mean(roc_auc_scores)  # type: ignore
 
 
 def _prediction_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:

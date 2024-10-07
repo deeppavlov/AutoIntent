@@ -36,7 +36,6 @@ class VectorDBModule(RetrievalModule):
         model = self.collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self.collection = None
 
 
 def retrieve_candidates(

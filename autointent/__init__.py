@@ -1,6 +1,6 @@
 import sys
 
-from autointent.context import Context
+from .context import Context
 
 __import__("pysqlite3")
 

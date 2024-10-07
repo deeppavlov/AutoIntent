@@ -64,7 +64,7 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int | No
 
 def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
     ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
-    return np.mean(ap_list)  # type: ignore
+    return sum(ap_list) / len(ap_list)
 
 
 def average_precision_intersecting(
