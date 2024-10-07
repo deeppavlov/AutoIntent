@@ -23,7 +23,7 @@ class VectorDBModule(RetrievalModule):
             self.collection,
             self.k,
             context.data_handler.utterances_test,
-            converter=context.vector_index.metadata_as_labels
+            converter=context.vector_index.metadata_as_labels,
         )
         return metric_fn(context.data_handler.labels_test, labels_pred)
 
@@ -38,10 +38,7 @@ class VectorDBModule(RetrievalModule):
 
 
 def retrieve_candidates(
-    collection: Collection,
-    k: int,
-    utterances: list[str],
-    converter: Callable
+    collection: Collection, k: int, utterances: list[str], converter: Callable
 ) -> list[int] | list[list[int]]:
     """
     Return

@@ -69,14 +69,17 @@ class VectorIndex:
 
 
 def _multiclass_labels_as_metadata(labels_list: list[int]):
-        return [{"intent_id": lab} for lab in labels_list]
+    return [{"intent_id": lab} for lab in labels_list]
+
 
 def _multilabel_labels_as_metadata(labels_list: list[list[int]]):
     """labels_list is already in binary format"""
     return [{str(i): lab for i, lab in enumerate(labs)} for labs in labels_list]
 
+
 def _multiclass_metadata_as_labels(metadata: list[dict]):
     return [dct["intent_id"] for dct in metadata]
+
 
 def _multilabel_metadata_as_labels(metadata: list[dict], n_classes):
     return [[dct[str(i)] for i in range(n_classes)] for dct in metadata]
