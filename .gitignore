@@ -170,4 +170,6 @@ data/RuBanking77
 data/RuClinc150
 data/RuSnips
 eurlex.json
+poetry.lock
+
 tests/minimal_optimization/logs
