@@ -4,15 +4,18 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
+from autointent import Context
 from autointent.context.data_handler.tags import Tag
 
 from .base import PredictionModule, apply_tags
-from autointent import Context
 
 logger = logging.getLogger(__name__)
 
 
 class ThresholdPredictor(PredictionModule):
+    multilabel: bool
+    tags: list[Tag]
+
     def __init__(self, thresh: float | list[float]) -> None:
         self.thresh = thresh
 

@@ -6,10 +6,9 @@ from autointent import Context
 from autointent.pipeline import Pipeline
 
 
-@pytest.mark.parametrize("mode, config_name", [
-    ("multiclass", "multiclass.yaml"),
-    ("multiclass_as_multilabel", "multilabel.yaml")
-])
+@pytest.mark.parametrize(
+    ("mode", "config_name"), [("multiclass", "multiclass.yaml"), ("multiclass_as_multilabel", "multilabel.yaml")]
+)
 def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name):
     run_name, db_dir = setup_environment
 
@@ -19,7 +18,7 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
         multilabel_utterance_records=[],
         test_utterance_records=[],
         device="cpu",
-        mode=mode,  # type: ignore
+        mode=mode,
         multilabel_generation_config="",
         db_dir=db_dir,
         regex_sampling=0,

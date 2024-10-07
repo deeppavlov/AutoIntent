@@ -1,4 +1,4 @@
-from typing import Literal, Any
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -50,7 +50,7 @@ def apply_weights(
     return probs
 
 
-def closest_weighting(labels:NDArray[Any], distances:NDArray[Any] , multilabel: bool, n_classes: int) -> NDArray[Any]:
+def closest_weighting(labels: NDArray[Any], distances: NDArray[Any], multilabel: bool, n_classes: int) -> NDArray[Any]:
     if not multilabel:
         labels = to_onehot(labels, n_classes)
     return _closest_weighting(labels, distances)
@@ -76,7 +76,7 @@ def _closest_weighting(labels: NDArray[Any], distances: NDArray[Any]) -> NDArray
     return (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
 
 
-def to_onehot(labels: NDArray[Any], n_classes : int) -> NDArray[Any]:
+def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
     """convert nd array of ints to (n+1)d array of zeros and ones"""
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)

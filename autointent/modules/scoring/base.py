@@ -4,10 +4,10 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
+from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
 from autointent.modules.base import Module
-from autointent import Context
 
 
 class ScoringModule(Module):

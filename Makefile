@@ -7,7 +7,7 @@ test:
 
 .PHONY: test-html
 test-html:
-	$(poetry) pytest --cov-report html
+	$(poetry) pytest --cov --cov-report html
 
 .PHONY: typing
 typing:

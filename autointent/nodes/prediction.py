@@ -1,14 +1,15 @@
-from collections.abc import Callable
 from typing import ClassVar
 
 from autointent.metrics import (
+    PredictionMetricFn,
     prediction_accuracy,
     prediction_f1,
     prediction_precision,
     prediction_recall,
-    prediction_roc_auc, PredictionMetricFn,
+    prediction_roc_auc,
 )
-from autointent.modules import ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor, PredictionModule
+from autointent.modules import ArgmaxPredictor, JinoosPredictor, PredictionModule, ThresholdPredictor, TunablePredictor
+
 from .base import Node
 
 

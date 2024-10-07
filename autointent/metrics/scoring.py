@@ -57,7 +57,7 @@ def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[lis
         log_likelihood = labels_array * np.log(scores_array) + (1 - labels_array) * np.log(1 - scores_array)
         clipped_one = log_likelihood.clip(min=-100, max=100)
         res = clipped_one.mean()
-    return res  # type: ignore
+    return res
 
 
 def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
@@ -76,7 +76,7 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
     if labels_.ndim == 1:
         labels_ = (labels_[:, None] == np.arange(n_classes)[None, :]).astype(int)
 
-    return roc_auc_score(labels_, scores_, average="macro")  # type: ignore
+    return roc_auc_score(labels_, scores_, average="macro")
 
 
 def calculate_prediction_metric(
@@ -135,7 +135,7 @@ def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]) -> floa
     top_ranked_labels = np.argmax(scores_, axis=1)
     is_in = labels_[np.arange(len(labels)), top_ranked_labels]
 
-    return np.mean(is_in)  # type: ignore
+    return np.mean(is_in)
 
 
 def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> float:
@@ -163,7 +163,7 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> 
     """
 
     n_classes = len(labels[0])
-    return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)  # type: ignore
+    return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)
 
 
 def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]]) -> float:
@@ -175,7 +175,7 @@ def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]])
 
     the ideal value is 0
     """
-    return -label_ranking_loss(labels, scores)  # type: ignore
+    return -label_ranking_loss(labels, scores)
 
 
 def scoring_map(labels: list[list[int]], scores: list[list[float]]) -> float:
@@ -186,4 +186,4 @@ def scoring_map(labels: list[list[int]], scores: list[list[float]]) -> float:
 
     the ideal value is 1, the worst is 0
     """
-    return label_ranking_average_precision_score(labels, scores)  # type: ignore
+    return label_ranking_average_precision_score(labels, scores)

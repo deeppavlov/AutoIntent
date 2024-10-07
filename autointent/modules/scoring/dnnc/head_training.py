@@ -61,7 +61,7 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
-        def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001 # type: ignore
+        def hook_function(module, input_tensor, output_tensor):  # noqa: ARG001
             logits_list.append(input_tensor[0].cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
@@ -94,7 +94,7 @@ class CrossEncoderWithLogreg:
 
         self._clf = clf
 
-    def fit(self, utterances: list[str], labels: list[int])     -> None:
+    def fit(self, utterances: list[str], labels: list[int]) -> None:
         """
         Construct train samples for binary classifier over cross-encoder features
 

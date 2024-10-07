@@ -3,7 +3,9 @@ from typing import Any
 
 from chromadb import Collection, PersistentClient
 from chromadb.config import Settings
-from chromadb.utils.embedding_functions.sentence_transformer_embedding_function import SentenceTransformerEmbeddingFunction
+from chromadb.utils.embedding_functions.sentence_transformer_embedding_function import (
+    SentenceTransformerEmbeddingFunction,
+)
 
 from .data_handler import DataHandler
 

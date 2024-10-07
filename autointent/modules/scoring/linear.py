@@ -5,8 +5,9 @@ import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
+from autointent import Context
+
 from .base import ScoringModule
-from ... import Context
 
 
 class LinearScorer(ScoringModule):
@@ -26,8 +27,10 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    def __init__(self, multilabel: bool = False) -> None:
+    def __init__(self, multilabel: bool = False, cv: int = 3, n_jobs: int = -1) -> None:
         self.multilabel = multilabel
+        self.cv = cv
+        self.n_jobs = n_jobs
 
     def fit(self, context: Context) -> None:
         collection = context.get_best_collection()
@@ -39,7 +42,7 @@ class LinearScorer(ScoringModule):
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            clf = LogisticRegressionCV(cv=3, n_jobs=8)
+            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=context.seed)
 
         clf.fit(features, labels)
 

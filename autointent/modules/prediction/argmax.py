@@ -4,8 +4,9 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from .base import PredictionModule
 from autointent import Context
+
+from .base import PredictionModule
 
 
 class ArgmaxPredictor(PredictionModule):

@@ -1,10 +1,10 @@
-from typing import Any
-
 import pathlib
-import pytest
+from typing import Any
 from uuid import uuid4
 
-from autointent.pipeline.main import setup_logging, get_run_name, load_data
+import pytest
+
+from autointent.pipeline.main import get_run_name, load_data, setup_logging
 from autointent.pipeline.utils import get_db_dir
 
 cur_path = pathlib.Path(__file__).parent.resolve()

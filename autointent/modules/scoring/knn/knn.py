@@ -1,12 +1,13 @@
 from collections.abc import Callable
-from typing import Literal, Any
+from typing import Any, Literal
 
 import numpy as np
+import numpy.typing as npt
 from chromadb import Collection
 
 from autointent import Context
 from autointent.modules.scoring.base import ScoringModule
-import numpy.typing as npt
+
 from .weighting import apply_weights
 
 
@@ -43,7 +44,9 @@ class KNNScorer(ScoringModule):
         del model
 
 
-def query(collection: Collection, k: int, utterances: list[str], converter: Callable[[Any], Any]) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+def query(
+    collection: Collection, k: int, utterances: list[str], converter: Callable[[Any], Any]
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     """
     Return
     ---

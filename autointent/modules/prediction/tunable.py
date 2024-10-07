@@ -7,11 +7,11 @@ import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
+from autointent import Context
 from autointent.context.data_handler.tags import Tag
 
 from .base import PredictionModule, get_prediction_evaluation_data
 from .threshold import multiclass_predict, multilabel_predict
-from autointent import Context
 
 
 class TunablePredictor(PredictionModule):
