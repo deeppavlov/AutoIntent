@@ -4,6 +4,7 @@ data/RuClinc150
 data/RuSnips
 __pycache__
 eurlex.json
+.venv
 dist
 poetry.lock
 .env
