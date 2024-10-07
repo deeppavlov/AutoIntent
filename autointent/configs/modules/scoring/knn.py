@@ -1,17 +1,14 @@
 from dataclasses import dataclass
-from enum import Enum
 
-from autointent.configs.modules.base import ModuleConfig
-
-
-class KNNWeightsType(Enum):
-    UNIFORM = "uniform"
-    DISTANCE = "distance"
-    CLOSEST = "closest"
+# from enum import Enum
+# class KNNWeightsType(Enum):
+#     UNIFORM = "uniform"
+#     DISTANCE = "distance"
+#     CLOSEST = "closest"
 
 
 @dataclass
-class KNNScorerConfig(ModuleConfig):
-    _target_: str = "modules.scoring.KNNScorer"
+class KNNScorerConfig:
     k: int
-    weights: KNNWeightsType
+    weights: str
+    _target_: str = "autointent.modules.scoring.KNNScorer"

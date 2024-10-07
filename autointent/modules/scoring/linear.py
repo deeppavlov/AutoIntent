@@ -22,16 +22,14 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    def __init__(self, multilabel=False):
-        self.multilabel = multilabel
-
     def fit(self, context: Context):
+        self._multilabel = context.multilabel
         collection = context.get_best_collection()
         dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
 
         labels = context.vector_index.metadata_as_labels(dataset["metadatas"])
-        if self.multilabel:
+        if self._multilabel:
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
@@ -45,7 +43,7 @@ class LinearScorer(ScoringModule):
     def predict(self, utterances: list[str]):
         features = self._emb_func(utterances)
         probas = self._clf.predict_proba(features)
-        if self.multilabel:
+        if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
         return probas
 

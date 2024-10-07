@@ -1,10 +1,8 @@
 from dataclasses import dataclass
 
-from autointent.configs.modules.base import ModuleConfig
-
 
 @dataclass
-class VectorDBConfig(ModuleConfig):
-    _target_: str = "modules.retrieval.VectorDBModule"
+class VectorDBConfig:
     k: int
     model_name: str
+    _target_: str = "autointent.modules.retrieval.VectorDBModule"

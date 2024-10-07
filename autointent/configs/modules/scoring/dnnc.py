@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 
-from autointent.configs.modules.base import ModuleConfig
-
 
 @dataclass
-class DNNCScorerConfig(ModuleConfig):
-    _target_: str = "modules.scoring.DNNCScorer"
+class DNNCScorerConfig:
     model_name: str
     k: int
     train_head: bool
+    _target_: str = "autointent.modules.scoring.DNNCScorer"

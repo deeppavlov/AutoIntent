@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 
-from autointent.configs.modules.base import ModuleConfig
-
 
 @dataclass
-class ThresholdPredictorConfig(ModuleConfig):
-    _target_: str = "modules.prediction.ThresholdPredictor"
-    thresh: float | list[float]
+class ThresholdPredictorConfig:
+    thresh: float
+    _target_: str = "autointent.modules.prediction.ThresholdPredictor"

@@ -10,7 +10,8 @@ from .threshold import multiclass_predict, multilabel_predict
 
 
 class TunablePredictor(PredictionModule):
-    """this one is intened to use for multi label classification"""
+    def __init__(self, n_trials: int):
+        self.n_trials = n_trials
 
     def fit(self, context: Context):
         self.tags = context.data_handler.tags
@@ -23,7 +24,9 @@ class TunablePredictor(PredictionModule):
                 "Using TunablePredictor imposes unnecessary computational overhead."
             )
 
-        thresh_optimizer = ThreshOptimizer(n_classes=context.n_classes, multilabel=context.multilabel)
+        thresh_optimizer = ThreshOptimizer(
+            n_classes=context.n_classes, multilabel=context.multilabel, n_trials=self.n_trials
+        )
         labels, scores = get_prediction_evaluation_data(context)
         thresh_optimizer.fit(
             probas=scores,
@@ -40,9 +43,10 @@ class TunablePredictor(PredictionModule):
 
 
 class ThreshOptimizer:
-    def __init__(self, n_classes: int, multilabel: bool):
+    def __init__(self, n_classes: int, multilabel: bool, n_trials: int):
         self.n_classes = n_classes
         self.multilabel = multilabel
+        self.n_trials = n_trials
 
     def objective(self, trial: Trial):
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
@@ -59,6 +63,6 @@ class ThreshOptimizer:
 
         study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=seed))
         optuna.logging.set_verbosity(optuna.logging.WARNING)
-        study.optimize(self.objective, n_trials=self.n_classes * 10)
+        study.optimize(self.objective, n_trials=self.n_trials)
 
         self.best_thresholds = np.array([study.best_params[f"threshold_{i}"] for i in range(self.n_classes)])
