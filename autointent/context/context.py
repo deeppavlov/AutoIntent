@@ -2,7 +2,7 @@ from typing import Any
 
 from chromadb import Collection
 
-from autointent.types import TASK_MODES
+from autointent.custom_types import TASK_MODES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo

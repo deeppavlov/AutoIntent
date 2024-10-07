@@ -3,7 +3,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from autointent.types import WEIGHT_TYPES
+from autointent.custom_types import WEIGHT_TYPES
 
 from .count_neighbors import get_counts, get_counts_multilabel
 

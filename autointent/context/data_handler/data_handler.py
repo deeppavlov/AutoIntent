@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from autointent.types import TASK_MODES
+from autointent.custom_types import TASK_MODES
 
 from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
 from .sampling import sample_from_regex

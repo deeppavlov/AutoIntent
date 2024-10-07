@@ -3,19 +3,20 @@ import itertools as it
 from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import torch
 
 from autointent.context import Context
+from autointent.metrics import PredictionMetricFn
 
 if TYPE_CHECKING:
     from autointent.modules import Module
 
 
 class Node:
-    metrics_available: dict[str, Callable]  # metrics functions
-    modules_available: dict[str, Callable]  # modules constructors
+    metrics_available: ClassVar[dict[str, PredictionMetricFn]]  # metrics functions
+    modules_available: ClassVar[dict[str, type[Module]]]  # modules constructors
     node_type: str
 
     def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger) -> None:

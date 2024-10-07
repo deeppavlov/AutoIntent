@@ -7,7 +7,7 @@ from chromadb import Collection
 
 from autointent import Context
 from autointent.modules.scoring.base import ScoringModule
-from autointent.types import WEIGHT_TYPES
+from autointent.custom_types import WEIGHT_TYPES
 
 from .weighting import apply_weights
 

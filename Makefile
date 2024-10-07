@@ -4,7 +4,7 @@ poetry = poetry run
 .PHONY: install
 install:
 	rm -f poetry.lock
-	poetry install --with dev,test,lint
+	poetry install --with dev,test,lint,typing
 
 .PHONY: test
 test:

@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
-from .logger import get_logger
+from autointent.logger import get_logger
 
 
 class OptimizationInfo:
