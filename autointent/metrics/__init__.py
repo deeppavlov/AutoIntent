@@ -1,4 +1,4 @@
-from autointent.metrics.prediction import (
+from .prediction import (
     PredictionMetricFn,
     prediction_accuracy,
     prediction_f1,
@@ -6,8 +6,8 @@ from autointent.metrics.prediction import (
     prediction_recall,
     prediction_roc_auc,
 )
-from autointent.metrics.regexp import regexp_partial_accuracy, regexp_partial_precision
-from autointent.metrics.retrieval import (
+from .regexp import regexp_partial_accuracy, regexp_partial_precision
+from .retrieval import (
     RetrievalMetricFn,
     retrieval_hit_rate,
     retrieval_hit_rate_intersecting,
@@ -25,7 +25,7 @@ from autointent.metrics.retrieval import (
     retrieval_precision_intersecting,
     retrieval_precision_macro,
 )
-from autointent.metrics.scoring import (
+from .scoring import (
     ScoringMetricFn,
     scoring_accuracy,
     scoring_f1,

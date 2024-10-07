@@ -1,4 +1,3 @@
-import importlib.resources as ires
 import json
 import logging
 from argparse import ArgumentParser
@@ -7,8 +6,8 @@ from pathlib import Path
 from typing import Any, Literal
 
 from autointent import Context
-from autointent.pipeline import Pipeline
-from autointent.pipeline.utils import generate_name, get_db_dir
+from .pipeline import Pipeline
+from .utils import generate_name, get_db_dir
 
 LoggingLevelType = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
