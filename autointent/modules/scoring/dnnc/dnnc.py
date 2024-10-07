@@ -51,7 +51,6 @@ class DNNCScorer(ScoringModule):
 
         return self._build_result(cross_encoder_scores, labels_pred)
 
-
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]):
         """
         Arguments

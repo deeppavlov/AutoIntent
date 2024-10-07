@@ -54,7 +54,6 @@ def _prediction_roc_auc_multiclass(y_true: list[int], y_pred: list[int]):
     return np.mean(roc_auc_scores)
 
 
-
 def _prediction_roc_auc_multilabel(y_true: list[list[int]], y_pred: list[list[int]]):
     """supports multilabel"""
     return roc_auc_score(y_true, y_pred, average="macro")

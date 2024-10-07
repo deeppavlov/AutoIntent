@@ -36,7 +36,7 @@ class ScoringNode(Node):
         "knn": KNNScorer,
         "linear": LinearScorer,
         "dnnc": DNNCScorer,
-        "mlknn": MLKnnScorer
+        "mlknn": MLKnnScorer,
     }
 
     node_type = "scoring"
