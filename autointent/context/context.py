@@ -1,6 +1,8 @@
-from typing import Any, Literal
+from typing import Any
 
 from chromadb import Collection
+
+from autointent.types import TASK_MODES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -14,7 +16,7 @@ class Context:
         multilabel_utterance_records: list[dict[str, Any]],
         test_utterance_records: list[dict[str, Any]],
         device: str,
-        mode: Literal["multiclass", "multilabel", "multiclass_as_multilabel"],
+        mode: TASK_MODES,
         multilabel_generation_config: str,
         db_dir: str,
         regex_sampling: int,

@@ -18,7 +18,7 @@ class Node:
     modules_available: dict[str, Callable]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
+    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger) -> None:
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values \
             (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]

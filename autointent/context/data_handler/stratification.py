@@ -9,7 +9,7 @@ from sklearn.utils import _safe_indexing, indexable
 from skmultilearn.model_selection import IterativeStratification
 
 
-def get_sample_utterances(intent_records: list[dict]) -> tuple[list[Any], list[Any]]:
+def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[Any], list[Any]]:
     """get plain list of all sample utterances and their intent labels"""
     utterances = [intent["sample_utterances"] for intent in intent_records]
     labels = [[intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances, strict=False)]

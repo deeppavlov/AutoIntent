@@ -19,7 +19,7 @@ class MLKnnScorer(ScoringModule):
     _cond_prob_true: NDArray[np.float64]
     _cond_prob_false: NDArray[np.float64]
 
-    def __init__(self, k: int, s: float = 1.0, ignore_first_neighbours: int = 0):
+    def __init__(self, k: int, s: float = 1.0, ignore_first_neighbours: int = 0) -> None:
         self.k = k
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours

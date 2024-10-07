@@ -1,7 +1,9 @@
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
+
+from autointent.types import WEIGHT_TYPES
 
 from .count_neighbors import get_counts, get_counts_multilabel
 
@@ -9,7 +11,7 @@ from .count_neighbors import get_counts, get_counts_multilabel
 def apply_weights(
     labels: NDArray[Any],
     distances: NDArray[Any],
-    weights: Literal["uniform", "distance", "closest"],
+    weights: WEIGHT_TYPES,
     n_classes: int,
     multilabel: bool,
 ) -> NDArray[Any]:

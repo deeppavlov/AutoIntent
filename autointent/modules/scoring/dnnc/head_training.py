@@ -61,7 +61,7 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
-        def hook_function(module, input_tensor, output_tensor):  # noqa: ARG001
+        def hook_function(module, input_tensor, output_tensor) -> None:  # noqa: ARG001, ANN001
             logits_list.append(input_tensor[0].cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)

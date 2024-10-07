@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -7,12 +7,13 @@ from chromadb import Collection
 
 from autointent import Context
 from autointent.modules.scoring.base import ScoringModule
+from autointent.types import WEIGHT_TYPES
 
 from .weighting import apply_weights
 
 
 class KNNScorer(ScoringModule):
-    def __init__(self, k: int, weights: Literal["uniform", "distance", "closest"] | bool):
+    def __init__(self, k: int, weights: WEIGHT_TYPES | bool) -> None:
         """
         Arguments
         ---
