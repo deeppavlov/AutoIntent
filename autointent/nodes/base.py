@@ -1,9 +1,9 @@
 import gc
 import itertools as it
-from abc import ABC
 from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
+from typing import Literal
 
 import torch
 
@@ -11,18 +11,25 @@ from autointent.context import Context
 from autointent.modules import Module
 
 
-class Node(ABC):
-    metrics_available: dict[str, Callable]  # metrics functions
-    modules_available: dict[str, type[Module]]  # modules constructors
-    node_type: str
+class NodeInfo:
+    def __init__(
+        self,
+        metrics_available: dict[str, Callable],
+        modules_available: dict[str, type[Module]],
+        node_type: Literal["regexp", "retrieval", "scoring", "prediction"],
+    ) -> None:
+        self.metrics_available = metrics_available
+        self.modules_available = modules_available
+        self.node_type = node_type
 
 
-class OptimizationNode(Node):
-    def configure_optimization(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
+class NodeOptimizer:
+    def __init__(self, node_info: NodeInfo, modules_search_spaces: list[dict], metric: str, logger: Logger):
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values \
             (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
         """
+        self.node_info = node_info
         self._logger = logger
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
@@ -36,17 +43,17 @@ class OptimizationNode(Node):
                 module_kwargs = dict(zip(search_space.keys(), module_config, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module = self.modules_available[module_type](**module_kwargs)
+                module = self.node_info.modules_available[module_type](**module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
                 module.fit(context)
 
                 self._logger.debug("scoring %s module...", module_type)
-                metric_value = module.score(context, self.metrics_available[self.metric_name])
+                metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
                 context.optimization_info.log_module_optimization(
-                    self.node_type,
+                    self.node_info.node_type,
                     module_type,
                     module_kwargs,
                     metric_value,
@@ -59,9 +66,8 @@ class OptimizationNode(Node):
         self._logger.info("%s node optimization is finished!", self.node_type)
 
 
-class InferenceNode(Node):
-    def configure_inference(self):
-        ...
+class InferenceNode:
+    def __init__(self, node_info: NodeInfo):
+        self.node_info = node_info
 
-    def load(self):
-        ...
+    def load(self): ...

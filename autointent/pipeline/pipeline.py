@@ -10,7 +10,7 @@ import numpy as np
 import yaml
 
 from autointent import Context
-from autointent.nodes import Node, PredictionNode, RegExpNode, RetrievalNode, ScoringNode
+from autointent.nodes import OptimizationNode, PredictionNode, RegExpNode, RetrievalNode, ScoringNode
 
 from .utils import NumpyEncoder
 
@@ -35,7 +35,7 @@ class Pipeline:
         self._logger.info("starting pipeline optimization...")
         for node_config in self.config["nodes"]:
             node_logger = logging.getLogger(node_config["node_type"])
-            node: Node = self.available_nodes[node_config["node_type"]](
+            node: OptimizationNode = self.available_nodes[node_config["node_type"]](
                 modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger=node_logger
             )
             node.fit(context)

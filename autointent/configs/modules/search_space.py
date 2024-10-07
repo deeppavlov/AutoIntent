@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field, make_dataclass
-from typing import TypeVar, get_type_hints
+from typing import get_type_hints
+
+from .base import ModuleConfig
 
 
 @dataclass
@@ -7,10 +9,7 @@ class SearchSpace:
     module_type: str
 
 
-T = TypeVar("T")
-
-
-def create_search_space_config(original_cls: type[T], module_type: str) -> type[T]:
+def create_search_space_config(original_cls: type[ModuleConfig], module_type: str) -> type[SearchSpace]:
     # Get the type hints of the original class
     type_hints = get_type_hints(original_cls)
 

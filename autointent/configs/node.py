@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from autointent.nodes import NodeInfo
+
 from .modules import ModuleConfig, SearchSpace
 
 
@@ -12,7 +14,7 @@ class InferenceNodeConfig:
 
 
 @dataclass
-class OptimizationNodeConfig:
-    node_type: str
-    search_space: SearchSpace
+class NodeOptimizerConfig:
+    node_info: NodeInfo
+    search_space: list[SearchSpace]
     metric: str
