@@ -1,26 +1,26 @@
 import importlib.resources as ires
 import json
 import logging
-from collections.abc import Callable
 from logging import Logger
 from pathlib import Path
 from typing import ClassVar
 
 import numpy as np
 import yaml
+from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.nodes import OptimizationNode, PredictionNode, RegExpNode, RetrievalNode, ScoringNode
+from autointent.configs.node import NodeOptimizerConfig
+from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
 from .utils import NumpyEncoder
 
 
 class Pipeline:
-    available_nodes: ClassVar[dict[str, Callable]] = {
-        "regexp": RegExpNode,
-        "retrieval": RetrievalNode,
-        "scoring": ScoringNode,
-        "prediction": PredictionNode,
+    available_nodes: ClassVar[dict[str, NodeInfo]] = {
+        "retrieval": RetrievalNodeInfo(),
+        "scoring": ScoringNodeInfo(),
+        "prediction": PredictionNodeInfo(),
     }
 
     def __init__(self, config_path: str, mode: str):
@@ -34,11 +34,13 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         for node_config in self.config["nodes"]:
-            node_logger = logging.getLogger(node_config["node_type"])
-            node: OptimizationNode = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger=node_logger
+            node_optimizer_config = NodeOptimizerConfig(
+                node_info=self.available_nodes[node_config["node_type"]],
+                modules_search_spaces=node_config["modules"],
+                metric=node_config["metric"],
             )
-            node.fit(context)
+            node_optimizer: NodeOptimizer = instantiate(node_optimizer_config)
+            node_optimizer.fit(context)
 
     def dump(self, logs_dir: str, run_name: str):
         self._logger.debug("dumping logs...")

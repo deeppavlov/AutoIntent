@@ -1,28 +1,24 @@
-from dataclasses import dataclass, field, make_dataclass
-from typing import get_type_hints
+from dataclasses import fields
+from typing import Any
+
+from pydantic import BaseModel, create_model
 
 from .base import ModuleConfig
 
 
-@dataclass
-class SearchSpace:
+class SearchSpace(BaseModel):
     module_type: str
 
 
-def create_search_space_config(original_cls: type[ModuleConfig], module_type: str) -> type[SearchSpace]:
-    # Get the type hints of the original class
-    type_hints = get_type_hints(original_cls)
+def create_search_space_config(data_class: type[ModuleConfig]) -> type[SearchSpace]:
+    data_class_fields = fields(data_class)
+    new_fields: dict[str, Any] = {}
 
-    # Create a new dictionary for the fields of the new class
-    new_fields = []
+    for field in data_class_fields:
+        if field.name == "module_type":
+            new_fields[field.name] = (list[field.type], field.default)
+        elif field.name != "_target_":
+            new_fields[field.name] = (list[field.type], ...)
 
-    # Iterate over the fields of the original class
-    for field_name, field_type in type_hints.items():
-        if field_name != "_target_":
-            # Change the type annotation to a list of the original type
-            new_fields.append((field_name, list[field_type], field(default_factory=list)))
-
-    new_fields.append(("module_type", str, module_type))
-
-    # Create the new data class
-    return make_dataclass(f"{original_cls.__name__}SearchSpace", new_fields, bases=(SearchSpace,))
+    model_name = data_class.__name__ + "SearchSpace"
+    return create_model(model_name, **new_fields)
