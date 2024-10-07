@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 
-from .modules import SearchSpace
+from .modules import ModuleConfig, SearchSpace
 
 
 @dataclass
 class InferenceNodeConfig:
     node_type: str
     module_type: str
-    module_config: dict
+    module_config: ModuleConfig
     load_path: str
 
 

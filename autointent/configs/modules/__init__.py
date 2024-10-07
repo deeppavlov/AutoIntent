@@ -1,3 +1,4 @@
+from .base import ModuleConfig
 from .prediction import ArgmaxPredictorConfig, JinoosPredictorConfig, ThresholdPredictorConfig, TunablePredictorConfig
 from .retrieval import VectorDBConfig
 from .scoring import DNNCScorerConfig, KNNScorerConfig, LinearScorerConfig, MLKnnScorerConfig
