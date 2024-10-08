@@ -36,7 +36,7 @@ class DataHandler:
             logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
             multiclass_intent_records = sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
 
-        if multilabel_generation_config is not None:
+        if multilabel_generation_config is not None and os.path.exists(multilabel_generation_config):
             logger.debug("generating multilabel utterances from multiclass ones...")
             new_utterances = generate_multilabel_version(multiclass_intent_records, multilabel_generation_config, seed)
             multilabel_utterance_records.extend(new_utterances)
