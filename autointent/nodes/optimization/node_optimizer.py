@@ -2,12 +2,12 @@ import gc
 import itertools as it
 import logging
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import torch
 from hydra.utils import instantiate
 
-from autointent.configs.modules import MODULES_CONFIGS, create_search_space_model
+from autointent.configs.modules import SearchSpaceDataclass
 from autointent.context import Context
 from autointent.nodes.base import NodeInfo
 
@@ -16,11 +16,10 @@ if TYPE_CHECKING:
 
 
 class NodeOptimizer:
-    def __init__(self, node_info: NodeInfo, search_space: list[dict], metric: str):
+    def __init__(self, node_info: NodeInfo, search_space: list[SearchSpaceDataclass], metric: str):
         self.node_info = node_info
         self.metric_name = metric
-        [self.validate_search_space(ss) for ss in search_space]  # TODO move this validation to pipeline loading
-        self.modules_search_spaces = search_space
+        self.modules_search_spaces = [dict(ss) for ss in search_space]
         self._logger = logging.getLogger(__name__)
 
     def fit(self, context: Context):
@@ -55,10 +54,3 @@ class NodeOptimizer:
                 gc.collect()
                 torch.cuda.empty_cache()
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
-
-
-    def validate_search_space(self, search_space: dict[str, Any]):
-        """perform pydantic validation"""
-        module_config = MODULES_CONFIGS[self.node_info.node_type][search_space["module_type"]]
-        make_search_space_model = create_search_space_model(module_config)
-        make_search_space_model(**search_space)

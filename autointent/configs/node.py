@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from autointent.nodes import NodeInfo
 
-from .modules import ModuleConfig
+from .modules import ModuleConfig, SearchSpaceDataclass
 
 
 @dataclass
@@ -17,6 +17,6 @@ class InferenceNodeConfig:
 @dataclass
 class NodeOptimizerConfig:
     node_info: NodeInfo
-    search_space: list[dict]
+    search_space: list[SearchSpaceDataclass]
     metric: str
     _target_: str = "autointent.nodes.NodeOptimizer"

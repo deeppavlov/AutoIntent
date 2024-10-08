@@ -23,7 +23,7 @@ def create_search_space_dataclass(data_class: type[ModuleConfig]) -> type[Search
         if field_.name == "module_type":
             new_fields.append((field_.name, field_.type, field(default=field_.default)))
         elif field_.name != "_target_":
-            new_fields.append((field_.name, list[field_.type], field(default=field_.default, default_factory=list)))
+            new_fields.append((field_.name, list[field_.type], field(default_factory=list)))
 
     return make_dataclass(f"{data_class.__name__}SearchSpace", new_fields, bases=(SearchSpaceDataclass,))
 
