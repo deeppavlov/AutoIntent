@@ -9,15 +9,15 @@ from hydra.utils import instantiate
 
 from autointent.configs.modules import SearchSpaceDataclass
 from autointent.context import Context
-from autointent.nodes.base import NodeInfo
+from autointent.nodes.nodes_info import NODES_INFO
 
 if TYPE_CHECKING:
     from autointent.modules import Module
 
 
 class NodeOptimizer:
-    def __init__(self, node_info: NodeInfo, search_space: list[SearchSpaceDataclass], metric: str):
-        self.node_info = node_info
+    def __init__(self, node_type: str, search_space: list[SearchSpaceDataclass], metric: str):
+        self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
         self.modules_search_spaces = [dict(ss) for ss in search_space]
         self._logger = logging.getLogger(__name__)

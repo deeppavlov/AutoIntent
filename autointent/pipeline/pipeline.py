@@ -1,7 +1,5 @@
-import importlib.resources as ires
 import json
 import logging
-from logging import Logger
 from pathlib import Path
 from typing import Any, ClassVar
 
@@ -24,12 +22,9 @@ class Pipeline:
         "prediction": PredictionNodeInfo(),
     }
 
-    def __init__(self, config_path: str, mode: str):
-        # TODO add config validation
+    def __init__(self, optimization_config):
         self._logger = logging.getLogger(__name__)
-
-        self._logger.debug("loading optimization search space config...")
-        self.config = load_config(config_path, mode, self._logger)
+        self.config = optimization_config
 
     def optimize(self, context: Context):
         self.context = context
@@ -79,20 +74,6 @@ class Pipeline:
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
-
-
-def load_config(config_path: str, mode: str, logger: Logger):
-    """load config from the given path or load default config which is distributed along with the autointent package"""
-    if config_path != "":
-        logger.debug("loading optimization search space config from %s...)", config_path)
-        with Path(config_path).open() as file:
-            file_content = file.read()
-    else:
-        logger.debug("loading default optimization search space config...")
-        config_name = "default-multilabel-config.yaml" if mode != "multiclass" else "default-multiclass-config.yaml"
-        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
-            file_content = file.read()
-    return yaml.safe_load(file_content)
 
 
 def make_report(logs: dict[str], nodes: list[str]) -> str:

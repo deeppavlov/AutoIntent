@@ -3,8 +3,11 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+from logging import Logger
 from pathlib import Path
 from typing import Literal
+
+import yaml
 
 from autointent import Context
 
@@ -112,7 +115,8 @@ def main():
     )
 
     # run optimization
-    pipeline = Pipeline(args.config_path, args.mode)
+    search_space_config = load_config(args.config_path, context.multilabel, logger)
+    pipeline = Pipeline(search_space_config)
     pipeline.optimize(context)
 
     # save results
@@ -145,3 +149,17 @@ def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
         handlers=[logging.StreamHandler()],
     )
     return logging.getLogger(__name__)
+
+
+def load_config(config_path: str, multilabel: bool, logger: Logger):
+    """load config from the given path or load default config which is distributed along with the autointent package"""
+    if config_path != "":
+        logger.debug("loading optimization search space config from %s...)", config_path)
+        with Path(config_path).open() as file:
+            file_content = file.read()
+    else:
+        logger.debug("loading default optimization search space config...")
+        config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
+        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
+            file_content = file.read()
+    return yaml.safe_load(file_content)

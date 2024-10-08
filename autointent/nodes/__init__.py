@@ -1,6 +1,3 @@
-from .base import NodeInfo
 from .inference import InferenceNode
+from .nodes_info import NodeInfo, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 from .optimization import NodeOptimizer
-from .prediction import PredictionNodeInfo
-from .retrieval import RetrievalNodeInfo
-from .scoring import ScoringNodeInfo
