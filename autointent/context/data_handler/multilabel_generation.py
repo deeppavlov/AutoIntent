@@ -42,7 +42,8 @@ def sample_multilabel_utterances(
 def generate_multilabel_version(intent_records: list[dict], config_string: str, seed: int) -> list[UtteranceRecord]:
     config_path = Path(config_string)
     if not config_path.exists():
-        raise FileNotFoundError(f"Config file {config_path} not found")
+        msg = f"Config file {config_path} not found"
+        raise FileNotFoundError(msg)
     config = json.loads(config_string)
     res = []
     for i in range(len(config)):
