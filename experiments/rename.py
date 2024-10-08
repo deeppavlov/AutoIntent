@@ -12,7 +12,7 @@ def list_and_replace_colon_in_filenames(directory: str) -> None:
     Returns:
         None
     """
-    for root, _, files in os.walk(directory):
+    for root, dirs, files in os.walk(directory):
         for filename in files:
             if ':' in filename:
                 new_filename = filename.replace(':', '_')
@@ -20,6 +20,14 @@ def list_and_replace_colon_in_filenames(directory: str) -> None:
                 new_file_path = os.path.join(root, new_filename)
                 os.rename(old_file_path, new_file_path)
                 print(f"Renamed: {old_file_path} -> {new_file_path}")
+
+        for dirname in dirs:
+            if ':' in dirname:
+                new_dirname = dirname.replace(':', '_')
+                old_dir_path = os.path.join(root, dirname)
+                new_dir_path = os.path.join(root, new_dirname)
+                os.rename(old_dir_path, new_dir_path)
+                print(f"Renamed directory: {old_dir_path} -> {new_dir_path}")
 
 
 if __name__ == "__main__":
