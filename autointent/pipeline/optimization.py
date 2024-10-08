@@ -11,8 +11,6 @@ import yaml
 from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.configs.modules import MODULES_CONFIGS, create_search_space_dataclass
-from autointent.configs.node import NodeOptimizerConfig
 from autointent.configs.pipeline import PipelineOptimizationConfig
 
 from .utils import generate_name, get_db_dir
@@ -122,7 +120,7 @@ def main():
 
     # run optimization
     search_space_config = load_config(args.config_path, context.multilabel, logger)
-    pipeline: Pipeline = instantiate(search_space_config)
+    pipeline: Pipeline = instantiate(PipelineOptimizationConfig(), **search_space_config)
     pipeline.optimize(context)
 
     # save results
@@ -157,7 +155,7 @@ def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> PipelineOptimizationConfig:
+def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
         if logger is not None:
@@ -170,21 +168,4 @@ def load_config(config_path: str, multilabel: bool, logger: Logger | None = None
         config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
         with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
             file_content = file.read()
-    return post_process_config(yaml.safe_load(file_content))
-
-
-def post_process_config(config: dict) -> PipelineOptimizationConfig:
-    for node_config in config["nodes"]:
-        node_config["search_space"] = [
-            parse_search_space(node_config["node_type"], ss) for ss in node_config["search_space"]
-        ]
-
-    config["nodes"] = [NodeOptimizerConfig(**node_config) for node_config in config["nodes"]]
-
-    return PipelineOptimizationConfig(**config)
-
-
-def parse_search_space(node_type: str, search_space: dict[str, Any]):
-    module_config = MODULES_CONFIGS[node_type][search_space["module_type"]]
-    make_search_space_model = create_search_space_dataclass(module_config)
-    return make_search_space_model(**search_space)
+    return yaml.safe_load(file_content)

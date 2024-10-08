@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 
-# from enum import Enum
-# class KNNWeightsType(Enum):
-#     UNIFORM = "uniform"
-#     DISTANCE = "distance"
-#     CLOSEST = "closest"
+from omegaconf import MISSING
+
+from autointent.configs.modules.base import ModuleConfig
 
 
 @dataclass
-class KNNScorerConfig:
-    k: int
-    weights: str
+class KNNScorerConfig(ModuleConfig):
+    k: int = MISSING
+    weights: str = MISSING
     _target_: str = "autointent.modules.scoring.KNNScorer"
