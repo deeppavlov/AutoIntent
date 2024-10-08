@@ -16,11 +16,11 @@ if TYPE_CHECKING:
 
 
 class NodeOptimizer:
-    def __init__(self, node_info: NodeInfo, modules_search_spaces: list[dict], metric: str):
-        self.validate_search_spaces(modules_search_spaces)
+    def __init__(self, node_info: NodeInfo, search_space: list[dict], metric: str):
         self.node_info = node_info
-        self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
+        # self.validate_search_spaces(search_space)
+        self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)
 
     def fit(self, context: Context):

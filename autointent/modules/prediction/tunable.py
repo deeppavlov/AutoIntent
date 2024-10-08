@@ -10,7 +10,7 @@ from .threshold import multiclass_predict, multilabel_predict
 
 
 class TunablePredictor(PredictionModule):
-    def __init__(self, n_trials: int):
+    def __init__(self, n_trials: int | None = None):
         self.n_trials = n_trials
 
     def fit(self, context: Context):
@@ -43,10 +43,10 @@ class TunablePredictor(PredictionModule):
 
 
 class ThreshOptimizer:
-    def __init__(self, n_classes: int, multilabel: bool, n_trials: int):
+    def __init__(self, n_classes: int, multilabel: bool, n_trials: int | None = None):
         self.n_classes = n_classes
         self.multilabel = multilabel
-        self.n_trials = n_trials
+        self.n_trials = n_trials if n_trials is not None else n_classes * 10
 
     def objective(self, trial: Trial):
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
