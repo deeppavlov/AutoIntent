@@ -8,14 +8,14 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdPredictor(PredictionModule):
-    def __init__(self, thresh: float):
+    def __init__(self, thresh: float | list[float]):
         self.thresh = thresh
 
     def fit(self, context: Context):
         self.multilabel = context.multilabel
         self.tags = context.data_handler.tags
 
-        if isinstance(self.thresh, list):
+        if not isinstance(self.thresh, float):
             if len(self.thresh) != context.n_classes:
                 msg = "Wrong number of thresholds provided doesn't match with number of classes"
                 logger.error(msg)

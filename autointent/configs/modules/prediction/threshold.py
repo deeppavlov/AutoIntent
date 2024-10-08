@@ -1,7 +1,8 @@
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
 class ThresholdPredictorConfig:
-    thresh: float | list[float]  # not supported by hydra :(
+    thresh: Any  # should be `float | list[float]` but union of containers is not supported by hydra :(
     _target_: str = "autointent.modules.prediction.ThresholdPredictor"
