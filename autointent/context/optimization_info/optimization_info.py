@@ -11,6 +11,8 @@ from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact,
 class OptimizationInfo:
     """TODO continous IO with file system (to be able to restore the state of optimization)"""
 
+    # todo how to set trials
+
     def __init__(self) -> None:
         self._logger = get_logger()
 
