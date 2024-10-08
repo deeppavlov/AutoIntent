@@ -3,13 +3,14 @@ import json
 import logging
 from logging import Logger
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 import yaml
 from hydra.utils import instantiate
 
 from autointent import Context
+from autointent.configs.modules import MODULES_CONFIGS, create_search_space_dataclass
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
@@ -36,7 +37,7 @@ class Pipeline:
         for node_config in self.config["nodes"]:
             node_optimizer_config = NodeOptimizerConfig(
                 node_info=self.available_nodes[node_config["node_type"]],
-                modules_search_spaces=node_config["modules"],
+                search_space=[parse_search_space(node_config["node_type"], ss) for ss in node_config["modules"]],
                 metric=node_config["metric"],
             )
             node_optimizer: NodeOptimizer = instantiate(node_optimizer_config)
@@ -104,3 +105,9 @@ def make_report(logs: dict[str], nodes: list[str]) -> str:
     messages = [json.dumps(c, indent=4) for c in configs]
     msg = "\n".join(messages)
     return "resulting pipeline configuration is the following:\n" + msg
+
+
+def parse_search_space(node_type: str, search_space: dict[str, Any]):
+    module_config = MODULES_CONFIGS[node_type][search_space["module_type"]]
+    make_search_space_model = create_search_space_dataclass(module_config)
+    return make_search_space_model(**search_space)
