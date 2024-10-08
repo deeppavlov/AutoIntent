@@ -37,9 +37,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        poetry install --with test
+        python -m poetry install --with test
 
     - name: Run tests
       run: |
-        poetry run pytest tests
-        poetry run clear-cache
+        python -m poetry run pytest tests
+        python -m poetry run clear-cache
