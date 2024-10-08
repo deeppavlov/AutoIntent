@@ -5,14 +5,20 @@ from argparse import ArgumentParser
 from datetime import datetime
 from logging import Logger
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import yaml
+from hydra.utils import instantiate
 
 from autointent import Context
+from autointent.configs.modules import MODULES_CONFIGS, create_search_space_dataclass
+from autointent.configs.node import NodeOptimizerConfig
+from autointent.configs.pipeline import PipelineOptimizationConfig
 
-from .pipeline import Pipeline
 from .utils import generate_name, get_db_dir
+
+if TYPE_CHECKING:
+    from .pipeline import Pipeline
 
 LoggingLevelType = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
@@ -116,7 +122,7 @@ def main():
 
     # run optimization
     search_space_config = load_config(args.config_path, context.multilabel, logger)
-    pipeline = Pipeline(search_space_config)
+    pipeline: Pipeline = instantiate(search_space_config)
     pipeline.optimize(context)
 
     # save results
@@ -151,15 +157,34 @@ def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def load_config(config_path: str, multilabel: bool, logger: Logger):
+def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> PipelineOptimizationConfig:
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path != "":
-        logger.debug("loading optimization search space config from %s...)", config_path)
+        if logger is not None:
+            logger.debug("loading optimization search space config from %s...)", config_path)
         with Path(config_path).open() as file:
             file_content = file.read()
     else:
-        logger.debug("loading default optimization search space config...")
+        if logger is not None:
+            logger.debug("loading default optimization search space config...")
         config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
         with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
             file_content = file.read()
-    return yaml.safe_load(file_content)
+    return post_process_config(yaml.safe_load(file_content))
+
+
+def post_process_config(config: dict) -> PipelineOptimizationConfig:
+    for node_config in config["nodes"]:
+        node_config["search_space"] = [
+            parse_search_space(node_config["node_type"], ss) for ss in node_config["search_space"]
+        ]
+
+    config["nodes"] = [NodeOptimizerConfig(**node_config) for node_config in config["nodes"]]
+
+    return PipelineOptimizationConfig(**config)
+
+
+def parse_search_space(node_type: str, search_space: dict[str, Any]):
+    module_config = MODULES_CONFIGS[node_type][search_space["module_type"]]
+    make_search_space_model = create_search_space_dataclass(module_config)
+    return make_search_space_model(**search_space)

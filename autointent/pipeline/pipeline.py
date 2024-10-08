@@ -1,15 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar
 
 import numpy as np
 import yaml
-from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.configs.modules import MODULES_CONFIGS, create_search_space_dataclass
-from autointent.configs.node import NodeOptimizerConfig
 from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
 from .utils import NumpyEncoder
@@ -22,20 +19,14 @@ class Pipeline:
         "prediction": PredictionNodeInfo(),
     }
 
-    def __init__(self, optimization_config):
+    def __init__(self, nodes: list[NodeOptimizer]):
         self._logger = logging.getLogger(__name__)
-        self.config = optimization_config
+        self.nodes = nodes
 
     def optimize(self, context: Context):
         self.context = context
         self._logger.info("starting pipeline optimization...")
-        for node_config in self.config["nodes"]:
-            node_optimizer_config = NodeOptimizerConfig(
-                node_info=self.available_nodes[node_config["node_type"]],
-                search_space=[parse_search_space(node_config["node_type"], ss) for ss in node_config["modules"]],
-                metric=node_config["metric"],
-            )
-            node_optimizer: NodeOptimizer = instantiate(node_optimizer_config)
+        for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
     def dump(self, logs_dir: str, run_name: str):
@@ -51,11 +42,11 @@ class Pipeline:
         logs_path = logs_dir / "logs.json"
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-        config_path = logs_dir / "config.yaml"
-        with config_path.open("w") as file:
-            yaml.dump(self.config, file)
+        # config_path = logs_dir / "config.yaml"
+        # with config_path.open("w") as file:
+        #     yaml.dump(self.config, file)
 
-        nodes = [node_config["node_type"] for node_config in self.config["nodes"]]
+        nodes = [node_config.node_info.node_type for node_config in self.nodes]
         self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
@@ -86,9 +77,3 @@ def make_report(logs: dict[str], nodes: list[str]) -> str:
     messages = [json.dumps(c, indent=4) for c in configs]
     msg = "\n".join(messages)
     return "resulting pipeline configuration is the following:\n" + msg
-
-
-def parse_search_space(node_type: str, search_space: dict[str, Any]):
-    module_config = MODULES_CONFIGS[node_type][search_space["module_type"]]
-    make_search_space_model = create_search_space_dataclass(module_config)
-    return make_search_space_model(**search_space)
