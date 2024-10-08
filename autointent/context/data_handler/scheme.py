@@ -2,7 +2,7 @@ from typing import TypedDict
 
 
 class IntentRecord(TypedDict):
-    intent_id: str
+    intent_id: int
     regexp_full_match: str
     regexp_partial_match: str
 

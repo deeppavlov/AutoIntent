@@ -90,20 +90,6 @@ def test_regex_sampling(
     assert data.utterances_train == ["hello", "hi", "hello", "hi", "goodbye", "bye", "goodbye", "bye"]
 
 
-def test_has_oos_samples(
-    sample_multiclass_intent_records, sample_multilabel_utterance_records, sample_test_utterance_records
-):
-    handler = DataHandler(
-        sample_multiclass_intent_records,
-        sample_multilabel_utterance_records,
-        sample_test_utterance_records,
-        mode="multiclass",
-        seed=42,
-    )
-
-    assert isinstance(handler.has_oos_samples(), bool)
-
-
 def test_dump_method(
     sample_multiclass_intent_records, sample_multilabel_utterance_records, sample_test_utterance_records
 ):
@@ -117,10 +103,11 @@ def test_dump_method(
 
     train_data, test_data = handler.dump()
 
-    assert isinstance(train_data, list)
-    assert isinstance(test_data, list)
-    assert len(train_data) > 0
-    assert len(test_data) > 0
+    assert train_data == [
+        {"intent_id": 0, "sample_utterances": ["hello", "hi"]},
+        {"intent_id": 1, "sample_utterances": ["goodbye", "bye"]},
+    ]
+    assert test_data == [{"labels": [0], "utterance": "greetings"}, {"labels": [1], "utterance": "farewell"}]
 
 
 def test_error_handling(

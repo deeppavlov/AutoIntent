@@ -28,10 +28,10 @@ def split_sample_utterances(
 ) -> tuple[
     int,
     list[Any],
-    npt.NDArray[Any],
-    npt.NDArray[Any],
-    npt.NDArray[Any],
-    npt.NDArray[Any],
+    list[str],
+    list[str],
+    list[int],
+    list[int],
 ]:
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test

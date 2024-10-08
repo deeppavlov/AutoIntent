@@ -26,7 +26,7 @@ def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
     return res
 
 
-def sample_from_regex(intent_records: list[dict], n_shots: int) -> list[dict]:
+def sample_from_regex(intent_records: list[dict[str, list[str]]], n_shots: int) -> list[dict]:
     for intent in intent_records:
         new_samples = generate_from_templates(intent["regexp_full_match"], n_shots)
         intent["sample_utterances"].extend(new_samples)
