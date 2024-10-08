@@ -1,17 +1,14 @@
 import gc
 import itertools as it
-from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 import torch
 
 from autointent.context import Context
 from autointent.metrics import PredictionMetricFn
-
-if TYPE_CHECKING:
-    from autointent.modules import Module
+from autointent.modules import Module
 
 
 class Node:

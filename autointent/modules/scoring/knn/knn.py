@@ -6,8 +6,8 @@ import numpy.typing as npt
 from chromadb import Collection
 
 from autointent import Context
-from autointent.modules.scoring.base import ScoringModule
 from autointent.custom_types import WEIGHT_TYPES
+from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
 

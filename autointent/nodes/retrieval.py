@@ -18,7 +18,7 @@ from autointent.metrics import (
     retrieval_precision_intersecting,
     retrieval_precision_macro,
 )
-from autointent.modules import VectorDBModule, RetrievalModule
+from autointent.modules import RetrievalModule, VectorDBModule
 
 from .base import Node
 

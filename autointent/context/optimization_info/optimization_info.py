@@ -3,8 +3,9 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from autointent.logger import get_logger
+
+from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 
 
 class OptimizationInfo:

@@ -21,7 +21,7 @@ typing:
 .PHONY: lint
 lint:
 	$(poetry) ruff format
-	$(poetry) ruff check
+	$(poetry) ruff check --fix
 
 .PHONY: all
 all: lint

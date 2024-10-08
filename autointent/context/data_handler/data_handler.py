@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+from transformers import set_seed
+
 from autointent.custom_types import TASK_MODES
 
 from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
@@ -17,11 +19,12 @@ class DataHandler:
         multilabel_utterance_records: list[dict[str, Any]],
         test_utterance_records: list[dict[str, Any]],
         mode: TASK_MODES,
-        multilabel_generation_config: str = "",
+        multilabel_generation_config: str | None = None,
         regex_sampling: int = 0,
         seed: int = 0,
     ) -> None:
         logger = logging.getLogger(__name__)
+        set_seed(seed)
 
         # TODO do somthing with this else if
         if not multiclass_intent_records and not multilabel_utterance_records:
@@ -31,9 +34,9 @@ class DataHandler:
 
         if regex_sampling > 0:
             logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
-            sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
+            multiclass_intent_records = sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
 
-        if multilabel_generation_config != "":
+        if multilabel_generation_config is not None:
             logger.debug("generating multilabel utterances from multiclass ones...")
             new_utterances = generate_multilabel_version(multiclass_intent_records, multilabel_generation_config, seed)
             multilabel_utterance_records.extend(new_utterances)

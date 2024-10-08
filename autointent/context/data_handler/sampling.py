@@ -1,4 +1,3 @@
-import contextlib
 import random
 
 import sre_yield
@@ -14,11 +13,8 @@ def distribute_shots(n: int, k: int) -> list[int]:
 
 
 def generate_from_template(template: str, n: int) -> list[str]:
-    """generate `n` samples from `template`, or fewer if its impossible"""
-    iterator = iter(sre_yield.AllStrings(template))
-    with contextlib.suppress(StopIteration):
-        res = [next(iterator) for _ in range(n)]
-    return res
+    """generate `n` samples from `template`, or fewer if it's impossible"""
+    return list(sre_yield.AllStrings(template))[:n]
 
 
 def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
@@ -30,8 +26,7 @@ def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
     return res
 
 
-def sample_from_regex(intent_records: list[dict], n_shots: int, seed: int = 0) -> list[dict]:
-    random.seed(seed)
+def sample_from_regex(intent_records: list[dict], n_shots: int) -> list[dict]:
     for intent in intent_records:
         new_samples = generate_from_templates(intent["regexp_full_match"], n_shots)
         intent["sample_utterances"].extend(new_samples)
