@@ -31,8 +31,8 @@ class NodeOptimizer:
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module_config = self.node_info.modules_configs[module_type](**module_kwargs)
-                module: Module = instantiate(module_config)
+                module_config = self.node_info.modules_configs[module_type]
+                module: Module = instantiate(module_config, **module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
                 module.fit(context)
