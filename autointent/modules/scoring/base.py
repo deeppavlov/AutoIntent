@@ -11,7 +11,7 @@ from autointent.modules.base import Module
 
 
 class ScoringModule(Module):
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> tuple[float, npt.NDArray[Any]]:
+    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
         """
         Return
         ---
@@ -23,7 +23,7 @@ class ScoringModule(Module):
         self._oos_scores = None
         if context.data_handler.has_oos_samples():
             self._oos_scores = self.predict(context.data_handler.oos_utterances)
-        return res, self._test_scores
+        return res
 
     def get_assets(self) -> ScorerArtifact:
         return ScorerArtifact(test_scores=self._test_scores, oos_scores=self._oos_scores)

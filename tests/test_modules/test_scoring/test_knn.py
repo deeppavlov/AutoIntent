@@ -23,7 +23,7 @@ def test_base_knn(setup_environment, load_clinic_subset):
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    metric_value, _ = vector_db.score(context, retrieval_hit_rate)
+    metric_value = vector_db.score(context, retrieval_hit_rate)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(
         node_type="retrieval",
@@ -37,7 +37,7 @@ def test_base_knn(setup_environment, load_clinic_subset):
     scorer = KNNScorer(k=3, weights="distance")
 
     scorer.fit(context)
-    score, _ = scorer.score(context, scoring_roc_auc)
+    score = scorer.score(context, scoring_roc_auc)
     assert score == 1
     predictions = scorer.predict(
         [

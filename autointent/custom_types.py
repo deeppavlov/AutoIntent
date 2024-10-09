@@ -1,5 +1,15 @@
+from enum import Enum
 from typing import Literal
 
-TASK_MODES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
+TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
+
+
+class LogLevel(Enum):
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    CRITICAL = "CRITICAL"
+
 
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]

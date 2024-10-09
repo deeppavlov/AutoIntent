@@ -52,6 +52,8 @@ class OptimizationInfo:
         return [trial.metric_value for trial in self.trials[node_type]]
 
     def _get_best_trial_idx(self, node_type: str) -> int:
+        if len(self.trials[node_type]) == 0:
+            return None
         res = self._trials_best_ids[node_type]
         if res is not None:
             return res
@@ -74,7 +76,7 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")
         return best_scorer_artifact.oos_scores
 
-    def dump(self) -> dict[str, dict[str, list[float]]]:
+    def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
         node_wise_metrics = {
             node_type: self._get_metrics_values(node_type)
             for node_type in ["regexp", "retrieval", "scoring", "prediction"]
@@ -83,3 +85,14 @@ class OptimizationInfo:
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
         }
+
+    def get_best_trials(self) -> list[dict[str, Any]]:
+        node_types = ["regexp", "retrieval", "scoring", "prediction"]
+        trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
+        res = {nt: {} for nt in node_types}
+        for idx, node_type in zip(trial_ids, node_types, strict=True):
+            if idx is None:
+                continue
+            trial = self.trials[node_type][idx]
+            res[node_type] = {"module_type": trial.module_type, "module_params": trial.module_params}
+        return res

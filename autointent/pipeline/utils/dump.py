@@ -2,6 +2,7 @@ import json
 from typing import Any
 
 import numpy as np
+from omegaconf import ListConfig
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -14,4 +15,6 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, ListConfig):
+            return list(obj)
         return super().default(obj)

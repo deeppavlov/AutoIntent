@@ -1,63 +1,60 @@
-import importlib.resources as ires
 import json
 import logging
-from collections.abc import Callable
-from logging import Logger
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, TypeVar
 
 import numpy as np
 import yaml
+from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.nodes import Node, PredictionNode, RegExpNode, RetrievalNode, ScoringNode
+from autointent.configs.pipeline import PipelineSearchSpace
+from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
 from .utils import NumpyEncoder
 
+PipelineType = TypeVar("PipelineType", bound="Pipeline")
+
 
 class Pipeline:
-    available_nodes: ClassVar[dict[str, Callable]] = {
-        "regexp": RegExpNode,
-        "retrieval": RetrievalNode,
-        "scoring": ScoringNode,
-        "prediction": PredictionNode,
+    available_nodes: ClassVar[dict[str, NodeInfo]] = {
+        "retrieval": RetrievalNodeInfo(),
+        "scoring": ScoringNodeInfo(),
+        "prediction": PredictionNodeInfo(),
     }
 
-    def __init__(self, config_path: str, mode: str) -> None:
-        # TODO add config validation
+    def __init__(self, nodes: list[NodeOptimizer]) -> None:
         self._logger = logging.getLogger(__name__)
+        self.nodes = nodes
 
-        self._logger.debug("loading optimization search space config...")
-        self.config = load_config(config_path, mode, self._logger)
+    @classmethod
+    def from_dict_config(cls, config: dict[str, Any]) -> PipelineType:
+        return instantiate(PipelineSearchSpace, **config)
 
     def optimize(self, context: Context) -> None:
         self.context = context
         self._logger.info("starting pipeline optimization...")
-        for node_config in self.config["nodes"]:
-            node_logger = logging.getLogger(node_config["node_type"])
-            node: Node = self.available_nodes[node_config["node_type"]](
-                modules_search_spaces=node_config["modules"], metric=node_config["metric"], logger=node_logger
-            )
-            node.fit(context)
+        for node_optimizer in self.nodes:
+            node_optimizer.fit(context)
 
     def dump(self, logs_dir: str, run_name: str) -> None:
         self._logger.debug("dumping logs...")
-        optimization_results = self.context.optimization_info.dump()
+        optimization_results = self.context.optimization_info.dump_evaluation_results()
 
         # create appropriate directory
         logs_dir_path = Path.cwd() if logs_dir == "" else Path(logs_dir)
         logs_dir_path = logs_dir_path / run_name
         logs_dir_path.mkdir(parents=True)
 
-        # dump config and optimization results
+        # dump search space and evaluation results
         logs_path = logs_dir_path / "logs.json"
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-        config_path = logs_dir_path / "config.yaml"
-        with config_path.open("w") as file:
-            yaml.dump(self.config, file)
+        # config_path = logs_dir / "config.yaml"
+        # with config_path.open("w") as file:
+        #     yaml.dump(self.config, file)
 
-        nodes = [node_config["node_type"] for node_config in self.config["nodes"]]
+        nodes = [node_config.node_info.node_type for node_config in self.nodes]
         self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
@@ -71,19 +68,11 @@ class Pipeline:
 
         self._logger.info("logs and other assets are saved to %s", logs_dir_path)
 
-
-def load_config(config_path: str, mode: str, logger: Logger) -> dict[str, Any]:
-    """load config from the given path or load default config which is distributed along with the autointent package"""
-    if config_path != "":
-        logger.debug("loading optimization search space config from %s...)", config_path)
-        with Path(config_path).open() as file:
-            file_content = file.read()
-    else:
-        logger.debug("loading default optimization search space config...")
-        config_name = "default-multilabel-config.yaml" if mode != "multiclass" else "default-multiclass-config.yaml"
-        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
-            file_content = file.read()
-    return yaml.safe_load(file_content)
+        # dump optimization results (config for inference)
+        inference_config = self.context.get_inference_config()
+        inference_config_path = logs_dir_path / "inference_config.yaml"
+        with inference_config_path.open("w") as file:
+            yaml.dump(inference_config, file)
 
 
 def make_report(logs: dict[str, Any], nodes: list[str]) -> str:

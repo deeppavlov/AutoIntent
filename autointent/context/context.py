@@ -2,7 +2,7 @@ from typing import Any
 
 from chromadb import Collection
 
-from autointent.custom_types import TASK_MODES
+from autointent.custom_types import TASK_TYPES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -16,7 +16,7 @@ class Context:
         multilabel_utterance_records: list[dict[str, Any]],
         test_utterance_records: list[dict[str, Any]],
         device: str,
-        mode: TASK_MODES,
+        mode: TASK_TYPES,
         multilabel_generation_config: str,
         db_dir: str,
         regex_sampling: int,
@@ -42,3 +42,15 @@ class Context:
     def get_best_collection(self) -> Collection:
         model_name = self.optimization_info.get_best_embedder()
         return self.vector_index.get_collection(model_name)
+
+    def get_inference_config(self) -> dict[str, Any]:
+        return {
+            "metadata": {
+                "device": self.device,
+                "multilabel": self.multilabel,
+                "n_classes": self.n_classes,
+                "seed": self.seed,
+                "db_dir": self.vector_index.db_dir,
+            },
+            "nodes_configs": self.optimization_info.get_best_trials(),
+        }

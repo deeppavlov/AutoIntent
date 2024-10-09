@@ -3,7 +3,7 @@ from typing import Any
 
 from transformers import set_seed
 
-from autointent.custom_types import TASK_MODES
+from autointent.custom_types import TASK_TYPES
 
 from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
 from .sampling import sample_from_regex
@@ -18,7 +18,7 @@ class DataHandler:
         multiclass_intent_records: list[dict[str, Any]],
         multilabel_utterance_records: list[dict[str, Any]],
         test_utterance_records: list[dict[str, Any]],
-        mode: TASK_MODES,
+        mode: TASK_TYPES,
         multilabel_generation_config: str | None = None,
         regex_sampling: int = 0,
         seed: int = 0,

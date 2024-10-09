@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.data_handler import Tag
+from autointent.context.optimization_info import PredictorArtifact
 from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
@@ -19,13 +20,13 @@ class PredictionModule(Module):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, npt.NDArray[Any]]:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
-        return metric_fn(labels, self._predictions), self._predictions
+        return metric_fn(labels, self._predictions)
 
-    def get_assets(self) -> npt.NDArray[Any]:
-        return self._predictions
+    def get_assets(self) -> PredictorArtifact:
+        return PredictorArtifact(labels=self._predictions)
 
     def clear_cache(self) -> None:
         pass

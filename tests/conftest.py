@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytest
 
 from autointent import Context
-from autointent.pipeline.main import get_run_name, load_data, setup_logging
+from autointent.pipeline.optimization.utils import get_run_name, load_data, setup_logging
 from autointent.pipeline.utils import get_db_dir
 
 cur_path = pathlib.Path(__file__).parent.resolve()
@@ -22,7 +22,7 @@ def setup_environment() -> tuple[str, str]:
 
 @pytest.fixture
 def load_clinic_subset() -> list[dict[str, Any]]:
-    return load_data(str(cur_path / "minimal_optimization" / "data" / "clinc_subset.json"))
+    return load_data(str(cur_path / "minimal_optimization" / "data" / "clinc_subset.json"), multilabel=False)
 
 
 @pytest.fixture

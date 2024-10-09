@@ -14,6 +14,7 @@ class VectorIndex:
     def __init__(self, db_dir: str, device: str, multilabel: bool, n_classes: int) -> None:
         self._logger = logging.getLogger(__name__)
 
+        self.db_dir = db_dir
         self.device = device
         self.multilabel = multilabel
         self.n_classes = n_classes

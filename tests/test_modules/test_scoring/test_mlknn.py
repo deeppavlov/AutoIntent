@@ -34,7 +34,7 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    metric_value, _ = vector_db.score(context, retrieval_hit_rate_macro)
+    metric_value = vector_db.score(context, retrieval_hit_rate_macro)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(
         node_type="retrieval",
@@ -47,7 +47,7 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
 
     scorer = MLKnnScorer(k=3)
     scorer.fit(context)
-    score, predictions = scorer.score(context, scoring_f1)
+    score = scorer.score(context, scoring_f1)
     np.testing.assert_almost_equal(score, 0.8632478632478633)
 
     predictions = scorer.predict_labels(
