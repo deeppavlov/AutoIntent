@@ -91,8 +91,5 @@ class OptimizationInfo:
             if idx is None:
                 continue
             trial = self.trials[node_type][idx]
-            res[node_type] = {
-                "module_type": trial.module_type,
-                "module_params": trial.module_params
-            }
+            res[node_type] = {"module_type": trial.module_type, "module_params": trial.module_params}
         return res

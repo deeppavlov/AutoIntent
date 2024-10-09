@@ -48,5 +48,5 @@ class Context:
                 "seed": self.seed,
                 "db_dir": self.vector_index.db_dir,
             },
-            "nodes_configs": self.optimization_info.get_best_trials()
+            "nodes_configs": self.optimization_info.get_best_trials(),
         }

@@ -50,7 +50,7 @@ ruff = "^0.6.8"
 [tool.ruff]
 line-length = 120
 indent-width = 4
-
+exclude=["experiments", "scripts"]
 target-version = "py310"
 
 [tool.ruff.lint]
