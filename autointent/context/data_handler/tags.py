@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass
@@ -12,7 +13,7 @@ class Tag:
     intent_ids: list[int] = field(default_factory=list)  # classes with this tag
 
 
-def collect_tags(intent_records: list[dict]):
+def collect_tags(intent_records: list[dict[str, Any]]) -> list[Tag]:
     tagwise_intent_ids = defaultdict(list)
     for dct in intent_records:
         if "tags" not in dct:

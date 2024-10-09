@@ -80,7 +80,6 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-
     def fit(self, pairs, labels):
         n_samples = len(pairs)
         assert n_samples == len(labels)

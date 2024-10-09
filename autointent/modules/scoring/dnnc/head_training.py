@@ -12,8 +12,10 @@ python training_stsbenchmark.py
 import itertools as it
 import logging
 from random import shuffle
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
@@ -21,7 +23,9 @@ from sklearn.linear_model import LogisticRegressionCV
 logger = logging.getLogger(__name__)
 
 
-def construct_samples(texts, labels, balancing_factor: int | None = None) -> tuple[list[dict], list[dict]]:
+def construct_samples(
+    texts: list[str], labels: list[Any], balancing_factor: int | None = None
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     samples = [[], []]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
@@ -46,16 +50,18 @@ def construct_samples(texts, labels, balancing_factor: int | None = None) -> tup
 
 
 class CrossEncoderWithLogreg:
-    def __init__(self, model: CrossEncoder, batch_size=16, verbose=False):
+    # TODO refactor
+
+    def __init__(self, model: CrossEncoder, batch_size: int = 16, verbose: bool = False) -> None:
         self.cross_encoder = model
         self.batch_size = batch_size
         self.verbose = verbose
 
     @torch.no_grad()
-    def get_features(self, pairs):
-        logits_list = []
+    def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+        logits_list: list[npt.NDArray[Any]] = []
 
-        def hook_function(module, input_tensor, output_tenspr):  # noqa: ARG001
+        def hook_function(module, input_tensor, output_tensor) -> None:  # noqa: ARG001, ANN001
             logits_list.append(input_tensor[0].cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
@@ -68,7 +74,7 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-    def _fit(self, pairs: list[tuple[str, str]], labels: list[int]):
+    def _fit(self, pairs: list[tuple[str, str]], labels: list[int]) -> None:
         """
         Arguments
         ---
@@ -88,7 +94,7 @@ class CrossEncoderWithLogreg:
 
         self._clf = clf
 
-    def fit(self, utterances: list[str], labels: list[int]):
+    def fit(self, utterances: list[str], labels: list[int]) -> None:
         """
         Construct train samples for binary classifier over cross-encoder features
 
@@ -100,7 +106,7 @@ class CrossEncoderWithLogreg:
         pairs, labels = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels)
 
-    def predict(self, pairs):
+    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
         Return probabilities of two utterances having the same intent label
         """

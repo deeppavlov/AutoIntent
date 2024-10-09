@@ -1,0 +1,50 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ "3.10", "3.11", "3.12" ]
+        # waighing when pysql will be removed
+        # include:
+        #   - os: windows-latest
+        #     python-version: "3.10"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: "pip"
+
+    # - name: Install Poetry
+    #   run: |
+    #     curl -sSL https://install.python-poetry.org | python3 -
+    #     echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      # run: |
+      #   poetry install --with test
+      run: |
+          pip install .
+          pip install pytest
+
+    - name: Run tests
+      run: |
+        pytest
+# poetry run pytest tests
+# poetry run clear-cache

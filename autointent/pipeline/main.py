@@ -1,10 +1,9 @@
-import importlib.resources as ires
 import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from autointent import Context
 
@@ -14,7 +13,7 @@ from .utils import generate_name, get_db_dir
 LoggingLevelType = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser()
     parser.add_argument(
         "--config-path",
@@ -88,7 +87,7 @@ def main():
     )
     args = parser.parse_args()
 
-    setup_logging(args.log_level)
+    setup_logging(args.log_level)  # TODO standardize logging
     logger = logging.getLogger(__name__)
 
     # configure the run and data
@@ -100,9 +99,9 @@ def main():
 
     # create shared objects for a whole pipeline
     context = Context(
-        load_data(args.multiclass_path, multilabel=False),
-        load_data(args.multilabel_path, multilabel=True),
-        load_data(args.test_path, multilabel=True),
+        load_data(args.multiclass_path),
+        load_data(args.multilabel_path),
+        load_data(args.test_path),
         args.device,
         args.mode,
         args.multilabel_generation_config,
@@ -119,25 +118,23 @@ def main():
     pipeline.dump(args.logs_dir, run_name)
 
 
-def load_data(data_path: str, multilabel: bool):
+def load_data(data_path: str) -> list[dict[str, Any]]:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path == "default":
-        data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
-        with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return json.load(file)
-    elif data_path != "":
-        with Path(data_path).open() as file:
-            return json.load(file)
-    return []
+    path = Path(data_path)
+    if not path.exists():
+        msg = "Path not exists"
+        raise ValueError(msg)
+    with Path(data_path).open() as file:
+        return json.load(file)
 
 
-def get_run_name(run_name: str):
+def get_run_name(run_name: str) -> str:
     if run_name == "":
         run_name = generate_name()
-    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
+    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
 
-def setup_logging(level: LoggingLevelType = None) -> logging.Logger:
+def setup_logging(level: LoggingLevelType | None = None) -> logging.Logger:
     logging.basicConfig(
         level=level,
         format="{asctime} - {name} - {levelname} - {message}",

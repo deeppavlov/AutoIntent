@@ -18,12 +18,13 @@ from autointent.metrics import (
     retrieval_precision_intersecting,
     retrieval_precision_macro,
 )
-from autointent.modules import VectorDBModule
+from autointent.modules import RetrievalModule, VectorDBModule
 
 from .base import Node
 
 
 class RetrievalNode(Node):
+    # todo change type
     metrics_available: ClassVar[dict[str, Callable]] = {
         "retrieval_hit_rate": retrieval_hit_rate,
         "retrieval_hit_rate_macro": retrieval_hit_rate_macro,
@@ -42,6 +43,6 @@ class RetrievalNode(Node):
         "retrieval_precision_intersecting": retrieval_precision_intersecting,
     }
 
-    modules_available: ClassVar[dict[str, Callable]] = {"vector_db": VectorDBModule}
+    modules_available: ClassVar[dict[str, type[RetrievalModule]]] = {"vector_db": VectorDBModule}
 
     node_type = "retrieval"

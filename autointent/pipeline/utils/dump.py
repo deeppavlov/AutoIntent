@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import numpy as np
 
@@ -6,7 +7,7 @@ import numpy as np
 class NumpyEncoder(json.JSONEncoder):
     """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""
 
-    def default(self, obj):
+    def default(self, obj: Any) -> str | int | float | list[Any] | Any:  # noqa: ANN401
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):

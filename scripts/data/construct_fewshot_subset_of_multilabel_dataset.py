@@ -30,7 +30,6 @@ def main():
     json.dump(res, open(args.output_path, "w"), indent=4, ensure_ascii=False)
 
 
-
 def update_counter(counter: defaultdict, labels: list[int]):
     for lab in labels:
         counter[lab] += 1

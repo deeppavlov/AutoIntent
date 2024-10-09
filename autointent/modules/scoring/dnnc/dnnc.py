@@ -1,10 +1,13 @@
 import itertools as it
 import logging
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 
-from autointent.modules.scoring.base import Context, ScoringModule
+from autointent import Context
+from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
 
@@ -19,12 +22,12 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int, train_head: bool = False):
+    def __init__(self, model_name: str, k: int, train_head: bool = False) -> None:
         self.model_name = model_name
         self.k = k
         self.train_head = train_head
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
         self._collection = context.get_best_collection()
 
@@ -33,7 +36,7 @@ class DNNCScorer(ScoringModule):
             model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
             self.model = model
 
-    def predict(self, utterances: list[str]):
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
         Return
         ---
@@ -51,7 +54,7 @@ class DNNCScorer(ScoringModule):
 
         return self._build_result(cross_encoder_scores, labels_pred)
 
-    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]):
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
         Arguments
         ---
@@ -83,7 +86,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[int]]):
+    def _build_result(self, scores: list[list[float]], labels: list[list[int]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---
@@ -94,20 +97,17 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        scores = np.array(scores)
-        labels = np.array(labels)
         n_classes = self._collection.metadata["n_classes"]
 
-        return build_result(scores, labels, n_classes)
+        return build_result(np.array(scores), np.array(labels), n_classes)
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self._collection = None
 
 
-def build_result(scores: np.ndarray, labels: np.ndarray, n_classes: int):
+def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
     res = np.zeros((len(scores), n_classes))
     best_neighbors = np.argmax(scores, axis=1)
     idx_helper = np.arange(len(res))

@@ -4,15 +4,11 @@ from autointent import Context
 from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
-from autointent.pipeline.main import get_db_dir, get_run_name, load_data, setup_logging
 
 
-def test_base_mlknn():
-    setup_logging("DEBUG")
-    run_name = get_run_name("multiclass-cpu")
-    db_dir = get_db_dir("", run_name)
+def test_base_mlknn(setup_environment, load_clinic_subset):
+    run_name, db_dir = setup_environment
 
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
     utterance = [
         {
             "utterance": "why is there a hold on my american saving bank account",
@@ -20,11 +16,11 @@ def test_base_mlknn():
         },
         {
             "utterance": "i am nost sure why my account is blocked",
-            "labels": [0, 3],
+            "labels": [0, 2],
         },
     ]
     context = Context(
-        multiclass_intent_records=data,
+        multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=utterance,
         test_utterance_records=utterance,
         device="cpu",
@@ -38,7 +34,7 @@ def test_base_mlknn():
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate_macro)
+    metric_value, _ = vector_db.score(context, retrieval_hit_rate_macro)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(
         node_type="retrieval",
@@ -51,7 +47,8 @@ def test_base_mlknn():
 
     scorer = MLKnnScorer(k=3)
     scorer.fit(context)
-    np.testing.assert_almost_equal(0.6663752913752914, scorer.score(context, scoring_f1))
+    score, predictions = scorer.score(context, scoring_f1)
+    np.testing.assert_almost_equal(score, 0.8632478632478633)
 
     predictions = scorer.predict_labels(
         [
@@ -62,4 +59,4 @@ def test_base_mlknn():
             "can you tell me why is my bank account frozen",
         ]
     )
-    assert (predictions == np.array([[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]])).all()
+    assert (predictions == np.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]])).all()

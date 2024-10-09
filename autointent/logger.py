@@ -14,10 +14,10 @@ def get_logger() -> logging.Logger:
 
 
 class PPrintFormatter(logging.Formatter):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(fmt="{asctime} - {name} - {levelname} - {message}", style="{")
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         if isinstance(record.msg, dict):
             format_msg = "module scoring results:\n"
             dct_to_str = pformat(record.msg)

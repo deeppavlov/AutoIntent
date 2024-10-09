@@ -1,24 +1,22 @@
 import gc
 import itertools as it
-from collections.abc import Callable
 from copy import deepcopy
 from logging import Logger
-from typing import TYPE_CHECKING
+from typing import ClassVar
 
 import torch
 
 from autointent.context import Context
-
-if TYPE_CHECKING:
-    from autointent.modules import Module
+from autointent.metrics import PredictionMetricFn
+from autointent.modules import Module
 
 
 class Node:
-    metrics_available: dict[str, Callable]  # metrics functions
-    modules_available: dict[str, Callable]  # modules constructors
+    metrics_available: ClassVar[dict[str, PredictionMetricFn]]  # metrics functions
+    modules_available: ClassVar[dict[str, type[Module]]]  # modules constructors
     node_type: str
 
-    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger):
+    def __init__(self, modules_search_spaces: list[dict], metric: str, logger: Logger) -> None:
         """
         `modules_search_spaces`: list of records, where each record is a mapping: hyperparam_name -> list of values \
             (search space) with extra field "module_type" with values from ["knn", "linear", "dnnc"]
@@ -27,7 +25,7 @@ class Node:
         self.modules_search_spaces = modules_search_spaces
         self.metric_name = metric
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self._logger.info("starting %s node optimization...", self.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
@@ -42,7 +40,7 @@ class Node:
                 module.fit(context)
 
                 self._logger.debug("scoring %s module...", module_type)
-                metric_value = module.score(context, self.metrics_available[self.metric_name])
+                metric_value, _ = module.score(context, self.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
                 context.optimization_info.log_module_optimization(

@@ -1,17 +1,20 @@
-from typing import Literal
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
+
+from autointent.custom_types import WEIGHT_TYPES
 
 from .count_neighbors import get_counts, get_counts_multilabel
 
 
 def apply_weights(
-    labels: np.ndarray,
-    distances: np.ndarray,
-    weights: Literal["uniform", "distance", "closest"],
+    labels: NDArray[Any],
+    distances: NDArray[Any],
+    weights: WEIGHT_TYPES,
     n_classes: int,
     multilabel: bool,
-):
+) -> NDArray[Any]:
     """
     Calculate probabilities
 
@@ -49,13 +52,13 @@ def apply_weights(
     return probs
 
 
-def closest_weighting(labels, distances, multilabel, n_classes):
+def closest_weighting(labels: NDArray[Any], distances: NDArray[Any], multilabel: bool, n_classes: int) -> NDArray[Any]:
     if not multilabel:
         labels = to_onehot(labels, n_classes)
     return _closest_weighting(labels, distances)
 
 
-def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
+def _closest_weighting(labels: NDArray[Any], distances: NDArray[Any]) -> NDArray[Any]:
     """
     Arguments
     ---
@@ -75,7 +78,7 @@ def _closest_weighting(labels: np.ndarray, distances: np.ndarray):
     return (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
 
 
-def to_onehot(labels: np.ndarray, n_classes):
+def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
     """convert nd array of ints to (n+1)d array of zeros and ones"""
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
