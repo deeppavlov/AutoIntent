@@ -41,9 +41,9 @@ jobs:
       run: |
           pip install .
           pip install pytest
-          pytest
 
     - name: Run tests
       run: |
-        poetry run pytest tests
-        poetry run clear-cache
+        pytest
+# poetry run pytest tests
+# poetry run clear-cache
