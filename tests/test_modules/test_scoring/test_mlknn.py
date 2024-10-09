@@ -16,7 +16,7 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
         },
         {
             "utterance": "i am nost sure why my account is blocked",
-            "labels": [0, 3],
+            "labels": [0, 2],
         },
     ]
     context = Context(
@@ -48,7 +48,7 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
     scorer = MLKnnScorer(k=3)
     scorer.fit(context)
     score, predictions = scorer.score(context, scoring_f1)
-    np.testing.assert_almost_equal(0.6663752913752914, score)
+    np.testing.assert_almost_equal(score, 0.8632478632478633)
 
     predictions = scorer.predict_labels(
         [
@@ -59,4 +59,4 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
             "can you tell me why is my bank account frozen",
         ]
     )
-    assert (predictions == np.array([[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]])).all()
+    assert (predictions == np.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]])).all()
