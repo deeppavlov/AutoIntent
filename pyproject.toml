@@ -50,7 +50,7 @@ ruff = "^0.6.8"
 [tool.ruff]
 line-length = 120
 indent-width = 4
-exclude=["experiments", "scripts"]
+exclude = ["experiments", "scripts"]
 target-version = "py310"
 
 [tool.ruff.lint]
@@ -60,8 +60,6 @@ ignore = ["D", "TD", "ANN", "FIX", "S311",  "COM812", "ISC001", "ERA001", "FBT"]
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
-"experiments/*" = ["ALL"]
-"scripts/*" = ["ALL"]
 
 [tool.ruff.lint.pylint]
 max-args = 10
