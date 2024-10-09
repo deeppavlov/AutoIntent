@@ -1,5 +1,6 @@
 import logging
-from typing import Literal
+
+from autointent.custom_types import ClassificationMode
 
 from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
 from .sampling import sample_from_regex
@@ -13,7 +14,7 @@ class DataHandler:
         multiclass_intent_records: list[dict],
         multilabel_utterance_records: list[dict],
         test_utterance_records: list[dict],
-        mode: Literal["multiclass", "multilabel", "multiclass_as_multilabel"],
+        mode: ClassificationMode,
         multilabel_generation_config: str = "",
         regex_sampling: int = 0,
         seed: int = 0,
@@ -36,15 +37,15 @@ class DataHandler:
             logger.debug("collecting tags from multiclass intent_records if present...")
             self.tags = collect_tags(multiclass_intent_records)
 
-        if mode == "multiclass":
+        if mode == ClassificationMode.multiclass:
             data = multiclass_intent_records
             self.tags = []
 
-        elif mode == "multilabel":
+        elif mode == ClassificationMode.multilabel:
             data = multilabel_utterance_records
             self.tags = []  # TODO add tags supporting for a pure multilabel case?
 
-        elif mode == "multiclass_as_multilabel":
+        elif mode == ClassificationMode.multiclass_as_multilabel:
             if not hasattr(self, "tags"):
                 logger.debug("collecting tags from multiclass intent_records if present...")
                 self.tags = collect_tags(multiclass_intent_records)
@@ -59,7 +60,7 @@ class DataHandler:
             logger.error(msg)
             raise ValueError(msg)
 
-        self.multilabel = mode != "multiclass"
+        self.multilabel = mode != ClassificationMode.multiclass
 
         logger.info("defining train and test splits...")
         (
@@ -71,7 +72,7 @@ class DataHandler:
             self.labels_test,
         ) = split_sample_utterances(data, test_utterance_records, self.multilabel, seed)
 
-        if mode != "multilabel":
+        if mode != ClassificationMode.multilabel:
             logger.debug("collection regexp patterns from multiclass intent records")
             self.regexp_patterns = [
                 {
