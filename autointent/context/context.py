@@ -2,9 +2,7 @@ from typing import Any
 
 from chromadb import Collection
 
-from autointent.custom_types import TASK_TYPES
-
-from .data_handler import DataHandler
+from .data_handler import DataHandler, Dataset
 from .optimization_info import OptimizationInfo
 from .vector_index import VectorIndex
 
@@ -12,21 +10,17 @@ from .vector_index import VectorIndex
 class Context:
     def __init__(
         self,
-        multiclass_intent_records: list[dict[str, Any]],
-        multilabel_utterance_records: list[dict[str, Any]],
-        test_utterance_records: list[dict[str, Any]],
+        dataset: Dataset,
+        test_dataset: Dataset | None,
         device: str,
-        mode: TASK_TYPES,
         multilabel_generation_config: str,
         db_dir: str,
         regex_sampling: int,
         seed: int,
     ) -> None:
         self.data_handler = DataHandler(
-            multiclass_intent_records,
-            multilabel_utterance_records,
-            test_utterance_records,
-            mode,
+            dataset,
+            test_dataset,
             multilabel_generation_config,
             regex_sampling,
             seed,
