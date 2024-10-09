@@ -1,18 +1,13 @@
 import logging
-from typing import TYPE_CHECKING
 
 import hydra
-from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.configs.pipeline import OptimizationConfig, PipelineSearchSpace
+from autointent.configs.pipeline import OptimizationConfig
+from autointent.pipeline.pipeline import Pipeline
 from autointent.pipeline.utils import get_db_dir
 
 from .utils import get_run_name, load_config, load_data, setup_logging
-
-if TYPE_CHECKING:
-    from autointent.pipeline.pipeline import Pipeline
-
 
 # def main():
 #     parser = ArgumentParser()
@@ -147,7 +142,7 @@ def optimization(cfg: OptimizationConfig) -> None:
 
     # run optimization
     search_space_config = load_config(cfg.search_space_path, context.multilabel, logger)
-    pipeline: Pipeline = instantiate(PipelineSearchSpace(), **search_space_config)
+    pipeline = Pipeline.from_dict_config(search_space_config)
     pipeline.optimize(context)
 
     # save results

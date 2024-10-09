@@ -1,12 +1,14 @@
 import json
 import logging
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import numpy as np
 import yaml
+from hydra.utils import instantiate
 
 from autointent import Context
+from autointent.configs.pipeline import PipelineSearchSpace
 from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
 from .utils import NumpyEncoder
@@ -22,6 +24,10 @@ class Pipeline:
     def __init__(self, nodes: list[NodeOptimizer]):
         self._logger = logging.getLogger(__name__)
         self.nodes = nodes
+
+    @classmethod
+    def from_dict_config(cls, config: dict[str, Any]):
+        return instantiate(PipelineSearchSpace, **config)
 
     def optimize(self, context: Context):
         self.context = context
