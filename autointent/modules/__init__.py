@@ -39,3 +39,19 @@ PREDICTION_MODULES_MULTILABEL: dict[str, type[PredictionModule]] = {
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
 }
+__all__ = [
+    "Module",
+    "ArgmaxPredictor",
+    "JinoosPredictor",
+    "PredictionModule",
+    "ThresholdPredictor",
+    "TunablePredictor",
+    "RegExp",
+    "RetrievalModule",
+    "VectorDBModule",
+    "DNNCScorer",
+    "KNNScorer",
+    "LinearScorer",
+    "MLKnnScorer",
+    "ScoringModule",
+]

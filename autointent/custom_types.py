@@ -1,10 +1,7 @@
 from enum import Enum
+from typing import Literal
 
-
-class ClassificationMode(Enum):
-    multiclass = "multiclass"
-    multilabel = "multilabel"
-    multiclass_as_multilabel = "multiclass_as_multilabel"
+TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
 
 
 class LogLevel(Enum):
@@ -13,3 +10,6 @@ class LogLevel(Enum):
     WARNING = "WARNING"
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
+
+
+WEIGHT_TYPES = Literal["uniform", "distance", "closest"]

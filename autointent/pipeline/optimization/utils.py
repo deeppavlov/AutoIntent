@@ -8,11 +8,10 @@ from typing import Any
 
 import yaml
 
-from autointent.custom_types import LogLevel
 from autointent.pipeline.utils import generate_name
 
 
-def load_data(data_path: str, multilabel: bool):
+def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
@@ -24,15 +23,15 @@ def load_data(data_path: str, multilabel: bool):
     return []
 
 
-def get_run_name(run_name: str):
+def get_run_name(run_name: str) -> str:
     if run_name == "":
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
 
 
-def setup_logging(level: LogLevel | None = None) -> logging.Logger:
+def setup_logging(level: str | None = None) -> logging.Logger:
     logging.basicConfig(
-        level=level.value,
+        level=level,
         format="{asctime} - {name} - {levelname} - {message}",
         style="{",
         handlers=[logging.StreamHandler()],

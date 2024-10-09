@@ -90,7 +90,7 @@ class TrialsIds(BaseModel):
     scoring: int | None = None
     prediction: int | None = None
 
-    def __getitem__(self, node_type: str) -> list[Trial]:
+    def __getitem__(self, node_type: str) -> int:
         return getattr(self, node_type)
 
     def __setitem__(self, node_type: str, idx: int) -> None:

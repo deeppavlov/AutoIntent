@@ -3,17 +3,13 @@ import numpy as np
 from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
-from autointent.pipeline.optimization import get_db_dir, get_run_name, load_data, setup_logging
 
 
-def test_base_knn():
-    setup_logging("DEBUG")
-    run_name = get_run_name("multiclass-cpu")
-    db_dir = get_db_dir("", run_name)
+def test_base_knn(setup_environment, load_clinic_subset):
+    run_name, db_dir = setup_environment
 
-    data = load_data("tests/minimal-optimization/data/clinc_subset.json", multilabel=False)
     context = Context(
-        multiclass_intent_records=data,
+        multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=[],
         test_utterance_records=[],
         device="cpu",
@@ -41,7 +37,8 @@ def test_base_knn():
     scorer = KNNScorer(k=3, weights="distance")
 
     scorer.fit(context)
-    assert scorer.score(context, scoring_roc_auc) == 1
+    score = scorer.score(context, scoring_roc_auc)
+    assert score == 1
     predictions = scorer.predict(
         [
             "why is there a hold on my american saving bank account",

@@ -1,13 +1,15 @@
 import itertools as it
 import logging
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from sklearn.model_selection import train_test_split
 from sklearn.utils import _safe_indexing, indexable
 from skmultilearn.model_selection import IterativeStratification
 
 
-def get_sample_utterances(intent_records: list[dict]):
+def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[Any], list[Any]]:
     """get plain list of all sample utterances and their intent labels"""
     utterances = [intent["sample_utterances"] for intent in intent_records]
     labels = [[intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances, strict=False)]
@@ -18,7 +20,19 @@ def get_sample_utterances(intent_records: list[dict]):
     return utterances, labels
 
 
-def split_sample_utterances(intent_records: list[dict], test_records: list[dict], multilabel: bool, seed: int = 0):
+def split_sample_utterances(
+    intent_records: list[dict],
+    test_records: list[dict],
+    multilabel: bool,
+    seed: int = 0,
+) -> tuple[
+    int,
+    list[Any],
+    list[str],
+    list[str],
+    list[int],
+    list[int],
+]:
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
     """
@@ -94,12 +108,16 @@ def split_sample_utterances(intent_records: list[dict], test_records: list[dict]
         logger.error(msg)
         raise ValueError(msg)
 
-    return [n_classes, oos_utterances, *splits]
+    return n_classes, oos_utterances, *splits
 
 
 def multilabel_train_test_split(
-    *arrays, test_size=0.25, random_state: int = 0, shuffle: bool = False, stratify: list[list[int]] | None = None
-):
+    *arrays: npt.NDArray[Any],
+    test_size: float = 0.25,
+    random_state: int = 0,
+    shuffle: bool = False,
+    stratify: list[list[int]] | None = None,
+) -> list[npt.NDArray[Any]]:
     """
     TODO:
     - test whether this function is not random
@@ -107,8 +125,6 @@ def multilabel_train_test_split(
     """
     if stratify is None:
         return train_test_split(*arrays, test_size=test_size, random_state=random_state, shuffle=shuffle)
-    stratify = np.array(stratify)
-
     n_arrays = len(arrays)
     if n_arrays == 0:
         msg = "At least one array required as input"
@@ -117,33 +133,34 @@ def multilabel_train_test_split(
     arrays = indexable(*arrays)
 
     stratifier = IterativeStratification(n_splits=2, order=2, sample_distribution_per_fold=[test_size, 1.0 - test_size])
-    train, test = next(stratifier.split(arrays[0], stratify))
+    train, test = next(stratifier.split(arrays[0], np.array(stratify)))
 
     return list(it.chain.from_iterable((_safe_indexing(a, train), _safe_indexing(a, test)) for a in arrays))
 
 
-def validate_test_labels(test_labels, multilabel, n_classes):
+def validate_test_labels(test_labels: list[int] | list[list[int]], multilabel: bool, n_classes: int) -> bool:
     """
     ensure that all classes are presented in the presented labels set
     """
-    if not multilabel:
+    if not multilabel and isinstance(test_labels[0], int):
         return is_multiclass_test_set_complete(test_labels, n_classes)
-    return is_multilabel_test_set_complete(test_labels)
+    if multilabel and isinstance(test_labels[0], list):
+        return is_multilabel_test_set_complete(np.array(test_labels))
+    msg = "unexpected labels format"
+    raise ValueError(msg)
 
 
-def is_multilabel_test_set_complete(labels: list[list[int]]):
-    labels = np.array(labels)
+def is_multilabel_test_set_complete(labels: npt.NDArray[Any]) -> bool:
     labels_counts = labels.sum(axis=0)
     return (labels_counts > 0).all()
 
 
-def is_multiclass_test_set_complete(labels: list[int], n_classes: int):
-    labels = np.array(labels)
-    labels = to_onehot(labels, n_classes)
-    return is_multilabel_test_set_complete(labels)
+def is_multiclass_test_set_complete(labels: list[int], n_classes: int) -> bool:
+    ohe_labels = to_onehot(np.array(labels), n_classes)
+    return is_multilabel_test_set_complete(ohe_labels)
 
 
-def to_onehot(labels: np.ndarray, n_classes):
+def to_onehot(labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
     """convert nd array of ints to (n+1)d array of zeros and ones"""
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)

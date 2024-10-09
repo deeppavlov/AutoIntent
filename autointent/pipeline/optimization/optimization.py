@@ -117,7 +117,7 @@ from .utils import get_run_name, load_config, load_data, setup_logging
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
 def optimization(cfg: OptimizationConfig) -> None:
-    setup_logging(cfg.log_level)
+    setup_logging(cfg.log_level.value)
     logger = logging.getLogger(__name__)
 
     # configure the run and data

@@ -3,17 +3,24 @@ poetry = poetry run
 
 .PHONY: install
 install:
-	rm -f poetry.lock
-	poetry install --with dev,test,lint
+	poetry install --with dev,test,lint,typing
 
 .PHONY: test
 test:
-	$(poetry) pytest
+	$(poetry) pytest tests --cov
+
+.PHONY: test-html
+test-html:
+	$(poetry) pytest --cov --cov-report html
+
+.PHONY: typing
+typing:
+	$(poetry) mypy autointent
 
 .PHONY: lint
 lint:
 	$(poetry) ruff format
-	$(poetry) ruff check
+	$(poetry) ruff check --fix
 
 .PHONY: all
 all: lint

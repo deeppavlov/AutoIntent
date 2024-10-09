@@ -1,7 +1,7 @@
 nodes:
   - node_type: retrieval
     metric: retrieval_hit_rate_intersecting
-    modules:
+    search_space:
       - module_type: vector_db
         k: [10]
         model_name:
@@ -9,15 +9,14 @@ nodes:
           - avsolatorio/GIST-small-Embedding-v0
   - node_type: scoring
     metric: scoring_roc_auc
-    modules:
+    search_space:
       - module_type: knn
         k: [5, 10]
         weights: [uniform, distance, closest]
       - module_type: linear
-        multilabel: [true]
   - node_type: prediction
     metric: prediction_accuracy
-    modules:
+    search_space:
       - module_type: threshold
         thresh: [0.5, [0.5, 0.5, 0.5]]
       - module_type: tunable

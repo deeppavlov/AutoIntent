@@ -1,19 +1,24 @@
 import logging
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
-from .base import Context, PredictionModule, get_prediction_evaluation_data
+from autointent import Context
+from autointent.context.data_handler.tags import Tag
+
+from .base import PredictionModule, get_prediction_evaluation_data
 from .threshold import multiclass_predict, multilabel_predict
 
 
 class TunablePredictor(PredictionModule):
-    def __init__(self, n_trials: int | None = None):
+    def __init__(self, n_trials: int | None = None) -> None:
         self.n_trials = n_trials
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self.tags = context.data_handler.tags
         self.multilabel = context.multilabel
 
@@ -36,27 +41,33 @@ class TunablePredictor(PredictionModule):
         )
         self.thresh = thresh_optimizer.best_thresholds
 
-    def predict(self, scores: list[list[float]]):
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
 
 class ThreshOptimizer:
-    def __init__(self, n_classes: int, multilabel: bool, n_trials: int | None = None):
+    def __init__(self, n_classes: int, multilabel: bool, n_trials: int | None = None) -> None:
         self.n_classes = n_classes
         self.multilabel = multilabel
         self.n_trials = n_trials if n_trials is not None else n_classes * 10
 
-    def objective(self, trial: Trial):
+    def objective(self, trial: Trial) -> float:
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
         if self.multilabel:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        return f1_score(self.labels, y_pred, average="macro")
+        return f1_score(self.labels, y_pred, average="macro")  # type: ignore[no-any-return]
 
-    def fit(self, probas, labels, seed, tags):
+    def fit(
+        self,
+        probas: npt.NDArray[Any],
+        labels: npt.NDArray[Any],
+        seed: int,
+        tags: list[Tag],
+    ) -> None:
         self.probas = probas
         self.labels = labels
         self.tags = tags

@@ -1,6 +1,8 @@
 from collections.abc import Callable
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from chromadb import Collection
 
 from autointent.context import Context
@@ -11,14 +13,14 @@ from .base import RetrievalModule
 
 
 class VectorDBModule(RetrievalModule):
-    def __init__(self, k: int, model_name: str):
+    def __init__(self, k: int, model_name: str) -> None:
         self.model_name = model_name
         self.k = k
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, str]:
+    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred = retrieve_candidates(
             self.collection,
             self.k,
@@ -30,16 +32,18 @@ class VectorDBModule(RetrievalModule):
     def get_assets(self) -> RetrieverArtifact:
         return RetrieverArtifact(embedder_name=self.model_name)
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         model = self.collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self.collection = None
 
 
 def retrieve_candidates(
-    collection: Collection, k: int, utterances: list[str], converter: Callable
-) -> list[int] | list[list[int]]:
+    collection: Collection,
+    k: int,
+    utterances: list[str],
+    converter: Callable[[Any], Any],
+) -> npt.NDArray[Any]:
     """
     Return
     ---

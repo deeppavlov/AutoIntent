@@ -2,7 +2,7 @@ import gc
 import itertools as it
 import logging
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import torch
 from hydra.utils import instantiate
@@ -14,19 +14,21 @@ from autointent.nodes.nodes_info import NODES_INFO
 if TYPE_CHECKING:
     from autointent.modules import Module
 
+NodeOptimizerType = TypeVar("NodeOptimizerType", bound="NodeOptimizer")
+
 
 class NodeOptimizer:
-    def __init__(self, node_type: str, search_space: list[dict], metric: str):
+    def __init__(self, node_type: str, search_space: list[dict], metric: str) -> None:
         self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]):
+    def from_dict_config(cls, config: dict[str, Any]) -> NodeOptimizerType:
         return instantiate(NodeOptimizerConfig, **config)
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):

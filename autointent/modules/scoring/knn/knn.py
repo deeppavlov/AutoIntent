@@ -1,16 +1,19 @@
 from collections.abc import Callable
-from typing import Literal
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 from chromadb import Collection
 
-from autointent.modules.scoring.base import Context, ScoringModule
+from autointent import Context
+from autointent.custom_types import WEIGHT_TYPES
+from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
 
 
 class KNNScorer(ScoringModule):
-    def __init__(self, k: int, weights: Literal["uniform", "distance", "closest"] | bool):
+    def __init__(self, k: int, weights: WEIGHT_TYPES | bool) -> None:
         """
         Arguments
         ---
@@ -26,24 +29,25 @@ class KNNScorer(ScoringModule):
             weights = "distance" if weights else "uniform"
         self.weights = weights
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
         self._collection = context.get_best_collection()
         self._n_classes = context.n_classes
         self._converter = context.vector_index.metadata_as_labels
 
-    def predict(self, utterances: list[str]):
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         labels, distances = query(self._collection, self.k, utterances, self._converter)
         return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         model = self._collection._embedding_function._model  # noqa: SLF001
         model.to(device="cpu")
         del model
-        self._collection = None
 
 
-def query(collection: Collection, k: int, utterances: list[str], converter: Callable):
+def query(
+    collection: Collection, k: int, utterances: list[str], converter: Callable[[Any], Any]
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     """
     Return
     ---
