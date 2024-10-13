@@ -76,9 +76,7 @@ class MLKnnScorer(ScoringModule):
             self.k + self.ignore_first_neighbours,
             self._converter,
         )
-        return np.array(
-            [candidates[self.ignore_first_neighbours :] for candidates in labels]
-        )
+        return np.array([candidates[self.ignore_first_neighbours :] for candidates in labels])
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
         probas = self.predict(utterances)

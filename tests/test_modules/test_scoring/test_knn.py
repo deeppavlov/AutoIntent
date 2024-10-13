@@ -8,9 +8,16 @@ from autointent.modules import KNNScorer, VectorDBModule
 def test_base_knn(setup_environment, load_clinic_subset):
     run_name, db_dir = setup_environment
 
-    context = Context(multiclass_intent_records=load_clinic_subset, multilabel_utterance_records=[],
-                      test_utterance_records=[], device="cpu", mode="multiclass", multilabel_generation_config="",
-                      regex_sampling=0, seed=0)
+    context = Context(
+        multiclass_intent_records=load_clinic_subset,
+        multilabel_utterance_records=[],
+        test_utterance_records=[],
+        device="cpu",
+        mode="multiclass",
+        multilabel_generation_config="",
+        regex_sampling=0,
+        seed=0,
+    )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)

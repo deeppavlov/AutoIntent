@@ -33,8 +33,16 @@ def test_base_regex(setup_environment):
             "regexp_partial_match": [".*"],
         },
     ]
-    context = Context(multiclass_intent_records=data, multilabel_utterance_records=[], test_utterance_records=[],
-                      device="cpu", mode="multiclass", multilabel_generation_config="", regex_sampling=0, seed=0)
+    context = Context(
+        multiclass_intent_records=data,
+        multilabel_utterance_records=[],
+        test_utterance_records=[],
+        device="cpu",
+        mode="multiclass",
+        multilabel_generation_config="",
+        regex_sampling=0,
+        seed=0,
+    )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)

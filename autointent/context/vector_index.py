@@ -48,7 +48,7 @@ class Index(ABC):
 
 
 class FaissIndex(Index):
-    def __init__(self, model_name: str, device: str):
+    def __init__(self, model_name: str, device: str) -> None:
         self.model_name = model_name
         self.device = device
         self.embedding_model = SentenceTransformer(model_name, device=device)
@@ -58,7 +58,7 @@ class FaissIndex(Index):
     def add(self, embeddings: np.ndarray, metadata: list[dict]) -> None:
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
-        self.index.add(embeddings)  # type: ignore
+        self.index.add(embeddings)  # type: ignore # noqa: PGH003
         self.metadata.extend(metadata)
 
     def delete(self) -> None:
@@ -85,16 +85,13 @@ class FaissIndex(Index):
     def get_metadata(self) -> list[dict]:
         return self.metadata
 
-    def get_all_embeddings(self) ->  npt.NDArray[Any]:
+    def get_all_embeddings(self) -> npt.NDArray[Any]:
         return self.index.reconstruct_n(0, self.index.ntotal)
-
 
     def query(
         self, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
     ) -> tuple[list[Any], list[list[float]]]:
-        all_results = []
-        for query in queries:
-            all_results.append(self.search_by_query(query, k))
+        all_results = [self.search_by_query(query, k) for query in queries]
 
         all_metadata = [[result["metadata"] for result in results] for results in all_results]
         all_distances = [[result["distance"] for result in results] for results in all_results]
@@ -116,7 +113,7 @@ class VectorIndex:
         self.indexes: dict[str, Index] = {}
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> str:
-        self._logger.info(f"Creating index for model: {model_name}")
+        self._logger.info("Creating index for model: %s", model_name)
 
         index = FaissIndex(model_name, self.device)
 
@@ -142,7 +139,7 @@ class VectorIndex:
 
     def delete_index(self, model_name: str) -> None:
         if model_name in self.indexes:
-            self._logger.debug(f"Deleting index for model: {model_name}")
+            self._logger.debug("Deleting index for model: %s", model_name)
             self.indexes[model_name].delete()
             del self.indexes[model_name]
 

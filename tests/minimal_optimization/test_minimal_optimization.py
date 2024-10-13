@@ -14,9 +14,16 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
     run_name, db_dir = setup_environment
 
     cur_path = pathlib.Path(__file__).parent.resolve()
-    context = Context(multiclass_intent_records=load_clinic_subset, multilabel_utterance_records=[],
-                      test_utterance_records=[], device="cpu", mode=mode, multilabel_generation_config="",
-                      regex_sampling=0, seed=0)
+    context = Context(
+        multiclass_intent_records=load_clinic_subset,
+        multilabel_utterance_records=[],
+        test_utterance_records=[],
+        device="cpu",
+        mode=mode,
+        multilabel_generation_config="",
+        regex_sampling=0,
+        seed=0,
+    )
 
     # run optimization
     search_space_config = load_config(str(cur_path / "configs" / config_name), multilabel=mode != "multiclass")

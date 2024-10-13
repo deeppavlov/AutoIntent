@@ -1,9 +1,3 @@
-from collections.abc import Callable
-from typing import Any
-
-import numpy as np
-import numpy.typing as npt
-
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.metrics import RetrievalMetricFn

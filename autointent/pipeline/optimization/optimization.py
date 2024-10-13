@@ -128,9 +128,16 @@ def optimization(cfg: OptimizationConfig) -> None:
     logger.debug("Chroma DB path: %s", db_dir)
 
     # create shared objects for a whole pipeline
-    context = Context(load_data(cfg.multiclass_path, multilabel=False), load_data(cfg.multilabel_path, multilabel=True),
-                      load_data(cfg.test_path, multilabel=True), cfg.device, cfg.mode, cfg.multilabel_generation_config,
-                      cfg.regex_sampling, cfg.seed)
+    context = Context(
+        load_data(cfg.multiclass_path, multilabel=False),
+        load_data(cfg.multilabel_path, multilabel=True),
+        load_data(cfg.test_path, multilabel=True),
+        cfg.device,
+        cfg.mode,
+        cfg.multilabel_generation_config,
+        cfg.regex_sampling,
+        cfg.seed,
+    )
 
     # run optimization
     search_space_config = load_config(cfg.search_space_path, context.multilabel, logger)

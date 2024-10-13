@@ -21,7 +21,7 @@ def mock_data_handler():
 
 
 @pytest.fixture
-def vector_index(tmp_path):
+def vector_index():
     return VectorIndex(device="cpu", multilabel=False, n_classes=2)
 
 
@@ -38,7 +38,7 @@ def test_metadata_as_labels_multiclass(vector_index):
     assert labels == [0, 1, 0]
 
 
-def test_metadata_as_labels_multilabel(tmp_path):
+def test_metadata_as_labels_multilabel():
     index = VectorIndex(device="cpu", multilabel=True, n_classes=3)
     metadata = [{"0": 1, "1": 0, "2": 1}, {"0": 0, "1": 1, "2": 0}]
     labels = index.metadata_as_labels(metadata)

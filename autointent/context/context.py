@@ -4,13 +4,21 @@ from autointent.custom_types import TASK_TYPES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index import VectorIndex, Index
+from .vector_index import Index, VectorIndex
 
 
 class Context:
-    def __init__(self, multiclass_intent_records: list[dict[str, Any]],
-                 multilabel_utterance_records: list[dict[str, Any]], test_utterance_records: list[dict[str, Any]],
-                 device: str, mode: TASK_TYPES, multilabel_generation_config: str, regex_sampling: int, seed: int) -> None:
+    def __init__(
+        self,
+        multiclass_intent_records: list[dict[str, Any]],
+        multilabel_utterance_records: list[dict[str, Any]],
+        test_utterance_records: list[dict[str, Any]],
+        device: str,
+        mode: TASK_TYPES,
+        multilabel_generation_config: str,
+        regex_sampling: int,
+        seed: int,
+    ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,
             multilabel_utterance_records,
