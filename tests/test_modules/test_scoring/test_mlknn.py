@@ -19,17 +19,9 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
             "labels": [0, 2],
         },
     ]
-    context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=utterance,
-        test_utterance_records=utterance,
-        device="cpu",
-        mode="multiclass_as_multilabel",
-        multilabel_generation_config="",
-        db_dir=db_dir,
-        regex_sampling=0,
-        seed=0,
-    )
+    context = Context(multiclass_intent_records=load_clinic_subset, multilabel_utterance_records=utterance,
+                      test_utterance_records=utterance, device="cpu", mode="multiclass_as_multilabel",
+                      multilabel_generation_config="", regex_sampling=0, seed=0)
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)

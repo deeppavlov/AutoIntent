@@ -33,7 +33,7 @@ class LinearScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        collection = context.get_best_collection()
+        collection = context.get_best_index()
         dataset = collection.get(include=["embeddings", "metadatas"])
         features = dataset["embeddings"]
 

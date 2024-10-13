@@ -29,7 +29,7 @@ class DNNCScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
-        self._collection = context.get_best_collection()
+        self._collection = context.get_best_index()
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)

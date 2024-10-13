@@ -3,7 +3,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from chromadb import Collection
 
 from autointent import Context
 from autointent.custom_types import WEIGHT_TYPES
@@ -31,7 +30,7 @@ class KNNScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        self._collection = context.get_best_collection()
+        self._collection = context.get_best_index()
         self._n_classes = context.n_classes
         self._converter = context.vector_index.metadata_as_labels
 
@@ -40,31 +39,4 @@ class KNNScorer(ScoringModule):
         return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self) -> None:
-        model = self._collection._embedding_function._model  # noqa: SLF001
-        model.to(device="cpu")
-        del model
-
-
-def query(
-    collection: Collection, k: int, utterances: list[str], converter: Callable[[Any], Any]
-) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
-    """
-    Return
-    ---
-
-    `labels`:
-    - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
-    - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
-
-    `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
-    """
-    query_res = collection.query(
-        query_texts=utterances,
-        n_results=k,
-        include=["metadatas", "documents", "distances"],  # one can add "embeddings"
-    )
-
-    res_labels = np.array([converter(candidates) for candidates in query_res["metadatas"]])
-    res_distances = np.array(query_res["distances"])
-
-    return res_labels, res_distances
+        pass
