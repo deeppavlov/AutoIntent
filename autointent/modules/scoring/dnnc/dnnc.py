@@ -43,9 +43,8 @@ class DNNCScorer(ScoringModule):
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
         query_res = self._collection.query(
-            query_texts=utterances,
-            n_results=self.k,
-            include=["metadatas", "documents"],  # one can add "embeddings", "distances"
+            utterances,
+            self.k,
         )
 
         cross_encoder_scores = self._get_cross_encoder_scores(utterances, query_res["documents"])
@@ -102,9 +101,7 @@ class DNNCScorer(ScoringModule):
         return build_result(np.array(scores), np.array(labels), n_classes)
 
     def clear_cache(self) -> None:
-        model = self._collection._embedding_function._model  # noqa: SLF001
-        model.to(device="cpu")
-        del model
+        pass
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

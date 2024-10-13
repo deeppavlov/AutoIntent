@@ -13,19 +13,13 @@ def context(load_clinic_subset):
                    regex_sampling=0, seed=0)
 
 
-def test_fit_creates_collection(context):
-    module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo")
-    module.fit(context)
-    assert module.collection is not None
-
 
 @pytest.mark.xfail
 def test_score_returns_correct_metrics(context):
     module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo")
     module.fit(context)
-    score, labels_pred = module.score(context, retrieval_map)
+    score = module.score(context, retrieval_map)
     assert score == 1.0
-    np.testing.assert_array_equal(labels_pred, np.array([[1, 0, 1]]))
 
 
 def test_get_assets_returns_correct_artifact():

@@ -19,23 +19,12 @@ def test_vector_index_initialization(tmp_path):
     assert vector_index.n_classes == 3
 
 
-def test_get_collection(tmp_path):
-    vector_index = VectorIndex("cpu", False, 3)
-    collection = vector_index.get_index("bert-base-uncased")
-    assert collection.name == "bert-base-uncased"
 
 
 def test_create_collection(tmp_path, data_handler):
     vector_index = VectorIndex("cpu", False, 3)
     collection = vector_index.create_index("bert-base-uncased", data_handler)
-    assert isinstance(collection, Collection)
-
-
-def test_delete_collection(tmp_path):
-    vector_index = VectorIndex("cpu", False, 3)
-    vector_index.get_collection("bert-base-uncased")  # Create collection
-    vector_index.delete_collection("bert-base-uncased")
-    assert "bert-base-uncased" not in vector_index.client.list_collections()
+    assert collection == "bert-base-uncased"
 
 
 def test_metadata_as_labels_multiclass(tmp_path):

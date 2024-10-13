@@ -18,7 +18,7 @@ def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
-    metric_value, _ = vector_db.score(context, retrieval_hit_rate)
+    metric_value = vector_db.score(context, retrieval_hit_rate)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(
         node_type="retrieval",

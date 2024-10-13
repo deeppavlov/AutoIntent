@@ -36,6 +36,16 @@ class Index(ABC):
     def get_all_embeddings(self) -> npt.NDArray[Any]:
         pass
 
+    @abstractmethod
+    def query(
+        self, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
+    ) -> tuple[list[Any], list[list[float]]]:
+        pass
+
+    @abstractmethod
+    def embed(self, utterances: list[str]) -> npt.NDArray[float]:
+        pass
+
 
 class FaissIndex(Index):
     def __init__(self, model_name: str, device: str):
@@ -48,7 +58,7 @@ class FaissIndex(Index):
     def add(self, embeddings: np.ndarray, metadata: list[dict]) -> None:
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
-        self.index.add(embeddings)
+        self.index.add(embeddings)  # type: ignore
         self.metadata.extend(metadata)
 
     def delete(self) -> None:
@@ -77,6 +87,24 @@ class FaissIndex(Index):
 
     def get_all_embeddings(self) ->  npt.NDArray[Any]:
         return self.index.reconstruct_n(0, self.index.ntotal)
+
+
+    def query(
+        self, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
+    ) -> tuple[list[Any], list[list[float]]]:
+        all_results = []
+        for query in queries:
+            all_results.append(self.search_by_query(query, k))
+
+        all_metadata = [[result["metadata"] for result in results] for results in all_results]
+        all_distances = [[result["distance"] for result in results] for results in all_results]
+
+        labels = [converter(candidates) for candidates in all_metadata] if converter else all_metadata
+
+        return labels, all_distances
+
+    def embed(self, utterances: list[str]) -> npt.NDArray[float]:
+        return self.embedding_model.encode(utterances, convert_to_numpy=True)
 
 
 class VectorIndex:
@@ -110,16 +138,7 @@ class VectorIndex:
         self, model_name: str, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
     ) -> tuple[list[Any], list[list[float]]]:
         index = self.indexes[model_name]
-        all_results = []
-        for query in queries:
-            all_results.append(index.search_by_query(query, k))
-
-        all_metadata = [[result["metadata"] for result in results] for results in all_results]
-        all_distances = [[result["distance"] for result in results] for results in all_results]
-
-        labels = [converter(candidates) for candidates in all_metadata]
-
-        return labels, all_distances
+        return index.query(queries, k, converter)
 
     def delete_index(self, model_name: str) -> None:
         if model_name in self.indexes:

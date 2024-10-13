@@ -35,8 +35,8 @@ class KNNScorer(ScoringModule):
         self._converter = context.vector_index.metadata_as_labels
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        labels, distances = query(self._collection, self.k, utterances, self._converter)
-        return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
+        labels, distances = self._collection.query(utterances, self.k, self._converter)
+        return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self) -> None:
         pass

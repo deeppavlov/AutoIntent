@@ -44,7 +44,7 @@ class MLKnnScorer(ScoringModule):
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
         for i in range(self.features.shape[0]):
-            neighbors = self.collection.search_by_embedding(self.features[i])
+            neighbors = self.collection.search_by_embedding(self.features[i], self.k)
             neighbors_metadata = [neighbor["metadata"] for neighbor in neighbors]
             deltas = np.sum(self._converter(neighbors_metadata), axis=0).astype(int)
             idx_helper = np.arange(self._n_classes)
@@ -71,12 +71,13 @@ class MLKnnScorer(ScoringModule):
         ---
         array of shape (n_queries, n_candidates, n_classes)
         """
-        query_res = self.collection.query(
+        labels, _ = self.collection.query(
             texts,
             self.k + self.ignore_first_neighbours,
+            self._converter,
         )
         return np.array(
-            [self._converter(candidates[self.ignore_first_neighbours :]) for candidates in query_res["metadatas"]]
+            [candidates[self.ignore_first_neighbours :] for candidates in labels]
         )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
