@@ -205,7 +205,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     run_name = args.run_name if args.run_name != "" else args.model_name.replace("/", "_")
-    run_name = run_name + "_" + datetime.now().strftime("%m-%d-%Y_%H:%M:%S")
+    run_name = run_name + "_" + datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 
     run_dir = os.path.join(args.logs_dir, run_name)
 
