@@ -26,7 +26,7 @@ def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
 def get_run_name(run_name: str) -> str:
     if run_name == "":
         run_name = generate_name()
-    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H:%M:%S')}"  # noqa: DTZ005
+    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
 
 def setup_logging(level: str | None = None) -> logging.Logger:

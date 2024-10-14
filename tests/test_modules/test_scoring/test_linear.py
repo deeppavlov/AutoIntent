@@ -15,7 +15,6 @@ def test_base_linear(setup_environment, load_clinic_subset):
         device="cpu",
         mode="multiclass",
         multilabel_generation_config="",
-        db_dir=db_dir,
         regex_sampling=0,
         seed=0,
     )

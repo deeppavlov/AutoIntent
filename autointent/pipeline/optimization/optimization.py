@@ -133,9 +133,8 @@ def optimization(cfg: OptimizationConfig) -> None:
         load_data(cfg.multilabel_path, multilabel=True),
         load_data(cfg.test_path, multilabel=True),
         cfg.device,
-        cfg.mode,
+        cfg.mode.value,
         cfg.multilabel_generation_config,
-        db_dir,
         cfg.regex_sampling,
         cfg.seed,
     )

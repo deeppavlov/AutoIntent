@@ -21,7 +21,6 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
         device="cpu",
         mode=mode,
         multilabel_generation_config="",
-        db_dir=db_dir,
         regex_sampling=0,
         seed=0,
     )

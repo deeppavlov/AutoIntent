@@ -4,10 +4,10 @@ from typing import ClassVar
 from autointent.metrics import regexp_partial_accuracy, regexp_partial_precision
 from autointent.modules import Module, RegExp
 
-from .base import Node
+from .base import NodeInfo
 
 
-class RegExpNode(Node):
+class RegExpNode(NodeInfo):
     metrics_available: ClassVar[dict[str, Callable]] = {
         "regexp_partial_precision": regexp_partial_precision,
         "regexp_partial_accuracy": regexp_partial_accuracy,

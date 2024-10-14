@@ -34,7 +34,6 @@ def context(load_clinic_subset):
         device="cpu",
         mode="multiclass",
         multilabel_generation_config="",
-        db_dir="multiclass",
         regex_sampling=0,
         seed=0,
     )

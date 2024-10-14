@@ -26,7 +26,6 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
         device="cpu",
         mode="multiclass_as_multilabel",
         multilabel_generation_config="",
-        db_dir=db_dir,
         regex_sampling=0,
         seed=0,
     )
