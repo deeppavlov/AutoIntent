@@ -11,14 +11,12 @@ class VectorDBModule(RetrievalModule):
         self.k = k
 
     def fit(self, context: Context) -> None:
-        self.collection_name = context.vector_index.create_index(self.model_name, context.data_handler)
+        self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
-        labels_pred, _ = context.vector_index.query(
-            self.collection_name,
+        labels_pred, _ = self.vector_index.query(
             context.data_handler.utterances_test,
             self.k,
-            context.vector_index.metadata_as_labels,
         )
         return metric_fn(context.data_handler.labels_test, labels_pred)
 

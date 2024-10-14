@@ -29,7 +29,7 @@ class DNNCScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
-        self._collection = context.get_best_index()
+        self.vector_index = context.get_best_index()
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -42,7 +42,7 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        query_res = self._collection.query(
+        query_res = self.vector_index.query(
             utterances,
             self.k,
         )

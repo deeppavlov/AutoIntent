@@ -1,6 +1,6 @@
 import logging
-from abc import ABC, abstractmethod
 from collections.abc import Callable
+from functools import partial
 from typing import Any
 
 import faiss
@@ -11,49 +11,14 @@ from sentence_transformers import SentenceTransformer
 from .data_handler import DataHandler
 
 
-class Index(ABC):
-    @abstractmethod
-    def add(self, embeddings: npt.NDArray[Any], metadata: list[dict[str, Any]]) -> None:
-        pass
-
-    @abstractmethod
-    def delete(self) -> None:
-        pass
-
-    @abstractmethod
-    def search_by_query(self, query: str, k: int = 5) -> list[dict]:
-        pass
-
-    @abstractmethod
-    def search_by_embedding(self, embedding: npt.NDArray[Any], k: int = 5) -> list[dict]:
-        pass
-
-    @abstractmethod
-    def get_metadata(self) -> list[dict[str, Any]] | list[str]:
-        pass
-
-    @abstractmethod
-    def get_all_embeddings(self) -> npt.NDArray[Any]:
-        pass
-
-    @abstractmethod
-    def query(
-        self, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
-    ) -> tuple[list[Any], list[list[float]]]:
-        pass
-
-    @abstractmethod
-    def embed(self, utterances: list[str]) -> npt.NDArray[float]:
-        pass
-
-
-class FaissIndex(Index):
-    def __init__(self, model_name: str, device: str) -> None:
+class VectorIndex:
+    def __init__(self, model_name: str, device: str, converter: Callable) -> None:
         self.model_name = model_name
         self.device = device
         self.embedding_model = SentenceTransformer(model_name, device=device)
         self.index = None
         self.metadata: list[dict] = []
+        self.converter = converter
 
     def add(self, embeddings: np.ndarray, metadata: list[dict]) -> None:
         if self.index is None:
@@ -88,34 +53,49 @@ class FaissIndex(Index):
     def get_all_embeddings(self) -> npt.NDArray[Any]:
         return self.index.reconstruct_n(0, self.index.ntotal)
 
+    def get_all_labels(self) -> list[int] | list[list[int]]:
+        return [self.converter(mtd) for mtd in self.metadata]
+
     def query(
-        self, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
+        self, queries: list[str] | list[npt.NDArray], k: int
     ) -> tuple[list[Any], list[list[float]]]:
-        all_results = [self.search_by_query(query, k) for query in queries]
+        if isinstance(queries[0], str):
+            all_results = [self.search_by_query(text, k) for text in queries]
+        else:
+            all_results = [self.search_by_embedding(emb, k) for emb in queries]
 
         all_metadata = [[result["metadata"] for result in results] for results in all_results]
         all_distances = [[result["distance"] for result in results] for results in all_results]
 
-        labels = [converter(candidates) for candidates in all_metadata] if converter else all_metadata
+        labels = [self.converter(candidates) for candidates in all_metadata] if self.converter else all_metadata
 
         return labels, all_distances
 
-    def embed(self, utterances: list[str]) -> npt.NDArray[float]:
+    def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         return self.embedding_model.encode(utterances, convert_to_numpy=True)
 
 
-class VectorIndex:
+class VectorIndexClient:
     def __init__(self, device: str, multilabel: bool, n_classes: int) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.multilabel = multilabel
         self.n_classes = n_classes
-        self.indexes: dict[str, Index] = {}
+        self.indexes: dict[str, VectorIndex] = {}
+        self.model_name = None
 
-    def create_index(self, model_name: str, data_handler: DataHandler) -> str:
+    def set_best_embedder_name(self, model_name: str) -> None:
+        if model_name not in self.indexes:
+            msg = f"model {model_name} wasn't created before"
+            self._logger.error(msg)
+            raise ValueError(msg)
+
+        self.model_name = model_name
+
+    def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         self._logger.info("Creating index for model: %s", model_name)
 
-        index = FaissIndex(model_name, self.device)
+        index = VectorIndex(model_name, self.device, self.build_converter())
 
         embeddings = index.embedding_model.encode(data_handler.utterances_train)
         metadata = self.labels_as_metadata(data_handler.labels_train)
@@ -123,19 +103,8 @@ class VectorIndex:
         index.add(embeddings, metadata)
 
         self.indexes[model_name] = index
-        return model_name
 
-    def search(self, model_name: str, query: str, k: int = 5) -> list[dict]:
-        return self.indexes[model_name].search_by_query(query, k)
-
-    def search_by_embedding(self, model_name: str, embedding: np.ndarray, k: int = 5) -> list[dict]:
-        return self.indexes[model_name].search_by_embedding(embedding, k)
-
-    def query(
-        self, model_name: str, queries: list[str], k: int, converter: Callable[[list[list[dict[str, int]]]], list[Any]]
-    ) -> tuple[list[Any], list[list[float]]]:
-        index = self.indexes[model_name]
-        return index.query(queries, k, converter)
+        return index
 
     def delete_index(self, model_name: str) -> None:
         if model_name in self.indexes:
@@ -143,17 +112,17 @@ class VectorIndex:
             self.indexes[model_name].delete()
             del self.indexes[model_name]
 
-    def metadata_as_labels(self, metadata: list[dict]) -> list[list[int]] | list[int]:
+    def build_converter(self) -> Callable:
         if self.multilabel:
-            return _multilabel_metadata_as_labels(metadata, self.n_classes)
-        return _multiclass_metadata_as_labels(metadata)
+            return partial(_multilabel_metadata_as_labels, n_classes=self.n_classes)
+        return _multiclass_metadata_as_labels
 
     def labels_as_metadata(self, labels: list[Any]) -> list[dict]:
         if self.multilabel:
             return _multilabel_labels_as_metadata(labels)
         return _multiclass_labels_as_metadata(labels)
 
-    def get_index(self, model_name: str) -> Index:
+    def get_index(self, model_name: str) -> VectorIndex:
         return self.indexes[model_name]
 
 

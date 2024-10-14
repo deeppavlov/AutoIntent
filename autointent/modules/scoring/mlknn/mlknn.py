@@ -1,6 +1,3 @@
-from collections.abc import Callable
-from typing import Any
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -11,7 +8,6 @@ from autointent.modules.scoring.base import ScoringModule
 class MLKnnScorer(ScoringModule):
     _multilabel: bool
     _n_classes: int
-    _converter: Callable[[Any], Any]
     _prior_prob_true: NDArray[np.float64]
     _prior_prob_false: NDArray[np.float64]
     _cond_prob_true: NDArray[np.float64]
@@ -24,13 +20,11 @@ class MLKnnScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        self.collection = context.get_best_index()
+        self.vector_index = context.get_best_index()
         self._n_classes = context.n_classes
-        self._converter = context.vector_index.metadata_as_labels
 
-        dataset = self.collection.get_metadata()
-        self.features = self.collection.get_all_embeddings()
-        self.labels = np.array(self._converter(dataset))
+        self.features = self.vector_index.get_all_embeddings()
+        self.labels = self.vector_index.get_all_labels()
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 
@@ -43,10 +37,10 @@ class MLKnnScorer(ScoringModule):
         c = np.zeros((self._n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
+        neighbors_labels = self._get_neighbors(embeddings=self.features)
+
         for i in range(self.features.shape[0]):
-            neighbors = self.collection.search_by_embedding(self.features[i], self.k)
-            neighbors_metadata = [neighbor["metadata"] for neighbor in neighbors]
-            deltas = np.sum(self._converter(neighbors_metadata), axis=0).astype(int)
+            deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
             idx_helper = np.arange(self._n_classes)
             deltas_idx = deltas[idx_helper]
             c[idx_helper, deltas_idx] += self.labels[i]
@@ -62,7 +56,7 @@ class MLKnnScorer(ScoringModule):
 
     def _get_neighbors(
         self,
-        texts: list[str],
+        queries: list[str] | list[NDArray]
     ) -> NDArray[np.int64]:
         """
         retrieve nearest neighbors and return their labels in binary format
@@ -71,10 +65,9 @@ class MLKnnScorer(ScoringModule):
         ---
         array of shape (n_queries, n_candidates, n_classes)
         """
-        labels, _ = self.collection.query(
-            texts,
+        labels, _ = self.vector_index.query(
+            queries,
             self.k + self.ignore_first_neighbours,
-            self._converter,
         )
         return np.array([candidates[self.ignore_first_neighbours :] for candidates in labels])
 

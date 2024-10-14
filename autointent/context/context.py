@@ -4,7 +4,7 @@ from autointent.custom_types import TASK_TYPES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index import Index, VectorIndex
+from .vector_index import VectorIndex, VectorIndexClient
 
 
 class Context:
@@ -29,16 +29,16 @@ class Context:
             seed,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index = VectorIndex(device, self.data_handler.multilabel, self.data_handler.n_classes)
+        self.vector_index_client = VectorIndexClient(device, self.data_handler.multilabel, self.data_handler.n_classes)
 
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
 
-    def get_best_index(self) -> Index:
+    def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()
-        return self.vector_index.get_index(model_name)
+        return self.vector_index_client.get_index(model_name)
 
     def get_inference_config(self) -> dict[str, Any]:
         return {
