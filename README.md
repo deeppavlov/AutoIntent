@@ -11,16 +11,17 @@
 
 ## Установка
 
-Доступна установка пакета из исходников (см. Releases):
-```bash
-pip install autointent-0.1.0a0-py3-none-any.whl
-```
+1. Скопировать проект:
 
-Для разработчиков:
 ```bash
 git clone https://github.com/voorhs/AutoIntent.git
 cd AutoIntent
-poetry install --with dev,test
+```
+
+2. Установить пакет:
+
+```bash
+pip install .
 ```
 
 ## Использование
@@ -254,7 +255,7 @@ Retrieval:
     - `retrieval_mrr_macro`
     - `retrieval_ndcg_macro`
     - `retrieval_precision_macro`
-Scoring:
+    Scoring:
 - все те же, но в формате макро усреднения (под теми же названиями):
     - `scoring_accuracy`
     - `scoring_f1`
@@ -274,8 +275,10 @@ Prediction:
     - `prediction_recall`
     - `prediction_roc_auc`
 
-## Contrib
+## Roadmap
 
-Устройство проекта:
-
-![](assets/dependency-graph.png)
+| Version | Description                                               |
+| ------- | --------------------------------------------------------- |
+| v0.0.x  | Python API, CLI API, Greedy optimization                  |
+| v0.1.x  | Web UI for logging, Bayes optimization, data augmentation |
+| v0.2.x  | Optimization presets, improved efficiency                 |
