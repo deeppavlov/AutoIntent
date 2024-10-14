@@ -26,3 +26,7 @@ class Module(ABC):
     @abstractmethod
     def clear_cache(self) -> None:
         """clear GPU/CPU memory"""
+
+    @abstractmethod
+    def load(self, path: str) -> None:
+        """load all data needed for inference"""

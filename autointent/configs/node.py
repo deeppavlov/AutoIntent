@@ -2,16 +2,13 @@ from dataclasses import dataclass
 
 from omegaconf import MISSING
 
-from .modules import ModuleConfig
-
 
 @dataclass
 class InferenceNodeConfig:
-    node_type: str = MISSING
-    module_type: str = MISSING
-    module_config: ModuleConfig = MISSING
-    load_path: str = MISSING
-    _target_: str = "autointent.nodes.InferenceNode"
+    node_type: str
+    module_type: str
+    module_config: dict
+    load_path: str
 
 
 @dataclass

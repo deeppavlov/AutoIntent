@@ -2,7 +2,7 @@ import gc
 import itertools as it
 import logging
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, TypeVar
 
 import torch
 from hydra.utils import instantiate
@@ -10,9 +10,6 @@ from hydra.utils import instantiate
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.context import Context
 from autointent.nodes.nodes_info import NODES_INFO
-
-if TYPE_CHECKING:
-    from autointent.modules import Module
 
 NodeOptimizerType = TypeVar("NodeOptimizerType", bound="NodeOptimizer")
 
@@ -38,8 +35,7 @@ class NodeOptimizer:
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module_config = self.node_info.modules_configs[module_type]
-                module: Module = instantiate(module_config, **module_kwargs)
+                module = self.node_info.modules_available[module_type](**module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
                 module.fit(context)
