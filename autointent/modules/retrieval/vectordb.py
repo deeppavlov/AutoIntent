@@ -14,7 +14,7 @@ class VectorDBModule(RetrievalModule):
         self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
-        labels_pred, _ = self.vector_index.query(
+        labels_pred, _, _ = self.vector_index.query(
             context.data_handler.utterances_test,
             self.k,
         )

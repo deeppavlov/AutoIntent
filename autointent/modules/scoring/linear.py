@@ -33,10 +33,10 @@ class LinearScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        collection = context.get_best_index()
-        features = collection.get_all_embeddings()
+        vector_index = context.get_best_index()
+        features = vector_index.get_all_embeddings()
+        labels = vector_index.get_all_labels()
 
-        labels = context.vector_index.metadata_as_labels(collection.get_metadata())
         if self._multilabel:
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
@@ -46,7 +46,7 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._emb_func = collection.embed
+        self._emb_func = vector_index.embed
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._emb_func(utterances)

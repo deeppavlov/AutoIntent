@@ -28,6 +28,7 @@ class DNNCScorer(ScoringModule):
         self.train_head = train_head
 
     def fit(self, context: Context) -> None:
+        self.n_classes = context.n_classes
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
         self.vector_index = context.get_best_index()
 
@@ -42,16 +43,14 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        query_res = self.vector_index.query(
+        labels, _, texts = self.vector_index.query(
             utterances,
             self.k,
         )
 
-        cross_encoder_scores = self._get_cross_encoder_scores(utterances, query_res["documents"])
+        cross_encoder_scores = self._get_cross_encoder_scores(utterances, texts)
 
-        labels_pred = [[cand["intent_id"] for cand in candidates] for candidates in query_res["metadatas"]]
-
-        return self._build_result(cross_encoder_scores, labels_pred)
+        return self._build_result(cross_encoder_scores, labels)
 
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
@@ -96,7 +95,7 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        n_classes = self._collection.metadata["n_classes"]
+        n_classes = self.n_classes
 
         return build_result(np.array(scores), np.array(labels), n_classes)
 

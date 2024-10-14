@@ -24,7 +24,7 @@ class MLKnnScorer(ScoringModule):
         self._n_classes = context.n_classes
 
         self.features = self.vector_index.get_all_embeddings()
-        self.labels = self.vector_index.get_all_labels()
+        self.labels = np.array(self.vector_index.get_all_labels())
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 
@@ -37,7 +37,7 @@ class MLKnnScorer(ScoringModule):
         c = np.zeros((self._n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
-        neighbors_labels = self._get_neighbors(embeddings=self.features)
+        neighbors_labels = self._get_neighbors(self.features)
 
         for i in range(self.features.shape[0]):
             deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
@@ -65,7 +65,7 @@ class MLKnnScorer(ScoringModule):
         ---
         array of shape (n_queries, n_candidates, n_classes)
         """
-        labels, _ = self.vector_index.query(
+        labels, _, _ = self.vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
         )

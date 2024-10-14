@@ -20,7 +20,9 @@ class VectorIndex:
         self.metadata: list[dict] = []
         self.converter = converter
 
-    def add(self, embeddings: np.ndarray, metadata: list[dict]) -> None:
+    def add(self, texts: list[str], metadata: list[dict]) -> None:
+        self.texts = texts
+        embeddings = self.embed(texts)
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)  # type: ignore # noqa: PGH003
@@ -31,19 +33,23 @@ class VectorIndex:
             self.index.reset()
         self.metadata = []
 
-    def search_by_query(self, query: str, k: int = 5) -> list[dict]:
-        query_embedding = self.embedding_model.encode([query])
-        return self.search_by_embedding(query_embedding, k)
+    def _search_by_text(self, texts: list[str], k: int) -> list[list[dict]]:
+        query_embedding = self.embedding_model.encode(texts)
+        return self._search_by_embedding(query_embedding, k)
 
-    def search_by_embedding(self, embedding: np.ndarray, k: int = 5) -> list[dict]:
-        if embedding.ndim == 1:
-            embedding = np.expand_dims(embedding, axis=0)
+    def _search_by_embedding(self, embedding: np.ndarray, k: int) -> list[list[dict]]:
+        if embedding.ndim != 2:  # noqa: PLR2004
+            msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
+            raise ValueError(msg)
 
         distances, indices = self.index.search(embedding, k)
 
         results = []
-        for i, idx in enumerate(indices[0]):
-            results.append({"id": idx, "distance": distances[0][i], "metadata": self.metadata[idx]})
+        for inds, dists in zip(indices, distances, strict=True):
+            cur_res = []
+            for ind, dist in zip(inds, dists, strict=True):
+                cur_res.append({"id": ind, "distance": dist, "metadata": self.metadata[ind]})
+            results.append(cur_res)
 
         return results
 
@@ -54,22 +60,36 @@ class VectorIndex:
         return self.index.reconstruct_n(0, self.index.ntotal)
 
     def get_all_labels(self) -> list[int] | list[list[int]]:
-        return [self.converter(mtd) for mtd in self.metadata]
+        return self.converter(self.metadata)
 
     def query(
         self, queries: list[str] | list[npt.NDArray], k: int
-    ) -> tuple[list[Any], list[list[float]]]:
-        if isinstance(queries[0], str):
-            all_results = [self.search_by_query(text, k) for text in queries]
-        else:
-            all_results = [self.search_by_embedding(emb, k) for emb in queries]
+    ) -> tuple[list[Any], list[list[float]], list[list[str]]]:
+        """
+        Arguments
+        ---
+        `queries`: list of string texts or list of numpy embeddings
+
+        `k`: number of nearest neighbors to return for each query
+
+        Return
+        ---
+        `labels`: list of integers (multiclass labels) or binary vectors (multilabel labels) of neighbors retrieved
+
+        `distances`: corresponding distances between queries and neighbors retrieved
+
+        `texts`: corresponding texts
+        """
+        func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
+        all_results = func(queries, k)
 
         all_metadata = [[result["metadata"] for result in results] for results in all_results]
         all_distances = [[result["distance"] for result in results] for results in all_results]
+        all_texts = [[self.texts[result["id"]] for result in results] for results in all_results]
 
         labels = [self.converter(candidates) for candidates in all_metadata] if self.converter else all_metadata
 
-        return labels, all_distances
+        return labels, all_distances, all_texts
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         return self.embedding_model.encode(utterances, convert_to_numpy=True)
@@ -96,11 +116,8 @@ class VectorIndexClient:
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device, self.build_converter())
-
-        embeddings = index.embedding_model.encode(data_handler.utterances_train)
         metadata = self.labels_as_metadata(data_handler.labels_train)
-
-        index.add(embeddings, metadata)
+        index.add(data_handler.utterances_train, metadata)
 
         self.indexes[model_name] = index
 

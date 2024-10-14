@@ -33,7 +33,7 @@ class KNNScorer(ScoringModule):
         self._n_classes = context.n_classes
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        labels, distances = self._collection.query(utterances, self.k)
+        labels, distances, _ = self._collection.query(utterances, self.k)
         return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self) -> None:
