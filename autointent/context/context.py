@@ -4,7 +4,7 @@ from autointent.custom_types import TASK_TYPES
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index import VectorIndex, VectorIndexClient
+from .vector_index_client import VectorIndex, VectorIndexClient
 
 
 class Context:

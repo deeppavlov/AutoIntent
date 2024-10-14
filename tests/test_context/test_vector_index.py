@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.context.vector_index import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndexClient
 
 
 @pytest.fixture

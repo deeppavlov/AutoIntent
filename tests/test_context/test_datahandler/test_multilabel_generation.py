@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from autointent.context.data_handler import DataHandler
-from autointent.context.vector_index import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndexClient
 
 
 @pytest.fixture
