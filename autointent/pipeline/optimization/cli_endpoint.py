@@ -3,11 +3,10 @@ import logging
 import hydra
 
 from autointent import Context
-from autointent.configs.pipeline import OptimizationConfig
-from autointent.pipeline.pipeline import Pipeline
-from autointent.pipeline.utils import get_db_dir
+from autointent.configs.optimization_cli import OptimizationConfig
 
-from .utils import get_run_name, load_config, load_data, setup_logging
+from .pipeline_optimizer import PipelineOptimizer
+from .utils import get_db_dir, get_run_name, load_config, load_data, setup_logging
 
 # def main():
 #     parser = ArgumentParser()
@@ -108,7 +107,7 @@ from .utils import get_run_name, load_config, load_data, setup_logging
 
 #     # run optimization
 #     search_space_config = load_config(args.config_path, context.multilabel, logger)
-#     pipeline: Pipeline = instantiate(PipelineSearchSpace(), **search_space_config)
+#     pipeline: Pipeline = instantiate(PipelineOptimizerConfig(), **search_space_config)
 #     pipeline.optimize(context)
 
 #     # save results
@@ -116,7 +115,7 @@ from .utils import get_run_name, load_config, load_data, setup_logging
 
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
-def optimization(cfg: OptimizationConfig) -> None:
+def main(cfg: OptimizationConfig) -> None:
     setup_logging(cfg.log_level.value)
     logger = logging.getLogger(__name__)
 
@@ -142,7 +141,7 @@ def optimization(cfg: OptimizationConfig) -> None:
 
     # run optimization
     search_space_config = load_config(cfg.search_space_path, context.multilabel, logger)
-    pipeline = Pipeline.from_dict_config(search_space_config)
+    pipeline = PipelineOptimizer.from_dict_config(search_space_config)
     pipeline.optimize(context)
 
     # save results

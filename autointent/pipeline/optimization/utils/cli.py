@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from autointent.pipeline.utils import generate_name
+from .name import generate_name
 
 
 def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:

@@ -1,35 +1,29 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, ClassVar, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 import yaml
 from hydra.utils import instantiate
 
 from autointent import Context
-from autointent.configs.pipeline import PipelineSearchSpace
-from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
+from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
+from autointent.nodes import NodeOptimizer
 
 from .utils import NumpyEncoder
 
-PipelineType = TypeVar("PipelineType", bound="Pipeline")
+PipelineType = TypeVar("PipelineType", bound="PipelineOptimizer")
 
 
-class Pipeline:
-    available_nodes: ClassVar[dict[str, NodeInfo]] = {
-        "retrieval": RetrievalNodeInfo(),
-        "scoring": ScoringNodeInfo(),
-        "prediction": PredictionNodeInfo(),
-    }
-
+class PipelineOptimizer:
     def __init__(self, nodes: list[NodeOptimizer]) -> None:
         self._logger = logging.getLogger(__name__)
         self.nodes = nodes
 
     @classmethod
     def from_dict_config(cls, config: dict[str, Any]) -> PipelineType:
-        return instantiate(PipelineSearchSpace, **config)
+        return instantiate(PipelineOptimizerConfig, **config)
 
     def optimize(self, context: Context) -> None:
         self.context = context

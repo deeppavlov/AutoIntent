@@ -37,6 +37,9 @@ class VectorDBModule(RetrievalModule):
         model.to(device="cpu")
         del model
 
+    def load(self, path: str) -> None:
+        pass
+
 
 def retrieve_candidates(
     collection: Collection,

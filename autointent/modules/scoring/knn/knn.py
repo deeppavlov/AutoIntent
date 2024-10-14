@@ -44,6 +44,9 @@ class KNNScorer(ScoringModule):
         model.to(device="cpu")
         del model
 
+    def load(self, path: str) -> None:
+        pass
+
 
 def query(
     collection: Collection, k: int, utterances: list[str], converter: Callable[[Any], Any]

@@ -5,10 +5,11 @@ from omegaconf import MISSING
 
 @dataclass
 class InferenceNodeConfig:
-    node_type: str
-    module_type: str
-    module_config: dict
-    load_path: str
+    node_type: str = MISSING
+    module_type: str = MISSING
+    module_config: dict = MISSING
+    load_path: str = MISSING
+    _target_: str = "autointent.nodes.InferenceNode"
 
 
 @dataclass
