@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -41,8 +43,25 @@ class ThresholdPredictor(PredictionModule):
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = {
+            "multilabel": self.multilabel,
+            "tags": self.tags
+        }
+
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(metadata, file, indent=4)
+
     def load(self, path: str) -> None:
-        pass
+        dump_dir = Path(path)
+
+        with (dump_dir / "metadata.json").open() as file:
+            metadata = json.load(file)
+
+        self.multilabel = metadata["multilabel"]
+        self.tags = metadata["tags"]
 
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:

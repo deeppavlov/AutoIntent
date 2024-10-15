@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -45,6 +47,28 @@ class TunablePredictor(PredictionModule):
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = {
+            "multilabel": self.multilabel,
+            "thresh": self.thresh.tolist(),
+            "tags": self.tags
+        }
+
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / "metadata.json").open() as file:
+            metadata = json.load(file)
+
+        self.thresh = np.array(metadata["thresh"])
+        self.multilabel = metadata["multilabel"]
+        self.tags = metadata["tags"]
 
 
 class ThreshOptimizer:
