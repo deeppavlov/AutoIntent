@@ -60,7 +60,8 @@ class LinearScorer(ScoringModule):
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        pass
+        self._embedder.cpu()
+        del self._embedder
 
     def dump(self, path: str) -> None:
         metadata = {

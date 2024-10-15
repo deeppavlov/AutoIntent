@@ -49,7 +49,7 @@ class KNNScorer(ScoringModule):
         return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self) -> None:
-        pass
+        self._vector_index.delete()
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -65,4 +65,4 @@ class KNNScorer(ScoringModule):
         self._multilabel = self.metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        self._vector_index = vector_index_client.get_index(self.metadata["model_name"])

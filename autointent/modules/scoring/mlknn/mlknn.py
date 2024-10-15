@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent import Context
+from autointent.context.vector_index_client import VectorIndexClient
 from autointent.modules.scoring.base import ScoringModule
 
 
@@ -24,6 +25,13 @@ class MLKnnScorer(ScoringModule):
     def fit(self, context: Context) -> None:
         self.vector_index = context.get_best_index()
         self._n_classes = context.n_classes
+
+        self.metadata = {
+            "db_dir": context.db_dir,
+            "device": context.device,
+            "n_classes": self._n_classes,
+            "model_name": self.vector_index.model_name,
+        }
 
         self.features = self.vector_index.get_all_embeddings()
         self.labels = np.array(self.vector_index.get_all_labels())
@@ -92,17 +100,13 @@ class MLKnnScorer(ScoringModule):
         return result
 
     def clear_cache(self) -> None:
-        pass
+        self.vector_index.delete()
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = {
-            "n_classes": self._n_classes,
-        }
-
         with (dump_dir / "metadata.json").open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
         arrays_to_save = {
             "prior_prob_true": self._prior_prob_true,
@@ -116,8 +120,8 @@ class MLKnnScorer(ScoringModule):
         dump_dir = Path(path)
 
         with (dump_dir / "metadata.json").open() as file:
-            metadata = json.load(file)
-        self._n_classes = metadata["n_classes"]
+            self.metadata = json.load(file)
+        self._n_classes = self.metadata["n_classes"]
 
         arrays = np.load(dump_dir / "probs.npz")
 
@@ -125,3 +129,6 @@ class MLKnnScorer(ScoringModule):
         self._prior_prob_false = arrays["prior_prob_false"]
         self._cond_prob_true = arrays["cond_prob_true"]
         self._cond_prob_false = arrays["cond_prob_false"]
+
+        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
+        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])
