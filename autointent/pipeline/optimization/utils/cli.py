@@ -29,6 +29,13 @@ def get_run_name(run_name: str) -> str:
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
 
+def get_logs_dir(logs_dir: str, run_name: str) -> Path:
+    logs_dir_ = Path.cwd() if logs_dir == "" else Path(logs_dir)
+    res = logs_dir_ / run_name
+    res.mkdir(parents=True)
+    return logs_dir
+
+
 def setup_logging(level: str | None = None) -> logging.Logger:
     logging.basicConfig(
         level=level,

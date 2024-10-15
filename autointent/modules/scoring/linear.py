@@ -1,7 +1,11 @@
+import json
+from pathlib import Path
 from typing import Any
 
+import joblib
 import numpy as np
 import numpy.typing as npt
+from sentence_transformers import SentenceTransformer
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
@@ -46,10 +50,10 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._emb_func = vector_index.embed
+        self._embedder = vector_index.embedding_model
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        features = self._emb_func(utterances)
+        features = self._embedder.encode(utterances)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
@@ -57,3 +61,39 @@ class LinearScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        metadata = {
+            "multilabel": self._multilabel,
+            "device": str(self._embedder.device),
+        }
+
+        dump_dir = Path(path)
+
+        metadata_path = dump_dir / "metadata.json"
+        with metadata_path.open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+        # dump sklearn model
+        clf_path = dump_dir / "classifier.joblib"
+        joblib.dump(self._clf, clf_path)
+
+        # dump sentence transformer model
+        embedder_dir = str(dump_dir / "embedding_model")
+        self._embedder.save(embedder_dir)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata_path = dump_dir / "metadata.json"
+        with metadata_path.open() as file:
+            metadata = json.load(file)
+        self._multilabel = metadata["multilabel"]
+
+        # load sklearn model
+        clf_path = dump_dir / "classifier.joblib"
+        self._clf = joblib.load(clf_path)
+
+        # load sentence transformer model
+        embedder_dir = str(dump_dir / "embedding_model")
+        self._embedder = SentenceTransformer(embedder_dir, device=metadata["device"])

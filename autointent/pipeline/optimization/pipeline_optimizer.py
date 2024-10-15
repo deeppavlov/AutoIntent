@@ -31,17 +31,15 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def dump(self, logs_dir: str, run_name: str) -> None:
+    def dump(self, logs_dir: Path) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump_evaluation_results()
 
         # create appropriate directory
-        logs_dir_path = Path.cwd() if logs_dir == "" else Path(logs_dir)
-        logs_dir_path = logs_dir_path / run_name
-        logs_dir_path.mkdir(parents=True)
+        logs_dir.mkdir(parents=True)
 
         # dump search space and evaluation results
-        logs_path = logs_dir_path / "logs.json"
+        logs_path = logs_dir / "logs.json"
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
         # config_path = logs_dir / "config.yaml"
@@ -53,18 +51,18 @@ class PipelineOptimizer:
 
         # dump train and test data splits
         train_data, test_data = self.context.data_handler.dump()
-        train_path = logs_dir_path / "train_data.json"
-        test_path = logs_dir_path / "test_data.json"
+        train_path = logs_dir / "train_data.json"
+        test_path = logs_dir / "test_data.json"
         with train_path.open("w") as file:
             json.dump(train_data, file, indent=4, ensure_ascii=False)
         with test_path.open("w") as file:
             json.dump(test_data, file, indent=4, ensure_ascii=False)
 
-        self._logger.info("logs and other assets are saved to %s", logs_dir_path)
+        self._logger.info("logs and other assets are saved to %s", logs_dir)
 
         # dump optimization results (config for inference)
         inference_config = self.context.get_inference_config()
-        inference_config_path = logs_dir_path / "inference_config.yaml"
+        inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
 

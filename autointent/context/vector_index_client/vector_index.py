@@ -49,7 +49,8 @@ class VectorIndex:
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
             raise ValueError(msg)
 
-        distances, indices = self.index.search(embedding, k)
+        cos_sim, indices = self.index.search(embedding, k)
+        distances = 1 - cos_sim
 
         results = []
         for inds, dists in zip(indices, distances, strict=True):
@@ -68,7 +69,7 @@ class VectorIndex:
 
     def query(
         self, queries: list[str] | list[npt.NDArray], k: int
-    ) -> tuple[list[Any], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[list[int] | list[list[int]]], list[list[float]], list[list[str]]]:
         """
         Arguments
         ---

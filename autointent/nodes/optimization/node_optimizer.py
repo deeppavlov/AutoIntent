@@ -2,6 +2,7 @@ import gc
 import itertools as it
 import logging
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, TypeVar
 
 import torch
@@ -31,7 +32,7 @@ class NodeOptimizer:
         for search_space in deepcopy(self.modules_search_spaces):
             module_type = search_space.pop("module_type")
 
-            for params_combination in it.product(*search_space.values()):
+            for j_combination, params_combination in enumerate(it.product(*search_space.values())):
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
@@ -44,6 +45,9 @@ class NodeOptimizer:
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
+                module_dump_dir = self.get_module_dump_dir(context.dump_dir, module_type, j_combination)
+                module.dump(module_dump_dir)
+
                 context.optimization_info.log_module_optimization(
                     self.node_info.node_type,
                     module_type,
@@ -51,8 +55,16 @@ class NodeOptimizer:
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
+                    module_dump_dir
                 )
+
                 module.clear_cache()
                 gc.collect()
                 torch.cuda.empty_cache()
+
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
+
+    def get_module_dump_dir(self, dump_dir: str, module_type: str, j_combination: int) -> str:
+        dump_dir_ = Path(dump_dir) / self.node_info.node_type / module_type / f"comb_{j_combination}"
+        dump_dir_.mkdir(parents=True)
+        return str(dump_dir_)

@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -19,7 +22,6 @@ class MLKnnScorer(ScoringModule):
         self.ignore_first_neighbours = ignore_first_neighbours
 
     def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
         self.vector_index = context.get_best_index()
         self._n_classes = context.n_classes
 
@@ -91,3 +93,35 @@ class MLKnnScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = {
+            "n_classes": self._n_classes,
+        }
+
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+        arrays_to_save = {
+            "prior_prob_true": self._prior_prob_true,
+            "prior_prob_false": self._prior_prob_false,
+            "cond_prob_true": self._cond_prob_true,
+            "cond_prob_false": self._cond_prob_false,
+        }
+        np.savez(dump_dir / "probs.npz", **arrays_to_save)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / "metadata.json").open() as file:
+            metadata = json.load(file)
+        self._n_classes = metadata["n_classes"]
+
+        arrays = np.load(dump_dir / "probs.npz")
+
+        self._prior_prob_true = arrays["prior_prob_true"]
+        self._prior_prob_false = arrays["prior_prob_false"]
+        self._cond_prob_true = arrays["cond_prob_true"]
+        self._cond_prob_false = arrays["cond_prob_false"]

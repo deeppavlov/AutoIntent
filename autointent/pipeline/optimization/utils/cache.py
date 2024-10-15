@@ -61,6 +61,7 @@ def get_db_dir(db_dir: str, run_name: str) -> str:
         cache_dir = get_chroma_cache_dir()
         db_dir = os.path.join(cache_dir, run_name)  # noqa: PTH118
 
+    Path(db_dir).mkdir(parents=True)
     add_cache_directory(db_dir)
 
     return db_dir

@@ -28,6 +28,7 @@ class OptimizationInfo:
         metric_value: float,
         metric_name: str,
         artifact: Artifact,
+        module_dump_dir: str,
     ) -> None:
         """
         Purposes:
@@ -41,6 +42,7 @@ class OptimizationInfo:
             metric_name=metric_name,
             metric_value=metric_value,
             module_params=module_params,
+            module_dump_dir=module_dump_dir,
         )
         self.trials[node_type].append(trial)
         self._logger.info(trial.model_dump())

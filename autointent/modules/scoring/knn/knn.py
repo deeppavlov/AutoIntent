@@ -1,9 +1,12 @@
+import json
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 
-from autointent import Context
+from autointent.context import Context
+from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import WEIGHT_TYPES
 from autointent.modules.scoring.base import ScoringModule
 
@@ -26,15 +29,40 @@ class KNNScorer(ScoringModule):
         if isinstance(weights, bool):
             weights = "distance" if weights else "uniform"
         self.weights = weights
+        self._vector_index = None
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        self._collection = context.get_best_index()
+        self._vector_index = context.get_best_index()
         self._n_classes = context.n_classes
 
+        self.metadata = {
+            "device": context.device,
+            "db_dir": context.db_dir,
+            "n_classes": self._n_classes,
+            "multilabel": self._multilabel,
+            "model_name": self._vector_index.model_name,
+        }
+
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        labels, distances, _ = self._collection.query(utterances, self.k)
+        labels, distances, _ = self._vector_index.query(utterances, self.k)
         return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(self.metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "metadata.json").open() as file:
+            self.metadata = json.load(file)
+
+        self._n_classes = self.metadata["n_classes"]
+        self._multilabel = self.metadata["multilabel"]
+
+        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
+        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])

@@ -1,3 +1,4 @@
+import json
 import logging
 import shutil
 from pathlib import Path
@@ -8,13 +9,10 @@ from .vector_index import VectorIndex
 
 
 class VectorIndexClient:
-    def __init__(self, device: str, multilabel: bool, n_classes: int, db_dir: str) -> None:
+    def __init__(self, device: str, db_dir: str) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.multilabel = multilabel
-        self.n_classes = n_classes
         self.db_dir = Path(db_dir)
-        self.indexes_dirnames: dict[str, str] = {}
         self.indexes_alive: dict[str, VectorIndex] = {}
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
@@ -24,13 +22,41 @@ class VectorIndexClient:
         index.add(data_handler.utterances_train, data_handler.labels_train)
 
         self.indexes_alive[model_name] = index
-        index.dump(self.get_dump_dir(model_name))
+        index.dump(self._get_dump_dirpath(model_name))
 
         return index
 
-    def get_dump_dir(self, model_name: str) -> Path:
+    def _add_index_dirname(self, model_name: str, dir_name: str) -> None:
+        path = self.db_dir / "indexes_dirnames.json"
+        if path.exists():
+            with path.open() as file:
+                indexes_dirnames = json.load(file)
+        else:
+            indexes_dirnames = {}
+        indexes_dirnames[model_name] = dir_name
+        with path.open("w") as file:
+            json.dump(indexes_dirnames, file, indent=4)
+
+    def _remove_index_dirname(self, model_name: str) -> str | None:
+        """remove and return dirname if vector index exists, otherwise return None"""
+        path = self.db_dir / "indexes_dirnames.json"
+        with path.open() as file:
+            indexes_dirnames = json.load(file)
+        dir_name = indexes_dirnames.pop(model_name, None)
+        with path.open("w") as file:
+            json.dump(indexes_dirnames, file, indent=4)
+        return dir_name
+
+    def _get_index_dirpath(self, model_name: str) -> Path | None:
+        """return dirname if vector index exists, otherwise return None"""
+        path = self.db_dir / "indexes_dirnames.json"
+        with path.open() as file:
+            indexes_dirnames = json.load(file)
+        return self.db_dir / indexes_dirnames.get(model_name, None)
+
+    def _get_dump_dirpath(self, model_name: str) -> Path:
         dir_name = model_name.replace("/", "-")
-        self.indexes_dirnames[model_name] = dir_name
+        self._add_index_dirname(model_name, dir_name)
         return self.db_dir / dir_name
 
     def delete_index(self, model_name: str) -> None:
@@ -39,15 +65,16 @@ class VectorIndexClient:
             index = self.indexes_alive.pop(model_name)
             index.delete()
 
-        if model_name in self.indexes_dirnames:
+        dir_name = self._remove_index_dirname(model_name)
+        if dir_name is not None:
             self._logger.debug("Deleting index for model: %s", model_name)
-            dir_name = self.indexes_dirnames.pop(model_name)
             shutil.rmtree(self.db_dir / dir_name)
 
     def get_index(self, model_name: str) -> VectorIndex:
-        if model_name in self.indexes_dirnames:
+        dirpath = self._get_index_dirpath(model_name)
+        if dirpath is not None:
             index = VectorIndex(model_name, self.device)
-            index.load(self.db_dir / self.indexes_dirnames[model_name])
+            index.load(dirpath)
             return index
 
         msg = f"index for {model_name} wasn't ever createds"

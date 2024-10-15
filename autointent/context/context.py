@@ -19,6 +19,7 @@ class Context:
         regex_sampling: int,
         seed: int,
         db_dir: str,
+        dump_dir: str,
     ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,
@@ -31,13 +32,15 @@ class Context:
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(
-            device, self.data_handler.multilabel, self.data_handler.n_classes, db_dir
+            device, db_dir
         )
 
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
+        self.db_dir = db_dir
+        self.dump_dir = dump_dir
 
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()
