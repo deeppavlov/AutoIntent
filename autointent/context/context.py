@@ -31,13 +31,14 @@ class Context:
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(
-            device, self.data_handler.multilabel, self.data_handler.n_classes, db_dir
+            device, db_dir
         )
 
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
+        self.db_dir = db_dir
 
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()

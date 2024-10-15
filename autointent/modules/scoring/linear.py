@@ -1,5 +1,6 @@
 from typing import Any
 
+import joblib
 import numpy as np
 import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -57,3 +58,9 @@ class LinearScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        joblib.dump(self._clf, path)
+
+    def load(self, path: str) -> None:
+        self._clf = joblib.load(path)

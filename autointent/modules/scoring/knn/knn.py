@@ -38,3 +38,9 @@ class KNNScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        pass
+
+    def load(self, path: str) -> None:
+        pass

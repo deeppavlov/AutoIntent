@@ -68,7 +68,7 @@ class VectorIndex:
 
     def query(
         self, queries: list[str] | list[npt.NDArray], k: int
-    ) -> tuple[list[Any], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[int | list[int]], list[list[float]], list[list[str]]]:
         """
         Arguments
         ---

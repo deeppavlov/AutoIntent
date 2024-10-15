@@ -19,7 +19,6 @@ class MLKnnScorer(ScoringModule):
         self.ignore_first_neighbours = ignore_first_neighbours
 
     def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
         self.vector_index = context.get_best_index()
         self._n_classes = context.n_classes
 
@@ -91,3 +90,12 @@ class MLKnnScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        arrays_to_save = {
+            "prior_prob_true": self._prior_prob_true,
+            "prior_prob_false": self._prior_prob_false,
+            "cond_prob_true": self._cond_prob_true,
+            "cond_prob_false": self._cond_prob_false
+        }
+        np.savez(path, **arrays_to_save)

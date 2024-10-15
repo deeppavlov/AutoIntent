@@ -1,4 +1,11 @@
+from typing import Any, TypeVar
+
+from hydra.utils import instantiate
+
+from autointent.configs.node import InferenceNodeConfig
 from autointent.nodes.nodes_info import NODES_INFO
+
+InferenceNodeType = TypeVar("InferenceNodeType", bound="InferenceNode")
 
 
 class InferenceNode:
@@ -6,3 +13,7 @@ class InferenceNode:
         self.node_info = NODES_INFO[node_type]
         self.module = self.node_info.modules_available[module_type](**module_config)
         self.module.load(load_path)
+
+    @classmethod
+    def from_dict_config(cls, config: dict[str, Any]) -> InferenceNodeType:
+        return instantiate(InferenceNodeConfig, **config)

@@ -52,6 +52,7 @@ class NodeOptimizer:
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                 )
+                # module.dump() # TODO
                 module.clear_cache()
                 gc.collect()
                 torch.cuda.empty_cache()

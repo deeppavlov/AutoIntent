@@ -27,6 +27,14 @@ class Module(ABC):
     def clear_cache(self) -> None:
         """clear GPU/CPU memory"""
 
+    @abstractmethod
+    def dump(self, path: str) -> None:
+        """dump all data needed for inference"""
+
+    @abstractmethod
     def load(self, path: str) -> None:
         """load all data needed for inference"""
-        self.path = path  # TODO turn to an abstract method
+
+    @abstractmethod
+    def predict(self) -> None:
+        """inference"""
