@@ -1,5 +1,7 @@
 import itertools as it
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -7,6 +9,7 @@ import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 
 from autointent import Context
+from autointent.context.vector_index_client import VectorIndexClient
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
@@ -36,6 +39,13 @@ class DNNCScorer(ScoringModule):
             model = CrossEncoderWithLogreg(self.model)
             model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
             self.model = model
+
+        self.metadata = {
+            "device": context.device,
+            "db_dir": context.db_dir,
+            "n_classes": self.n_classes,
+            "biencoder_model": self.vector_index.model_name,
+        }
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -101,6 +111,30 @@ class DNNCScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         pass
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(self.metadata, file, indent=4)
+
+        crossencoder_dir = str(dump_dir / "crossencoder")
+        self.model.save(crossencoder_dir)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "metadata.json").open() as file:
+            self.metadata = json.load(file)
+
+        self.n_classes = self.metadata["n_classes"]
+
+        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
+        self.vector_index = vector_index_client.get_index(self.metadata["biencoder_model"])
+
+        crossencoder_dir = str(dump_dir / "crossencoder")
+        if not self.train_head:
+            self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
+        else:
+            self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

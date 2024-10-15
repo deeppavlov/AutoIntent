@@ -58,6 +58,7 @@ class KNNScorer(ScoringModule):
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
+
         with (dump_dir / "metadata.json").open() as file:
             self.metadata = json.load(file)
 
