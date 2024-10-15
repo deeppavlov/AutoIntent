@@ -42,7 +42,6 @@ def context(load_clinc_subset):
             test_dataset=None,
             device="cpu",
             multilabel_generation_config="",
-            db_dir=dataset_type,
             regex_sampling=0,
             seed=0,
         )

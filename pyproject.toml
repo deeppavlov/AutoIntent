@@ -8,10 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 sentence-transformers = "3.0.1"
-chromadb = "0.5.5"
 scikit-learn = "1.5.1"
 scikit-multilearn = "0.2.0"
-pysqlite3-binary = "^0.5.3.post1"
 appdirs = "^1.4.4"
 sre-yield = "^1.2"
 optuna = "^4.0.0"
@@ -19,6 +17,7 @@ xeger = "^0.4.0"
 pathlib = "^1.0.1"
 pydantic = "^2.9.2"
 hydra-core = "^1.3.2"
+faiss-cpu = "^1.9.0"
 
 
 [tool.poetry.group.dev]

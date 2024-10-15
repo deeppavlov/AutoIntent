@@ -45,3 +45,7 @@ make lint
 ```
 
 6. Ура, можно открывать Pull Request!
+
+## Устройство проекта
+
+![](assets/dependency-graph.png)

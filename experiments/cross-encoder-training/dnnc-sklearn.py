@@ -8,18 +8,12 @@ Usage:
 python training_stsbenchmark.py
 """
 
-import sys
-
-sys.path.append("/home/voorhs/repos/AutoIntent")
-
 import itertools as it
 import os
 from random import shuffle
 
 import joblib
 import numpy as np
-import torch
-from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.model_selection import train_test_split
 
@@ -184,49 +178,3 @@ def find_best_f1_and_threshold(scores, labels, high_score_more_similar: bool = T
                 threshold = (rows[i][0] + rows[i + 1][0]) / 2
 
     return best_f1, best_precision, best_recall, threshold
-
-
-if __name__ == "__main__":
-    import json
-    from argparse import ArgumentParser
-    from datetime import datetime
-
-    from autointent.data_handler import get_sample_utterances
-
-    parser = ArgumentParser()
-    parser.add_argument("--model-name", type=str, default="llmrails/ember-v1")
-    parser.add_argument(
-        "--logs-dir",
-        type=str,
-        default="experiments/cross-encoder-training/logs-sklearn",
-    )
-    parser.add_argument("--run-name", type=str, default="")
-    parser.add_argument("--batch-size", type=int, default=16)
-    args = parser.parse_args()
-
-    run_name = args.run_name if args.run_name != "" else args.model_name.replace("/", "_")
-    run_name = run_name + "_" + datetime.now().strftime("%m-%d-%Y_%H:%M:%S")
-
-    run_dir = os.path.join(args.logs_dir, run_name)
-
-    if not os.path.exists(run_dir):
-        os.makedirs(run_dir)
-
-    # Define our Cross-Encoder
-    model = CrossEncoderWithLogreg(CrossEncoder("llmrails/ember-v1"), batch_size=args.batch_size)
-
-    # Read dataset
-    dataset_path = "data/intent_records/banking77.json"
-    intent_records = json.load(open(dataset_path))
-
-    utterances, labels = get_sample_utterances(intent_records)
-    texts_train, texts_test, labels_train, labels_test = construct_samples(utterances, labels, balancing_factor=3)
-
-    # train
-    with torch.no_grad():
-        model.fit(texts_train, labels_train)
-        logs = model.score(texts_test, labels_test, dump_logs=True)
-
-    logs_path = os.path.join(run_dir, "logs.json")
-    json.dump(logs, open(logs_path, "w"), indent=4, ensure_ascii=False)
-    model.save_model(os.path.join(run_dir, "checkpoint.joblib"))

@@ -32,7 +32,6 @@ def test_base_mlknn(setup_environment, load_clinc_subset):
         test_dataset=test_dataset,
         device="cpu",
         multilabel_generation_config="",
-        db_dir=db_dir,
         regex_sampling=0,
         seed=0,
     )

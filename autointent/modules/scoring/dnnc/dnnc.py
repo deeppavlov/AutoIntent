@@ -28,8 +28,9 @@ class DNNCScorer(ScoringModule):
         self.train_head = train_head
 
     def fit(self, context: Context) -> None:
+        self.n_classes = context.n_classes
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
-        self._collection = context.get_best_collection()
+        self.vector_index = context.get_best_index()
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -42,17 +43,14 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        query_res = self._collection.query(
-            query_texts=utterances,
-            n_results=self.k,
-            include=["metadatas", "documents"],  # one can add "embeddings", "distances"
+        labels, _, texts = self.vector_index.query(
+            utterances,
+            self.k,
         )
 
-        cross_encoder_scores = self._get_cross_encoder_scores(utterances, query_res["documents"])
+        cross_encoder_scores = self._get_cross_encoder_scores(utterances, texts)
 
-        labels_pred = [[cand["intent_id"] for cand in candidates] for candidates in query_res["metadatas"]]
-
-        return self._build_result(cross_encoder_scores, labels_pred)
+        return self._build_result(cross_encoder_scores, labels)
 
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
@@ -97,14 +95,12 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        n_classes = self._collection.metadata["n_classes"]
+        n_classes = self.n_classes
 
         return build_result(np.array(scores), np.array(labels), n_classes)
 
     def clear_cache(self) -> None:
-        model = self._collection._embedding_function._model  # noqa: SLF001
-        model.to(device="cpu")
-        del model
+        pass
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

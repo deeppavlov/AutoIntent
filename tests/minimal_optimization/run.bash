@@ -2,13 +2,13 @@
 
 # Run the first command
 poetry run autointent \
-    --config-path tests/minimal-optimization/configs/multiclass.yaml \
-    --multiclass-path tests/minimal-optimization/data/clinc_subset.json \
-    --logs-dir tests/minimal-optimization/logs \
-    --mode multiclass \
-    --device "cpu" \
-    --log-level "DEBUG" \
-    --run-name multiclass-cpu
+    search_space_path="tests/minimal_optimization/configs/multiclass.yaml" \
+    multiclass_path="tests/minimal_optimization/data/clinc_subset.json" \
+    logs_dir="tests/minimal_optimization/logs" \
+    mode="multiclass" \
+    device="cpu" \
+    log_level="DEBUG" \
+    run_name="multiclass-cpu"
 
 # Capture the exit code of the first command
 exit_code_1=$?
@@ -21,13 +21,13 @@ fi
 
 # Run the second command
 poetry run autointent \
-    --config-path tests/minimal-optimization/configs/multilabel.yaml \
-    --multiclass-path tests/minimal-optimization/data/clinc_subset.json \
-    --logs-dir tests/minimal-optimization/logs \
-    --mode multiclass_as_multilabel \
-    --device "cpu" \
-    --log-level "DEBUG" \
-    --run-name multilabel-cpu
+    search_space_path=tests/minimal_optimization/configs/multilabel.yaml \
+    multiclass_path=tests/minimal_optimization/data/clinc_subset.json \
+    logs_dir=tests/minimal_optimization/logs \
+    mode=multiclass_as_multilabel \
+    device="cpu" \
+    log_level="DEBUG" \
+    run_name=multilabel-cpu
 
 # Capture the exit code of the second command
 exit_code_2=$?

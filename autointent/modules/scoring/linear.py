@@ -33,11 +33,10 @@ class LinearScorer(ScoringModule):
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        collection = context.get_best_collection()
-        dataset = collection.get(include=["embeddings", "metadatas"])
-        features = dataset["embeddings"]
+        vector_index = context.get_best_index()
+        features = vector_index.get_all_embeddings()
+        labels = vector_index.get_all_labels()
 
-        labels = context.vector_index.metadata_as_labels(dataset["metadatas"])
         if self._multilabel:
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
@@ -47,7 +46,7 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._emb_func = collection._embedding_function  # noqa: SLF001
+        self._emb_func = vector_index.embed
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._emb_func(utterances)
@@ -57,7 +56,4 @@ class LinearScorer(ScoringModule):
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        model = self._emb_func._model  # noqa: SLF001
-        model.to(device="cpu")
-        del model
-        self.collection = None
+        pass
