@@ -2,17 +2,8 @@ from dataclasses import dataclass
 from enum import Enum
 
 from hydra.core.config_store import ConfigStore
-from omegaconf import MISSING
 
 from autointent.custom_types import LogLevel
-
-from .node import NodeOptimizerConfig
-
-
-@dataclass
-class PipelineSearchSpace:
-    nodes: list[NodeOptimizerConfig] = MISSING
-    _target_: str = "autointent.pipeline.pipeline.Pipeline"
 
 
 class ClassificationMode(Enum):

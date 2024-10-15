@@ -5,8 +5,7 @@ from uuid import uuid4
 import pytest
 
 from autointent import Context
-from autointent.pipeline.optimization.utils import get_run_name, load_data, setup_logging
-from autointent.pipeline.utils import get_db_dir
+from autointent.pipeline.optimization.utils import get_db_dir, get_run_name, load_data, setup_logging
 
 cur_path = pathlib.Path(__file__).parent.resolve()
 

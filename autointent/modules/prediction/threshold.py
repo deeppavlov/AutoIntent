@@ -41,6 +41,9 @@ class ThresholdPredictor(PredictionModule):
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
+    def load(self, path: str) -> None:
+        pass
+
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
     """
