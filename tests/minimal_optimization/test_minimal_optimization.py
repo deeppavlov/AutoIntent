@@ -23,6 +23,7 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
+        db_dir=db_dir,
     )
 
     # run optimization

@@ -28,6 +28,7 @@ def test_base_mlknn(setup_environment, load_clinic_subset):
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
+        db_dir=db_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

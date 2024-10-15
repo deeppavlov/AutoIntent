@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from typing import Any
 
 import faiss
@@ -10,13 +12,19 @@ class VectorIndex:
     def __init__(self, model_name: str, device: str) -> None:
         self.model_name = model_name
         self.device = device
-        self.embedding_model = SentenceTransformer(model_name, device=device)
         self.index = None
+
         self.labels: list[int] | list[list[int]] = []    # (n_samples,) or (n_samples, n_classes)
+        self.texts: list[str] = []
+        self.embedding_model: SentenceTransformer = None
 
     def add(self, texts: list[str], labels: list[int] | list[list[int]]) -> None:
         self.texts = texts
+
+        if self.embedding_model is None:
+            self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
         embeddings = self.embed(texts)
+
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)  # type: ignore # noqa: PGH003
@@ -26,6 +34,11 @@ class VectorIndex:
         if self.index:
             self.index.reset()
         self.labels = []
+        self.texts = []
+
+        if self.embedding_model:
+            self.embedding_model.cpu()
+            del self.embedding_model
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict]]:
         query_embedding = self.embedding_model.encode(texts)
@@ -72,6 +85,7 @@ class VectorIndex:
         `texts`: corresponding texts
         """
         func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
+
         all_results = func(queries, k)
 
         all_labels = [[self.labels[result["id"]] for result in results] for results in all_results]
@@ -82,3 +96,25 @@ class VectorIndex:
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         return self.embedding_model.encode(utterances, convert_to_numpy=True)
+
+    def dump(self, dir_path: Path) -> None:
+        dir_path.mkdir(parents=True, exist_ok=True)
+        self.dump_dir = dir_path
+        faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
+        self.embedding_model.save(str(self.dump_dir / "embedding_model"))
+        with (self.dump_dir / "texts.txt").open("w") as file:
+            json.dump(self.texts, file, indent=4, ensure_ascii=False)
+        with (self.dump_dir / "labels.txt").open("w") as file:
+            json.dump(self.labels, file, indent=4, ensure_ascii=False)
+
+    def load(self, dir_path: Path | None = None) -> None:
+        self.delete()
+
+        if dir_path is None:
+            dir_path = self.dump_dir
+        self.index = faiss.read_index(str(dir_path / "index.faiss"))
+        self.embedding_model = SentenceTransformer(str(dir_path / "embedding_model"))
+        with (dir_path / "texts.txt").open() as file:
+            self.texts = json.load(file)
+        with (dir_path / "labels.txt").open() as file:
+            self.labels = json.load(file)

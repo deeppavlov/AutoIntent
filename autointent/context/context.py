@@ -18,6 +18,7 @@ class Context:
         multilabel_generation_config: str,
         regex_sampling: int,
         seed: int,
+        db_dir: str,
     ) -> None:
         self.data_handler = DataHandler(
             multiclass_intent_records,
@@ -29,7 +30,9 @@ class Context:
             seed,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(device, self.data_handler.multilabel, self.data_handler.n_classes)
+        self.vector_index_client = VectorIndexClient(
+            device, self.data_handler.multilabel, self.data_handler.n_classes, db_dir
+        )
 
         self.device = device
         self.multilabel = self.data_handler.multilabel

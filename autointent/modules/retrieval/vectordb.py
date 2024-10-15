@@ -24,4 +24,4 @@ class VectorDBModule(RetrievalModule):
         return RetrieverArtifact(embedder_name=self.model_name)
 
     def clear_cache(self) -> None:
-        pass
+        self.vector_index.delete()

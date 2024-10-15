@@ -136,6 +136,7 @@ def main(cfg: OptimizationConfig) -> None:
         cfg.multilabel_generation_config,
         cfg.regex_sampling,
         cfg.seed,
+        db_dir,
     )
 
     # run optimization

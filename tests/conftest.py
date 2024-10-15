@@ -25,7 +25,8 @@ def load_clinic_subset() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
-def context(load_clinic_subset):
+def context(load_clinic_subset, setup_environment):
+    run_name, db_dir = setup_environment
     return Context(
         multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=[],
@@ -35,4 +36,5 @@ def context(load_clinic_subset):
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
+        db_dir=db_dir,
     )
