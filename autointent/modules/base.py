@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
-from autointent.nodes.nodes_info.base import METRIC_FN
+from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):

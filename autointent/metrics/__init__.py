@@ -10,7 +10,7 @@ from .prediction import (
     prediction_recall,
     prediction_roc_auc,
 )
-from .regexp import regexp_partial_accuracy, regexp_partial_precision
+from .regexp import RegexpMetricFn, regexp_partial_accuracy, regexp_partial_precision
 from .retrieval import (
     RetrievalMetricFn,
     retrieval_hit_rate,
@@ -89,6 +89,9 @@ PREDICTION_METRICS_MULTICLASS: dict[str, PredictionMetricFn] = funcs_to_dict(
 )
 
 PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
+
+METRIC_FN = PredictionMetricFn | RegexpMetricFn | RetrievalMetricFn | ScoringMetricFn
+
 __all__ = [
     "PredictionMetricFn",
     "prediction_accuracy",
@@ -125,4 +128,6 @@ __all__ = [
     "scoring_precision",
     "scoring_recall",
     "scoring_roc_auc",
+    "RegexpMetricFn",
+    "METRIC_FN",
 ]
