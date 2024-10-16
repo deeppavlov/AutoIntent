@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from autointent.configs.node import InferenceNodeConfig
 from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
@@ -88,13 +89,20 @@ class OptimizationInfo:
             "configs": self.trials.model_dump(),
         }
 
-    def get_best_trials(self) -> list[dict[str, Any]]:
+    def get_inference_nodes_config(self) -> list[InferenceNodeConfig]:
         node_types = ["regexp", "retrieval", "scoring", "prediction"]
         trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
-        res = {nt: {} for nt in node_types}
+        res = []
         for idx, node_type in zip(trial_ids, node_types, strict=True):
             if idx is None:
                 continue
             trial = self.trials[node_type][idx]
-            res[node_type] = {"module_type": trial.module_type, "module_params": trial.module_params}
+            res.append(
+                InferenceNodeConfig(
+                    node_type=node_type,
+                    module_type=trial.module_type,
+                    module_config=trial.module_params,
+                    load_path=trial.module_dump_dir
+                )
+            )
         return res

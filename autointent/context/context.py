@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any
 
 from autointent.custom_types import TASK_TYPES
@@ -47,6 +48,9 @@ class Context:
         return self.vector_index_client.get_index(model_name)
 
     def get_inference_config(self) -> dict[str, Any]:
+        nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
+        for cfg in nodes_configs:
+            cfg.pop("_target_")
         return {
             "metadata": {
                 "device": self.device,
@@ -54,5 +58,5 @@ class Context:
                 "n_classes": self.n_classes,
                 "seed": self.seed,
             },
-            "nodes_configs": self.optimization_info.get_best_trials(),
+            "nodes_configs": nodes_configs,
         }

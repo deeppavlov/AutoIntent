@@ -33,7 +33,7 @@ def get_logs_dir(logs_dir: str, run_name: str) -> Path:
     logs_dir_ = Path.cwd() if logs_dir == "" else Path(logs_dir)
     res = logs_dir_ / run_name
     res.mkdir(parents=True)
-    return logs_dir
+    return res
 
 
 def setup_logging(level: str | None = None) -> logging.Logger:

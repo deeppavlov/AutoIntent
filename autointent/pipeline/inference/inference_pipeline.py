@@ -10,8 +10,12 @@ PipelineType = TypeVar("PipelineType", bound="InferencePipeline")
 
 class InferencePipeline:
     def __init__(self, nodes: list[InferenceNode]) -> None:
-        self.nodes = nodes
+        self.nodes = {node.node_info.node_type: node for node in nodes}
 
     @classmethod
     def from_dict_config(cls, config: dict[str, Any]) -> PipelineType:
         return instantiate(InferencePipelineConfig, **config)
+
+    def predict(self, utterances: list[str]) -> list[int] | list[list[int]]:
+        scores = self.nodes["scoring"].module.predict(utterances)
+        return self.nodes["prediction"].module.predict(scores)

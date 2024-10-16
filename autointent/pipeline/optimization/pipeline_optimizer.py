@@ -36,7 +36,7 @@ class PipelineOptimizer:
         optimization_results = self.context.optimization_info.dump_evaluation_results()
 
         # create appropriate directory
-        logs_dir.mkdir(parents=True)
+        logs_dir.mkdir(parents=True, exist_ok=True)
 
         # dump search space and evaluation results
         logs_path = logs_dir / "logs.json"
