@@ -10,7 +10,7 @@ from autointent.pipeline.optimization.utils import load_config
 @pytest.mark.parametrize(
     ("mode", "config_name"), [("multiclass", "multiclass.yaml"), ("multiclass_as_multilabel", "multilabel.yaml")]
 )
-def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name):
+def test_full_pipeline(setup_environment, mode, load_clinic_subset, config_name, logs_dir, dump_dir):
     run_name, db_dir = setup_environment
 
     cur_path = pathlib.Path(__file__).parent.resolve()
@@ -24,6 +24,7 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
         regex_sampling=0,
         seed=0,
         db_dir=db_dir,
+        dump_dir=dump_dir,
     )
 
     # run optimization
@@ -32,4 +33,4 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir=str(cur_path / "logs"), run_name=run_name)
+    pipeline.dump(logs_dir=(logs_dir / run_name / "logs"))

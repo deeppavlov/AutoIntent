@@ -1,22 +1,7 @@
 import pytest
 
-from autointent.context import Context
 from autointent.metrics import retrieval_map
 from autointent.modules.retrieval.vectordb import VectorDBModule
-
-
-@pytest.fixture
-def context(load_clinic_subset):
-    return Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
-        device="cpu",
-        mode="multiclass",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-    )
 
 
 @pytest.mark.xfail

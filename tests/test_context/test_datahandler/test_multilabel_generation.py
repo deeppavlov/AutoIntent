@@ -22,7 +22,5 @@ def vector_index(setup_environment):
 
 def test_vector_index_initialization(setup_environment):
     run_name, db_dir = setup_environment
-    index = VectorIndexClient(device="cpu", multilabel=False, n_classes=2, db_dir=db_dir)
+    index = VectorIndexClient(device="cpu", db_dir=db_dir)
     assert index.device == "cpu"
-    assert index.multilabel is False
-    assert index.n_classes == 2

@@ -25,7 +25,7 @@ def load_clinic_subset() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
-def context(load_clinic_subset, setup_environment):
+def context(load_clinic_subset, setup_environment, dump_dir):
     run_name, db_dir = setup_environment
     return Context(
         multiclass_intent_records=load_clinic_subset,
@@ -37,4 +37,15 @@ def context(load_clinic_subset, setup_environment):
         regex_sampling=0,
         seed=0,
         db_dir=db_dir,
+        dump_dir=dump_dir
     )
+
+@pytest.fixture
+def logs_dir() -> str:
+    cur_path = pathlib.Path(__file__).parent.resolve()
+    return cur_path / "logs"
+
+
+@pytest.fixture
+def dump_dir(logs_dir) -> str:
+    return str(logs_dir / "module_dumps")
