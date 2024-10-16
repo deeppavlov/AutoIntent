@@ -23,7 +23,9 @@ class PredictionMetricFn(Protocol):
         ...
 
 
-def simple_check(func: Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]) -> PredictionMetricFn:
+def simple_check(
+    func: PredictionMetricFn,
+) -> Callable[[list[int] | list[list[int]], list[int] | list[list[int]]], float]:
     @wraps(func)
     def wrapper(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
         y_pred_ = np.array(y_pred)
@@ -52,12 +54,12 @@ def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray
         binarized_pred = (y_pred == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
-    return np.mean(roc_auc_scores)
+    return np.mean(roc_auc_scores)  # type: ignore[return-value]
 
 
 def _prediction_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multilabel"""
-    return roc_auc_score(y_true, y_pred, average="macro")
+    return roc_auc_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
 @simple_check
@@ -75,16 +77,16 @@ def prediction_roc_auc(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> fl
 @simple_check
 def prediction_precision(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return precision_score(y_true, y_pred, average="macro")
+    return precision_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
 @simple_check
 def prediction_recall(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return recall_score(y_true, y_pred, average="macro")
+    return recall_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
 @simple_check
 def prediction_f1(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     """supports multiclass and multilabel"""
-    return f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]

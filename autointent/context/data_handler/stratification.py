@@ -21,8 +21,8 @@ def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[An
 
 
 def split_sample_utterances(
-    intent_records: list[dict],
-    test_records: list[dict],
+    intent_records: list[dict[str, Any]],
+    test_records: list[dict[str, Any]] | None,
     multilabel: bool,
     seed: int = 0,
 ) -> tuple[
@@ -124,7 +124,7 @@ def multilabel_train_test_split(
     - implement shuffling
     """
     if stratify is None:
-        return train_test_split(*arrays, test_size=test_size, random_state=random_state, shuffle=shuffle)
+        return train_test_split(*arrays, test_size=test_size, random_state=random_state, shuffle=shuffle)  # type: ignore[no-any-return]
     n_arrays = len(arrays)
     if n_arrays == 0:
         msg = "At least one array required as input"
@@ -143,7 +143,7 @@ def validate_test_labels(test_labels: list[int] | list[list[int]], multilabel: b
     ensure that all classes are presented in the presented labels set
     """
     if not multilabel and isinstance(test_labels[0], int):
-        return is_multiclass_test_set_complete(test_labels, n_classes)
+        return is_multiclass_test_set_complete(test_labels, n_classes)  # type: ignore[arg-type]
     if multilabel and isinstance(test_labels[0], list):
         return is_multilabel_test_set_complete(np.array(test_labels))
     msg = "unexpected labels format"
@@ -152,7 +152,7 @@ def validate_test_labels(test_labels: list[int] | list[list[int]], multilabel: b
 
 def is_multilabel_test_set_complete(labels: npt.NDArray[Any]) -> bool:
     labels_counts = labels.sum(axis=0)
-    return (labels_counts > 0).all()
+    return (labels_counts > 0).all()  # type: ignore[no-any-return]
 
 
 def is_multiclass_test_set_complete(labels: list[int], n_classes: int) -> bool:

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from omegaconf import MISSING
 
@@ -17,6 +18,6 @@ class InferenceNodeConfig:
 @dataclass
 class NodeOptimizerConfig:
     node_type: str = MISSING
-    search_space: list[dict] = MISSING
+    search_space: list[dict[str, Any]] = MISSING
     metric: str = MISSING
     _target_: str = "autointent.nodes.NodeOptimizer"

@@ -80,7 +80,7 @@ class DNNCScorer(ScoringModule):
 
         flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
         return [
-            flattened_cross_encoder_scores[i : i + self.k]
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 

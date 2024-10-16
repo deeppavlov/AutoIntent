@@ -2,6 +2,7 @@ import json
 import random
 from itertools import combinations
 from pathlib import Path
+from typing import Any
 
 import xeger
 
@@ -15,7 +16,7 @@ def sample_unique_tuples(k: int, n: int, m: int) -> list[tuple[int, ...]]:
     return all_combinations[:m]
 
 
-def sample_utterance_from_regexp(intent_record: dict, x: xeger.Xeger) -> str:
+def sample_utterance_from_regexp(intent_record: dict[str, Any], x: xeger.Xeger) -> str:
     n_templates = len(intent_record["regexp_full_match"])
     i_template = random.randint(0, n_templates - 1)
     res: str = x.xeger(intent_record["regexp_full_match"][i_template])
@@ -23,7 +24,7 @@ def sample_utterance_from_regexp(intent_record: dict, x: xeger.Xeger) -> str:
 
 
 def sample_multilabel_utterances(
-    intent_records: list[dict], n_samples: int, n_labels: int, seed: int = 0
+    intent_records: list[dict[str, Any]], n_samples: int, n_labels: int, seed: int = 0
 ) -> list[UtteranceRecord]:
     # TODO improve versatility
     # TODO make global fix seed
@@ -39,7 +40,9 @@ def sample_multilabel_utterances(
     return res
 
 
-def generate_multilabel_version(intent_records: list[dict], config_string: str, seed: int) -> list[UtteranceRecord]:
+def generate_multilabel_version(
+    intent_records: list[dict[str, Any]], config_string: str, seed: int
+) -> list[UtteranceRecord]:
     config_path = Path(config_string)
     if not config_path.exists():
         msg = f"Config file {config_path} not found"
@@ -52,7 +55,7 @@ def generate_multilabel_version(intent_records: list[dict], config_string: str, 
     return res
 
 
-def convert_to_multilabel_format(intent_records: list[dict]) -> list[UtteranceRecord]:
+def convert_to_multilabel_format(intent_records: list[dict[str, Any]]) -> list[UtteranceRecord]:
     utterances, labels = get_sample_utterances(intent_records)
     return [
         UtteranceRecord(utterance=ut, labels=[lab] if lab != -1 else [])
