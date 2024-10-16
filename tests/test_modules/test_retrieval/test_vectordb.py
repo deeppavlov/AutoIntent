@@ -5,10 +5,10 @@ from autointent.modules.retrieval.vectordb import VectorDBModule
 
 
 @pytest.mark.xfail
-def test_score_returns_correct_metrics(context):
+def test_score_returns_correct_metrics(context_multiclass):
     module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo")
-    module.fit(context)
-    score = module.score(context, retrieval_map)
+    module.fit(context_multiclass)
+    score = module.score(context_multiclass, retrieval_map)
     assert score == 1.0
 
 

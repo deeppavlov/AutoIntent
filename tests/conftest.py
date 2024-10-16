@@ -25,7 +25,7 @@ def load_clinic_subset() -> list[dict[str, Any]]:
 
 
 @pytest.fixture
-def context(load_clinic_subset, setup_environment, dump_dir):
+def context_multiclass(load_clinic_subset, setup_environment, dump_dir):
     run_name, db_dir = setup_environment
     return Context(
         multiclass_intent_records=load_clinic_subset,
@@ -33,6 +33,23 @@ def context(load_clinic_subset, setup_environment, dump_dir):
         test_utterance_records=[],
         device="cpu",
         mode="multiclass",
+        multilabel_generation_config="",
+        regex_sampling=0,
+        seed=0,
+        db_dir=db_dir,
+        dump_dir=dump_dir
+    )
+
+
+@pytest.fixture
+def context_multilabel(load_clinic_subset, setup_environment, dump_dir):
+    run_name, db_dir = setup_environment
+    return Context(
+        multiclass_intent_records=load_clinic_subset,
+        multilabel_utterance_records=[],
+        test_utterance_records=[],
+        device="cpu",
+        mode="multiclass_as_multilabel",
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
