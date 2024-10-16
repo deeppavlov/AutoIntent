@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Any, Protocol
 
 import numpy as np
@@ -28,7 +29,7 @@ class RetrievalMetricFn(Protocol):
 
 
 def macrofy(
-    metric_fn: RetrievalMetricFn,
+    metric_fn: Callable[[npt.NDArray[Any], npt.NDArray[Any], int | None], float],
     query_labels: list[list[int]],
     candidates_labels: list[list[list[int]]],
     k: int | None = None,
@@ -46,7 +47,7 @@ def macrofy(
         binarized_candidates_labels = candidates_labels_[..., i]
         classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))
 
-    return np.mean(classwise_values)
+    return np.mean(classwise_values)  # type: ignore[return-value]
 
 
 def average_precision(query_label: int, candidate_labels: list[int], k: int | None = None) -> float:
@@ -62,7 +63,7 @@ def average_precision(query_label: int, candidate_labels: list[int], k: int | No
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def retrieval_map(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+def retrieval_map(query_labels: npt.NDArray[Any], candidates_labels: npt.NDArray[Any], k: int | None = None) -> float:
     ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
     return sum(ap_list) / len(ap_list)
 
@@ -117,7 +118,7 @@ def retrieval_map_numpy(query_labels: list[int], candidates_labels: list[list[in
         out=np.zeros_like(sum_precision),
         where=num_relevant != 0,
     )
-    return np.mean(average_precision)
+    return np.mean(average_precision)  # type: ignore[no-any-return]
 
 
 def retrieval_hit_rate(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
@@ -164,10 +165,12 @@ def retrieval_hit_rate_numpy(query_labels: list[int], candidates_labels: list[li
     candidates_labels_ = np.array(candidates_labels)
     truncated_candidates = candidates_labels_[:, :k]
     hit_mask = np.isin(query_labels_[:, None], truncated_candidates).any(axis=1)
-    return hit_mask.mean()
+    return hit_mask.mean()  # type: ignore[no-any-return]
 
 
-def retrieval_precision(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+def retrieval_precision(
+    query_labels: npt.NDArray[Any], candidates_labels: npt.NDArray[Any], k: int | None = None
+) -> float:
     total_precision = 0.0
     num_queries = len(query_labels)
 
@@ -218,7 +221,7 @@ def retrieval_precision_numpy(
     matches = (top_k_candidates == query_labels_[:, None]).astype(int)
     relevant_counts = np.sum(matches, axis=1)
     precision_at_k = relevant_counts / k
-    return np.mean(precision_at_k)
+    return np.mean(precision_at_k)  # type: ignore[no-any-return]
 
 
 def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
@@ -236,7 +239,7 @@ def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     relevance_scores = relevance_scores[:k]
     discounts = np.log2(np.arange(2, len(relevance_scores) + 2))
-    return np.sum(relevance_scores / discounts)
+    return np.sum(relevance_scores / discounts)  # type: ignore[no-any-return]
 
 
 def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
@@ -256,9 +259,9 @@ def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     return dcg(ideal_scores, k)
 
 
-def retrieval_ndcg(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+def retrieval_ndcg(query_labels: npt.NDArray[Any], candidates_labels: npt.NDArray[Any], k: int | None = None) -> float:
     ndcg_scores: list[float] = []
-    relevance_scores = np.array(query_labels)[:, None] == np.array(candidates_labels)
+    relevance_scores: npt.NDArray[np.bool] = np.array(query_labels)[:, None] == np.array(candidates_labels)
 
     for rel_scores in relevance_scores:
         cur_dcg = dcg(rel_scores, k)
@@ -289,7 +292,7 @@ def retrieval_ndcg_macro(
     return macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
-def retrieval_mrr(query_labels: list[int], candidates_labels: list[list[int]], k: int | None = None) -> float:
+def retrieval_mrr(query_labels: npt.NDArray[Any], candidates_labels: npt.NDArray[Any], k: int | None = None) -> float:
     mrr_sum = 0.0
     num_queries = len(query_labels)
 

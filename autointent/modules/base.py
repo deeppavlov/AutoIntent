@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from collections.abc import Callable
-from typing import Any
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
+from autointent.nodes.nodes_info.base import METRIC_FN
 
 
 class Module(ABC):
@@ -12,7 +11,7 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def score(self, context: Context, metric_fn: Callable[[Any], Any]) -> float:
+    def score(self, context: Context, metric_fn: METRIC_FN) -> float:
         """
         calculates metric on test set and returns metric value
         """

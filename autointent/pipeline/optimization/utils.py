@@ -16,10 +16,10 @@ def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
         with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return json.load(file)
+            return json.load(file)  # type: ignore[no-any-return]
     elif data_path != "":
         with Path(data_path).open() as file:
-            return json.load(file)
+            return json.load(file)  # type: ignore[no-any-return]
     return []
 
 
@@ -52,4 +52,4 @@ def load_config(config_path: str, multilabel: bool, logger: Logger | None = None
         config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
         with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
             file_content = file.read()
-    return yaml.safe_load(file_content)
+    return yaml.safe_load(file_content)  # type: ignore[no-any-return]

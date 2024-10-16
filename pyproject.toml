@@ -125,6 +125,12 @@ module = [
     "xeger",
     "appdirs",
     "sre_yield",
+    "skmultilearn.model_selection",
+    "omegaconf",
+    "hydra",
+    "hydra.*",
+    "transformers",
+    "faiss",
 ]
 ignore_missing_imports = true
 

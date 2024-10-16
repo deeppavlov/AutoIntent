@@ -52,4 +52,4 @@ def get_topk(scores: npt.NDArray[Any], k: int) -> npt.NDArray[Any]:
     top_scores = scores[np.arange(len(scores))[:, None], top_indices]
     # sort them
     top_indices_sorted = np.argsort(top_scores, axis=1)[:, ::-1]
-    return top_indices[np.arange(len(scores))[:, None], top_indices_sorted]
+    return top_indices[np.arange(len(scores))[:, None], top_indices_sorted]  # type: ignore[no-any-return]

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 def construct_samples(
     texts: list[str], labels: list[Any], balancing_factor: int | None = None
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    samples = [[], []]
+    samples = [[], []]  # type: ignore[var-annotated]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
         pair = [text1, text2]
@@ -44,8 +44,8 @@ def construct_samples(
     else:
         samples = samples[0] + samples[1]
 
-    pairs = [dct["texts"] for dct in samples]
-    labels = [dct["label"] for dct in samples]
+    pairs = [dct["texts"] for dct in samples]  # type: ignore[call-overload]
+    labels = [dct["label"] for dct in samples]  # type: ignore[call-overload]
     return pairs, labels
 
 
@@ -61,7 +61,7 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
-        def hook_function(module, input_tensor, output_tensor) -> None:  # noqa: ARG001, ANN001
+        def hook_function(module, input_tensor, output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ARG001, ANN001
             logits_list.append(input_tensor[0].cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
@@ -103,8 +103,8 @@ class CrossEncoderWithLogreg:
         - `utterances`: list of text pairs as strings
         - `labels`: intent class labels
         """
-        pairs, labels = construct_samples(utterances, labels, balancing_factor=1)
-        self._fit(pairs, labels)
+        pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
+        self._fit(pairs, labels_)  # type: ignore[arg-type]
 
     def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
@@ -112,4 +112,4 @@ class CrossEncoderWithLogreg:
         """
         features = self.get_features(pairs)
 
-        return self._clf.predict_proba(features)[:, 1]
+        return self._clf.predict_proba(features)[:, 1]  # type: ignore[no-any-return]

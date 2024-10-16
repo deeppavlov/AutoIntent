@@ -115,7 +115,7 @@ from .utils import get_run_name, load_config, load_data, setup_logging
 #     pipeline.dump(args.logs_dir, run_name)
 
 
-@hydra.main(config_name="optimization_config", config_path=".", version_base=None)
+@hydra.main(config_name="optimization_config", config_path=".", version_base=None)  # type: ignore[misc]
 def optimization(cfg: OptimizationConfig) -> None:
     setup_logging(cfg.log_level.value)
     logger = logging.getLogger(__name__)

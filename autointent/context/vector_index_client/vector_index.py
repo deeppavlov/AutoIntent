@@ -11,29 +11,33 @@ class VectorIndex:
         self.model_name = model_name
         self.device = device
         self.embedding_model = SentenceTransformer(model_name, device=device)
-        self.index = None
-        self.labels: list[int] | list[list[int]] = []    # (n_samples,) or (n_samples, n_classes)
+        self.index: None | faiss.Index = None
+        self.labels: list[int] | list[list[int]] = []  # (n_samples,) or (n_samples, n_classes)
 
     def add(self, texts: list[str], labels: list[int] | list[list[int]]) -> None:
         self.texts = texts
         embeddings = self.embed(texts)
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
-        self.index.add(embeddings)  # type: ignore # noqa: PGH003
-        self.labels.extend(labels)
+        self.index.add(embeddings)
+        self.labels.extend(labels)  # type: ignore[arg-type]
 
     def delete(self) -> None:
         if self.index:
             self.index.reset()
         self.labels = []
 
-    def _search_by_text(self, texts: list[str], k: int) -> list[list[dict]]:
+    def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
         query_embedding = self.embedding_model.encode(texts)
         return self._search_by_embedding(query_embedding, k)
 
-    def _search_by_embedding(self, embedding: np.ndarray, k: int) -> list[list[dict]]:
+    def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
         if embedding.ndim != 2:  # noqa: PLR2004
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
+            raise ValueError(msg)
+
+        if self.index is None:
+            msg = "Index is not created yet"
             raise ValueError(msg)
 
         distances, indices = self.index.search(embedding, k)
@@ -48,13 +52,16 @@ class VectorIndex:
         return results
 
     def get_all_embeddings(self) -> npt.NDArray[Any]:
-        return self.index.reconstruct_n(0, self.index.ntotal)
+        if self.index is None:
+            msg = "Index is not created yet"
+            raise ValueError(msg)
+        return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
     def get_all_labels(self) -> list[int] | list[list[int]]:
         return self.labels
 
     def query(
-        self, queries: list[str] | list[npt.NDArray], k: int
+        self, queries: list[str] | npt.NDArray[Any], k: int
     ) -> tuple[list[Any], list[list[float]], list[list[str]]]:
         """
         Arguments
@@ -71,8 +78,10 @@ class VectorIndex:
 
         `texts`: corresponding texts
         """
-        func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
-        all_results = func(queries, k)
+        if isinstance(queries[0], str):
+            all_results = self._search_by_text(queries, k)  # type: ignore[arg-type]
+        else:
+            all_results = self._search_by_embedding(queries, k)  # type: ignore[arg-type]
 
         all_labels = [[self.labels[result["id"]] for result in results] for results in all_results]
         all_distances = [[result["distance"] for result in results] for results in all_results]
