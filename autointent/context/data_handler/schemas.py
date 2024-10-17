@@ -4,6 +4,12 @@ from functools import cached_property
 from pydantic import BaseModel
 
 
+class UtteranceType(str, Enum):
+    oos = "oos"
+    multilabel = "multilabel"
+    multiclass = "multiclass"
+
+
 class DatasetType(str, Enum):
     multilabel = "multilabel"
     multiclass = "multiclass"
@@ -21,14 +27,21 @@ class Utterance(BaseModel):
         return encoding
 
     @cached_property
-    def type(self) -> DatasetType:
+    def type(self) -> UtteranceType:
+        if self.label is None:
+            return UtteranceType.oos
         if isinstance(self.label, int):
-            return DatasetType.multiclass
-        return DatasetType.multilabel
+            return UtteranceType.multiclass
+        return UtteranceType.multilabel
 
     @cached_property
     def oos(self) -> bool:
         return self.label is None
+
+    def to_multilabel(self) -> "Utterance":
+        if self.type in {UtteranceType.multilabel, UtteranceType.oos}:
+            return self
+        return Utterance(text=self.text, label=[self.label])
 
 
 class Intent(BaseModel):
@@ -45,9 +58,9 @@ class Dataset(BaseModel):
 
     @cached_property
     def type(self) -> DatasetType:
-        if all(utterance.type == DatasetType.multilabel for utterance in self.utterances):
-            return DatasetType.multilabel
-        return DatasetType.multiclass
+        if all(utterance.type in {UtteranceType.multiclass, UtteranceType.oos} for utterance in self.utterances):
+            return DatasetType.multiclass
+        return DatasetType.multilabel
 
     @cached_property
     def n_classes(self) -> int:
@@ -61,3 +74,9 @@ class Dataset(BaseModel):
                 for label in utterance.label:
                     classes.add(label)
         return len(classes)
+
+    def to_multilabel(self) -> "Dataset":
+        return Dataset(
+            utterances=[utterance.to_multilabel() for utterance in self.utterances],
+            intents=self.intents
+        )

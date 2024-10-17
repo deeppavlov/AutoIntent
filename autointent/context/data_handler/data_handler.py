@@ -18,10 +18,14 @@ class DataHandler:
         test_dataset: Dataset | None = None,
         multilabel_generation_config: str = "",
         regex_sampling: int = 0,
+        force_multilabel: bool = False,
         random_seed: int = 0,
     ) -> None:
         logger = logging.getLogger(__name__)
         set_seed(random_seed)
+
+        if force_multilabel:
+            dataset = dataset.to_multilabel()
 
         self.multilabel = dataset.type == DatasetType.multilabel
 
