@@ -22,83 +22,62 @@ def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[An
     return utterances, labels
 
 
+def get_samples(dataset: Dataset) -> tuple[list[str], list[int] | list[list[int]]]:
+    utterances, labels = [], []
+    for utterance in dataset.utterances:
+        if utterance.oos:
+            continue
+        utterances.append(utterance.text)
+        if dataset.type == DatasetType.multiclass:
+            labels.append(utterance.label)
+        else:
+            labels.append(utterance.one_hot_label(dataset.n_classes))
+    return utterances, labels
+
+
+def get_oos_samples(dataset: Dataset) -> list[str]:
+    return [utterance.text for utterance in dataset.utterances if utterance.oos]
+
+
 def split_sample_utterances(
     dataset: Dataset,
     test_dataset: Dataset | None = None,
     random_seed: int = 0,
 ) -> ...:
-    """
-    Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
-    """
     logger = logging.getLogger(__name__)
 
-    multilabel = dataset.type == DatasetType.multilabel
+    utterances, labels = get_samples(dataset)
+    oos_utterances = get_oos_samples(dataset)
 
-    utterances = [utterance.text for utterance in dataset.utterances]
-    labels = [utterance.label for utterance in dataset.utterances]
-
-    if not multilabel:
-        logger.debug("parsing multiclass dataset...")
-
-        in_domain_mask = np.array(labels) != -1
-
-        in_domain_utterances = [
-            ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if is_in_domain
-        ]
-        in_domain_labels = [lab for lab, is_in_domain in zip(labels, in_domain_mask, strict=False) if is_in_domain]
-        oos_utterances = [ut for ut, is_in_domain in zip(utterances, in_domain_mask, strict=False) if not is_in_domain]
-
-        n_classes = len(set(in_domain_labels))
-        splitter = train_test_split
-
-    else:
-        logger.debug("parsing multilabel dataset...")
-
-        classes = set(it.chain.from_iterable(labels))
-        n_classes = len(classes) if -1 not in classes else len(classes) - 1
-
-        in_domain_utterances = [ut for ut, lab in zip(utterances, labels, strict=False) if len(lab) > 0]
-        in_domain_labels = [[int(i in lab) for i in range(n_classes)] for lab in labels if len(lab) > 0]
-        oos_utterances = [ut for ut, lab in zip(utterances, labels, strict=False) if len(lab) == 0]
-
+    splitter = train_test_split
+    if dataset.type == DatasetType.multilabel:
         splitter = multilabel_train_test_split
 
     if test_dataset is None:
-        logger.debug("test utterances are not provided, using train test splitting...")
-
         splits = splitter(
-            in_domain_utterances,
-            in_domain_labels,
+            utterances,
+            labels,
             test_size=0.25,
             random_state=random_seed,
-            stratify=in_domain_labels,
+            stratify=labels,
             shuffle=True,
         )
         test_labels = splits[-1]
     else:
-        logger.debug("parsing test dataset...")
+        test_utterances, test_labels = get_samples(test_dataset)
+        oos_utterances.extend(get_oos_samples(test_dataset))
 
-        test_utterances, test_labels, oos_utterances = [], [], []
+        splits = [utterances, test_utterances, labels, test_labels]
 
-        for utterance in test_dataset.utterances:
-            if utterance.oos:
-                oos_utterances.append(utterance.text)
-            else:
-                test_utterances.append(utterance.text)
-                if multilabel:
-                    test_labels.append(utterance.one_hot_label(n_classes))
-                else:
-                    test_labels.append(utterance.label)
-
-        splits = [in_domain_utterances, test_utterances, in_domain_labels, test_labels]
-
-    is_valid = validate_test_labels(test_labels, multilabel, n_classes)
+    is_valid = validate_test_labels(
+        test_labels, dataset.type == DatasetType.multilabel, dataset.n_classes,
+    )
     if not is_valid:
         msg = "for some reason test set doesn't contain some classes examples"
         logger.error(msg)
         raise ValueError(msg)
 
-    return n_classes, oos_utterances, *splits
+    return dataset.n_classes, oos_utterances, *splits
 
 
 def multilabel_train_test_split(

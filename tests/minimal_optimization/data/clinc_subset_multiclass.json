@@ -11,10 +11,6 @@
         {
             "id": 2,
             "name": "alarm"
-        },
-        {
-            "id": -1,
-            "name": "oos"
         }
     ],
     "utterances": [
@@ -79,16 +75,13 @@
             "label": 2
         },
         {
-            "text": "how much is an overdraft fee for bank",
-            "label": -1
+            "text": "how much is an overdraft fee for bank"
         },
         {
-            "text": "why are exponents preformed before multiplication in the order of operations",
-            "label": -1
+            "text": "why are exponents preformed before multiplication in the order of operations"
         },
         {
-            "text": "what size wipers does this car take",
-            "label": -1
+            "text": "what size wipers does this car take"
         }
     ]
 }

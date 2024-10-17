@@ -1,5 +1,6 @@
 from enum import Enum
 from functools import cached_property
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -11,7 +12,7 @@ class DatasetType(str, Enum):
 
 class Utterance(BaseModel):
     text: str
-    label: list[int] | int
+    label: int | list[int] | None = None
 
     def one_hot_label(self, n_classes: int) -> list[int]:
         encoding = [0] * n_classes
@@ -28,9 +29,7 @@ class Utterance(BaseModel):
 
     @cached_property
     def oos(self) -> bool:
-        if self.type == DatasetType.multiclass:
-            return self.label == -1
-        return not self.label
+        return self.label is None
 
 
 class Intent(BaseModel):
@@ -47,6 +46,19 @@ class Dataset(BaseModel):
 
     @cached_property
     def type(self) -> DatasetType:
-        if all(utterance.type == DatasetType.multiclass for utterance in self.utterances):
-            return DatasetType.multiclass
-        return DatasetType.multilabel
+        if all(utterance.type == DatasetType.multilabel for utterance in self.utterances):
+            return DatasetType.multilabel
+        return DatasetType.multiclass
+
+    @cached_property
+    def n_classes(self) -> int:
+        classes = set()
+        for utterance in self.utterances:
+            if utterance.oos:
+                continue
+            if self.type == DatasetType.multiclass:
+                classes.add(utterance.label)
+            else:
+                for label in utterance.label:
+                    classes.add(label)
+        return len(classes)
