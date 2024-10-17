@@ -41,10 +41,6 @@ def sample_multilabel_utterances(
 def generate_multilabel_version(
     dataset: Dataset, config_string: str, random_seed: int,
 ) -> Dataset:
-    config_path = Path(config_string)
-    if not config_path.exists():
-        msg = f"Config file {config_path} not found"
-        raise FileNotFoundError(msg)
     config = json.loads(config_string)
 
     sampled_utterances = []
