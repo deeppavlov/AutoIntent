@@ -28,7 +28,7 @@ class RegExp(Module):
 
     def _predict_single(self, utterance: str) -> set[int]:
         return {
-            intent_record["intent_id"]
+            intent_record["id"]
             for intent_record in self.regexp_patterns
             if self._match(utterance, intent_record)
         }

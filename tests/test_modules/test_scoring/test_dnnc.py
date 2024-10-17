@@ -8,15 +8,17 @@ from autointent.modules import DNNCScorer, VectorDBModule
 
 @pytest.mark.xfail(reason="Scorer can output different scores")
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1), (False, 0.5)])
-def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score):
+def test_base_dnnc(setup_environment, load_clinc_subset, train_head, pred_score):
     run_name, db_dir = setup_environment
 
+    dataset = load_clinc_subset(
+        "tests/minimal_optimization/data/clinc_subset_multiclass.json",
+    )
+
     context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
+        dataset=dataset,
+        test_dataset=None,
         device="cpu",
-        mode="multiclass",
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
