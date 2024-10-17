@@ -3,14 +3,17 @@ import pathlib
 import pytest
 
 from autointent import Context
+from autointent.configs.optimization_cli import ClassificationMode
 from autointent.pipeline import PipelineOptimizer
+from autointent.pipeline.optimization.cli_endpoint import OptimizationConfig
+from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
 from autointent.pipeline.optimization.utils import load_config
 
 
 @pytest.mark.parametrize(
     ("mode", "config_name"), [("multiclass", "multiclass.yaml"), ("multiclass_as_multilabel", "multilabel.yaml")]
 )
-def test_full_pipeline(setup_environment, mode, load_clinic_subset, config_name, logs_dir, dump_dir):
+def test_optimization_pipeline_python_api(setup_environment, mode, load_clinic_subset, config_name, logs_dir, dump_dir):
     run_name, db_dir = setup_environment
 
     cur_path = pathlib.Path(__file__).parent.resolve()
@@ -34,3 +37,23 @@ def test_full_pipeline(setup_environment, mode, load_clinic_subset, config_name,
 
     # save results
     pipeline.dump(logs_dir=(logs_dir / run_name / "logs"))
+
+
+@pytest.mark.parametrize(
+    ("mode", "config_name"),
+    [
+        (ClassificationMode.multiclass, "multiclass.yaml"),
+        (ClassificationMode.multiclass_as_multilabel, "multilabel.yaml"),
+    ],
+)
+def test_optimization_pipeline_cli(mode, config_name, logs_dir):
+    cur_path = pathlib.Path(__file__).parent.resolve()
+
+    config = OptimizationConfig(
+        search_space_path=str(cur_path / "configs" / config_name),
+        multiclass_path=str(cur_path / "data" / "clinc_subset.json"),
+        device="cpu",
+        mode=mode,
+        logs_dir=logs_dir,
+    )
+    optimize_pipeline(config)

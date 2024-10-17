@@ -57,6 +57,5 @@ def load_config(config_path: str, multilabel: bool, logger: Logger | None = None
         if logger is not None:
             logger.debug("loading default optimization search space config...")
         config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
-        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
-            file_content = file.read()
+        file_content = ires.files("autointent.datafiles").joinpath(config_name).read_text()
     return yaml.safe_load(file_content)
