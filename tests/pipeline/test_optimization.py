@@ -1,4 +1,4 @@
-import pathlib
+import importlib.resources as ires
 
 import pytest
 
@@ -16,7 +16,6 @@ from autointent.pipeline.optimization.utils import load_config
 def test_optimization_pipeline_python_api(setup_environment, mode, load_clinic_subset, config_name, logs_dir, dump_dir):
     run_name, db_dir = setup_environment
 
-    cur_path = pathlib.Path(__file__).parent.resolve()
     context = Context(
         multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=[],
@@ -31,12 +30,13 @@ def test_optimization_pipeline_python_api(setup_environment, mode, load_clinic_s
     )
 
     # run optimization
-    search_space_config = load_config(str(cur_path / "configs" / config_name), multilabel=mode != "multiclass")
+    config_path = ires.files("tests.assets.configs").joinpath(config_name)
+    search_space_config = load_config(str(config_path), multilabel=mode != "multiclass")
     pipeline = PipelineOptimizer.from_dict_config(search_space_config)
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir=(logs_dir / run_name / "logs"))
+    pipeline.dump(logs_dir=logs_dir)
 
 
 @pytest.mark.parametrize(
@@ -47,11 +47,9 @@ def test_optimization_pipeline_python_api(setup_environment, mode, load_clinic_s
     ],
 )
 def test_optimization_pipeline_cli(mode, config_name, logs_dir):
-    cur_path = pathlib.Path(__file__).parent.resolve()
-
     config = OptimizationConfig(
-        search_space_path=str(cur_path / "configs" / config_name),
-        multiclass_path=str(cur_path / "data" / "clinc_subset.json"),
+        search_space_path=ires.files("tests.assets.configs").joinpath(config_name),
+        multiclass_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
         device="cpu",
         mode=mode,
         logs_dir=logs_dir,

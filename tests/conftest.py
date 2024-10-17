@@ -1,3 +1,4 @@
+import importlib.resources as ires
 import pathlib
 from typing import Any
 from uuid import uuid4
@@ -21,7 +22,8 @@ def setup_environment() -> tuple[str, str]:
 
 @pytest.fixture
 def load_clinic_subset() -> list[dict[str, Any]]:
-    return load_data(str(cur_path / "minimal_optimization" / "data" / "clinc_subset.json"), multilabel=False)
+    data_path = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+    return load_data(str(data_path), multilabel=False)
 
 
 @pytest.fixture
@@ -58,9 +60,8 @@ def context_multilabel(load_clinic_subset, setup_environment, dump_dir):
     )
 
 @pytest.fixture
-def logs_dir() -> str:
-    cur_path = pathlib.Path(__file__).parent.resolve()
-    return cur_path / "logs"
+def logs_dir() -> pathlib.Path:
+    return pathlib.Path.cwd() / "tests_logs"
 
 
 @pytest.fixture

@@ -61,7 +61,7 @@ from autointent.modules.scoring.knn.weighting import closest_weighting
 )
 def test_knn_get_counts(labels, n_classes, ground_truth):
     weights = np.ones_like(labels)
-    np.testing.assert_array_equal(x=get_counts(labels, n_classes, weights), y=ground_truth)
+    np.testing.assert_array_equal(actual=get_counts(labels, n_classes, weights), desired=ground_truth)
 
 
 @pytest.mark.parametrize(
@@ -94,7 +94,7 @@ def test_knn_get_counts(labels, n_classes, ground_truth):
     ],
 )
 def test_scoring_get_topk(scores, k, ground_truth):
-    np.testing.assert_array_equal(x=get_topk(scores, k=k), y=ground_truth)
+    np.testing.assert_array_equal(actual=get_topk(scores, k=k), desired=ground_truth)
 
 
 @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ def test_scoring_get_topk(scores, k, ground_truth):
     ],
 )
 def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
-    np.testing.assert_array_equal(x=build_result(scores, labels, n_classes), y=ground_truth)
+    np.testing.assert_array_equal(actual=build_result(scores, labels, n_classes), desired=ground_truth)
 
 
 @pytest.mark.parametrize(
@@ -185,4 +185,6 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
     ],
 )
 def test_closest_weighting(labels, distances, multilabel, n_classes, ground_truth):
-    np.testing.assert_array_equal(x=closest_weighting(labels, distances, multilabel, n_classes), y=ground_truth)
+    np.testing.assert_array_equal(
+        actual=closest_weighting(labels, distances, multilabel, n_classes), desired=ground_truth
+    )
