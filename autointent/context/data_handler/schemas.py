@@ -60,7 +60,7 @@ class Dataset(BaseModel):
     def type(self) -> DatasetType:
         if all(utterance.type in {UtteranceType.multiclass, UtteranceType.oos} for utterance in self.utterances):
             return DatasetType.multiclass
-        return DatasetType.multilabel
+        return DatasetType.multilabel  # TODO add proper dataset type validation
 
     @cached_property
     def n_classes(self) -> int:
