@@ -25,7 +25,7 @@ def apply_weights(
     - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
     - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
 
-    `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
+    `distances`: np.ndarray of shape (n_samples, n_neighbors) with float values
 
     Return
     ---

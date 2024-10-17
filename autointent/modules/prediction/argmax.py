@@ -20,3 +20,9 @@ class ArgmaxPredictor(PredictionModule):
 
     def predict(self, scores: NDArray[Any]) -> NDArray[Any]:
         return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
+
+    def load(self, path: str) -> None:
+        pass
+
+    def dump(self, path: str) -> None:
+        pass

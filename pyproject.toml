@@ -50,9 +50,9 @@ optional = true
 mypy = "^1.11.2"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization.optimization:optimization"
-"autointent-inference" = "autointent.pipeline.inference:main"
-"clear-cache" = "autointent.pipeline.utils.cache:clear_chroma_cache"
+"autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
+"autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
+"clear-cache" = "autointent.pipeline.optimization.utils.cache:clear_chroma_cache"
 
 [tool.ruff]
 line-length = 120

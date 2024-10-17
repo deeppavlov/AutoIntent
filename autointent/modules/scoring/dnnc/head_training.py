@@ -8,12 +8,13 @@ It does NOT produce a sentence embedding and does NOT work for individual senten
 Usage:
 python training_stsbenchmark.py
 """
-
 import itertools as it
 import logging
+from pathlib import Path
 from random import shuffle
-from typing import Any
+from typing import Any, TypeVar
 
+import joblib
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -49,13 +50,14 @@ def construct_samples(
     return pairs, labels
 
 
+CrossEncoderType = TypeVar("CrossEncoderType", bound="CrossEncoderWithLogreg")
+
 class CrossEncoderWithLogreg:
     # TODO refactor
 
-    def __init__(self, model: CrossEncoder, batch_size: int = 16, verbose: bool = False) -> None:
+    def __init__(self, model: CrossEncoder, batch_size: int = 16) -> None:
         self.cross_encoder = model
         self.batch_size = batch_size
-        self.verbose = verbose
 
     @torch.no_grad()
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
@@ -113,3 +115,32 @@ class CrossEncoderWithLogreg:
         features = self.get_features(pairs)
 
         return self._clf.predict_proba(features)[:, 1]
+
+    def save(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        crossencoder_dir = str(dump_dir / "crossencoder")
+        self.cross_encoder.save(crossencoder_dir)
+
+        clf_path = dump_dir / "classifier.joblib"
+        joblib.dump(self._clf, clf_path)
+
+    def set_classifier(self, clf: LogisticRegressionCV) -> None:
+        self._clf = clf
+
+    @classmethod
+    def load(cls, path: str) -> CrossEncoderType:
+        dump_dir = Path(path)
+
+        # load sklearn model
+        clf_path = dump_dir / "classifier.joblib"
+        clf = joblib.load(clf_path)
+
+        # load sentence transformer model
+        crossencoder_dir = str(dump_dir / "crossencoder")
+        model = CrossEncoder(crossencoder_dir)  # TODO control device
+
+        res = CrossEncoderWithLogreg(model)
+        res.set_classifier(clf)
+
+        return res

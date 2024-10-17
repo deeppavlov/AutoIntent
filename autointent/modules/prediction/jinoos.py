@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -8,7 +10,7 @@ from autointent import Context
 
 from .base import PredictionModule, get_prediction_evaluation_data
 
-default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+default_search_space = np.linspace(0, 1, num=100)
 
 
 class JinoosPredictor(PredictionModule):
@@ -41,6 +43,22 @@ class JinoosPredictor(PredictionModule):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._thresh)
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = {"thresh": self._thresh}
+
+        with (dump_dir / "metadata.json").open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / "metadata.json").open() as file:
+            metadata = json.load(file)
+
+        self._thresh = metadata["thresh"]
 
 
 def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
