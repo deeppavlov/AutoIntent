@@ -1,3 +1,4 @@
+import importlib.resources as ires
 import pathlib
 
 import pytest
@@ -13,7 +14,6 @@ from autointent.pipeline.optimization.utils import load_config
 def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name):
     run_name, db_dir = setup_environment
 
-    cur_path = pathlib.Path(__file__).parent.resolve()
     context = Context(
         multiclass_intent_records=load_clinic_subset,
         multilabel_utterance_records=[],
@@ -26,9 +26,12 @@ def test_full_pipeline(setup_environment, load_clinic_subset, mode, config_name)
     )
 
     # run optimization
-    search_space_config = load_config(str(cur_path / "configs" / config_name), multilabel=mode != "multiclass")
+    config_path = ires.files("tests.assets.configs").joinpath(config_name)
+    search_space_config = load_config(str(config_path), multilabel=mode != "multiclass")
+
     pipeline = Pipeline.from_dict_config(search_space_config)
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir=str(cur_path / "logs"), run_name=run_name)
+    logs_dir = pathlib.Path.cwd() / "tests_logs"
+    pipeline.dump(logs_dir=str(logs_dir), run_name=run_name)
