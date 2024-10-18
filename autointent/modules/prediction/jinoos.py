@@ -5,9 +5,9 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.metrics.converter import transform
 
 from .base import PredictionModule, get_prediction_evaluation_data
-from ...metrics.converter import transform
 
 default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
@@ -55,7 +55,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[int] | npt.NDArray[Any], y_pred: list[int]| npt.NDArray[Any]) -> float:
+def jinoos_score(y_true: list[int] | npt.NDArray[Any], y_pred: list[int] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 

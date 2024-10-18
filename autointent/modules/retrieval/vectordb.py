@@ -1,5 +1,3 @@
-from typing_extensions import override
-
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.metrics import RetrievalMetricFn

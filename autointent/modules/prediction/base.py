@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-from typing_extensions import override
+
 import numpy as np
 import numpy.typing as npt
 

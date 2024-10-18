@@ -1,6 +1,5 @@
 import re
 from typing import Any
-from typing_extensions import override
 
 from autointent import Context
 from autointent.context.optimization_info.data_models import Artifact
@@ -45,7 +44,8 @@ class RegExp(Module):
             else self.predict(context.data_handler.oos_utterances),
         }
         if assets["test_matches"] is None:
-            raise ValueError("no matches found")
+            msg = "no matches found"
+            raise ValueError(msg)
         return metric_fn(context.data_handler.labels_test, assets["test_matches"])
 
     def clear_cache(self) -> None:

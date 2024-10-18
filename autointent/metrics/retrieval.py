@@ -275,7 +275,9 @@ def retrieval_ndcg(query_labels: QUERY_TYPE, candidates_labels: CANDIDATE_TYPE, 
     return np.mean(ndcg_scores)  # type: ignore[return-value]
 
 
-def retrieval_ndcg_intersecting(query_labels: QUERY_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
+def retrieval_ndcg_intersecting(
+    query_labels: QUERY_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+) -> float:
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     ndcg_scores: list[float] = []
     expanded_relevance_scores: npt.NDArray[np.bool] = query_labels_[:, None, :] == candidates_labels_
