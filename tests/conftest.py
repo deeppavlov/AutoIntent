@@ -1,10 +1,10 @@
 import pathlib
-from typing import Any
 from uuid import uuid4
 
 import pytest
 
 from autointent import Context
+from autointent.context.data_handler import Dataset
 from autointent.pipeline.optimization.utils import get_run_name, load_data, setup_logging
 from autointent.pipeline.utils import get_db_dir
 
@@ -21,19 +21,29 @@ def setup_environment() -> tuple[str, str]:
 
 
 @pytest.fixture
-def load_clinic_subset() -> list[dict[str, Any]]:
-    return load_data(str(cur_path / "minimal_optimization" / "data" / "clinc_subset.json"), multilabel=False)
+def load_clinc_subset():
+
+    def _load_data(dataset_path: str) -> Dataset:
+        data = load_data(dataset_path, multilabel=False)
+        return Dataset.model_validate(data)
+
+    return _load_data
 
 
 @pytest.fixture
-def context(load_clinic_subset):
-    return Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
-        device="cpu",
-        mode="multiclass",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-    )
+def context(load_clinc_subset):
+
+    def _get_context(dataset_type: str) -> Context:
+        dataset_path = pathlib.Path("tests/minimal_optimization/data/").joinpath(
+            f"clinc_subset_{dataset_type}.json",
+        )
+        return Context(
+            dataset=load_clinc_subset(dataset_path),
+            test_dataset=None,
+            device="cpu",
+            multilabel_generation_config="",
+            regex_sampling=0,
+            seed=0,
+        )
+
+    return _get_context

@@ -3,6 +3,8 @@ from typing import Any
 
 import sre_yield
 
+from .schemas import Dataset, Utterance
+
 
 def distribute_shots(n: int, k: int) -> list[int]:
     """randomly distribute `k` samples among `n` bins"""
@@ -27,8 +29,15 @@ def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
     return res
 
 
-def sample_from_regex(intent_records: list[dict[str, list[str]]], n_shots: int) -> list[dict[str, Any]]:
-    for intent in intent_records:
-        new_samples = generate_from_templates(intent["regexp_full_match"], n_shots)
-        intent["sample_utterances"].extend(new_samples)
-    return intent_records
+def sample_from_regex(
+    dataset: Dataset, n_shots: int, random_seed: int = 0,
+) -> Dataset:
+    random.seed(random_seed)
+
+    for intent in dataset.intents:
+        generated_texts = generate_from_templates(intent.regexp_full_match, n_shots)
+        for generated_text in generated_texts:
+            utterance = Utterance(text=generated_text, label=intent.id)
+            dataset.utterances.append(utterance)
+
+    return dataset

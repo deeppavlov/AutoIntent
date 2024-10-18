@@ -4,11 +4,10 @@ from typing import Any
 
 from transformers import set_seed
 
-from autointent.custom_types import TASK_TYPES
-
-from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
+from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
-from .scheme import IntentRecord, UtteranceRecord
+from .schemas import Dataset, DatasetType
+from .scheme import UtteranceRecord
 from .stratification import split_sample_utterances
 from .tags import collect_tags
 
@@ -16,58 +15,35 @@ from .tags import collect_tags
 class DataHandler:
     def __init__(
         self,
-        multiclass_intent_records: list[dict[str, Any]],
-        multilabel_utterance_records: list[dict[str, Any]],
-        test_utterance_records: list[dict[str, Any]],
-        mode: TASK_TYPES,
-        multilabel_generation_config: str | None = None,
+        dataset: Dataset,
+        test_dataset: Dataset | None = None,
+        multilabel_generation_config: str = "",
         regex_sampling: int = 0,
-        seed: int = 0,
+        force_multilabel: bool = False,
+        random_seed: int = 0,
     ) -> None:
         logger = logging.getLogger(__name__)
-        set_seed(seed)
+        set_seed(random_seed)
 
-        # TODO do somthing with this else if
-        if not multiclass_intent_records and not multilabel_utterance_records:
-            msg = "No data provided, both `multiclass_intent_records` and `multilabel_utterance_records` are empty"
-            logger.error(msg)
-            raise ValueError(msg)
+        if force_multilabel:
+            dataset = dataset.to_multilabel()
+
+        self.multilabel = dataset.type == DatasetType.multilabel
 
         if regex_sampling > 0:
             logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
-            multiclass_intent_records = sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
+            dataset = sample_from_regex(dataset=dataset, n_shots=regex_sampling)
 
         if multilabel_generation_config is not None and multilabel_generation_config != "":
             logger.debug("generating multilabel utterances from multiclass ones...")
-            new_utterances = generate_multilabel_version(multiclass_intent_records, multilabel_generation_config, seed)
-            multilabel_utterance_records.extend(new_utterances)  # type: ignore[arg-type]
-            logger.debug("collecting tags from multiclass intent_records if present...")
-            self.tags = collect_tags(multiclass_intent_records)
+            dataset = generate_multilabel_version(
+                dataset=dataset,
+                multilabel_generation_config=multilabel_generation_config,
+                random_seed=random_seed,
+            )
 
-        if mode == "multiclass":
-            data = multiclass_intent_records
-            self.tags = []
-
-        elif mode == "multilabel":
-            data = multilabel_utterance_records
-            self.tags = []  # TODO add tags supporting for a pure multilabel case?
-
-        elif mode == "multiclass_as_multilabel":
-            if not hasattr(self, "tags"):
-                logger.debug("collecting tags from multiclass intent_records if present...")
-                self.tags = collect_tags(multiclass_intent_records)
-
-            logger.debug("formatting multiclass labels to multilabel...")
-            old_utterances = convert_to_multilabel_format(multiclass_intent_records)
-            multilabel_utterance_records.extend(old_utterances)  # type: ignore[arg-type]
-            data = multilabel_utterance_records
-
-        else:
-            msg = f"unexpected classification mode value: {mode}"
-            logger.error(msg)
-            raise ValueError(msg)
-
-        self.multilabel = mode != "multiclass"
+        logger.debug("collecting tags from multiclass intent_records if present...")
+        self.tags = collect_tags(dataset)
 
         logger.info("defining train and test splits...")
         (
@@ -77,18 +53,21 @@ class DataHandler:
             self.utterances_test,
             self.labels_train,
             self.labels_test,
-        ) = split_sample_utterances(data, test_utterance_records, self.multilabel, seed)
+        ) = split_sample_utterances(
+            dataset=dataset,
+            test_dataset=test_dataset,
+            random_seed=random_seed,
+        )
 
-        if mode != "multilabel":
-            logger.debug("collection regexp patterns from multiclass intent records")
-            self.regexp_patterns = [
-                IntentRecord(
-                    intent_id=intent["intent_id"],
-                    regexp_full_match=intent["regexp_full_match"],
-                    regexp_partial_match=intent["regexp_partial_match"],
-                )
-                for intent in multiclass_intent_records
-            ]
+        logger.debug("collection regexp patterns from multiclass intent records")
+        self.regexp_patterns = [
+            {
+                "id": intent.id,
+                "regexp_full_match": intent.regexp_full_match,
+                "regexp_partial_match": intent.regexp_partial_match,
+            }
+            for intent in dataset.intents
+        ]
 
         self._logger = logger
 
