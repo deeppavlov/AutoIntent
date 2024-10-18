@@ -30,13 +30,10 @@ def test_generate_from_template():
 
 def test_sample_from_regex():
     data = {
-        "utterances": [
-            {"text": "hello", "label": 0},
-            {"text": "goodbye", "label": 1}
-        ],
+        "utterances": [{"text": "hello", "label": 0}, {"text": "goodbye", "label": 1}],
         "intents": [
             {"id": 0, "regexp_full_match": ["hello|hi", "hey there"]},
-            {"id": 1, "regexp_full_match": ["goodbye|bye"]}
+            {"id": 1, "regexp_full_match": ["goodbye|bye"]},
         ],
     }
 

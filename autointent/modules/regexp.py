@@ -15,7 +15,7 @@ class RegExp(Module):
                 "regexp_full_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_full_match"]],
                 "regexp_partial_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_partial_match"]],
             }
-            for dct in context.data_handler.regexp_patterns
+            for dct in context.data_handler.regexp_patterns  # todo what now regexp_patterns?
         ]
 
     def predict(self, utterances: list[str]) -> list[list[int]]:
@@ -28,11 +28,8 @@ class RegExp(Module):
         return any(ptn.match(text) for ptn in intent_record["regexp_partial_match"])
 
     def _predict_single(self, utterance: str) -> set[int]:
-        return {
-            intent_record["id"]
-            for intent_record in self.regexp_patterns
-            if self._match(utterance, intent_record)
-        }
+        # todo test this
+        return {intent_record["id"] for intent_record in self.regexp_patterns if self._match(utterance, intent_record)}  # type: ignore[misc]
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:  # type: ignore[override]
         # TODO add parameter to a whole pipeline (or just to regexp module):

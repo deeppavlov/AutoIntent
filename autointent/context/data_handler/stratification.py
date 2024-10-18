@@ -22,7 +22,7 @@ def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[An
     return utterances, labels
 
 
-def get_samples(dataset: Dataset) -> tuple[list[str], list[int] | list[list[int]]]:
+def get_samples(dataset: Dataset) -> tuple[list[str], list[int | list[int] | None]]:
     utterances, labels = [], []
     for utterance in dataset.utterances:
         if utterance.oos:
@@ -80,7 +80,9 @@ def split_sample_utterances(
         splits = [utterances, test_utterances, labels, test_labels]
 
     is_valid = validate_test_labels(
-        test_labels, dataset.type == DatasetType.multilabel, dataset.n_classes,
+        test_labels,
+        dataset.type == DatasetType.multilabel,
+        dataset.n_classes,
     )
     if not is_valid:
         msg = "for some reason test set doesn't contain some classes examples"

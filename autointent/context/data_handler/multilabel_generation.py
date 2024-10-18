@@ -1,8 +1,6 @@
 import json
 import random
 from itertools import combinations
-from pathlib import Path
-from typing import Any
 
 import xeger
 
@@ -19,11 +17,14 @@ def sample_utterance_from_regexp(intent: Intent, x: xeger.Xeger) -> str:
     n_templates = len(intent.regexp_full_match)
     i_template = random.randint(0, n_templates - 1)
     res = x.xeger(intent.regexp_full_match[i_template])
-    return res.strip()
+    return res.strip()  # type: ignore[no-any-return]
 
 
 def sample_multilabel_utterances(
-    dataset: Dataset, n_samples: int, n_labels: int, random_seed: int,
+    dataset: Dataset,
+    n_samples: int,
+    n_labels: int,
+    random_seed: int,
 ) -> list[Utterance]:
     # TODO improve versatility
     random.seed(random_seed)
@@ -40,7 +41,9 @@ def sample_multilabel_utterances(
 
 
 def generate_multilabel_version(
-    dataset: Dataset, config_string: str, random_seed: int,
+    dataset: Dataset,
+    config_string: str,
+    random_seed: int,
 ) -> Dataset:
     config = json.loads(config_string)
 

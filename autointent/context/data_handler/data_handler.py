@@ -38,7 +38,7 @@ class DataHandler:
             logger.debug("generating multilabel utterances from multiclass ones...")
             dataset = generate_multilabel_version(
                 dataset=dataset,
-                multilabel_generation_config=multilabel_generation_config,
+                config_string=multilabel_generation_config,
                 random_seed=random_seed,
             )
 

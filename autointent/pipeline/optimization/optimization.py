@@ -128,15 +128,18 @@ def optimization(cfg: OptimizationConfig) -> None:
     logger.debug("Chroma DB path: %s", db_dir)
 
     # create shared objects for a whole pipeline
+    # TODO
+    # Argument 1 to "Context" has incompatible type "list[dict[str, Any]]"; expected "Dataset"
+    # Argument 2 to "Context" has incompatible type "list[dict[str, Any]]"; expected "Dataset | None"
+    # Argument 5 to "Context" has incompatible type "str"; expected "int"
+
     context = Context(
         load_data(cfg.multiclass_path, multilabel=False),
-        load_data(cfg.multilabel_path, multilabel=True),
         load_data(cfg.test_path, multilabel=True),
         cfg.device,
         cfg.mode.value,
         cfg.multilabel_generation_config,
         cfg.regex_sampling,
-        cfg.seed,
     )
 
     # run optimization
