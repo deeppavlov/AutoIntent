@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from typing import Any
+from typing_extensions import override
 
 import numpy as np
 import numpy.typing as npt
@@ -11,7 +12,7 @@ from autointent.modules.base import Module
 
 
 class ScoringModule(Module):
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
+    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:  # type: ignore[override]
         """
         Return
         ---

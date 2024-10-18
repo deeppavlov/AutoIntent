@@ -1,5 +1,6 @@
 import re
 from typing import Any
+from typing_extensions import override
 
 from autointent import Context
 from autointent.context.optimization_info.data_models import Artifact
@@ -34,7 +35,7 @@ class RegExp(Module):
             if self._match(utterance, intent_record)
         }
 
-    def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
+    def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:  # type: ignore[override]
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
         assets = {
@@ -43,6 +44,8 @@ class RegExp(Module):
             if len(context.data_handler.oos_utterances) == 0
             else self.predict(context.data_handler.oos_utterances),
         }
+        if assets["test_matches"] is None:
+            raise ValueError("no matches found")
         return metric_fn(context.data_handler.labels_test, assets["test_matches"])
 
     def clear_cache(self) -> None:

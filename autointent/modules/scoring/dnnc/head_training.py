@@ -58,7 +58,7 @@ class CrossEncoderWithLogreg:
         self.verbose = verbose
 
     @torch.no_grad()
-    def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+    def get_features(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
         def hook_function(module, input_tensor, output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ARG001, ANN001
@@ -74,7 +74,7 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-    def _fit(self, pairs: list[tuple[str, str]], labels: list[int]) -> None:
+    def _fit(self, pairs: list[list[str]], labels: list[int]) -> None:
         """
         Arguments
         ---
@@ -106,7 +106,7 @@ class CrossEncoderWithLogreg:
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
-    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+    def predict(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
         """
         Return probabilities of two utterances having the same intent label
         """

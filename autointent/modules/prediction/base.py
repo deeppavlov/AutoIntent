@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-
+from typing_extensions import override
 import numpy as np
 import numpy.typing as npt
 
@@ -20,7 +20,7 @@ class PredictionModule(Module, ABC):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:  # type: ignore[override]
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
@@ -41,7 +41,7 @@ def get_prediction_evaluation_data(
     oos_scores = context.optimization_info.get_best_oos_scores()
     if oos_scores is not None:
         oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
-        labels = np.concatenate([labels, np.array(oos_labels)])
+        labels = np.concatenate([np.array(labels), np.array(oos_labels)])
         scores = np.concatenate([scores, oos_scores])
 
     return labels, scores  # type: ignore[return-value]

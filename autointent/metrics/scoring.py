@@ -2,15 +2,20 @@ import logging
 from typing import Protocol
 
 import numpy as np
+import numpy.typing as npt
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
+from .converter import transform
 from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 logger = logging.getLogger(__name__)
 
+LABELS_VALUE_TYPE = list[int] | list[list[int]] | npt.NDArray[np.int64]
+PREDICTED_VALUE_TYPE = list[list[float]] | npt.NDArray[np.float64]
+
 
 class ScoringMetricFn(Protocol):
-    def __call__(self, labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+    def __call__(self, labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
         """
         Arguments
         ---
@@ -22,7 +27,7 @@ class ScoringMetricFn(Protocol):
         ...
 
 
-def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
 
@@ -42,8 +47,7 @@ def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[lis
     ```
     where `s[i,c]` is a predicted score of `i`th utterance having ground truth label `c`
     """
-    scores_array = np.array(scores)
-    labels_array = np.array(labels)
+    labels_array, scores_array = transform(labels, scores)
 
     if np.any((scores_array <= 0) | (scores_array > 1)):
         msg = "One or more scores are not from [0,1]. It is incompatible with `scoring_log_likelihood` metric"
@@ -60,7 +64,7 @@ def scoring_log_likelihood(labels: list[int] | list[list[int]], scores: list[lis
     return res  # type: ignore[no-any-return]
 
 
-def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
 
@@ -69,8 +73,7 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
     {1\\over C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
     ```
     """
-    scores_ = np.array(scores)
-    labels_ = np.array(labels)
+    labels_, scores_ = transform(labels, scores)
 
     n_classes = scores_.shape[1]
     if labels_.ndim == 1:
@@ -80,10 +83,9 @@ def scoring_roc_auc(labels: list[int] | list[list[int]], scores: list[list[float
 
 
 def calculate_prediction_metric(
-    func: PredictionMetricFn, labels: list[int] | list[list[int]], scores: list[list[float]]
+    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE
 ) -> float:
-    scores_ = np.array(scores)
-    labels_ = np.array(labels)
+    labels_, scores_ = transform(labels, scores)
 
     if labels_.ndim == 1:
         pred_labels = np.argmax(scores, axis=1)
@@ -95,42 +97,41 @@ def calculate_prediction_metric(
     return res
 
 
-def scoring_accuracy(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_accuracy, labels, scores)
 
 
-def scoring_f1(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_f1(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_f1, labels, scores)
 
 
-def scoring_precision(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_precision(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_precision, labels, scores)
 
 
-def scoring_recall(labels: list[int] | list[list[int]], scores: list[list[float]]) -> float:
+def scoring_recall(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_recall, labels, scores)
 
 
-def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]) -> float:
+def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multilabel
 
     calculates fraction of cases when the top-ranked label is in the set of proper labels of the instance
     """
-    scores_ = np.array(scores)
-    labels_ = np.array(labels)
+    labels_, scores_ = transform(labels, scores)
 
     top_ranked_labels = np.argmax(scores_, axis=1)
     is_in = labels_[np.arange(len(labels)), top_ranked_labels]
@@ -138,7 +139,7 @@ def scoring_hit_rate(labels: list[list[int]], scores: list[list[float]]) -> floa
     return np.mean(is_in)  # type: ignore[no-any-return]
 
 
-def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> float:
+def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multilabel
 
@@ -161,12 +162,13 @@ def scoring_neg_coverage(labels: list[list[int]], scores: list[list[float]]) -> 
     res = 1 - np.mean(float_ranks)
     ```
     """
+    labels_, scores_ = transform(labels, scores)
 
-    n_classes = len(labels[0])
+    n_classes = scores_.shape[1]
     return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)  # type: ignore[no-any-return]
 
 
-def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]]) -> float:
+def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multilabel
 
@@ -178,7 +180,7 @@ def scoring_neg_ranking_loss(labels: list[list[int]], scores: list[list[float]])
     return -label_ranking_loss(labels, scores)  # type: ignore[no-any-return]
 
 
-def scoring_map(labels: list[list[int]], scores: list[list[float]]) -> float:
+def scoring_map(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
     """
     supports multilabel
 
