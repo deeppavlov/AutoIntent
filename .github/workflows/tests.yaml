@@ -30,14 +30,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         cache: "pip"
 
-    # - name: Install Poetry
-    #   run: |
-    #     curl -sSL https://install.python-poetry.org | python3 -
-    #     echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
     - name: Install dependencies
-      # run: |
-      #   poetry install --with test
       run: |
           pip install .
           pip install pytest
@@ -45,5 +38,3 @@ jobs:
     - name: Run tests
       run: |
         pytest
-# poetry run pytest tests
-# poetry run clear-cache

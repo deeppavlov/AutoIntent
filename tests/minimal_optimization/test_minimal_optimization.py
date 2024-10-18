@@ -32,7 +32,8 @@ def test_full_pipeline(setup_environment, load_clinc_subset, dataset_filename, c
 
     # run optimization
     search_space_config = load_config(
-        str(cur_path / "configs" / config_name), dataset.type == DatasetType.multilabel,
+        str(cur_path / "configs" / config_name),
+        dataset.type == DatasetType.multilabel,
     )
     pipeline = Pipeline.from_dict_config(search_space_config)
     pipeline.optimize(context)

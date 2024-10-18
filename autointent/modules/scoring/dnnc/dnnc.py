@@ -22,6 +22,8 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
+    model: CrossEncoder | CrossEncoderWithLogreg
+
     def __init__(self, model_name: str, k: int, train_head: bool = False) -> None:
         self.model_name = model_name
         self.k = k
@@ -80,7 +82,7 @@ class DNNCScorer(ScoringModule):
 
         flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
         return [
-            flattened_cross_encoder_scores[i : i + self.k]
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 

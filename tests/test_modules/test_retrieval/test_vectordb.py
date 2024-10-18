@@ -9,7 +9,6 @@ from autointent.modules.retrieval.vectordb import VectorDBModule
 
 @pytest.fixture
 def context(load_clinc_subset):
-
     def _get_context(dataset_type: str) -> Context:
         dataset_path = pathlib.Path("tests/minimal_optimization/data/").joinpath(
             f"clinc_subset_{dataset_type}.json",

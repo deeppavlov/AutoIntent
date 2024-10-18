@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any
 
 import numpy as np
@@ -11,7 +11,7 @@ from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
 
-class PredictionModule(Module):
+class PredictionModule(Module, ABC):
     @abstractmethod
     def fit(self, context: Context) -> None:
         pass
@@ -20,7 +20,7 @@ class PredictionModule(Module):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:  # type: ignore[override]
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
@@ -40,11 +40,11 @@ def get_prediction_evaluation_data(
 
     oos_scores = context.optimization_info.get_best_oos_scores()
     if oos_scores is not None:
-        oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)
-        labels = np.concatenate([labels, oos_labels])
+        oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
+        labels = np.concatenate([np.array(labels), np.array(oos_labels)])
         scores = np.concatenate([scores, oos_scores])
 
-    return labels, scores
+    return labels, scores  # type: ignore[return-value]
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:

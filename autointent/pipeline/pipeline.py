@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, ClassVar, TypeVar
+from typing import Any, ClassVar
 
 import numpy as np
 import yaml
@@ -12,8 +12,6 @@ from autointent.configs.pipeline import PipelineSearchSpace
 from autointent.nodes import NodeInfo, NodeOptimizer, PredictionNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
 
 from .utils import NumpyEncoder
-
-PipelineType = TypeVar("PipelineType", bound="Pipeline")
 
 
 class Pipeline:
@@ -28,8 +26,8 @@ class Pipeline:
         self.nodes = nodes
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> PipelineType:
-        return instantiate(PipelineSearchSpace, **config)
+    def from_dict_config(cls, config: dict[str, Any]) -> "Pipeline":
+        return instantiate(PipelineSearchSpace, **config)  # type: ignore[no-any-return]
 
     def optimize(self, context: Context) -> None:
         self.context = context

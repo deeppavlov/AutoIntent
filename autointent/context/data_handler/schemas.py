@@ -22,6 +22,9 @@ class Utterance(BaseModel):
     def one_hot_label(self, n_classes: int) -> list[int]:
         encoding = [0] * n_classes
         label = [self.label] if isinstance(self.label, int) else self.label
+        if label is None:
+            msg = "Cannot one-hot encode OOS utterance"
+            raise ValueError(msg)
         for idx in label:
             encoding[idx] = 1
         return encoding
@@ -70,13 +73,10 @@ class Dataset(BaseModel):
                 continue
             if self.type == DatasetType.multiclass:
                 classes.add(utterance.label)
-            else:
+            elif isinstance(utterance.label, list):
                 for label in utterance.label:
                     classes.add(label)
         return len(classes)
 
     def to_multilabel(self) -> "Dataset":
-        return Dataset(
-            utterances=[utterance.to_multilabel() for utterance in self.utterances],
-            intents=self.intents
-        )
+        return Dataset(utterances=[utterance.to_multilabel() for utterance in self.utterances], intents=self.intents)

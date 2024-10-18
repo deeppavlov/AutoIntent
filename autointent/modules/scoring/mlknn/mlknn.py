@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -54,10 +56,7 @@ class MLKnnScorer(ScoringModule):
 
         return cond_prob_true, cond_prob_false
 
-    def _get_neighbors(
-        self,
-        queries: list[str] | list[NDArray]
-    ) -> NDArray[np.int64]:
+    def _get_neighbors(self, queries: list[str] | NDArray[Any]) -> NDArray[np.int64]:
         """
         retrieve nearest neighbors and return their labels in binary format
 

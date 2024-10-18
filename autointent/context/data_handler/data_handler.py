@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Sequence
 from typing import Any
 
 from transformers import set_seed
@@ -37,7 +38,7 @@ class DataHandler:
             logger.debug("generating multilabel utterances from multiclass ones...")
             dataset = generate_multilabel_version(
                 dataset=dataset,
-                multilabel_generation_config=multilabel_generation_config,
+                config_string=multilabel_generation_config,
                 random_seed=random_seed,
             )
 
@@ -75,13 +76,13 @@ class DataHandler:
 
     def dump(
         self,
-    ) -> tuple[list[dict[str, Any] | UtteranceRecord], list[UtteranceRecord]]:
+    ) -> tuple[list[dict[str, Any]], list[UtteranceRecord]]:
         self._logger.debug("dumping train, test and oos data...")
         train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
         test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)
         oos_data = _dump_oos(self.oos_utterances)
         test_data = test_data + oos_data
-        return train_data, test_data
+        return train_data, test_data  # type: ignore[return-value]
 
 
 def _dump_train(
@@ -89,17 +90,17 @@ def _dump_train(
     labels: list[list[int]] | list[int],
     n_classes: int,
     multilabel: bool,
-) -> list[dict[str, Any] | UtteranceRecord]:
+) -> Sequence[dict[str, Any]]:
     if multilabel and isinstance(labels[0], list):
         res = []
-        for ut, labs in zip(utterances, labels, strict=False):
-            labs_converted = [i for i in range(n_classes) if labs[i]]
-            res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
+        for ut, labs in zip(utterances, labels, strict=True):
+            labs_converted = [i for i in range(n_classes) if labs[i]]  # type: ignore[index]
+            res.append({"utterance": ut, "labels": labs_converted})
     elif not multilabel and isinstance(labels[0], int):
         # TODO check if rec is used
-        res = [{"intent_id": i} for i in range(n_classes)]
+        res = [{"intent_id": i} for i in range(n_classes)]  # type: ignore[dict-item]
         for ut, lab in zip(utterances, labels, strict=False):
-            rec = res[lab]
+            rec = res[lab]  # type: ignore[call-overload]
             rec["sample_utterances"] = [*rec.get("sample_utterances", []), ut]
     else:
         message = "unexpected labels format"
@@ -116,7 +117,7 @@ def _dump_test(
     res = []
     for ut, labs in zip(utterances, labels, strict=True):
         labs_converted = (
-            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]
+            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]  # type: ignore[index,list-item]
         )
         res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
     return res

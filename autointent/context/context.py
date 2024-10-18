@@ -20,7 +20,7 @@ class Context:
             test_dataset,
             multilabel_generation_config,
             regex_sampling,
-            seed,
+            random_seed=seed,
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, self.data_handler.multilabel, self.data_handler.n_classes)

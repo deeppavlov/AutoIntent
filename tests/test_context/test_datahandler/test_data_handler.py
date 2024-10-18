@@ -51,7 +51,6 @@ def sample_multilabel_data():
     return data, test_data
 
 
-
 def test_data_handler_initialization(sample_multiclass_data):
     train_data, test_data = sample_multiclass_data
     handler = DataHandler(
