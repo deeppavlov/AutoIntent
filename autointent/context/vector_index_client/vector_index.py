@@ -28,7 +28,7 @@ class VectorIndex:
         self.labels = []
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
-        query_embedding = self.embedding_model.encode(texts)
+        query_embedding: npt.NDArray[np.float64] = self.embedding_model.encode(texts, convert_to_numpy=True)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
@@ -90,4 +90,4 @@ class VectorIndex:
         return all_labels, all_distances, all_texts
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
-        return self.embedding_model.encode(utterances, convert_to_numpy=True)
+        return self.embedding_model.encode(utterances, convert_to_numpy=True)  # type: ignore[return-value]

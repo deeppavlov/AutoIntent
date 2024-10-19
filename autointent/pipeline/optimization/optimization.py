@@ -8,6 +8,8 @@ from autointent.pipeline.pipeline import Pipeline
 from autointent.pipeline.utils import get_db_dir
 
 from .utils import get_run_name, load_config, load_data, setup_logging
+from ...context.data_handler import Dataset
+
 
 # def main():
 #     parser = ArgumentParser()
@@ -115,7 +117,7 @@ from .utils import get_run_name, load_config, load_data, setup_logging
 #     pipeline.dump(args.logs_dir, run_name)
 
 
-@hydra.main(config_name="optimization_config", config_path=".", version_base=None)  # type: ignore[misc]
+@hydra.main(config_name="optimization_config", config_path=".", version_base=None)
 def optimization(cfg: OptimizationConfig) -> None:
     setup_logging(cfg.log_level.value)
     logger = logging.getLogger(__name__)
@@ -128,18 +130,13 @@ def optimization(cfg: OptimizationConfig) -> None:
     logger.debug("Chroma DB path: %s", db_dir)
 
     # create shared objects for a whole pipeline
-    # TODO
-    # Argument 1 to "Context" has incompatible type "list[dict[str, Any]]"; expected "Dataset"
-    # Argument 2 to "Context" has incompatible type "list[dict[str, Any]]"; expected "Dataset | None"
-    # Argument 5 to "Context" has incompatible type "str"; expected "int"
-
     context = Context(
-        load_data(cfg.multiclass_path, multilabel=False),
-        load_data(cfg.test_path, multilabel=True),
+        Dataset.model_validate(load_data(cfg.multiclass_path, multilabel=False)),
+        Dataset.model_validate(load_data(cfg.test_path, multilabel=True)),
         cfg.device,
-        cfg.mode.value,
         cfg.multilabel_generation_config,
         cfg.regex_sampling,
+        cfg.seed,
     )
 
     # run optimization
