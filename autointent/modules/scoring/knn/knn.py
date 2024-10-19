@@ -11,6 +11,8 @@ from .weighting import apply_weights
 
 
 class KNNScorer(ScoringModule):
+    weights: WEIGHT_TYPES
+
     def __init__(self, k: int, weights: WEIGHT_TYPES | bool) -> None:
         """
         Arguments
@@ -25,7 +27,7 @@ class KNNScorer(ScoringModule):
         self.k = k
         if isinstance(weights, bool):
             weights = "distance" if weights else "uniform"
-        self.weights = weights
+        self.weights = weights  # type: ignore[assignment]
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel

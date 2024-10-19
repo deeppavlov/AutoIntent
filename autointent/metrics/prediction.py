@@ -1,17 +1,21 @@
 import logging
-from collections.abc import Callable
-from functools import wraps
-from typing import Any, Protocol
+from typing import Protocol
 
 import numpy as np
 import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
+from .converter import transform
+
 logger = logging.getLogger(__name__)
+
+LABELS_VALUE_TYPE = list[int] | list[list[int]] | npt.NDArray[np.int64]
+PREDICTED_VALUE_TYPE = list[int] | list[list[int]] | npt.NDArray[np.int64]
+# PredictionMetricFn = Callable[[TRUE_VALUE_TYPE, PREDICTED_VALUE_TYPE], float]
 
 
 class PredictionMetricFn(Protocol):
-    def __call__(self, y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
+    def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
         """
         Arguments
         ---
@@ -23,68 +27,53 @@ class PredictionMetricFn(Protocol):
         ...
 
 
-def simple_check(func: Callable[[npt.NDArray[Any], npt.NDArray[Any]], float]) -> PredictionMetricFn:
-    @wraps(func)
-    def wrapper(y_true: list[int] | list[list[int]], y_pred: list[int] | list[list[int]]) -> float:
-        y_pred_ = np.array(y_pred)
-        y_true_ = np.array(y_true)
-        if y_pred_.ndim != y_true_.ndim:
-            msg = "Something went wrong with labels dimensions"
-            logger.error(msg)
-            raise ValueError(msg)
-        return func(y_true_, y_pred_)
-
-    return wrapper
-
-
-@simple_check
-def prediction_accuracy(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def prediction_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass and multilabel"""
-    return np.mean(y_true == y_pred)  # type: ignore[no-any-return]
+    y_true_, y_pred_ = transform(y_true, y_pred)
+    return np.mean(y_true_ == y_pred_)  # type: ignore[no-any-return]
 
 
-def _prediction_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def _prediction_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass"""
+    y_true_, y_pred_ = transform(y_true, y_pred)
+
     n_classes = len(np.unique(y_true))
     roc_auc_scores: list[float] = []
     for k in range(n_classes):
-        binarized_true = (y_true == k).astype(int)
-        binarized_pred = (y_pred == k).astype(int)
+        binarized_true = (y_true_ == k).astype(int)
+        binarized_pred = (y_pred_ == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
-    return np.mean(roc_auc_scores)
+    return np.mean(roc_auc_scores)  # type: ignore[return-value]
 
 
-def _prediction_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def _prediction_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multilabel"""
-    return roc_auc_score(y_true, y_pred, average="macro")
+    return roc_auc_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-@simple_check
-def prediction_roc_auc(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def prediction_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass and multilabel"""
-    if y_pred.ndim == y_true.ndim == 1:
-        return _prediction_roc_auc_multiclass(y_true, y_pred)
-    if y_pred.ndim == y_true.ndim == 2:  # noqa: PLR2004
-        return _prediction_roc_auc_multilabel(y_true, y_pred)
+    y_true_, y_pred_ = transform(y_true, y_pred)
+    if y_pred_.ndim == y_true_.ndim == 1:
+        return _prediction_roc_auc_multiclass(y_true_, y_pred_)
+    if y_pred_.ndim == y_true_.ndim == 2:  # noqa: PLR2004
+        return _prediction_roc_auc_multilabel(y_true_, y_pred_)
     msg = "Something went wrong with labels dimensions"
     logger.error(msg)
     raise ValueError(msg)
 
 
-@simple_check
-def prediction_precision(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass and multilabel"""
-    return precision_score(y_true, y_pred, average="macro")
+    return precision_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-@simple_check
-def prediction_recall(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass and multilabel"""
-    return recall_score(y_true, y_pred, average="macro")
+    return recall_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-@simple_check
-def prediction_f1(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
+def prediction_f1(y_true: LABELS_VALUE_TYPE, y_pred: PREDICTED_VALUE_TYPE) -> float:
     """supports multiclass and multilabel"""
-    return f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]

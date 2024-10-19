@@ -4,6 +4,7 @@ import hydra
 
 from autointent import Context
 from autointent.configs.pipeline import OptimizationConfig
+from autointent.context.data_handler import Dataset
 from autointent.pipeline.pipeline import Pipeline
 from autointent.pipeline.utils import get_db_dir
 
@@ -129,11 +130,9 @@ def optimization(cfg: OptimizationConfig) -> None:
 
     # create shared objects for a whole pipeline
     context = Context(
-        load_data(cfg.multiclass_path, multilabel=False),
-        load_data(cfg.multilabel_path, multilabel=True),
-        load_data(cfg.test_path, multilabel=True),
+        Dataset.model_validate(load_data(cfg.multiclass_path, multilabel=False)),
+        Dataset.model_validate(load_data(cfg.test_path, multilabel=True)),
         cfg.device,
-        cfg.mode.value,
         cfg.multilabel_generation_config,
         cfg.regex_sampling,
         cfg.seed,

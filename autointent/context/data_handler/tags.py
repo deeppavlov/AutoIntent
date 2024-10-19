@@ -20,7 +20,4 @@ def collect_tags(dataset: Dataset) -> list[Tag]:
         for tag in intent.tags:
             tag_mapping[tag].append(intent.id)
 
-    return [
-        Tag(tag_name=tag, intent_ids=intent_ids)
-        for tag, intent_ids in tag_mapping.items()
-    ]
+    return [Tag(tag_name=tag, intent_ids=intent_ids) for tag, intent_ids in tag_mapping.items()]

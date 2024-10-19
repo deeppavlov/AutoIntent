@@ -42,38 +42,41 @@ class OptimizationInfo:
             metric_value=metric_value,
             module_params=module_params,
         )
-        self.trials[node_type].append(trial)
+        self.trials.add_trial(node_type, trial)
         self._logger.info(trial.model_dump())
 
         # save artifact
-        self.artifacts[node_type].append(artifact)
+        self.artifacts.add_artifact(node_type, artifact)
 
     def _get_metrics_values(self, node_type: str) -> list[float]:
-        return [trial.metric_value for trial in self.trials[node_type]]
+        return [trial.metric_value for trial in self.trials.get_trials(node_type)]
 
-    def _get_best_trial_idx(self, node_type: str) -> int:
-        if len(self.trials[node_type]) == 0:
+    def _get_best_trial_idx(self, node_type: str) -> int | None:
+        if len(self.trials.get_trials(node_type)) == 0:
             return None
-        res = self._trials_best_ids[node_type]
+        res = self._trials_best_ids.get_best_trial_idx(node_type)
         if res is not None:
             return res
-        self._trials_best_ids[node_type] = np.argmax(self._get_metrics_values(node_type))
-        return self._trials_best_ids[node_type]
+        self._trials_best_ids.set_best_trial_idx(node_type, int(np.argmax(self._get_metrics_values(node_type))))
+        return self._trials_best_ids.get_best_trial_idx(node_type)
 
-    def _get_best_artifact(self, node_type: str) -> ScorerArtifact:
+    def _get_best_artifact(self, node_type: str) -> RetrieverArtifact | ScorerArtifact | Artifact:
         i_best = self._get_best_trial_idx(node_type)
-        return self.artifacts[node_type][i_best]
+        if i_best is None:
+            msg = f"No best trial for {node_type}"
+            raise ValueError(msg)
+        return self.artifacts.get_best_artifact(node_type, i_best)
 
     def get_best_embedder(self) -> str:
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type="retrieval")
+        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type="retrieval")  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
 
     def get_best_oos_scores(self) -> NDArray[np.float64] | None:
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")  # type: ignore[assignment]
         return best_scorer_artifact.oos_scores
 
     def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
@@ -86,13 +89,13 @@ class OptimizationInfo:
             "configs": self.trials.model_dump(),
         }
 
-    def get_best_trials(self) -> list[dict[str, Any]]:
+    def get_best_trials(self) -> dict[str, Any]:
         node_types = ["regexp", "retrieval", "scoring", "prediction"]
         trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
-        res = {nt: {} for nt in node_types}
+        res: dict[str, Any] = {nt: {} for nt in node_types}
         for idx, node_type in zip(trial_ids, node_types, strict=True):
             if idx is None:
                 continue
-            trial = self.trials[node_type][idx]
+            trial = self.trials.get_trial(node_type, idx)
             res[node_type] = {"module_type": trial.module_type, "module_params": trial.module_params}
         return res

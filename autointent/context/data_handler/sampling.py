@@ -29,7 +29,9 @@ def generate_from_templates(patterns: list[str], n_shots: int) -> list[str]:
 
 
 def sample_from_regex(
-    dataset: Dataset, n_shots: int, random_seed: int = 0,
+    dataset: Dataset,
+    n_shots: int,
+    random_seed: int = 0,
 ) -> Dataset:
     random.seed(random_seed)
 

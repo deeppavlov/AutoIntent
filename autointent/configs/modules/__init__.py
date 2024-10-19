@@ -24,3 +24,21 @@ MODULES_CONFIGS: dict[str, dict[str, type[ModuleConfig]]] = {
     "scoring": SCORING_MODULES_CONFIGS,
     "prediction": PREDICTION_MODULES_CONFIGS,
 }
+
+
+__all__ = [
+    "PREDICTION_MODULES_CONFIGS",
+    "RETRIEVAL_MODULES_CONFIGS",
+    "SCORING_MODULES_CONFIGS",
+    "MODULES_CONFIGS",
+    "ModuleConfig",
+    "ArgmaxPredictorConfig",
+    "JinoosPredictorConfig",
+    "ThresholdPredictorConfig",
+    "TunablePredictorConfig",
+    "VectorDBConfig",
+    "DNNCScorerConfig",
+    "KNNScorerConfig",
+    "LinearScorerConfig",
+    "MLKnnScorerConfig",
+]

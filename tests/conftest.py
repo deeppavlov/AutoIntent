@@ -22,7 +22,6 @@ def setup_environment() -> tuple[str, str]:
 
 @pytest.fixture
 def load_clinc_subset():
-
     def _load_data(dataset_path: str) -> Dataset:
         data = load_data(dataset_path, multilabel=False)
         return Dataset.model_validate(data)
@@ -32,7 +31,6 @@ def load_clinc_subset():
 
 @pytest.fixture
 def context(load_clinc_subset):
-
     def _get_context(dataset_type: str) -> Context:
         dataset_path = pathlib.Path("tests/minimal_optimization/data/").joinpath(
             f"clinc_subset_{dataset_type}.json",
