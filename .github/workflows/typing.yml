@@ -17,4 +17,4 @@ jobs:
             pip install mypy
 
       - name: Run mypy
-        run: mypy
+        run: make typing
