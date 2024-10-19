@@ -21,4 +21,4 @@ jobs:
           poetry install --with typing
 
       - name: Run mypy
-        run: mypy autointent
+        run: make typing

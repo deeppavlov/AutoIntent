@@ -4,12 +4,11 @@ import hydra
 
 from autointent import Context
 from autointent.configs.pipeline import OptimizationConfig
+from autointent.context.data_handler import Dataset
 from autointent.pipeline.pipeline import Pipeline
 from autointent.pipeline.utils import get_db_dir
 
 from .utils import get_run_name, load_config, load_data, setup_logging
-from ...context.data_handler import Dataset
-
 
 # def main():
 #     parser = ArgumentParser()
