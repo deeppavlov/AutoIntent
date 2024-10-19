@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, TypedDict
 
 from transformers import set_seed
 
@@ -10,6 +10,12 @@ from .schemas import Dataset, DatasetType
 from .scheme import UtteranceRecord
 from .stratification import split_sample_utterances
 from .tags import collect_tags
+
+
+class RegexPatterns(TypedDict):
+    id: int
+    regexp_full_match: list[str]
+    regexp_partial_match: list[str]
 
 
 class DataHandler:
@@ -61,11 +67,11 @@ class DataHandler:
 
         logger.debug("collection regexp patterns from multiclass intent records")
         self.regexp_patterns = [
-            {
-                "id": intent.id,
-                "regexp_full_match": intent.regexp_full_match,
-                "regexp_partial_match": intent.regexp_partial_match,
-            }
+            RegexPatterns(
+                id=intent.id,
+                regexp_full_match=intent.regexp_full_match,
+                regexp_partial_match=intent.regexp_partial_match,
+            )
             for intent in dataset.intents
         ]
 
