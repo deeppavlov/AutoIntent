@@ -2,13 +2,13 @@ import numpy as np
 
 from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
-from autointent.modules import KNNScorer, VectorDBModule
+from autointent.modules import LinearScorer, VectorDBModule
 
 
-def test_base_knn(setup_environment, load_clinc_subset):
+def test_base_linear(setup_environment, load_clinc_subset):
     run_name, db_dir = setup_environment
 
-    dataset = load_clinc_subset("tests/minimal_optimization/data/clinc_subset_multiclass.json")
+    dataset = load_clinc_subset("multiclass")
 
     context = Context(
         dataset=dataset,
@@ -33,20 +33,30 @@ def test_base_knn(setup_environment, load_clinc_subset):
         artifact=artifact,
     )
 
-    scorer = KNNScorer(k=3, weights="distance")
+    scorer = LinearScorer()
 
     scorer.fit(context)
     score = scorer.score(context, scoring_roc_auc)
     assert score == 1
-    predictions = scorer.predict(
-        [
-            "why is there a hold on my american saving bank account",
-            "i am nost sure why my account is blocked",
-            "why is there a hold on my capital one checking account",
-            "i think my account is blocked but i do not know the reason",
-            "can you tell me why is my bank account frozen",
-        ]
+    test_data = [
+        "why is there a hold on my american saving bank account",
+        "i am nost sure why my account is blocked",
+        "why is there a hold on my capital one checking account",
+        "i think my account is blocked but i do not know the reason",
+        "can you tell me why is my bank account frozen",
+    ]
+    predictions = scorer.predict(test_data)
+
+    np.testing.assert_almost_equal(
+        np.array(
+            [
+                [0.17928316, 0.59134606, 0.22937078],
+                [0.15927759, 0.62366319, 0.21705922],
+                [0.20068982, 0.53887681, 0.26043337],
+                [0.17557128, 0.61313277, 0.21129594],
+                [0.17908815, 0.63129863, 0.18961322],
+            ]
+        ),
+        predictions,
+        decimal=2,
     )
-    assert (
-        predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])
-    ).all()
