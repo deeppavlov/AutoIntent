@@ -10,8 +10,8 @@ from autointent.nodes.optimization import NodeOptimizer
 logger = logging.getLogger(__name__)
 
 
-def test_prediction_multiclass(context, scoring_optimizer_multiclass):
-    context = context("multiclass")
+def test_prediction_multiclass(scoring_optimizer_multiclass):
+    context, scoring_optimizer_multiclass = scoring_optimizer_multiclass
     scoring_optimizer_multiclass.fit(context)
 
     prediction_optimizer_config = {
@@ -47,8 +47,8 @@ def test_prediction_multiclass(context, scoring_optimizer_multiclass):
         torch.cuda.empty_cache()
 
 
-def test_prediction_multilabel(context, scoring_optimizer_multilabel):
-    context = context("multilabel")
+def test_prediction_multilabel(scoring_optimizer_multilabel):
+    context, scoring_optimizer_multilabel = scoring_optimizer_multilabel
     scoring_optimizer_multilabel.fit(context)
 
     prediction_optimizer_config = {

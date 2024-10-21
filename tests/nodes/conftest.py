@@ -47,7 +47,7 @@ def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
         ],
     }
 
-    return NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)
 
 
 @pytest.fixture
@@ -63,4 +63,4 @@ def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
         ],
     }
 
-    return NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)
