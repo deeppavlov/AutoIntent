@@ -10,7 +10,7 @@ from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
 from .scoring import DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
 
-RETRIEVAL_MODULES_MULTICLASS: dict[str, type[RetrievalModule]] = {
+RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "vector_db": VectorDBModule,
 }
 
@@ -28,14 +28,14 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = {
     "mlknn": MLKnnScorer,
 }
 
-PREDICTION_MODULES_MULTICLASS: dict[str, type[PredictionModule]] = {
+PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "argmax": ArgmaxPredictor,
     "jinoos": JinoosPredictor,
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
 }
 
-PREDICTION_MODULES_MULTILABEL: dict[str, type[PredictionModule]] = {
+PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
 }
@@ -54,4 +54,10 @@ __all__ = [
     "LinearScorer",
     "MLKnnScorer",
     "ScoringModule",
+    "RETRIEVAL_MODULES_MULTICLASS",
+    "RETRIEVAL_MODULES_MULTILABEL",
+    "SCORING_MODULES_MULTICLASS",
+    "SCORING_MODULES_MULTILABEL",
+    "PREDICTION_MODULES_MULTICLASS",
+    "PREDICTION_MODULES_MULTILABEL",
 ]

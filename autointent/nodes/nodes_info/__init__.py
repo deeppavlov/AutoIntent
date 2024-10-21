@@ -8,3 +8,5 @@ NODES_INFO: dict[str, NodeInfo] = {
     "scoring": ScoringNodeInfo(),
     "prediction": PredictionNodeInfo(),
 }
+
+__all__ = ["NodeInfo", "PredictionNodeInfo", "RetrievalNodeInfo", "ScoringNodeInfo", "NODES_INFO"]

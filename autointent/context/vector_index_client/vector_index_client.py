@@ -12,7 +12,7 @@ class VectorIndexClient:
         self.multilabel = multilabel
         self.n_classes = n_classes
         self.indexes: dict[str, VectorIndex] = {}
-        self.model_name = None
+        self.model_name: str | None = None
 
     def set_best_embedder_name(self, model_name: str) -> None:
         if model_name not in self.indexes:
@@ -39,4 +39,8 @@ class VectorIndexClient:
             del self.indexes[model_name]
 
     def get_index(self, model_name: str) -> VectorIndex:
+        if model_name not in self.indexes:
+            msg = f"model {model_name} wasn't created before"
+            self._logger.error(msg)
+            raise ValueError(msg)
         return self.indexes[model_name]

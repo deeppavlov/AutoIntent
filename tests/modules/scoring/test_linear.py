@@ -5,15 +5,15 @@ from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import LinearScorer, VectorDBModule
 
 
-def test_base_linear(setup_environment, load_clinic_subset):
+def test_base_linear(setup_environment, load_clinc_subset):
     run_name, db_dir = setup_environment
 
+    dataset = load_clinc_subset("multiclass")
+
     context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
+        dataset=dataset,
+        test_dataset=None,
         device="cpu",
-        mode="multiclass",
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
