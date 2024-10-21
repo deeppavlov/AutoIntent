@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.metrics.converter import transform
 
 from .base import PredictionModule, get_prediction_evaluation_data
 
@@ -72,7 +73,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[int], y_pred: list[int]) -> float:
+def jinoos_score(y_true: list[int] | npt.NDArray[Any], y_pred: list[int] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 
@@ -83,8 +84,7 @@ def jinoos_score(y_true: list[int], y_pred: list[int]) -> float:
     where $C_{in}$ is the number of correctly predicted in-domain labels, \
     and $N_{in}$ is the total number of in-domain labels. The same for OOS samples
     """
-    y_true_ = np.array(y_true)
-    y_pred_ = np.array(y_pred)
+    y_true_, y_pred_ = transform(y_true, y_pred)
 
     in_domain_mask = y_true_ != -1
     correct_mask = y_true_ == y_pred_

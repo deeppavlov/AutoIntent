@@ -10,8 +10,9 @@ from autointent.nodes.optimization import NodeOptimizer
 logger = logging.getLogger(__name__)
 
 
-def test_prediction_multiclass(context_multiclass, scoring_optimizer_multiclass):
-    scoring_optimizer_multiclass.fit(context_multiclass)
+def test_prediction_multiclass(context, scoring_optimizer_multiclass):
+    context = context("multiclass")
+    scoring_optimizer_multiclass.fit(context)
 
     prediction_optimizer_config = {
         "metric": "prediction_accuracy",
@@ -30,9 +31,9 @@ def test_prediction_multiclass(context_multiclass, scoring_optimizer_multiclass)
 
     prediction_optimizer = NodeOptimizer.from_dict_config(prediction_optimizer_config)
 
-    prediction_optimizer.fit(context_multiclass)
+    prediction_optimizer.fit(context)
 
-    for trial in context_multiclass.optimization_info.trials.prediction:
+    for trial in context.optimization_info.trials.prediction:
         config = {
             "node_type": "prediction",
             "module_type": trial.module_type,
@@ -46,8 +47,9 @@ def test_prediction_multiclass(context_multiclass, scoring_optimizer_multiclass)
         torch.cuda.empty_cache()
 
 
-def test_prediction_multilabel(context_multilabel, scoring_optimizer_multilabel):
-    scoring_optimizer_multilabel.fit(context_multilabel)
+def test_prediction_multilabel(context, scoring_optimizer_multilabel):
+    context = context("multilabel")
+    scoring_optimizer_multilabel.fit(context)
 
     prediction_optimizer_config = {
         "metric": "prediction_accuracy",
@@ -60,9 +62,9 @@ def test_prediction_multilabel(context_multilabel, scoring_optimizer_multilabel)
 
     prediction_optimizer = NodeOptimizer.from_dict_config(prediction_optimizer_config)
 
-    prediction_optimizer.fit(context_multilabel)
+    prediction_optimizer.fit(context)
 
-    for trial in context_multilabel.optimization_info.trials.prediction:
+    for trial in context.optimization_info.trials.prediction:
         config = {
             "node_type": "prediction",
             "module_type": trial.module_type,

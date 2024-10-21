@@ -8,11 +8,12 @@ from autointent.nodes import InferenceNode, NodeOptimizer
 logger = logging.getLogger(__name__)
 
 
-def test_retrieval_multiclass(context_multiclass):
+def test_retrieval_multiclass(context):
+    context = context("multiclass")
     retrieval_optimizer = get_retrieval_optimizer(multilabel=False)
-    retrieval_optimizer.fit(context_multiclass)
+    retrieval_optimizer.fit(context)
 
-    for trial in context_multiclass.optimization_info.trials.retrieval:
+    for trial in context.optimization_info.trials.retrieval:
         config = {
             "node_type": "retrieval",
             "module_type": trial.module_type,
@@ -26,11 +27,12 @@ def test_retrieval_multiclass(context_multiclass):
         torch.cuda.empty_cache()
 
 
-def test_retrieval_multilabel(context_multilabel):
+def test_retrieval_multilabel(context):
+    context = context("multilabel")
     retrieval_optimizer = get_retrieval_optimizer(multilabel=True)
-    retrieval_optimizer.fit(context_multilabel)
+    retrieval_optimizer.fit(context)
 
-    for trial in context_multilabel.optimization_info.trials.retrieval:
+    for trial in context.optimization_info.trials.retrieval:
         config = {
             "node_type": "retrieval",
             "module_type": trial.module_type,

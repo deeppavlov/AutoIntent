@@ -2,6 +2,7 @@ import re
 
 import pytest
 
+from autointent.context.data_handler import Dataset
 from autointent.context.data_handler.sampling import (
     distribute_shots,
     generate_from_template,
@@ -28,19 +29,22 @@ def test_generate_from_template():
 
 
 def test_sample_from_regex():
-    intent_records = [
-        {"intent_id": "greeting", "regexp_full_match": ["hello|hi", "hey there"], "sample_utterances": ["hello"]},
-        {"intent_id": "farewell", "regexp_full_match": ["goodbye|bye"], "sample_utterances": ["goodbye"]},
-    ]
+    data = {
+        "utterances": [{"text": "hello", "label": 0}, {"text": "goodbye", "label": 1}],
+        "intents": [
+            {"id": 0, "regexp_full_match": ["hello|hi", "hey there"]},
+            {"id": 1, "regexp_full_match": ["goodbye|bye"]},
+        ],
+    }
 
     n_shots = 5
-    result = sample_from_regex(intent_records, n_shots)
+    dataset = sample_from_regex(Dataset.model_validate(data), n_shots)
 
-    assert len(result) == 2
-    for intent in result:
-        assert len(intent["sample_utterances"]) > 1
-        for utterance in intent["sample_utterances"][1:]:  # Skip the original utterance
-            assert any(re.fullmatch(pattern, utterance) for pattern in intent["regexp_full_match"])
+    assert len(dataset.intents) == 2
+    for intent in dataset.intents:
+        for utterance in dataset.utterances[2:]:
+            if intent.id == utterance.label:
+                assert any(re.fullmatch(pattern, utterance.text) for pattern in intent.regexp_full_match)
 
 
 @pytest.mark.parametrize(("n", "k"), [(5, 10), (1, 10), (10, 0), (100, 1000)])
@@ -64,10 +68,13 @@ def test_generate_from_templates_distribution():
 
 
 def test_sample_from_regex_consistency():
-    intent_records = [{"intent_id": "test", "regexp_full_match": ["\\d{3}"], "sample_utterances": []}]
+    data = {
+        "utterances": [],
+        "intents": [{"id": 0, "regexp_full_match": ["\\d{3}"]}],
+    }
 
     n_shots = 10
-    result = sample_from_regex(intent_records, n_shots)
+    dataset = sample_from_regex(Dataset.model_validate(data), n_shots)
 
-    assert len(result[0]["sample_utterances"]) == n_shots
-    assert all(re.fullmatch("\\d{3}", x) for x in result[0]["sample_utterances"])
+    assert len(dataset.utterances) == n_shots
+    assert all(re.fullmatch("\\d{3}", x.text) for x in dataset.utterances)

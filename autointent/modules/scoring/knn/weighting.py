@@ -46,10 +46,10 @@ def apply_weights(
         counts = get_counts_multilabel(labels, weights_)
         probs = counts / weights_.sum(axis=1, keepdims=True)
     else:
-        counts = get_counts(labels, n_classes, weights_)
+        counts = get_counts(labels, n_classes, weights_)  # type: ignore[assignment]
         probs = counts / counts.sum(axis=1, keepdims=True)
 
-    return probs
+    return probs  # type: ignore[no-any-return]
 
 
 def closest_weighting(labels: NDArray[Any], distances: NDArray[Any], multilabel: bool, n_classes: int) -> NDArray[Any]:
@@ -75,7 +75,7 @@ def _closest_weighting(labels: NDArray[Any], distances: NDArray[Any]) -> NDArray
 
     # select closest candidate for each query-class pair
     similarities = np.max(expanded_distances_view, axis=1)
-    return (similarities + 1) / 2  # cosine [-1,+1] -> prob [0,1]
+    return (similarities + 1) / 2  # type: ignore[no-any-return] # cosine [-1,+1] -> prob [0,1]
 
 
 def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:

@@ -8,19 +8,21 @@ from typing import Any
 
 import yaml
 
+from autointent.context.data_handler import Dataset
+
 from .name import generate_name
 
 
-def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
+def load_data(data_path: str, multilabel: bool) -> Dataset:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default":
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
         with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return json.load(file)
+            return Dataset.model_validate(json.load(file))  # type: ignore[no-any-return]
     elif data_path != "":
         with Path(data_path).open() as file:
-            return json.load(file)
-    return []
+            return Dataset.model_validate(json.load(file))  # type: ignore[no-any-return]
+    return None
 
 
 def get_run_name(run_name: str) -> str:
@@ -57,5 +59,6 @@ def load_config(config_path: str, multilabel: bool, logger: Logger | None = None
         if logger is not None:
             logger.debug("loading default optimization search space config...")
         config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
-        file_content = ires.files("autointent.datafiles").joinpath(config_name).read_text()
-    return yaml.safe_load(file_content)
+        with ires.files("autointent.datafiles").joinpath(config_name).open() as file:
+            file_content = file.read()
+    return yaml.safe_load(file_content)  # type: ignore[no-any-return]

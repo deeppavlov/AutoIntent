@@ -1,35 +1,41 @@
 import numpy as np
 
 from autointent import Context
+from autointent.context.data_handler import Dataset
 from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 
 
-def test_base_mlknn(setup_environment, load_clinic_subset, dump_dir):
+def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
     run_name, db_dir = setup_environment
 
-    utterance = [
+    dataset = load_clinc_subset("multilabel")
+
+    test_dataset = Dataset.model_validate(
         {
-            "utterance": "why is there a hold on my american saving bank account",
-            "labels": [0, 1, 2],
+            "utterances": [
+                {
+                    "text": "why is there a hold on my american saving bank account",
+                    "label": [0, 1, 2],
+                },
+                {
+                    "text": "i am nost sure why my account is blocked",
+                    "label": [0, 2],
+                },
+            ],
         },
-        {
-            "utterance": "i am nost sure why my account is blocked",
-            "labels": [0, 2],
-        },
-    ]
+    )
+
     context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=utterance,
-        test_utterance_records=utterance,
+        dataset=dataset,
+        test_dataset=test_dataset,
         device="cpu",
-        mode="multiclass_as_multilabel",
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
         db_dir=db_dir,
-        dump_dir=dump_dir,
+        dump_dir=dump_dir
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -44,13 +50,13 @@ def test_base_mlknn(setup_environment, load_clinic_subset, dump_dir):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
-        module_dump_dir="",
+        module_dump_dir=""
     )
 
     scorer = MLKnnScorer(k=3)
     scorer.fit(context)
     score = scorer.score(context, scoring_f1)
-    np.testing.assert_almost_equal(score, 0.8632478632478633)
+    np.testing.assert_almost_equal(score, 2 / 9)
 
     predictions = scorer.predict_labels(
         [

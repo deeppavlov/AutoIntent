@@ -20,8 +20,8 @@ def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
-        db_dir=db_dir,
         dump_dir=dump_dir,
+        db_dir=db_dir
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -36,7 +36,6 @@ def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
-        module_dump_dir="",
     )
 
     scorer = DNNCScorer("sergeyzh/rubert-tiny-turbo", k=3, train_head=train_head)

@@ -39,6 +39,13 @@ class PredictorArtifact(Artifact):
     labels: NDArray[np.float64]
 
 
+def validate_node_name(value: str) -> str:
+    if value in ["regexp", "retrieval", "scoring", "prediction"]:
+        return value
+    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'prediction']"
+    raise ValueError(msg)
+
+
 class Artifacts(BaseModel):
     """
     Modules hyperparams and outputs. The best ones are transmitted between nodes of the pipeline
@@ -51,8 +58,14 @@ class Artifacts(BaseModel):
     scoring: list[ScorerArtifact] = []
     prediction: list[PredictorArtifact] = []
 
-    def __getitem__(self, node_type: str) -> list:
-        return getattr(self, node_type)
+    def add_artifact(self, node_type: str, artifact: Artifact) -> None:
+        self.get_artifacts(node_type).append(artifact)
+
+    def get_artifacts(self, node_type: str) -> list[Artifact]:
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
+
+    def get_best_artifact(self, node_type: str, idx: int) -> Artifact:
+        return self.get_artifacts(node_type)[idx]
 
 
 class Trial(BaseModel):
@@ -77,8 +90,14 @@ class Trials(BaseModel):
     scoring: list[Trial] = []
     prediction: list[Trial] = []
 
-    def __getitem__(self, node_type: str) -> list[Trial]:
-        return getattr(self, node_type)
+    def get_trial(self, node_type: str, idx: int) -> Trial:
+        return self.get_trials(node_type)[idx]
+
+    def get_trials(self, node_type: str) -> list[Trial]:
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
+
+    def add_trial(self, node_type: str, trial: Trial) -> None:
+        self.get_trials(node_type).append(trial)
 
 
 class TrialsIds(BaseModel):
@@ -91,8 +110,8 @@ class TrialsIds(BaseModel):
     scoring: int | None = None
     prediction: int | None = None
 
-    def __getitem__(self, node_type: str) -> int:
-        return getattr(self, node_type)
+    def get_best_trial_idx(self, node_type: str) -> int | None:
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
 
-    def __setitem__(self, node_type: str, idx: int) -> None:
-        setattr(self, node_type, idx)
+    def set_best_trial_idx(self, node_type: str, idx: int) -> None:
+        setattr(self, validate_node_name(node_type), idx)

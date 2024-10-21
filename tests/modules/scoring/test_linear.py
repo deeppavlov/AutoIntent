@@ -1,16 +1,19 @@
 import numpy as np
 
+from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import LinearScorer, VectorDBModule
 
 
-def test_base_linear(context_multiclass):
+def test_base_linear(context):
+    context = context("multiclass")
+
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context_multiclass)
-    metric_value = vector_db.score(context_multiclass, retrieval_hit_rate)
+    vector_db.fit(context)
+    metric_value = vector_db.score(context, retrieval_hit_rate)
     artifact = vector_db.get_assets()
-    context_multiclass.optimization_info.log_module_optimization(
+    context.optimization_info.log_module_optimization(
         node_type="retrieval",
         module_type="vector_db",
         module_params=retrieval_params,
@@ -22,8 +25,8 @@ def test_base_linear(context_multiclass):
 
     scorer = LinearScorer()
 
-    scorer.fit(context_multiclass)
-    score = scorer.score(context_multiclass, scoring_roc_auc)
+    scorer.fit(context)
+    score = scorer.score(context, scoring_roc_auc)
     assert score == 1
     test_data = [
         "why is there a hold on my american saving bank account",

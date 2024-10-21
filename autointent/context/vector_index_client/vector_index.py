@@ -12,7 +12,7 @@ class VectorIndex:
     def __init__(self, model_name: str, device: str) -> None:
         self.model_name = model_name
         self.device = device
-        self.index = None
+        self.index: None | faiss.Index = None
 
         self.labels: list[int] | list[list[int]] = []    # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
@@ -27,8 +27,8 @@ class VectorIndex:
 
         if self.index is None:
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
-        self.index.add(embeddings)  # type: ignore # noqa: PGH003
-        self.labels.extend(labels)
+        self.index.add(embeddings)
+        self.labels.extend(labels)  # type: ignore[arg-type]
 
     def delete(self) -> None:
         if self.index:
@@ -40,11 +40,11 @@ class VectorIndex:
             self.embedding_model.cpu()
             del self.embedding_model
 
-    def _search_by_text(self, texts: list[str], k: int) -> list[list[dict]]:
-        query_embedding = self.embedding_model.encode(texts)
+    def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
+        query_embedding: npt.NDArray[np.float64] = self.embedding_model.encode(texts, convert_to_numpy=True)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
-    def _search_by_embedding(self, embedding: np.ndarray, k: int) -> list[list[dict]]:
+    def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
         if embedding.ndim != 2:  # noqa: PLR2004
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
             raise ValueError(msg)
@@ -62,13 +62,16 @@ class VectorIndex:
         return results
 
     def get_all_embeddings(self) -> npt.NDArray[Any]:
-        return self.index.reconstruct_n(0, self.index.ntotal)
+        if self.index is None:
+            msg = "Index is not created yet"
+            raise ValueError(msg)
+        return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
     def get_all_labels(self) -> list[int] | list[list[int]]:
         return self.labels
 
     def query(
-        self, queries: list[str] | list[npt.NDArray], k: int
+        self, queries: list[str] | list[npt.NDArray[np.float32]], k: int
     ) -> tuple[list[list[int] | list[list[int]]], list[list[float]], list[list[str]]]:
         """
         Arguments
@@ -96,7 +99,7 @@ class VectorIndex:
         return all_labels, all_distances, all_texts
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
-        return self.embedding_model.encode(utterances, convert_to_numpy=True)
+        return self.embedding_model.encode(utterances, convert_to_numpy=True)  # type: ignore[return-value]
 
     def dump(self, dir_path: Path) -> None:
         dir_path.mkdir(parents=True, exist_ok=True)
