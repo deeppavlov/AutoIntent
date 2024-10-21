@@ -137,7 +137,7 @@ def main(cfg: OptimizationConfig) -> None:
         cfg.regex_sampling,
         cfg.seed,
         db_dir,
-        dump_dir
+        dump_dir,
     )
 
     # run optimization

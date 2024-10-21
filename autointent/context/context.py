@@ -26,9 +26,7 @@ class Context:
             random_seed=seed,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(
-            device, db_dir
-        )
+        self.vector_index_client = VectorIndexClient(device, db_dir)
 
         self.device = device
         self.multilabel = self.data_handler.multilabel

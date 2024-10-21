@@ -25,7 +25,7 @@ def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset
         regex_sampling=0,
         seed=0,
         db_dir=db_dir,
-        dump_dir=dump_dir
+        dump_dir=dump_dir,
     )
 
     # run optimization

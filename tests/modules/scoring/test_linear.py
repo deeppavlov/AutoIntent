@@ -1,6 +1,5 @@
 import numpy as np
 
-from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import LinearScorer, VectorDBModule
 

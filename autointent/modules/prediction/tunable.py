@@ -51,11 +51,7 @@ class TunablePredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = {
-            "multilabel": self.multilabel,
-            "thresh": self.thresh.tolist(),
-            "tags": self.tags
-        }
+        metadata = {"multilabel": self.multilabel, "thresh": self.thresh.tolist(), "tags": self.tags}
 
         with (dump_dir / "metadata.json").open("w") as file:
             json.dump(metadata, file, indent=4)

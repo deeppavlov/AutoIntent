@@ -53,7 +53,7 @@ class NodeOptimizer:
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
-                    module_dump_dir
+                    module_dump_dir,
                 )
 
                 module.clear_cache()

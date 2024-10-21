@@ -12,7 +12,6 @@ from autointent.pipeline.optimization.utils import NumpyEncoder
 
 @hydra.main(config_name="inference_config", config_path=".", version_base=None)
 def main(cfg: InferenceConfig) -> None:
-
     # load data for prediction
     with Path(cfg.data_path).open() as file:
         data: list[str] = json.load(file)

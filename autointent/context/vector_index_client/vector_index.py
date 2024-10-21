@@ -14,7 +14,7 @@ class VectorIndex:
         self.device = device
         self.index: None | faiss.Index = None
 
-        self.labels: list[int] | list[list[int]] = []    # (n_samples,) or (n_samples, n_classes)
+        self.labels: list[int] | list[list[int]] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
         self.embedding_model: SentenceTransformer = None
 

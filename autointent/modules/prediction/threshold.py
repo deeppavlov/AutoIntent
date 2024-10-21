@@ -46,10 +46,7 @@ class ThresholdPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = {
-            "multilabel": self.multilabel,
-            "tags": self.tags
-        }
+        metadata = {"multilabel": self.multilabel, "tags": self.tags}
 
         with (dump_dir / "metadata.json").open("w") as file:
             json.dump(metadata, file, indent=4)

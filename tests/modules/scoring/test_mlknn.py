@@ -35,7 +35,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
         regex_sampling=0,
         seed=0,
         db_dir=db_dir,
-        dump_dir=dump_dir
+        dump_dir=dump_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -50,7 +50,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
-        module_dump_dir=""
+        module_dump_dir="",
     )
 
     scorer = MLKnnScorer(k=3)

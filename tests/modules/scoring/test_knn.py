@@ -18,7 +18,7 @@ def test_base_knn(setup_environment, load_clinc_subset, dump_dir):
         regex_sampling=0,
         seed=0,
         dump_dir=dump_dir,
-        db_dir=db_dir
+        db_dir=db_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

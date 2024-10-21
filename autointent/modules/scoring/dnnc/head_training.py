@@ -8,6 +8,7 @@ It does NOT produce a sentence embedding and does NOT work for individual senten
 Usage:
 python training_stsbenchmark.py
 """
+
 import itertools as it
 import logging
 from pathlib import Path
@@ -51,6 +52,7 @@ def construct_samples(
 
 
 CrossEncoderType = TypeVar("CrossEncoderType", bound="CrossEncoderWithLogreg")
+
 
 class CrossEncoderWithLogreg:
     # TODO refactor

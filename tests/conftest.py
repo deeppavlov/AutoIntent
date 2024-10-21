@@ -33,6 +33,7 @@ def load_clinc_subset():
 @pytest.fixture
 def context(load_clinc_subset, dump_dir, setup_environment):
     run_name, db_dir = setup_environment
+
     def _get_context(dataset_type: DATASET_TYPE) -> Context:
         return Context(
             dataset=load_clinc_subset(dataset_type),
@@ -42,7 +43,7 @@ def context(load_clinc_subset, dump_dir, setup_environment):
             regex_sampling=0,
             seed=0,
             db_dir=db_dir,
-            dump_dir=dump_dir
+            dump_dir=dump_dir,
         )
 
     return _get_context
@@ -53,7 +54,9 @@ def get_config():
     def _get_config(dataset_type: DATASET_TYPE):
         config_path = ires.files("tests.assets.configs").joinpath(f"{dataset_type}.yaml")
         return load_config(str(config_path), multilabel=dataset_type == "multilabel")
+
     return _get_config
+
 
 @pytest.fixture
 def logs_dir() -> pathlib.Path:

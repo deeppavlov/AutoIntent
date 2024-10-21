@@ -21,7 +21,7 @@ def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score
         regex_sampling=0,
         seed=0,
         dump_dir=dump_dir,
-        db_dir=db_dir
+        db_dir=db_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

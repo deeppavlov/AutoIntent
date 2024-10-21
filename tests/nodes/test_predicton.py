@@ -41,7 +41,7 @@ def test_prediction_multiclass(scoring_optimizer_multiclass):
             "load_path": trial.module_dump_dir,
         }
         node = InferenceNode(**config)
-        node.module.predict(np.array([[0.27486506, 0.31681463, 0.37459106], [0.2769358,  0.31536099, 0.37366978]]))
+        node.module.predict(np.array([[0.27486506, 0.31681463, 0.37459106], [0.2769358, 0.31536099, 0.37366978]]))
         node.module.clear_cache()
         gc.collect()
         torch.cuda.empty_cache()
@@ -72,7 +72,7 @@ def test_prediction_multilabel(scoring_optimizer_multilabel):
             "load_path": trial.module_dump_dir,
         }
         node = InferenceNode(**config)
-        node.module.predict(np.array([[0.27486506, 0.31681463, 0.37459106], [0.2769358,  0.31536099, 0.37366978]]))
+        node.module.predict(np.array([[0.27486506, 0.31681463, 0.37459106], [0.2769358, 0.31536099, 0.37366978]]))
         node.module.clear_cache()
         gc.collect()
         torch.cuda.empty_cache()
