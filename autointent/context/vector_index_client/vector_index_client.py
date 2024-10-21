@@ -6,7 +6,7 @@ from .vector_index import VectorIndex
 
 
 class VectorIndexClient:
-    def __init__(self, device: str, multilabel: bool, n_classes: int) -> None:
+    def __init__(self, multilabel: bool, n_classes: int, device: str | None = None) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.multilabel = multilabel

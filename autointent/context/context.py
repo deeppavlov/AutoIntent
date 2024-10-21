@@ -9,11 +9,11 @@ class Context:
     def __init__(
         self,
         dataset: Dataset,
-        test_dataset: Dataset | None,
-        device: str,
-        multilabel_generation_config: str,
-        regex_sampling: int,
-        seed: int,
+        test_dataset: Dataset | None = None,
+        device: str | None = None,
+        multilabel_generation_config: str | None = None,
+        regex_sampling: int = 0,
+        seed: int = 42,
     ) -> None:
         self.data_handler = DataHandler(
             dataset,
@@ -23,7 +23,9 @@ class Context:
             random_seed=seed,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(device, self.data_handler.multilabel, self.data_handler.n_classes)
+        self.vector_index_client = VectorIndexClient(
+            self.data_handler.multilabel, self.data_handler.n_classes, device=device
+        )
 
         self.device = device
         self.multilabel = self.data_handler.multilabel

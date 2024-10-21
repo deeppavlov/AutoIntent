@@ -23,19 +23,19 @@ class ClassificationMode(Enum):
 
 @dataclass
 class OptimizationConfig:
-    search_space_path: str = ""
-    multiclass_path: str = ""
-    multilabel_path: str = ""
-    test_path: str = ""
-    db_dir: str = ""
-    logs_dir: str = ""
-    run_name: str = ""
+    multiclass_path: str = MISSING
+    search_space_path: str | None = None
+    multilabel_path: str | None = None
+    test_path: str | None = None
+    db_dir: str | None = None
+    logs_dir: str | None = None
+    run_name: str | None = None
     mode: ClassificationMode = ClassificationMode.multiclass
-    device: str = "cuda:0"
+    device: str | None = None
     regex_sampling: int = 0
     seed: int = 0
     log_level: LogLevel = LogLevel.ERROR
-    multilabel_generation_config: str = ""
+    multilabel_generation_config: str | None = None
 
 
 cs = ConfigStore.instance()

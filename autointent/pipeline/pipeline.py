@@ -35,12 +35,12 @@ class Pipeline:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def dump(self, logs_dir: str, run_name: str) -> None:
+    def dump(self, run_name: str, logs_dir: str | None = None) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump_evaluation_results()
 
         # create appropriate directory
-        logs_dir_path = Path.cwd() if logs_dir == "" else Path(logs_dir)
+        logs_dir_path = Path.cwd() if logs_dir is None else Path(logs_dir)
         logs_dir_path = logs_dir_path / run_name
         logs_dir_path.mkdir(parents=True)
 
