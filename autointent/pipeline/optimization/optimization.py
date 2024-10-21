@@ -123,7 +123,7 @@ def optimization(cfg: OptimizationConfig) -> None:
 
     # configure the run and data
     run_name = get_run_name(cfg.run_name)
-    db_dir = get_db_dir(cfg.db_dir, run_name)
+    db_dir = get_db_dir(run_name, cfg.db_dir)
 
     logger.debug("Run Name: %s", run_name)
     logger.debug("Chroma DB path: %s", db_dir)
@@ -131,11 +131,11 @@ def optimization(cfg: OptimizationConfig) -> None:
     # create shared objects for a whole pipeline
     context = Context(
         Dataset.model_validate(load_data(cfg.multiclass_path, multilabel=False)),
-        Dataset.model_validate(load_data(cfg.test_path, multilabel=True)),
-        cfg.device,
-        cfg.multilabel_generation_config,
-        cfg.regex_sampling,
-        cfg.seed,
+        test_dataset=Dataset.model_validate(load_data(cfg.test_path, multilabel=True)),
+        multilabel_generation_config=cfg.multilabel_generation_config,
+        regex_sampling=cfg.regex_sampling,
+        device=cfg.device,
+        seed=cfg.seed,
     )
 
     # run optimization
@@ -144,4 +144,4 @@ def optimization(cfg: OptimizationConfig) -> None:
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(cfg.logs_dir, run_name)
+    pipeline.dump(run_name, cfg.logs_dir)

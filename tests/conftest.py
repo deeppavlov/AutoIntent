@@ -11,6 +11,7 @@ from autointent.pipeline.utils import get_db_dir
 
 DATASET_TYPE = Literal["multiclass", "multilabel"]
 
+
 @pytest.fixture
 def setup_environment() -> tuple[str, str]:
     setup_logging("DEBUG")
@@ -50,4 +51,5 @@ def get_config():
     def _get_config(dataset_type: DATASET_TYPE):
         config_path = ires.files("tests.assets.configs").joinpath(f"{dataset_type}.yaml")
         return load_config(str(config_path), multilabel=dataset_type == "multilabel")
+
     return _get_config

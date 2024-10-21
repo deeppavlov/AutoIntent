@@ -13,7 +13,6 @@ from autointent.pipeline import Pipeline
 def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset_type):
     run_name, db_dir = setup_environment
 
-
     dataset = load_clinc_subset(dataset_type)
 
     context = Context(

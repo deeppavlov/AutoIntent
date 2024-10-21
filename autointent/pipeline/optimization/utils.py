@@ -11,20 +11,20 @@ import yaml
 from autointent.pipeline.utils import generate_name
 
 
-def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
+def load_data(data_path: str | None, multilabel: bool) -> list[dict[str, Any]]:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path == "default":
+    if data_path is None:
         data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
         with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
             return json.load(file)  # type: ignore[no-any-return]
-    elif data_path != "":
+    elif data_path is not None and data_path != "":
         with Path(data_path).open() as file:
             return json.load(file)  # type: ignore[no-any-return]
     return []
 
 
-def get_run_name(run_name: str) -> str:
-    if run_name == "":
+def get_run_name(run_name: str | None = None) -> str:
+    if run_name is None:
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
@@ -39,9 +39,9 @@ def setup_logging(level: str | None = None) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
+def load_config(config_path: str | None, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
     """load config from the given path or load default config which is distributed along with the autointent package"""
-    if config_path != "":
+    if config_path is not None:
         if logger is not None:
             logger.debug("loading optimization search space config from %s...)", config_path)
         with Path(config_path).open() as file:
