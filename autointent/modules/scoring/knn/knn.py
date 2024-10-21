@@ -14,6 +14,8 @@ from .weighting import apply_weights
 
 
 class KNNScorer(ScoringModule):
+    weights: WEIGHT_TYPES
+
     def __init__(self, k: int, weights: WEIGHT_TYPES | bool) -> None:
         """
         Arguments

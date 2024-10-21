@@ -1,72 +1,55 @@
 import logging
-from typing import Any
+from collections.abc import Sequence
+from typing import Any, TypedDict
 
 from transformers import set_seed
 
-from autointent.custom_types import TASK_TYPES
-
-from .multilabel_generation import convert_to_multilabel_format, generate_multilabel_version
+from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
-from .scheme import IntentRecord, UtteranceRecord
+from .schemas import Dataset, DatasetType
+from .scheme import UtteranceRecord
 from .stratification import split_sample_utterances
 from .tags import collect_tags
+
+
+class RegexPatterns(TypedDict):
+    id: int
+    regexp_full_match: list[str]
+    regexp_partial_match: list[str]
 
 
 class DataHandler:
     def __init__(
         self,
-        multiclass_intent_records: list[dict[str, Any]],
-        multilabel_utterance_records: list[dict[str, Any]],
-        test_utterance_records: list[dict[str, Any]],
-        mode: TASK_TYPES,
-        multilabel_generation_config: str | None = None,
+        dataset: Dataset,
+        test_dataset: Dataset | None = None,
+        multilabel_generation_config: str = "",
         regex_sampling: int = 0,
-        seed: int = 0,
+        force_multilabel: bool = False,
+        random_seed: int = 0,
     ) -> None:
         logger = logging.getLogger(__name__)
-        set_seed(seed)
+        set_seed(random_seed)
 
-        # TODO do somthing with this else if
-        if not multiclass_intent_records and not multilabel_utterance_records:
-            msg = "No data provided, both `multiclass_intent_records` and `multilabel_utterance_records` are empty"
-            logger.error(msg)
-            raise ValueError(msg)
+        if force_multilabel:
+            dataset = dataset.to_multilabel()
+
+        self.multilabel = dataset.type == DatasetType.multilabel
 
         if regex_sampling > 0:
             logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
-            multiclass_intent_records = sample_from_regex(multiclass_intent_records, n_shots=regex_sampling)
+            dataset = sample_from_regex(dataset=dataset, n_shots=regex_sampling)
 
         if multilabel_generation_config is not None and multilabel_generation_config != "":
             logger.debug("generating multilabel utterances from multiclass ones...")
-            new_utterances = generate_multilabel_version(multiclass_intent_records, multilabel_generation_config, seed)
-            multilabel_utterance_records.extend(new_utterances)
-            logger.debug("collecting tags from multiclass intent_records if present...")
-            self.tags = collect_tags(multiclass_intent_records)
+            dataset = generate_multilabel_version(
+                dataset=dataset,
+                config_string=multilabel_generation_config,
+                random_seed=random_seed,
+            )
 
-        if mode == "multiclass":
-            data = multiclass_intent_records
-            self.tags = []
-
-        elif mode == "multilabel":
-            data = multilabel_utterance_records
-            self.tags = []  # TODO add tags supporting for a pure multilabel case?
-
-        elif mode == "multiclass_as_multilabel":
-            if not hasattr(self, "tags"):
-                logger.debug("collecting tags from multiclass intent_records if present...")
-                self.tags = collect_tags(multiclass_intent_records)
-
-            logger.debug("formatting multiclass labels to multilabel...")
-            old_utterances = convert_to_multilabel_format(multiclass_intent_records)
-            multilabel_utterance_records.extend(old_utterances)
-            data = multilabel_utterance_records
-
-        else:
-            msg = f"unexpected classification mode value: {mode}"
-            logger.error(msg)
-            raise ValueError(msg)
-
-        self.multilabel = mode != "multiclass"
+        logger.debug("collecting tags from multiclass intent_records if present...")
+        self.tags = collect_tags(dataset)
 
         logger.info("defining train and test splits...")
         (
@@ -76,18 +59,21 @@ class DataHandler:
             self.utterances_test,
             self.labels_train,
             self.labels_test,
-        ) = split_sample_utterances(data, test_utterance_records, self.multilabel, seed)
+        ) = split_sample_utterances(
+            dataset=dataset,
+            test_dataset=test_dataset,
+            random_seed=random_seed,
+        )
 
-        if mode != "multilabel":
-            logger.debug("collection regexp patterns from multiclass intent records")
-            self.regexp_patterns = [
-                IntentRecord(
-                    intent_id=intent["intent_id"],
-                    regexp_full_match=intent["regexp_full_match"],
-                    regexp_partial_match=intent["regexp_partial_match"],
-                )
-                for intent in multiclass_intent_records
-            ]
+        logger.debug("collection regexp patterns from multiclass intent records")
+        self.regexp_patterns = [
+            RegexPatterns(
+                id=intent.id,
+                regexp_full_match=intent.regexp_full_match,
+                regexp_partial_match=intent.regexp_partial_match,
+            )
+            for intent in dataset.intents
+        ]
 
         self._logger = logger
 
@@ -96,13 +82,13 @@ class DataHandler:
 
     def dump(
         self,
-    ) -> tuple[list[dict[str, Any] | UtteranceRecord], list[UtteranceRecord]]:
+    ) -> tuple[list[dict[str, Any]], list[UtteranceRecord]]:
         self._logger.debug("dumping train, test and oos data...")
         train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
         test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)
         oos_data = _dump_oos(self.oos_utterances)
         test_data = test_data + oos_data
-        return train_data, test_data
+        return train_data, test_data  # type: ignore[return-value]
 
 
 def _dump_train(
@@ -110,17 +96,17 @@ def _dump_train(
     labels: list[list[int]] | list[int],
     n_classes: int,
     multilabel: bool,
-) -> list[dict[str, Any] | UtteranceRecord]:
+) -> Sequence[dict[str, Any]]:
     if multilabel and isinstance(labels[0], list):
         res = []
-        for ut, labs in zip(utterances, labels, strict=False):
-            labs_converted = [i for i in range(n_classes) if labs[i]]
-            res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
+        for ut, labs in zip(utterances, labels, strict=True):
+            labs_converted = [i for i in range(n_classes) if labs[i]]  # type: ignore[index]
+            res.append({"utterance": ut, "labels": labs_converted})
     elif not multilabel and isinstance(labels[0], int):
         # TODO check if rec is used
-        res = [{"intent_id": i} for i in range(n_classes)]
+        res = [{"intent_id": i} for i in range(n_classes)]  # type: ignore[dict-item]
         for ut, lab in zip(utterances, labels, strict=False):
-            rec = res[lab]
+            rec = res[lab]  # type: ignore[call-overload]
             rec["sample_utterances"] = [*rec.get("sample_utterances", []), ut]
     else:
         message = "unexpected labels format"
@@ -137,7 +123,7 @@ def _dump_test(
     res = []
     for ut, labs in zip(utterances, labels, strict=True):
         labs_converted = (
-            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]
+            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]  # type: ignore[index,list-item]
         )
         res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
     return res

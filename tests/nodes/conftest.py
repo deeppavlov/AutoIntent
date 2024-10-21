@@ -35,8 +35,9 @@ def get_retrieval_optimizer(multilabel: bool):
 
 
 @pytest.fixture
-def scoring_optimizer_multiclass(context_multiclass, retrieval_optimizer_multiclass):
-    retrieval_optimizer_multiclass.fit(context_multiclass)
+def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
+    context = context("multiclass")
+    retrieval_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
@@ -46,12 +47,13 @@ def scoring_optimizer_multiclass(context_multiclass, retrieval_optimizer_multicl
         ],
     }
 
-    return NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)
 
 
 @pytest.fixture
-def scoring_optimizer_multilabel(context_multilabel, retrieval_optimizer_multilabel):
-    retrieval_optimizer_multilabel.fit(context_multilabel)
+def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
+    context = context("multilabel")
+    retrieval_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
@@ -61,4 +63,4 @@ def scoring_optimizer_multilabel(context_multilabel, retrieval_optimizer_multila
         ],
     }
 
-    return NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)

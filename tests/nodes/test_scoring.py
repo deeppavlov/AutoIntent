@@ -9,8 +9,9 @@ from autointent.nodes.optimization import NodeOptimizer
 logger = logging.getLogger(__name__)
 
 
-def test_scoring_multiclass(context_multiclass, retrieval_optimizer_multiclass):
-    retrieval_optimizer_multiclass.fit(context_multiclass)
+def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
+    context = context("multiclass")
+    retrieval_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
@@ -29,9 +30,9 @@ def test_scoring_multiclass(context_multiclass, retrieval_optimizer_multiclass):
 
     scoring_optimizer = NodeOptimizer.from_dict_config(scoring_optimizer_config)
 
-    scoring_optimizer.fit(context_multiclass)
+    scoring_optimizer.fit(context)
 
-    for trial in context_multiclass.optimization_info.trials.scoring:
+    for trial in context.optimization_info.trials.scoring:
         config = {
             "node_type": "scoring",
             "module_type": trial.module_type,
@@ -45,8 +46,9 @@ def test_scoring_multiclass(context_multiclass, retrieval_optimizer_multiclass):
         torch.cuda.empty_cache()
 
 
-def test_scoring_multilabel(context_multilabel, retrieval_optimizer_multilabel):
-    retrieval_optimizer_multilabel.fit(context_multilabel)
+def test_scoring_multilabel(context, retrieval_optimizer_multilabel):
+    context = context("multilabel")
+    retrieval_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
@@ -60,9 +62,9 @@ def test_scoring_multilabel(context_multilabel, retrieval_optimizer_multilabel):
 
     scoring_optimizer = NodeOptimizer.from_dict_config(scoring_optimizer_config)
 
-    scoring_optimizer.fit(context_multilabel)
+    scoring_optimizer.fit(context)
 
-    for trial in context_multilabel.optimization_info.trials.scoring:
+    for trial in context.optimization_info.trials.scoring:
         config = {
             "node_type": "scoring",
             "module_type": trial.module_type,

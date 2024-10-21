@@ -18,7 +18,7 @@ class ThresholdPredictor(PredictionModule):
     multilabel: bool
     tags: list[Tag]
 
-    def __init__(self, thresh: float | list[float]) -> None:
+    def __init__(self, thresh: float | npt.NDArray[Any]) -> None:
         self.thresh = thresh
 
     def fit(self, context: Context) -> None:
@@ -70,7 +70,7 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
     ---
     array of int labels, shape (n_samples,)
     """
-    pred_classes = np.argmax(scores, axis=1)
+    pred_classes: npt.NDArray[Any] = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
 
     if isinstance(thresh, float):

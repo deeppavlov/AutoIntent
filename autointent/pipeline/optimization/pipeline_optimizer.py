@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 import numpy as np
 import yaml
@@ -13,8 +13,6 @@ from autointent.nodes import NodeOptimizer
 
 from .utils import NumpyEncoder
 
-PipelineType = TypeVar("PipelineType", bound="PipelineOptimizer")
-
 
 class PipelineOptimizer:
     def __init__(self, nodes: list[NodeOptimizer]) -> None:
@@ -22,8 +20,8 @@ class PipelineOptimizer:
         self.nodes = nodes
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> PipelineType:
-        return instantiate(PipelineOptimizerConfig, **config)
+    def from_dict_config(cls, config: dict[str, Any]) -> "PipelineOptimizer":
+        return instantiate(PipelineOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def optimize(self, context: Context) -> None:
         self.context = context

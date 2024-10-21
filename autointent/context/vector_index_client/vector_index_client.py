@@ -13,7 +13,15 @@ class VectorIndexClient:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = Path(db_dir)
-        self.indexes_alive: dict[str, VectorIndex] = {}
+        self.model_name = None
+
+    def set_best_embedder_name(self, model_name: str) -> None:
+        if model_name not in self.indexes:
+            msg = f"model {model_name} wasn't created before"
+            self._logger.error(msg)
+            raise ValueError(msg)
+
+        self.model_name = model_name
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         """
@@ -24,7 +32,6 @@ class VectorIndexClient:
         index = VectorIndex(model_name, self.device)
         index.add(data_handler.utterances_train, data_handler.labels_train)
 
-        self.indexes_alive[model_name] = index
         index.dump(self._get_dump_dirpath(model_name))
 
         return index
@@ -63,11 +70,6 @@ class VectorIndexClient:
         return self.db_dir / dir_name
 
     def delete_index(self, model_name: str) -> None:
-        if model_name in self.indexes_alive:
-            self._logger.debug("Killing index for model: %s", model_name)
-            index = self.indexes_alive.pop(model_name)
-            index.delete()
-
         dir_name = self._remove_index_dirname(model_name)
         if dir_name is not None:
             self._logger.debug("Deleting index for model: %s", model_name)
