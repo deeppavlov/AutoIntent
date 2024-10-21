@@ -16,6 +16,9 @@ class VectorIndexClient:
         self.indexes_alive: dict[str, VectorIndex] = {}
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
+        """
+        model_name should be a repo from hugging face, not a path to a local model
+        """
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device)

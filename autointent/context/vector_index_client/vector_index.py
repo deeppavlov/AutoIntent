@@ -21,8 +21,6 @@ class VectorIndex:
     def add(self, texts: list[str], labels: list[int] | list[list[int]]) -> None:
         self.texts = texts
 
-        if self.embedding_model is None:
-            self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
         embeddings = self.embed(texts)
 
         if self.index is None:
@@ -96,6 +94,8 @@ class VectorIndex:
         return all_labels, all_distances, all_texts
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
+        if self.embedding_model is None:
+            self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
         return self.embedding_model.encode(utterances, convert_to_numpy=True)
 
     def dump(self, dir_path: Path) -> None:
