@@ -7,7 +7,7 @@ from autointent.pipeline import Pipeline
 
 
 @pytest.mark.parametrize(
-    ("dataset_type"),
+    "dataset_type",
     ["multiclass", "multilabel"],
 )
 def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset_type):
