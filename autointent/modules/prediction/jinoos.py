@@ -1,20 +1,29 @@
+import json
 import logging
-from typing import Any
+from pathlib import Path
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule, get_prediction_evaluation_data
 
-default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+default_search_space = np.linspace(0, 1, num=100)
+
+
+class JinoosPredictorDumpMetadata(TypedDict):
+    thresh: list[float]
 
 
 class JinoosPredictor(PredictionModule):
+    metadata_dict_name = "metadata.json"
+
     def __init__(self, search_space: list[float] | None = None) -> None:
-        self.search_space = search_space if search_space is not None else default_search_space
+        self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
     def fit(self, context: Context) -> None:
         """
@@ -43,6 +52,22 @@ class JinoosPredictor(PredictionModule):
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._thresh)
 
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = JinoosPredictorDumpMetadata(thresh=self._thresh.tolist())
+
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata: JinoosPredictorDumpMetadata = json.load(file)
+
+        self._thresh = metadata["thresh"]
+
 
 def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     pred_classes = np.argmax(scores, axis=1)
@@ -55,7 +80,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[int] | npt.NDArray[Any], y_pred: list[int] | npt.NDArray[Any]) -> float:
+def jinoos_score(y_true: list[LABEL_TYPE] | npt.NDArray[Any], y_pred: list[LABEL_TYPE] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 

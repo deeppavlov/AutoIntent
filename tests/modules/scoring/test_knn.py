@@ -5,7 +5,7 @@ from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
 
 
-def test_base_knn(setup_environment, load_clinc_subset):
+def test_base_knn(setup_environment, load_clinc_subset, dump_dir):
     run_name, db_dir = setup_environment
 
     dataset = load_clinc_subset("multiclass")
@@ -17,6 +17,8 @@ def test_base_knn(setup_environment, load_clinc_subset):
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
+        dump_dir=dump_dir,
+        db_dir=db_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -31,6 +33,7 @@ def test_base_knn(setup_environment, load_clinc_subset):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
+        module_dump_dir="",
     )
 
     scorer = KNNScorer(k=3, weights="distance")

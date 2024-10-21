@@ -1,23 +1,11 @@
 import numpy as np
 
-from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import LinearScorer, VectorDBModule
 
 
-def test_base_linear(setup_environment, load_clinc_subset):
-    run_name, db_dir = setup_environment
-
-    dataset = load_clinc_subset("multiclass")
-
-    context = Context(
-        dataset=dataset,
-        test_dataset=None,
-        device="cpu",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-    )
+def test_base_linear(context):
+    context = context("multiclass")
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
@@ -31,6 +19,7 @@ def test_base_linear(setup_environment, load_clinc_subset):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
+        module_dump_dir="",
     )
 
     scorer = LinearScorer()

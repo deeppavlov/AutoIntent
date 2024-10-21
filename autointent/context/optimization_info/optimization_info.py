@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from autointent.configs.node import InferenceNodeConfig
 from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
@@ -28,6 +29,7 @@ class OptimizationInfo:
         metric_value: float,
         metric_name: str,
         artifact: Artifact,
+        module_dump_dir: str,
     ) -> None:
         """
         Purposes:
@@ -41,6 +43,7 @@ class OptimizationInfo:
             metric_name=metric_name,
             metric_value=metric_value,
             module_params=module_params,
+            module_dump_dir=module_dump_dir,
         )
         self.trials.add_trial(node_type, trial)
         self._logger.info(trial.model_dump())
@@ -89,13 +92,20 @@ class OptimizationInfo:
             "configs": self.trials.model_dump(),
         }
 
-    def get_best_trials(self) -> dict[str, Any]:
+    def get_inference_nodes_config(self) -> list[InferenceNodeConfig]:
         node_types = ["regexp", "retrieval", "scoring", "prediction"]
         trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
-        res: dict[str, Any] = {nt: {} for nt in node_types}
+        res = []
         for idx, node_type in zip(trial_ids, node_types, strict=True):
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)
-            res[node_type] = {"module_type": trial.module_type, "module_params": trial.module_params}
+            res.append(
+                InferenceNodeConfig(
+                    node_type=node_type,
+                    module_type=trial.module_type,
+                    module_config=trial.module_params,
+                    load_path=trial.module_dump_dir,
+                )
+            )
         return res

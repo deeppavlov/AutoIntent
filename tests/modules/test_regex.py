@@ -90,6 +90,7 @@ def test_base_regex(setup_environment):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
+        module_dump_dir="",
     )
 
     scorer = RegExp()

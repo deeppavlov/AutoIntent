@@ -26,84 +26,101 @@ pip install .
 
 ## Использование
 
-В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
-```
-usage: autointent [-h] [--config-path CONFIG_PATH]
-                  [--multiclass-path MULTICLASS_PATH]
-                  [--multilabel-path MULTILABEL_PATH] [--test-path TEST_PATH]
-                  [--db-dir DB_DIR] [--logs-dir LOGS_DIR]
-                  [--run-name RUN_NAME]
-                  [--mode {multiclass,multilabel,multiclass_as_multilabel}]
-                  [--device DEVICE] [--regex-sampling REGEX_SAMPLING]
-                  [--seed SEED]
-                  [--log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
-                  [--multilabel-generation-config MULTILABEL_GENERATION_CONFIG]
+### Оптимизация
 
-options:
-  -h, --help            show this help message and exit
-  --config-path CONFIG_PATH
-                        Path to a yaml configuration file that defines the
-                        optimization search space. Omit this to use the
-                        default configuration.
-  --multiclass-path MULTICLASS_PATH
-                        Path to a json file with intent records. Set to
-                        "default" to use banking77 data stored within the
-                        autointent package.
-  --multilabel-path MULTILABEL_PATH
-                        Path to a json file with utterance records. Set to
-                        "default" to use dstc3 data stored within the
-                        autointent package.
-  --test-path TEST_PATH
-                        Path to a json file with utterance records. Skip this
-                        option if you want to use a random subset of the
-                        training sample as test data.
-  --db-dir DB_DIR       Location where to save chroma database file. Omit to
-                        use your system's default cache directory.
-  --logs-dir LOGS_DIR   Location where to save optimization logs that will be
-                        saved as
-                        `<logs_dir>/<run_name>_<cur_datetime>/logs.json`
-  --run-name RUN_NAME   Name of the run prepended to optimization logs
-                        filename
-  --mode {multiclass,multilabel,multiclass_as_multilabel}
-                        Evaluation mode. This parameter must be consistent
-                        with provided data.
-  --device DEVICE       Specify device in torch notation
-  --regex-sampling REGEX_SAMPLING
-                        Number of shots per intent to sample from regular
-                        expressions. This option extends sample utterances
-                        within multiclass intent records.
-  --seed SEED           Affects the data partitioning
-  --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                        Set the logging level
-  --multilabel-generation-config MULTILABEL_GENERATION_CONFIG
-                        Config string like "[20, 40, 20, 10]" means 20 one-
-                        label examples, 40 two-label examples, 20 three-label
-                        examples, 10 four-label examples. This option extends
-                        multilabel utterance records.
+В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
+Примеры использования:
+```bash
+autointent dataset_path=default-multiclass
+autointent dataset_path=default-multilabel
+autointent dataset_path=data/intent_records/ac_robotic_new.json \
+    force_multilabel=true \
+    logs_dir=experiments/multiclass_as_multilabel/ \
+    run_name=robotics_new_testing \
+    regex_sampling=10 \
+    multilabel_generation_config="[0, 4000, 1000]"
+autointent dataset_path=data/intent_records/ac_robotic_new.json \
+           test_path=data/intent_records/ac_robotic_val.json \
+           force_multilabel=true \
+           regex_sampling=20
+autointent dataset_path=default-multiclass \
+           test_path=data/intent_records/banking77_test.json
+```
+
+Все опции:
+```
+search_space_path  Path to a yaml configuration file that defines the
+                   optimization search space. Omit this to use the
+                   default configuration.
+
+dataset_path       Path to a json file with training data. Set to
+                   "default" to use banking77 data stored within the
+                   autointent package.
+
+test_path          Path to a json file with test records. Skip this
+                   option if you want to use a random subset of the
+                   training sample as test data.
+
+db_dir             Location where to save faiss database file. Omit to
+                   use your system's default cache directory.
+
+logs_dir           Location where to save optimization logs that will be
+                   saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
+                   Omit to use current working directory.
+
+run_name           Name of the run prepended to optimization assets dirname
+
+device             Specify device in torch notation
+
+regex_sampling     Number of shots per intent to sample from regular
+                   expressions. This option extends sample utterances
+                   within multiclass intent records.
+
+seed               Affects the data partitioning
+
+log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+                   Omit to use ERROR by default.
+
+multilabel_generation_config 
+                   Config string like "[20, 40, 20, 10]" means 20 one-
+                   label examples, 40 two-label examples, 20 three-label
+                   examples, 10 four-label examples. This option extends
+                   multilabel utterance records.
+
+force_multilabel  Set to true if your data is multiclass but you want to
+                  train the multilabel classifier.
 ```
 
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
 
-Примеры использования:
+Пример входных данных в директории `data/intent_records`.
+
+### Инференс
+
+После проведённой оптимизации найденный классификатор можно загрузить и использовать для предсказания:
 ```bash
-autointent --mode multiclass --multiclass-path default
-autointent --mode multilabel --multilabel-path default
-autointent --multiclass-path data/intent_records/ac_robotic_new.json \
-        --mode multiclass_as_multilabel \
-        --logs-dir experiments/multiclass_as_multilabel/ \
-        --run-name robotics_new_testing \
-        --regex-sampling 10 \
-        --multilabel-generation-config "[0, 4000, 1000]"
-autointent --multiclass-path data/intent_records/ac_robotic_new.json \
-           --test-path data/intent_records/ac_robotic_val.json \
-           --mode "multiclass_as_multilabel" \
-           --regex-sampling 20
-autointent --mode multiclass \
-           --multiclass-path default \
-           --test-path data/intent_records/banking77_test.json 
+autointent \
+    dataset_path="tests/assets/data/clinc_subset_multiclass.json" \
+    search_space_path="tests/assets/configs/multiclass.yaml"
+autointent-inference \
+    data_path="experiments/hydra-configs/data/utterances.json" \
+    source_dir="tasty_auk_10-21-2024_14-24-48" \
+    output_path="test-infer" 
 ```
 
-Пример входных данных в директории `data/intent_records`.
+Все опции инференса:
+```
+data_path    Path to a json list of string containing with utterances
+             for which you want to make a prediction.
+
+source_dir   Path to a directory with optimization assets.
+
+output_path  Path to a resulting json file with predictions made for 
+             your utterances from data_path
+
+log_level    String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+             Omit to use ERROR by default.
+```
 
 ## Постановка задачи и формат входных данных
 

@@ -4,6 +4,8 @@ from typing import Any, TypedDict
 
 from transformers import set_seed
 
+from autointent.custom_types import LABEL_TYPE
+
 from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
 from .schemas import Dataset, DatasetType
@@ -93,7 +95,7 @@ class DataHandler:
 
 def _dump_train(
     utterances: list[str],
-    labels: list[list[int]] | list[int],
+    labels: list[LABEL_TYPE],
     n_classes: int,
     multilabel: bool,
 ) -> Sequence[dict[str, Any]]:
@@ -106,7 +108,7 @@ def _dump_train(
         # TODO check if rec is used
         res = [{"intent_id": i} for i in range(n_classes)]  # type: ignore[dict-item]
         for ut, lab in zip(utterances, labels, strict=False):
-            rec = res[lab]  # type: ignore[call-overload]
+            rec = res[lab]  # type: ignore[index]
             rec["sample_utterances"] = [*rec.get("sample_utterances", []), ut]
     else:
         message = "unexpected labels format"
@@ -116,7 +118,7 @@ def _dump_train(
 
 def _dump_test(
     utterances: list[str],
-    labels: list[list[int]] | list[int],
+    labels: list[LABEL_TYPE],
     n_classes: int,
     multilabel: bool,
 ) -> list[UtteranceRecord]:

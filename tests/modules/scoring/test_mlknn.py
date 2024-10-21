@@ -7,7 +7,7 @@ from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 
 
-def test_base_mlknn(setup_environment, load_clinc_subset):
+def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
     run_name, db_dir = setup_environment
 
     dataset = load_clinc_subset("multilabel")
@@ -34,6 +34,8 @@ def test_base_mlknn(setup_environment, load_clinc_subset):
         multilabel_generation_config="",
         regex_sampling=0,
         seed=0,
+        db_dir=db_dir,
+        dump_dir=dump_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -48,6 +50,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset):
         metric_value=metric_value,
         metric_name="retrieval_hit_rate_macro",
         artifact=artifact,
+        module_dump_dir="",
     )
 
     scorer = MLKnnScorer(k=3)

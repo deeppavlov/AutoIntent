@@ -8,25 +8,38 @@ from typing import Any
 
 import yaml
 
-from autointent.pipeline.utils import generate_name
+from autointent.context.data_handler import Dataset
+
+from .name import generate_name
 
 
-def load_data(data_path: str, multilabel: bool) -> list[dict[str, Any]]:
+def load_data(data_path: str) -> Dataset | None:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path == "default":
-        data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
-        with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return json.load(file)  # type: ignore[no-any-return]
+    if data_path == "default-multiclass":
+        with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
+            res = json.load(file)
+    elif data_path == "default-multilabel":
+        with ires.files("autointent.datafiles").joinpath("dstc3-20shot.json").open() as file:
+            res = json.load(file)
     elif data_path != "":
         with Path(data_path).open() as file:
-            return json.load(file)  # type: ignore[no-any-return]
-    return []
+            res = json.load(file)
+    else:
+        return None
+    return Dataset.model_validate(res)
 
 
 def get_run_name(run_name: str) -> str:
     if run_name == "":
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
+
+
+def get_logs_dir(logs_dir: str, run_name: str) -> Path:
+    logs_dir_ = Path.cwd() if logs_dir == "" else Path(logs_dir)
+    res = logs_dir_ / run_name
+    res.mkdir(parents=True)
+    return res
 
 
 def setup_logging(level: str | None = None) -> logging.Logger:

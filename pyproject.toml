@@ -51,11 +51,12 @@ mypy = "^1"
 types-pyyaml = "^6.0.12.20240917"
 types-pygments = "^2.18.0.20240506"
 types-setuptools = "^75.2.0.20241019"
+joblib-stubs = "^1.4.2.5.20240918"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization.optimization:optimization"
-"autointent-inference" = "autointent.pipeline.inference:main"
-"clear-cache" = "autointent.pipeline.utils.cache:clear_chroma_cache"
+"autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
+"autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
+"clear-cache" = "autointent.pipeline.optimization.utils.cache:clear_chroma_cache"
 
 [tool.ruff]
 line-length = 120
@@ -119,6 +120,7 @@ plugins = [
     "numpy.typing.mypy_plugin",
 ]
 mypy_path = "autointent"
+disable_error_code = ["override"]
 
 [[tool.mypy.overrides]]
 module = [
