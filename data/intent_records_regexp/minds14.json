@@ -1,226 +1,426 @@
-[
-    {
-        "intent_id": 0,
-        "intent_name": null,
-        "sample_utterances": [
-            "Hello hello I am a client of your bank I have your credit card I would like to know if it can be used abroad and Do I need to do anything at all in order to use it abroad If there are some extra there is some nasty fee for it",
-            "I am going abroad Can I pay with my card abroad",
-            "Your bank's miss card Can I pay her when I travel abroad",
-            "I would like to know if I can pay with my card abroad",
-            "Good morning next week I am leaving abroad what is the commission for withdrawing funds in Ugra"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my card",
-            "would like to"
-        ]
-    },
-    {
-        "intent_id": 1,
-        "intent_name": null,
-        "sample_utterances": [
-            "I want to change my address I'm calling to change my address",
-            "Hello, I have moved here to another apartment and in this regard, I would like to tell you a new address so that everything will be aptudey",
-            "I need to change my address",
-            "Good afternoon, registration address",
-            "detailed directions download my Just like me MP3 320"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "to change",
-            "to change my"
-        ]
-    },
-    {
-        "intent_id": 2,
-        "intent_name": null,
-        "sample_utterances": [
-            "I can't log into my account and see the balance of my account",
-            "Hello, the application does not load, now I cannot look at my bank account",
-            "I cannot open the application I click on the icon and nothing happens I see the start screen and nothing is loaded",
-            "the application does not load the balance of my new account how can i check the account",
-            "when entering the application, it throws me out of it"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "the application",
-            "i can not"
-        ]
-    },
-    {
-        "intent_id": 3,
-        "intent_name": null,
-        "sample_utterances": [
-            "What is the maximum amount I can withdraw from an ATM And how can I increase the amount of the maximum amount of money",
-            "Hello How much money can I withdraw at one time",
-            "I want to know the maximum amount that I can withdraw from my account",
-            "Hello, I would like to know what is the maximum withdrawal limit on my bank account",
-            "if Minecraft withdrawing the amount santa maria How can I withdraw door cards Olga how much can I take a referral and how much can I withdraw within 3"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "an atm",
-            "from an atm"
-        ]
-    },
-    {
-        "intent_id": 4,
-        "intent_name": null,
-        "sample_utterances": [
-            "get the balance in the current account",
-            "Hello, can you please see the balance on my account",
-            "Hello, I would like to know how much money I have left in my account",
-            "Good afternoon I would like to check my balance How much money do I have left in my account?",
-            "Good morning I would like to know how much is left on my current account Thank you very much"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my account",
-            "would like to"
-        ]
-    },
-    {
-        "intent_id": 5,
-        "intent_name": null,
-        "sample_utterances": [
-            "Hello, I'm calling about a new business loan. I wanted to ask a few questions and understand how your system works",
-            "who can I talk to about a business loan",
-            "everything happening to me new business loans",
-            "Hello, hello. I called you about business loans. The fact is that I have a new company and I need some new equipment, so to speak, and so on, so I would like to know now. Can I get a new business loan from you and what is generally needed for this",
-            "Good afternoon, I would like to consult about the loan I want to take a loan, respectively, this first loan is a certain amount with whom I could talk about this topic Thank you"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "business loan",
-            "a business loan"
-        ]
-    },
-    {
-        "intent_id": 6,
-        "intent_name": null,
-        "sample_utterances": [
-            "Hello, I have your bank card, but unfortunately it doesn’t work now. Could you help me",
-            "my card is not working my payment was declined What do I need to do",
-            "Hello, I am calling about problems with my credit card. And I'm trying to pay at the store on my birthday, my payment didn't go through. Could you check why my card is not working?",
-            "Why is my card not working",
-            "picture does not work i can use Why didn’t pay"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my card",
-            "you help me"
-        ]
-    },
-    {
-        "intent_id": 7,
-        "intent_name": null,
-        "sample_utterances": [
-            "Hello, I would like to deposit money into my account How can I put it transfer And what methods are possible in your bank",
-            "Please tell me how can I deposit money into my current account together thanks",
-            "Hello, I would like to know where the nearest branch is where I could deposit cash",
-            "Where can I put money into my account",
-            "How can I deposit money into my account"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my account",
-            "into my account"
-        ]
-    },
-    {
-        "intent_id": 8,
-        "intent_name": null,
-        "sample_utterances": [
-            "Tell me about direct debiting from my account what operations were carried out today",
-            "want to know more details about direct debit",
-            "Tell us about direct write-off",
-            "I do not need credit cards I just would like to Pay directly the balance every time you buy, you can tell me what are the conditions for direct exchange on my account",
-            "How direct debit works"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "would like",
-            "would like to"
-        ]
-    },
-    {
-        "intent_id": 9,
-        "intent_name": null,
-        "sample_utterances": [
-            "Good afternoon I would like to block my card",
-            "please block my card",
-            "please freeze my card urgently",
-            "I lost my card and want to freeze my account",
-            "set all transactions on my card freeze my card please block my card"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my card",
-            "block my card"
-        ]
-    },
-    {
-        "intent_id": 10,
-        "intent_name": null,
-        "sample_utterances": [
-            "what to pay sms-code",
-            "I am trying to make a payment, but some text messages come with confirmation of payment and it is not clear what to do with them Do I need to somehow answer them or something",
-            "Hello I want to make one purchase through the online bank And I have not received confirmation yet When can I receive it",
-            "I want to make a large payment and I am waiting for confirmation via SMS, it does not reach me Could you send me a confirmation code by SMS Thanks again",
-            "I want to pay for a purchase on the Internet But I do not receive an SMS with a confirmation code"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "to make",
-            "to make a"
-        ]
-    },
-    {
-        "intent_id": 11,
-        "intent_name": null,
-        "sample_utterances": [
-            "Congratulations, my partner and I would like to have a joint account How can I create a joint account and what documents need to be completed for this Thank you",
-            "how can i create a joint account can i have an account with my partner business application where application has options",
-            "What data is needed to create a joint account",
-            "Hello, I would like to open a joint account with my wife. Could you help me with this?",
-            "Good afternoon, and I have to open an account in your bank But I would also like to open a joint account How it works"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "a joint",
-            "a joint account"
-        ]
-    },
-    {
-        "intent_id": 12,
-        "intent_name": null,
-        "sample_utterances": [
-            "I would like to know about my recent transactions Could you please give me a complete list",
-            "Where can I see a list of my transactions",
-            "I would like to see my last transactions there is a payment I do not know",
-            "Show me information about all my payments for the last week",
-            "Hello. Can you provide me with a list of my last transactions. It seems to me from the payments that I have not made and I do not know"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "my last",
-            "would like to"
-        ]
-    },
-    {
-        "intent_id": 13,
-        "intent_name": null,
-        "sample_utterances": [
-            "and I received an invoice that I need to pay",
-            "I need to pay the invoice, tell me how to do it, how can I pay And the term of payment by my credit card And what other data do you need so that I can pay for this invoice And you need an address or just credit card information",
-            "bill payment",
-            "I would like to pay the bill",
-            "and I want to pay my bill by card"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "to pay",
-            "i need to"
-        ]
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "Hello hello I am a client of your bank I have your credit card I would like to know if it can be used abroad and Do I need to do anything at all in order to use it abroad If there are some extra there is some nasty fee for it",
+            "label": 0
+        },
+        {
+            "text": "I am going abroad Can I pay with my card abroad",
+            "label": 0
+        },
+        {
+            "text": "Your bank's miss card Can I pay her when I travel abroad",
+            "label": 0
+        },
+        {
+            "text": "I would like to know if I can pay with my card abroad",
+            "label": 0
+        },
+        {
+            "text": "Good morning next week I am leaving abroad what is the commission for withdrawing funds in Ugra",
+            "label": 0
+        },
+        {
+            "text": "I want to change my address I'm calling to change my address",
+            "label": 1
+        },
+        {
+            "text": "Hello, I have moved here to another apartment and in this regard, I would like to tell you a new address so that everything will be aptudey",
+            "label": 1
+        },
+        {
+            "text": "I need to change my address",
+            "label": 1
+        },
+        {
+            "text": "Good afternoon, registration address",
+            "label": 1
+        },
+        {
+            "text": "detailed directions download my Just like me MP3 320",
+            "label": 1
+        },
+        {
+            "text": "I can't log into my account and see the balance of my account",
+            "label": 2
+        },
+        {
+            "text": "Hello, the application does not load, now I cannot look at my bank account",
+            "label": 2
+        },
+        {
+            "text": "I cannot open the application I click on the icon and nothing happens I see the start screen and nothing is loaded",
+            "label": 2
+        },
+        {
+            "text": "the application does not load the balance of my new account how can i check the account",
+            "label": 2
+        },
+        {
+            "text": "when entering the application, it throws me out of it",
+            "label": 2
+        },
+        {
+            "text": "What is the maximum amount I can withdraw from an ATM And how can I increase the amount of the maximum amount of money",
+            "label": 3
+        },
+        {
+            "text": "Hello How much money can I withdraw at one time",
+            "label": 3
+        },
+        {
+            "text": "I want to know the maximum amount that I can withdraw from my account",
+            "label": 3
+        },
+        {
+            "text": "Hello, I would like to know what is the maximum withdrawal limit on my bank account",
+            "label": 3
+        },
+        {
+            "text": "if Minecraft withdrawing the amount santa maria How can I withdraw door cards Olga how much can I take a referral and how much can I withdraw within 3",
+            "label": 3
+        },
+        {
+            "text": "get the balance in the current account",
+            "label": 4
+        },
+        {
+            "text": "Hello, can you please see the balance on my account",
+            "label": 4
+        },
+        {
+            "text": "Hello, I would like to know how much money I have left in my account",
+            "label": 4
+        },
+        {
+            "text": "Good afternoon I would like to check my balance How much money do I have left in my account?",
+            "label": 4
+        },
+        {
+            "text": "Good morning I would like to know how much is left on my current account Thank you very much",
+            "label": 4
+        },
+        {
+            "text": "Hello, I'm calling about a new business loan. I wanted to ask a few questions and understand how your system works",
+            "label": 5
+        },
+        {
+            "text": "who can I talk to about a business loan",
+            "label": 5
+        },
+        {
+            "text": "everything happening to me new business loans",
+            "label": 5
+        },
+        {
+            "text": "Hello, hello. I called you about business loans. The fact is that I have a new company and I need some new equipment, so to speak, and so on, so I would like to know now. Can I get a new business loan from you and what is generally needed for this",
+            "label": 5
+        },
+        {
+            "text": "Good afternoon, I would like to consult about the loan I want to take a loan, respectively, this first loan is a certain amount with whom I could talk about this topic Thank you",
+            "label": 5
+        },
+        {
+            "text": "Hello, I have your bank card, but unfortunately it doesn’t work now. Could you help me",
+            "label": 6
+        },
+        {
+            "text": "my card is not working my payment was declined What do I need to do",
+            "label": 6
+        },
+        {
+            "text": "Hello, I am calling about problems with my credit card. And I'm trying to pay at the store on my birthday, my payment didn't go through. Could you check why my card is not working?",
+            "label": 6
+        },
+        {
+            "text": "Why is my card not working",
+            "label": 6
+        },
+        {
+            "text": "picture does not work i can use Why didn’t pay",
+            "label": 6
+        },
+        {
+            "text": "Hello, I would like to deposit money into my account How can I put it transfer And what methods are possible in your bank",
+            "label": 7
+        },
+        {
+            "text": "Please tell me how can I deposit money into my current account together thanks",
+            "label": 7
+        },
+        {
+            "text": "Hello, I would like to know where the nearest branch is where I could deposit cash",
+            "label": 7
+        },
+        {
+            "text": "Where can I put money into my account",
+            "label": 7
+        },
+        {
+            "text": "How can I deposit money into my account",
+            "label": 7
+        },
+        {
+            "text": "Tell me about direct debiting from my account what operations were carried out today",
+            "label": 8
+        },
+        {
+            "text": "want to know more details about direct debit",
+            "label": 8
+        },
+        {
+            "text": "Tell us about direct write-off",
+            "label": 8
+        },
+        {
+            "text": "I do not need credit cards I just would like to Pay directly the balance every time you buy, you can tell me what are the conditions for direct exchange on my account",
+            "label": 8
+        },
+        {
+            "text": "How direct debit works",
+            "label": 8
+        },
+        {
+            "text": "Good afternoon I would like to block my card",
+            "label": 9
+        },
+        {
+            "text": "please block my card",
+            "label": 9
+        },
+        {
+            "text": "please freeze my card urgently",
+            "label": 9
+        },
+        {
+            "text": "I lost my card and want to freeze my account",
+            "label": 9
+        },
+        {
+            "text": "set all transactions on my card freeze my card please block my card",
+            "label": 9
+        },
+        {
+            "text": "what to pay sms-code",
+            "label": 10
+        },
+        {
+            "text": "I am trying to make a payment, but some text messages come with confirmation of payment and it is not clear what to do with them Do I need to somehow answer them or something",
+            "label": 10
+        },
+        {
+            "text": "Hello I want to make one purchase through the online bank And I have not received confirmation yet When can I receive it",
+            "label": 10
+        },
+        {
+            "text": "I want to make a large payment and I am waiting for confirmation via SMS, it does not reach me Could you send me a confirmation code by SMS Thanks again",
+            "label": 10
+        },
+        {
+            "text": "I want to pay for a purchase on the Internet But I do not receive an SMS with a confirmation code",
+            "label": 10
+        },
+        {
+            "text": "Congratulations, my partner and I would like to have a joint account How can I create a joint account and what documents need to be completed for this Thank you",
+            "label": 11
+        },
+        {
+            "text": "how can i create a joint account can i have an account with my partner business application where application has options",
+            "label": 11
+        },
+        {
+            "text": "What data is needed to create a joint account",
+            "label": 11
+        },
+        {
+            "text": "Hello, I would like to open a joint account with my wife. Could you help me with this?",
+            "label": 11
+        },
+        {
+            "text": "Good afternoon, and I have to open an account in your bank But I would also like to open a joint account How it works",
+            "label": 11
+        },
+        {
+            "text": "I would like to know about my recent transactions Could you please give me a complete list",
+            "label": 12
+        },
+        {
+            "text": "Where can I see a list of my transactions",
+            "label": 12
+        },
+        {
+            "text": "I would like to see my last transactions there is a payment I do not know",
+            "label": 12
+        },
+        {
+            "text": "Show me information about all my payments for the last week",
+            "label": 12
+        },
+        {
+            "text": "Hello. Can you provide me with a list of my last transactions. It seems to me from the payments that I have not made and I do not know",
+            "label": 12
+        },
+        {
+            "text": "and I received an invoice that I need to pay",
+            "label": 13
+        },
+        {
+            "text": "I need to pay the invoice, tell me how to do it, how can I pay And the term of payment by my credit card And what other data do you need so that I can pay for this invoice And you need an address or just credit card information",
+            "label": 13
+        },
+        {
+            "text": "bill payment",
+            "label": 13
+        },
+        {
+            "text": "I would like to pay the bill",
+            "label": 13
+        },
+        {
+            "text": "and I want to pay my bill by card",
+            "label": 13
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my card",
+                "would like to"
+            ]
+        },
+        {
+            "id": 1,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "to change",
+                "to change my"
+            ]
+        },
+        {
+            "id": 2,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "the application",
+                "i can not"
+            ]
+        },
+        {
+            "id": 3,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "an atm",
+                "from an atm"
+            ]
+        },
+        {
+            "id": 4,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my account",
+                "would like to"
+            ]
+        },
+        {
+            "id": 5,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "business loan",
+                "a business loan"
+            ]
+        },
+        {
+            "id": 6,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my card",
+                "you help me"
+            ]
+        },
+        {
+            "id": 7,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my account",
+                "into my account"
+            ]
+        },
+        {
+            "id": 8,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "would like",
+                "would like to"
+            ]
+        },
+        {
+            "id": 9,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my card",
+                "block my card"
+            ]
+        },
+        {
+            "id": 10,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "to make",
+                "to make a"
+            ]
+        },
+        {
+            "id": 11,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "a joint",
+                "a joint account"
+            ]
+        },
+        {
+            "id": 12,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "my last",
+                "would like to"
+            ]
+        },
+        {
+            "id": 13,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "to pay",
+                "i need to"
+            ]
+        }
+    ]
+}

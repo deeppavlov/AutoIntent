@@ -1,1415 +1,1418 @@
-[
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "can you give me a moderately priced restaurant",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "vegetarian",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "what is the eagles address",
-        "labels": [
-            6,
-            10
-        ]
-    },
-    {
-        "utterance": "telephone",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "what area is it in",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "post code",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "thank you and good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "yes im looking for a traditional restaurant in the expensive price range",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "im trying to find a vegetarian restaurant and i dont care regarding the price range",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "i dont care",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "chesterton",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "does it have a television",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "hi im looking for a pub",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "what is the address phone number and postcode",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "and what is the address and phone number",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "may i have the address and prices",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "thank you goodbye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "number",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "im looking for a pub with and internet connection",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "price",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "price",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "restaurant",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "and whats the post code",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "i want to find a restaurant in kings hedges",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "i would like japanese food",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "yes i would like to know about a restaurant",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "any price range",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "a restaurant in kings hedges",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "no no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "uh what are some other eareas",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "i dont care",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "castle hill area",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "moderate",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "ya any part of the avenue is fine",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "im looking for a japanese restaurant",
-        "labels": [
-            6
-        ]
-    },
-    {
-        "utterance": "and what is the price of the venue",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "what is the type of food",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "ok what does it have a television",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "whats the phone number",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "uhm address",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "does it have internet connection",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "does it have a television",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "and the phone number",
-        "labels": [
-            10
-        ]
-    },
-    {
-        "utterance": "end of system audio no im looking for a seafood restaurant",
-        "labels": [
-            6,
-            7
-        ]
-    },
-    {
-        "utterance": "ok what is the address phone number and price",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "yes please",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "yeah lets have you got anything in the mediterranean food in the area",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "what about any other area",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "no particular venue",
-        "labels": [
-            6,
-            7
-        ]
-    },
-    {
-        "utterance": "whats the uh thank you and goodbye",
-        "labels": [
-            2,
-            12
-        ]
-    },
-    {
-        "utterance": "goodbye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "next type of food cherry hinton area",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "yeah hi uh i want to find an internet connection and must have a tv",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "breathing ok thank you goodbye",
-        "labels": [
-            2,
-            12
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "thank you goodbye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "can you select me another venue",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "next choice",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "ok thank you goodbye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "thank you good bye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "thank you goodbye",
-        "labels": [
-            2
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "how about indian",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "yes im looking for a moderately priced restaurant and it should be in the addenbrookes area",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "noise ah hi i am looking for an",
-        "labels": [
-            5
-        ]
-    },
-    {
-        "utterance": "no any part cheap food",
-        "labels": [
-            6,
-            7
-        ]
-    },
-    {
-        "utterance": "okay and uh",
-        "labels": [
-            0
-        ]
-    },
-    {
-        "utterance": "okay thank you goodbye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "thank you",
-        "labels": [
-            12
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "no thank you goodbye",
-        "labels": [
-            2,
-            12,
-            7
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "hi im looking for a pub having internet connection and have a tv",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "ah hi ah i am looking for a thia restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "ok thank you",
-        "labels": [
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "thank you",
-        "labels": [
-            12
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "yes i am",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "what about mediterranean",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "okay what is the",
-        "labels": [
-            0
-        ]
-    },
-    {
-        "utterance": "hi im looking for a mediterranean restaurant in the rosemary area",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "ok thank you what is the phone number and post code",
-        "labels": [
-            0,
-            12,
-            10
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "alright thank you good bye",
-        "labels": [
-            2,
-            12
-        ]
-    },
-    {
-        "utterance": "ok i need the phone number and the area",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "ok unintelligible",
-        "labels": [
-            0
-        ]
-    },
-    {
-        "utterance": "ok can i get an address phone number and post code please",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "ok and a",
-        "labels": [
-            0
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "yes i am looking for a restaurant",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "no i want the postcode",
-        "labels": [
-            7,
-            10
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "ok whats the address phone number and post code",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "breathing thank you good bye",
-        "labels": [
-            2,
-            12
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "yes i would like to know about a restaurant",
-        "labels": [
-            6,
-            1
-        ]
-    },
-    {
-        "utterance": "yes",
-        "labels": [
-            1
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "what else do you have",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "ok thank you goodbye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "is it in the cheap price range",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "no",
-        "labels": [
-            7
-        ]
-    },
-    {
-        "utterance": "ok can you get me the phone number and the what type of food unintelligible",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "is it in the kings hedge area",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "any other pubs",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "clicking thank you good bye",
-        "labels": [
-            2,
-            12
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "what about contemporary restaurant",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "hi im looking for a contemporary restaurant and is it should be free",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "ok and whats the phone number",
-        "labels": [
-            0,
-            10
-        ]
-    },
-    {
-        "utterance": "hi i am looking for an ex",
-        "labels": [
-            5
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "ok thank you good bye",
-        "labels": [
-            2,
-            0,
-            12
-        ]
-    },
-    {
-        "utterance": "is it located in addenbrookes area",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "is it in the city center jesus christ this is ridiculous",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "is it a chinese takeaway restaurant",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "is it burger gourmet",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "say again",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "is it cheap price range",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "um is it free",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "hello i am looking for cheap restaurant in addenbrookes area",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "ya hi ah i want to find a fusion restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "does the bakers have a television",
-        "labels": [
-            3,
-            10
-        ]
-    },
-    {
-        "utterance": "are there any other pubs",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "can we start again",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "hi im looking for cafe",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "ah does it have a moderate price range",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "pick a different area",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "breathing do you have anything in newnham area",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "is it located in the castlehill area",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "is it a thia restaurant",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "not spanish food not spanish food fast",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "are there any other options",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "is it in the addenbrookes area",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "how about castle hill",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "hi im looking for a fusion restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "is it in the city center",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "no is it in fenditton",
-        "labels": [
-            3,
-            7
-        ]
-    },
-    {
-        "utterance": "does it serve vegetarian food",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "ah what about asian food",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "is it in the cheap price range",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "what else do you have",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "do you have any others",
-        "labels": [
-            9
-        ]
-    },
-    {
-        "utterance": "is it in the trumington area",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "noise is it in the moderate price range",
-        "labels": [
-            3
-        ]
-    },
-    {
-        "utterance": "hi im looking for a fusion restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "how about the fenditton area",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "say again",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "hi im looking for a cheap restaurant in the fenditton area",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "hi im looking for a restaurant in fenditton",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "hi im looking for a cheap restaurant in the girton area",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "hello",
-        "labels": [
-            5
-        ]
-    },
-    {
-        "utterance": "any kind of food what about any kind of food",
-        "labels": [
-            6,
-            9
-        ]
-    },
-    {
-        "utterance": "hi im looking for an english restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "hello",
-        "labels": [
-            5
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "could you repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "hi im looking for a restaurant in fen ditton",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "hi im looking for a fusion restaurant",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "hi im looking for a restaurnt in the barnwell area",
-        "labels": [
-            5,
-            6
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "im sorry could you repeat that",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "could you repeat that please",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "uh cheap or moderate",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "search again",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "id like to start over please",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "i need a pub not bakers",
-        "labels": [
-            6,
-            4
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "repeat",
-        "labels": [
-            8
-        ]
-    },
-    {
-        "utterance": "i didnt ask for a moderate price range i need a pub with internet and tv",
-        "labels": [
-            6,
-            4
-        ]
-    },
-    {
-        "utterance": "may i restart",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "lets start over please",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "not so expensive price range",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "less expensive",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "um cheap cheap venue not indian",
-        "labels": [
-            6,
-            4
-        ]
-    },
-    {
-        "utterance": "can i start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "lets start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "lets not go to japan",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "start over",
-        "labels": [
-            11
-        ]
-    },
-    {
-        "utterance": "less expensive",
-        "labels": [
-            4
-        ]
-    },
-    {
-        "utterance": "not free moderate",
-        "labels": [
-            6,
-            4
-        ]
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "can you give me a moderately priced restaurant",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "vegetarian",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "what is the eagles address",
+            "label": [
+                6,
+                10
+            ]
+        },
+        {
+            "text": "telephone",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "what area is it in",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "post code",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "thank you and good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "yes im looking for a traditional restaurant in the expensive price range",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "im trying to find a vegetarian restaurant and i dont care regarding the price range",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "i dont care",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "chesterton",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "does it have a television",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "hi im looking for a pub",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "what is the address phone number and postcode",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "and what is the address and phone number",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "may i have the address and prices",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "thank you goodbye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "number",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "im looking for a pub with and internet connection",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "price",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "price",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "restaurant",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "and whats the post code",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "i want to find a restaurant in kings hedges",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "i would like japanese food",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "yes i would like to know about a restaurant",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "any price range",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "a restaurant in kings hedges",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "no no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "uh what are some other eareas",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "i dont care",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "castle hill area",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "moderate",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "ya any part of the avenue is fine",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "im looking for a japanese restaurant",
+            "label": [
+                6
+            ]
+        },
+        {
+            "text": "and what is the price of the venue",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "what is the type of food",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "ok what does it have a television",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "whats the phone number",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "uhm address",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "does it have internet connection",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "does it have a television",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "and the phone number",
+            "label": [
+                10
+            ]
+        },
+        {
+            "text": "end of system audio no im looking for a seafood restaurant",
+            "label": [
+                6,
+                7
+            ]
+        },
+        {
+            "text": "ok what is the address phone number and price",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "yes please",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "yeah lets have you got anything in the mediterranean food in the area",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "what about any other area",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "no particular venue",
+            "label": [
+                6,
+                7
+            ]
+        },
+        {
+            "text": "whats the uh thank you and goodbye",
+            "label": [
+                2,
+                12
+            ]
+        },
+        {
+            "text": "goodbye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "next type of food cherry hinton area",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "yeah hi uh i want to find an internet connection and must have a tv",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "breathing ok thank you goodbye",
+            "label": [
+                2,
+                12
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "thank you goodbye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "can you select me another venue",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "next choice",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "ok thank you goodbye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "thank you good bye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "thank you goodbye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "how about indian",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "yes im looking for a moderately priced restaurant and it should be in the addenbrookes area",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "noise ah hi i am looking for an",
+            "label": [
+                5
+            ]
+        },
+        {
+            "text": "no any part cheap food",
+            "label": [
+                6,
+                7
+            ]
+        },
+        {
+            "text": "okay and uh",
+            "label": [
+                0
+            ]
+        },
+        {
+            "text": "okay thank you goodbye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "thank you",
+            "label": [
+                12
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "no thank you goodbye",
+            "label": [
+                2,
+                12,
+                7
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "hi im looking for a pub having internet connection and have a tv",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "ah hi ah i am looking for a thia restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "ok thank you",
+            "label": [
+                0,
+                12
+            ]
+        },
+        {
+            "text": "thank you",
+            "label": [
+                12
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "yes i am",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "what about mediterranean",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "okay what is the",
+            "label": [
+                0
+            ]
+        },
+        {
+            "text": "hi im looking for a mediterranean restaurant in the rosemary area",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "ok thank you what is the phone number and post code",
+            "label": [
+                0,
+                12,
+                10
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "alright thank you good bye",
+            "label": [
+                2,
+                12
+            ]
+        },
+        {
+            "text": "ok i need the phone number and the area",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "ok unintelligible",
+            "label": [
+                0
+            ]
+        },
+        {
+            "text": "ok can i get an address phone number and post code please",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "ok and a",
+            "label": [
+                0
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "yes i am looking for a restaurant",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "no i want the postcode",
+            "label": [
+                7,
+                10
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "ok whats the address phone number and post code",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "breathing thank you good bye",
+            "label": [
+                2,
+                12
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "yes i would like to know about a restaurant",
+            "label": [
+                6,
+                1
+            ]
+        },
+        {
+            "text": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "what else do you have",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "ok thank you goodbye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "is it in the cheap price range",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "text": "ok can you get me the phone number and the what type of food unintelligible",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "is it in the kings hedge area",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "any other pubs",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "clicking thank you good bye",
+            "label": [
+                2,
+                12
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "what about contemporary restaurant",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "hi im looking for a contemporary restaurant and is it should be free",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "ok and whats the phone number",
+            "label": [
+                0,
+                10
+            ]
+        },
+        {
+            "text": "hi i am looking for an ex",
+            "label": [
+                5
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "ok thank you good bye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "text": "is it located in addenbrookes area",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "is it in the city center jesus christ this is ridiculous",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "is it a chinese takeaway restaurant",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "is it burger gourmet",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "say again",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "is it cheap price range",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "um is it free",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "hello i am looking for cheap restaurant in addenbrookes area",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "ya hi ah i want to find a fusion restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "does the bakers have a television",
+            "label": [
+                3,
+                10
+            ]
+        },
+        {
+            "text": "are there any other pubs",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "can we start again",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "hi im looking for cafe",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "ah does it have a moderate price range",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "pick a different area",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "breathing do you have anything in newnham area",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "is it located in the castlehill area",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "is it a thia restaurant",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "not spanish food not spanish food fast",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "are there any other options",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "is it in the addenbrookes area",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "how about castle hill",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "hi im looking for a fusion restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "is it in the city center",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "no is it in fenditton",
+            "label": [
+                3,
+                7
+            ]
+        },
+        {
+            "text": "does it serve vegetarian food",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "ah what about asian food",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "is it in the cheap price range",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "what else do you have",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "do you have any others",
+            "label": [
+                9
+            ]
+        },
+        {
+            "text": "is it in the trumington area",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "noise is it in the moderate price range",
+            "label": [
+                3
+            ]
+        },
+        {
+            "text": "hi im looking for a fusion restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "how about the fenditton area",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "say again",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "hi im looking for a cheap restaurant in the fenditton area",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "hi im looking for a restaurant in fenditton",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "hi im looking for a cheap restaurant in the girton area",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "hello",
+            "label": [
+                5
+            ]
+        },
+        {
+            "text": "any kind of food what about any kind of food",
+            "label": [
+                6,
+                9
+            ]
+        },
+        {
+            "text": "hi im looking for an english restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "hello",
+            "label": [
+                5
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "could you repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "hi im looking for a restaurant in fen ditton",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "hi im looking for a fusion restaurant",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "hi im looking for a restaurnt in the barnwell area",
+            "label": [
+                5,
+                6
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "im sorry could you repeat that",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "could you repeat that please",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "uh cheap or moderate",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "search again",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "id like to start over please",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "i need a pub not bakers",
+            "label": [
+                6,
+                4
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "repeat",
+            "label": [
+                8
+            ]
+        },
+        {
+            "text": "i didnt ask for a moderate price range i need a pub with internet and tv",
+            "label": [
+                6,
+                4
+            ]
+        },
+        {
+            "text": "may i restart",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "lets start over please",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "not so expensive price range",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "less expensive",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "um cheap cheap venue not indian",
+            "label": [
+                6,
+                4
+            ]
+        },
+        {
+            "text": "can i start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "lets start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "lets not go to japan",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "start over",
+            "label": [
+                11
+            ]
+        },
+        {
+            "text": "less expensive",
+            "label": [
+                4
+            ]
+        },
+        {
+            "text": "not free moderate",
+            "label": [
+                6,
+                4
+            ]
+        }
+    ],
+    "intents": []
+}
