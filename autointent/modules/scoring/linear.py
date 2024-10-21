@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import joblib
 import numpy as np
@@ -12,6 +12,11 @@ from sklearn.multioutput import MultiOutputClassifier
 from autointent import Context
 
 from .base import ScoringModule
+
+
+class LinearScorerDumpDict(TypedDict):
+    multilabel: bool
+    device: str
 
 
 class LinearScorer(ScoringModule):
@@ -30,6 +35,10 @@ class LinearScorer(ScoringModule):
         - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
     ```
     """
+
+    metadata_dict_name: str = "metadata.json"
+    classifier_file_name: str = "classifier.joblib"
+    embedding_model_subdir: str = "embedding_model"
 
     def __init__(self, cv: int = 3, n_jobs: int = -1) -> None:
         self.cv = cv
@@ -64,37 +73,37 @@ class LinearScorer(ScoringModule):
         del self._embedder
 
     def dump(self, path: str) -> None:
-        metadata = {
-            "multilabel": self._multilabel,
-            "device": str(self._embedder.device),
-        }
+        metadata = LinearScorerDumpDict(
+            multilabel=self._multilabel,
+            device=str(self._embedder.device),
+        )
 
         dump_dir = Path(path)
 
-        metadata_path = dump_dir / "metadata.json"
+        metadata_path = dump_dir / self.metadata_dict_name
         with metadata_path.open("w") as file:
             json.dump(metadata, file, indent=4)
 
         # dump sklearn model
-        clf_path = dump_dir / "classifier.joblib"
+        clf_path = dump_dir / self.classifier_file_name
         joblib.dump(self._clf, clf_path)
 
         # dump sentence transformer model
-        embedder_dir = str(dump_dir / "embedding_model")
+        embedder_dir = str(dump_dir / self.embedding_model_subdir)
         self._embedder.save(embedder_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata_path = dump_dir / "metadata.json"
+        metadata_path = dump_dir / self.metadata_dict_name
         with metadata_path.open() as file:
-            metadata = json.load(file)
+            metadata = LinearScorerDumpDict(**json.load(file))
         self._multilabel = metadata["multilabel"]
 
         # load sklearn model
-        clf_path = dump_dir / "classifier.joblib"
+        clf_path = dump_dir / self.classifier_file_name
         self._clf = joblib.load(clf_path)
 
         # load sentence transformer model
-        embedder_dir = str(dump_dir / "embedding_model")
+        embedder_dir = str(dump_dir / self.embedding_model_subdir)
         self._embedder = SentenceTransformer(embedder_dir, device=metadata["device"])

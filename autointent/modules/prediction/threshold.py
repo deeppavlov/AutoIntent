@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -14,7 +14,13 @@ from .base import PredictionModule, apply_tags
 logger = logging.getLogger(__name__)
 
 
+class ThresholdPredictorDumpMetadata(TypedDict):
+    multilabel: bool
+    tags: list[Tag]
+
+
 class ThresholdPredictor(PredictionModule):
+    metadata_dict_name: str = "metadata.json"
     multilabel: bool
     tags: list[Tag]
 
@@ -46,16 +52,16 @@ class ThresholdPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = {"multilabel": self.multilabel, "tags": self.tags}
+        metadata = ThresholdPredictorDumpMetadata(multilabel=self.multilabel, tags=self.tags)
 
-        with (dump_dir / "metadata.json").open("w") as file:
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
 
-        with (dump_dir / "metadata.json").open() as file:
-            metadata = json.load(file)
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata = ThresholdPredictorDumpMetadata(**json.load(file))
 
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]

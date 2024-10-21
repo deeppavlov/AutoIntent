@@ -2,7 +2,7 @@ import itertools as it
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -17,6 +17,13 @@ from .head_training import CrossEncoderWithLogreg
 logger = logging.getLogger(__name__)
 
 
+class DNNCScorerDumpMetadata(TypedDict):
+    device: str
+    db_dir: str
+    n_classes: int
+    biencoder_model: str
+
+
 class DNNCScorer(ScoringModule):
     """
     TODO:
@@ -25,6 +32,8 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
+    metadata_dict_name: str = "metadata.json"
+    crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
 
     def __init__(self, model_name: str, k: int, train_head: bool = False) -> None:
@@ -42,12 +51,12 @@ class DNNCScorer(ScoringModule):
             model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
             self.model = model
 
-        self.metadata = {
-            "device": context.device,
-            "db_dir": context.db_dir,
-            "n_classes": self.n_classes,
-            "biencoder_model": self.vector_index.model_name,
-        }
+        self.metadata = DNNCScorerDumpMetadata(
+            device=context.device,
+            db_dir=context.db_dir,
+            n_classes=self.n_classes,
+            biencoder_model=self.vector_index.model_name,
+        )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -116,23 +125,23 @@ class DNNCScorer(ScoringModule):
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
-        with (dump_dir / "metadata.json").open("w") as file:
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
 
-        crossencoder_dir = str(dump_dir / "crossencoder")
+        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         self.model.save(crossencoder_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
-        with (dump_dir / "metadata.json").open() as file:
-            self.metadata = json.load(file)
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            self.metadata = DNNCScorerDumpMetadata(**json.load(file))
 
         self.n_classes = self.metadata["n_classes"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
         self.vector_index = vector_index_client.get_index(self.metadata["biencoder_model"])
 
-        crossencoder_dir = str(dump_dir / "crossencoder")
+        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         if not self.train_head:
             self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
         else:

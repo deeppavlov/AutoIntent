@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -14,9 +14,15 @@ from .base import PredictionModule, get_prediction_evaluation_data
 default_search_space = np.linspace(0, 1, num=100)
 
 
+class JinoosPredictorDumpMetadata(TypedDict):
+    thresh: list[float]
+
+
 class JinoosPredictor(PredictionModule):
+    metadata_dict_name = "metadata.json"
+
     def __init__(self, search_space: list[float] | None = None) -> None:
-        self.search_space = search_space if search_space is not None else default_search_space
+        self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
     def fit(self, context: Context) -> None:
         """
@@ -48,16 +54,16 @@ class JinoosPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = {"thresh": self._thresh}
+        metadata = JinoosPredictorDumpMetadata(thresh=self._thresh.tolist())
 
-        with (dump_dir / "metadata.json").open("w") as file:
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
 
-        with (dump_dir / "metadata.json").open() as file:
-            metadata = json.load(file)
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata = JinoosPredictorDumpMetadata(**json.load(file))
 
         self._thresh = metadata["thresh"]
 
