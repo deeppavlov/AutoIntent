@@ -18,6 +18,7 @@ class OptimizationConfig:
     seed: int = 0
     log_level: LogLevel = LogLevel.ERROR
     multilabel_generation_config: str = ""
+    force_multilabel: bool = False
 
 
 cs = ConfigStore.instance()

@@ -10,7 +10,6 @@ class InferenceConfig:
     data_path: str
     source_dir: str
     output_path: str
-    seed: int = 0
     log_level: LogLevel = LogLevel.ERROR
 
 

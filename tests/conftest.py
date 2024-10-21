@@ -25,7 +25,7 @@ def setup_environment() -> tuple[str, str]:
 def load_clinc_subset():
     def _load_data(dataset_type: DATASET_TYPE) -> Dataset:
         dataset_path = ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")
-        return load_data(dataset_path, multilabel=False)
+        return load_data(dataset_path)
 
     return _load_data
 

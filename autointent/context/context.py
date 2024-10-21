@@ -17,6 +17,7 @@ class Context:
         seed: int,
         db_dir: str,
         dump_dir: str,
+        force_multilabel: bool = False
     ) -> None:
         self.data_handler = DataHandler(
             dataset,
@@ -24,6 +25,7 @@ class Context:
             multilabel_generation_config,
             regex_sampling,
             random_seed=seed,
+            force_multilabel=force_multilabel
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, db_dir)

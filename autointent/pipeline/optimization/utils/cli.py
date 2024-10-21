@@ -13,16 +13,20 @@ from autointent.context.data_handler import Dataset
 from .name import generate_name
 
 
-def load_data(data_path: str, multilabel: bool) -> Dataset | None:
+def load_data(data_path: str) -> Dataset | None:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
-    if data_path == "default":
-        data_name = "dstc3-20shot.json" if multilabel else "banking77.json"
-        with ires.files("autointent.datafiles").joinpath(data_name).open() as file:
-            return Dataset.model_validate(json.load(file))
+    if data_path == "default-multiclass":
+        with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
+            res = json.load(file)
+    elif data_path == "default-multilabel":
+        with ires.files("autointent.datafiles").joinpath("dstc3-20shot.json").open() as file:
+            res = json.load(file)
     elif data_path != "":
         with Path(data_path).open() as file:
-            return Dataset.model_validate(json.load(file))
-    return None
+            res = json.load(file)
+    else:
+        return None
+    return Dataset.model_validate(res)
 
 
 def get_run_name(run_name: str) -> str:
