@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent.context import Context
-from autointent.context.vector_index_client import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import WEIGHT_TYPES
 from autointent.modules.scoring.base import ScoringModule
 
@@ -24,8 +24,9 @@ class KNNScorerDumpMetadata(TypedDict):
 class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     metadata_dict_name: str = "metadata.json"
+    _vector_index: VectorIndex
 
-    def __init__(self, k: int, weights: WEIGHT_TYPES | bool) -> None:
+    def __init__(self, k: int, weights: WEIGHT_TYPES) -> None:
         """
         Arguments
         ---
@@ -37,10 +38,7 @@ class KNNScorer(ScoringModule):
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
         self.k = k
-        if isinstance(weights, bool):
-            weights = "distance" if weights else "uniform"
         self.weights = weights
-        self._vector_index = None
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
@@ -71,7 +69,7 @@ class KNNScorer(ScoringModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = KNNScorerDumpMetadata(**json.load(file))
+            self.metadata = json.load(file)
 
         self._n_classes = self.metadata["n_classes"]
         self._multilabel = self.metadata["multilabel"]

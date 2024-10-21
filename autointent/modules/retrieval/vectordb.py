@@ -3,17 +3,18 @@ from pathlib import Path
 
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.context.vector_index_client import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.metrics import RetrievalMetricFn
 
 from .base import RetrievalModule
 
 
 class VectorDBModule(RetrievalModule):
+    vector_index: VectorIndex
+
     def __init__(self, k: int, model_name: str) -> None:
         self.model_name = model_name
         self.k = k
-        self.vector_index = None
 
     def fit(self, context: Context) -> None:
         self.vector_index_client_kwargs = {
@@ -23,7 +24,7 @@ class VectorDBModule(RetrievalModule):
 
         self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:  # type: ignore[override]
+    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(
             context.data_handler.utterances_test,
             self.k,
@@ -49,7 +50,9 @@ class VectorDBModule(RetrievalModule):
         vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)
         self.vector_index = vector_index_client.get_index(self.model_name)
 
-    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+    def predict(
+        self, utterances: list[str]
+    ) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
         """
         return labels, distances and texts of retrieved nearest neighbors
         """

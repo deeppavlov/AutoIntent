@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule, get_prediction_evaluation_data
@@ -63,7 +64,7 @@ class JinoosPredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata = JinoosPredictorDumpMetadata(**json.load(file))
+            metadata: JinoosPredictorDumpMetadata = json.load(file)
 
         self._thresh = metadata["thresh"]
 
@@ -79,7 +80,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[int] | npt.NDArray[Any], y_pred: list[int] | npt.NDArray[Any]) -> float:
+def jinoos_score(y_true: list[LABEL_TYPE] | npt.NDArray[Any], y_pred: list[LABEL_TYPE] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 

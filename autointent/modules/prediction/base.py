@@ -20,7 +20,7 @@ class PredictionModule(Module, ABC):
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:  # type: ignore[override]
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)

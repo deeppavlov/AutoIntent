@@ -127,7 +127,7 @@ class MLKnnScorer(ScoringModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = MLKnnScorerDumpMetadata(**json.load(file))
+            self.metadata = json.load(file)
         self._n_classes = self.metadata["n_classes"]
 
         arrays = np.load(dump_dir / self.arrays_filename)

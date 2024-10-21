@@ -3,6 +3,8 @@ from functools import cached_property
 
 from pydantic import BaseModel
 
+from autointent.custom_types import LABEL_TYPE
+
 
 class UtteranceType(str, Enum):
     oos = "oos"
@@ -17,9 +19,9 @@ class DatasetType(str, Enum):
 
 class Utterance(BaseModel):
     text: str
-    label: int | list[int] | None = None
+    label: LABEL_TYPE | None = None
 
-    def one_hot_label(self, n_classes: int) -> list[int]:
+    def one_hot_label(self, n_classes: int) -> LABEL_TYPE:
         encoding = [0] * n_classes
         label = [self.label] if isinstance(self.label, int) else self.label
         if label is None:

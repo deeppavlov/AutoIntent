@@ -51,6 +51,7 @@ mypy = "^1"
 types-pyyaml = "^6.0.12.20240917"
 types-pygments = "^2.18.0.20240506"
 types-setuptools = "^75.2.0.20241019"
+joblib-stubs = "^1.4.2.5.20240918"
 
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
@@ -119,6 +120,7 @@ plugins = [
     "numpy.typing.mypy_plugin",
 ]
 mypy_path = "autointent"
+disable_error_code = ["override"]
 
 [[tool.mypy.overrides]]
 module = [

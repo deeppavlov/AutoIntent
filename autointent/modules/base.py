@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import Any
+
+import numpy.typing as npt
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
@@ -35,5 +38,5 @@ class Module(ABC):
         """load all data needed for inference"""
 
     @abstractmethod
-    def predict(self) -> None:
+    def predict(self, utterances_or_scores: list[str] | npt.NDArray[Any]) -> npt.NDArray[Any]:
         """inference"""

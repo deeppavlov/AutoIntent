@@ -1,5 +1,7 @@
 from typing import TypedDict
 
+from autointent.custom_types import LABEL_TYPE
+
 
 class IntentRecord(TypedDict):
     intent_id: int
@@ -9,4 +11,4 @@ class IntentRecord(TypedDict):
 
 class UtteranceRecord(TypedDict):
     utterance: str
-    labels: list[int] | tuple[int, ...]
+    labels: LABEL_TYPE | tuple[int, ...]

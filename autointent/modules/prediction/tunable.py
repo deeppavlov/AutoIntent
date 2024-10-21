@@ -68,7 +68,7 @@ class TunablePredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata = TunablePredictorDumpMetadata(**json.load(file))
+            metadata: TunablePredictorDumpMetadata = json.load(file)
 
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]

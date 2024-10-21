@@ -10,6 +10,7 @@ from sentence_transformers import CrossEncoder
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
+from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
@@ -105,7 +106,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[int]]) -> npt.NDArray[Any]:
+    def _build_result(self, scores: list[list[float]], labels: list[list[LABEL_TYPE]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---
@@ -134,7 +135,7 @@ class DNNCScorer(ScoringModule):
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = DNNCScorerDumpMetadata(**json.load(file))
+            self.metadata = json.load(file)
 
         self.n_classes = self.metadata["n_classes"]
 

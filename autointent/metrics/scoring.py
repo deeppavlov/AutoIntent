@@ -2,20 +2,17 @@ import logging
 from typing import Protocol
 
 import numpy as np
-import numpy.typing as npt
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
 from .converter import transform
+from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 logger = logging.getLogger(__name__)
 
-LABELS_VALUE_TYPE = list[int] | list[list[int]] | npt.NDArray[np.int64]
-PREDICTED_VALUE_TYPE = list[list[float]] | npt.NDArray[np.float64]
-
 
 class ScoringMetricFn(Protocol):
-    def __call__(self, labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+    def __call__(self, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
         """
         Arguments
         ---
@@ -27,7 +24,7 @@ class ScoringMetricFn(Protocol):
         ...
 
 
-def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
 
@@ -64,7 +61,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TY
     return res  # type: ignore[no-any-return]
 
 
-def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
 
@@ -83,7 +80,7 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> 
 
 
 def calculate_prediction_metric(
-    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE
+    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
 ) -> float:
     labels_, scores_ = transform(labels, scores)
 
@@ -97,35 +94,35 @@ def calculate_prediction_metric(
     return res
 
 
-def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_accuracy, labels, scores)
 
 
-def scoring_f1(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_f1, labels, scores)
 
 
-def scoring_precision(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_precision, labels, scores)
 
 
-def scoring_recall(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multiclass and multilabel
     """
     return calculate_prediction_metric(prediction_recall, labels, scores)
 
 
-def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multilabel
 
@@ -139,7 +136,7 @@ def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) ->
     return np.mean(is_in)  # type: ignore[no-any-return]
 
 
-def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multilabel
 
@@ -168,7 +165,7 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE
     return 1 - (coverage_error(labels, scores) - 1) / (n_classes - 1)  # type: ignore[no-any-return]
 
 
-def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multilabel
 
@@ -180,7 +177,7 @@ def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_
     return -label_ranking_loss(labels, scores)  # type: ignore[no-any-return]
 
 
-def scoring_map(labels: LABELS_VALUE_TYPE, scores: PREDICTED_VALUE_TYPE) -> float:
+def scoring_map(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     supports multilabel
 

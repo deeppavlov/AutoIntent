@@ -61,7 +61,7 @@ class ThresholdPredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata = ThresholdPredictorDumpMetadata(**json.load(file))
+            metadata: ThresholdPredictorDumpMetadata = json.load(file)
 
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]

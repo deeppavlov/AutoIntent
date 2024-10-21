@@ -7,34 +7,37 @@ import numpy as np
 import numpy.typing as npt
 from sentence_transformers import SentenceTransformer
 
+from autointent.custom_types import LABEL_TYPE
+
 
 class VectorIndex:
+    index: faiss.Index
+    embedding_model: SentenceTransformer
+
     def __init__(self, model_name: str, device: str) -> None:
         self.model_name = model_name
         self.device = device
-        self.index: None | faiss.Index = None
 
-        self.labels: list[int] | list[list[int]] = []  # (n_samples,) or (n_samples, n_classes)
+        self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
-        self.embedding_model: SentenceTransformer = None
 
-    def add(self, texts: list[str], labels: list[int] | list[list[int]]) -> None:
+    def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
         self.texts = texts
 
         embeddings = self.embed(texts)
 
-        if self.index is None:
+        if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)
-        self.labels.extend(labels)  # type: ignore[arg-type]
+        self.labels.extend(labels)
 
     def delete(self) -> None:
-        if self.index:
+        if hasattr(self, "index"):
             self.index.reset()
         self.labels = []
         self.texts = []
 
-        if self.embedding_model:
+        if hasattr(self, "embedding_model"):
             self.embedding_model.cpu()
             del self.embedding_model
 
@@ -60,17 +63,17 @@ class VectorIndex:
         return results
 
     def get_all_embeddings(self) -> npt.NDArray[Any]:
-        if self.index is None:
+        if not hasattr(self, "index"):
             msg = "Index is not created yet"
             raise ValueError(msg)
         return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
-    def get_all_labels(self) -> list[int] | list[list[int]]:
+    def get_all_labels(self) -> list[LABEL_TYPE]:
         return self.labels
 
     def query(
-        self, queries: list[str] | list[npt.NDArray[np.float32]], k: int
-    ) -> tuple[list[list[int] | list[list[int]]], list[list[float]], list[list[str]]]:
+        self, queries: list[str] | npt.NDArray[np.float32], k: int
+    ) -> tuple[list[list[LABEL_TYPE]], list[list[float]], list[list[str]]]:
         """
         Arguments
         ---
@@ -88,7 +91,7 @@ class VectorIndex:
         """
         func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
 
-        all_results = func(queries, k)
+        all_results = func(queries, k)  # type: ignore[arg-type]
 
         all_labels = [[self.labels[result["id"]] for result in results] for results in all_results]
         all_distances = [[result["distance"] for result in results] for results in all_results]
@@ -97,9 +100,9 @@ class VectorIndex:
         return all_labels, all_distances, all_texts
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
-        if self.embedding_model is None:
+        if not hasattr(self, "embedding_model"):
             self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
-        return self.embedding_model.encode(utterances, convert_to_numpy=True)
+        return self.embedding_model.encode(utterances, convert_to_numpy=True)  # type: ignore[return-value]
 
     def dump(self, dir_path: Path) -> None:
         dir_path.mkdir(parents=True, exist_ok=True)

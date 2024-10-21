@@ -7,21 +7,16 @@ from autointent.context.data_handler import DataHandler
 
 from .vector_index import VectorIndex
 
+DIRNAMES_TYPE = dict[str, str]
+
 
 class VectorIndexClient:
+    model_name: str
+
     def __init__(self, device: str, db_dir: str) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = Path(db_dir)
-        self.model_name = None
-
-    def set_best_embedder_name(self, model_name: str) -> None:
-        if model_name not in self.indexes:
-            msg = f"model {model_name} wasn't created before"
-            self._logger.error(msg)
-            raise ValueError(msg)
-
-        self.model_name = model_name
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         """
@@ -40,7 +35,7 @@ class VectorIndexClient:
         path = self.db_dir / "indexes_dirnames.json"
         if path.exists():
             with path.open() as file:
-                indexes_dirnames = json.load(file)
+                indexes_dirnames: DIRNAMES_TYPE = json.load(file)
         else:
             indexes_dirnames = {}
         indexes_dirnames[model_name] = dir_name
@@ -51,7 +46,7 @@ class VectorIndexClient:
         """remove and return dirname if vector index exists, otherwise return None"""
         path = self.db_dir / "indexes_dirnames.json"
         with path.open() as file:
-            indexes_dirnames = json.load(file)
+            indexes_dirnames: DIRNAMES_TYPE = json.load(file)
         dir_name = indexes_dirnames.pop(model_name, None)
         with path.open("w") as file:
             json.dump(indexes_dirnames, file, indent=4)
@@ -61,8 +56,11 @@ class VectorIndexClient:
         """return dirname if vector index exists, otherwise return None"""
         path = self.db_dir / "indexes_dirnames.json"
         with path.open() as file:
-            indexes_dirnames = json.load(file)
-        return self.db_dir / indexes_dirnames.get(model_name, None)
+            indexes_dirnames: DIRNAMES_TYPE = json.load(file)
+        dirname = indexes_dirnames.get(model_name, None)
+        if dirname is None:
+            return None
+        return self.db_dir / dirname
 
     def _get_dump_dirpath(self, model_name: str) -> Path:
         dir_name = model_name.replace("/", "-")

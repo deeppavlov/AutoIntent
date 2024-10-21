@@ -130,7 +130,9 @@ def main(cfg: OptimizationConfig) -> None:
 
     # create shared objects for a whole pipeline
     context = Context(
-        load_data(cfg.dataset_path, multilabel=False),
+        load_data(  # type: ignore[arg-type]
+            cfg.dataset_path, multilabel=False
+        ),
         load_data(cfg.test_path, multilabel=True),
         cfg.device,
         cfg.multilabel_generation_config,

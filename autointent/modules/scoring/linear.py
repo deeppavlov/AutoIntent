@@ -97,7 +97,7 @@ class LinearScorer(ScoringModule):
 
         metadata_path = dump_dir / self.metadata_dict_name
         with metadata_path.open() as file:
-            metadata = LinearScorerDumpDict(**json.load(file))
+            metadata: LinearScorerDumpDict = json.load(file)
         self._multilabel = metadata["multilabel"]
 
         # load sklearn model

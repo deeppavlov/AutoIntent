@@ -22,6 +22,8 @@ import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 
+from autointent.custom_types import LABEL_TYPE
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,7 +80,7 @@ class CrossEncoderWithLogreg:
 
         return np.concatenate(logits_list, axis=0)
 
-    def _fit(self, pairs: list[list[str]], labels: list[int]) -> None:
+    def _fit(self, pairs: list[list[str]], labels: list[LABEL_TYPE]) -> None:
         """
         Arguments
         ---
@@ -98,7 +100,7 @@ class CrossEncoderWithLogreg:
 
         self._clf = clf
 
-    def fit(self, utterances: list[str], labels: list[int]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         """
         Construct train samples for binary classifier over cross-encoder features
 
@@ -116,7 +118,7 @@ class CrossEncoderWithLogreg:
         """
         features = self.get_features(pairs)
 
-        return self._clf.predict_proba(features)[:, 1]
+        return self._clf.predict_proba(features)[:, 1]  # type: ignore[no-any-return]
 
     def save(self, path: str) -> None:
         dump_dir = Path(path)
@@ -131,7 +133,7 @@ class CrossEncoderWithLogreg:
         self._clf = clf
 
     @classmethod
-    def load(cls, path: str) -> CrossEncoderType:
+    def load(cls, path: str) -> "CrossEncoderWithLogreg":
         dump_dir = Path(path)
 
         # load sklearn model

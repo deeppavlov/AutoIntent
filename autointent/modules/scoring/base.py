@@ -11,7 +11,7 @@ from autointent.modules.base import Module
 
 
 class ScoringModule(Module):
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:  # type: ignore[override]
+    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
         """
         Return
         ---
