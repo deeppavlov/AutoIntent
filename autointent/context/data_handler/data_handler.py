@@ -25,7 +25,7 @@ class DataHandler:
         self,
         dataset: Dataset,
         test_dataset: Dataset | None = None,
-        multilabel_generation_config: str = "",
+        multilabel_generation_config: str | None = None,
         regex_sampling: int = 0,
         force_multilabel: bool = False,
         random_seed: int = 0,

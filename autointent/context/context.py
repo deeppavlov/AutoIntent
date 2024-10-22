@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from pathlib import Path
 from typing import Any
 
 from .data_handler import DataHandler, Dataset
@@ -10,13 +11,13 @@ class Context:
     def __init__(
         self,
         dataset: Dataset,
-        test_dataset: Dataset | None,
-        device: str,
-        multilabel_generation_config: str,
-        regex_sampling: int,
-        seed: int,
-        db_dir: str,
-        dump_dir: str,
+        test_dataset: Dataset | None = None,
+        device: str = "cpu",
+        multilabel_generation_config: str | None = None,
+        regex_sampling: int = 0,
+        seed: int = 42,
+        db_dir: str | Path | None = None,
+        dump_dir: str | Path | None = None,
         force_multilabel: bool = False,
     ) -> None:
         self.data_handler = DataHandler(

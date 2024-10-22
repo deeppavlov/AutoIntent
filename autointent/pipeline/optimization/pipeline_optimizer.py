@@ -29,7 +29,7 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def dump(self, logs_dir: Path) -> None:
+    def dump(self, logs_dir: Path | None = None) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump_evaluation_results()
 

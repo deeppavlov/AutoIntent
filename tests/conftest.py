@@ -17,8 +17,10 @@ def setup_environment() -> tuple[str, str]:
     setup_logging("DEBUG")
     uuid = uuid4()
     run_name = get_run_name(str(uuid))
-    db_dir = get_db_dir("", run_name)
-    return run_name, db_dir
+    logs_dir = pathlib.Path.cwd() / "tests_logs"
+    db_dir = get_db_dir(run_name, logs_dir / "db")
+    dump_dir = logs_dir / "modules_dump"
+    return run_name, db_dir, dump_dir, logs_dir
 
 
 @pytest.fixture
@@ -31,8 +33,8 @@ def load_clinc_subset():
 
 
 @pytest.fixture
-def context(load_clinc_subset, dump_dir, setup_environment):
-    run_name, db_dir = setup_environment
+def context(load_clinc_subset, setup_environment):
+    run_name, db_dir, dump_dir, logs_dir = setup_environment
 
     def _get_context(dataset_type: DATASET_TYPE) -> Context:
         return Context(
@@ -56,13 +58,3 @@ def get_config():
         return load_config(str(config_path), multilabel=dataset_type == "multilabel")
 
     return _get_config
-
-
-@pytest.fixture
-def logs_dir() -> pathlib.Path:
-    return pathlib.Path.cwd() / "tests_logs"
-
-
-@pytest.fixture
-def dump_dir(logs_dir) -> str:
-    return str(logs_dir / "module_dumps")

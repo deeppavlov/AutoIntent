@@ -1,5 +1,4 @@
 import json
-import os
 import shutil
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -50,18 +49,17 @@ def add_cache_directory(directory: str) -> None:
     write_chroma_config(chroma_config)
 
 
-def get_db_dir(db_dir: str, run_name: str) -> str:
+def get_db_dir(run_name: str, db_dir: Path | None = None) -> Path:
     """
     Get the directory path for chroma db file.
     Use default cache dir if not provided.
     Save path into user config in order to remove it from cache later.
     """
 
-    if db_dir == "":
-        cache_dir = get_chroma_cache_dir()
-        db_dir = os.path.join(cache_dir, run_name)  # noqa: PTH118
+    if db_dir is None:
+        db_dir = get_chroma_cache_dir() / run_name
 
-    Path(db_dir).mkdir(parents=True)
+    db_dir.mkdir(parents=True, exist_ok=True)
     add_cache_directory(db_dir)
 
     return db_dir

@@ -13,7 +13,7 @@ from autointent.context.data_handler import Dataset
 from .name import generate_name
 
 
-def load_data(data_path: str) -> Dataset | None:
+def load_data(data_path: str) -> Dataset:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default-multiclass":
         with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
@@ -21,11 +21,10 @@ def load_data(data_path: str) -> Dataset | None:
     elif data_path == "default-multilabel":
         with ires.files("autointent.datafiles").joinpath("dstc3-20shot.json").open() as file:
             res = json.load(file)
-    elif data_path != "":
+    else:
         with Path(data_path).open() as file:
             res = json.load(file)
-    else:
-        return None
+
     return Dataset.model_validate(res)
 
 
@@ -35,9 +34,10 @@ def get_run_name(run_name: str) -> str:
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
 
-def get_logs_dir(logs_dir: str, run_name: str) -> Path:
-    logs_dir_ = Path.cwd() if logs_dir == "" else Path(logs_dir)
-    res = logs_dir_ / run_name
+def get_logs_dir(run_name: str, logs_dir: Path | None = None) -> Path:
+    if logs_dir is None:
+        logs_dir = Path.cwd()
+    res = logs_dir / run_name
     res.mkdir(parents=True)
     return res
 

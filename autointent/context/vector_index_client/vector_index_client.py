@@ -13,10 +13,10 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str) -> None:
+    def __init__(self, device: str = "cpu", db_dir: str | Path | None = None) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.db_dir = Path(db_dir)
+        self.db_dir = Path.cwd() if db_dir is None else Path(db_dir)
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         """
