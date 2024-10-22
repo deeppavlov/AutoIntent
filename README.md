@@ -131,13 +131,6 @@ log_level    String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
 {
     "intent_id": 0,
     "intent_name": "activate_my_card",
-    "sample_utterances": [
-        "Please help me with my card.  It won't activate.",
-        "I tired but an unable to activate my card.",
-        "I want to start using my card.",
-        "How do I verify my new card?",
-        "I tried activating my plug-in and it didn't piece of work"
-    ],
     "regexp_full_match": [
         "(alexa ){0,1}are we having a communication problem",
         "(alexa ){0,1}i don't think you understand",
@@ -153,9 +146,50 @@ log_level    String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
 Расшифровка полей:
 - `intent_id` метка класса (пока что поддерживается только консистентная разметка 0..N)
 - `intent_name` опциональный параметр
-- `sample_utterances` список реплик представителей данного класса
 - `regexp_full_match` грамматика, описывающая представителей данного класса (используется затем в связке с `re.fullmatch(pattern, text)`)
 - `regexp_partial_match` грамматика, описывающая только часть представителей данного класса (используется затем в связке с `re.match(pattern, text)`)
+
+Если есть примеры фраз, то стоит собрать их в другой словарик:
+```
+"utterances": [
+    {
+        "text": "I tried activating my plug-in and it didn't piece of work",
+        "label": 0
+    },
+    {
+        "text": "I want to open an account for my children",
+        "label": 1
+    },
+    {
+        "text": "How old do you need to be to use the banks services?",
+        "label": 1
+    },
+    ...
+]
+```
+
+Если одна фраза может содержать несколько лейблов, то так:
+```
+"utterances": [
+    {
+        "text": "can you please give me the address and the postcode",
+        "label": [
+            10
+        ]
+    },
+    {
+        "text": "alright thank you goodbye",
+        "label": [
+            2,
+            12
+        ]
+    },
+    ...
+]
+```
+
+Если у фраза относится к разряду out-of-scope, то поле label не нужно указывать.
+
 
 ### Multilabel
 
