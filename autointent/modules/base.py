@@ -5,6 +5,7 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent.context import Context
+from autointent.context.data_handler import Tag
 from autointent.context.optimization_info.data_models import Artifact
 from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import METRIC_FN
@@ -12,7 +13,7 @@ from autointent.metrics import METRIC_FN
 
 class Module(ABC):
     @abstractmethod
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
         pass
 
     @abstractmethod

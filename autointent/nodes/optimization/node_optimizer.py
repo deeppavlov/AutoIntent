@@ -7,6 +7,7 @@ from typing import Any
 
 import torch
 from hydra.utils import instantiate
+from typing_extensions import Self
 
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.context import Context
@@ -23,7 +24,7 @@ class NodeOptimizer:
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> "NodeOptimizer":
+    def from_dict_config(cls, config: dict[str, Any]) -> Self:
         return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def fit(self, context: Context) -> None:

@@ -4,10 +4,12 @@ from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import Self
 
 from autointent.context import Context
+from autointent.context.data_handler import Tag
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
-from autointent.custom_types import WEIGHT_TYPES
+from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES
 from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
@@ -25,7 +27,16 @@ class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
 
-    def __init__(self, k: int, weights: WEIGHT_TYPES) -> None:
+    def __init__(
+        self,
+        model_name: str,
+        k: int,
+        weights: WEIGHT_TYPES,
+        n_classes: int,
+        multilabel: bool,
+        db_dir: str | None = None,
+        device: str | None = None,
+    ) -> None:
         """
         Arguments
         ---
@@ -36,25 +47,48 @@ class KNNScorer(ScoringModule):
             - closest: each sample has a non zero weight iff is the closest sample of some class
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
+        self.model_name = model_name
         self.k = k
         self.weights = weights
+        self.n_classes = n_classes
+        self.multilabel = multilabel
+        self.db_dir = db_dir
+        self.device = device
 
-    def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
-        self._vector_index = context.get_best_index()
-        self._n_classes = context.n_classes
+    @classmethod
+    def from_context(
+        cls,
+        context: Context,
+        k: int = 3,
+        weights: WEIGHT_TYPES = "distance",
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+    ) -> Self:
+        return cls(
+            model_name=model_name,
+            k=k,
+            weights=weights,
+            n_classes=context.n_classes,
+            multilabel=context.multilabel,
+            db_dir=context.db_dir,
+            device=context.device,
+        )
+
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index = vector_index_client.get_or_create_index(self.model_name)
+        vector_index.add(utterances, labels)
 
         self.metadata = KNNScorerDumpMetadata(
-            device=context.device,
-            db_dir=context.db_dir,
-            n_classes=self._n_classes,
-            multilabel=self._multilabel,
+            device=self.device,
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            multilabel=self.multilabel,
             model_name=self._vector_index.model_name,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         labels, distances, _ = self._vector_index.query(utterances, self.k)
-        return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
+        return apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
 
     def clear_cache(self) -> None:
         self._vector_index.delete()
@@ -70,8 +104,8 @@ class KNNScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata = json.load(file)
 
-        self._n_classes = self.metadata["n_classes"]
-        self._multilabel = self.metadata["multilabel"]
+        self.n_classes = self.metadata["n_classes"]
+        self.multilabel = self.metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
         self._vector_index = vector_index_client.get_index(self.metadata["model_name"])

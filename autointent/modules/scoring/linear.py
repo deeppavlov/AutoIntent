@@ -11,6 +11,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from typing_extensions import Self
 
 from autointent.context import Context
+from autointent.context.data_handler import Tag
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 
@@ -67,15 +68,15 @@ class LinearScorer(ScoringModule):
         n_jobs: int = -1,
     ) -> Self:
         return cls(
-            db_dir=context.db_dir,
             model_name=model_name,
+            db_dir=context.db_dir,
             cv=cv,
             n_jobs=n_jobs,
             device=context.device,
             seed=context.seed,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
         self._multilabel = isinstance(labels[0], list)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
