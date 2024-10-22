@@ -4,6 +4,7 @@ from pathlib import Path
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import RetrievalMetricFn
 
 from .base import RetrievalModule
@@ -12,17 +13,25 @@ from .base import RetrievalModule
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
-    def __init__(self, k: int, model_name: str) -> None:
+    def __init__(self, k: int, model_name: str, device: str = "cpu", db_dir: str = ".") -> None:
         self.model_name = model_name
         self.k = k
+        self.device = device
+        self.db_dir = db_dir
 
-    def fit(self, context: Context) -> None:
+    def configure_optimization(self, context: Context) -> None:
+        """extract some info from context that is useful for node optimization"""
+        self.device = context.device
+        self.db_dir = context.db_dir
+
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         self.vector_index_client_kwargs = {
-            "device": context.device,
-            "db_dir": context.db_dir,
+            "device": self.device,
+            "db_dir": self.db_dir,
         }
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
-        self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
+        self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(

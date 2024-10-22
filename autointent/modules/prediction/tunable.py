@@ -1,5 +1,4 @@
 import json
-import logging
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -9,10 +8,11 @@ import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
-from autointent import Context
+from autointent.context import Context
 from autointent.context.data_handler.tags import Tag
+from autointent.custom_types import LABEL_TYPE
 
-from .base import PredictionModule, get_prediction_evaluation_data
+from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
 
 
@@ -25,28 +25,28 @@ class TunablePredictorDumpMetadata(TypedDict):
 class TunablePredictor(PredictionModule):
     metadata_dict_name: str = "metadata.json"
 
-    def __init__(self, n_trials: int | None = None) -> None:
+    def __init__(self, n_trials: int | None = None, seed: int = 0) -> None:
         self.n_trials = n_trials
+        self.seed = seed
 
-    def fit(self, context: Context) -> None:
-        self.tags = context.data_handler.tags
-        self.multilabel = context.multilabel
+    def configure_optimization(self, context: Context) -> None:
+        self.seed = context.seed
 
-        if not context.data_handler.has_oos_samples():
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                "Your data doesn't contain out-of-scope utterances."
-                "Using TunablePredictor imposes unnecessary computational overhead."
-            )
+    def fit(self, scores: npt.NDArray[np.float32], labels: list[LABEL_TYPE], tags: list[Tag]) -> None:
+        """
+        When data doesn't contain out-of-scope utterances, using
+        TunablePredictor imposes unnecessary computational overhead.
+        """
+        self.tags = tags
+        self.multilabel = isinstance(labels[0], list)
+        n_classes = len(labels[0]) if self.multilabel else len(set(labels).difference([-1]))
 
-        thresh_optimizer = ThreshOptimizer(
-            n_classes=context.n_classes, multilabel=context.multilabel, n_trials=self.n_trials
-        )
-        labels, scores = get_prediction_evaluation_data(context)
+        thresh_optimizer = ThreshOptimizer(n_classes=n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
+
         thresh_optimizer.fit(
             probas=scores,
             labels=labels,
-            seed=context.seed,
+            seed=self.seed,
             tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds

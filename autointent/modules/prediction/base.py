@@ -7,6 +7,7 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.context.optimization_info import PredictorArtifact
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
@@ -34,7 +35,7 @@ class PredictionModule(Module, ABC):
 
 def get_prediction_evaluation_data(
     context: Context,
-) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+) -> tuple[list[LABEL_TYPE], npt.NDArray[Any]]:
     labels = context.data_handler.labels_test
     scores = context.optimization_info.get_best_test_scores()
 
@@ -44,7 +45,7 @@ def get_prediction_evaluation_data(
         labels = np.concatenate([np.array(labels), np.array(oos_labels)])
         scores = np.concatenate([scores, oos_scores])
 
-    return labels, scores  # type: ignore[return-value]
+    return labels.tolist(), scores  # type: ignore[return-value]
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:

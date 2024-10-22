@@ -22,14 +22,16 @@ class VectorIndex:
         self.texts: list[str] = []
 
     def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
-        self.texts = texts
-
         embeddings = self.embed(texts)
 
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)
         self.labels.extend(labels)
+        self.texts.extend(texts)
+
+    def is_empty(self) -> bool:
+        return len(self.labels) == 0
 
     def delete(self) -> None:
         if hasattr(self, "index"):

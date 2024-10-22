@@ -3,7 +3,7 @@ import logging
 import shutil
 from pathlib import Path
 
-from autointent.context.data_handler import DataHandler
+from autointent.custom_types import LABEL_TYPE
 
 from .vector_index import VectorIndex
 
@@ -18,16 +18,19 @@ class VectorIndexClient:
         self.device = device
         self.db_dir = Path(db_dir)
 
-    def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
+    def create_index(
+        self, model_name: str, utterances: list[str] | None = None, labels: list[LABEL_TYPE] | None = None
+    ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
         """
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device)
-        index.add(data_handler.utterances_train, data_handler.labels_train)
 
-        index.dump(self._get_dump_dirpath(model_name))
+        if utterances is not None and labels is not None:
+            index.add(utterances, labels)
+            index.dump(self._get_dump_dirpath(model_name))
 
         return index
 
@@ -63,6 +66,8 @@ class VectorIndexClient:
         return self.db_dir / dirname
 
     def _get_dump_dirpath(self, model_name: str) -> Path:
+        if not self.db_dir.exists():
+            self.db_dir.mkdir(parents=True, exist_ok=True)
         dir_name = model_name.replace("/", "-")
         self._add_index_dirname(model_name, dir_name)
         return self.db_dir / dir_name
@@ -80,6 +85,19 @@ class VectorIndexClient:
             index.load(dirpath)
             return index
 
-        msg = f"index for {model_name} wasn't ever createds"
+        msg = f"index for {model_name} wasn't ever created"
         self._logger.error(msg)
-        raise ValueError(msg)
+        raise NonExistentIndexError(msg)
+
+    def get_or_create_index(self, model_name: str) -> VectorIndex:
+        try:
+            res = self.get_index(model_name)
+        except NonExistentIndexError:
+            res = self.create_index(model_name)
+        return res
+
+
+class NonExistentIndexError(Exception):
+    def __init__(self, message: str = "non-existent index was requested") -> None:
+        self.message = message
+        super().__init__(message)

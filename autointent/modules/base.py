@@ -10,6 +10,10 @@ from autointent.metrics import METRIC_FN
 
 class Module(ABC):
     @abstractmethod
+    def configure_optimization(self, context: Context) -> None:
+        """extract some info from context that is useful for node optimization"""
+
+    @abstractmethod
     def fit(self, context: Context) -> None:
         pass
 

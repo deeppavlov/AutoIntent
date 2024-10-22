@@ -10,6 +10,8 @@ from hydra.utils import instantiate
 
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.context import Context
+from autointent.modules import Module
+from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
 
 
@@ -35,9 +37,10 @@ class NodeOptimizer:
 
                 self._logger.debug("initializing %s module...", module_type)
                 module = self.node_info.modules_available[module_type](**module_kwargs)
+                module.configure_optimization(context)
 
                 self._logger.debug("optimizing %s module...", module_type)
-                module.fit(context)
+                self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_type)
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
@@ -66,3 +69,15 @@ class NodeOptimizer:
         dump_dir_ = Path(dump_dir) / self.node_info.node_type / module_type / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
+
+    def module_fit(self, module: Module, context: Context) -> None:
+        if self.node_info.node_type in ["retrieval", "scoring"]:
+            args = (context.data_handler.utterances_train, context.data_handler.labels_train)
+        elif self.node_info.node_type == "prediction":
+            labels, scores = get_prediction_evaluation_data(context)
+            args = (scores, labels, context.data_handler.tags)
+        else:
+            msg = "something's wrong"
+            self._logger(msg)
+            raise ValueError(msg)
+        module.fit(*args)
