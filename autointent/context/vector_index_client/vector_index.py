@@ -14,9 +14,10 @@ class VectorIndex:
     index: faiss.Index
     embedding_model: SentenceTransformer
 
-    def __init__(self, model_name: str, device: str) -> None:
+    def __init__(self, model_name: str, device: str, embedder_batch_size: int = 1) -> None:
         self.model_name = model_name
         self.device = device
+        self.embedder_batch_size = embedder_batch_size
 
         self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
@@ -42,7 +43,7 @@ class VectorIndex:
             del self.embedding_model
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
-        query_embedding: npt.NDArray[np.float64] = self.embedding_model.encode(texts, convert_to_numpy=True)  # type: ignore[assignment]
+        query_embedding: npt.NDArray[np.float64] = self.embed(texts)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
@@ -102,13 +103,16 @@ class VectorIndex:
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         if not hasattr(self, "embedding_model"):
             self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
-        return self.embedding_model.encode(utterances, convert_to_numpy=True)  # type: ignore[return-value]
+        return self.embedding_model.encode(utterances, convert_to_numpy=True, batch_size=self.embedder_batch_size)  # type: ignore[return-value]
+
+    def save_embedder(self, path: Path) -> None:
+        self.embedding_model.save(str(path))
 
     def dump(self, dir_path: Path) -> None:
         dir_path.mkdir(parents=True, exist_ok=True)
         self.dump_dir = dir_path
         faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
-        self.embedding_model.save(str(self.dump_dir / "embedding_model"))
+        self.save_embedder(self.dump_dir / "embedding_model")
         with (self.dump_dir / "texts.txt").open("w") as file:
             json.dump(self.texts, file, indent=4, ensure_ascii=False)
         with (self.dump_dir / "labels.txt").open("w") as file:

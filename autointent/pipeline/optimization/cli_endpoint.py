@@ -36,6 +36,7 @@ def main(cfg: OptimizationConfig) -> None:
         db_dir,
         dump_dir,
         cfg.force_multilabel,
+        cfg.embedder_batch_size,
     )
 
     # run optimization

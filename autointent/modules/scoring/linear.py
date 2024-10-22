@@ -59,18 +59,20 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._embedder = vector_index.embedding_model
+        self._embedder = vector_index
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        features = self._embedder.encode(utterances)
+        features = self._embedder.embed(utterances)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self._embedder.cpu()
-        del self._embedder
+        pass
+        # it doesn't look like a good idea to try and delete someone's internal attribute
+        # self._embedder.cpu()
+        # del self._embedder
 
     def dump(self, path: str) -> None:
         metadata = LinearScorerDumpDict(
@@ -89,8 +91,7 @@ class LinearScorer(ScoringModule):
         joblib.dump(self._clf, clf_path)
 
         # dump sentence transformer model
-        embedder_dir = str(dump_dir / self.embedding_model_subdir)
-        self._embedder.save(embedder_dir)
+        self._embedder.save_embedder(dump_dir / self.embedding_model_subdir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)

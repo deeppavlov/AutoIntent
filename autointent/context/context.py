@@ -18,6 +18,7 @@ class Context:
         db_dir: str,
         dump_dir: str,
         force_multilabel: bool = False,
+        embedder_batch_size: int = 1,
     ) -> None:
         self.data_handler = DataHandler(
             dataset,
@@ -28,7 +29,7 @@ class Context:
             force_multilabel=force_multilabel,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(device, db_dir)
+        self.vector_index_client = VectorIndexClient(device, db_dir, embedder_batch_size)
 
         self.device = device
         self.multilabel = self.data_handler.multilabel
