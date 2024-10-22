@@ -8,6 +8,7 @@ import numpy.typing as npt
 from sentence_transformers import SentenceTransformer
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
+from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndexClient
@@ -38,18 +39,17 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    metadata_dict_name: str = "metadata.json"
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
 
     def __init__(
         self,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        db_dir: str = "vector_index",
         cv: int = 3,
         n_jobs: int = -1,
-        device: str = "cpu",
-        db_dir: str = ".",
+        device: str | None = None,
         seed: int = 0,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
     ) -> None:
         self.cv = cv
         self.n_jobs = n_jobs
@@ -58,12 +58,22 @@ class LinearScorer(ScoringModule):
         self.seed = seed
         self.model_name = model_name
 
-    def configure_optimization(self, context: Context) -> None:
-        """extract some info from context that is useful for node optimization"""
-        self.device = context.device
-        self.db_dir = context.db_dir
-        self.seed = context.seed
-        self.model_name = context.optimization_info.get_best_embedder()
+    @classmethod
+    def from_context(
+        cls,
+        context: Context,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        cv: int = 3,
+        n_jobs: int = -1,
+    ) -> Self:
+        return cls(
+            db_dir=context.db_dir,
+            model_name=model_name,
+            cv=cv,
+            n_jobs=n_jobs,
+            device=context.device,
+            seed=context.seed,
+        )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         self._multilabel = isinstance(labels[0], list)

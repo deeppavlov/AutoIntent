@@ -33,7 +33,6 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    metadata_dict_name: str = "metadata.json"
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
 

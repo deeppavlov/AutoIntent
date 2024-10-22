@@ -24,7 +24,6 @@ class MLKnnScorer(ScoringModule):
     _prior_prob_false: NDArray[np.float64]
     _cond_prob_true: NDArray[np.float64]
     _cond_prob_false: NDArray[np.float64]
-    metadata_dict_name: str = "metadata.json"
     arrays_filename: str = "probs.npz"
 
     def __init__(self, k: int, s: float = 1.0, ignore_first_neighbours: int = 0) -> None:

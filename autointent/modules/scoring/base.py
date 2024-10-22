@@ -11,6 +11,8 @@ from autointent.modules.base import Module
 
 
 class ScoringModule(Module):
+    metadata_dict_name: str = "metadata.json"
+
     def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
         """
         Return

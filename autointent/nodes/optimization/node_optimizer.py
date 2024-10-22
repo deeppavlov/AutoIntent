@@ -36,8 +36,7 @@ class NodeOptimizer:
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module = self.node_info.modules_available[module_type](**module_kwargs)
-                module.configure_optimization(context)
+                module = self.node_info.modules_available[module_type].from_context(context, **module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
                 self.module_fit(module, context)
@@ -78,6 +77,6 @@ class NodeOptimizer:
             args = (scores, labels, context.data_handler.tags)
         else:
             msg = "something's wrong"
-            self._logger(msg)
+            self._logger.error(msg)
             raise ValueError(msg)
         module.fit(*args)
