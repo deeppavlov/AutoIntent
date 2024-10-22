@@ -19,6 +19,7 @@ class OptimizationConfig:
     log_level: LogLevel = LogLevel.ERROR
     multilabel_generation_config: str = ""
     force_multilabel: bool = False
+    embedder_batch_size: int = 1
 
 
 cs = ConfigStore.instance()
