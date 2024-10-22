@@ -1,1927 +1,2085 @@
-[
-    {
-        "intent_id": 0,
-        "intent_name": "activate_my_card",
-        "utterance": "Пожалуйста, помогите мне с моей картой. Она не активируется."
-    },
-    {
-        "intent_id": 0,
-        "intent_name": "activate_my_card",
-        "utterance": "Я устал, но не могу активировать свою карту."
-    },
-    {
-        "intent_id": 0,
-        "intent_name": "activate_my_card",
-        "utterance": "Я хочу начать пользоваться своей картой."
-    },
-    {
-        "intent_id": 0,
-        "intent_name": "activate_my_card",
-        "utterance": "Как мне проверить мою новую карту?"
-    },
-    {
-        "intent_id": 0,
-        "intent_name": "activate_my_card",
-        "utterance": "Я попытался активировать свой плагин, и это не сработало."
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "age_limit",
-        "utterance": "Я хочу открыть счет для своих детей"
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "age_limit",
-        "utterance": "Сколько вам должно быть лет, чтобы пользоваться услугами банка?"
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "age_limit",
-        "utterance": "Какой минимальный возраст для открытия счета"
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "age_limit",
-        "utterance": "Могут ли мои дети открыть счет?"
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "age_limit",
-        "utterance": "Сколько мне должно быть лет?"
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "apple_pay_or_google_pay",
-        "utterance": "Здравствуйте, у меня есть Apple Watch. Как я могу использовать их для пополнения карты?"
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "apple_pay_or_google_pay",
-        "utterance": "Могу ли я использовать Google Pay для пополнения счета?"
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "apple_pay_or_google_pay",
-        "utterance": "Почему пополнение не работает, даже если я получил свой American Express в Apple Bay?"
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "apple_pay_or_google_pay",
-        "utterance": "Могу ли я внести деньги с помощью Apple Pay?"
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "apple_pay_or_google_pay",
-        "utterance": "Могу ли я использовать Google Pay для пополнения счета"
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "atm_support",
-        "utterance": "Я могу использовать эту карту в каких банкоматах?"
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "atm_support",
-        "utterance": "Могу ли я использовать карту в любом банкомате?"
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "atm_support",
-        "utterance": "В каких местах я могу получить деньги?"
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "atm_support",
-        "utterance": "Какие банкоматы принимают эту карту?"
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "atm_support",
-        "utterance": "Какие банкоматы я могу использовать для снятия денег?"
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "automatic_top_up",
-        "utterance": "Могу ли я автоматически вносить деньги на свой счет во время путешествия?"
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "automatic_top_up",
-        "utterance": "Мне нужна помощь в поиске опции автоматического пополнения счета."
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "automatic_top_up",
-        "utterance": "Какова максимальная сумма, которую вы можете сделать для автоматического пополнения счета?"
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "automatic_top_up",
-        "utterance": "Я не могу найти опцию автоматического пополнения счета."
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "automatic_top_up",
-        "utterance": "Есть ли какие-либо ограничения для автоматического пополнения счета?"
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "balance_not_updated_after_bank_transfer",
-        "utterance": "помогите, мои деньги не показываются"
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "balance_not_updated_after_bank_transfer",
-        "utterance": "как я могу увидеть, что я перевел"
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "balance_not_updated_after_bank_transfer",
-        "utterance": "Здравствуйте. Можете ли вы помочь выяснить, почему недавний перевод с моего банковского счета в Великобритании не отображается?"
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "balance_not_updated_after_bank_transfer",
-        "utterance": "Я сделал перевод из Франции два дня назад, но мне было интересно, если международные переводы занимают больше времени, чтобы прибыть, потому что он еще не сделал это."
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "balance_not_updated_after_bank_transfer",
-        "utterance": "После того, как я перевел деньги, баланс остался прежним."
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "balance_not_updated_after_cheque_or_cash_deposit",
-        "utterance": "Почему мой последний депозит чека занимает так много времени?"
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "balance_not_updated_after_cheque_or_cash_deposit",
-        "utterance": "Я все еще жду деньги, которые я положил сегодня утром"
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "balance_not_updated_after_cheque_or_cash_deposit",
-        "utterance": "Я пытался использовать чек, чтобы обновить свой баланс, но это не работает?"
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "balance_not_updated_after_cheque_or_cash_deposit",
-        "utterance": "Я внес наличные деньги, но они не отображаются на моем счете"
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "balance_not_updated_after_cheque_or_cash_deposit",
-        "utterance": "Я положил немного денег на свой счет, но он не отображает это на моем балансе."
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "beneficiary_not_allowed",
-        "utterance": "Есть ли что-то, что мешает мне делать переводы"
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "beneficiary_not_allowed",
-        "utterance": "Каковы причины, по которым мой бенефициар не допускается?"
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "beneficiary_not_allowed",
-        "utterance": "Что-то не так с функциями перевода? Я продолжаю пытаться перевести средства и получаю только сообщение об ошибке."
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "beneficiary_not_allowed",
-        "utterance": "Каковы причины, по которым бенефициару будет отказано?"
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "beneficiary_not_allowed",
-        "utterance": "Перевод на мой счет был отклонен."
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "cancel_transfer",
-        "utterance": "Отменить транзакцию"
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "cancel_transfer",
-        "utterance": "Могу ли я отменить перевод, который я только что сделал?"
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "cancel_transfer",
-        "utterance": "Мне нужно было сделать платеж на мой счет, но я ввел неправильный номер. Приложение не позволит мне отменить эту транзакцию. Мне нужно, чтобы она была отменена как можно скорее!!"
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "cancel_transfer",
-        "utterance": "Я допустил ошибку сегодня утром, когда делал перевод."
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "cancel_transfer",
-        "utterance": "Могу ли я отменить транзакцию?"
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "card_about_to_expire",
-        "utterance": "Есть ли какие-либо экспресс-сборы, если я хочу, чтобы моя новая карта была быстрее?"
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "card_about_to_expire",
-        "utterance": "Нужно ли мне что-то делать, чтобы получить новую карту после истечения срока ее действия?"
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "card_about_to_expire",
-        "utterance": "Я нахожусь за границей в Китае, могу ли я получить замену карты?"
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "card_about_to_expire",
-        "utterance": "Могу ли я получить новую карту с новым сроком действия в Китае?"
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "card_about_to_expire",
-        "utterance": "Есть ли ограничения на новые карты в Китае?"
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "card_acceptance",
-        "utterance": "Есть ли место, где я не могу использовать свою карту?"
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "card_acceptance",
-        "utterance": "В каких магазинах я могу делать покупки с этой картой?"
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "card_acceptance",
-        "utterance": "Как я узнаю, где я могу использовать свою карту?"
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "card_acceptance",
-        "utterance": "Могу ли я сказать, какой бизнес примет эту карту?"
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "card_acceptance",
-        "utterance": "Есть ли предприятия, которые не принимают эту карту?"
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "card_arrival",
-        "utterance": "Я все еще жду свою карту?"
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "card_arrival",
-        "utterance": "Что я могу сделать, если моя карта все еще не пришла через 2 недели?"
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "card_arrival",
-        "utterance": "Я жду уже больше недели. Карточка все еще приходит?"
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "card_arrival",
-        "utterance": "Могу ли я отслеживать свою карту, пока она находится в процессе доставки?"
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "card_arrival",
-        "utterance": "Как я узнаю, получу ли я свою карту или она потерялась?"
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "card_delivery_estimate",
-        "utterance": "Может ли он быть доставлен конкретно в определенную дату?"
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "card_delivery_estimate",
-        "utterance": "Мне нужно быстро получить свою карту"
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "card_delivery_estimate",
-        "utterance": "Когда я могу ожидать свою карту? Я живу в США."
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "card_delivery_estimate",
-        "utterance": "Помогите! Когда карта прибудет ко мне домой?"
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "card_delivery_estimate",
-        "utterance": "Могу ли я получить свою карту с быстрым отслеживанием?"
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "card_linking",
-        "utterance": "Моя карта была найдена. Есть ли способ вернуть ее в приложение?"
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "card_linking",
-        "utterance": "Я смог найти свою карту. Как мне поместить ее в свое приложение?"
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "card_linking",
-        "utterance": "Как мне сделать так, чтобы моя карта отображалась в приложении?"
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "card_linking",
-        "utterance": "Я только что получил свою карту. Она еще не привязана - как мне это сделать?"
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "card_linking",
-        "utterance": "Потерянная карта найдена, хочу вернуть ее в приложение"
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "card_not_working",
-        "utterance": "Я не могу использовать свою карту, потому что она не работает."
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "card_not_working",
-        "utterance": "Кажется, я не могу использовать свою карту"
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "card_not_working",
-        "utterance": "Моя карта вообще не работает, мне нужна помощь. Это действительно расстраивает."
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "card_not_working",
-        "utterance": "Можете ли вы сказать мне, в чем проблема с моей картой? Сегодня она была отклонена в ресторане."
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "card_not_working",
-        "utterance": "Как мне починить сломанную карту?"
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "card_payment_fee_charged",
-        "utterance": "Когда я расплачивался своей картой, взималась комиссия."
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "card_payment_fee_charged",
-        "utterance": "Я получил плату, которую не должен был получать."
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "card_payment_fee_charged",
-        "utterance": "Почему с меня берут деньги за использование моей карты?"
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "card_payment_fee_charged",
-        "utterance": "Скажите мне, почему есть плата за оплату картой."
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "card_payment_fee_charged",
-        "utterance": "Я не понимаю, почему с меня берут деньги за использование моей карты."
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "card_payment_not_recognised",
-        "utterance": "Есть платеж с моей карты, который я не выполнял. Я не знаю, что имя показано."
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "card_payment_not_recognised",
-        "utterance": "Моя выписка показывает, что я произвел платеж незнакомому продавцу."
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "card_payment_not_recognised",
-        "utterance": "Там есть платеж с моей карты, который я точно не делал сам, никогда не видел этого имени раньше."
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "card_payment_not_recognised",
-        "utterance": "Помогите! В приложении есть платеж, который я не помню."
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "card_payment_not_recognised",
-        "utterance": "Я не понимаю, откуда взялось это обвинение."
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "card_payment_wrong_exchange_rate",
-        "utterance": "В прошлую субботу с меня взяли дополнительную плату за обменный курс по моему платежу. Что-то не так?"
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "card_payment_wrong_exchange_rate",
-        "utterance": "Здравствуйте, я разочарован таким плохим обменным курсом и надеюсь, что вы сможете мне помочь. Не могли бы вы подтвердить для меня официальный межбанковский обменный курс?"
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "card_payment_wrong_exchange_rate",
-        "utterance": "Я думаю, что обмен валюты, который был применен, неправильный."
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "card_payment_wrong_exchange_rate",
-        "utterance": "Обменный курс, который мне выставили за покупку, был неправильным."
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "card_payment_wrong_exchange_rate",
-        "utterance": "Не могли бы вы объяснить, почему обменный курс для товара, который я купил, неправильный?"
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "card_swallowed",
-        "utterance": "Что мне делать, если банкомат забрал мою карту?"
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "card_swallowed",
-        "utterance": "Что мне теперь делать, моя кредитная карта была проглочена банкоматом?"
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "card_swallowed",
-        "utterance": "Банкомат не вернул мне мою карту."
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "card_swallowed",
-        "utterance": "Моя карта застряла в банкомате, что мне делать?"
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "card_swallowed",
-        "utterance": "Что мне делать, если я не могу достать свою карту из банкомата?"
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "cash_withdrawal_charge",
-        "utterance": "Почему взимается плата, когда я снимаю деньги?"
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "cash_withdrawal_charge",
-        "utterance": "Почему с меня взяли комиссию за снятие наличных?"
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "cash_withdrawal_charge",
-        "utterance": "Я снял наличные, и есть плата. Что это такое?"
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "cash_withdrawal_charge",
-        "utterance": "Я спрашиваю о том, почему была дополнительная плата, когда я использовал банкомат."
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "cash_withdrawal_charge",
-        "utterance": "Почему с меня берут дополнительную плату, когда я снимаю деньги?"
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "cash_withdrawal_not_recognised",
-        "utterance": "Я посмотрел на приложение, и оно говорит, что я снял наличные."
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "cash_withdrawal_not_recognised",
-        "utterance": "Я не снимал сумму наличных, которая отображается в приложении."
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "cash_withdrawal_not_recognised",
-        "utterance": "Я видел в приложении, что снятие наличных было завершено на моем счете; однако я не завершил его."
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "cash_withdrawal_not_recognised",
-        "utterance": "Я получил уведомление из моего приложения о том, что я снял наличные, но я не помню, чтобы делал это."
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "cash_withdrawal_not_recognised",
-        "utterance": "У кого-то есть копия моей карты!! Я определенно все еще храню ее здесь, но кто-то только что снял 500 фунтов наличными, ПОМОГИТЕ!"
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "change_pin",
-        "utterance": "Могу ли я изменить свой ПИН-код?"
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "change_pin",
-        "utterance": "Каковы шаги, чтобы изменить мой ПИН-код на что-то другое?"
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "change_pin",
-        "utterance": "Каким образом я могу изменить свой PIN-код и где мне нужно быть?"
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "change_pin",
-        "utterance": "Могу ли я изменить свой PIN-код в любом банкомате?"
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "change_pin",
-        "utterance": "Мне нужно сделать PIN-код моей карты другим номером"
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "compromised_card",
-        "utterance": "Я думаю, что кто-то использует мою карту без моего разрешения!"
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "compromised_card",
-        "utterance": "Что мне делать, если я обнаруживаю мошенническое использование моего автомобиля?"
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "compromised_card",
-        "utterance": "Я думаю, что моя учетная запись была взломана, там есть обвинения, которые я не признаю."
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "compromised_card",
-        "utterance": "Я не узнаю некоторые транзакции. Кто-то еще использует его?"
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "compromised_card",
-        "utterance": "Я только что получил электронное письмо с подтверждением моей покупки с помощью моей карты. Я вошел в мобильное приложение на карте и обнаружил, что несколько покупок были сделаны без моего ведома. Очевидно, кто-то украл информацию о моей карте и совершил эти мошеннические покупки. Мне нужно, чтобы транзакция была отменена и моя карта была приостановлена."
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "contactless_not_working",
-        "utterance": "Должен ли я удалить приложение, прежде чем попробовать его снова?"
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "contactless_not_working",
-        "utterance": "Почему, когда я попытался расплатиться бесконтактно в автобусе, это не сработало?"
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "contactless_not_working",
-        "utterance": "Почему моя бесконтактная карта не работает?"
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "contactless_not_working",
-        "utterance": "Мои бесконтактные платежи не работают."
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "contactless_not_working",
-        "utterance": "сколько дней занимает оформление новой карты?"
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "country_support",
-        "utterance": "В каких странах вы доступны?"
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "country_support",
-        "utterance": "Где вы поддерживаете карты?"
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "country_support",
-        "utterance": "Как мне получить карту, если я живу в США?"
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "country_support",
-        "utterance": "Пожалуйста, перечислите страны, которые вы поддерживаете."
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "country_support",
-        "utterance": "Эти карты доступны в Европе?"
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "declined_card_payment",
-        "utterance": "Я не уверен, почему моя карта не сработала"
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "declined_card_payment",
-        "utterance": "Моя карта не работает в магазинах."
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "declined_card_payment",
-        "utterance": "Вы знаете, почему мой платеж по карте был отклонен?"
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "declined_card_payment",
-        "utterance": "Почему моя карта не работает? Меня пригласили воспользоваться моей новой картой, но она постоянно отклоняется. Помогите, пожалуйста."
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "declined_card_payment",
-        "utterance": "Я не мог использовать свою карту в магазине."
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "declined_cash_withdrawal",
-        "utterance": "Я пытался снять наличные и получил отказ, почему?"
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "declined_cash_withdrawal",
-        "utterance": "Почему мне отказали, когда я попытался получить свои деньги?"
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "declined_cash_withdrawal",
-        "utterance": "Я не смог получить доступ к своим деньгам в банкомате"
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "declined_cash_withdrawal",
-        "utterance": "Мне нужны были деньги на вечер с девушками, но мне отказали, почему?"
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "declined_cash_withdrawal",
-        "utterance": "Почему мне не дали снять деньги в банкомате?"
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "declined_transfer",
-        "utterance": "Перевод не может быть завершен, заявляет \"отклонено\""
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "declined_transfer",
-        "utterance": "Почему мой запрос на перевод был отклонен?"
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "declined_transfer",
-        "utterance": "Мой перевод был отклонен"
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "declined_transfer",
-        "utterance": "Я пытался купить что-то онлайн вчера и получил сообщение с отказом. Я попробовал снова сегодня и получил то же сообщение. В чем проблема?"
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "declined_transfer",
-        "utterance": "У меня возникли проблемы с переводом. Сообщение \"Отклонить\" появляется после совершения перевода."
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "direct_debit_payment_not_recognised",
-        "utterance": "Здравствуйте, я нашел большую сумму платежа в моих старых заявлениях, которые, я уверен, были сделаны не мной. Я знаю, что время прошло, но есть ли способ оспорить этот платеж сейчас?"
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "direct_debit_payment_not_recognised",
-        "utterance": "Что это за слово?"
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "direct_debit_payment_not_recognised",
-        "utterance": "Пожалуйста, помогите мне выяснить, почему в моих записях есть странное прямое дебетование."
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "direct_debit_payment_not_recognised",
-        "utterance": "Я вижу в приложении прямой дебет, который не мой"
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "direct_debit_payment_not_recognised",
-        "utterance": "Есть прямой дебетовый платеж, который я не делал."
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "disposable_card_limits",
-        "utterance": "Есть ли какие-либо ограничения на одноразовые карты?"
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "disposable_card_limits",
-        "utterance": "Сколько раз я могу использовать виртуальную карту?"
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "disposable_card_limits",
-        "utterance": "Подруга рассказывала мне о своих одноразовых картах. Что мне нужно сделать, чтобы получить эту функцию?"
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "disposable_card_limits",
-        "utterance": "Могу ли я иметь больше одноразовых карт?"
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "disposable_card_limits",
-        "utterance": "Я пробовал использовать виртуальную карту для отеля, но это не сработало, почему бы и нет"
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "edit_personal_details",
-        "utterance": "Я хочу изменить свои личные данные."
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "edit_personal_details",
-        "utterance": "Я здесь, чтобы изменить свой адрес."
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "edit_personal_details",
-        "utterance": "Я хотел бы внести некоторые изменения в мою личную информацию."
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "edit_personal_details",
-        "utterance": "Я хотел бы изменить свою фамилию после вступления в брак."
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "edit_personal_details",
-        "utterance": "Я хотел бы изменить свой адрес"
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "exchange_charge",
-        "utterance": "Сколько стоит обмен валюты?"
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "exchange_charge",
-        "utterance": "Существуют ли какие-либо скрытые дополнительные сборы за обмен валюты?"
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "exchange_charge",
-        "utterance": "Если я часто обмениваю валюту, могу ли я получить скидку?"
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "exchange_charge",
-        "utterance": "Есть ли какие-либо расходы, чтобы изменить иностранные деньги на местные?"
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "exchange_charge",
-        "utterance": "Каковы сборы за обмен валюты?"
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "exchange_rate",
-        "utterance": "Сколько стоят мои деньги в других странах?"
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "exchange_rate",
-        "utterance": "Будут ли мои деньги иметь одинаковую ценность, когда я буду путешествовать за границей?"
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "exchange_rate",
-        "utterance": "Вы знаете обменный курс?"
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "exchange_rate",
-        "utterance": "Какой курс обмена валют я получу в будние дни и в выходные?"
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "exchange_rate",
-        "utterance": "Как выглядит обмен?"
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "exchange_via_app",
-        "utterance": "Могу ли я поменять AUD на GBP?"
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "exchange_via_app",
-        "utterance": "Мне нужно произвести обмен между разными валютами, например, GBP и USD. Могу ли я сделать это с помощью вашего приложения?"
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "exchange_via_app",
-        "utterance": "Как я могу поменять на другую валюту?"
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "exchange_via_app",
-        "utterance": "Разрешает ли приложение обмен между долларами США и фунтами стерлингов"
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "exchange_via_app",
-        "utterance": "Что, если мне нужно использовать GBP вместо USD?"
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "extra_charge_on_statement",
-        "utterance": "Почему на моей выписке указана дополнительная плата?"
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "extra_charge_on_statement",
-        "utterance": "Почему они взяли с меня дополнительный 1 доллар?"
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "extra_charge_on_statement",
-        "utterance": "Почему в моей выписке указана комиссия в 1 евро?"
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "extra_charge_on_statement",
-        "utterance": "Почему я вижу дополнительную плату в размере 1 фунта на моей выписке?"
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "extra_charge_on_statement",
-        "utterance": "Я спрашиваю о списании 1 доллара с моей выписки."
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "failed_transfer",
-        "utterance": "Что происходит? Я уже 5 раз пытался перевести деньги. Система не работает? Этого не должно происходить, так как это обычный перевод."
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "failed_transfer",
-        "utterance": "Есть ли причина, по которой мой перевод не удался?"
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "failed_transfer",
-        "utterance": "Почему мой перевод не завершился?"
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "failed_transfer",
-        "utterance": "Почему я не смог завершить этот перевод?"
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "failed_transfer",
-        "utterance": "Я сделал 5 попыток сделать очень стандартный опрос, но я не могу заставить его работать. В чем проблема? Есть ли проблема, связанная с вашей системой?"
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "fiat_currency_support",
-        "utterance": "В скольких разных валютах я могу хранить деньги?"
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "fiat_currency_support",
-        "utterance": "Разрешается обмен валюты?"
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "fiat_currency_support",
-        "utterance": "В скольких валютах я могу хранить деньги на своем счете?"
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "fiat_currency_support",
-        "utterance": "Принимаются ли евро для обмена?"
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "fiat_currency_support",
-        "utterance": "Можно ли хранить деньги в нескольких валютах?"
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "get_disposable_virtual_card",
-        "utterance": "Для чего вы используете одноразовые карты?"
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "get_disposable_virtual_card",
-        "utterance": "Как мне получить одноразовую виртуальную карту?"
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "get_disposable_virtual_card",
-        "utterance": "Я хочу одноразовую виртуальную карту, как мне это сделать?"
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "get_disposable_virtual_card",
-        "utterance": "Для чего предназначены одноразовые карты?"
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "get_disposable_virtual_card",
-        "utterance": "Мне нужна одноразовая виртуальная карта. Пожалуйста, расскажите, как ее заказать."
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "get_physical_card",
-        "utterance": "Я не уверен, что делать с PIN-кодом, потому что у меня его еще нет."
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "get_physical_card",
-        "utterance": "Мой PIN-код отправляется отдельно?"
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "get_physical_card",
-        "utterance": "Где я могу получить ПИН-код моей карты?"
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "get_physical_card",
-        "utterance": "Мой пин-код не пришел по почте! Как я могу его отменить или получить новый?"
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "get_physical_card",
-        "utterance": "Где находится PIN-код карты?"
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "getting_spare_card",
-        "utterance": "Взимается ли дополнительная плата за отправку дополнительных карт?"
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "getting_spare_card",
-        "utterance": "Я хотел бы заказать дополнительную карту"
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "getting_spare_card",
-        "utterance": "Я хочу несколько дополнительных физических карт."
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "getting_spare_card",
-        "utterance": "Я хотел бы открыть вторую карту для моей дочери, как вы можете мне помочь?"
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "getting_spare_card",
-        "utterance": "Буду ли я платить за отправку большего количества карт?"
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "getting_virtual_card",
-        "utterance": "Я хотел бы заказать виртуальную карту, где я могу ее получить?"
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "getting_virtual_card",
-        "utterance": "Мне нужно заказать новую виртуальную карту, как это сделать?"
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "getting_virtual_card",
-        "utterance": "Как я могу подписаться на виртуальную карту?"
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "getting_virtual_card",
-        "utterance": "Я еще не получил свою виртуальную карту!!"
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "getting_virtual_card",
-        "utterance": "Можете ли вы дать мне виртуальную карту?"
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "lost_or_stolen_card",
-        "utterance": "Была ли какая-либо активность на моей карте сегодня?"
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "lost_or_stolen_card",
-        "utterance": "Я потерял свой кошелек, и все мои карты были в нем."
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "lost_or_stolen_card",
-        "utterance": "Я в панике! Я потерял свою карту! Помогите!"
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "lost_or_stolen_card",
-        "utterance": "Мне нужно сообщить об украденной карте"
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "lost_or_stolen_card",
-        "utterance": "Как мне заменить украденную карту?"
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "lost_or_stolen_phone",
-        "utterance": "Мой телефон украли, что мне делать в первую очередь?"
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "lost_or_stolen_phone",
-        "utterance": "Мой телефон украли, что мне делать?"
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "lost_or_stolen_phone",
-        "utterance": "Я потерял свой телефон, что мне делать?"
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "lost_or_stolen_phone",
-        "utterance": "Кто-то украл мой телефон, что мне делать?"
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "lost_or_stolen_phone",
-        "utterance": "Я думаю, что потерял свой телефон. Есть ли способ помешать кому-либо войти в мою учетную запись на нем?"
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "order_physical_card",
-        "utterance": "Сколько стоит физическая карта?"
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "order_physical_card",
-        "utterance": "Куда могут быть доставлены карты?"
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "order_physical_card",
-        "utterance": "Что мне делать, чтобы получить физическую карту?"
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "order_physical_card",
-        "utterance": "Могу ли я попросить карту?"
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "order_physical_card",
-        "utterance": "Должен ли я платить за физическую карту?"
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "passcode_forgotten",
-        "utterance": "Помогите! Я не знаю, какой у меня пароль."
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "passcode_forgotten",
-        "utterance": "Я думал, что знаю свой пароль, но, кажется, я ошибался, что я могу теперь сделать?"
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "passcode_forgotten",
-        "utterance": "Я не могу получить доступ к своему приложению из-за того, что забыл пароль."
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "passcode_forgotten",
-        "utterance": "Я не могу вспомнить свой пароль."
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "passcode_forgotten",
-        "utterance": "Что мне делать, если я не знаю свой пароль?"
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "pending_card_payment",
-        "utterance": "Что это значит, когда платеж отложен?"
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "pending_card_payment",
-        "utterance": "Не могли бы вы, пожалуйста, сказать мне, почему мои покупки с сегодняшнего утра говорят, что оплата отложена?"
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "pending_card_payment",
-        "utterance": "Покупка, которую я сделал, все еще находится на рассмотрении."
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "pending_card_payment",
-        "utterance": "Есть ли проблема с платежом, который, как я вижу, все еще не завершен?"
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "pending_card_payment",
-        "utterance": "Есть платеж, который я сделал, который еще не прошел."
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "pending_cash_withdrawal",
-        "utterance": "Я хотел бы знать, почему снятие денег, которое я сделал, отображается как ожидающее."
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "pending_cash_withdrawal",
-        "utterance": "Почему мое снятие наличных по-прежнему отображается как ожидающее?"
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "pending_cash_withdrawal",
-        "utterance": "У меня уже есть наличные деньги, моя учетная запись по-прежнему отображается как ожидающая."
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "pending_cash_withdrawal",
-        "utterance": "Я пытался получить наличные из банкомата, но это занимает слишком много времени"
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "pending_cash_withdrawal",
-        "utterance": "Почему снятие наличных отложено?"
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "pending_top_up",
-        "utterance": "Сколько времени занимает пополнение счета?"
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "pending_top_up",
-        "utterance": "У меня такое впечатление, что мой депозит еще не пополнен"
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "pending_top_up",
-        "utterance": "Сколько времени потребуется, чтобы мои деньги были депонированы?"
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "pending_top_up",
-        "utterance": "Я положил деньги на свою карту, и я не вижу их на балансе"
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "pending_top_up",
-        "utterance": "У меня есть пополнение, которое все еще не завершено, и я хотел бы узнать об этом."
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "pending_transfer",
-        "utterance": "Я положил деньги на отпуск, и они не показываются. мне нужны эти деньги сегодня, сколько времени это займет"
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "pending_transfer",
-        "utterance": "Я не могу понять, почему перевод все еще находится на рассмотрении?"
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "pending_transfer",
-        "utterance": "Переводы могут занять до одного дня для обработки перед отправкой на счета получателей.Пожалуйста, подтвердите, что вы правильно ввели данные своей учетной записи.Переводы SEPA могут занять до двух рабочих дней, в то время как переводы SWIFT могут занять до пяти рабочих дней."
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "pending_transfer",
-        "utterance": "Когда мой перевод завершится?"
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "pending_transfer",
-        "utterance": "Сколько времени занимают переводы, мой просто говорит \"в ожидании\"?"
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "pin_blocked",
-        "utterance": "Я превысил количество попыток ввода PIN-кода"
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "pin_blocked",
-        "utterance": "Я перепутал свой пин-код и теперь я заперт."
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "pin_blocked",
-        "utterance": "Пожалуйста, помогите мне разблокировать мой пин-код, который я слишком много раз ставил неправильно."
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "pin_blocked",
-        "utterance": "Помогите мне разблокировать мой счет. Я слишком много раз неправильно вводил ПИН-код."
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "pin_blocked",
-        "utterance": "Я заблокировал свой аккаунт, как мне разблокировать мой ПИН-код?"
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "receiving_money",
-        "utterance": "Можно ли получать зарплату здесь?"
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "receiving_money",
-        "utterance": "Как мой босс может заплатить мне прямо на карту?"
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "receiving_money",
-        "utterance": "Зарплата в фунтах стерлингов была получена. Нужно ли ее переводить в другое место?"
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "receiving_money",
-        "utterance": "Я получаю зарплату от моего работодателя в фунтах стерлингов; нужно ли мне что-то делать в приложении, чтобы указать это?"
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "receiving_money",
-        "utterance": "Как мой друг может дать мне деньги?"
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "Refund_not_showing_up",
-        "utterance": "Я пока не вижу деньги, которые мне вернули, на моем счете. Я некоторое время назад попросил продавца вернуть мне деньги, так что я не знаю, почему это занимает так много времени. Не могли бы вы заглянуть внутрь и посмотреть, есть ли там деньги, просто их еще нет на моем счете?"
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "Refund_not_showing_up",
-        "utterance": "Почему я пропускаю возврат денег"
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "Refund_not_showing_up",
-        "utterance": "Пожалуйста, помогите мне. Я все еще жду возврата."
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "Refund_not_showing_up",
-        "utterance": "Я запросил возмещение, но не могу увидеть его на своем счете."
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "Refund_not_showing_up",
-        "utterance": "Когда мне вернут деньги?"
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "request_refund",
-        "utterance": "Сколько времени займет возврат денег за то, что я купил?"
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "request_refund",
-        "utterance": "Пожалуйста, скажите мне, как получить возмещение за то, что я купил."
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "request_refund",
-        "utterance": "Могу ли я отменить эту покупку?"
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "request_refund",
-        "utterance": "Я хочу вернуть товар для возврата денег, могу ли я это сделать?"
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "request_refund",
-        "utterance": "Могу ли я запросить возврат"
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "reverted_card_payment?",
-        "utterance": "Я хотел купить что-то в Интернете, но оплата была возвращена мне. Это продолжается уже пару недель. Пожалуйста, скажите мне, что здесь происходит?"
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "reverted_card_payment?",
-        "utterance": "Я пытался использовать свою дебетовую карту, но оплата не работала."
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "reverted_card_payment?",
-        "utterance": "Здравствуйте, у меня была проблема с платежом по моей карте, и на моем счете показано, что мой платеж прошел. Затем со мной связался продавец, сказав: \"Они не получили мой платеж\", затем платеж был возвращен на мой счет. поэтому я хотел бы увидеть, почему он это сделал, пожалуйста."
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "reverted_card_payment?",
-        "utterance": "Я думаю, что мой платеж по карте был отменен"
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "reverted_card_payment?",
-        "utterance": "Скажите мне, почему мой платеж по карте будет отменен."
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "supported_cards_and_currencies",
-        "utterance": "Как я могу использовать American Express для пополнения своего счета?"
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "supported_cards_and_currencies",
-        "utterance": "Какие валюты вы принимаете для добавления денег?"
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "supported_cards_and_currencies",
-        "utterance": "Поддерживается ли моя кредитная карта для пополнения?"
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "supported_cards_and_currencies",
-        "utterance": "Могу ли я внести деньги на свой счет, используя American Express?"
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "supported_cards_and_currencies",
-        "utterance": "Могу ли я использовать свою карту American Express, чтобы внести деньги на свой счет?"
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "terminate_account",
-        "utterance": "Как мне деактивировать свою учетную запись?"
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "terminate_account",
-        "utterance": "Немедленно удалите мой аккаунт."
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "terminate_account",
-        "utterance": "Можете ли вы удалить мою учетную запись?"
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "terminate_account",
-        "utterance": "Как я могу закрыть свой счет?"
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "terminate_account",
-        "utterance": "пожалуйста, удалите учетную запись"
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "top_up_by_bank_transfer_charge",
-        "utterance": "Есть ли плата за пополнение счета за перевод?"
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "top_up_by_bank_transfer_charge",
-        "utterance": "Будет ли взиматься плата за пополнение счета с помощью SEPA-перевода?"
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "top_up_by_bank_transfer_charge",
-        "utterance": "Какова плата за получение SEPA-перевода?"
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "top_up_by_bank_transfer_charge",
-        "utterance": "Есть ли плата за переводы SEPA?"
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "top_up_by_bank_transfer_charge",
-        "utterance": "Будет ли с меня взиматься плата за перевод SEPA?"
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "top_up_by_card_charge",
-        "utterance": "Какова плата за использование карты пополнения счета в США?"
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "top_up_by_card_charge",
-        "utterance": "Какова плата за пополнение карты в США?"
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "top_up_by_card_charge",
-        "utterance": "Какие сборы взимаются, когда я пополняю счет"
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "top_up_by_card_charge",
-        "utterance": "Есть ли плата за пополнение карты?"
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "top_up_by_card_charge",
-        "utterance": "С каких американских карт взимается плата за пополнение счета?"
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "top_up_by_cash_or_cheque",
-        "utterance": "Помогите мне, пожалуйста, мне нужно пополнить наличные."
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "top_up_by_cash_or_cheque",
-        "utterance": "У вас есть какие-либо варианты пополнения чеком моего счета?"
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "top_up_by_cash_or_cheque",
-        "utterance": "Есть ли место, куда я могу отправить чек, чтобы добавить его на свой счет?"
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "top_up_by_cash_or_cheque",
-        "utterance": "Достаточно ли будет чека?"
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "top_up_by_cash_or_cheque",
-        "utterance": "Я не могу найти какой-либо вариант пополнения счета с помощью чека?"
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "top_up_failed",
-        "utterance": "Я думаю, что мое пополнение не удалось."
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "top_up_failed",
-        "utterance": "Пополнение не работает"
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "top_up_failed",
-        "utterance": "Мой пополнение не работает"
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "top_up_failed",
-        "utterance": "Мое пополнение не прошло, что случилось?"
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "top_up_failed",
-        "utterance": "Мое пополнение было отклонено приложением."
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "top_up_limits",
-        "utterance": "Какова максимальная сумма пополнения счета?"
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "top_up_limits",
-        "utterance": "Пополнения неограниченны?"
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "top_up_limits",
-        "utterance": "Могу ли я увеличить свой максимальный лимит пополнения счета?"
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "top_up_limits",
-        "utterance": "Могу ли я пополнить счет на любую сумму?"
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "top_up_limits",
-        "utterance": "Каков предел того, сколько я могу пополнить?"
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "top_up_reverted",
-        "utterance": "Мое пополнение не появилось, как показано, и мои деньги исчезли, можете ли вы помочь мне решить эту проблему с глюком?"
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "top_up_reverted",
-        "utterance": "Мое пополнение было отменено?"
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "top_up_reverted",
-        "utterance": "Я недавно пополнил счет и видел, как деньги проходят, но теперь они просто исчезли? Что происходит?"
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "top_up_reverted",
-        "utterance": "По какой причине мое пополнение было отменено?"
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "top_up_reverted",
-        "utterance": "Я думаю, что моя сумма была возвращена"
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "topping_up_by_card",
-        "utterance": "Мои деньги, которые у меня были, пропали, и я не мог получить бензин!"
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "topping_up_by_card",
-        "utterance": "Я не вижу, как я пополняю счет"
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "topping_up_by_card",
-        "utterance": "Я не могу найти деньги в своем кошельке!"
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "topping_up_by_card",
-        "utterance": "Я хочу перевести деньги с помощью моей кредитной карты."
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "topping_up_by_card",
-        "utterance": "Я пытался пополнить счет с помощью своей карты, но деньги исчезли?"
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "transaction_charged_twice",
-        "utterance": "Транзакция показывает двойное время."
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "transaction_charged_twice",
-        "utterance": "Есть повторная оплата за один и тот же товар"
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "transaction_charged_twice",
-        "utterance": "Как я могу это исправить? На моем счете двойное списание."
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "transaction_charged_twice",
-        "utterance": "С моей карты дважды списали деньги за одно и то же!"
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "transaction_charged_twice",
-        "utterance": "Мы с мужем отправились на наш еженедельный \"ужин и кино\", и настала моя очередь забрать чек. Теперь я вижу, что с моей карты дважды списали деньги. К кому мне обратиться, чтобы аннулировать второе списание и зачислить деньги на мою карту?"
-    },
-    {
-        "intent_id": 64,
-        "intent_name": "transfer_fee_charged",
-        "utterance": "Я переводил деньги другу, и думал, что это будет бесплатно, но я вижу, что есть плата. Что с этим?"
-    },
-    {
-        "intent_id": 64,
-        "intent_name": "transfer_fee_charged",
-        "utterance": "Существует плата за перевод, пожалуйста, объясните мне это."
-    },
-    {
-        "intent_id": 64,
-        "intent_name": "transfer_fee_charged",
-        "utterance": "Я не знал, что за перевод взимается плата. Какова плата?"
-    },
-    {
-        "intent_id": 64,
-        "intent_name": "transfer_fee_charged",
-        "utterance": "Я перевел деньги, почему с меня взяли дополнительную плату?"
-    },
-    {
-        "intent_id": 64,
-        "intent_name": "transfer_fee_charged",
-        "utterance": "Когда я делал перевод, с меня взяли дополнительную плату."
-    },
-    {
-        "intent_id": 65,
-        "intent_name": "transfer_into_account",
-        "utterance": "Я хочу перевести деньги. Как мне это сделать для моего счета?"
-    },
-    {
-        "intent_id": 65,
-        "intent_name": "transfer_into_account",
-        "utterance": "Как мне перевести деньги на мой счет?"
-    },
-    {
-        "intent_id": 65,
-        "intent_name": "transfer_into_account",
-        "utterance": "Как я могу связать свой банк с моим пополняемым счетом?"
-    },
-    {
-        "intent_id": 65,
-        "intent_name": "transfer_into_account",
-        "utterance": "У меня есть счет, на котором нет средств. Могу ли я перевести их из другого банка?"
-    },
-    {
-        "intent_id": 65,
-        "intent_name": "transfer_into_account",
-        "utterance": "КАК ПЕРЕВОДИТЬ ДЕНЬГИ С МОЕГО БАНКОВСКОГО СЧЕТА?"
-    },
-    {
-        "intent_id": 66,
-        "intent_name": "transfer_not_received_by_recipient",
-        "utterance": "Я беспокоюсь, что прошло слишком много времени, чтобы перевод был завершен."
-    },
-    {
-        "intent_id": 66,
-        "intent_name": "transfer_not_received_by_recipient",
-        "utterance": "Какое время обычно требуется, чтобы перевод прошел? У меня есть друг, которому он нужен немедленно, но он еще не прошел."
-    },
-    {
-        "intent_id": 66,
-        "intent_name": "transfer_not_received_by_recipient",
-        "utterance": "Моя денежная транзакция не может быть видна человеку, которому я ее отправил."
-    },
-    {
-        "intent_id": 66,
-        "intent_name": "transfer_not_received_by_recipient",
-        "utterance": "Сколько времени обычно занимает перевод? Я отправил немного денег подруге ранее сегодня, и она действительно нуждается в этом. Это все еще ожидающий перевод, хотя я отправил его несколько часов назад."
-    },
-    {
-        "intent_id": 66,
-        "intent_name": "transfer_not_received_by_recipient",
-        "utterance": "Я сделал перевод внутри страны позавчера, но его до сих пор нет. Можете ли вы, пожалуйста, проверить, что с этим происходит, номер счета определенно правильный, я уже проверил это."
-    },
-    {
-        "intent_id": 67,
-        "intent_name": "transfer_timing",
-        "utterance": "Сколько времени мне ждать, прежде чем перевод поступит на мой счет?"
-    },
-    {
-        "intent_id": 67,
-        "intent_name": "transfer_timing",
-        "utterance": "Будет ли перевод отображаться на моем счете в ближайшее время?"
-    },
-    {
-        "intent_id": 67,
-        "intent_name": "transfer_timing",
-        "utterance": "Сколько времени займет перевод из США?"
-    },
-    {
-        "intent_id": 67,
-        "intent_name": "transfer_timing",
-        "utterance": "Когда деньги поступят на мой счет?"
-    },
-    {
-        "intent_id": 67,
-        "intent_name": "transfer_timing",
-        "utterance": "Сколько времени потребуется, чтобы получить мои деньги"
-    },
-    {
-        "intent_id": 68,
-        "intent_name": "unable_to_verify_identity",
-        "utterance": "Можете ли вы помочь мне с подтверждением моей личности?"
-    },
-    {
-        "intent_id": 68,
-        "intent_name": "unable_to_verify_identity",
-        "utterance": "Какие доказательства вам нужны для моей идентификации?"
-    },
-    {
-        "intent_id": 68,
-        "intent_name": "unable_to_verify_identity",
-        "utterance": "Есть ли какие-либо причины, по которым моя личность не будет принята, даже если все, что я предоставил, является фактическим?"
-    },
-    {
-        "intent_id": 68,
-        "intent_name": "unable_to_verify_identity",
-        "utterance": "У меня возникли некоторые трудности с проверкой моего удостоверения личности."
-    },
-    {
-        "intent_id": 68,
-        "intent_name": "unable_to_verify_identity",
-        "utterance": "Я не могу проверить свой идентификатор."
-    },
-    {
-        "intent_id": 69,
-        "intent_name": "verify_my_identity",
-        "utterance": "Что вам нужно для проверки личности?"
-    },
-    {
-        "intent_id": 69,
-        "intent_name": "verify_my_identity",
-        "utterance": "Как я могу доказать, что я - это я?"
-    },
-    {
-        "intent_id": 69,
-        "intent_name": "verify_my_identity",
-        "utterance": "Мне нужно подтвердить свою личность."
-    },
-    {
-        "intent_id": 69,
-        "intent_name": "verify_my_identity",
-        "utterance": "Как мне подтвердить свою личность?"
-    },
-    {
-        "intent_id": 69,
-        "intent_name": "verify_my_identity",
-        "utterance": "Как подтвердить свою личность в Интернете"
-    },
-    {
-        "intent_id": 70,
-        "intent_name": "verify_source_of_funds",
-        "utterance": "Откуда именно берутся деньги"
-    },
-    {
-        "intent_id": 70,
-        "intent_name": "verify_source_of_funds",
-        "utterance": "Откуда у меня деньги?"
-    },
-    {
-        "intent_id": 70,
-        "intent_name": "verify_source_of_funds",
-        "utterance": "Могу ли я проверить, откуда поступили средства?"
-    },
-    {
-        "intent_id": 70,
-        "intent_name": "verify_source_of_funds",
-        "utterance": "Каковы источники средств на моем счете?"
-    },
-    {
-        "intent_id": 70,
-        "intent_name": "verify_source_of_funds",
-        "utterance": "нужно знать, откуда берутся деньги"
-    },
-    {
-        "intent_id": 71,
-        "intent_name": "verify_top_up",
-        "utterance": "Вы знаете, как я могу проверить, что я пополнил свою карту?"
-    },
-    {
-        "intent_id": 71,
-        "intent_name": "verify_top_up",
-        "utterance": "где код для проверки карты пополнения?"
-    },
-    {
-        "intent_id": 71,
-        "intent_name": "verify_top_up",
-        "utterance": "Как проверяется карта пополнения?"
-    },
-    {
-        "intent_id": 71,
-        "intent_name": "verify_top_up",
-        "utterance": "Расскажите мне о проверке пополнения счета"
-    },
-    {
-        "intent_id": 71,
-        "intent_name": "verify_top_up",
-        "utterance": "Каков код подтверждения для моей карты пополнения счета?"
-    },
-    {
-        "intent_id": 72,
-        "intent_name": "virtual_card_not_working",
-        "utterance": "Почему моя одноразовая виртуальная карта не работает?"
-    },
-    {
-        "intent_id": 72,
-        "intent_name": "virtual_card_not_working",
-        "utterance": "Могу ли я использовать свою виртуальную карту для совершения транзакций для членства?"
-    },
-    {
-        "intent_id": 72,
-        "intent_name": "virtual_card_not_working",
-        "utterance": "Почему моя виртуальная карта не работает?"
-    },
-    {
-        "intent_id": 72,
-        "intent_name": "virtual_card_not_working",
-        "utterance": "Моя виртуальная карта просто не проходит."
-    },
-    {
-        "intent_id": 72,
-        "intent_name": "virtual_card_not_working",
-        "utterance": "Моя виртуальная карта не работает."
-    },
-    {
-        "intent_id": 73,
-        "intent_name": "visa_or_mastercard",
-        "utterance": "Есть ли способ, которым я могу получить MasterCard?"
-    },
-    {
-        "intent_id": 73,
-        "intent_name": "visa_or_mastercard",
-        "utterance": "Это только Visa или я могу также использовать MasterCard?"
-    },
-    {
-        "intent_id": 73,
-        "intent_name": "visa_or_mastercard",
-        "utterance": "Я не хочу карту VISA."
-    },
-    {
-        "intent_id": 73,
-        "intent_name": "visa_or_mastercard",
-        "utterance": "Я предпочитаю использовать Mastercard, могу ли я его заменить?"
-    },
-    {
-        "intent_id": 73,
-        "intent_name": "visa_or_mastercard",
-        "utterance": "Я предпочитаю Mastecard."
-    },
-    {
-        "intent_id": 74,
-        "intent_name": "why_verify_identity",
-        "utterance": "Почему у вас есть проверка личности?"
-    },
-    {
-        "intent_id": 74,
-        "intent_name": "why_verify_identity",
-        "utterance": "Я не чувствую себя комфортно, проверяя свою личность."
-    },
-    {
-        "intent_id": 74,
-        "intent_name": "why_verify_identity",
-        "utterance": "Зачем вам так много личной информации от меня?"
-    },
-    {
-        "intent_id": 74,
-        "intent_name": "why_verify_identity",
-        "utterance": "Вы знаете причину проверки личности?"
-    },
-    {
-        "intent_id": 74,
-        "intent_name": "why_verify_identity",
-        "utterance": "Я ответил на так много вопросов о своей личности. Зачем вам эта информация?"
-    },
-    {
-        "intent_id": 75,
-        "intent_name": "wrong_amount_of_cash_received",
-        "utterance": "Почему я получил только часть суммы, которую пытался снять?"
-    },
-    {
-        "intent_id": 75,
-        "intent_name": "wrong_amount_of_cash_received",
-        "utterance": "моя транзакция в банкомате была ошибочной"
-    },
-    {
-        "intent_id": 75,
-        "intent_name": "wrong_amount_of_cash_received",
-        "utterance": "почему я получил только 20.00"
-    },
-    {
-        "intent_id": 75,
-        "intent_name": "wrong_amount_of_cash_received",
-        "utterance": "Почему мой запрос наличных и сумма, которую я получил, различаются?"
-    },
-    {
-        "intent_id": 75,
-        "intent_name": "wrong_amount_of_cash_received",
-        "utterance": "Я попытался снять 100 долларов, все, что он мне дал, было 20 долларов."
-    },
-    {
-        "intent_id": 76,
-        "intent_name": "wrong_exchange_rate_for_cash_withdrawal",
-        "utterance": "Неправильный обменный курс был применен ко мне при снятии наличных."
-    },
-    {
-        "intent_id": 76,
-        "intent_name": "wrong_exchange_rate_for_cash_withdrawal",
-        "utterance": "Я получил меньше наличных денег из-за обменного курса."
-    },
-    {
-        "intent_id": 76,
-        "intent_name": "wrong_exchange_rate_for_cash_withdrawal",
-        "utterance": "Почему плата за снятие денег такая высокая? Я чувствую, что с меня взяли слишком много, и я бы никогда не воспользовался этим банкоматом, если бы знал об этом заранее."
-    },
-    {
-        "intent_id": 76,
-        "intent_name": "wrong_exchange_rate_for_cash_withdrawal",
-        "utterance": "Я считаю, что неправильный обменный курс был применен к наличной транзакции, которую я сделал за границей."
-    },
-    {
-        "intent_id": 76,
-        "intent_name": "wrong_exchange_rate_for_cash_withdrawal",
-        "utterance": "Когда я получил наличные деньги, сумма была не такой, какой она должна была быть, исходя из обменного курса."
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "Пожалуйста, помогите мне с моей картой. Она не активируется.",
+            "label": 0
+        },
+        {
+            "text": "Я устал, но не могу активировать свою карту.",
+            "label": 0
+        },
+        {
+            "text": "Я хочу начать пользоваться своей картой.",
+            "label": 0
+        },
+        {
+            "text": "Как мне проверить мою новую карту?",
+            "label": 0
+        },
+        {
+            "text": "Я попытался активировать свой плагин, и это не сработало.",
+            "label": 0
+        },
+        {
+            "text": "Я хочу открыть счет для своих детей",
+            "label": 1
+        },
+        {
+            "text": "Сколько вам должно быть лет, чтобы пользоваться услугами банка?",
+            "label": 1
+        },
+        {
+            "text": "Какой минимальный возраст для открытия счета",
+            "label": 1
+        },
+        {
+            "text": "Могут ли мои дети открыть счет?",
+            "label": 1
+        },
+        {
+            "text": "Сколько мне должно быть лет?",
+            "label": 1
+        },
+        {
+            "text": "Здравствуйте, у меня есть Apple Watch. Как я могу использовать их для пополнения карты?",
+            "label": 2
+        },
+        {
+            "text": "Могу ли я использовать Google Pay для пополнения счета?",
+            "label": 2
+        },
+        {
+            "text": "Почему пополнение не работает, даже если я получил свой American Express в Apple Bay?",
+            "label": 2
+        },
+        {
+            "text": "Могу ли я внести деньги с помощью Apple Pay?",
+            "label": 2
+        },
+        {
+            "text": "Могу ли я использовать Google Pay для пополнения счета",
+            "label": 2
+        },
+        {
+            "text": "Я могу использовать эту карту в каких банкоматах?",
+            "label": 3
+        },
+        {
+            "text": "Могу ли я использовать карту в любом банкомате?",
+            "label": 3
+        },
+        {
+            "text": "В каких местах я могу получить деньги?",
+            "label": 3
+        },
+        {
+            "text": "Какие банкоматы принимают эту карту?",
+            "label": 3
+        },
+        {
+            "text": "Какие банкоматы я могу использовать для снятия денег?",
+            "label": 3
+        },
+        {
+            "text": "Могу ли я автоматически вносить деньги на свой счет во время путешествия?",
+            "label": 4
+        },
+        {
+            "text": "Мне нужна помощь в поиске опции автоматического пополнения счета.",
+            "label": 4
+        },
+        {
+            "text": "Какова максимальная сумма, которую вы можете сделать для автоматического пополнения счета?",
+            "label": 4
+        },
+        {
+            "text": "Я не могу найти опцию автоматического пополнения счета.",
+            "label": 4
+        },
+        {
+            "text": "Есть ли какие-либо ограничения для автоматического пополнения счета?",
+            "label": 4
+        },
+        {
+            "text": "помогите, мои деньги не показываются",
+            "label": 5
+        },
+        {
+            "text": "как я могу увидеть, что я перевел",
+            "label": 5
+        },
+        {
+            "text": "Здравствуйте. Можете ли вы помочь выяснить, почему недавний перевод с моего банковского счета в Великобритании не отображается?",
+            "label": 5
+        },
+        {
+            "text": "Я сделал перевод из Франции два дня назад, но мне было интересно, если международные переводы занимают больше времени, чтобы прибыть, потому что он еще не сделал это.",
+            "label": 5
+        },
+        {
+            "text": "После того, как я перевел деньги, баланс остался прежним.",
+            "label": 5
+        },
+        {
+            "text": "Почему мой последний депозит чека занимает так много времени?",
+            "label": 6
+        },
+        {
+            "text": "Я все еще жду деньги, которые я положил сегодня утром",
+            "label": 6
+        },
+        {
+            "text": "Я пытался использовать чек, чтобы обновить свой баланс, но это не работает?",
+            "label": 6
+        },
+        {
+            "text": "Я внес наличные деньги, но они не отображаются на моем счете",
+            "label": 6
+        },
+        {
+            "text": "Я положил немного денег на свой счет, но он не отображает это на моем балансе.",
+            "label": 6
+        },
+        {
+            "text": "Есть ли что-то, что мешает мне делать переводы",
+            "label": 7
+        },
+        {
+            "text": "Каковы причины, по которым мой бенефициар не допускается?",
+            "label": 7
+        },
+        {
+            "text": "Что-то не так с функциями перевода? Я продолжаю пытаться перевести средства и получаю только сообщение об ошибке.",
+            "label": 7
+        },
+        {
+            "text": "Каковы причины, по которым бенефициару будет отказано?",
+            "label": 7
+        },
+        {
+            "text": "Перевод на мой счет был отклонен.",
+            "label": 7
+        },
+        {
+            "text": "Отменить транзакцию",
+            "label": 8
+        },
+        {
+            "text": "Могу ли я отменить перевод, который я только что сделал?",
+            "label": 8
+        },
+        {
+            "text": "Мне нужно было сделать платеж на мой счет, но я ввел неправильный номер. Приложение не позволит мне отменить эту транзакцию. Мне нужно, чтобы она была отменена как можно скорее!!",
+            "label": 8
+        },
+        {
+            "text": "Я допустил ошибку сегодня утром, когда делал перевод.",
+            "label": 8
+        },
+        {
+            "text": "Могу ли я отменить транзакцию?",
+            "label": 8
+        },
+        {
+            "text": "Есть ли какие-либо экспресс-сборы, если я хочу, чтобы моя новая карта была быстрее?",
+            "label": 9
+        },
+        {
+            "text": "Нужно ли мне что-то делать, чтобы получить новую карту после истечения срока ее действия?",
+            "label": 9
+        },
+        {
+            "text": "Я нахожусь за границей в Китае, могу ли я получить замену карты?",
+            "label": 9
+        },
+        {
+            "text": "Могу ли я получить новую карту с новым сроком действия в Китае?",
+            "label": 9
+        },
+        {
+            "text": "Есть ли ограничения на новые карты в Китае?",
+            "label": 9
+        },
+        {
+            "text": "Есть ли место, где я не могу использовать свою карту?",
+            "label": 10
+        },
+        {
+            "text": "В каких магазинах я могу делать покупки с этой картой?",
+            "label": 10
+        },
+        {
+            "text": "Как я узнаю, где я могу использовать свою карту?",
+            "label": 10
+        },
+        {
+            "text": "Могу ли я сказать, какой бизнес примет эту карту?",
+            "label": 10
+        },
+        {
+            "text": "Есть ли предприятия, которые не принимают эту карту?",
+            "label": 10
+        },
+        {
+            "text": "Я все еще жду свою карту?",
+            "label": 11
+        },
+        {
+            "text": "Что я могу сделать, если моя карта все еще не пришла через 2 недели?",
+            "label": 11
+        },
+        {
+            "text": "Я жду уже больше недели. Карточка все еще приходит?",
+            "label": 11
+        },
+        {
+            "text": "Могу ли я отслеживать свою карту, пока она находится в процессе доставки?",
+            "label": 11
+        },
+        {
+            "text": "Как я узнаю, получу ли я свою карту или она потерялась?",
+            "label": 11
+        },
+        {
+            "text": "Может ли он быть доставлен конкретно в определенную дату?",
+            "label": 12
+        },
+        {
+            "text": "Мне нужно быстро получить свою карту",
+            "label": 12
+        },
+        {
+            "text": "Когда я могу ожидать свою карту? Я живу в США.",
+            "label": 12
+        },
+        {
+            "text": "Помогите! Когда карта прибудет ко мне домой?",
+            "label": 12
+        },
+        {
+            "text": "Могу ли я получить свою карту с быстрым отслеживанием?",
+            "label": 12
+        },
+        {
+            "text": "Моя карта была найдена. Есть ли способ вернуть ее в приложение?",
+            "label": 13
+        },
+        {
+            "text": "Я смог найти свою карту. Как мне поместить ее в свое приложение?",
+            "label": 13
+        },
+        {
+            "text": "Как мне сделать так, чтобы моя карта отображалась в приложении?",
+            "label": 13
+        },
+        {
+            "text": "Я только что получил свою карту. Она еще не привязана - как мне это сделать?",
+            "label": 13
+        },
+        {
+            "text": "Потерянная карта найдена, хочу вернуть ее в приложение",
+            "label": 13
+        },
+        {
+            "text": "Я не могу использовать свою карту, потому что она не работает.",
+            "label": 14
+        },
+        {
+            "text": "Кажется, я не могу использовать свою карту",
+            "label": 14
+        },
+        {
+            "text": "Моя карта вообще не работает, мне нужна помощь. Это действительно расстраивает.",
+            "label": 14
+        },
+        {
+            "text": "Можете ли вы сказать мне, в чем проблема с моей картой? Сегодня она была отклонена в ресторане.",
+            "label": 14
+        },
+        {
+            "text": "Как мне починить сломанную карту?",
+            "label": 14
+        },
+        {
+            "text": "Когда я расплачивался своей картой, взималась комиссия.",
+            "label": 15
+        },
+        {
+            "text": "Я получил плату, которую не должен был получать.",
+            "label": 15
+        },
+        {
+            "text": "Почему с меня берут деньги за использование моей карты?",
+            "label": 15
+        },
+        {
+            "text": "Скажите мне, почему есть плата за оплату картой.",
+            "label": 15
+        },
+        {
+            "text": "Я не понимаю, почему с меня берут деньги за использование моей карты.",
+            "label": 15
+        },
+        {
+            "text": "Есть платеж с моей карты, который я не выполнял. Я не знаю, что имя показано.",
+            "label": 16
+        },
+        {
+            "text": "Моя выписка показывает, что я произвел платеж незнакомому продавцу.",
+            "label": 16
+        },
+        {
+            "text": "Там есть платеж с моей карты, который я точно не делал сам, никогда не видел этого имени раньше.",
+            "label": 16
+        },
+        {
+            "text": "Помогите! В приложении есть платеж, который я не помню.",
+            "label": 16
+        },
+        {
+            "text": "Я не понимаю, откуда взялось это обвинение.",
+            "label": 16
+        },
+        {
+            "text": "В прошлую субботу с меня взяли дополнительную плату за обменный курс по моему платежу. Что-то не так?",
+            "label": 17
+        },
+        {
+            "text": "Здравствуйте, я разочарован таким плохим обменным курсом и надеюсь, что вы сможете мне помочь. Не могли бы вы подтвердить для меня официальный межбанковский обменный курс?",
+            "label": 17
+        },
+        {
+            "text": "Я думаю, что обмен валюты, который был применен, неправильный.",
+            "label": 17
+        },
+        {
+            "text": "Обменный курс, который мне выставили за покупку, был неправильным.",
+            "label": 17
+        },
+        {
+            "text": "Не могли бы вы объяснить, почему обменный курс для товара, который я купил, неправильный?",
+            "label": 17
+        },
+        {
+            "text": "Что мне делать, если банкомат забрал мою карту?",
+            "label": 18
+        },
+        {
+            "text": "Что мне теперь делать, моя кредитная карта была проглочена банкоматом?",
+            "label": 18
+        },
+        {
+            "text": "Банкомат не вернул мне мою карту.",
+            "label": 18
+        },
+        {
+            "text": "Моя карта застряла в банкомате, что мне делать?",
+            "label": 18
+        },
+        {
+            "text": "Что мне делать, если я не могу достать свою карту из банкомата?",
+            "label": 18
+        },
+        {
+            "text": "Почему взимается плата, когда я снимаю деньги?",
+            "label": 19
+        },
+        {
+            "text": "Почему с меня взяли комиссию за снятие наличных?",
+            "label": 19
+        },
+        {
+            "text": "Я снял наличные, и есть плата. Что это такое?",
+            "label": 19
+        },
+        {
+            "text": "Я спрашиваю о том, почему была дополнительная плата, когда я использовал банкомат.",
+            "label": 19
+        },
+        {
+            "text": "Почему с меня берут дополнительную плату, когда я снимаю деньги?",
+            "label": 19
+        },
+        {
+            "text": "Я посмотрел на приложение, и оно говорит, что я снял наличные.",
+            "label": 20
+        },
+        {
+            "text": "Я не снимал сумму наличных, которая отображается в приложении.",
+            "label": 20
+        },
+        {
+            "text": "Я видел в приложении, что снятие наличных было завершено на моем счете; однако я не завершил его.",
+            "label": 20
+        },
+        {
+            "text": "Я получил уведомление из моего приложения о том, что я снял наличные, но я не помню, чтобы делал это.",
+            "label": 20
+        },
+        {
+            "text": "У кого-то есть копия моей карты!! Я определенно все еще храню ее здесь, но кто-то только что снял 500 фунтов наличными, ПОМОГИТЕ!",
+            "label": 20
+        },
+        {
+            "text": "Могу ли я изменить свой ПИН-код?",
+            "label": 21
+        },
+        {
+            "text": "Каковы шаги, чтобы изменить мой ПИН-код на что-то другое?",
+            "label": 21
+        },
+        {
+            "text": "Каким образом я могу изменить свой PIN-код и где мне нужно быть?",
+            "label": 21
+        },
+        {
+            "text": "Могу ли я изменить свой PIN-код в любом банкомате?",
+            "label": 21
+        },
+        {
+            "text": "Мне нужно сделать PIN-код моей карты другим номером",
+            "label": 21
+        },
+        {
+            "text": "Я думаю, что кто-то использует мою карту без моего разрешения!",
+            "label": 22
+        },
+        {
+            "text": "Что мне делать, если я обнаруживаю мошенническое использование моего автомобиля?",
+            "label": 22
+        },
+        {
+            "text": "Я думаю, что моя учетная запись была взломана, там есть обвинения, которые я не признаю.",
+            "label": 22
+        },
+        {
+            "text": "Я не узнаю некоторые транзакции. Кто-то еще использует его?",
+            "label": 22
+        },
+        {
+            "text": "Я только что получил электронное письмо с подтверждением моей покупки с помощью моей карты. Я вошел в мобильное приложение на карте и обнаружил, что несколько покупок были сделаны без моего ведома. Очевидно, кто-то украл информацию о моей карте и совершил эти мошеннические покупки. Мне нужно, чтобы транзакция была отменена и моя карта была приостановлена.",
+            "label": 22
+        },
+        {
+            "text": "Должен ли я удалить приложение, прежде чем попробовать его снова?",
+            "label": 23
+        },
+        {
+            "text": "Почему, когда я попытался расплатиться бесконтактно в автобусе, это не сработало?",
+            "label": 23
+        },
+        {
+            "text": "Почему моя бесконтактная карта не работает?",
+            "label": 23
+        },
+        {
+            "text": "Мои бесконтактные платежи не работают.",
+            "label": 23
+        },
+        {
+            "text": "сколько дней занимает оформление новой карты?",
+            "label": 23
+        },
+        {
+            "text": "В каких странах вы доступны?",
+            "label": 24
+        },
+        {
+            "text": "Где вы поддерживаете карты?",
+            "label": 24
+        },
+        {
+            "text": "Как мне получить карту, если я живу в США?",
+            "label": 24
+        },
+        {
+            "text": "Пожалуйста, перечислите страны, которые вы поддерживаете.",
+            "label": 24
+        },
+        {
+            "text": "Эти карты доступны в Европе?",
+            "label": 24
+        },
+        {
+            "text": "Я не уверен, почему моя карта не сработала",
+            "label": 25
+        },
+        {
+            "text": "Моя карта не работает в магазинах.",
+            "label": 25
+        },
+        {
+            "text": "Вы знаете, почему мой платеж по карте был отклонен?",
+            "label": 25
+        },
+        {
+            "text": "Почему моя карта не работает? Меня пригласили воспользоваться моей новой картой, но она постоянно отклоняется. Помогите, пожалуйста.",
+            "label": 25
+        },
+        {
+            "text": "Я не мог использовать свою карту в магазине.",
+            "label": 25
+        },
+        {
+            "text": "Я пытался снять наличные и получил отказ, почему?",
+            "label": 26
+        },
+        {
+            "text": "Почему мне отказали, когда я попытался получить свои деньги?",
+            "label": 26
+        },
+        {
+            "text": "Я не смог получить доступ к своим деньгам в банкомате",
+            "label": 26
+        },
+        {
+            "text": "Мне нужны были деньги на вечер с девушками, но мне отказали, почему?",
+            "label": 26
+        },
+        {
+            "text": "Почему мне не дали снять деньги в банкомате?",
+            "label": 26
+        },
+        {
+            "text": "Перевод не может быть завершен, заявляет \"отклонено\"",
+            "label": 27
+        },
+        {
+            "text": "Почему мой запрос на перевод был отклонен?",
+            "label": 27
+        },
+        {
+            "text": "Мой перевод был отклонен",
+            "label": 27
+        },
+        {
+            "text": "Я пытался купить что-то онлайн вчера и получил сообщение с отказом. Я попробовал снова сегодня и получил то же сообщение. В чем проблема?",
+            "label": 27
+        },
+        {
+            "text": "У меня возникли проблемы с переводом. Сообщение \"Отклонить\" появляется после совершения перевода.",
+            "label": 27
+        },
+        {
+            "text": "Здравствуйте, я нашел большую сумму платежа в моих старых заявлениях, которые, я уверен, были сделаны не мной. Я знаю, что время прошло, но есть ли способ оспорить этот платеж сейчас?",
+            "label": 28
+        },
+        {
+            "text": "Что это за слово?",
+            "label": 28
+        },
+        {
+            "text": "Пожалуйста, помогите мне выяснить, почему в моих записях есть странное прямое дебетование.",
+            "label": 28
+        },
+        {
+            "text": "Я вижу в приложении прямой дебет, который не мой",
+            "label": 28
+        },
+        {
+            "text": "Есть прямой дебетовый платеж, который я не делал.",
+            "label": 28
+        },
+        {
+            "text": "Есть ли какие-либо ограничения на одноразовые карты?",
+            "label": 29
+        },
+        {
+            "text": "Сколько раз я могу использовать виртуальную карту?",
+            "label": 29
+        },
+        {
+            "text": "Подруга рассказывала мне о своих одноразовых картах. Что мне нужно сделать, чтобы получить эту функцию?",
+            "label": 29
+        },
+        {
+            "text": "Могу ли я иметь больше одноразовых карт?",
+            "label": 29
+        },
+        {
+            "text": "Я пробовал использовать виртуальную карту для отеля, но это не сработало, почему бы и нет",
+            "label": 29
+        },
+        {
+            "text": "Я хочу изменить свои личные данные.",
+            "label": 30
+        },
+        {
+            "text": "Я здесь, чтобы изменить свой адрес.",
+            "label": 30
+        },
+        {
+            "text": "Я хотел бы внести некоторые изменения в мою личную информацию.",
+            "label": 30
+        },
+        {
+            "text": "Я хотел бы изменить свою фамилию после вступления в брак.",
+            "label": 30
+        },
+        {
+            "text": "Я хотел бы изменить свой адрес",
+            "label": 30
+        },
+        {
+            "text": "Сколько стоит обмен валюты?",
+            "label": 31
+        },
+        {
+            "text": "Существуют ли какие-либо скрытые дополнительные сборы за обмен валюты?",
+            "label": 31
+        },
+        {
+            "text": "Если я часто обмениваю валюту, могу ли я получить скидку?",
+            "label": 31
+        },
+        {
+            "text": "Есть ли какие-либо расходы, чтобы изменить иностранные деньги на местные?",
+            "label": 31
+        },
+        {
+            "text": "Каковы сборы за обмен валюты?",
+            "label": 31
+        },
+        {
+            "text": "Сколько стоят мои деньги в других странах?",
+            "label": 32
+        },
+        {
+            "text": "Будут ли мои деньги иметь одинаковую ценность, когда я буду путешествовать за границей?",
+            "label": 32
+        },
+        {
+            "text": "Вы знаете обменный курс?",
+            "label": 32
+        },
+        {
+            "text": "Какой курс обмена валют я получу в будние дни и в выходные?",
+            "label": 32
+        },
+        {
+            "text": "Как выглядит обмен?",
+            "label": 32
+        },
+        {
+            "text": "Могу ли я поменять AUD на GBP?",
+            "label": 33
+        },
+        {
+            "text": "Мне нужно произвести обмен между разными валютами, например, GBP и USD. Могу ли я сделать это с помощью вашего приложения?",
+            "label": 33
+        },
+        {
+            "text": "Как я могу поменять на другую валюту?",
+            "label": 33
+        },
+        {
+            "text": "Разрешает ли приложение обмен между долларами США и фунтами стерлингов",
+            "label": 33
+        },
+        {
+            "text": "Что, если мне нужно использовать GBP вместо USD?",
+            "label": 33
+        },
+        {
+            "text": "Почему на моей выписке указана дополнительная плата?",
+            "label": 34
+        },
+        {
+            "text": "Почему они взяли с меня дополнительный 1 доллар?",
+            "label": 34
+        },
+        {
+            "text": "Почему в моей выписке указана комиссия в 1 евро?",
+            "label": 34
+        },
+        {
+            "text": "Почему я вижу дополнительную плату в размере 1 фунта на моей выписке?",
+            "label": 34
+        },
+        {
+            "text": "Я спрашиваю о списании 1 доллара с моей выписки.",
+            "label": 34
+        },
+        {
+            "text": "Что происходит? Я уже 5 раз пытался перевести деньги. Система не работает? Этого не должно происходить, так как это обычный перевод.",
+            "label": 35
+        },
+        {
+            "text": "Есть ли причина, по которой мой перевод не удался?",
+            "label": 35
+        },
+        {
+            "text": "Почему мой перевод не завершился?",
+            "label": 35
+        },
+        {
+            "text": "Почему я не смог завершить этот перевод?",
+            "label": 35
+        },
+        {
+            "text": "Я сделал 5 попыток сделать очень стандартный опрос, но я не могу заставить его работать. В чем проблема? Есть ли проблема, связанная с вашей системой?",
+            "label": 35
+        },
+        {
+            "text": "В скольких разных валютах я могу хранить деньги?",
+            "label": 36
+        },
+        {
+            "text": "Разрешается обмен валюты?",
+            "label": 36
+        },
+        {
+            "text": "В скольких валютах я могу хранить деньги на своем счете?",
+            "label": 36
+        },
+        {
+            "text": "Принимаются ли евро для обмена?",
+            "label": 36
+        },
+        {
+            "text": "Можно ли хранить деньги в нескольких валютах?",
+            "label": 36
+        },
+        {
+            "text": "Для чего вы используете одноразовые карты?",
+            "label": 37
+        },
+        {
+            "text": "Как мне получить одноразовую виртуальную карту?",
+            "label": 37
+        },
+        {
+            "text": "Я хочу одноразовую виртуальную карту, как мне это сделать?",
+            "label": 37
+        },
+        {
+            "text": "Для чего предназначены одноразовые карты?",
+            "label": 37
+        },
+        {
+            "text": "Мне нужна одноразовая виртуальная карта. Пожалуйста, расскажите, как ее заказать.",
+            "label": 37
+        },
+        {
+            "text": "Я не уверен, что делать с PIN-кодом, потому что у меня его еще нет.",
+            "label": 38
+        },
+        {
+            "text": "Мой PIN-код отправляется отдельно?",
+            "label": 38
+        },
+        {
+            "text": "Где я могу получить ПИН-код моей карты?",
+            "label": 38
+        },
+        {
+            "text": "Мой пин-код не пришел по почте! Как я могу его отменить или получить новый?",
+            "label": 38
+        },
+        {
+            "text": "Где находится PIN-код карты?",
+            "label": 38
+        },
+        {
+            "text": "Взимается ли дополнительная плата за отправку дополнительных карт?",
+            "label": 39
+        },
+        {
+            "text": "Я хотел бы заказать дополнительную карту",
+            "label": 39
+        },
+        {
+            "text": "Я хочу несколько дополнительных физических карт.",
+            "label": 39
+        },
+        {
+            "text": "Я хотел бы открыть вторую карту для моей дочери, как вы можете мне помочь?",
+            "label": 39
+        },
+        {
+            "text": "Буду ли я платить за отправку большего количества карт?",
+            "label": 39
+        },
+        {
+            "text": "Я хотел бы заказать виртуальную карту, где я могу ее получить?",
+            "label": 40
+        },
+        {
+            "text": "Мне нужно заказать новую виртуальную карту, как это сделать?",
+            "label": 40
+        },
+        {
+            "text": "Как я могу подписаться на виртуальную карту?",
+            "label": 40
+        },
+        {
+            "text": "Я еще не получил свою виртуальную карту!!",
+            "label": 40
+        },
+        {
+            "text": "Можете ли вы дать мне виртуальную карту?",
+            "label": 40
+        },
+        {
+            "text": "Была ли какая-либо активность на моей карте сегодня?",
+            "label": 41
+        },
+        {
+            "text": "Я потерял свой кошелек, и все мои карты были в нем.",
+            "label": 41
+        },
+        {
+            "text": "Я в панике! Я потерял свою карту! Помогите!",
+            "label": 41
+        },
+        {
+            "text": "Мне нужно сообщить об украденной карте",
+            "label": 41
+        },
+        {
+            "text": "Как мне заменить украденную карту?",
+            "label": 41
+        },
+        {
+            "text": "Мой телефон украли, что мне делать в первую очередь?",
+            "label": 42
+        },
+        {
+            "text": "Мой телефон украли, что мне делать?",
+            "label": 42
+        },
+        {
+            "text": "Я потерял свой телефон, что мне делать?",
+            "label": 42
+        },
+        {
+            "text": "Кто-то украл мой телефон, что мне делать?",
+            "label": 42
+        },
+        {
+            "text": "Я думаю, что потерял свой телефон. Есть ли способ помешать кому-либо войти в мою учетную запись на нем?",
+            "label": 42
+        },
+        {
+            "text": "Сколько стоит физическая карта?",
+            "label": 43
+        },
+        {
+            "text": "Куда могут быть доставлены карты?",
+            "label": 43
+        },
+        {
+            "text": "Что мне делать, чтобы получить физическую карту?",
+            "label": 43
+        },
+        {
+            "text": "Могу ли я попросить карту?",
+            "label": 43
+        },
+        {
+            "text": "Должен ли я платить за физическую карту?",
+            "label": 43
+        },
+        {
+            "text": "Помогите! Я не знаю, какой у меня пароль.",
+            "label": 44
+        },
+        {
+            "text": "Я думал, что знаю свой пароль, но, кажется, я ошибался, что я могу теперь сделать?",
+            "label": 44
+        },
+        {
+            "text": "Я не могу получить доступ к своему приложению из-за того, что забыл пароль.",
+            "label": 44
+        },
+        {
+            "text": "Я не могу вспомнить свой пароль.",
+            "label": 44
+        },
+        {
+            "text": "Что мне делать, если я не знаю свой пароль?",
+            "label": 44
+        },
+        {
+            "text": "Что это значит, когда платеж отложен?",
+            "label": 45
+        },
+        {
+            "text": "Не могли бы вы, пожалуйста, сказать мне, почему мои покупки с сегодняшнего утра говорят, что оплата отложена?",
+            "label": 45
+        },
+        {
+            "text": "Покупка, которую я сделал, все еще находится на рассмотрении.",
+            "label": 45
+        },
+        {
+            "text": "Есть ли проблема с платежом, который, как я вижу, все еще не завершен?",
+            "label": 45
+        },
+        {
+            "text": "Есть платеж, который я сделал, который еще не прошел.",
+            "label": 45
+        },
+        {
+            "text": "Я хотел бы знать, почему снятие денег, которое я сделал, отображается как ожидающее.",
+            "label": 46
+        },
+        {
+            "text": "Почему мое снятие наличных по-прежнему отображается как ожидающее?",
+            "label": 46
+        },
+        {
+            "text": "У меня уже есть наличные деньги, моя учетная запись по-прежнему отображается как ожидающая.",
+            "label": 46
+        },
+        {
+            "text": "Я пытался получить наличные из банкомата, но это занимает слишком много времени",
+            "label": 46
+        },
+        {
+            "text": "Почему снятие наличных отложено?",
+            "label": 46
+        },
+        {
+            "text": "Сколько времени занимает пополнение счета?",
+            "label": 47
+        },
+        {
+            "text": "У меня такое впечатление, что мой депозит еще не пополнен",
+            "label": 47
+        },
+        {
+            "text": "Сколько времени потребуется, чтобы мои деньги были депонированы?",
+            "label": 47
+        },
+        {
+            "text": "Я положил деньги на свою карту, и я не вижу их на балансе",
+            "label": 47
+        },
+        {
+            "text": "У меня есть пополнение, которое все еще не завершено, и я хотел бы узнать об этом.",
+            "label": 47
+        },
+        {
+            "text": "Я положил деньги на отпуск, и они не показываются. мне нужны эти деньги сегодня, сколько времени это займет",
+            "label": 48
+        },
+        {
+            "text": "Я не могу понять, почему перевод все еще находится на рассмотрении?",
+            "label": 48
+        },
+        {
+            "text": "Переводы могут занять до одного дня для обработки перед отправкой на счета получателей.Пожалуйста, подтвердите, что вы правильно ввели данные своей учетной записи.Переводы SEPA могут занять до двух рабочих дней, в то время как переводы SWIFT могут занять до пяти рабочих дней.",
+            "label": 48
+        },
+        {
+            "text": "Когда мой перевод завершится?",
+            "label": 48
+        },
+        {
+            "text": "Сколько времени занимают переводы, мой просто говорит \"в ожидании\"?",
+            "label": 48
+        },
+        {
+            "text": "Я превысил количество попыток ввода PIN-кода",
+            "label": 49
+        },
+        {
+            "text": "Я перепутал свой пин-код и теперь я заперт.",
+            "label": 49
+        },
+        {
+            "text": "Пожалуйста, помогите мне разблокировать мой пин-код, который я слишком много раз ставил неправильно.",
+            "label": 49
+        },
+        {
+            "text": "Помогите мне разблокировать мой счет. Я слишком много раз неправильно вводил ПИН-код.",
+            "label": 49
+        },
+        {
+            "text": "Я заблокировал свой аккаунт, как мне разблокировать мой ПИН-код?",
+            "label": 49
+        },
+        {
+            "text": "Можно ли получать зарплату здесь?",
+            "label": 50
+        },
+        {
+            "text": "Как мой босс может заплатить мне прямо на карту?",
+            "label": 50
+        },
+        {
+            "text": "Зарплата в фунтах стерлингов была получена. Нужно ли ее переводить в другое место?",
+            "label": 50
+        },
+        {
+            "text": "Я получаю зарплату от моего работодателя в фунтах стерлингов; нужно ли мне что-то делать в приложении, чтобы указать это?",
+            "label": 50
+        },
+        {
+            "text": "Как мой друг может дать мне деньги?",
+            "label": 50
+        },
+        {
+            "text": "Я пока не вижу деньги, которые мне вернули, на моем счете. Я некоторое время назад попросил продавца вернуть мне деньги, так что я не знаю, почему это занимает так много времени. Не могли бы вы заглянуть внутрь и посмотреть, есть ли там деньги, просто их еще нет на моем счете?",
+            "label": 51
+        },
+        {
+            "text": "Почему я пропускаю возврат денег",
+            "label": 51
+        },
+        {
+            "text": "Пожалуйста, помогите мне. Я все еще жду возврата.",
+            "label": 51
+        },
+        {
+            "text": "Я запросил возмещение, но не могу увидеть его на своем счете.",
+            "label": 51
+        },
+        {
+            "text": "Когда мне вернут деньги?",
+            "label": 51
+        },
+        {
+            "text": "Сколько времени займет возврат денег за то, что я купил?",
+            "label": 52
+        },
+        {
+            "text": "Пожалуйста, скажите мне, как получить возмещение за то, что я купил.",
+            "label": 52
+        },
+        {
+            "text": "Могу ли я отменить эту покупку?",
+            "label": 52
+        },
+        {
+            "text": "Я хочу вернуть товар для возврата денег, могу ли я это сделать?",
+            "label": 52
+        },
+        {
+            "text": "Могу ли я запросить возврат",
+            "label": 52
+        },
+        {
+            "text": "Я хотел купить что-то в Интернете, но оплата была возвращена мне. Это продолжается уже пару недель. Пожалуйста, скажите мне, что здесь происходит?",
+            "label": 53
+        },
+        {
+            "text": "Я пытался использовать свою дебетовую карту, но оплата не работала.",
+            "label": 53
+        },
+        {
+            "text": "Здравствуйте, у меня была проблема с платежом по моей карте, и на моем счете показано, что мой платеж прошел. Затем со мной связался продавец, сказав: \"Они не получили мой платеж\", затем платеж был возвращен на мой счет. поэтому я хотел бы увидеть, почему он это сделал, пожалуйста.",
+            "label": 53
+        },
+        {
+            "text": "Я думаю, что мой платеж по карте был отменен",
+            "label": 53
+        },
+        {
+            "text": "Скажите мне, почему мой платеж по карте будет отменен.",
+            "label": 53
+        },
+        {
+            "text": "Как я могу использовать American Express для пополнения своего счета?",
+            "label": 54
+        },
+        {
+            "text": "Какие валюты вы принимаете для добавления денег?",
+            "label": 54
+        },
+        {
+            "text": "Поддерживается ли моя кредитная карта для пополнения?",
+            "label": 54
+        },
+        {
+            "text": "Могу ли я внести деньги на свой счет, используя American Express?",
+            "label": 54
+        },
+        {
+            "text": "Могу ли я использовать свою карту American Express, чтобы внести деньги на свой счет?",
+            "label": 54
+        },
+        {
+            "text": "Как мне деактивировать свою учетную запись?",
+            "label": 55
+        },
+        {
+            "text": "Немедленно удалите мой аккаунт.",
+            "label": 55
+        },
+        {
+            "text": "Можете ли вы удалить мою учетную запись?",
+            "label": 55
+        },
+        {
+            "text": "Как я могу закрыть свой счет?",
+            "label": 55
+        },
+        {
+            "text": "пожалуйста, удалите учетную запись",
+            "label": 55
+        },
+        {
+            "text": "Есть ли плата за пополнение счета за перевод?",
+            "label": 56
+        },
+        {
+            "text": "Будет ли взиматься плата за пополнение счета с помощью SEPA-перевода?",
+            "label": 56
+        },
+        {
+            "text": "Какова плата за получение SEPA-перевода?",
+            "label": 56
+        },
+        {
+            "text": "Есть ли плата за переводы SEPA?",
+            "label": 56
+        },
+        {
+            "text": "Будет ли с меня взиматься плата за перевод SEPA?",
+            "label": 56
+        },
+        {
+            "text": "Какова плата за использование карты пополнения счета в США?",
+            "label": 57
+        },
+        {
+            "text": "Какова плата за пополнение карты в США?",
+            "label": 57
+        },
+        {
+            "text": "Какие сборы взимаются, когда я пополняю счет",
+            "label": 57
+        },
+        {
+            "text": "Есть ли плата за пополнение карты?",
+            "label": 57
+        },
+        {
+            "text": "С каких американских карт взимается плата за пополнение счета?",
+            "label": 57
+        },
+        {
+            "text": "Помогите мне, пожалуйста, мне нужно пополнить наличные.",
+            "label": 58
+        },
+        {
+            "text": "У вас есть какие-либо варианты пополнения чеком моего счета?",
+            "label": 58
+        },
+        {
+            "text": "Есть ли место, куда я могу отправить чек, чтобы добавить его на свой счет?",
+            "label": 58
+        },
+        {
+            "text": "Достаточно ли будет чека?",
+            "label": 58
+        },
+        {
+            "text": "Я не могу найти какой-либо вариант пополнения счета с помощью чека?",
+            "label": 58
+        },
+        {
+            "text": "Я думаю, что мое пополнение не удалось.",
+            "label": 59
+        },
+        {
+            "text": "Пополнение не работает",
+            "label": 59
+        },
+        {
+            "text": "Мой пополнение не работает",
+            "label": 59
+        },
+        {
+            "text": "Мое пополнение не прошло, что случилось?",
+            "label": 59
+        },
+        {
+            "text": "Мое пополнение было отклонено приложением.",
+            "label": 59
+        },
+        {
+            "text": "Какова максимальная сумма пополнения счета?",
+            "label": 60
+        },
+        {
+            "text": "Пополнения неограниченны?",
+            "label": 60
+        },
+        {
+            "text": "Могу ли я увеличить свой максимальный лимит пополнения счета?",
+            "label": 60
+        },
+        {
+            "text": "Могу ли я пополнить счет на любую сумму?",
+            "label": 60
+        },
+        {
+            "text": "Каков предел того, сколько я могу пополнить?",
+            "label": 60
+        },
+        {
+            "text": "Мое пополнение не появилось, как показано, и мои деньги исчезли, можете ли вы помочь мне решить эту проблему с глюком?",
+            "label": 61
+        },
+        {
+            "text": "Мое пополнение было отменено?",
+            "label": 61
+        },
+        {
+            "text": "Я недавно пополнил счет и видел, как деньги проходят, но теперь они просто исчезли? Что происходит?",
+            "label": 61
+        },
+        {
+            "text": "По какой причине мое пополнение было отменено?",
+            "label": 61
+        },
+        {
+            "text": "Я думаю, что моя сумма была возвращена",
+            "label": 61
+        },
+        {
+            "text": "Мои деньги, которые у меня были, пропали, и я не мог получить бензин!",
+            "label": 62
+        },
+        {
+            "text": "Я не вижу, как я пополняю счет",
+            "label": 62
+        },
+        {
+            "text": "Я не могу найти деньги в своем кошельке!",
+            "label": 62
+        },
+        {
+            "text": "Я хочу перевести деньги с помощью моей кредитной карты.",
+            "label": 62
+        },
+        {
+            "text": "Я пытался пополнить счет с помощью своей карты, но деньги исчезли?",
+            "label": 62
+        },
+        {
+            "text": "Транзакция показывает двойное время.",
+            "label": 63
+        },
+        {
+            "text": "Есть повторная оплата за один и тот же товар",
+            "label": 63
+        },
+        {
+            "text": "Как я могу это исправить? На моем счете двойное списание.",
+            "label": 63
+        },
+        {
+            "text": "С моей карты дважды списали деньги за одно и то же!",
+            "label": 63
+        },
+        {
+            "text": "Мы с мужем отправились на наш еженедельный \"ужин и кино\", и настала моя очередь забрать чек. Теперь я вижу, что с моей карты дважды списали деньги. К кому мне обратиться, чтобы аннулировать второе списание и зачислить деньги на мою карту?",
+            "label": 63
+        },
+        {
+            "text": "Я переводил деньги другу, и думал, что это будет бесплатно, но я вижу, что есть плата. Что с этим?",
+            "label": 64
+        },
+        {
+            "text": "Существует плата за перевод, пожалуйста, объясните мне это.",
+            "label": 64
+        },
+        {
+            "text": "Я не знал, что за перевод взимается плата. Какова плата?",
+            "label": 64
+        },
+        {
+            "text": "Я перевел деньги, почему с меня взяли дополнительную плату?",
+            "label": 64
+        },
+        {
+            "text": "Когда я делал перевод, с меня взяли дополнительную плату.",
+            "label": 64
+        },
+        {
+            "text": "Я хочу перевести деньги. Как мне это сделать для моего счета?",
+            "label": 65
+        },
+        {
+            "text": "Как мне перевести деньги на мой счет?",
+            "label": 65
+        },
+        {
+            "text": "Как я могу связать свой банк с моим пополняемым счетом?",
+            "label": 65
+        },
+        {
+            "text": "У меня есть счет, на котором нет средств. Могу ли я перевести их из другого банка?",
+            "label": 65
+        },
+        {
+            "text": "КАК ПЕРЕВОДИТЬ ДЕНЬГИ С МОЕГО БАНКОВСКОГО СЧЕТА?",
+            "label": 65
+        },
+        {
+            "text": "Я беспокоюсь, что прошло слишком много времени, чтобы перевод был завершен.",
+            "label": 66
+        },
+        {
+            "text": "Какое время обычно требуется, чтобы перевод прошел? У меня есть друг, которому он нужен немедленно, но он еще не прошел.",
+            "label": 66
+        },
+        {
+            "text": "Моя денежная транзакция не может быть видна человеку, которому я ее отправил.",
+            "label": 66
+        },
+        {
+            "text": "Сколько времени обычно занимает перевод? Я отправил немного денег подруге ранее сегодня, и она действительно нуждается в этом. Это все еще ожидающий перевод, хотя я отправил его несколько часов назад.",
+            "label": 66
+        },
+        {
+            "text": "Я сделал перевод внутри страны позавчера, но его до сих пор нет. Можете ли вы, пожалуйста, проверить, что с этим происходит, номер счета определенно правильный, я уже проверил это.",
+            "label": 66
+        },
+        {
+            "text": "Сколько времени мне ждать, прежде чем перевод поступит на мой счет?",
+            "label": 67
+        },
+        {
+            "text": "Будет ли перевод отображаться на моем счете в ближайшее время?",
+            "label": 67
+        },
+        {
+            "text": "Сколько времени займет перевод из США?",
+            "label": 67
+        },
+        {
+            "text": "Когда деньги поступят на мой счет?",
+            "label": 67
+        },
+        {
+            "text": "Сколько времени потребуется, чтобы получить мои деньги",
+            "label": 67
+        },
+        {
+            "text": "Можете ли вы помочь мне с подтверждением моей личности?",
+            "label": 68
+        },
+        {
+            "text": "Какие доказательства вам нужны для моей идентификации?",
+            "label": 68
+        },
+        {
+            "text": "Есть ли какие-либо причины, по которым моя личность не будет принята, даже если все, что я предоставил, является фактическим?",
+            "label": 68
+        },
+        {
+            "text": "У меня возникли некоторые трудности с проверкой моего удостоверения личности.",
+            "label": 68
+        },
+        {
+            "text": "Я не могу проверить свой идентификатор.",
+            "label": 68
+        },
+        {
+            "text": "Что вам нужно для проверки личности?",
+            "label": 69
+        },
+        {
+            "text": "Как я могу доказать, что я - это я?",
+            "label": 69
+        },
+        {
+            "text": "Мне нужно подтвердить свою личность.",
+            "label": 69
+        },
+        {
+            "text": "Как мне подтвердить свою личность?",
+            "label": 69
+        },
+        {
+            "text": "Как подтвердить свою личность в Интернете",
+            "label": 69
+        },
+        {
+            "text": "Откуда именно берутся деньги",
+            "label": 70
+        },
+        {
+            "text": "Откуда у меня деньги?",
+            "label": 70
+        },
+        {
+            "text": "Могу ли я проверить, откуда поступили средства?",
+            "label": 70
+        },
+        {
+            "text": "Каковы источники средств на моем счете?",
+            "label": 70
+        },
+        {
+            "text": "нужно знать, откуда берутся деньги",
+            "label": 70
+        },
+        {
+            "text": "Вы знаете, как я могу проверить, что я пополнил свою карту?",
+            "label": 71
+        },
+        {
+            "text": "где код для проверки карты пополнения?",
+            "label": 71
+        },
+        {
+            "text": "Как проверяется карта пополнения?",
+            "label": 71
+        },
+        {
+            "text": "Расскажите мне о проверке пополнения счета",
+            "label": 71
+        },
+        {
+            "text": "Каков код подтверждения для моей карты пополнения счета?",
+            "label": 71
+        },
+        {
+            "text": "Почему моя одноразовая виртуальная карта не работает?",
+            "label": 72
+        },
+        {
+            "text": "Могу ли я использовать свою виртуальную карту для совершения транзакций для членства?",
+            "label": 72
+        },
+        {
+            "text": "Почему моя виртуальная карта не работает?",
+            "label": 72
+        },
+        {
+            "text": "Моя виртуальная карта просто не проходит.",
+            "label": 72
+        },
+        {
+            "text": "Моя виртуальная карта не работает.",
+            "label": 72
+        },
+        {
+            "text": "Есть ли способ, которым я могу получить MasterCard?",
+            "label": 73
+        },
+        {
+            "text": "Это только Visa или я могу также использовать MasterCard?",
+            "label": 73
+        },
+        {
+            "text": "Я не хочу карту VISA.",
+            "label": 73
+        },
+        {
+            "text": "Я предпочитаю использовать Mastercard, могу ли я его заменить?",
+            "label": 73
+        },
+        {
+            "text": "Я предпочитаю Mastecard.",
+            "label": 73
+        },
+        {
+            "text": "Почему у вас есть проверка личности?",
+            "label": 74
+        },
+        {
+            "text": "Я не чувствую себя комфортно, проверяя свою личность.",
+            "label": 74
+        },
+        {
+            "text": "Зачем вам так много личной информации от меня?",
+            "label": 74
+        },
+        {
+            "text": "Вы знаете причину проверки личности?",
+            "label": 74
+        },
+        {
+            "text": "Я ответил на так много вопросов о своей личности. Зачем вам эта информация?",
+            "label": 74
+        },
+        {
+            "text": "Почему я получил только часть суммы, которую пытался снять?",
+            "label": 75
+        },
+        {
+            "text": "моя транзакция в банкомате была ошибочной",
+            "label": 75
+        },
+        {
+            "text": "почему я получил только 20.00",
+            "label": 75
+        },
+        {
+            "text": "Почему мой запрос наличных и сумма, которую я получил, различаются?",
+            "label": 75
+        },
+        {
+            "text": "Я попытался снять 100 долларов, все, что он мне дал, было 20 долларов.",
+            "label": 75
+        },
+        {
+            "text": "Неправильный обменный курс был применен ко мне при снятии наличных.",
+            "label": 76
+        },
+        {
+            "text": "Я получил меньше наличных денег из-за обменного курса.",
+            "label": 76
+        },
+        {
+            "text": "Почему плата за снятие денег такая высокая? Я чувствую, что с меня взяли слишком много, и я бы никогда не воспользовался этим банкоматом, если бы знал об этом заранее.",
+            "label": 76
+        },
+        {
+            "text": "Я считаю, что неправильный обменный курс был применен к наличной транзакции, которую я сделал за границей.",
+            "label": 76
+        },
+        {
+            "text": "Когда я получил наличные деньги, сумма была не такой, какой она должна была быть, исходя из обменного курса.",
+            "label": 76
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "activate_my_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 1,
+            "name": "age_limit",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 2,
+            "name": "apple_pay_or_google_pay",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 3,
+            "name": "atm_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 4,
+            "name": "automatic_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 5,
+            "name": "balance_not_updated_after_bank_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 6,
+            "name": "balance_not_updated_after_cheque_or_cash_deposit",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 7,
+            "name": "beneficiary_not_allowed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 8,
+            "name": "cancel_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 9,
+            "name": "card_about_to_expire",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 10,
+            "name": "card_acceptance",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 11,
+            "name": "card_arrival",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 12,
+            "name": "card_delivery_estimate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 13,
+            "name": "card_linking",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 14,
+            "name": "card_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 15,
+            "name": "card_payment_fee_charged",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 16,
+            "name": "card_payment_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 17,
+            "name": "card_payment_wrong_exchange_rate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 18,
+            "name": "card_swallowed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 19,
+            "name": "cash_withdrawal_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 20,
+            "name": "cash_withdrawal_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 21,
+            "name": "change_pin",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 22,
+            "name": "compromised_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 23,
+            "name": "contactless_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 24,
+            "name": "country_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 25,
+            "name": "declined_card_payment",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 26,
+            "name": "declined_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 27,
+            "name": "declined_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 28,
+            "name": "direct_debit_payment_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 29,
+            "name": "disposable_card_limits",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 30,
+            "name": "edit_personal_details",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 31,
+            "name": "exchange_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 32,
+            "name": "exchange_rate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 33,
+            "name": "exchange_via_app",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 34,
+            "name": "extra_charge_on_statement",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 35,
+            "name": "failed_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 36,
+            "name": "fiat_currency_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 37,
+            "name": "get_disposable_virtual_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 38,
+            "name": "get_physical_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 39,
+            "name": "getting_spare_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 40,
+            "name": "getting_virtual_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 41,
+            "name": "lost_or_stolen_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 42,
+            "name": "lost_or_stolen_phone",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 43,
+            "name": "order_physical_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 44,
+            "name": "passcode_forgotten",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 45,
+            "name": "pending_card_payment",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 46,
+            "name": "pending_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 47,
+            "name": "pending_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 48,
+            "name": "pending_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 49,
+            "name": "pin_blocked",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 50,
+            "name": "receiving_money",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 51,
+            "name": "Refund_not_showing_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 52,
+            "name": "request_refund",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 53,
+            "name": "reverted_card_payment?",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 54,
+            "name": "supported_cards_and_currencies",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 55,
+            "name": "terminate_account",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 56,
+            "name": "top_up_by_bank_transfer_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 57,
+            "name": "top_up_by_card_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 58,
+            "name": "top_up_by_cash_or_cheque",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 59,
+            "name": "top_up_failed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 60,
+            "name": "top_up_limits",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 61,
+            "name": "top_up_reverted",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 62,
+            "name": "topping_up_by_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 63,
+            "name": "transaction_charged_twice",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 64,
+            "name": "transfer_fee_charged",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 65,
+            "name": "transfer_into_account",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 66,
+            "name": "transfer_not_received_by_recipient",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 67,
+            "name": "transfer_timing",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 68,
+            "name": "unable_to_verify_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 69,
+            "name": "verify_my_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 70,
+            "name": "verify_source_of_funds",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 71,
+            "name": "verify_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 72,
+            "name": "virtual_card_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 73,
+            "name": "visa_or_mastercard",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 74,
+            "name": "why_verify_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 75,
+            "name": "wrong_amount_of_cash_received",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 76,
+            "name": "wrong_exchange_rate_for_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        }
+    ]
+}
