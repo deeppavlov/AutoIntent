@@ -6,22 +6,65 @@ from openai import AsyncOpenAI
 from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
 
 PROMPT_DESCRIPTION = """
+Your task is to write a description of the intent.
+
+You are given the name of the intent and user intentions related to it. The description should be:
+1) in declarative form
+2) no more than one sentence
+3) in the language in which the utterances and the name are written.
+
+Remember:
+Respond with just the description, no extra details.
+Keep in mind that either the names or user queries may not be provided.
+
+For example:
+
+name:
+activate_my_card
+user utterances:
+Please help me with my card. It won't activate.
+I tried but am unable to activate my card.
+I want to start using my card.
+description:
+user wants to activate his card
+
+name:
+beneficiary_not_allowed
+user utterances:
+
+description:
+user want to know why his beneficiary is not allowed
+
+name:
+оформление_отпуска
+user utterances:
+как оформить отпуск
+в какие даты надо оформить отпуск
+как запланировать отпуск
+description:
+пользователь спрашивает про оформление отпуска
+
+name:
 {intent_name}
-{utterances}
+user utterances:
+{user_utterances}
+description:
 """
-# где лучше использовать PROMPT_DESCRIPTION? вставить его в функцию или вынести куда-то?
-# куда внедрить enhance_dataset_with_description? в datahandler? задать булевый аргумент в гидре добавлять\не добавлять описание?
-# по остальным аргументами api_base, api_key, model_name тоже добавить в гидру?
 
 
 def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     intent_utterances = defaultdict(list)
 
     for utterance in utterances:
-        if utterance.label is not None:
+        if utterance.label is None:
+            continue
+
+        text = utterance.text
+        if isinstance(utterance.label, list):
             for label in utterance.label:
-                text = utterance.text
                 intent_utterances[label].append(text)
+        else:
+            intent_utterances[utterance.label].append(text)
 
     return intent_utterances
 
@@ -29,7 +72,7 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
 async def generate_intent_description(
     client: AsyncOpenAI, intent_name: str, utterances: list[str], model_name: str
 ) -> str:
-    content = PROMPT_DESCRIPTION.format(intent_name=intent_name, utterances="\n".join(utterances))
+    content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances))
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
         model=model_name,
@@ -65,7 +108,7 @@ def enhance_dataset_with_descriptions(
     dataset: Dataset, api_base: str, api_key: str, model_name: str = "gpt-3.5-turbo"
 ) -> Dataset:
     client = AsyncOpenAI(
-        api_base=api_base,
+        base_url=api_base,
         api_key=api_key,
     )
     intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
