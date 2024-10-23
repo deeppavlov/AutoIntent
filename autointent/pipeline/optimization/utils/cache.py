@@ -60,7 +60,7 @@ def get_db_dir(run_name: str, db_dir: Path | None = None) -> Path:
         db_dir = get_chroma_cache_dir() / run_name
 
     db_dir.mkdir(parents=True, exist_ok=True)
-    add_cache_directory(str(db_dir))
+    add_cache_directory(str(db_dir.resolve()))
 
     return db_dir
 

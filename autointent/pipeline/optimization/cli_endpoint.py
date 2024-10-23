@@ -6,7 +6,7 @@ from autointent import Context
 from autointent.configs.optimization_cli import OptimizationConfig
 
 from .pipeline_optimizer import PipelineOptimizer
-from .utils import get_db_dir, get_logs_dir, get_run_name, load_config, load_data, setup_logging
+from .utils import load_config, load_data, setup_logging
 
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
@@ -14,14 +14,9 @@ def main(cfg: OptimizationConfig) -> None:
     setup_logging(cfg.logs.level.value)
     logger = logging.getLogger(__name__)
 
-    # configure the run and data
-    run_name = get_run_name(cfg.logs.run_name)
-    db_dir = get_db_dir(run_name, cfg.vector_index.db_dir)
-    logs_dir = get_logs_dir(run_name, cfg.logs.dirpath)
-    dump_dir = logs_dir / "modules_dumps"
-
-    logger.debug("Run Name: %s", run_name)
-    logger.debug("Chroma DB path: %s", db_dir)
+    logger.debug("Run Name: %s", cfg.logs.run_name)
+    logger.debug("logs and assets: %s", cfg.logs.dirpath)
+    logger.debug("Vector index path: %s", cfg.vector_index.db_dir)
 
     # create shared objects for a whole pipeline
     context = Context(
@@ -31,8 +26,8 @@ def main(cfg: OptimizationConfig) -> None:
         cfg.augmentation.multilabel_generation_config,
         cfg.augmentation.regex_sampling,
         cfg.seed,
-        db_dir,
-        dump_dir,
+        cfg.vector_index.db_dir,
+        cfg.logs.dump_dir,
         cfg.data.force_multilabel,
     )
 
@@ -42,4 +37,4 @@ def main(cfg: OptimizationConfig) -> None:
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(logs_dir)
+    pipeline.dump(cfg.logs.dirpath)
