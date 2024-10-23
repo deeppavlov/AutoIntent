@@ -53,6 +53,15 @@ description:
 
 
 def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
+    """
+    Groups utterances by their labels.
+
+    Args:
+        utterances (list[Utterance]): List of utterances with `label` and `text` attributes.
+
+    Returns:
+        dict[int, list[str]]: A dictionary where labels map to lists of utterance texts.
+    """
     intent_utterances = defaultdict(list)
 
     for utterance in utterances:
@@ -69,9 +78,21 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     return intent_utterances
 
 
-async def generate_intent_description(
+async def create_intent_description(
     client: AsyncOpenAI, intent_name: str, utterances: list[str], model_name: str
 ) -> str:
+    """
+    Creates a description for a specific intent using an OpenAI model.
+
+    Args:
+        client (AsyncOpenAI): The OpenAI client used to generate the description.
+        intent_name (str): The name of the intent for which the description is generated.
+        utterances (list[str]): A list of example utterances related to the intent.
+        model_name (str): The name of the OpenAI model to use for generating the description.
+
+    Returns:
+        str: The generated description for the intent.
+    """
     content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances))
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
@@ -80,16 +101,28 @@ async def generate_intent_description(
     return chat_completion.choices[0].message.content.strip()
 
 
-async def generate(
+async def generate_intent_descriptions(
     client: AsyncOpenAI, intent_utterances: dict[int, list[str]], intents: list[Intent], model_name: str
 ) -> list[Intent]:
+    """
+    Generates descriptions for a list of intents using an OpenAI model.
+
+    Args:
+        client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
+        intent_utterances (dict[int, list[str]]): A dictionary mapping intent IDs to their corresponding utterances.
+        intents (list[Intent]): A list of intents to generate descriptions for.
+        model_name (str): The name of the OpenAI model to use for generating descriptions.
+
+    Returns:
+        list[Intent]: The list of intents with updated descriptions.
+    """
     tasks = []
     for intent in intents:
         if intent.description is not None:
             continue
         utterances = intent_utterances.get(intent.id, [])
         task = asyncio.create_task(
-            generate_intent_description(
+            create_intent_description(
                 client=client,
                 intent_name=intent.name,
                 utterances=utterances,
@@ -107,10 +140,22 @@ async def generate(
 def enhance_dataset_with_descriptions(
     dataset: Dataset, api_base: str, api_key: str, model_name: str = "gpt-3.5-turbo"
 ) -> Dataset:
+    """
+    Enhances a dataset by generating descriptions for intents using an OpenAI model.
+
+    Args:
+        dataset (Dataset): The dataset containing utterances and intents that require descriptions.
+        api_base (str): The base URL for the OpenAI API.
+        api_key (str): The API key for authenticating the OpenAI client.
+        model_name (str, optional): The OpenAI model to use for generating descriptions. Defaults to "gpt-3.5-turbo".
+
+    Returns:
+        Dataset: The dataset with intents enhanced by generated descriptions.
+    """
     client = AsyncOpenAI(
         base_url=api_base,
         api_key=api_key,
     )
     intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
-    dataset.intents = asyncio.run(generate(client, intent_utterances, dataset.intents, model_name))
+    dataset.intents = asyncio.run(generate_intent_descriptions(client, intent_utterances, dataset.intents, model_name))
     return dataset
