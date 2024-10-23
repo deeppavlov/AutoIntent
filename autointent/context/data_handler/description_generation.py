@@ -1,6 +1,8 @@
+from collections import defaultdict
+
 from openai import OpenAI
 
-from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
+from autointent.context.data_handler.schemas import Dataset, Utterance
 
 PROMPT_DESCRIPTION = """
 {intent_name}
@@ -11,8 +13,15 @@ PROMPT_DESCRIPTION = """
 # по остальным аргументами api_base, api_key, model_name тоже добавить в гидру?
 
 
-def get_utternaces_by_id(intents: list[Intent], utterances: list[Utterance]) -> dict[int, list[str]]:
-    pass
+def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
+    intent_utterances = defaultdict(list)
+
+    for utterance in utterances:
+        if utterance.label is not None:
+            for label in utterance.label:
+                intent_utterances[label].append(utterance.text)
+
+    return intent_utterances
 
 
 def generate_intent_description(client: OpenAI, intent_name: str, utterances: list[str], model_name: str) -> str:
@@ -35,11 +44,14 @@ def enhance_dataset_with_descriptions(
         api_base=api_base,
         api_key=api_key,
     )
-    intent_utterances = get_utternaces_by_id(dataset.intents, dataset.utterances)
+    intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
 
     for intent in dataset.intents:
         if not intent.description:
             intent.description = generate_intent_description(
-                client=client, intent_name=intent.name, utterances=intent_utterances[intent.id], model_name=model_name
+                client=client,
+                intent_name=intent.name,
+                utterances=intent_utterances.get(intent.id, []),
+                model_name=model_name,
             )
     return dataset
