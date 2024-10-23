@@ -2,7 +2,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from .data_handler import DataHandler, Dataset
+from .data_handler import DataAugmenter, DataHandler, Dataset
 from .optimization_info import OptimizationInfo
 from .vector_index_client import VectorIndex, VectorIndexClient
 
@@ -20,13 +20,13 @@ class Context:
         dump_dir: str | Path | None = None,
         force_multilabel: bool = False,
     ) -> None:
+        augmenter = DataAugmenter(multilabel_generation_config, regex_sampling, seed)
         self.data_handler = DataHandler(
             dataset,
             test_dataset,
-            multilabel_generation_config,
-            regex_sampling,
             random_seed=seed,
             force_multilabel=force_multilabel,
+            augmenter=augmenter
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, db_dir)

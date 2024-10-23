@@ -13,6 +13,8 @@ from .scheme import UtteranceRecord
 from .stratification import split_sample_utterances
 from .tags import collect_tags
 
+logger = logging.getLogger(__name__)
+
 
 class RegexPatterns(TypedDict):
     id: int
@@ -20,17 +22,41 @@ class RegexPatterns(TypedDict):
     regexp_partial_match: list[str]
 
 
+class DataAugmenter:
+    def __init__(
+        self, multilabel_generation_config: str | None = None, regex_sampling: int = 0, random_seed: int = 0
+    ) -> None:
+        self.multilabel_generation_config = multilabel_generation_config
+        self.regex_sampling = regex_sampling
+        self.random_seed = random_seed
+
+    def __call__(self, dataset: Dataset) -> Dataset:
+        if self.regex_sampling > 0:
+            logger.debug(
+                "sampling %s utterances from regular expressions for each intent class...", self.regex_sampling
+            )
+            dataset = sample_from_regex(dataset=dataset, n_shots=self.regex_sampling)
+
+        if self.multilabel_generation_config is not None and self.multilabel_generation_config != "":
+            logger.debug("generating multilabel utterances from multiclass ones...")
+            dataset = generate_multilabel_version(
+                dataset=dataset,
+                config_string=self.multilabel_generation_config,
+                random_seed=self.random_seed,
+            )
+
+        return dataset
+
+
 class DataHandler:
     def __init__(
         self,
         dataset: Dataset,
         test_dataset: Dataset | None = None,
-        multilabel_generation_config: str | None = None,
-        regex_sampling: int = 0,
         force_multilabel: bool = False,
         random_seed: int = 0,
+        augmenter: DataAugmenter | None = None,
     ) -> None:
-        logger = logging.getLogger(__name__)
         set_seed(random_seed)
 
         if force_multilabel:
@@ -38,17 +64,8 @@ class DataHandler:
 
         self.multilabel = dataset.type == DatasetType.multilabel
 
-        if regex_sampling > 0:
-            logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
-            dataset = sample_from_regex(dataset=dataset, n_shots=regex_sampling)
-
-        if multilabel_generation_config is not None and multilabel_generation_config != "":
-            logger.debug("generating multilabel utterances from multiclass ones...")
-            dataset = generate_multilabel_version(
-                dataset=dataset,
-                config_string=multilabel_generation_config,
-                random_seed=random_seed,
-            )
+        if augmenter is not None:
+            dataset = augmenter(dataset)
 
         logger.debug("collecting tags from multiclass intent_records if present...")
         self.tags = collect_tags(dataset)
