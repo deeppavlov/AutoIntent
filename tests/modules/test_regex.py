@@ -8,7 +8,7 @@ from autointent.modules import RegExp, VectorDBModule
 
 @pytest.mark.xfail(reason="Issues with intent_id")
 def test_base_regex(setup_environment):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     data = {
         "utterances": [

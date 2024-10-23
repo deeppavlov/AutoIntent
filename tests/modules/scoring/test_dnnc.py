@@ -9,7 +9,7 @@ from autointent.modules import DNNCScorer, VectorDBModule
 @pytest.mark.xfail(reason="This test is failing on windows, because have different score")
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1), (False, 0.5)])
 def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     context = Context(
         dataset=load_clinic_subset,

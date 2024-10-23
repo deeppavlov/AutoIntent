@@ -19,7 +19,7 @@ from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipel
     ["multiclass", "multilabel"],
 )
 def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset_type):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset(dataset_type)
 
@@ -46,7 +46,7 @@ def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset
     ],
 )
 def test_optimization_pipeline_cli(dataset_type, setup_environment):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
     config = OptimizationConfig(
         data=DataConfig(
             train_path=ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")

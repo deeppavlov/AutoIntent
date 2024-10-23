@@ -6,7 +6,7 @@ from autointent.modules import KNNScorer, VectorDBModule
 
 
 def test_base_knn(setup_environment, load_clinc_subset):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multiclass")
 

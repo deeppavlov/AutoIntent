@@ -5,6 +5,7 @@ from pathlib import Path
 
 from autointent.context.data_handler import DataHandler
 
+from .cache import get_db_dir
 from .vector_index import VectorIndex
 
 DIRNAMES_TYPE = dict[str, str]
@@ -16,7 +17,7 @@ class VectorIndexClient:
     def __init__(self, device: str = "cpu", db_dir: str | Path | None = None) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.db_dir = Path.cwd() if db_dir is None else Path(db_dir)
+        self.db_dir = get_db_dir(db_dir)
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         """

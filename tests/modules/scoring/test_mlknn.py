@@ -8,7 +8,7 @@ from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 
 
 def test_base_mlknn(setup_environment, load_clinc_subset):
-    run_name, db_dir, dump_dir, logs_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multilabel")
 
