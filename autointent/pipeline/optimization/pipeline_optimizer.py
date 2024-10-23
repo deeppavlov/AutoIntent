@@ -29,9 +29,12 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def dump(self, logs_dir: Path | None = None) -> None:
+    def dump(self, logs_dir: str | Path) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump_evaluation_results()
+
+        if isinstance(logs_dir, str):
+            logs_dir = Path(logs_dir)
 
         # create appropriate directory
         logs_dir.mkdir(parents=True, exist_ok=True)

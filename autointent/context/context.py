@@ -36,7 +36,7 @@ class Context:
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
         self.db_dir = db_dir
-        self.dump_dir = dump_dir
+        self.dump_dir = Path.cwd() / "modules_dumps" if dump_dir is None else Path(dump_dir)
 
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()

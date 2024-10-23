@@ -43,7 +43,7 @@ def add_cache_directory(directory: str) -> None:
     chroma_config = read_chroma_config()
 
     directories = set(chroma_config.cache_directories)
-    directories.add(str(directory))
+    directories.add(directory)
     chroma_config.cache_directories = sorted(directories)
 
     write_chroma_config(chroma_config)
@@ -60,7 +60,7 @@ def get_db_dir(run_name: str, db_dir: Path | None = None) -> Path:
         db_dir = get_chroma_cache_dir() / run_name
 
     db_dir.mkdir(parents=True, exist_ok=True)
-    add_cache_directory(db_dir)
+    add_cache_directory(str(db_dir))
 
     return db_dir
 

@@ -13,7 +13,7 @@ from autointent.context.data_handler import Dataset
 from .name import generate_name
 
 
-def load_data(data_path: str) -> Dataset:
+def load_data(data_path: str | Path) -> Dataset:
     """load data from the given path or load sample data which is distributed along with the autointent package"""
     if data_path == "default-multiclass":
         with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
@@ -28,8 +28,8 @@ def load_data(data_path: str) -> Dataset:
     return Dataset.model_validate(res)
 
 
-def get_run_name(run_name: str) -> str:
-    if run_name == "":
+def get_run_name(run_name: str | None = None) -> str:
+    if run_name is None:
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005
 
@@ -52,9 +52,9 @@ def setup_logging(level: str | None = None) -> logging.Logger:
     return logging.getLogger(__name__)
 
 
-def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
+def load_config(config_path: str | Path | None, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
     """load config from the given path or load default config which is distributed along with the autointent package"""
-    if config_path != "":
+    if config_path is not None:
         if logger is not None:
             logger.debug("loading optimization search space config from %s...)", config_path)
         with Path(config_path).open() as file:
