@@ -5,6 +5,7 @@ from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import Self
 
 from autointent import Context
 from autointent.custom_types import LABEL_TYPE
@@ -22,22 +23,32 @@ class JinoosPredictorDumpMetadata(TypedDict):
 class JinoosPredictor(PredictionModule):
     metadata_dict_name = "metadata.json"
 
-    def __init__(self, search_space: list[float] | None = None) -> None:
+    def __init__(self, has_oos_samples: bool, best_oos_scores: npt.NDArray[np.float64] | None = None, search_space: list[float] | None = None) -> None:
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
+        self.has_oos_samples = has_oos_samples
+        self.best_oos_scores = best_oos_scores
 
-    def fit(self, context: Context) -> None:
+    @classmethod
+    def from_context(cls, context: Context, search_space: list[float] | None = None, **kwargs: dict[str, Any]) -> Self:
+        return cls(
+            has_oos_samples=context.data_handler.has_oos_samples(),
+            best_oos_scores=context.optimization_info.get_best_oos_scores(),
+            search_space=search_space,
+        )
+
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
         """
         TODO: use dev split instead of test split
         """
 
-        if not context.data_handler.has_oos_samples():
+        if not self.has_oos_samples:
             logger = logging.getLogger(__name__)
             logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using JinoosPredictor imposes unnecessary computational overhead."
             )
 
-        y_true, scores = get_prediction_evaluation_data(context)
+        y_true, scores = get_prediction_evaluation_data(scores, labels, self.best_oos_scores)
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []

@@ -13,7 +13,7 @@ from autointent.metrics import METRIC_FN
 
 class Module(ABC):
     @abstractmethod
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod

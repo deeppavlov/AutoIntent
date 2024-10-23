@@ -136,6 +136,7 @@ module = [
     "hydra.*",
     "transformers",
     "faiss",
+    "joblib",
 ]
 ignore_missing_imports = true
 

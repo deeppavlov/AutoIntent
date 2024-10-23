@@ -2,7 +2,9 @@ import itertools as it
 import json
 import logging
 from pathlib import Path
-from typing import Any, Self, TypedDict
+from typing import Any, TypedDict
+
+from typing_extensions import Self
 
 import numpy as np
 import numpy.typing as npt
@@ -42,8 +44,8 @@ class DNNCScorer(ScoringModule):
         model_name: str,
         k: int,
         n_classes: int,
-        device: str | None = None,
-        db_dir: str | None = None,
+        db_dir: str,
+        device: str = "cpu",
         train_head: bool = False,
     ) -> None:
         self.model_name = model_name
@@ -70,7 +72,7 @@ class DNNCScorer(ScoringModule):
             db_dir=context.db_dir,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=self.device)
 
         if self.train_head:
@@ -161,7 +163,7 @@ class DNNCScorer(ScoringModule):
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: DNNCScorerDumpMetadata = json.load(file)
+            self.metadata: DNNCScorerDumpMetadata = json.load(file)  # type: ignore[no-redef]
 
         self.n_classes = self.metadata["n_classes"]
         self.model_name = self.metadata["biencoder_model"]

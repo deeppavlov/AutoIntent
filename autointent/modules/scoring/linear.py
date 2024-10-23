@@ -49,7 +49,7 @@ class LinearScorer(ScoringModule):
         db_dir: str = "vector_index",
         cv: int = 3,
         n_jobs: int = -1,
-        device: str | None = None,
+        device: str = "cpu",
         seed: int = 0,
     ) -> None:
         self.cv = cv
@@ -76,7 +76,7 @@ class LinearScorer(ScoringModule):
             seed=context.seed,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE],  *args: Any, **kwargs: dict[str, Any]) -> None:
         self._multilabel = isinstance(labels[0], list)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)

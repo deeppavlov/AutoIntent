@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Any
 
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
@@ -24,7 +25,7 @@ class VectorDBModule(RetrievalModule):
         self.device = context.device
         self.db_dir = context.db_dir
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE],  *args: Any, **kwargs: dict[str, Any]) -> None:
         self.vector_index_client_kwargs = {
             "device": self.device,
             "db_dir": self.db_dir,

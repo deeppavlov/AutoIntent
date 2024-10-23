@@ -75,7 +75,7 @@ class NodeOptimizer:
             args = (context.data_handler.utterances_train, context.data_handler.labels_train)
         elif self.node_info.node_type == "prediction":
             labels, scores = get_prediction_evaluation_data(context)
-            args = (scores, labels, context.data_handler.tags)
+            args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
         else:
             msg = "something's wrong"
             self._logger.error(msg)

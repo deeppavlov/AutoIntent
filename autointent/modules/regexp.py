@@ -1,6 +1,8 @@
 import re
 from typing import Any
 
+from typing_extensions import Self
+
 from autointent import Context
 from autointent.context.optimization_info.data_models import Artifact
 from autointent.custom_types import LABEL_TYPE
@@ -10,13 +12,22 @@ from .base import Module
 
 
 class RegExp(Module):
-    def fit(self, context: Context) -> None:
+    def __init__(self, regexp_patterns: list[dict[str, Any]]) -> None:
+        self.regexp_patterns = regexp_patterns
+
+    @classmethod
+    def from_context(cls, context: Context, **kwargs: Any) -> Self:
+        return cls(
+            regexp_patterns=context.data_handler.regexp_patterns,
+        )
+
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
         self.regexp_patterns = [
             {
                 "regexp_full_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_full_match"]],
                 "regexp_partial_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_partial_match"]],
             }
-            for dct in context.data_handler.regexp_patterns  # todo what now regexp_patterns?
+            for dct in self.regexp_patterns
         ]
 
     def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:

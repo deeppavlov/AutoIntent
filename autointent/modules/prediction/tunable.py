@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any, TypedDict
+from typing_extensions import Self
 
 import numpy as np
 import numpy.typing as npt
@@ -29,10 +30,11 @@ class TunablePredictor(PredictionModule):
         self.n_trials = n_trials
         self.seed = seed
 
-    def configure_optimization(self, context: Context) -> None:
-        self.seed = context.seed
+    @classmethod
+    def from_context(cls, context: Context, n_trials: int | None = None) -> Self:
+        return cls(n_trials=n_trials, seed=context.seed)
 
-    def fit(self, scores: npt.NDArray[np.float32], labels: list[LABEL_TYPE], tags: list[Tag]) -> None:
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag]| None = None, *args: Any, **kwargs: dict[str, Any]) -> None:
         """
         When data doesn't contain out-of-scope utterances, using
         TunablePredictor imposes unnecessary computational overhead.
@@ -45,7 +47,7 @@ class TunablePredictor(PredictionModule):
 
         thresh_optimizer.fit(
             probas=scores,
-            labels=labels,
+            labels=np.array(labels),
             seed=self.seed,
             tags=self.tags,
         )

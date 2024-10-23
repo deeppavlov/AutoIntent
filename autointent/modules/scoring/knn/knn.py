@@ -34,8 +34,8 @@ class KNNScorer(ScoringModule):
         weights: WEIGHT_TYPES,
         n_classes: int,
         multilabel: bool,
-        db_dir: str | None = None,
-        device: str | None = None,
+        db_dir: str,
+        device: str = "cpu",
     ) -> None:
         """
         Arguments
@@ -73,7 +73,7 @@ class KNNScorer(ScoringModule):
             device=context.device,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE],  *args: Any, **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
         vector_index = vector_index_client.get_or_create_index(self.model_name)
         vector_index.add(utterances, labels)

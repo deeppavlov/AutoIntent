@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Any
 
 import numpy as np
@@ -10,7 +10,7 @@ from autointent.metrics import ScoringMetricFn
 from autointent.modules.base import Module
 
 
-class ScoringModule(Module):
+class ScoringModule(Module, ABC):
     metadata_dict_name: str = "metadata.json"
 
     def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:

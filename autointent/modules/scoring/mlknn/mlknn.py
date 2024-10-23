@@ -45,7 +45,7 @@ class MLKnnScorer(ScoringModule):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         db_dir: str = "vector-index",
-        device: str | None = None,
+        device: str = "cpu",
     ) -> None:
         self.n_classes = n_classes
         self.k = k
@@ -86,7 +86,7 @@ class MLKnnScorer(ScoringModule):
         )
 
         self.features = vector_index.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
-        self.labels = labels
+        self.labels = np.array(labels)
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 

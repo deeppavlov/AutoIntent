@@ -5,11 +5,13 @@ from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler.tags import Tag
 
 from .base import PredictionModule, apply_tags
+from ...custom_types import LABEL_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -24,21 +26,27 @@ class ThresholdPredictor(PredictionModule):
     multilabel: bool
     tags: list[Tag]
 
-    def __init__(self, thresh: float | npt.NDArray[Any]) -> None:
+    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int, has_oos_samples: bool) -> None:
         self.thresh = thresh
+        self.multilabel = multilabel
+        self.n_classes = n_classes
+        self.has_oos_samples = has_oos_samples
 
-    def fit(self, context: Context) -> None:
-        self.multilabel = context.multilabel
-        self.tags = context.data_handler.tags
+    @classmethod
+    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5, **kwargs: dict[str, Any]) -> Self:
+        return cls(thresh=thresh, multilabel=context.multilabel, n_classes=context.n_classes, has_oos_samples=context.data_handler.has_oos_samples())
+
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag]| None = None, *args: Any, **kwargs: dict[str, Any]) -> None:
+        self.tags = tags
 
         if not isinstance(self.thresh, float):
-            if len(self.thresh) != context.n_classes:
+            if len(self.thresh) != self.n_classes:
                 msg = "Wrong number of thresholds provided doesn't match with number of classes"
                 logger.error(msg)
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
-        if not context.data_handler.has_oos_samples():
+        if not self.has_oos_samples:
             logger.warning(
                 "Your data doesn't contain out-of-scope utterances."
                 "Using ThresholdPredictor imposes unnecessary quality degradation."
