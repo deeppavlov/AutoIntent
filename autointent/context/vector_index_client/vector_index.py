@@ -14,7 +14,7 @@ class VectorIndex:
     index: faiss.Index
     embedding_model: SentenceTransformer
 
-    def __init__(self, model_name: str, device: str) -> None:
+    def __init__(self, model_name: str, device: str = "cpu") -> None:
         self.model_name = model_name
         self.device = device
 

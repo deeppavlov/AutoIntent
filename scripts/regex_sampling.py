@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("--output-path", type=str, required=True)
     args = parser.parse_args()
 
-    intent_records = json.load(open(args.data_path))
+    intent_records = json.load(open(args.input_path))
 
     sample_from_regex(intent_records, args.n_shots)
 

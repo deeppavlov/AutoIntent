@@ -54,7 +54,7 @@ class DNNCScorer(ScoringModule):
 
         self.metadata = DNNCScorerDumpMetadata(
             device=context.device,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             n_classes=self.n_classes,
             biencoder_model=self.vector_index.model_name,
         )
