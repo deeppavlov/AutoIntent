@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
 from typing import Any, TypedDict
-from typing_extensions import Self
 
 import numpy as np
 import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
+from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.data_handler.tags import Tag
@@ -34,14 +34,20 @@ class TunablePredictor(PredictionModule):
     def from_context(cls, context: Context, n_trials: int | None = None) -> Self:
         return cls(n_trials=n_trials, seed=context.seed)
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag]| None = None, *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LABEL_TYPE],
+        tags: list[Tag] = [],
+        **kwargs: dict[str, Any],
+    ) -> None:
         """
         When data doesn't contain out-of-scope utterances, using
         TunablePredictor imposes unnecessary computational overhead.
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
-        n_classes = len(labels[0]) if self.multilabel else len(set(labels).difference([-1]))
+        n_classes = len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
 
         thresh_optimizer = ThreshOptimizer(n_classes=n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
 

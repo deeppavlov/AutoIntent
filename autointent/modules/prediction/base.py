@@ -14,10 +14,9 @@ from autointent.modules.base import Module
 
 
 class PredictionModule(Module, ABC):
-
-    @overload
+    @overload  # type: ignore[misc]
     @abstractmethod
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod
@@ -37,18 +36,20 @@ class PredictionModule(Module, ABC):
 
 
 def get_prediction_evaluation_data(
-    scores:npt.NDArray[Any], labels: list[LABEL_TYPE], best_oos_scores: npt.NDArray[np.float64] | None
+    context: Context,
 ) -> tuple[list[LABEL_TYPE], npt.NDArray[Any]]:
+    labels = np.array(context.data_handler.labels_test)
+    scores = context.optimization_info.get_best_test_scores()
 
     if scores is None:
-        msg = "Scores are not available. Run the predictor first."
-        raise ValueError(msg)
+        raise ValueError("No test scores found in the optimization info")
 
+    oos_scores = context.optimization_info.get_best_oos_scores()
     return_scores = scores
-    if best_oos_scores is not None:
+    if oos_scores is not None:
         oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
         labels = np.concatenate([labels, np.array(oos_labels)])
-        return_scores = np.concatenate([scores, best_oos_scores])
+        return_scores = np.concatenate([scores, oos_scores])
 
     return labels.tolist(), return_scores
 

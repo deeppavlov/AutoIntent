@@ -6,9 +6,9 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
+from autointent.custom_types import LABEL_TYPE
 
 from .base import PredictionModule
-from ...custom_types import LABEL_TYPE
 
 
 class ArgmaxPredictor(PredictionModule):
@@ -16,12 +16,12 @@ class ArgmaxPredictor(PredictionModule):
         self.has_oos_samples = has_oos_samples
 
     @classmethod
-    def from_context(cls, context: Context, **kwargs: Any) -> Self:
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
         return cls(
             has_oos_samples=context.data_handler.has_oos_samples(),
         )
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         if self.has_oos_samples:
             logger = logging.getLogger(__name__)
             logger.warning(

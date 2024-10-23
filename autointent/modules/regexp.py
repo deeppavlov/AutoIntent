@@ -1,5 +1,5 @@
 import re
-from typing import Any
+from typing import Any, TypedDict
 
 from typing_extensions import Self
 
@@ -9,21 +9,30 @@ from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.regexp import RegexpMetricFn
 
 from .base import Module
+from autointent.context.data_handler.data_handler import RegexPatterns
+
+
+class RegexPatternsCompiled(TypedDict):
+    id: int
+    regexp_full_match: list[re.Pattern[str]]
+    regexp_partial_match: list[re.Pattern[str]]
+
 
 
 class RegExp(Module):
-    def __init__(self, regexp_patterns: list[dict[str, Any]]) -> None:
+    def __init__(self, regexp_patterns: list[RegexPatterns]) -> None:
         self.regexp_patterns = regexp_patterns
 
     @classmethod
-    def from_context(cls, context: Context, **kwargs: Any) -> Self:
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
         return cls(
             regexp_patterns=context.data_handler.regexp_patterns,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
-        self.regexp_patterns = [
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+        self.regexp_patterns_compiled: list[RegexPatternsCompiled] = [
             {
+                "id": dct["id"],
                 "regexp_full_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_full_match"]],
                 "regexp_partial_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_partial_match"]],
             }
@@ -33,7 +42,7 @@ class RegExp(Module):
     def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:
         return [list(self._predict_single(ut)) for ut in utterances]
 
-    def _match(self, text: str, intent_record: dict[str, Any]) -> bool:
+    def _match(self, text: str, intent_record: RegexPatternsCompiled) -> bool:
         full_match = any(ptn.fullmatch(text) for ptn in intent_record["regexp_full_match"])
         if full_match:
             return True
@@ -41,7 +50,7 @@ class RegExp(Module):
 
     def _predict_single(self, utterance: str) -> set[int]:
         # todo test this
-        return {intent_record["id"] for intent_record in self.regexp_patterns if self._match(utterance, intent_record)}  # type: ignore[misc]
+        return {intent_record["id"] for intent_record in self.regexp_patterns_compiled if self._match(utterance, intent_record)}
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
         # TODO add parameter to a whole pipeline (or just to regexp module):
@@ -62,3 +71,9 @@ class RegExp(Module):
 
     def get_assets(self) -> Artifact:
         return Artifact()
+
+    def load(self, path: str) -> None:
+        pass
+
+    def dump(self, path: str) -> None:
+        pass

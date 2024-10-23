@@ -4,14 +4,12 @@ import logging
 from pathlib import Path
 from typing import Any, TypedDict
 
-from typing_extensions import Self
-
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
+from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.data_handler import Tag
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
@@ -72,7 +70,7 @@ class DNNCScorer(ScoringModule):
             db_dir=context.db_dir,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=self.device)
 
         if self.train_head:

@@ -9,9 +9,9 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler.tags import Tag
+from autointent.custom_types import LABEL_TYPE
 
 from .base import PredictionModule, apply_tags
-from ...custom_types import LABEL_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,9 @@ class ThresholdPredictor(PredictionModule):
     multilabel: bool
     tags: list[Tag]
 
-    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int, has_oos_samples: bool) -> None:
+    def __init__(
+        self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int, has_oos_samples: bool
+    ) -> None:
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
@@ -34,9 +36,20 @@ class ThresholdPredictor(PredictionModule):
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5, **kwargs: dict[str, Any]) -> Self:
-        return cls(thresh=thresh, multilabel=context.multilabel, n_classes=context.n_classes, has_oos_samples=context.data_handler.has_oos_samples())
+        return cls(
+            thresh=thresh,
+            multilabel=context.multilabel,
+            n_classes=context.n_classes,
+            has_oos_samples=context.data_handler.has_oos_samples(),
+        )
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag]| None = None, *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LABEL_TYPE],
+        tags: list[Tag] = [],
+        **kwargs: dict[str, Any],
+    ) -> None:
         self.tags = tags
 
         if not isinstance(self.thresh, float):

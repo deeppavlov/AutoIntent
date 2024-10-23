@@ -7,7 +7,6 @@ from numpy.typing import NDArray
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.data_handler import Tag
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
@@ -74,7 +73,7 @@ class MLKnnScorer(ScoringModule):
             device=context.device,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], tags: list[Tag] | None = None) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
         vector_index = vector_index_client.get_or_create_index(self.model_name)
 

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any
+from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
@@ -16,16 +17,25 @@ class VectorDBModule(RetrievalModule):
 
     def __init__(self, k: int, model_name: str, device: str = "cpu", db_dir: str = ".") -> None:
         self.model_name = model_name
-        self.k = k
         self.device = device
         self.db_dir = db_dir
+        super().__init__(k=k)
+
+    @classmethod
+    def from_context(cls, context: Context, k: int =5 ,  model_name: str = "sentence-transformers/all-MiniLM-L6-v2", **kwargs: dict[str, Any]) -> Self:
+        return cls(
+            k=k,
+            model_name=model_name,
+            db_dir=context.db_dir,
+            device=context.device,
+        )
 
     def configure_optimization(self, context: Context) -> None:
         """extract some info from context that is useful for node optimization"""
         self.device = context.device
         self.db_dir = context.db_dir
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE],  *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         self.vector_index_client_kwargs = {
             "device": self.device,
             "db_dir": self.db_dir,

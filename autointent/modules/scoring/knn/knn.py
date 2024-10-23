@@ -7,7 +7,6 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent.context import Context
-from autointent.context.data_handler import Tag
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES
 from autointent.modules.scoring.base import ScoringModule
@@ -73,7 +72,7 @@ class KNNScorer(ScoringModule):
             device=context.device,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE],  *args: Any, **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
         vector_index = vector_index_client.get_or_create_index(self.model_name)
         vector_index.add(utterances, labels)
