@@ -82,16 +82,19 @@ async def create_intent_description(
     client: AsyncOpenAI, intent_name: str | None, utterances: list[str], model_name: str
 ) -> str:
     """
-    Creates a description for a specific intent using an OpenAI model.
+    Generates a description for a specific intent using an OpenAI model.
 
     Args:
-        client (AsyncOpenAI): The OpenAI client used to generate the description.
-        intent_name (str): The name of the intent for which the description is generated.
+        client (AsyncOpenAI): The OpenAI client instance used to communicate with the model.
+        intent_name (str | None): The name of the intent to describe. If None, an empty string will be used.
         utterances (list[str]): A list of example utterances related to the intent.
-        model_name (str): The name of the OpenAI model to use for generating the description.
+        model_name (str): The identifier of the OpenAI model to use for generating the description.
 
     Returns:
-        str: The generated description for the intent.
+        str: The generated description of the intent.
+
+    Raises:
+        ValueError: If the response from the model is not a string or is in an unexpected format.
     """
     intent_name = intent_name if intent_name is not None else ""
     content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances))
@@ -99,7 +102,12 @@ async def create_intent_description(
         messages=[{"role": "user", "content": content}],
         model=model_name,
     )
-    return chat_completion.choices[0].message.content.strip()
+    result = chat_completion.choices[0].message.content.strip()
+
+    if not isinstance(result, str):
+        error_text = f"Unexpected response type: expected str, got {type(result).__name__}"
+        raise TypeError(error_text)
+    return result
 
 
 async def generate_intent_descriptions(
