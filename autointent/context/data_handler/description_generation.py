@@ -1,8 +1,9 @@
+import asyncio
 from collections import defaultdict
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 
-from autointent.context.data_handler.schemas import Dataset, Utterance
+from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
 
 PROMPT_DESCRIPTION = """
 {intent_name}
@@ -25,34 +26,48 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     return intent_utterances
 
 
-def generate_intent_description(client: OpenAI, intent_name: str, utterances: list[str], model_name: str) -> str:
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": PROMPT_DESCRIPTION.format(intent_name=intent_name, utterances="\n".join(utterances)),
-            }
-        ],
+async def generate_intent_description(
+    client: AsyncOpenAI, intent_name: str, utterances: list[str], model_name: str
+) -> str:
+    content = PROMPT_DESCRIPTION.format(intent_name=intent_name, utterances="\n".join(utterances))
+    chat_completion = await client.chat.completions.create(
+        messages=[{"role": "user", "content": content}],
         model=model_name,
     )
-    return chat_completion.choices[0].text.strip()
+    return chat_completion.choices[0].message.content.strip()
+
+
+async def generate(
+    client: AsyncOpenAI, intent_utterances: dict[int, list[str]], intents: list[Intent], model_name: str
+) -> list[Intent]:
+    tasks = []
+    for intent in intents:
+        if intent.description is not None:
+            continue
+        utterances = intent_utterances.get(intent.id, [])
+        task = asyncio.create_task(
+            generate_intent_description(
+                client=client,
+                intent_name=intent.name,
+                utterances=utterances,
+                model_name=model_name,
+            )
+        )
+        tasks.append((intent, task))
+
+    descriptions = await asyncio.gather(*(task for _, task in tasks))
+    for (intent, _), description in zip(tasks, descriptions, strict=False):
+        intent.description = description
+    return intents
 
 
 def enhance_dataset_with_descriptions(
     dataset: Dataset, api_base: str, api_key: str, model_name: str = "gpt-3.5-turbo"
 ) -> Dataset:
-    client = OpenAI(
+    client = AsyncOpenAI(
         api_base=api_base,
         api_key=api_key,
     )
     intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
-
-    for intent in dataset.intents:
-        if not intent.description:
-            intent.description = generate_intent_description(
-                client=client,
-                intent_name=intent.name,
-                utterances=intent_utterances.get(intent.id, []),
-                model_name=model_name,
-            )
+    dataset.intents = asyncio.run(generate(client, intent_utterances, dataset.intents, model_name))
     return dataset
