@@ -102,7 +102,7 @@ async def create_intent_description(
         messages=[{"role": "user", "content": content}],
         model=model_name,
     )
-    result = chat_completion.choices[0].message.content.strip()
+    result = chat_completion.choices[0].message.content
 
     if not isinstance(result, str):
         error_text = f"Unexpected response type: expected str, got {type(result).__name__}"
