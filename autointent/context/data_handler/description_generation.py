@@ -97,7 +97,7 @@ async def create_intent_description(
         ValueError: If the response from the model is not a string or is in an unexpected format.
     """
     intent_name = intent_name if intent_name is not None else ""
-    content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances))
+    content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances[:5]))
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
         model=model_name,
