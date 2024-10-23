@@ -19,7 +19,8 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     for utterance in utterances:
         if utterance.label is not None:
             for label in utterance.label:
-                intent_utterances[label].append(utterance.text)
+                text = utterance.text
+                intent_utterances[label].append(text)
 
     return intent_utterances
 
