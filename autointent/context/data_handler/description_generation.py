@@ -79,7 +79,7 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
 
 
 async def create_intent_description(
-    client: AsyncOpenAI, intent_name: str, utterances: list[str], model_name: str
+    client: AsyncOpenAI, intent_name: str | None, utterances: list[str], model_name: str
 ) -> str:
     """
     Creates a description for a specific intent using an OpenAI model.
@@ -93,6 +93,7 @@ async def create_intent_description(
     Returns:
         str: The generated description for the intent.
     """
+    intent_name = intent_name if intent_name is not None else ""
     content = PROMPT_DESCRIPTION.format(intent_name=intent_name, user_utterances="\n".join(utterances))
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
