@@ -6,6 +6,9 @@ PROMPT_DESCRIPTION = """
 {intent_name}
 {utterances}
 """
+# где лучше использовать PROMPT_DESCRIPTION? вставить его в функцию или вынести куда-то?
+# куда внедрить enhance_dataset_with_description? в datahandler? задать булевый аргумент в гидре добавлять\не добавлять описание?
+# по остальным аргументами api_base, api_key, model_name тоже добавить в гидру?
 
 
 def get_utternaces_by_id(intents: list[Intent], utterances: list[Utterance]) -> dict[int, list[str]]:
