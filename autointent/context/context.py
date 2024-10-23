@@ -22,11 +22,7 @@ class Context:
     ) -> None:
         augmenter = DataAugmenter(multilabel_generation_config, regex_sampling, seed)
         self.data_handler = DataHandler(
-            dataset,
-            test_dataset,
-            random_seed=seed,
-            force_multilabel=force_multilabel,
-            augmenter=augmenter
+            dataset, test_dataset, random_seed=seed, force_multilabel=force_multilabel, augmenter=augmenter
         )
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, db_dir)

@@ -48,9 +48,7 @@ def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset
 def test_optimization_pipeline_cli(dataset_type, setup_environment):
     db_dir, dump_dir, logs_dir = setup_environment
     config = OptimizationConfig(
-        data=DataConfig(
-            train_path=ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")
-        ),
+        data=DataConfig(train_path=ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")),
         task=TaskConfig(
             search_space_path=ires.files("tests.assets.configs").joinpath(f"{dataset_type}.yaml"),
         ),
