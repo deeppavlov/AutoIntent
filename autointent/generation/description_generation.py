@@ -120,8 +120,7 @@ async def generate_intent_descriptions(
 
 def enhance_dataset_with_descriptions(
     dataset: Dataset,
-    api_base: str,
-    api_key: str,
+    client: AsyncOpenAI,
     prompt: str = PROMPT_DESCRIPTION,
     model_name: str = "gpt-4o-mini",
 ) -> Dataset:
@@ -130,8 +129,7 @@ def enhance_dataset_with_descriptions(
 
     Args:
         dataset (Dataset): The dataset containing utterances and intents that require descriptions.
-        api_base (str): The base URL for the OpenAI API.
-        api_key (str): The API key for authenticating the OpenAI client.
+        client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
         prompt (str): A string template for the prompt, which must include placeholders for {intent_name}
                                   and {user_utterances} to format the content sent to the model.
         model_name (str, optional): The OpenAI model to use for generating descriptions. Defaults to "gpt-3.5-turbo".
@@ -141,10 +139,6 @@ def enhance_dataset_with_descriptions(
     """
     check_prompt_description(prompt)
 
-    client = AsyncOpenAI(
-        base_url=api_base,
-        api_key=api_key,
-    )
     intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
     dataset.intents = asyncio.run(
         generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name)
