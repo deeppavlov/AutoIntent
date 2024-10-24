@@ -2,19 +2,21 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 import numpy.typing as npt
+from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):
     @abstractmethod
-    def fit(self, context: Context) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod
-    def score(self, context: Context, metric_fn: METRIC_FN) -> float:
+    def score(self, utterances: list[str], labels: list[LABEL_TYPE], oos_utterances: list[str] | None, metric_fn: METRIC_FN) -> float:
         """
         calculates metric on test set and returns metric value
         """
@@ -40,3 +42,8 @@ class Module(ABC):
     @abstractmethod
     def predict(self, utterances_or_scores: list[str] | npt.NDArray[Any]) -> npt.NDArray[Any]:
         """inference"""
+
+    @classmethod
+    @abstractmethod
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
+        pass

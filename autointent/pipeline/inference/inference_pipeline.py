@@ -18,3 +18,6 @@ class InferencePipeline:
     def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:
         scores = self.nodes["scoring"].module.predict(utterances)
         return self.nodes["prediction"].module.predict(scores)  # type: ignore[return-value]
+
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+        pass

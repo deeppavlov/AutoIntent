@@ -8,8 +8,11 @@ import numpy.typing as npt
 from sentence_transformers import SentenceTransformer
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
+from typing_extensions import Self
 
-from autointent import Context
+from autointent.context import Context
+from autointent.context.vector_index_client import VectorIndexClient
+from autointent.custom_types import LABEL_TYPE
 
 from .base import ScoringModule
 
@@ -36,25 +39,55 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    metadata_dict_name: str = "metadata.json"
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
 
-    def __init__(self, cv: int = 3, n_jobs: int = -1) -> None:
+    def __init__(
+        self,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        db_dir: str = "vector_index",
+        cv: int = 3,
+        n_jobs: int = -1,
+        device: str = "cpu",
+        seed: int = 0,
+    ) -> None:
         self.cv = cv
         self.n_jobs = n_jobs
+        self.device = device
+        self.db_dir = db_dir
+        self.seed = seed
+        self.model_name = model_name
 
-    def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
-        vector_index = context.get_best_index()
-        features = vector_index.get_all_embeddings()
-        labels = vector_index.get_all_labels()
+    @classmethod
+    def from_context(
+        cls,
+        context: Context,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        cv: int = 3,
+        n_jobs: int = -1,
+    ) -> Self:
+        return cls(
+            model_name=model_name,
+            db_dir=context.db_dir,
+            cv=cv,
+            n_jobs=n_jobs,
+            device=context.device,
+            seed=context.seed,
+        )
+
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+        self._multilabel = isinstance(labels[0], list)
+
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index = vector_index_client.get_or_create_index(self.model_name)
+
+        features = vector_index.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
 
         if self._multilabel:
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=context.seed)
+            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=self.seed)
 
         clf.fit(features, labels)
 

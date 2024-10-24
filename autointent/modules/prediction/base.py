@@ -3,25 +3,28 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import overload
 
-from autointent import Context
 from autointent.context.data_handler import Tag
-from autointent.context.optimization_info import PredictorArtifact
+from autointent.context.optimization_info import PredictorArtifact, ScorerArtifact
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
 
 class PredictionModule(Module, ABC):
+    @overload  # type: ignore[misc]
     @abstractmethod
-    def fit(self, context: Context) -> None:
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
-        labels, scores = get_prediction_evaluation_data(context)
+    @overload  # type: ignore[misc]
+    def score(self, utterances: list[str], labels: list[LABEL_TYPE], oos_utterances: list[str] | None, artifact: ScorerArtifact, metric_fn: PredictionMetricFn) -> float:
+        labels, scores = get_prediction_evaluation_data(labels, artifact)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
 
@@ -33,18 +36,22 @@ class PredictionModule(Module, ABC):
 
 
 def get_prediction_evaluation_data(
-    context: Context,
-) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
-    labels = context.data_handler.labels_test
-    scores = context.optimization_info.get_best_test_scores()
+    labels: list[LABEL_TYPE], artifact: ScorerArtifact,
+) -> tuple[list[LABEL_TYPE], npt.NDArray[Any]]:
+    labels = np.array(labels)
+    scores = artifact.get_best_test_scores()
 
-    oos_scores = context.optimization_info.get_best_oos_scores()
+    if scores is None:
+        raise ValueError("No test scores found in the optimization info")
+
+    oos_scores = artifact.get_best_oos_scores()
+    return_scores = scores
     if oos_scores is not None:
         oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
-        labels = np.concatenate([np.array(labels), np.array(oos_labels)])
-        scores = np.concatenate([scores, oos_scores])
+        labels = np.concatenate([labels, np.array(oos_labels)])
+        return_scores = np.concatenate([scores, oos_scores])
 
-    return labels, scores  # type: ignore[return-value]
+    return labels.tolist(), return_scores
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:

@@ -82,6 +82,9 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")  # type: ignore[assignment]
         return best_scorer_artifact.oos_scores
 
+    def get_best_scores(self) -> ScorerArtifact:
+        return self._get_best_artifact(node_type="scoring")
+
     def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
         node_wise_metrics = {
             node_type: self._get_metrics_values(node_type)
