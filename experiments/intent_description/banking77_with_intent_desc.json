@@ -1,0 +1,2162 @@
+{
+    "utterances": [
+        {
+            "text": "Please help me with my card.  It won't activate.",
+            "label": 0
+        },
+        {
+            "text": "I tired but an unable to activate my card.",
+            "label": 0
+        },
+        {
+            "text": "I want to start using my card.",
+            "label": 0
+        },
+        {
+            "text": "How do I verify my new card?",
+            "label": 0
+        },
+        {
+            "text": "I tried activating my plug-in and it didn't piece of work",
+            "label": 0
+        },
+        {
+            "text": "I want to open an account for my children",
+            "label": 1
+        },
+        {
+            "text": "How old do you need to be to use the banks services?",
+            "label": 1
+        },
+        {
+            "text": "Whats the minimum age to have an account",
+            "label": 1
+        },
+        {
+            "text": "Can my children open an account?",
+            "label": 1
+        },
+        {
+            "text": "How old do I need to be?",
+            "label": 1
+        },
+        {
+            "text": "Hi, I have an apple watch. How do I use it to top up my card?",
+            "label": 2
+        },
+        {
+            "text": "Can I use google pay to top up?",
+            "label": 2
+        },
+        {
+            "text": "why top up is not working even if I got my American Express in Apple Bay?",
+            "label": 2
+        },
+        {
+            "text": "Can I deposit money using Apple Pay?",
+            "label": 2
+        },
+        {
+            "text": "Can I use google pay for topping -up",
+            "label": 2
+        },
+        {
+            "text": "I can use this card at which ATMs?",
+            "label": 3
+        },
+        {
+            "text": "Can I use the card at any cash machine?",
+            "label": 3
+        },
+        {
+            "text": "What locations can I get money from?",
+            "label": 3
+        },
+        {
+            "text": "What ATMs take this card?",
+            "label": 3
+        },
+        {
+            "text": "Which ATM's can I use to make a withdrawal?",
+            "label": 3
+        },
+        {
+            "text": "Can I add money automatically to my account while traveling?",
+            "label": 4
+        },
+        {
+            "text": "i need help finding the auto top up option.",
+            "label": 4
+        },
+        {
+            "text": "What are the maximum amount you can do for auto top-up?",
+            "label": 4
+        },
+        {
+            "text": "I can't find the auto-top up option.",
+            "label": 4
+        },
+        {
+            "text": "Does the auto top-up have any limits?",
+            "label": 4
+        },
+        {
+            "text": "help my money isnt showing up",
+            "label": 5
+        },
+        {
+            "text": "how do i see what i transferred",
+            "label": 5
+        },
+        {
+            "text": "Hello. Can you help figure out why the recent transfer from my UK bank account isn't showing up?",
+            "label": 5
+        },
+        {
+            "text": "I've made a transfer from France two days ago but I was wondering if international transfers take longer to arrive because it hasn't made it yet.",
+            "label": 5
+        },
+        {
+            "text": "After I transferred money the balance remained the same.",
+            "label": 5
+        },
+        {
+            "text": "Why is my last cheque deposit taking so long?",
+            "label": 6
+        },
+        {
+            "text": "I am still waiting for a the cash I deposited this morning",
+            "label": 6
+        },
+        {
+            "text": "I tried using a check to update my balance, but it isn't work? Is something wrong?",
+            "label": 6
+        },
+        {
+            "text": "I deposited cash but it isn't showing up in my account",
+            "label": 6
+        },
+        {
+            "text": "I put some cash into my account but it's not displaying that on my balance.",
+            "label": 6
+        },
+        {
+            "text": "is there something blocking me from making transfers",
+            "label": 7
+        },
+        {
+            "text": "What are the reasons for my beneficiary not being allowed?",
+            "label": 7
+        },
+        {
+            "text": "Is there something wrong with the transferring functions? I keep trying to transfer funds and only get an error message.",
+            "label": 7
+        },
+        {
+            "text": "What are the reasons a beneficiary would be denied?",
+            "label": 7
+        },
+        {
+            "text": "A transfer to my account was denied.",
+            "label": 7
+        },
+        {
+            "text": "Cancel a transaction",
+            "label": 8
+        },
+        {
+            "text": "Am I able to cancel a transfer I just made",
+            "label": 8
+        },
+        {
+            "text": "I needed to make a payment on my account, but I typed in the incorrect number.  The app won't allow me to cancel this transaction.  I need it cancelled ASAP!!",
+            "label": 8
+        },
+        {
+            "text": "I made a mistake this morning when I did a transfer. How do I reverse it?",
+            "label": 8
+        },
+        {
+            "text": "Can I cancel a transaction?",
+            "label": 8
+        },
+        {
+            "text": "Are there any express fees if i want my new card faster?",
+            "label": 9
+        },
+        {
+            "text": "Do I need to do something to get a new card once it expires?",
+            "label": 9
+        },
+        {
+            "text": "I am overseas in China, can I get a replacement card?",
+            "label": 9
+        },
+        {
+            "text": "Can I get a new card with new expiration date in China?",
+            "label": 9
+        },
+        {
+            "text": "Are there restrictions on new cards in China?",
+            "label": 9
+        },
+        {
+            "text": "Is there anywhere I can't use my card?",
+            "label": 10
+        },
+        {
+            "text": "In which stores can I shop with this card?",
+            "label": 10
+        },
+        {
+            "text": "How do I know where I can use my card?",
+            "label": 10
+        },
+        {
+            "text": "Can I tell what business will take this card?",
+            "label": 10
+        },
+        {
+            "text": "Are there businesses that don't accept this card?",
+            "label": 10
+        },
+        {
+            "text": "I am still waiting on my card?",
+            "label": 11
+        },
+        {
+            "text": "What can I do if my card still hasn't arrived after 2 weeks?",
+            "label": 11
+        },
+        {
+            "text": "I have been waiting over a week. Is the card still coming?",
+            "label": 11
+        },
+        {
+            "text": "Can I track my card while it is in the process of delivery?",
+            "label": 11
+        },
+        {
+            "text": "How do I know if I will get my card, or if it is lost?",
+            "label": 11
+        },
+        {
+            "text": "Can it specifically be delivered on a certain date?",
+            "label": 12
+        },
+        {
+            "text": "I need to get my card quickly",
+            "label": 12
+        },
+        {
+            "text": "When can I expect my card? I live in the US.",
+            "label": 12
+        },
+        {
+            "text": "Help! When will the card arrive at my home?",
+            "label": 12
+        },
+        {
+            "text": "Can I get my card fast tracked?",
+            "label": 12
+        },
+        {
+            "text": "My card has been found. Is there any way for me to put it back into the app?",
+            "label": 13
+        },
+        {
+            "text": "I was able to find my card. How to I go about putting it into my app?",
+            "label": 13
+        },
+        {
+            "text": "how do I get my card to show in the app?",
+            "label": 13
+        },
+        {
+            "text": "I just got my card.  It's not linked yet--how do I do that?",
+            "label": 13
+        },
+        {
+            "text": "lost card found, want to put it back in app",
+            "label": 13
+        },
+        {
+            "text": "I can't use my card because it is not working.",
+            "label": 14
+        },
+        {
+            "text": "I can't seem to be able to use my card",
+            "label": 14
+        },
+        {
+            "text": "My card isn't working at all, I need assistance. It's really frustrating.",
+            "label": 14
+        },
+        {
+            "text": "Can you tell me what the problem with my card is? It was declined at a restaurant today.",
+            "label": 14
+        },
+        {
+            "text": "How do I fix a broken card?",
+            "label": 14
+        },
+        {
+            "text": "There was a fee charged when I paid with my card.",
+            "label": 15
+        },
+        {
+            "text": "I received a fee I should not have.",
+            "label": 15
+        },
+        {
+            "text": "Why am I being a charged for using my card?",
+            "label": 15
+        },
+        {
+            "text": "Tell me why there is a fee for a card payment.",
+            "label": 15
+        },
+        {
+            "text": "I don't understand why I'm being charged for using my card.",
+            "label": 15
+        },
+        {
+            "text": "There's a payment with my card that I didn't perform. I don't know that name shown.",
+            "label": 16
+        },
+        {
+            "text": "My statement indicates I made a payment to an unfamiliar merchant.",
+            "label": 16
+        },
+        {
+            "text": "There's a payment with my card that I definitely didn't do myself, never seen that name before.",
+            "label": 16
+        },
+        {
+            "text": "Help! In the app there is a payment that I don't remember.",
+            "label": 16
+        },
+        {
+            "text": "I don't understand where this charge came from.",
+            "label": 16
+        },
+        {
+            "text": "Last Saturday, I was charged extra for the exchange rate on my payment. Is something wrong?",
+            "label": 17
+        },
+        {
+            "text": "Hi, I am disappointed to see such a bad exchange rate and hope you can assist me. Would you be able to confirm the official interbank exchange rate for me?",
+            "label": 17
+        },
+        {
+            "text": "I think the currency exchange that's been applied is wrong.",
+            "label": 17
+        },
+        {
+            "text": "The exchange rate I was charged for a purchase was not right.",
+            "label": 17
+        },
+        {
+            "text": "Can you please explain why the exchange rate for the item I bought is wrong?",
+            "label": 17
+        },
+        {
+            "text": "What do I do if the ATM took my card?",
+            "label": 18
+        },
+        {
+            "text": "What do I do now my credit card has been swallowed by the ATM?",
+            "label": 18
+        },
+        {
+            "text": "An ATM machine didn't give me back my card.",
+            "label": 18
+        },
+        {
+            "text": "My card got trapped inside an ATM, what should I do?",
+            "label": 18
+        },
+        {
+            "text": "What do I do if I can't get my card out of the ATM?",
+            "label": 18
+        },
+        {
+            "text": "Why is there a charge when I took out money?",
+            "label": 19
+        },
+        {
+            "text": "Why have I been charged a fee for cash withdrawal?",
+            "label": 19
+        },
+        {
+            "text": "I made a cash withdrawl and there is a charge.  What is this?",
+            "label": 19
+        },
+        {
+            "text": "I am inquiring about why there was an extra fee charged when I used an ATM.",
+            "label": 19
+        },
+        {
+            "text": "Why am I being charged extra when I withdrew money?",
+            "label": 19
+        },
+        {
+            "text": "I looked on the app and it says I withdrew cash.  I didn't!",
+            "label": 20
+        },
+        {
+            "text": "I didn't withdraw the amount of cash that is showing up in the app.",
+            "label": 20
+        },
+        {
+            "text": "I saw on the app that a cash withdrawal was completed on my account; however, I did not complete it.",
+            "label": 20
+        },
+        {
+            "text": "I got a notice from my app that I withdrew cash but I don't remember doing so. How do I fix this?",
+            "label": 20
+        },
+        {
+            "text": "Someone has a copy of my card !! I definitely still have it here but someone just made a 500£ cash withdrawal, HELP!",
+            "label": 20
+        },
+        {
+            "text": "Is it possible for me to change my PIN number?",
+            "label": 21
+        },
+        {
+            "text": "What are the steps to change my PIN to something else?",
+            "label": 21
+        },
+        {
+            "text": "In what way can I change my PIN and where do I need to be?",
+            "label": 21
+        },
+        {
+            "text": "Can I change my PIN at any cash machines?",
+            "label": 21
+        },
+        {
+            "text": "I need to make my card PIN a different number",
+            "label": 21
+        },
+        {
+            "text": "I think someone is using my card without my permission!",
+            "label": 22
+        },
+        {
+            "text": "What do I do if I detect fraudulent use on my car?",
+            "label": 22
+        },
+        {
+            "text": "I think my account has been hacked there are charges on there I don't recognize.",
+            "label": 22
+        },
+        {
+            "text": "I don't recognize some transactions.  Is someone else using it?",
+            "label": 22
+        },
+        {
+            "text": "I just got an email in confirming my purchase with my card. I login to the mobile app on the card and found out there are several purchase were made without me aware of it. Evidently someone had stole my card information and made these fraudulent purchase. I need the transaction to be reverse and have my card suspended.",
+            "label": 22
+        },
+        {
+            "text": "Should i uninstall the app before i try it again?",
+            "label": 23
+        },
+        {
+            "text": "How come when I tried to pay contactless at the bus it didnt work?",
+            "label": 23
+        },
+        {
+            "text": "Why is my contactless not working?",
+            "label": 23
+        },
+        {
+            "text": "My contactless payments don't work.",
+            "label": 23
+        },
+        {
+            "text": "how many days processing new card?",
+            "label": 23
+        },
+        {
+            "text": "Which countries are you available in?",
+            "label": 24
+        },
+        {
+            "text": "Where are you cards supported?",
+            "label": 24
+        },
+        {
+            "text": "How do I get a card if I live in the US?",
+            "label": 24
+        },
+        {
+            "text": "Please list the countries you support.",
+            "label": 24
+        },
+        {
+            "text": "Are these cards available in europe?",
+            "label": 24
+        },
+        {
+            "text": "I'm not sure why my card didn't work",
+            "label": 25
+        },
+        {
+            "text": "My card is not working at stores.",
+            "label": 25
+        },
+        {
+            "text": "Do you know why my card payment has been declined?",
+            "label": 25
+        },
+        {
+            "text": "Why isn't my card working? I was pumped to use my new card but it keeps getting declined. Help please.",
+            "label": 25
+        },
+        {
+            "text": "I could not use my card in a store.",
+            "label": 25
+        },
+        {
+            "text": "I tried to withdraw cash and got declined, why is that?",
+            "label": 26
+        },
+        {
+            "text": "Why was I declined when I tried to get my money?",
+            "label": 26
+        },
+        {
+            "text": "I could not access my money at the ATM",
+            "label": 26
+        },
+        {
+            "text": "i needed money for a night out with the girls but i was declined, why?",
+            "label": 26
+        },
+        {
+            "text": "Why was I blocked from withdrawing from the ATM?",
+            "label": 26
+        },
+        {
+            "text": "Transfer unable to be completed, states 'declined'",
+            "label": 27
+        },
+        {
+            "text": "Why was my transfer request decline?",
+            "label": 27
+        },
+        {
+            "text": "My transfer was rejected",
+            "label": 27
+        },
+        {
+            "text": "I tried to buy something online yesterday and got a message saying declined. I tried again today and got the same message. What's the problem?",
+            "label": 27
+        },
+        {
+            "text": "I am having trouble doing a transfer. A \"Decline \" message appears after making the transfer.",
+            "label": 27
+        },
+        {
+            "text": "Hi, i found a large amount payment in my old statements which i am sure was not made by me. I am aware that the time has passed but is there a way to raise a dispute for this payment now?",
+            "label": 28
+        },
+        {
+            "text": "what is the word?",
+            "label": 28
+        },
+        {
+            "text": "Please help my find out why there is an odd direct debit in my records.",
+            "label": 28
+        },
+        {
+            "text": "I am seeing in the App a diret debit that its not mine",
+            "label": 28
+        },
+        {
+            "text": "There is a direct debit payment that I did not make.",
+            "label": 28
+        },
+        {
+            "text": "Do the disposable cards have any restrictions on them?",
+            "label": 29
+        },
+        {
+            "text": "How many times can I use a virtual card?",
+            "label": 29
+        },
+        {
+            "text": "A friend was telling me about her disposable cards. What would I have to do to be able to get that feature?",
+            "label": 29
+        },
+        {
+            "text": "Can I have more disposable cards?",
+            "label": 29
+        },
+        {
+            "text": "i tried using a virtual card for a hotel but it didn't work, why not",
+            "label": 29
+        },
+        {
+            "text": "I am interested in changing my personal details.",
+            "label": 30
+        },
+        {
+            "text": "I am here to change my adress.",
+            "label": 30
+        },
+        {
+            "text": "I'd like to make some changes to my personal information.",
+            "label": 30
+        },
+        {
+            "text": "I would like to change my name after marriage.",
+            "label": 30
+        },
+        {
+            "text": "I would like to change my adress",
+            "label": 30
+        },
+        {
+            "text": "How much is the exchange fee?",
+            "label": 31
+        },
+        {
+            "text": "Are there any hidden extra fees for currency exchanges?",
+            "label": 31
+        },
+        {
+            "text": "If I exchange currencies on a frequent basis can I receive a discount?",
+            "label": 31
+        },
+        {
+            "text": "Is there any cost to change foreign money to local?",
+            "label": 31
+        },
+        {
+            "text": "What are the currency exchange fees?",
+            "label": 31
+        },
+        {
+            "text": "What is my money worth in other countries?",
+            "label": 32
+        },
+        {
+            "text": "Will my money be of equal value when I travel abroad?",
+            "label": 32
+        },
+        {
+            "text": "Do you know the rate of exchange?",
+            "label": 32
+        },
+        {
+            "text": "What foreign exchange rate will I get on weekdays and on the weekends?",
+            "label": 32
+        },
+        {
+            "text": "What is the exchange looking like?",
+            "label": 32
+        },
+        {
+            "text": "Can I change from AUD to GBP?",
+            "label": 33
+        },
+        {
+            "text": "I need to exchange between different currencies, like GBP and USD. Can I do that with your app?",
+            "label": 33
+        },
+        {
+            "text": "How can I change to another currency?",
+            "label": 33
+        },
+        {
+            "text": "Does the app allowing exchanges between USD and GBP",
+            "label": 33
+        },
+        {
+            "text": "What if I need to use GBP instead of USD?",
+            "label": 33
+        },
+        {
+            "text": "Why is there an extra fee on my statement?",
+            "label": 34
+        },
+        {
+            "text": "Why did they charge me an extra $1?",
+            "label": 34
+        },
+        {
+            "text": "Why is there a 1 euro fee on my statement?",
+            "label": 34
+        },
+        {
+            "text": "Why do I see an extra £1 charge on my statement?",
+            "label": 34
+        },
+        {
+            "text": "I am inquiring about a $1 charge on my statement.",
+            "label": 34
+        },
+        {
+            "text": "What is happening?  I have tried to transfer money 5x already.  Is the system down?  This shouldnt be happening as this is a basic transfer.",
+            "label": 35
+        },
+        {
+            "text": "Is there a reason that my transfer failed?",
+            "label": 35
+        },
+        {
+            "text": "Why didn't my transfer complete?",
+            "label": 35
+        },
+        {
+            "text": "Why was I unable to finish this transfer?",
+            "label": 35
+        },
+        {
+            "text": "I have made 5 attempts to make a very standard survey, yet I can't get it to work. What is the problem? Is there an issue related to your system?",
+            "label": 35
+        },
+        {
+            "text": "How many different currencies can I hold money in?",
+            "label": 36
+        },
+        {
+            "text": "Do you allow currency exchanges?",
+            "label": 36
+        },
+        {
+            "text": "How many currencies can I have money in in my account?",
+            "label": 36
+        },
+        {
+            "text": "Is the EUR accepted for exchanges?",
+            "label": 36
+        },
+        {
+            "text": "Is it okay to hold money in multiple currencies?",
+            "label": 36
+        },
+        {
+            "text": "What do you use disposable cards on?",
+            "label": 37
+        },
+        {
+            "text": "How do I get a disposable virtual card as well?",
+            "label": 37
+        },
+        {
+            "text": "I want a disposable virtual card, how do I do that?",
+            "label": 37
+        },
+        {
+            "text": "What are the disposable cards for?",
+            "label": 37
+        },
+        {
+            "text": "I need a disposable virtual card. Please tell me how to order one.",
+            "label": 37
+        },
+        {
+            "text": "I'm not sure what to do about the PIN, because I don't have one yet.",
+            "label": 38
+        },
+        {
+            "text": "Is my PIN sent separably?",
+            "label": 38
+        },
+        {
+            "text": "Where can I get my card PIN?",
+            "label": 38
+        },
+        {
+            "text": "my pin hasn't arrived in the post! How do I cancel it or get a new one?",
+            "label": 38
+        },
+        {
+            "text": "Where is the card PIN located?",
+            "label": 38
+        },
+        {
+            "text": "Are extra charges added for sending out additional cards?",
+            "label": 39
+        },
+        {
+            "text": "I'd like to order an additional card",
+            "label": 39
+        },
+        {
+            "text": "I want some extra physical cards.",
+            "label": 39
+        },
+        {
+            "text": "I would like open a second card for my daughter, how can you assist me?",
+            "label": 39
+        },
+        {
+            "text": "Am I gonna be charged for sending out more cards?",
+            "label": 39
+        },
+        {
+            "text": "I would like to order a virtual card, where can I get one?",
+            "label": 40
+        },
+        {
+            "text": "I need to order a new virtual card, how do I do that?",
+            "label": 40
+        },
+        {
+            "text": "How can I sign up for a virtual card?",
+            "label": 40
+        },
+        {
+            "text": "I haven't received my virtual card yet!!",
+            "label": 40
+        },
+        {
+            "text": "Can you give me a virtual card?",
+            "label": 40
+        },
+        {
+            "text": "Has there been any activity on my card today?",
+            "label": 41
+        },
+        {
+            "text": "I lost my wallet and all my cards were in it.",
+            "label": 41
+        },
+        {
+            "text": "I'm panicking!  I lost my card!  Help!",
+            "label": 41
+        },
+        {
+            "text": "I need to report a stolen card",
+            "label": 41
+        },
+        {
+            "text": "How do I replace a stolen card?",
+            "label": 41
+        },
+        {
+            "text": "My phone was stolen, what should I do first?",
+            "label": 42
+        },
+        {
+            "text": "My phone was stolen, what should I do?",
+            "label": 42
+        },
+        {
+            "text": "I lost my phone, what should I do?",
+            "label": 42
+        },
+        {
+            "text": "Someone has stolen my phone, what should I do?",
+            "label": 42
+        },
+        {
+            "text": "I think I lost my phone.  Is there a way to prevent anyone from getting into my account on it?",
+            "label": 42
+        },
+        {
+            "text": "How much does it cost for a physical card?",
+            "label": 43
+        },
+        {
+            "text": "Where can the cards be delivered?",
+            "label": 43
+        },
+        {
+            "text": "What do i do to get a physical card?",
+            "label": 43
+        },
+        {
+            "text": "Can I request a card?",
+            "label": 43
+        },
+        {
+            "text": "Do I have to pay for a physical card?",
+            "label": 43
+        },
+        {
+            "text": "Help me!  I don't know what my password is.",
+            "label": 44
+        },
+        {
+            "text": "I thought I knew my password but I guess I was wrong, what can I do now?",
+            "label": 44
+        },
+        {
+            "text": "I am unable to access my app due to forgetting my passcode.",
+            "label": 44
+        },
+        {
+            "text": "I can't recall my password.",
+            "label": 44
+        },
+        {
+            "text": "What should I do if I don't know my password?",
+            "label": 44
+        },
+        {
+            "text": "What does it mean when a payment is pending?",
+            "label": 45
+        },
+        {
+            "text": "Could you please tell me why my purchases from this morning say payment is pending?",
+            "label": 45
+        },
+        {
+            "text": "The purchase I made is still pending.",
+            "label": 45
+        },
+        {
+            "text": "Is there a problem with the payment that I see is still pending?",
+            "label": 45
+        },
+        {
+            "text": "There is a payment that I made that hasn't gone through yet.",
+            "label": 45
+        },
+        {
+            "text": "I would like to know why a withdraw I made for some cash shows up as pending.",
+            "label": 46
+        },
+        {
+            "text": "Why is my cash withdrawal still showing as pending?",
+            "label": 46
+        },
+        {
+            "text": "I have the cash already, my account still shows up as pending.  How can my account be still pending?",
+            "label": 46
+        },
+        {
+            "text": "I tried to get cash out of the ATM but it is taking too long",
+            "label": 46
+        },
+        {
+            "text": "Why is the cash withdrawal under pending?",
+            "label": 46
+        },
+        {
+            "text": "How long does a top-up take to go through?",
+            "label": 47
+        },
+        {
+            "text": "I am under the impression that my top up is still pending",
+            "label": 47
+        },
+        {
+            "text": "How long will it take for my money to be deposited?",
+            "label": 47
+        },
+        {
+            "text": "i put money on my card and i dont see it on the balance",
+            "label": 47
+        },
+        {
+            "text": "I have a top-up that's still pending and wanted to know about it.",
+            "label": 47
+        },
+        {
+            "text": "i put in money for vacation and its not showing. i need that money today, how long will it take",
+            "label": 48
+        },
+        {
+            "text": "I can't figure out why a transfer is still pending?",
+            "label": 48
+        },
+        {
+            "text": "Transfers can take up to one day to process before departing for the beneficiary accounts. Please confirm that you've entered your account details correctly. SEPA transfers can take up to two working days, while SWIFT transfers can take up to five working days.",
+            "label": 48
+        },
+        {
+            "text": "When will my transfer finish pending?",
+            "label": 48
+        },
+        {
+            "text": "How long do transfers take, mine just says pending?",
+            "label": 48
+        },
+        {
+            "text": "I have exceeded the number of PIN attempts",
+            "label": 49
+        },
+        {
+            "text": "I mistook my pin and now I am locked.  Can you unlock me?",
+            "label": 49
+        },
+        {
+            "text": "Please help me unblock my pin which I put the wrong one too many times.",
+            "label": 49
+        },
+        {
+            "text": "Help me unblock my account.  I entered the PIN wrong too many times.",
+            "label": 49
+        },
+        {
+            "text": "I locked myself out of my account, how do I unblock my PIN?",
+            "label": 49
+        },
+        {
+            "text": "Can my salary be received here?",
+            "label": 50
+        },
+        {
+            "text": "How can my boss pay me directly to the card?",
+            "label": 50
+        },
+        {
+            "text": "Salary in GBP has been received. Does it need to be configured into another place?",
+            "label": 50
+        },
+        {
+            "text": "I am paid by my employer in GBP; do I need to do anything in the app to indicate this?",
+            "label": 50
+        },
+        {
+            "text": "How can my friend give me money?",
+            "label": 50
+        },
+        {
+            "text": "I don't see my refund money yet in my account. I asked the merchant a while ago for a refund, so I don't know what's taking so long.  Can you look into it and see if the money is there, just not in my account yet?",
+            "label": 51
+        },
+        {
+            "text": "Why am I missing my refund",
+            "label": 51
+        },
+        {
+            "text": "Please help me.  I am still waiting on a refund.",
+            "label": 51
+        },
+        {
+            "text": "I requested a refund but am unable to see it in my account. Why is that?",
+            "label": 51
+        },
+        {
+            "text": "When will my refund come through",
+            "label": 51
+        },
+        {
+            "text": "How long does it take to get a refund on something I bought?",
+            "label": 52
+        },
+        {
+            "text": "Please tell me how to get a refund for something I bought.",
+            "label": 52
+        },
+        {
+            "text": "Can i cancel this purchase?",
+            "label": 52
+        },
+        {
+            "text": "I want to return an item for a refund can I do that?",
+            "label": 52
+        },
+        {
+            "text": "Can I request a refund",
+            "label": 52
+        },
+        {
+            "text": "I wanted to purchase something online but the payment was returned back to me. This has been going on for a couple of weeks. Please tell me what is going on here?",
+            "label": 53
+        },
+        {
+            "text": "I tried to use my debit card, but the payment did not work.",
+            "label": 53
+        },
+        {
+            "text": "Hi, I had an issue with my card payment and It shows on my account that my payment went through. Then I got contacted from the seller saying \"they did not receive my payment\" then the payment was returned to my account. so I would like to see why it did that please.",
+            "label": 53
+        },
+        {
+            "text": "I think my card payment has been reverted",
+            "label": 53
+        },
+        {
+            "text": "Tell me why my card payment would be reverted.",
+            "label": 53
+        },
+        {
+            "text": "How do I use American express to top up my account?",
+            "label": 54
+        },
+        {
+            "text": "Which currencies do you accept for adding money?",
+            "label": 54
+        },
+        {
+            "text": "Is my credit card supported for top-ups?",
+            "label": 54
+        },
+        {
+            "text": "Am I able to add money into my account using my American Express?",
+            "label": 54
+        },
+        {
+            "text": "Can I use my American Express card to add money into my account?",
+            "label": 54
+        },
+        {
+            "text": "How do I deactivate my account?",
+            "label": 55
+        },
+        {
+            "text": "Remove my account immediately.",
+            "label": 55
+        },
+        {
+            "text": "Are you able to delete my account?",
+            "label": 55
+        },
+        {
+            "text": "How do I discontinue my account?",
+            "label": 55
+        },
+        {
+            "text": "please delete account",
+            "label": 55
+        },
+        {
+            "text": "Is there a top up fee for transfer?",
+            "label": 56
+        },
+        {
+            "text": "Will there be a charge for topping up by account with a SEPA transfer?",
+            "label": 56
+        },
+        {
+            "text": "What are the charges for receiving a SEPA transfer?",
+            "label": 56
+        },
+        {
+            "text": "Is there a charge for SEPA transfers?",
+            "label": 56
+        },
+        {
+            "text": "Will I be charged a fee for a SEPA transfer?",
+            "label": 56
+        },
+        {
+            "text": "What is the charge for using a Top up card in the US?",
+            "label": 57
+        },
+        {
+            "text": "What is the fee for topping up a US card?",
+            "label": 57
+        },
+        {
+            "text": "What fees are charged when I top up",
+            "label": 57
+        },
+        {
+            "text": "Is there a charge for topping up by card?",
+            "label": 57
+        },
+        {
+            "text": "Which US cards have top up charges?",
+            "label": 57
+        },
+        {
+            "text": "Help me please, I need to top up cash.",
+            "label": 58
+        },
+        {
+            "text": "Do you have any options to top up with a cheque on my account?",
+            "label": 58
+        },
+        {
+            "text": "Is there somewhere I can send a check to add to my account?",
+            "label": 58
+        },
+        {
+            "text": "Will a cheque suffice?",
+            "label": 58
+        },
+        {
+            "text": "I can't find any option to top up with a cheque?",
+            "label": 58
+        },
+        {
+            "text": "I think my top-up has failed.",
+            "label": 59
+        },
+        {
+            "text": "Top-up is not working",
+            "label": 59
+        },
+        {
+            "text": "My top up is not working",
+            "label": 59
+        },
+        {
+            "text": "My top-up hasn't gone through, what happened?",
+            "label": 59
+        },
+        {
+            "text": "My top-up was rejected by an app.",
+            "label": 59
+        },
+        {
+            "text": "What is the max amount of top-ups?",
+            "label": 60
+        },
+        {
+            "text": "Are top-ups unlimited?",
+            "label": 60
+        },
+        {
+            "text": "Can I increase my top-up maximum?",
+            "label": 60
+        },
+        {
+            "text": "Can I top-up any amount?",
+            "label": 60
+        },
+        {
+            "text": "What's the limit to how much I can top up?",
+            "label": 60
+        },
+        {
+            "text": "My top up did not show up as shown and my money has disappeared, can you help me fix this glitch problem?",
+            "label": 61
+        },
+        {
+            "text": "Has my top-up been cancelled?",
+            "label": 61
+        },
+        {
+            "text": "I topped up recently and saw the money go through, but now it's just gone? What's going on",
+            "label": 61
+        },
+        {
+            "text": "For what reason did my top-up get cancelled?",
+            "label": 61
+        },
+        {
+            "text": "I think my top up has been reverted",
+            "label": 61
+        },
+        {
+            "text": "My money I had was gone and I could not get gas!",
+            "label": 62
+        },
+        {
+            "text": "i can not see my top up",
+            "label": 62
+        },
+        {
+            "text": "I can't see my top up in my wallet!",
+            "label": 62
+        },
+        {
+            "text": "I want to transfer money using my credit card.",
+            "label": 62
+        },
+        {
+            "text": "I tried topping up using my card, but the money is gone?",
+            "label": 62
+        },
+        {
+            "text": "A transaction shows duplicate times.",
+            "label": 63
+        },
+        {
+            "text": "There is a repeat charge for the same item",
+            "label": 63
+        },
+        {
+            "text": "How can I fix this?  There is a double charge on my account.",
+            "label": 63
+        },
+        {
+            "text": "My card got charged twice for the same thing!",
+            "label": 63
+        },
+        {
+            "text": "My husband and I went out for our weekly \"dinner and a movie,\" and it was my turn to pick up the check. Now I see that my card was charged twice. Who should I contact about negating the second charge and getting my card credited?",
+            "label": 63
+        },
+        {
+            "text": "I was transferring some money to a friend, which I thought would be free, but I see there is a charge.  What's up with that?",
+            "label": 64
+        },
+        {
+            "text": "There is a fee for a transfer, please explain that to me.",
+            "label": 64
+        },
+        {
+            "text": "I didn't know there was a charge for tranferring. What is the charge?",
+            "label": 64
+        },
+        {
+            "text": "I transferred money, why was charged for an extra fee?",
+            "label": 64
+        },
+        {
+            "text": "When I made a transfer I was charged extra.",
+            "label": 64
+        },
+        {
+            "text": "I want to transfer money. How do I do that for my account?",
+            "label": 65
+        },
+        {
+            "text": "How do I transfer money into my account?",
+            "label": 65
+        },
+        {
+            "text": "How can I link my bank to my top up account?",
+            "label": 65
+        },
+        {
+            "text": "I have an account that is empty of funds. Can I transfer some from another bank?",
+            "label": 65
+        },
+        {
+            "text": "HOW DO I TRANSFER MONEY FROM MY BANK ACCOUNT?",
+            "label": 65
+        },
+        {
+            "text": "I am worried that too much time has gone by for a transfer to be completed.",
+            "label": 66
+        },
+        {
+            "text": "What is the time frame that it usually takes for a transfer to come through? I have a friend needing it immediately but it has yet to come through.",
+            "label": 66
+        },
+        {
+            "text": "My money transaction can't be seen by the person I sent it to",
+            "label": 66
+        },
+        {
+            "text": "How long does it typically take a transfer to go through?  I sent some money to a friend earlier today, and she really needs it.  It still is a pending transfer, even though I sent it a few hours ago.",
+            "label": 66
+        },
+        {
+            "text": "I have done a transfer within the country the day before yesterday, but it's still not there yet. Can you please check what's going on with that, the account number definitely is the right one, I've checked that already.",
+            "label": 66
+        },
+        {
+            "text": "How long am I to wait before the transfer gets to my account?",
+            "label": 67
+        },
+        {
+            "text": "Will the transfer show up in my account soon?",
+            "label": 67
+        },
+        {
+            "text": "What time will a transfer from the US take?",
+            "label": 67
+        },
+        {
+            "text": "When will the money reach my  account?",
+            "label": 67
+        },
+        {
+            "text": "How long does it take to get my money",
+            "label": 67
+        },
+        {
+            "text": "Can you help me with proving my identity?",
+            "label": 68
+        },
+        {
+            "text": "What proof do you need for my identification?",
+            "label": 68
+        },
+        {
+            "text": "Are there any reasons that my identity wouldn't be accepted even though everything I've provided is factual?",
+            "label": 68
+        },
+        {
+            "text": "I am having some difficulty verifying my id.",
+            "label": 68
+        },
+        {
+            "text": "I am not able to verify my id. Why?",
+            "label": 68
+        },
+        {
+            "text": "What do you require for identity verification?",
+            "label": 69
+        },
+        {
+            "text": "How can I prove I am me?",
+            "label": 69
+        },
+        {
+            "text": "I need to verify my identity. How do I do that?",
+            "label": 69
+        },
+        {
+            "text": "How do I verify my identity?",
+            "label": 69
+        },
+        {
+            "text": "How do I verify my identity online",
+            "label": 69
+        },
+        {
+            "text": "where exactly does money come from",
+            "label": 70
+        },
+        {
+            "text": "Where did my money come from?",
+            "label": 70
+        },
+        {
+            "text": "Can I check to see where the funds came from?",
+            "label": 70
+        },
+        {
+            "text": "What are the sources for the funds in my account?",
+            "label": 70
+        },
+        {
+            "text": "need to know where money comes from",
+            "label": 70
+        },
+        {
+            "text": "Do you know how I can verify that I did a top-up to my card?",
+            "label": 71
+        },
+        {
+            "text": "where is the code for verifying the top up card?",
+            "label": 71
+        },
+        {
+            "text": "The top-up card is verified how?",
+            "label": 71
+        },
+        {
+            "text": "Tell me about verifying top-up",
+            "label": 71
+        },
+        {
+            "text": "What is the verification code for my top up card?",
+            "label": 71
+        },
+        {
+            "text": "Why isn't my disposable virtual card working?",
+            "label": 72
+        },
+        {
+            "text": "Can I use my virtual card to complete transactions for memberships?",
+            "label": 72
+        },
+        {
+            "text": "Why won't my virtual card work?",
+            "label": 72
+        },
+        {
+            "text": "My virtual card is just not going through.",
+            "label": 72
+        },
+        {
+            "text": "My virtual card isn't working.",
+            "label": 72
+        },
+        {
+            "text": "Is there a way I can have a mastercard?",
+            "label": 73
+        },
+        {
+            "text": "is it just visa or can i also use mastercard?",
+            "label": 73
+        },
+        {
+            "text": "I do not want a VISA card.",
+            "label": 73
+        },
+        {
+            "text": "I prefer using Mastercard, can I substitute?",
+            "label": 73
+        },
+        {
+            "text": "I prefer Mastecard.",
+            "label": 73
+        },
+        {
+            "text": "Why do you have an identity check?",
+            "label": 74
+        },
+        {
+            "text": "I do not feel comfortable verifying my identity.",
+            "label": 74
+        },
+        {
+            "text": "Why on earth do you need so much personal id info from me?",
+            "label": 74
+        },
+        {
+            "text": "DO you know the reason for the identity check?",
+            "label": 74
+        },
+        {
+            "text": "I answered so many questions about my identity. Why do you need this info?",
+            "label": 74
+        },
+        {
+            "text": "Why did I only receive a partial amount of what I tried to withdraw?",
+            "label": 75
+        },
+        {
+            "text": "my atm transaction was wrong",
+            "label": 75
+        },
+        {
+            "text": "why did i only get 20.00",
+            "label": 75
+        },
+        {
+            "text": "Why is my cash request and the amount I received different?",
+            "label": 75
+        },
+        {
+            "text": "I tried to withdraw $100, all it gave me was $20.",
+            "label": 75
+        },
+        {
+            "text": "The wrong exchange rate was applied to me while pulling out cash.",
+            "label": 76
+        },
+        {
+            "text": "I got less cash because of the exchange rate.",
+            "label": 76
+        },
+        {
+            "text": "Why is the fee for taking money out so high?  I feel I was overcharged and I would have never used this ATM if I would have known ahead of time.",
+            "label": 76
+        },
+        {
+            "text": "I believe a wrong exchange rate was applied towards a cash transaction I made abroad.",
+            "label": 76
+        },
+        {
+            "text": "When I got my cash, the amount was not what it should have been, based on the exchange rate.",
+            "label": 76
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "activate_my_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to activate their card"
+        },
+        {
+            "id": 1,
+            "name": "age_limit",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the age limit for using the bank's services."
+        },
+        {
+            "id": 2,
+            "name": "apple_pay_or_google_pay",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know if they can use Apple Pay or Google Pay for topping up their card."
+        },
+        {
+            "id": 3,
+            "name": "atm_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know about ATM support"
+        },
+        {
+            "id": 4,
+            "name": "automatic_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about automatic top-up for their account."
+        },
+        {
+            "id": 5,
+            "name": "balance_not_updated_after_bank_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about why the balance has not been updated after a bank transfer."
+        },
+        {
+            "id": 6,
+            "name": "balance_not_updated_after_cheque_or_cash_deposit",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the delay in updating their balance after a cheque or cash deposit."
+        },
+        {
+            "id": 7,
+            "name": "beneficiary_not_allowed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know why his beneficiary is not allowed"
+        },
+        {
+            "id": 8,
+            "name": "cancel_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to cancel a transfer"
+        },
+        {
+            "id": 9,
+            "name": "card_about_to_expire",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the process of getting a new card before the current one expires."
+        },
+        {
+            "id": 10,
+            "name": "card_acceptance",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know where he can use his card"
+        },
+        {
+            "id": 11,
+            "name": "card_arrival",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user inquiring about the arrival status of their card"
+        },
+        {
+            "id": 12,
+            "name": "card_delivery_estimate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know the estimated delivery time for the card"
+        },
+        {
+            "id": 13,
+            "name": "card_linking",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to link their card back to the app."
+        },
+        {
+            "id": 14,
+            "name": "card_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is experiencing issues with their card and needs assistance."
+        },
+        {
+            "id": 15,
+            "name": "card_payment_fee_charged",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about a fee charged for using a card"
+        },
+        {
+            "id": 16,
+            "name": "card_payment_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user does not recognize a payment made with their card"
+        },
+        {
+            "id": 17,
+            "name": "card_payment_wrong_exchange_rate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about a wrong exchange rate applied to a card payment"
+        },
+        {
+            "id": 18,
+            "name": "card_swallowed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user's card was swallowed by an ATM and they need assistance."
+        },
+        {
+            "id": 19,
+            "name": "cash_withdrawal_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the charge for cash withdrawals."
+        },
+        {
+            "id": 20,
+            "name": "cash_withdrawal_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is reporting a cash withdrawal that they did not recognize or authorize."
+        },
+        {
+            "id": 21,
+            "name": "change_pin",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to change their PIN number."
+        },
+        {
+            "id": 22,
+            "name": "compromised_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User suspects unauthorized use of their card and wants to report fraudulent transactions."
+        },
+        {
+            "id": 23,
+            "name": "contactless_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is asking about the issues with their contactless payment not working"
+        },
+        {
+            "id": 24,
+            "name": "country_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the countries supported by the service."
+        },
+        {
+            "id": 25,
+            "name": "declined_card_payment",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about why their card payment was declined"
+        },
+        {
+            "id": 26,
+            "name": "declined_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the reason for their declined cash withdrawal."
+        },
+        {
+            "id": 27,
+            "name": "declined_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user's transfer request was declined and they are seeking information or assistance."
+        },
+        {
+            "id": 28,
+            "name": "direct_debit_payment_not_recognised",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is querying about an unrecognized direct debit payment"
+        },
+        {
+            "id": 29,
+            "name": "disposable_card_limits",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about limitations related to disposable cards"
+        },
+        {
+            "id": 30,
+            "name": "edit_personal_details",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to edit personal details"
+        },
+        {
+            "id": 31,
+            "name": "exchange_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about currency exchange charges"
+        },
+        {
+            "id": 32,
+            "name": "exchange_rate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the exchange rate."
+        },
+        {
+            "id": 33,
+            "name": "exchange_via_app",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know if they can exchange currencies via the app"
+        },
+        {
+            "id": 34,
+            "name": "extra_charge_on_statement",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is asking about an extra charge on their statement"
+        },
+        {
+            "id": 35,
+            "name": "failed_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user's transfer has failed multiple times and is seeking an explanation for the issue."
+        },
+        {
+            "id": 36,
+            "name": "fiat_currency_support",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know about the support for fiat currencies"
+        },
+        {
+            "id": 37,
+            "name": "get_disposable_virtual_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know how to get a disposable virtual card."
+        },
+        {
+            "id": 38,
+            "name": "get_physical_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about obtaining a physical card and its associated PIN."
+        },
+        {
+            "id": 39,
+            "name": "getting_spare_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to get a spare card"
+        },
+        {
+            "id": 40,
+            "name": "getting_virtual_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know how to get a virtual card"
+        },
+        {
+            "id": 41,
+            "name": "lost_or_stolen_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user needs assistance with a lost or stolen card."
+        },
+        {
+            "id": 42,
+            "name": "lost_or_stolen_phone",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user needs guidance on what to do if their phone is lost or stolen"
+        },
+        {
+            "id": 43,
+            "name": "order_physical_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to order a physical card"
+        },
+        {
+            "id": 44,
+            "name": "passcode_forgotten",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user has forgotten their password or passcode."
+        },
+        {
+            "id": 45,
+            "name": "pending_card_payment",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about pending card payments"
+        },
+        {
+            "id": 46,
+            "name": "pending_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about a pending cash withdrawal"
+        },
+        {
+            "id": 47,
+            "name": "pending_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user inquires about the status of a pending top-up transaction"
+        },
+        {
+            "id": 48,
+            "name": "pending_transfer",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user inquires about the status and processing time of a pending transfer."
+        },
+        {
+            "id": 49,
+            "name": "pin_blocked",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to unblock their PIN"
+        },
+        {
+            "id": 50,
+            "name": "receiving_money",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know about receiving money"
+        },
+        {
+            "id": 51,
+            "name": "Refund_not_showing_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the status of a refund that has not yet appeared in their account"
+        },
+        {
+            "id": 52,
+            "name": "request_refund",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to request a refund on a purchase"
+        },
+        {
+            "id": 53,
+            "name": "reverted_card_payment?",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the reason for their card payment being reverted."
+        },
+        {
+            "id": 54,
+            "name": "supported_cards_and_currencies",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know about supported cards and currencies"
+        },
+        {
+            "id": 55,
+            "name": "terminate_account",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to terminate or delete their account"
+        },
+        {
+            "id": 56,
+            "name": "top_up_by_bank_transfer_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the charges for topping up with a bank transfer"
+        },
+        {
+            "id": 57,
+            "name": "top_up_by_card_charge",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know the charges for topping up a card in the US"
+        },
+        {
+            "id": 58,
+            "name": "top_up_by_cash_or_cheque",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know if they can top up by cash or cheque"
+        },
+        {
+            "id": 59,
+            "name": "top_up_failed",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user's top-up transaction has failed."
+        },
+        {
+            "id": 60,
+            "name": "top_up_limits",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the limits for topping up."
+        },
+        {
+            "id": 61,
+            "name": "top_up_reverted",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about a top-up that has been reverted or disappeared from their account"
+        },
+        {
+            "id": 62,
+            "name": "topping_up_by_card",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to know about topping up by card."
+        },
+        {
+            "id": 63,
+            "name": "transaction_charged_twice",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user experiencing a double charge on a transaction and seeking resolution"
+        },
+        {
+            "id": 64,
+            "name": "transfer_fee_charged",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about being charged a fee for a money transfer."
+        },
+        {
+            "id": 65,
+            "name": "transfer_into_account",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to transfer money into their account"
+        },
+        {
+            "id": 66,
+            "name": "transfer_not_received_by_recipient",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is concerned about a transfer not being received by the recipient and wants to know the usual time frame for transfers."
+        },
+        {
+            "id": 67,
+            "name": "transfer_timing",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user inquires about the timing of a transfer to their account"
+        },
+        {
+            "id": 68,
+            "name": "unable_to_verify_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is unable to verify their identity."
+        },
+        {
+            "id": 69,
+            "name": "verify_my_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to verify their identity"
+        },
+        {
+            "id": 70,
+            "name": "verify_source_of_funds",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user wants to verify the source of funds"
+        },
+        {
+            "id": 71,
+            "name": "verify_top_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the process of verifying a top-up on their card"
+        },
+        {
+            "id": 72,
+            "name": "virtual_card_not_working",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about issues with their virtual card"
+        },
+        {
+            "id": 73,
+            "name": "visa_or_mastercard",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is inquiring about the possibility of obtaining a Mastercard instead of a Visa card"
+        },
+        {
+            "id": 74,
+            "name": "why_verify_identity",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is questioning the reason for the identity verification."
+        },
+        {
+            "id": 75,
+            "name": "wrong_amount_of_cash_received",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is questioning the wrong amount of cash received"
+        },
+        {
+            "id": 76,
+            "name": "wrong_exchange_rate_for_cash_withdrawal",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "user is questioning the wrong exchange rate applied for cash withdrawal."
+        }
+    ]
+}

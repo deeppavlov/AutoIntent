@@ -37,6 +37,9 @@ class DataHandler:
             dataset = dataset.to_multilabel()
 
         self.multilabel = dataset.type == DatasetType.multilabel
+        self.label_description: list[str | None] = [
+            intent.description for intent in sorted(dataset.intents, key=lambda x: x.id)
+        ]
 
         if regex_sampling > 0:
             logger.debug("sampling %s utterances from regular expressions for each intent class...", regex_sampling)
