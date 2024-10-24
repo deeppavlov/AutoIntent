@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
+from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import ScoringMetricFn
 from autointent.modules.base import Module
 
@@ -13,18 +14,18 @@ from autointent.modules.base import Module
 class ScoringModule(Module, ABC):
     metadata_dict_name: str = "metadata.json"
 
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
+    def score(self, utterances: list[str], labels: list[LABEL_TYPE], oos_utterances: list[str] | None, metric_fn: ScoringMetricFn) -> float:
         """
         Return
         ---
         - metric calculcated on test set
         - predicted scores of test set and oos utterances
         """
-        self._test_scores = self.predict(context.data_handler.utterances_test)
-        res = metric_fn(context.data_handler.labels_test, self._test_scores)
+        self._test_scores = self.predict(utterances)
+        res = metric_fn(labels, self._test_scores)
         self._oos_scores = None
-        if context.data_handler.has_oos_samples():
-            self._oos_scores = self.predict(context.data_handler.oos_utterances)
+        if oos_utterances is not None and len(oos_utterances) > 0:
+            self._oos_scores = self.predict(oos_utterances)
         return res
 
     def get_assets(self) -> ScorerArtifact:

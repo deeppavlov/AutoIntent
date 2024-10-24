@@ -44,12 +44,12 @@ class VectorDBModule(RetrievalModule):
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
+    def score(self, utterances: list[str], labels: list[LABEL_TYPE], oos_utterances: list[str] | None, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(
-            context.data_handler.utterances_test,
+            utterances,
             self.k,
         )
-        return metric_fn(context.data_handler.labels_test, labels_pred)
+        return metric_fn(labels, labels_pred)
 
     def get_assets(self) -> RetrieverArtifact:
         return RetrieverArtifact(embedder_name=self.model_name)

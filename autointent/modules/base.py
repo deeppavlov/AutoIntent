@@ -16,7 +16,7 @@ class Module(ABC):
         pass
 
     @abstractmethod
-    def score(self, context: Context, metric_fn: METRIC_FN) -> float:
+    def score(self, utterances: list[str], labels: list[LABEL_TYPE], oos_utterances: list[str] | None, metric_fn: METRIC_FN) -> float:
         """
         calculates metric on test set and returns metric value
         """

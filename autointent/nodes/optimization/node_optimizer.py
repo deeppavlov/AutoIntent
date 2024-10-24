@@ -43,7 +43,7 @@ class NodeOptimizer:
                 self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_type)
-                metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
+                metric_value = self.module_score(module, context)
 
                 assets = module.get_assets()
                 module_dump_dir = self.get_module_dump_dir(context.dump_dir, module_type, j_combination)
@@ -81,3 +81,15 @@ class NodeOptimizer:
             self._logger.error(msg)
             raise ValueError(msg)
         module.fit(*args)
+
+    def module_score(self, module: Module, context: Context) -> float:
+        if self.node_info.node_type in ["retrieval", "scoring"]:
+            args = (context.data_handler.utterances_test, context.data_handler.labels_test, context.data_handler.oos_utterances, self.node_info.metrics_available[self.metric_name])
+        elif self.node_info.node_type == "prediction":
+            artifact = context.optimization_info.get_best_scores()
+            args = (context.data_handler.utterances_test, context.data_handler.labels_test, context.data_handler.oos_utterances, artifact, self.node_info.metrics_available[self.metric_name])
+        else:
+            msg = "something's wrong"
+            self._logger.error(msg)
+            raise ValueError(msg)
+        return module.score(*args)
