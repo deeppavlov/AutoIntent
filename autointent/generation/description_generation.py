@@ -123,7 +123,7 @@ def enhance_dataset_with_descriptions(
     api_base: str,
     api_key: str,
     prompt: str = PROMPT_DESCRIPTION,
-    model_name: str = "gpt-3.5-turbo",
+    model_name: str = "gpt-4o-mini",
 ) -> Dataset:
     """
     Enhances a dataset by generating descriptions for intents using an OpenAI model.
