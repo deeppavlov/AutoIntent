@@ -39,7 +39,7 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = self._vector_index.embed([desc for desc in descriptions if desc is not None])
+        self.description_vectors = self._vector_index.embed([desc for desc in descriptions])
 
         self.metadata = DescriptionScorerDumpMetadata(
             device=context.device,
