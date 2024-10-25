@@ -23,7 +23,8 @@ class DNNCScorerDumpMetadata(TypedDict):
     device: str
     db_dir: str
     n_classes: int
-    biencoder_model: str
+    cross_encoder_name: str
+    search_model_name: str
 
 
 class DNNCScorer(ScoringModule):
@@ -39,14 +40,16 @@ class DNNCScorer(ScoringModule):
 
     def __init__(
         self,
-        model_name: str,
+        cross_encoder_name: str,
+            search_model_name: str,
         k: int,
         n_classes: int,
         db_dir: str,
         device: str = "cpu",
         train_head: bool = False,
     ) -> None:
-        self.model_name = model_name
+        self.cross_encoder_name = cross_encoder_name
+        self.search_model_name = search_model_name
         self.k = k
         self.train_head = train_head
         self.n_classes = n_classes
@@ -57,12 +60,14 @@ class DNNCScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        cross_encoder_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        search_model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         k: int = 3,
         train_head: bool = False,
     ) -> Self:
         return cls(
-            model_name=model_name,
+            cross_encoder_name=cross_encoder_name,
+            search_model_name=search_model_name,
             k=k,
             train_head=train_head,
             n_classes=context.n_classes,
@@ -71,7 +76,11 @@ class DNNCScorer(ScoringModule):
         )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
-        self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=self.device)
+        self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
+
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index = vector_index_client.get_or_create_index(self.search_model_name)
+        vector_index.add(utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -82,7 +91,8 @@ class DNNCScorer(ScoringModule):
             device=self.device,
             db_dir=self.db_dir,
             n_classes=self.n_classes,
-            biencoder_model=self.model_name,
+            cross_encoder_name=self.cross_encoder_name,
+            search_model_name=self.search_model_name,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -164,10 +174,11 @@ class DNNCScorer(ScoringModule):
             self.metadata: DNNCScorerDumpMetadata = json.load(file)  # type: ignore[no-redef]
 
         self.n_classes = self.metadata["n_classes"]
-        self.model_name = self.metadata["biencoder_model"]
+        self.cross_encoder_name = self.metadata["cross_encoder_name"]
+        self.search_model_name = self.metadata["search_model_name"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.model_name)
+        self.vector_index = vector_index_client.get_index(self.cross_encoder_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         if not self.train_head:
