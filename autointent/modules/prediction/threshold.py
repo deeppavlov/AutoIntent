@@ -27,12 +27,11 @@ class ThresholdPredictor(PredictionModule):
     tags: list[Tag]
 
     def __init__(
-        self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int, has_oos_samples: bool
+        self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int
     ) -> None:
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
-        self.has_oos_samples = has_oos_samples
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5, **kwargs: dict[str, Any]) -> Self:
@@ -40,7 +39,6 @@ class ThresholdPredictor(PredictionModule):
             thresh=thresh,
             multilabel=context.multilabel,
             n_classes=context.n_classes,
-            has_oos_samples=context.data_handler.has_oos_samples(),
         )
 
     def fit(
@@ -59,11 +57,6 @@ class ThresholdPredictor(PredictionModule):
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
-        if not self.has_oos_samples:
-            logger.warning(
-                "Your data doesn't contain out-of-scope utterances."
-                "Using ThresholdPredictor imposes unnecessary quality degradation."
-            )
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:

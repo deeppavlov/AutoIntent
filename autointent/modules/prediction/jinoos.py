@@ -25,19 +25,13 @@ class JinoosPredictor(PredictionModule):
 
     def __init__(
         self,
-        has_oos_samples: bool,
-        best_oos_scores: npt.NDArray[np.float64] | None = None,
         search_space: list[float] | None = None,
     ) -> None:
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
-        self.has_oos_samples = has_oos_samples
-        self.best_oos_scores = best_oos_scores
 
     @classmethod
     def from_context(cls, context: Context, search_space: list[float] | None = None, **kwargs: dict[str, Any]) -> Self:
         return cls(
-            has_oos_samples=context.data_handler.has_oos_samples(),
-            best_oos_scores=context.optimization_info.get_best_oos_scores(),
             search_space=search_space,
         )
 
@@ -45,14 +39,6 @@ class JinoosPredictor(PredictionModule):
         """
         TODO: use dev split instead of test split
         """
-
-        if not self.has_oos_samples:
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                "Your data doesn't contain out-of-scope utterances."
-                "Using JinoosPredictor imposes unnecessary computational overhead."
-            )
-
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []
