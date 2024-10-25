@@ -1,4 +1,5 @@
 import asyncio
+import random
 from collections import defaultdict
 
 from openai import AsyncOpenAI
@@ -34,7 +35,12 @@ def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
 
 
 async def create_intent_description(
-    client: AsyncOpenAI, intent_name: str | None, utterances: list[str], prompt: PromptDescription, model_name: str
+    client: AsyncOpenAI,
+    intent_name: str | None,
+    utterances: list[str],
+    regexp_patterns: list[str],
+    prompt: PromptDescription,
+    model_name: str,
 ) -> str:
     """
     Generates a description for a specific intent using an OpenAI model.
@@ -43,6 +49,7 @@ async def create_intent_description(
         client (AsyncOpenAI): The OpenAI client instance used to communicate with the model.
         intent_name (str | None): The name of the intent to describe. If None, an empty string will be used.
         utterances (list[str]): A list of example utterances related to the intent.
+        regexp_patterns (list[str]): A list of regular expression patterns associated with the intent.
         prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
                                   and {user_utterances} to format the content sent to the model.
         model_name (str): The identifier of the OpenAI model to use for generating the description.
@@ -54,10 +61,16 @@ async def create_intent_description(
         ValueError: If the response from the model is not a string or is in an unexpected format.
     """
     intent_name = intent_name if intent_name is not None else ""
-    content = prompt.text.format(intent_name=intent_name, user_utterances="\n".join(utterances[:5]))
+    utterances = random.sample(utterances, min(5, len(utterances)))
+    regexp_patterns = random.sample(regexp_patterns, min(3, len(regexp_patterns)))
+
+    content = prompt.text.format(
+        intent_name=intent_name, user_utterances="\n".join(utterances), regexp_patterns="\n".join(regexp_patterns)
+    )
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
         model=model_name,
+        temperature=0.2,
     )
     result = chat_completion.choices[0].message.content
 
@@ -93,11 +106,13 @@ async def generate_intent_descriptions(
         if intent.description is not None:
             continue
         utterances = intent_utterances.get(intent.id, [])
+        regexp_patterns = intent.regexp_full_match + intent.regexp_partial_match
         task = asyncio.create_task(
             create_intent_description(
                 client=client,
                 intent_name=intent.name,
                 utterances=utterances,
+                regexp_patterns=regexp_patterns,
                 prompt=prompt,
                 model_name=model_name,
             )
