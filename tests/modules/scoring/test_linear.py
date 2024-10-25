@@ -9,7 +9,7 @@ def test_base_linear(context):
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context)
+    vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate)
     artifact = vector_db.get_assets()
     context.optimization_info.log_module_optimization(

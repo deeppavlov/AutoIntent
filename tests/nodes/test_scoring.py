@@ -21,7 +21,8 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
             {"module_type": "linear"},
             {
                 "module_type": "dnnc",
-                "model_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "search_model_name": ["sergeyzh/rubert-tiny-turbo"],
                 "k": [3],
                 "train_head": [False, True],
             },

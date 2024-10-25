@@ -15,11 +15,17 @@ from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 
 from .base import ScoringModule
+from ..base import BaseMetadataDict
 
 
-class LinearScorerDumpDict(TypedDict):
-    multilabel: bool
+class LinearScorerDumpDict(BaseMetadataDict):
+    model_name: str
+    db_dir: str
+    cv: int
+    n_jobs: int
     device: str
+    seed: int
+    multilabel: bool
 
 
 class LinearScorer(ScoringModule):
@@ -50,6 +56,7 @@ class LinearScorer(ScoringModule):
         n_jobs: int = -1,
         device: str = "cpu",
         seed: int = 0,
+        multilabel: bool = False,
     ) -> None:
         self.cv = cv
         self.n_jobs = n_jobs
@@ -57,6 +64,7 @@ class LinearScorer(ScoringModule):
         self.db_dir = db_dir
         self.seed = seed
         self.model_name = model_name
+        self._multilabel = multilabel
 
     @classmethod
     def from_context(
@@ -93,6 +101,15 @@ class LinearScorer(ScoringModule):
 
         self._clf = clf
         self._embedder = vector_index.embedding_model
+        self.metadata = LinearScorerDumpDict(
+            model_name=self.model_name,
+            db_dir=self.db_dir,
+            cv=self.cv,
+            n_jobs=self.n_jobs,
+            device=self.device,
+            seed=self.seed,
+            multilabel=self._multilabel,
+        )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._embedder.encode(utterances)
@@ -106,16 +123,11 @@ class LinearScorer(ScoringModule):
         del self._embedder
 
     def dump(self, path: str) -> None:
-        metadata = LinearScorerDumpDict(
-            multilabel=self._multilabel,
-            device=str(self._embedder.device),
-        )
-
         dump_dir = Path(path)
 
         metadata_path = dump_dir / self.metadata_dict_name
         with metadata_path.open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
         # dump sklearn model
         clf_path = dump_dir / self.classifier_file_name

@@ -9,10 +9,11 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
+from autointent.modules.base import BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 
-class MLKnnScorerDumpMetadata(TypedDict):
+class MLKnnScorerDumpMetadata(BaseMetadataDict):
     db_dir: str
     device: str
     n_classes: int
@@ -75,7 +76,7 @@ class MLKnnScorer(ScoringModule):
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        vector_index = vector_index_client.get_or_create_index(self.model_name)
+        self.vector_index = vector_index_client.get_or_create_index(self.model_name)
 
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
@@ -84,7 +85,7 @@ class MLKnnScorer(ScoringModule):
             model_name=self.vector_index.model_name,
         )
 
-        self.features = vector_index.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
+        self.features = self.vector_index.embed(utterances) if self.vector_index.is_empty() else self.vector_index.get_all_embeddings()
         self.labels = np.array(labels)
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()

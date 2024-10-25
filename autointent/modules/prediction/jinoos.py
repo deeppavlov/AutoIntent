@@ -11,17 +11,17 @@ from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule
+from ..base import BaseMetadataDict
+from autointent.context.data_handler import Tag
 
 default_search_space = np.linspace(0, 1, num=100)
 
 
-class JinoosPredictorDumpMetadata(TypedDict):
+class JinoosPredictorDumpMetadata(BaseMetadataDict):
     thresh: list[float]
 
 
 class JinoosPredictor(PredictionModule):
-    metadata_dict_name = "metadata.json"
-
     def __init__(
         self,
         search_space: list[float] | None = None,
@@ -34,7 +34,7 @@ class JinoosPredictor(PredictionModule):
             search_space=search_space,
         )
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag] | None = None, **kwargs: dict[str, Any]) -> None:
         """
         TODO: use dev split instead of test split
         """

@@ -12,14 +12,17 @@ from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES
 from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
+from ...base import BaseMetadataDict
 
 
-class KNNScorerDumpMetadata(TypedDict):
-    device: str
-    db_dir: str
+class KNNScorerDumpMetadata(BaseMetadataDict):
+    model_name: str
+    k: int
+    weights: WEIGHT_TYPES
     n_classes: int
     multilabel: bool
-    model_name: str
+    db_dir: str
+    device: str
 
 
 class KNNScorer(ScoringModule):
@@ -74,8 +77,8 @@ class KNNScorer(ScoringModule):
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        vector_index = vector_index_client.get_or_create_index(self.model_name)
-        vector_index.add(utterances, labels)
+        self._vector_index = vector_index_client.get_or_create_index(self.model_name)
+        self._vector_index.add(utterances, labels)
 
         self.metadata = KNNScorerDumpMetadata(
             device=self.device,
@@ -83,6 +86,8 @@ class KNNScorer(ScoringModule):
             n_classes=self.n_classes,
             multilabel=self.multilabel,
             model_name=self._vector_index.model_name,
+            k=self.k,
+            weights=self.weights,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

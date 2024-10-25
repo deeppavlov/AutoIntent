@@ -2,6 +2,7 @@ import json
 import logging
 import shutil
 from pathlib import Path
+from typing import Any
 
 from autointent.custom_types import LABEL_TYPE
 
@@ -13,7 +14,7 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str) -> None:
+    def __init__(self, device: str, db_dir: str, **kwargs: dict[str, Any]) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = Path(db_dir)

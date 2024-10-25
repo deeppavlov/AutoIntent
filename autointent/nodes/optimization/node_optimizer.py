@@ -52,7 +52,7 @@ class NodeOptimizer:
                 context.optimization_info.log_module_optimization(
                     self.node_info.node_type,
                     module_type,
-                    module_kwargs,
+                    module.metadata,
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions

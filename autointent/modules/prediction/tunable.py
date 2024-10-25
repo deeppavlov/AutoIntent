@@ -15,17 +15,16 @@ from autointent.custom_types import LABEL_TYPE
 
 from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
+from ..base import BaseMetadataDict
 
 
-class TunablePredictorDumpMetadata(TypedDict):
+class TunablePredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     thresh: list[float]
     tags: list[Tag] | None
 
 
 class TunablePredictor(PredictionModule):
-    metadata_dict_name: str = "metadata.json"
-
     def __init__(self, n_trials: int | None = None, seed: int = 0) -> None:
         self.n_trials = n_trials
         self.seed = seed

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, TypedDict
 
 import numpy.typing as npt
 from typing_extensions import Self
@@ -10,7 +10,14 @@ from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import METRIC_FN
 
 
+class BaseMetadataDict(TypedDict):
+    pass
+
+
 class Module(ABC):
+    metadata_dict_name: str = "metadata.json"
+    metadata: BaseMetadataDict
+
     @abstractmethod
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         pass

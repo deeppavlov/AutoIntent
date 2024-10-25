@@ -11,7 +11,14 @@ from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import RetrievalMetricFn
 
 from .base import RetrievalModule
+from ..base import BaseMetadataDict
 
+
+class VectorDBMetadata(BaseMetadataDict):
+    k: int
+    model_name: str
+    device: str
+    db_dir: str
 
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
@@ -20,6 +27,14 @@ class VectorDBModule(RetrievalModule):
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
+
+        self.metadata = VectorDBMetadata(
+            k=k,
+            model_name=model_name,
+            device=device,
+            db_dir=db_dir,
+        )
+
         super().__init__(k=k)
 
     @classmethod
@@ -37,16 +52,8 @@ class VectorDBModule(RetrievalModule):
             device=context.device,
         )
 
-    def configure_optimization(self, context: Context) -> None:
-        """extract some info from context that is useful for node optimization"""
-        self.device = context.device
-        self.db_dir = context.db_dir
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
-        self.vector_index_client_kwargs = {
-            "device": self.device,
-            "db_dir": self.db_dir,
-        }
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
@@ -67,14 +74,14 @@ class VectorDBModule(RetrievalModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open("w") as file:
-            json.dump(self.vector_index_client_kwargs, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
-            self.vector_index_client_kwargs = json.load(file)
+            self.metadata = json.load(file)
 
-        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)
+        vector_index_client = VectorIndexClient(**self.metadata)
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:

@@ -12,11 +12,12 @@ from autointent.context.data_handler.tags import Tag
 from autointent.custom_types import LABEL_TYPE
 
 from .base import PredictionModule, apply_tags
+from ..base import BaseMetadataDict
 
 logger = logging.getLogger(__name__)
 
 
-class ThresholdPredictorDumpMetadata(TypedDict):
+class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     tags: list[Tag] | None
 
@@ -26,7 +27,7 @@ class ThresholdPredictor(PredictionModule):
     multilabel: bool
     tags: list[Tag] | None
 
-    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int) -> None:
+    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool = False, n_classes: int | None = None) -> None:
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes

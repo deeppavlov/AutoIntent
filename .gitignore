@@ -172,4 +172,5 @@ data/RuSnips
 eurlex.json
 poetry.lock
 
+indexes_dirnames.json
 tests_logs

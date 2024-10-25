@@ -15,16 +15,18 @@ from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
+from ...base import BaseMetadataDict
 
 logger = logging.getLogger(__name__)
 
 
-class DNNCScorerDumpMetadata(TypedDict):
+class DNNCScorerDumpMetadata(BaseMetadataDict):
     device: str
     db_dir: str
     n_classes: int
     cross_encoder_name: str
     search_model_name: str
+    k: int
 
 
 class DNNCScorer(ScoringModule):
@@ -79,8 +81,8 @@ class DNNCScorer(ScoringModule):
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        vector_index = vector_index_client.get_or_create_index(self.search_model_name)
-        vector_index.add(utterances, labels)
+        self.vector_index = vector_index_client.get_or_create_index(self.search_model_name)
+        self.vector_index.add(utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -93,6 +95,7 @@ class DNNCScorer(ScoringModule):
             n_classes=self.n_classes,
             cross_encoder_name=self.cross_encoder_name,
             search_model_name=self.search_model_name,
+            k=self.k,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -178,7 +181,7 @@ class DNNCScorer(ScoringModule):
         self.search_model_name = self.metadata["search_model_name"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.cross_encoder_name)
+        self.vector_index = vector_index_client.get_index(self.search_model_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         if not self.train_head:
