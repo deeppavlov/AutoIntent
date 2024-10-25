@@ -111,9 +111,9 @@ class VectorIndex:
         self.dump_dir = dir_path
         faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
         self.embedding_model.save(str(self.dump_dir / "embedding_model"))
-        with (self.dump_dir / "texts.txt").open("w") as file:
+        with (self.dump_dir / "texts.json").open("w") as file:
             json.dump(self.texts, file, indent=4, ensure_ascii=False)
-        with (self.dump_dir / "labels.txt").open("w") as file:
+        with (self.dump_dir / "labels.json").open("w") as file:
             json.dump(self.labels, file, indent=4, ensure_ascii=False)
 
     def load(self, dir_path: Path | None = None) -> None:
@@ -123,7 +123,7 @@ class VectorIndex:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
         self.embedding_model = SentenceTransformer(str(dir_path / "embedding_model"))
-        with (dir_path / "texts.txt").open() as file:
+        with (dir_path / "texts.json").open() as file:
             self.texts = json.load(file)
-        with (dir_path / "labels.txt").open() as file:
+        with (dir_path / "labels.json").open() as file:
             self.labels = json.load(file)

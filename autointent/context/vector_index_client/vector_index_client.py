@@ -86,7 +86,7 @@ class VectorIndexClient:
             index.load(dirpath)
             return index
 
-        msg = f"index for {model_name} wasn't ever created"
+        msg = f"Index for {model_name} wasn't ever created in {dirpath}"
         self._logger.error(msg)
         raise NonExistentIndexError(msg)
 

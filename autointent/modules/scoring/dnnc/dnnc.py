@@ -62,7 +62,7 @@ class DNNCScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        cross_encoder_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        cross_encoder_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         search_model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
         k: int = 3,
         train_head: bool = False,
@@ -170,6 +170,7 @@ class DNNCScorer(ScoringModule):
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         self.model.save(crossencoder_dir)
+        self.vector_index.dump(Path(self.db_dir))
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)

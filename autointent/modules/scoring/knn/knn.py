@@ -99,14 +99,17 @@ class KNNScorer(ScoringModule):
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
+
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
+
+        self._vector_index.dump(dump_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = json.load(file)
+            self.metadata: KNNScorerDumpMetadata = json.load(file)
 
         self.n_classes = self.metadata["n_classes"]
         self.multilabel = self.metadata["multilabel"]
