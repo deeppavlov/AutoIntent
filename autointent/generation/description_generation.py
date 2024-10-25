@@ -4,10 +4,10 @@ from collections import defaultdict
 from openai import AsyncOpenAI
 
 from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
-from autointent.generation.prompts import PROMPT_DESCRIPTION
+from autointent.generation.prompt_scheme import PromptDescription
 
 
-def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
+def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     """
     Groups utterances by their labels.
 
@@ -33,16 +33,8 @@ def get_utternaces_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     return intent_utterances
 
 
-def check_prompt_description(prompt: str) -> None:
-    if prompt.find("{intent_name}") == -1 or prompt.find("{user_utterances}") == -1:
-        error_text = (
-            "The 'prompt_description' template must properly include {intent_name} and {user_utterances} placeholders."
-        )
-        raise ValueError(error_text)
-
-
 async def create_intent_description(
-    client: AsyncOpenAI, intent_name: str | None, utterances: list[str], prompt: str, model_name: str
+    client: AsyncOpenAI, intent_name: str | None, utterances: list[str], prompt: PromptDescription, model_name: str
 ) -> str:
     """
     Generates a description for a specific intent using an OpenAI model.
@@ -51,7 +43,7 @@ async def create_intent_description(
         client (AsyncOpenAI): The OpenAI client instance used to communicate with the model.
         intent_name (str | None): The name of the intent to describe. If None, an empty string will be used.
         utterances (list[str]): A list of example utterances related to the intent.
-        prompt (str): A string template for the prompt, which must include placeholders for {intent_name}
+        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
                                   and {user_utterances} to format the content sent to the model.
         model_name (str): The identifier of the OpenAI model to use for generating the description.
 
@@ -62,7 +54,7 @@ async def create_intent_description(
         ValueError: If the response from the model is not a string or is in an unexpected format.
     """
     intent_name = intent_name if intent_name is not None else ""
-    content = prompt.format(intent_name=intent_name, user_utterances="\n".join(utterances[:5]))
+    content = prompt.text.format(intent_name=intent_name, user_utterances="\n".join(utterances[:5]))
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
         model=model_name,
@@ -79,7 +71,7 @@ async def generate_intent_descriptions(
     client: AsyncOpenAI,
     intent_utterances: dict[int, list[str]],
     intents: list[Intent],
-    prompt: str,
+    prompt: PromptDescription,
     model_name: str,
 ) -> list[Intent]:
     """
@@ -89,7 +81,7 @@ async def generate_intent_descriptions(
         client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
         intent_utterances (dict[int, list[str]]): A dictionary mapping intent IDs to their corresponding utterances.
         intents (list[Intent]): A list of intents to generate descriptions for.
-        prompt (str): A string template for the prompt, which must include placeholders for {intent_name}
+        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
                                   and {user_utterances} to format the content sent to the model.
         model_name (str): The name of the OpenAI model to use for generating descriptions.
 
@@ -121,7 +113,7 @@ async def generate_intent_descriptions(
 def enhance_dataset_with_descriptions(
     dataset: Dataset,
     client: AsyncOpenAI,
-    prompt: str = PROMPT_DESCRIPTION,
+    prompt: PromptDescription,
     model_name: str = "gpt-4o-mini",
 ) -> Dataset:
     """
@@ -130,16 +122,14 @@ def enhance_dataset_with_descriptions(
     Args:
         dataset (Dataset): The dataset containing utterances and intents that require descriptions.
         client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
-        prompt (str): A string template for the prompt, which must include placeholders for {intent_name}
+        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
                                   and {user_utterances} to format the content sent to the model.
         model_name (str, optional): The OpenAI model to use for generating descriptions. Defaults to "gpt-3.5-turbo".
 
     Returns:
         Dataset: The dataset with intents enhanced by generated descriptions.
     """
-    check_prompt_description(prompt)
-
-    intent_utterances = get_utternaces_by_id(utterances=dataset.utterances)
+    intent_utterances = get_utterances_by_id(utterances=dataset.utterances)
     dataset.intents = asyncio.run(
         generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name)
     )
