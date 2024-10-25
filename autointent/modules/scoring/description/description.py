@@ -58,8 +58,10 @@ class DescriptionScorer(ScoringModule):
         )
 
         if self._multilabel:
-            return scipy.special.expit(distances / self.temperature)
-        return scipy.special.softmax(distances / self.temperature, axis=1)
+            probabilites: NDArray[np.float64] = scipy.special.expit(distances / self.temperature)
+        else:
+            probabilites: NDArray[np.float64] = scipy.special.softmax(distances / self.temperature, axis=1)
+        return probabilites
 
     def clear_cache(self) -> None:
         self._vector_index.delete()
