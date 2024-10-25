@@ -68,14 +68,7 @@ class DataHandler:
         )
 
         logger.debug("collection regexp patterns from multiclass intent records")
-        self.regexp_patterns = [
-            RegexPatterns(
-                id=intent.id,
-                regexp_full_match=intent.regexp_full_match,
-                regexp_partial_match=intent.regexp_partial_match,
-            )
-            for intent in dataset.intents
-        ]
+        self.regexp_patterns = [intent.get_regexp_patterns() for intent in dataset.intents]
 
         self._logger = logger
 

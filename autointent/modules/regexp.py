@@ -1,7 +1,8 @@
-import re
-from typing import Any
+import json
+from pathlib import Path
 
 from autointent import Context
+from autointent.context.data_handler.schemas import RegExpPatterns
 from autointent.context.optimization_info.data_models import Artifact
 from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.regexp import RegexpMetricFn
@@ -10,27 +11,27 @@ from .base import Module
 
 
 class RegExp(Module):
+    metadata_dict_name: str = "metadata.json"
+
+
     def fit(self, context: Context) -> None:
-        self.regexp_patterns = [
-            {
-                "regexp_full_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_full_match"]],
-                "regexp_partial_match": [re.compile(ptn, flags=re.IGNORECASE) for ptn in dct["regexp_partial_match"]],
-            }
-            for dct in context.data_handler.regexp_patterns  # todo what now regexp_patterns?
-        ]
+        self.regexp_patterns = context.data_handler.regexp_patterns
 
     def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:
-        return [list(self._predict_single(ut)) for ut in utterances]
+        return [list(self._predict(utterance)) for utterance in utterances]
 
-    def _match(self, text: str, intent_record: dict[str, Any]) -> bool:
-        full_match = any(ptn.fullmatch(text) for ptn in intent_record["regexp_full_match"])
-        if full_match:
-            return True
-        return any(ptn.match(text) for ptn in intent_record["regexp_partial_match"])
+    def _match(self, utterance: str, patterns: RegExpPatterns) -> bool:
+        full_match = any(pattern.fullmatch(utterance) for pattern in patterns.regexp_full_match)
+        partial_match = any(pattern.match(utterance) for pattern in patterns.regexp_partial_match)
+        return full_match or partial_match
 
-    def _predict_single(self, utterance: str) -> set[int]:
-        # todo test this
-        return {intent_record["id"] for intent_record in self.regexp_patterns if self._match(utterance, intent_record)}  # type: ignore[misc]
+    def _predict(self, utterance: str) -> set[int]:
+        # TODO testing
+        return {
+            regexp_patterns.id
+            for regexp_patterns in self.regexp_patterns
+            if self._match(utterance, regexp_patterns)
+        }
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
         # TODO add parameter to a whole pipeline (or just to regexp module):
@@ -51,3 +52,19 @@ class RegExp(Module):
 
     def get_assets(self) -> Artifact:
         return Artifact()
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = [pattern.model_dump() for pattern in self.regexp_patterns]
+
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata =  json.load(file)
+
+        self.regexp_patterns = [RegExpPatterns.model_validate(patterns) for patterns in metadata]

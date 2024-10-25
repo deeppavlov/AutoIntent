@@ -1,7 +1,9 @@
+import re
 from enum import Enum
 from functools import cached_property
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, model_serializer
 
 from autointent.custom_types import LABEL_TYPE
 
@@ -49,12 +51,41 @@ class Utterance(BaseModel):
         return Utterance(text=self.text, label=[self.label])
 
 
+class RegExpPatterns(BaseModel):
+    id: int
+    regexp_full_match: list[re.Pattern[str]]
+    regexp_partial_match: list[re.Pattern[str]]
+
+    @field_validator("regexp_full_match", "regexp_partial_match", mode="before")
+    @classmethod
+    def _compile(cls, patterns: list[str]) -> list[re.Pattern[str]]:
+        return [re.compile(pattern, flags=re.IGNORECASE) for pattern in patterns]
+
+    @model_serializer
+    def _serialize(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "regexp_full_match": self._serialize_patterns(self.regexp_full_match),
+            "regexp_partial_match": self._serialize_patterns(self.regexp_partial_match),
+        }
+
+    def _serialize_patterns(self, patterns: list[re.Pattern[str]]) -> list[str]:
+        return [pattern.pattern for pattern in patterns]
+
+
 class Intent(BaseModel):
     id: int
     name: str | None = None
     tags: list[str] = []
     regexp_full_match: list[str] = []
     regexp_partial_match: list[str] = []
+
+    def get_regexp_patterns(self) -> RegExpPatterns:
+        return RegExpPatterns(
+            id=self.id,
+            regexp_full_match=self.regexp_full_match,
+            regexp_partial_match=self.regexp_partial_match,
+        )
 
 
 class Dataset(BaseModel):

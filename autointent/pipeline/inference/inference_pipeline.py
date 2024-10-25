@@ -15,6 +15,9 @@ class InferencePipeline:
     def from_dict_config(cls, config: dict[str, Any]) -> "InferencePipeline":
         return instantiate(InferencePipelineConfig, **config)  # type: ignore[no-any-return]
 
-    def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:
+    def predict(self, utterances: list[str]) -> dict[str, list[LABEL_TYPE]]:
         scores = self.nodes["scoring"].module.predict(utterances)
-        return self.nodes["prediction"].module.predict(scores)  # type: ignore[return-value]
+        output = {"predictions" : self.nodes["prediction"].module.predict(scores)}
+        if "regexp" in self.nodes:
+            output["regexp_predictions"] = self.nodes["regexp"].module.predict(utterances)
+        return output

@@ -9,7 +9,7 @@ from autointent.utils import funcs_to_dict
 from .base import NodeInfo
 
 
-class RegExpNode(NodeInfo):
+class RegExpNodeInfo(NodeInfo):
     metrics_available: ClassVar[Mapping[str, RegexpMetricFn]] = funcs_to_dict(
         regexp_partial_accuracy,
         regexp_partial_precision,

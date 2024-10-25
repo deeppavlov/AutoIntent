@@ -33,7 +33,7 @@ def main(cfg: InferenceConfig) -> None:
     pipeline = InferencePipeline.from_dict_config(pipeline_config)
 
     # send data to pipeline
-    labels: list[LABEL_TYPE] = pipeline.predict(data)
+    labels: dict[str, list[LABEL_TYPE]] = pipeline.predict(data)
 
     # save results
     with Path(cfg.output_path).open("w") as file:
