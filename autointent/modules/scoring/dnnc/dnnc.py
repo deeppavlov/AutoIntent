@@ -41,7 +41,7 @@ class DNNCScorer(ScoringModule):
     def __init__(
         self,
         cross_encoder_name: str,
-            search_model_name: str,
+        search_model_name: str,
         k: int,
         n_classes: int,
         db_dir: str,

@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any
+
 from typing_extensions import Self
 
 from autointent.context import Context
@@ -22,7 +23,13 @@ class VectorDBModule(RetrievalModule):
         super().__init__(k=k)
 
     @classmethod
-    def from_context(cls, context: Context, k: int =5 ,  model_name: str = "sentence-transformers/all-MiniLM-L6-v2", **kwargs: dict[str, Any]) -> Self:
+    def from_context(
+        cls,
+        context: Context,
+        k: int = 5,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        **kwargs: dict[str, Any],
+    ) -> Self:
         return cls(
             k=k,
             model_name=model_name,

@@ -18,17 +18,15 @@ logger = logging.getLogger(__name__)
 
 class ThresholdPredictorDumpMetadata(TypedDict):
     multilabel: bool
-    tags: list[Tag]
+    tags: list[Tag] | None
 
 
 class ThresholdPredictor(PredictionModule):
     metadata_dict_name: str = "metadata.json"
     multilabel: bool
-    tags: list[Tag]
+    tags: list[Tag] | None
 
-    def __init__(
-        self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int
-    ) -> None:
+    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool, n_classes: int) -> None:
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
@@ -45,7 +43,7 @@ class ThresholdPredictor(PredictionModule):
         self,
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
-        tags: list[Tag] = [],
+        tags: list[Tag] | None = None,
         **kwargs: dict[str, Any],
     ) -> None:
         self.tags = tags
@@ -56,7 +54,6 @@ class ThresholdPredictor(PredictionModule):
                 logger.error(msg)
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
-
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:

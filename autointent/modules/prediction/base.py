@@ -42,7 +42,8 @@ def get_prediction_evaluation_data(
     scores = context.optimization_info.get_best_test_scores()
 
     if scores is None:
-        raise ValueError("No test scores found in the optimization info")
+        msg = "No test scores found in the optimization info"
+        raise ValueError(msg)
 
     oos_scores = context.optimization_info.get_best_oos_scores()
     return_scores = scores

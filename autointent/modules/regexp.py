@@ -4,19 +4,18 @@ from typing import Any, TypedDict
 from typing_extensions import Self
 
 from autointent import Context
+from autointent.context.data_handler.data_handler import RegexPatterns
 from autointent.context.optimization_info.data_models import Artifact
 from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.regexp import RegexpMetricFn
 
 from .base import Module
-from autointent.context.data_handler.data_handler import RegexPatterns
 
 
 class RegexPatternsCompiled(TypedDict):
     id: int
     regexp_full_match: list[re.Pattern[str]]
     regexp_partial_match: list[re.Pattern[str]]
-
 
 
 class RegExp(Module):
@@ -50,7 +49,11 @@ class RegExp(Module):
 
     def _predict_single(self, utterance: str) -> set[int]:
         # todo test this
-        return {intent_record["id"] for intent_record in self.regexp_patterns_compiled if self._match(utterance, intent_record)}
+        return {
+            intent_record["id"]
+            for intent_record in self.regexp_patterns_compiled
+            if self._match(utterance, intent_record)
+        }
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
         # TODO add parameter to a whole pipeline (or just to regexp module):

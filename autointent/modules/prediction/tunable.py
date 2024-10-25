@@ -20,7 +20,7 @@ from .threshold import multiclass_predict, multilabel_predict
 class TunablePredictorDumpMetadata(TypedDict):
     multilabel: bool
     thresh: list[float]
-    tags: list[Tag]
+    tags: list[Tag] | None
 
 
 class TunablePredictor(PredictionModule):
@@ -38,7 +38,7 @@ class TunablePredictor(PredictionModule):
         self,
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
-        tags: list[Tag] = [],
+        tags: list[Tag] | None = None,
         **kwargs: dict[str, Any],
     ) -> None:
         """
@@ -47,7 +47,9 @@ class TunablePredictor(PredictionModule):
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
-        n_classes = len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+        n_classes = (
+            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+        )
 
         thresh_optimizer = ThreshOptimizer(n_classes=n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
 
@@ -102,7 +104,7 @@ class ThreshOptimizer:
         probas: npt.NDArray[Any],
         labels: npt.NDArray[Any],
         seed: int,
-        tags: list[Tag],
+        tags: list[Tag] | None = None,
     ) -> None:
         self.probas = probas
         self.labels = labels
