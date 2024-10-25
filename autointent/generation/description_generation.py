@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
+from autointent.context.data_handler.schemas import Dataset, Intent, Utterance, UtteranceType
 from autointent.generation.prompt_scheme import PromptDescription
 
 
@@ -20,11 +20,11 @@ def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     intent_utterances = defaultdict(list)
 
     for utterance in utterances:
-        if utterance.label is None:
+        if utterance.type == UtteranceType.oos:
             continue
 
         text = utterance.text
-        if isinstance(utterance.label, list):
+        if utterance.type == UtteranceType.multilabel:
             for label in utterance.label:
                 intent_utterances[label].append(text)
         else:
