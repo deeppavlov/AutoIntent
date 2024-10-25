@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import numpy as np
+import scipy
 from numpy.typing import NDArray
 from sklearn.metrics.pairwise import pairwise_distances
 
@@ -23,8 +24,9 @@ class DescriptionScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
     _vector_index: VectorIndex
 
-    def __init__(self, similarity_metric: str = "cosine") -> None:
+    def __init__(self, similarity_metric: str = "cosine", temperature: float = 1.0) -> None:
         self.similarity_metric = similarity_metric
+        self.temperature = temperature
 
     def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
@@ -54,7 +56,10 @@ class DescriptionScorer(ScoringModule):
         distances: NDArray[np.float64] = pairwise_distances(
             utterance_vectors, self.description_vectors, metric=self.similarity_metric
         )
-        return distances
+
+        if self._multilabel:
+            return scipy.special.expit(distances / self.temperature)
+        return scipy.special.softmax(distances / self.temperature, axis=1)
 
     def clear_cache(self) -> None:
         self._vector_index.delete()
