@@ -5,19 +5,19 @@ from typing import Any
 import faiss
 import numpy as np
 import numpy.typing as npt
-from sentence_transformers import SentenceTransformer
 
 from autointent.custom_types import LABEL_TYPE
+from autointent.context.embedder import Embedder
 
 
 class VectorIndex:
     index: faiss.Index
-    embedding_model: SentenceTransformer
+    embedder: Embedder
 
     def __init__(self, model_name: str, device: str, embedder_batch_size: int = 1) -> None:
         self.model_name = model_name
+        self.embedder = Embedder(model_name=model_name, embedder_batch_size=embedder_batch_size, device=device)
         self.device = device
-        self.embedder_batch_size = embedder_batch_size
 
         self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
@@ -25,7 +25,7 @@ class VectorIndex:
     def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
         self.texts = texts
 
-        embeddings = self.embed(texts)
+        embeddings = self.embedder.embed(texts)
 
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
@@ -38,12 +38,10 @@ class VectorIndex:
         self.labels = []
         self.texts = []
 
-        if hasattr(self, "embedding_model"):
-            self.embedding_model.cpu()
-            del self.embedding_model
+        self.embedder.delete()
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
-        query_embedding: npt.NDArray[np.float64] = self.embed(texts)  # type: ignore[assignment]
+        query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
@@ -100,19 +98,11 @@ class VectorIndex:
 
         return all_labels, all_distances, all_texts
 
-    def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
-        if not hasattr(self, "embedding_model"):
-            self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
-        return self.embedding_model.encode(utterances, convert_to_numpy=True, batch_size=self.embedder_batch_size)  # type: ignore[return-value]
-
-    def save_embedder(self, path: Path) -> None:
-        self.embedding_model.save(str(path))
-
     def dump(self, dir_path: Path) -> None:
         dir_path.mkdir(parents=True, exist_ok=True)
         self.dump_dir = dir_path
         faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
-        self.save_embedder(self.dump_dir / "embedding_model")
+        self.embedder.dump(self.dump_dir / "embedding_model")
         with (self.dump_dir / "texts.txt").open("w") as file:
             json.dump(self.texts, file, indent=4, ensure_ascii=False)
         with (self.dump_dir / "labels.txt").open("w") as file:
@@ -124,7 +114,7 @@ class VectorIndex:
         if dir_path is None:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedding_model = SentenceTransformer(str(dir_path / "embedding_model"))
+        self.embedding_model = Embedder(model_path=dir_path / "embedding_model")
         with (dir_path / "texts.txt").open() as file:
             self.texts = json.load(file)
         with (dir_path / "labels.txt").open() as file:

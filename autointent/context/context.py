@@ -31,6 +31,7 @@ class Context:
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, db_dir, embedder_batch_size)
 
+        self.embedder_batch_size = embedder_batch_size
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
