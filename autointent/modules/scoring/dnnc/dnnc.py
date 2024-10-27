@@ -27,6 +27,7 @@ class DNNCScorerDumpMetadata(BaseMetadataDict):
     cross_encoder_name: str
     search_model_name: str
     k: int
+    train_head: bool
 
 
 class DNNCScorer(ScoringModule):
@@ -96,6 +97,7 @@ class DNNCScorer(ScoringModule):
             cross_encoder_name=self.cross_encoder_name,
             search_model_name=self.search_model_name,
             k=self.k,
+            train_head=self.train_head,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -180,15 +182,16 @@ class DNNCScorer(ScoringModule):
         self.n_classes = self.metadata["n_classes"]
         self.cross_encoder_name = self.metadata["cross_encoder_name"]
         self.search_model_name = self.metadata["search_model_name"]
+        self.train_head = self.metadata["train_head"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
         self.vector_index = vector_index_client.get_index(self.search_model_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
-        if not self.train_head:
-            self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
-        else:
+        if self.train_head:
             self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
+        else:
+            self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

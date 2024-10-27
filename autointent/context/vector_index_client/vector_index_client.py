@@ -28,6 +28,7 @@ class VectorIndexClient:
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device)
+        self._add_index_dirname(model_name, str(self.db_dir))
 
         if utterances is not None and labels is not None:
             index.add(utterances, labels)
