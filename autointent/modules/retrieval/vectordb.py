@@ -48,7 +48,7 @@ class VectorDBModule(RetrievalModule):
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
             self.vector_index_client_kwargs = json.load(file)
 
-        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore
+        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
