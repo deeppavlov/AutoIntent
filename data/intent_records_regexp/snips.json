@@ -1,114 +1,216 @@
-[
-    {
-        "intent_id": 0,
-        "intent_name": "AddToPlaylist",
-        "sample_utterances": [
-            "Add the Beatles tune Yesterday to my playlist, The Southern Highway Chronicles",
-            "Add tune to this is trey songz",
-            "Add arthur russell to my Women of Disco playlist.",
-            "Add the name Not Fade Away to the playlist the midnight hour",
-            "Add the artist to my Metal playlist."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "to my",
-            "playlist add this"
-        ]
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "BookRestaurant",
-        "sample_utterances": [
-            "Make reservations for me at a taverna in Hong Kong",
-            "Book me a reservation for Ad Hoc in Brazil for a party of 7",
-            "book a table for me and belinda serving minestra in a bar",
-            "book a spot at Rimsky-Korsakoffee House in Mackville",
-            "I want to take my mom and I to the tea house"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "book a",
-            "a table for"
-        ]
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "GetWeather",
-        "sample_utterances": [
-            "What will the humidity be in Beroun on aug. 26",
-            "What will the humidity be in AR in 49 weeks and a half from now",
-            "what is the weather forecast for Moffett",
-            "at 0 AM what will the weather be here",
-            "Is it going to be foggy at two am in Barberville"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "the weather",
-            "what is the"
-        ]
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "PlayMusic",
-        "sample_utterances": [
-            "Play some seventies music on Netflix .",
-            "Play Goa music on Google Music .",
-            "Play the track Goodbye Alexander, Goodbye Honey Boy from Ehsaan Noorani",
-            "Lets hear some 2009 music",
-            "Play songs by Naomi Schemer"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "play some",
-            "i want to"
-        ]
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "RateBook",
-        "sample_utterances": [
-            "Rate this album zero of 6",
-            "rate the series The Quantity Theory of Insanity 1",
-            "Rate this album a 3",
-            "Rate Timeline of science fiction 4 out of 6",
-            "I give Benson-Meditation 1 out of 6 stars ."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "of 6",
-            "out of 6"
-        ]
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "SearchCreativeWork",
-        "sample_utterances": [
-            "play the song S.F. sound furniture",
-            "Where to buy painting Target Practice",
-            "I'd like to see Apartment Hunting .",
-            "show video game name Find the Colour",
-            "Find a TV show called The God Boy ."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "find a",
-            "where can i"
-        ]
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "SearchScreeningEvent",
-        "sample_utterances": [
-            "What time is A Ball at the Anjo House playing",
-            "What time is My Son Shall Be Armenian playing at Plitt Theatres",
-            "I'd like to watch Heartbreak at Pacific Theatres at two pm",
-            "What time is The Toll of the Sea playing",
-            "are there any movies playing around here"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": [
-            "the movie",
-            "the movie schedule"
-        ]
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "Add the Beatles tune Yesterday to my playlist, The Southern Highway Chronicles",
+            "label": 0
+        },
+        {
+            "text": "Add tune to this is trey songz",
+            "label": 0
+        },
+        {
+            "text": "Add arthur russell to my Women of Disco playlist.",
+            "label": 0
+        },
+        {
+            "text": "Add the name Not Fade Away to the playlist the midnight hour",
+            "label": 0
+        },
+        {
+            "text": "Add the artist to my Metal playlist.",
+            "label": 0
+        },
+        {
+            "text": "Make reservations for me at a taverna in Hong Kong",
+            "label": 1
+        },
+        {
+            "text": "Book me a reservation for Ad Hoc in Brazil for a party of 7",
+            "label": 1
+        },
+        {
+            "text": "book a table for me and belinda serving minestra in a bar",
+            "label": 1
+        },
+        {
+            "text": "book a spot at Rimsky-Korsakoffee House in Mackville",
+            "label": 1
+        },
+        {
+            "text": "I want to take my mom and I to the tea house",
+            "label": 1
+        },
+        {
+            "text": "What will the humidity be in Beroun on aug. 26",
+            "label": 2
+        },
+        {
+            "text": "What will the humidity be in AR in 49 weeks and a half from now",
+            "label": 2
+        },
+        {
+            "text": "what is the weather forecast for Moffett",
+            "label": 2
+        },
+        {
+            "text": "at 0 AM what will the weather be here",
+            "label": 2
+        },
+        {
+            "text": "Is it going to be foggy at two am in Barberville",
+            "label": 2
+        },
+        {
+            "text": "Play some seventies music on Netflix .",
+            "label": 3
+        },
+        {
+            "text": "Play Goa music on Google Music .",
+            "label": 3
+        },
+        {
+            "text": "Play the track Goodbye Alexander, Goodbye Honey Boy from Ehsaan Noorani",
+            "label": 3
+        },
+        {
+            "text": "Lets hear some 2009 music",
+            "label": 3
+        },
+        {
+            "text": "Play songs by Naomi Schemer",
+            "label": 3
+        },
+        {
+            "text": "Rate this album zero of 6",
+            "label": 4
+        },
+        {
+            "text": "rate the series The Quantity Theory of Insanity 1",
+            "label": 4
+        },
+        {
+            "text": "Rate this album a 3",
+            "label": 4
+        },
+        {
+            "text": "Rate Timeline of science fiction 4 out of 6",
+            "label": 4
+        },
+        {
+            "text": "I give Benson-Meditation 1 out of 6 stars .",
+            "label": 4
+        },
+        {
+            "text": "play the song S.F. sound furniture",
+            "label": 5
+        },
+        {
+            "text": "Where to buy painting Target Practice",
+            "label": 5
+        },
+        {
+            "text": "I'd like to see Apartment Hunting .",
+            "label": 5
+        },
+        {
+            "text": "show video game name Find the Colour",
+            "label": 5
+        },
+        {
+            "text": "Find a TV show called The God Boy .",
+            "label": 5
+        },
+        {
+            "text": "What time is A Ball at the Anjo House playing",
+            "label": 6
+        },
+        {
+            "text": "What time is My Son Shall Be Armenian playing at Plitt Theatres",
+            "label": 6
+        },
+        {
+            "text": "I'd like to watch Heartbreak at Pacific Theatres at two pm",
+            "label": 6
+        },
+        {
+            "text": "What time is The Toll of the Sea playing",
+            "label": 6
+        },
+        {
+            "text": "are there any movies playing around here",
+            "label": 6
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "AddToPlaylist",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "to my",
+                "playlist add this"
+            ]
+        },
+        {
+            "id": 1,
+            "name": "BookRestaurant",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "book a",
+                "a table for"
+            ]
+        },
+        {
+            "id": 2,
+            "name": "GetWeather",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "the weather",
+                "what is the"
+            ]
+        },
+        {
+            "id": 3,
+            "name": "PlayMusic",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "play some",
+                "i want to"
+            ]
+        },
+        {
+            "id": 4,
+            "name": "RateBook",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "of 6",
+                "out of 6"
+            ]
+        },
+        {
+            "id": 5,
+            "name": "SearchCreativeWork",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "find a",
+                "where can i"
+            ]
+        },
+        {
+            "id": 6,
+            "name": "SearchScreeningEvent",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [
+                "the movie",
+                "the movie schedule"
+            ]
+        }
+    ]
+}

@@ -1,93 +1,195 @@
-[
-    {
-        "intent_id": 0,
-        "intent_name": "add_to_playlist",
-        "sample_utterances": [
-            "Добавьте еще одну песню в плейлист Cita Romántica.",
-            "добавить Клем Берк в мой плейлист Pre-Party R&B Jams",
-            "Добавить прямую трансляцию из Aragon Ballroom в Trapeo",
-            "Добавьте \"Объединяйтесь и побеждайте\" в мой вечер",
-            "Добавить трек в мой Digster Future Hits"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "book_restaurant",
-        "sample_utterances": [
-            "Бронируйте ближневосточный ресторан в IN на полдень",
-            "Забронируйте столик в T-Rex вдали от Halsey St.",
-            "Я хотел бы поесть в таверне, где подают чили кон карне на компанию из 10 человек",
-            "У меня группа из четырех человек в Японии, и мне нужна бронь в Rimsky-Korsakoffee House на 3 августа.",
-            "Пожалуйста, забронируйте столик в ресторане где-нибудь в Мондови, штат Коннектикут."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "get_weather",
-        "sample_utterances": [
-            "Какой будет погода в этом году в заповеднике Horseshoe Lake State Fish and Wildlife Area?",
-            "Будет ли солнечно через сто тридцать пять дней в Национальном морском заповеднике Монтерей-Бэй?",
-            "Ожидается ли дождь рядом с моим текущим местоположением в 0 часов?",
-            "каков прогноз, начиная с 1 сентября 2039 года, для более холодных условий в АК",
-            "Как холодно в Принстон-Джанкшн"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "play_music",
-        "sample_utterances": [
-            "Мне нужно услышать песню Aspro Mavro от Билла Шимчика на Youtube",
-            "Послушать Yo Ho from the New York Pops на YouTube",
-            "Слушайте музыку семидесятых от Janne Puurtinen на Youtube.",
-            "играет альбом Música Da Série De Filmes O Hobbit Алекса Отаолы",
-            "Играть в Magic Sam из тридцатых"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "rate_book",
-        "sample_utterances": [
-            "Оцените Лотос и Шторм ноль из 6",
-            "Оцените The Fall-Down Artist на 5 звезд.",
-            "Оцените текущий роман на один балл",
-            "Оцените \"Человека-обезьяну\" на 4",
-            "Я ставлю The Penalty три звезды"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "search_creative_work",
-        "sample_utterances": [
-            "Саундтрек к фильму \"По эту сторону рая\"",
-            "Найдите книгу под названием \"Безумный волшебник\"",
-            "Найди картинку Громче, чем бомбы",
-            "показать творческую работу Through the Back Door",
-            "Где можно посмотреть телешоу You Make Me Hate Music"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "search_screening_event",
-        "sample_utterances": [
-            "Какое расписание фильмов в Malco Theatres",
-            "Я хочу получить расписание фильмов",
-            "Покажите мне время для фильма \"Я сожалею\" в моем кинотеатре",
-            "Найдите время для Trouble for Two за одну минуту в Landmark Theatres",
-            "Пожалуйста, покажите мне расписание фильмов, которые идут по соседству."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "Добавьте еще одну песню в плейлист Cita Romántica.",
+            "label": 0
+        },
+        {
+            "text": "добавить Клем Берк в мой плейлист Pre-Party R&B Jams",
+            "label": 0
+        },
+        {
+            "text": "Добавить прямую трансляцию из Aragon Ballroom в Trapeo",
+            "label": 0
+        },
+        {
+            "text": "Добавьте \"Объединяйтесь и побеждайте\" в мой вечер",
+            "label": 0
+        },
+        {
+            "text": "Добавить трек в мой Digster Future Hits",
+            "label": 0
+        },
+        {
+            "text": "Бронируйте ближневосточный ресторан в IN на полдень",
+            "label": 1
+        },
+        {
+            "text": "Забронируйте столик в T-Rex вдали от Halsey St.",
+            "label": 1
+        },
+        {
+            "text": "Я хотел бы поесть в таверне, где подают чили кон карне на компанию из 10 человек",
+            "label": 1
+        },
+        {
+            "text": "У меня группа из четырех человек в Японии, и мне нужна бронь в Rimsky-Korsakoffee House на 3 августа.",
+            "label": 1
+        },
+        {
+            "text": "Пожалуйста, забронируйте столик в ресторане где-нибудь в Мондови, штат Коннектикут.",
+            "label": 1
+        },
+        {
+            "text": "Какой будет погода в этом году в заповеднике Horseshoe Lake State Fish and Wildlife Area?",
+            "label": 2
+        },
+        {
+            "text": "Будет ли солнечно через сто тридцать пять дней в Национальном морском заповеднике Монтерей-Бэй?",
+            "label": 2
+        },
+        {
+            "text": "Ожидается ли дождь рядом с моим текущим местоположением в 0 часов?",
+            "label": 2
+        },
+        {
+            "text": "каков прогноз, начиная с 1 сентября 2039 года, для более холодных условий в АК",
+            "label": 2
+        },
+        {
+            "text": "Как холодно в Принстон-Джанкшн",
+            "label": 2
+        },
+        {
+            "text": "Мне нужно услышать песню Aspro Mavro от Билла Шимчика на Youtube",
+            "label": 3
+        },
+        {
+            "text": "Послушать Yo Ho from the New York Pops на YouTube",
+            "label": 3
+        },
+        {
+            "text": "Слушайте музыку семидесятых от Janne Puurtinen на Youtube.",
+            "label": 3
+        },
+        {
+            "text": "играет альбом Música Da Série De Filmes O Hobbit Алекса Отаолы",
+            "label": 3
+        },
+        {
+            "text": "Играть в Magic Sam из тридцатых",
+            "label": 3
+        },
+        {
+            "text": "Оцените Лотос и Шторм ноль из 6",
+            "label": 4
+        },
+        {
+            "text": "Оцените The Fall-Down Artist на 5 звезд.",
+            "label": 4
+        },
+        {
+            "text": "Оцените текущий роман на один балл",
+            "label": 4
+        },
+        {
+            "text": "Оцените \"Человека-обезьяну\" на 4",
+            "label": 4
+        },
+        {
+            "text": "Я ставлю The Penalty три звезды",
+            "label": 4
+        },
+        {
+            "text": "Саундтрек к фильму \"По эту сторону рая\"",
+            "label": 5
+        },
+        {
+            "text": "Найдите книгу под названием \"Безумный волшебник\"",
+            "label": 5
+        },
+        {
+            "text": "Найди картинку Громче, чем бомбы",
+            "label": 5
+        },
+        {
+            "text": "показать творческую работу Through the Back Door",
+            "label": 5
+        },
+        {
+            "text": "Где можно посмотреть телешоу You Make Me Hate Music",
+            "label": 5
+        },
+        {
+            "text": "Какое расписание фильмов в Malco Theatres",
+            "label": 6
+        },
+        {
+            "text": "Я хочу получить расписание фильмов",
+            "label": 6
+        },
+        {
+            "text": "Покажите мне время для фильма \"Я сожалею\" в моем кинотеатре",
+            "label": 6
+        },
+        {
+            "text": "Найдите время для Trouble for Two за одну минуту в Landmark Theatres",
+            "label": 6
+        },
+        {
+            "text": "Пожалуйста, покажите мне расписание фильмов, которые идут по соседству.",
+            "label": 6
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "add_to_playlist",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 1,
+            "name": "book_restaurant",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 2,
+            "name": "get_weather",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 3,
+            "name": "play_music",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 4,
+            "name": "rate_book",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 5,
+            "name": "search_creative_work",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 6,
+            "name": "search_screening_event",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        }
+    ]
+}
