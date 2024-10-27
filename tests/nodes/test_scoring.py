@@ -17,8 +17,8 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            # {"k": [3], "module_type": "knn", "weights": ["uniform", "distance", "closest"]},
-            # {"module_type": "linear"},
+            {"k": [3], "module_type": "knn", "weights": ["uniform", "distance", "closest"]},
+            {"module_type": "linear"},
             {
                 "module_type": "dnnc",
                 "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],

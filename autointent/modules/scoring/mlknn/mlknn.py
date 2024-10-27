@@ -18,6 +18,10 @@ class MLKnnScorerDumpMetadata(BaseMetadataDict):
     device: str
     n_classes: int
     model_name: str
+    k: int
+    s: float
+    n_classes: int
+    ignore_first_neighbours: int
 
 
 class ArrayToSave(TypedDict):
@@ -83,6 +87,9 @@ class MLKnnScorer(ScoringModule):
             device=self.device,
             n_classes=self.n_classes,
             model_name=self.vector_index.model_name,
+            k=self.k,
+            s=self.s,
+            ignore_first_neighbours=self.ignore_first_neighbours,
         )
 
         self.features = self.vector_index.embed(utterances) if self.vector_index.is_empty() else self.vector_index.get_all_embeddings()
@@ -171,6 +178,9 @@ class MLKnnScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata: MLKnnScorerDumpMetadata = json.load(file)
         self.n_classes = self.metadata["n_classes"]
+        self.k = self.metadata["k"]
+        self.s = self.metadata["s"]
+        self.ignore_first_neighbours = self.metadata["ignore_first_neighbours"]
 
         arrays: ArrayToSave = np.load(dump_dir / self.arrays_filename)
 

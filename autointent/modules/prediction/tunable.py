@@ -22,12 +22,16 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     thresh: list[float]
     tags: list[Tag] | None
+    n_trials: int
 
 
 class TunablePredictor(PredictionModule):
-    def __init__(self, n_trials: int | None = None, seed: int = 0) -> None:
+    def __init__(self,thresh: list[float]| None = None, n_trials: int | None = None, seed: int = 0, multilabel: bool = False, tags: list[Tag] | None = None) -> None:
         self.n_trials = n_trials
         self.seed = seed
+        self.multilabel = multilabel
+        self.thresh = thresh
+        self.tags = tags
 
     @classmethod
     def from_context(cls, context: Context, n_trials: int | None = None) -> Self:
@@ -59,6 +63,7 @@ class TunablePredictor(PredictionModule):
             tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
+        self.metadata = TunablePredictorDumpMetadata(multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_trials=self.n_trials)
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
@@ -68,10 +73,8 @@ class TunablePredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = TunablePredictorDumpMetadata(multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags)
-
         with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
@@ -79,9 +82,12 @@ class TunablePredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: TunablePredictorDumpMetadata = json.load(file)
 
+        self.metadata = metadata
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]
+        self.n_trials = metadata["n_trials"]
+
 
 
 class ThreshOptimizer:
