@@ -6,8 +6,8 @@ import faiss
 import numpy as np
 import numpy.typing as npt
 
-from autointent.custom_types import LABEL_TYPE
 from autointent.context.embedder import Embedder
+from autointent.custom_types import LABEL_TYPE
 
 
 class VectorIndex:
