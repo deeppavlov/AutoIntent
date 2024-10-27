@@ -1,8 +1,8 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypedDict
-from omegaconf.listconfig import ListConfig
+from typing import Any
+
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import Self
@@ -10,9 +10,9 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.data_handler.tags import Tag
 from autointent.custom_types import LABEL_TYPE
+from autointent.modules.base import BaseMetadataDict
 
 from .base import PredictionModule, apply_tags
-from ..base import BaseMetadataDict
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,6 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     # tags: list[Tag] | None
     thresh: float | npt.NDArray[Any]
-    multilabel: bool
     n_classes: int | None
 
 
@@ -30,7 +29,13 @@ class ThresholdPredictor(PredictionModule):
     multilabel: bool
     tags: list[Tag] | None
 
-    def __init__(self, thresh: float | npt.NDArray[Any], multilabel: bool = False, n_classes: int | None = None, tags: list[Tag] | None = None) -> None:
+    def __init__(
+        self,
+        thresh: float | npt.NDArray[Any],
+        multilabel: bool = False,
+        n_classes: int | None = None,
+        tags: list[Tag] | None = None,
+    ) -> None:
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
@@ -53,7 +58,6 @@ class ThresholdPredictor(PredictionModule):
     ) -> None:
         self.tags = tags
 
-
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self.n_classes:
                 msg = "Wrong number of thresholds provided doesn't match with number of classes"
@@ -65,7 +69,8 @@ class ThresholdPredictor(PredictionModule):
             multilabel=self.multilabel,
             # tags=self.tags,
             thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),
-            n_classes=self.n_classes)
+            n_classes=self.n_classes,
+        )
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:

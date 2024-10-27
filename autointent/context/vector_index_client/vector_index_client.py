@@ -14,7 +14,7 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, device: str, db_dir: str, **kwargs: dict[str, Any]) -> None:  # noqa: ARG002
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = Path(db_dir)

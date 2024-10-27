@@ -2,7 +2,7 @@ import itertools as it
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -12,10 +12,10 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
+from autointent.modules.base import BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
-from ...base import BaseMetadataDict
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +177,7 @@ class DNNCScorer(ScoringModule):
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: DNNCScorerDumpMetadata = json.load(file)  # type: ignore[no-redef]
+            self.metadata: DNNCScorerDumpMetadata = json.load(file)
 
         self.n_classes = self.metadata["n_classes"]
         self.cross_encoder_name = self.metadata["cross_encoder_name"]

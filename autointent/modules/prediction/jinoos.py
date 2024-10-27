@@ -1,18 +1,18 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
+from autointent.context.data_handler import Tag
 from autointent.custom_types import LABEL_TYPE
 from autointent.metrics.converter import transform
+from autointent.modules.base import BaseMetadataDict
 
 from .base import PredictionModule
-from ..base import BaseMetadataDict
-from autointent.context.data_handler import Tag
 
 default_search_space = np.linspace(0, 1, num=100)
 
@@ -25,10 +25,10 @@ class JinoosPredictor(PredictionModule):
     def __init__(
         self,
         search_space: list[float] | None = None,
-        thresh: float | npt.NDArray[Any] | None = None,
+        thresh: float | npt.NDArray[Any] = 0.5,
     ) -> None:
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
-        self._thresh = thresh
+        self._thresh = np.array(thresh)
 
     @classmethod
     def from_context(cls, context: Context, search_space: list[float] | None = None, **kwargs: dict[str, Any]) -> Self:
@@ -36,7 +36,13 @@ class JinoosPredictor(PredictionModule):
             search_space=search_space,
         )
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag] | None = None, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LABEL_TYPE],
+        tags: list[Tag] | None = None,
+        **kwargs: dict[str, Any],
+    ) -> None:
         """
         TODO: use dev split instead of test split
         """
@@ -67,7 +73,7 @@ class JinoosPredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: JinoosPredictorDumpMetadata = json.load(file)
 
-        self._thresh = metadata["thresh"]
+        self._thresh = np.array(metadata["thresh"])
         self.metadata = metadata
 
 
@@ -77,7 +83,7 @@ def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[An
     return pred_classes, best_scores
 
 
-def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
+def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: npt.NDArray[Any]) -> npt.NDArray[Any]:
     classes[scores < thresh] = -1  # out of scope
     return classes
 

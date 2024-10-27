@@ -5,14 +5,14 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
+from autointent.context.data_handler import Tag
 from autointent.custom_types import LABEL_TYPE
 
 from .base import PredictionModule
-from ...context.data_handler import Tag
 
 
 class ArgmaxPredictor(PredictionModule):
-    metadata = {}
+    metadata = {}  # noqa: RUF012
 
     def __init__(self) -> None:
         pass
@@ -21,7 +21,13 @@ class ArgmaxPredictor(PredictionModule):
     def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
         return cls()
 
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag] | None = None, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LABEL_TYPE],
+        tags: list[Tag] | None = None,
+        **kwargs: dict[str, Any],
+    ) -> None:
         pass
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:

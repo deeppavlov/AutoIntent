@@ -20,7 +20,6 @@ class MLKnnScorerDumpMetadata(BaseMetadataDict):
     model_name: str
     k: int
     s: float
-    n_classes: int
     ignore_first_neighbours: int
 
 
@@ -92,7 +91,11 @@ class MLKnnScorer(ScoringModule):
             ignore_first_neighbours=self.ignore_first_neighbours,
         )
 
-        self.features = self.vector_index.embed(utterances) if self.vector_index.is_empty() else self.vector_index.get_all_embeddings()
+        self.features = (
+            self.vector_index.embed(utterances)
+            if self.vector_index.is_empty()
+            else self.vector_index.get_all_embeddings()
+        )
         self.labels = np.array(labels)
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()

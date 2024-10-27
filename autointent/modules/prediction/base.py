@@ -16,7 +16,13 @@ from autointent.modules.base import Module
 class PredictionModule(Module, ABC):
     @overload  # type: ignore[misc]
     @abstractmethod
-    def fit(self, scores: npt.NDArray[Any], labels: list[LABEL_TYPE], tags: list[Tag] | None = None, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LABEL_TYPE],
+        tags: list[Tag] | None = None,
+        **kwargs: dict[str, Any],
+    ) -> None:
         pass
 
     @abstractmethod

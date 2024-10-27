@@ -9,9 +9,9 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 from autointent.metrics import RetrievalMetricFn
+from autointent.modules.base import BaseMetadataDict
 
 from .base import RetrievalModule
-from ..base import BaseMetadataDict
 
 
 class VectorDBMetadata(BaseMetadataDict):
@@ -19,6 +19,7 @@ class VectorDBMetadata(BaseMetadataDict):
     model_name: str
     device: str
     db_dir: str
+
 
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
@@ -52,7 +53,6 @@ class VectorDBModule(RetrievalModule):
             device=context.device,
         )
 
-
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
@@ -81,9 +81,12 @@ class VectorDBModule(RetrievalModule):
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
-            self.metadata = json.load(file)
+            self.metadata: VectorDBMetadata = json.load(file)
 
-        vector_index_client = VectorIndexClient(**self.metadata)
+        vector_index_client = VectorIndexClient(
+            db_dir=self.metadata["db_dir"],
+            device=self.metadata["device"],
+        )
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:

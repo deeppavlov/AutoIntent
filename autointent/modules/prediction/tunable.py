@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -12,10 +12,10 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.data_handler.tags import Tag
 from autointent.custom_types import LABEL_TYPE
+from autointent.modules.base import BaseMetadataDict
 
 from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
-from ..base import BaseMetadataDict
 
 
 class TunablePredictorDumpMetadata(BaseMetadataDict):
@@ -26,7 +26,14 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 
 
 class TunablePredictor(PredictionModule):
-    def __init__(self,thresh: list[float]| None = None, n_trials: int | None = None, seed: int = 0, multilabel: bool = False, tags: list[Tag] | None = None) -> None:
+    def __init__(
+        self,
+        thresh: float | npt.NDArray[Any],
+        n_trials: int = 10,
+        seed: int = 0,
+        multilabel: bool = False,
+        tags: list[Tag] | None = None,
+    ) -> None:
         self.n_trials = n_trials
         self.seed = seed
         self.multilabel = multilabel
@@ -34,8 +41,8 @@ class TunablePredictor(PredictionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: int | None = None) -> Self:
-        return cls(n_trials=n_trials, seed=context.seed)
+    def from_context(cls, context: Context, thresh: float =0.5, n_trials: int = 10) -> Self:
+        return cls(n_trials=n_trials, seed=context.seed, thresh=thresh)
 
     def fit(
         self,
@@ -63,7 +70,9 @@ class TunablePredictor(PredictionModule):
             tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
-        self.metadata = TunablePredictorDumpMetadata(multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_trials=self.n_trials)
+        self.metadata = TunablePredictorDumpMetadata(
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_trials=self.n_trials
+        )
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
@@ -87,7 +96,6 @@ class TunablePredictor(PredictionModule):
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]
         self.n_trials = metadata["n_trials"]
-
 
 
 class ThreshOptimizer:

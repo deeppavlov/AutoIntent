@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -9,10 +9,10 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES
+from autointent.modules.base import BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
-from ...base import BaseMetadataDict
 
 
 class KNNScorerDumpMetadata(BaseMetadataDict):

@@ -7,6 +7,7 @@ from autointent.configs.node import InferenceNodeConfig
 from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from autointent.modules.base import BaseMetadataDict
 
 
 class OptimizationInfo:
@@ -25,7 +26,7 @@ class OptimizationInfo:
         self,
         node_type: str,
         module_type: str,
-        module_params: dict[str, Any],
+        module_params: BaseMetadataDict,
         metric_value: float,
         metric_name: str,
         artifact: Artifact,

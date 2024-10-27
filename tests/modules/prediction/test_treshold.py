@@ -1,9 +1,9 @@
 import numpy as np
 
 from autointent import Context
+from autointent.metrics import retrieval_hit_rate
 from autointent.modules import ThresholdPredictor, VectorDBModule
 from autointent.modules.prediction.base import get_prediction_evaluation_data
-from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 
 
 def get_fit_data(context: Context, db_dir):
@@ -22,8 +22,7 @@ def get_fit_data(context: Context, db_dir):
         module_dump_dir="",
     )
     labels, scores = get_prediction_evaluation_data(context)
-    args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
-    return args
+    return scores, labels, context.data_handler.tags
 
 
 def test_predict_returns_correct_indices(context, tmp_path):

@@ -11,7 +11,6 @@ from autointent.modules.base import Module
 
 
 class ScoringModule(Module, ABC):
-
     def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
         """
         Return

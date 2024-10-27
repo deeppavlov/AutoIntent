@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import joblib
 import numpy as np
@@ -13,9 +13,9 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
+from autointent.modules.base import BaseMetadataDict
 
 from .base import ScoringModule
-from ..base import BaseMetadataDict
 
 
 class LinearScorerDumpDict(BaseMetadataDict):
