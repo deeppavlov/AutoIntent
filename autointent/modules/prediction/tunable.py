@@ -41,7 +41,7 @@ class TunablePredictor(PredictionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float =0.5, n_trials: int = 10) -> Self:
+    def from_context(cls, context: Context, thresh: float = 0.5, n_trials: int = 10) -> Self:
         return cls(n_trials=n_trials, seed=context.seed, thresh=thresh)
 
     def fit(

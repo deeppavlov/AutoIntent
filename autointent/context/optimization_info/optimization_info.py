@@ -1,13 +1,12 @@
-from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
 from autointent.logger import get_logger
+from autointent.modules.base import BaseMetadataDict
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
-from autointent.modules.base import BaseMetadataDict
 
 
 class OptimizationInfo:
