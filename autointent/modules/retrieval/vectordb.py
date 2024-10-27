@@ -23,7 +23,7 @@ class VectorDBMetadata(BaseMetadataDict):
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
-    def __init__(self, k: int, model_name: str, device: str = "cpu", db_dir: str = ".") -> None:
+    def __init__(self, k: int, model_name: str, db_dir: str, device: str = "cpu") -> None:
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
@@ -57,6 +57,7 @@ class VectorDBModule(RetrievalModule):
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+        self.vector_index.dump(Path(self.db_dir))
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(
@@ -75,6 +76,7 @@ class VectorDBModule(RetrievalModule):
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open("w") as file:
             json.dump(self.metadata, file, indent=4)
+        self.vector_index.dump(dump_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)

@@ -38,7 +38,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
         dump_dir=dump_dir,
     )
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate_macro)
@@ -53,7 +53,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
         module_dump_dir="",
     )
 
-    scorer = MLKnnScorer(k=3, model_name="sergeyzh/rubert-tiny-turbo", n_classes=3)
+    scorer = MLKnnScorer(db_dir=db_dir, k=3, model_name="sergeyzh/rubert-tiny-turbo", n_classes=3)
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_f1)
     np.testing.assert_almost_equal(score, 2 / 9)

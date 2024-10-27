@@ -50,8 +50,8 @@ class LinearScorer(ScoringModule):
 
     def __init__(
         self,
+        db_dir: str,
         model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        db_dir: str = "vector_index",
         cv: int = 3,
         n_jobs: int = -1,
         device: str = "cpu",

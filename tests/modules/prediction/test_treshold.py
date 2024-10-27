@@ -6,8 +6,8 @@ from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 
 
-def get_fit_data(context: Context):
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+def get_fit_data(context: Context, db_dir):
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate)
@@ -26,25 +26,25 @@ def get_fit_data(context: Context):
     return args
 
 
-def test_predict_returns_correct_indices(context):
+def test_predict_returns_correct_indices(context, tmp_path):
     predictor = ThresholdPredictor(0.5)
-    predictor.fit(*get_fit_data(context("multiclass")))
+    predictor.fit(*get_fit_data(context("multiclass"), tmp_path))
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
     predictions = predictor.predict(scores)
     np.testing.assert_array_equal(predictions, np.array([1, 0, 1]))
 
 
-def test_predict_returns_list(context):
+def test_predict_returns_list(context, tmp_path):
     predictor = ThresholdPredictor(np.array([0.5, 0.5, 0.5]))
-    predictor.fit(*get_fit_data(context("multiclass")))
+    predictor.fit(*get_fit_data(context("multiclass"), tmp_path))
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
     predictions = predictor.predict(scores)
     np.testing.assert_array_equal(predictions, np.array([1, 0, 1]))
 
 
-def test_predict_handles_single_class(context):
+def test_predict_handles_single_class(context, tmp_path):
     predictor = ThresholdPredictor(0.5)
-    predictor.fit(*get_fit_data(context("multiclass")))
+    predictor.fit(*get_fit_data(context("multiclass"), tmp_path))
     scores = np.array([[0.5], [0.5], [0.5]])
     predictions = predictor.predict(scores)
     np.testing.assert_array_equal(predictions, np.array([0, 0, 0]))

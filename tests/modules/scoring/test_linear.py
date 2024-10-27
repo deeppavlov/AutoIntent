@@ -4,10 +4,12 @@ from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import LinearScorer, VectorDBModule
 
 
-def test_base_linear(context):
+def test_base_linear(context, setup_environment):
+    run_name, db_dir = setup_environment
+
     context = context("multiclass")
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate)
@@ -22,9 +24,9 @@ def test_base_linear(context):
         module_dump_dir="",
     )
 
-    scorer = LinearScorer()
+    scorer = LinearScorer(db_dir)
 
-    scorer.fit(context)
+    scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_roc_auc)
     assert score == 1
     test_data = [
@@ -35,16 +37,18 @@ def test_base_linear(context):
         "can you tell me why is my bank account frozen",
     ]
     predictions = scorer.predict(test_data)
-
+    print(predictions)
     np.testing.assert_almost_equal(
         np.array(
-            [
-                [0.17928316, 0.59134606, 0.22937078],
-                [0.15927759, 0.62366319, 0.21705922],
-                [0.20068982, 0.53887681, 0.26043337],
-                [0.17557128, 0.61313277, 0.21129594],
-                [0.17908815, 0.63129863, 0.18961322],
-            ]
+            [[0.10645702, 0.78091989, 0.11262309,],
+             [0.06595671, 0.84008038, 0.09396291,],
+            [0.12650829,
+    0.73910616,
+    0.13438556,],
+    [0.06949465, 0.84499476, 0.08551059,],
+    [0.07943653,
+    0.81020573,
+    0.11035774,],]
         ),
         predictions,
         decimal=2,

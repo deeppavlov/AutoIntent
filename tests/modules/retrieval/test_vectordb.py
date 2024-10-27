@@ -8,12 +8,12 @@ from autointent.modules.retrieval.vectordb import VectorDBModule
 def test_score_returns_correct_metrics(context):
     context = context("multiclass")
     module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo")
-    module.fit(context)
+    module.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = module.score(context, retrieval_map)
     assert score == 1.0
 
 
-def test_get_assets_returns_correct_artifact():
-    module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo")
+def test_get_assets_returns_correct_artifact(tmp_path):
+    module = VectorDBModule(k=5, model_name="sergeyzh/rubert-tiny-turbo", db_dir=str(tmp_path))
     artifact = module.get_assets()
     assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"

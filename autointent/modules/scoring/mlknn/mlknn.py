@@ -43,12 +43,12 @@ class MLKnnScorer(ScoringModule):
 
     def __init__(
         self,
+        db_dir: str,
         n_classes: int,
         k: int,
         model_name: str,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        db_dir: str = "vector-index",
         device: str = "cpu",
     ) -> None:
         self.n_classes = n_classes
