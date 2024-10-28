@@ -7,7 +7,7 @@ from .vector_index_client import VectorIndex, VectorIndexClient
 
 
 class Context:
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         dataset: Dataset,
         test_dataset: Dataset | None,
@@ -18,6 +18,8 @@ class Context:
         db_dir: str,
         dump_dir: str,
         force_multilabel: bool = False,
+        embedder_batch_size: int = 1,
+        embedder_max_length: int | None = None,
     ) -> None:
         self.data_handler = DataHandler(
             dataset,
@@ -28,8 +30,9 @@ class Context:
             force_multilabel=force_multilabel,
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(device, db_dir)
+        self.vector_index_client = VectorIndexClient(device, db_dir, embedder_batch_size, embedder_max_length)
 
+        self.embedder_batch_size = embedder_batch_size
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes

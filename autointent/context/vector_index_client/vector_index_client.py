@@ -13,10 +13,14 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str) -> None:
+    def __init__(
+        self, device: str, db_dir: str, embedder_batch_size: int = 1, embedder_max_length: int | None = None
+    ) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = Path(db_dir)
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
 
     def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
         """
@@ -24,7 +28,7 @@ class VectorIndexClient:
         """
         self._logger.info("Creating index for model: %s", model_name)
 
-        index = VectorIndex(model_name, self.device)
+        index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
         index.add(data_handler.utterances_train, data_handler.labels_train)
 
         index.dump(self._get_dump_dirpath(model_name))
@@ -76,7 +80,7 @@ class VectorIndexClient:
     def get_index(self, model_name: str) -> VectorIndex:
         dirpath = self._get_index_dirpath(model_name)
         if dirpath is not None:
-            index = VectorIndex(model_name, self.device)
+            index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
             index.load(dirpath)
             return index
 
