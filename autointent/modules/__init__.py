@@ -37,12 +37,11 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "logit_adapt": LogitAdaptivnessPredictor 
 }
 
-}
-
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
 }
+
 __all__ = [
     "Module",
     "ArgmaxPredictor",
