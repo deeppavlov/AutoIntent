@@ -80,7 +80,7 @@ class VectorIndexClient:
     def get_index(self, model_name: str) -> VectorIndex:
         dirpath = self._get_index_dirpath(model_name)
         if dirpath is not None:
-            index = VectorIndex(model_name, self.device, self.embedder_batch_size)
+            index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
             index.load(dirpath)
             return index
 
