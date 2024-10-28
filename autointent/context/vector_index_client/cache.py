@@ -1,10 +1,27 @@
 import json
-import os
+import logging
 import shutil
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from uuid import uuid4
 
 from appdirs import user_cache_dir, user_config_dir
+
+
+def get_logger() -> logging.Logger:
+    logger = logging.getLogger("my_logger")
+
+    logger.setLevel(logging.INFO)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    ch.setFormatter(formatter)
+
+    logger.addHandler(ch)
+
+    return logger
 
 
 @dataclass
@@ -44,35 +61,36 @@ def add_cache_directory(directory: str) -> None:
     chroma_config = read_chroma_config()
 
     directories = set(chroma_config.cache_directories)
-    directories.add(str(directory))
+    directories.add(directory)
     chroma_config.cache_directories = sorted(directories)
 
     write_chroma_config(chroma_config)
 
 
-def get_db_dir(db_dir: str, run_name: str) -> str:
+def get_db_dir(db_dir: str | Path | None = None) -> Path:
     """
     Get the directory path for chroma db file.
     Use default cache dir if not provided.
     Save path into user config in order to remove it from cache later.
     """
 
-    if db_dir == "":
-        cache_dir = get_chroma_cache_dir()
-        db_dir = os.path.join(cache_dir, run_name)  # noqa: PTH118
-
-    Path(db_dir).mkdir(parents=True)
-    add_cache_directory(db_dir)
+    db_dir = get_chroma_cache_dir() / str(uuid4()) if db_dir is None else Path(db_dir)
+    db_dir.mkdir(parents=True, exist_ok=True)
+    add_cache_directory(str(db_dir.resolve()))
 
     return db_dir
 
 
 def clear_chroma_cache() -> None:
     # TODO: test on all platforms
+    logger = get_logger()
     chroma_config = read_chroma_config()
     for cache_dirs in chroma_config.cache_directories:
         if Path(cache_dirs).exists():
             shutil.rmtree(cache_dirs)
+            logger.info("cleared vector index at %s", cache_dirs)
+        else:
+            logger.error("vector index at %s not found", cache_dirs)
         chroma_config.cache_directories.remove(cache_dirs)
     write_chroma_config(chroma_config)
 

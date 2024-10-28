@@ -19,7 +19,7 @@ class VectorDBModule(RetrievalModule):
     def fit(self, context: Context) -> None:
         self.vector_index_client_kwargs = {
             "device": context.device,
-            "db_dir": context.db_dir,
+            "db_dir": str(context.db_dir),
         }
 
         self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)

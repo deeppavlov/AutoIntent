@@ -5,18 +5,13 @@ from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
 
 
-def test_base_knn(setup_environment, load_clinc_subset, dump_dir):
-    run_name, db_dir = setup_environment
+def test_base_knn(setup_environment, load_clinc_subset):
+    db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multiclass")
 
     context = Context(
         dataset=dataset,
-        test_dataset=None,
-        device="cpu",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
         dump_dir=dump_dir,
         db_dir=db_dir,
     )
