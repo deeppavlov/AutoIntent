@@ -8,7 +8,7 @@ from .prediction import (
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
+from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
 
 RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "vector_db": VectorDBModule,
@@ -53,6 +53,7 @@ __all__ = [
     "KNNScorer",
     "LinearScorer",
     "MLKnnScorer",
+    "DescriptionScorer",
     "ScoringModule",
     "RETRIEVAL_MODULES_MULTICLASS",
     "RETRIEVAL_MODULES_MULTILABEL",
