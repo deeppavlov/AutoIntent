@@ -1,5 +1,6 @@
 import importlib.resources as ires
 from typing import Literal
+from uuid import uuid4
 
 import pytest
 
@@ -14,9 +15,10 @@ DATASET_TYPE = Literal["multiclass", "multilabel"]
 def setup_environment() -> tuple[str, str]:
     setup_logging("DEBUG")
     logs_dir = ires.files("tests").joinpath("logs")
-    db_dir = logs_dir / "db"
+    def get_db_dir():
+        return logs_dir / "db" / str(uuid4())
     dump_dir = logs_dir / "modules_dump"
-    return db_dir, dump_dir, logs_dir
+    return get_db_dir, dump_dir, logs_dir
 
 
 @pytest.fixture
@@ -40,7 +42,7 @@ def context(load_clinc_subset, setup_environment):
             multilabel_generation_config="",
             regex_sampling=0,
             seed=0,
-            db_dir=db_dir,
+            db_dir=db_dir(),
             dump_dir=dump_dir,
         )
 

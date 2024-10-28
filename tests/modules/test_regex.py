@@ -72,7 +72,7 @@ def test_base_regex(setup_environment):
     context = Context(
         dataset=Dataset.model_validate(data),
         dump_dir=dump_dir,
-        db_dir=db_dir,
+        db_dir=db_dir(),
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

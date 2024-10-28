@@ -25,7 +25,7 @@ def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset
 
     context = Context(
         dataset=dataset,
-        db_dir=db_dir,
+        db_dir=db_dir(),
         dump_dir=dump_dir,
     )
 

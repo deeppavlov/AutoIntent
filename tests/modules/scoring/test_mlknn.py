@@ -30,7 +30,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset):
     context = Context(
         dataset=dataset,
         test_dataset=test_dataset,
-        db_dir=db_dir,
+        db_dir=db_dir(),
         dump_dir=dump_dir,
     )
 
