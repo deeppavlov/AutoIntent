@@ -5,7 +5,7 @@ from typing import TypedDict
 import numpy as np
 import scipy
 from numpy.typing import NDArray
-from sklearn.metrics.pairwise import pairwise_distances
+from scipy.spatial.distance import cdist
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
@@ -24,8 +24,8 @@ class DescriptionScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
     _vector_index: VectorIndex
 
-    def __init__(self, similarity_metric: str = "cosine", temperature: float = 1.0) -> None:
-        self.similarity_metric = similarity_metric
+    def __init__(self, temperature: float = 1.0) -> None:
+        self.similarity_metric = "cosine"
         self.temperature = temperature
 
     def fit(self, context: Context) -> None:
@@ -55,15 +55,15 @@ class DescriptionScorer(ScoringModule):
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         utterance_vectors = self._vector_index.embedder.embed(utterances)
-        distances: NDArray[np.float64] = pairwise_distances(
+        distances: NDArray[np.float64] = cdist(
             utterance_vectors, self.description_vectors, metric=self.similarity_metric
         )
+        similarities = 1 - distances
 
         if self._multilabel:
-            adjusted_distances = np.clip(1 - distances, 1e-10, 1 - 1e-10)
-            probabilites = scipy.special.expit(scipy.special.logit(adjusted_distances) / self.temperature)
+            probabilites = scipy.special.expit(similarities / self.temperature)
         else:
-            probabilites = scipy.special.softmax((1 - distances) / self.temperature, axis=1)
+            probabilites = scipy.special.softmax(similarities / self.temperature, axis=1)
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
