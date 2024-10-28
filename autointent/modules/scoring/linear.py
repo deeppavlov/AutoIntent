@@ -5,11 +5,11 @@ from typing import Any, TypedDict
 import joblib
 import numpy as np
 import numpy.typing as npt
-from sentence_transformers import SentenceTransformer
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context
+from autointent.context.embedder import Embedder
 
 from .base import ScoringModule
 
@@ -59,18 +59,17 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._embedder = vector_index.embedding_model
+        self._embedder = vector_index.embedder
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        features = self._embedder.encode(utterances)
+        features = self._embedder.embed(utterances)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self._embedder.cpu()
-        del self._embedder
+        self._embedder.delete()
 
     def dump(self, path: str) -> None:
         metadata = LinearScorerDumpDict(
@@ -89,8 +88,7 @@ class LinearScorer(ScoringModule):
         joblib.dump(self._clf, clf_path)
 
         # dump sentence transformer model
-        embedder_dir = str(dump_dir / self.embedding_model_subdir)
-        self._embedder.save(embedder_dir)
+        self._embedder.dump(dump_dir / self.embedding_model_subdir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
@@ -105,5 +103,5 @@ class LinearScorer(ScoringModule):
         self._clf = joblib.load(clf_path)
 
         # load sentence transformer model
-        embedder_dir = str(dump_dir / self.embedding_model_subdir)
-        self._embedder = SentenceTransformer(embedder_dir, device=metadata["device"])
+        embedder_dir = dump_dir / self.embedding_model_subdir
+        self._embedder = Embedder(device=metadata["device"], model_path=embedder_dir)

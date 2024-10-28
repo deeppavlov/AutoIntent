@@ -20,6 +20,7 @@ class VectorDBModule(RetrievalModule):
         self.vector_index_client_kwargs = {
             "device": context.device,
             "db_dir": context.db_dir,
+            "embedder_batch_size": context.embedder_batch_size,
         }
 
         self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
@@ -47,7 +48,7 @@ class VectorDBModule(RetrievalModule):
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
             self.vector_index_client_kwargs = json.load(file)
 
-        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)
+        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
