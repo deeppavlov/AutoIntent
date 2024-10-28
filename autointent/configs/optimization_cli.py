@@ -11,7 +11,7 @@ from autointent.pipeline.optimization.utils import generate_name
 
 @dataclass
 class DataConfig:
-    train_path: Path = MISSING
+    train_path: str | Path = MISSING
     test_path: Path | None = None
     force_multilabel: bool = False
 
