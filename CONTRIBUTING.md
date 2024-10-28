@@ -49,3 +49,38 @@ make lint
 ## Устройство проекта
 
 ![](assets/dependency-graph.png)
+
+## Настройка логгера
+Чтобы видеть debug строчки у вас есть несколько опций:
+
+1. Включить весь debug output через опцию коммандной строки: 
+```bash 
+autointent hydra.verbose=true
+```
+2. Включить debug output только для определенных модулей, пример для autointent.pipeline.optimization.cli_endpoint и самой hydra: 
+```bash
+autointent hydra.verbose=[hydra,autointent/pipeline/optimization/cli_endpoint] hydra.job_logging.root.level=DEBUG
+```
+
+Само конфигурирование логгера сделано в autointent.configs.optimization_cli.logger_config. Вы можете изменить любой параметр логгера через коммандную строку. Вот пример, как поменять уровень логгера на ERROR:
+```bash
+autointent hydra.job_logging.root.level=ERROR
+```
+
+Еще можно изменить параметры логгера через yaml файлы:
+1. Создадим папку с конфиг. файлами: test_config
+2. test_config/config.yaml:
+```
+defaults:
+  - optimization_config
+  - _self_
+  - override hydra/job_logging: custom
+  
+# set your config params for optimization here
+embedder_batch_size: 32
+```
+3. Поместите конфигурацию логгера в test_config/hydra/job_logging/custom.yaml (параметры см. [здесь](https://docs.python.org/3/howto/logging.html))
+4. Запускаем с конфиг файлом config.yaml:
+```bash
+autointent --config-path FULL_PATH/test_config --config-name config
+```

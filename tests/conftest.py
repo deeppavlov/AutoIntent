@@ -7,14 +7,13 @@ import pytest
 
 from autointent import Context
 from autointent.context.data_handler import Dataset
-from autointent.pipeline.optimization.utils import get_db_dir, get_run_name, load_config, load_data, setup_logging
+from autointent.pipeline.optimization.utils import get_db_dir, get_run_name, load_config, load_data
 
 DATASET_TYPE = Literal["multiclass", "multilabel"]
 
 
 @pytest.fixture
 def setup_environment() -> tuple[str, str]:
-    setup_logging("DEBUG")
     uuid = uuid4()
     run_name = get_run_name(str(uuid))
     db_dir = get_db_dir("", run_name)
