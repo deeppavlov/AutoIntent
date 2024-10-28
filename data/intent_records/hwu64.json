@@ -1,834 +1,1734 @@
-[
-    {
-        "intent_id": 0,
-        "intent_name": "alarm_query",
-        "sample_utterances": [
-            "what alarms do i have set right now",
-            "checkout today alarm of meeting",
-            "report alarm settings",
-            "see see for me the alarms that you have set tomorrow morning",
-            "is there an alarm for ten am"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 1,
-        "intent_name": "alarm_remove",
-        "sample_utterances": [
-            "delete alarm",
-            "remove the latest alarm",
-            "stop wake up calls for this week",
-            "remove the first alarm",
-            "remove my earliest alarm for tomorrow"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 2,
-        "intent_name": "alarm_set",
-        "sample_utterances": [
-            "set a alarm for the day",
-            "set an alarm for tomorrow at six in the morning",
-            "put an alarm and wake me up at six am tomorrow morning",
-            "set alarm at five am",
-            "update alarm"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 3,
-        "intent_name": "audio_volume_down",
-        "sample_utterances": [
-            "decrease the volume",
-            "lower volume to half",
-            "could you please lower your volume",
-            "turn down the speakers",
-            "please slow down volume of speaker"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 4,
-        "intent_name": "audio_volume_mute",
-        "sample_utterances": [
-            "go silent until three pm",
-            "please do not talk for thirty minutes",
-            "silence speakers",
-            "silently adjust",
-            "turn off audio"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 5,
-        "intent_name": "audio_volume_up",
-        "sample_utterances": [
-            "turn up radio volume",
-            "i can't hear you speak up",
-            "speak louder please",
-            "increase the volume please",
-            "please increase the volume of the current song"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 6,
-        "intent_name": "calendar_query",
-        "sample_utterances": [
-            "do i have a dentist appointment on monday morning",
-            "do i have a meeting on saturday march twenty fifth",
-            "is my calendar free for thursday",
-            "what important dates are there in my calendar this month",
-            "tell me about the meetings over a period of time"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 7,
-        "intent_name": "calendar_remove",
-        "sample_utterances": [
-            "remove standup on friday at ten am",
-            "update the calendar with the last event removed",
-            "take away all events",
-            "erase next calendar event",
-            "clear my schedule for today"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 8,
-        "intent_name": "calendar_set",
-        "sample_utterances": [
-            "write down that i am going to meet with jenny on the third okay",
-            "on third april we will go to watch j llb movie set it",
-            "reminder about meeting from eight am to twelve pm",
-            "new reminder at three pm",
-            "set rotating event"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 9,
-        "intent_name": "cooking_recipe",
-        "sample_utterances": [
-            "what does one have to damage in cream to make butter",
-            "what can i cook with broccoli and chicken",
-            "in five sentences let me know the procedure of making thanksgiving turkey",
-            "what food is good",
-            "i would like instructions on how to cook baked chicken"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 10,
-        "intent_name": "datetime_convert",
-        "sample_utterances": [
-            "if it is noon in virginia what time is it in california",
-            "switch to eastern time zone",
-            "please change time zone to india",
-            "change this time to ist",
-            "please convert the time of here at nine pm to brasil time zone"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 11,
-        "intent_name": "datetime_query",
-        "sample_utterances": [
-            "give me time",
-            "could you please tell me what time is in singapore",
-            "report the current time in oakland",
-            "the twenty second is on what day of the week",
-            "what week of the year does the summer season start"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 12,
-        "intent_name": "email_addcontact",
-        "sample_utterances": [
-            "please add this email to my contacts",
-            "just add a new email in my contacts from michael",
-            "save this email in contact",
-            "add email to existing contact",
-            "i need you to add this email in my contacts"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 13,
-        "intent_name": "email_query",
-        "sample_utterances": [
-            "what is the last email i received",
-            "refresh the inbox and update about any unread mails",
-            "check inbox for mail from sarah",
-            "have i gotten any emails from mom lately",
-            "tell me when i get new emails from principal lowry"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 14,
-        "intent_name": "email_querycontact",
-        "sample_utterances": [
-            "when was the last time that i spoke to john",
-            "make a call to",
-            "what's the email address of silvia",
-            "please find a mail address of manoj and tell me",
-            "check in contacts"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 15,
-        "intent_name": "email_sendemail",
-        "sample_utterances": [
-            "email my friend about our plans tonight",
-            "send email to cat that i will accept job offer",
-            "email james about the softball game james we need to get some refreshments before heading over",
-            "can you open the reply inbox",
-            "prepare email for susan"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 16,
-        "intent_name": "general_affirm",
-        "sample_utterances": [
-            "great response to command.",
-            "yeap amazing response to the command.",
-            "yes you've done your understanding correcly.",
-            "yeap you have done answer exactly.",
-            "you have understood my instructions perfectly."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 17,
-        "intent_name": "general_commandstop",
-        "sample_utterances": [
-            "olly please will you shut off.",
-            "olly please shut down.",
-            "olly would you please shut up.",
-            "olly please will you shut up.",
-            "will you stop please."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 18,
-        "intent_name": "general_confirm",
-        "sample_utterances": [
-            "confirm last thing said please.",
-            "please check last thing i said.",
-            "i like you check and confirm last thing i said please.",
-            "will you check and confirm instruction.",
-            "can you check last thing i said please."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 19,
-        "intent_name": "general_dontcare",
-        "sample_utterances": [
-            "i do not really know, olly.",
-            "would not care.",
-            "anything will be okay with me.",
-            "does not matter to me.",
-            "it is unimportant for me, olly."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 20,
-        "intent_name": "general_explain",
-        "sample_utterances": [
-            "once again clarify me about your answers please.",
-            "don't get this.",
-            "explain it further please.",
-            "s1, rephrase me more on it.",
-            "would you once again clarify me about your response please."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 21,
-        "intent_name": "general_joke",
-        "sample_utterances": [
-            "can you tell me a nice joke",
-            "say joke",
-            "i need to find a funny joke that is ok for kids",
-            "do you know any good jokes",
-            "do you know any jokes"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 22,
-        "intent_name": "general_negate",
-        "sample_utterances": [
-            "i think you messed up with my command.",
-            "this was not what i am searching for.",
-            "uhh no, that's not what i am searching for.",
-            "you told me the incorrect date please correct this.",
-            "nope, i did not say it."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 23,
-        "intent_name": "general_praise",
-        "sample_utterances": [
-            "that's helpful,.",
-            "that's perfect, musch appreciated.",
-            "thank you so much.",
-            "fantastic job, you did well, olly.",
-            "perfect work, you've done well, olly."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 24,
-        "intent_name": "general_quirky",
-        "sample_utterances": [
-            "i had a relaxing day today",
-            "i want a not only to direct me to an internet site but actually answer any given question",
-            "can you feel",
-            "have a anyinput day",
-            "what is the best chocolate chip cookie recipe"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 25,
-        "intent_name": "general_repeat",
-        "sample_utterances": [
-            "let us start over.",
-            "please would you replay your last phrase said.",
-            "say the last one said again please.",
-            "reset.",
-            "can you tell me what said once more."
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 26,
-        "intent_name": "iot_cleaning",
-        "sample_utterances": [
-            "by ten to eleven am daily start my vacuum cleaner",
-            "please clean the floor",
-            "start roomba",
-            "i want to turn on the robot vacuum cleaner",
-            "activate robot vacuum"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 27,
-        "intent_name": "iot_coffee",
-        "sample_utterances": [
-            "please activate my coffee pot for me",
-            "i need a drink",
-            "make us a brew",
-            "please make me a coffee using the coffee machine",
-            "please get the coffee machine to make me some coffee"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 28,
-        "intent_name": "iot_hue_lightchange",
-        "sample_utterances": [
-            "please make the lights watching friendly",
-            "change house light colors to blue",
-            "change the colours please",
-            "change lights from red to blue",
-            "i need to change the color of this light"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 29,
-        "intent_name": "iot_hue_lightdim",
-        "sample_utterances": [
-            "lower the lights in the bedroom",
-            "dim the lights in my bedroom",
-            "period the light should be in dim",
-            "lower lights",
-            "dim the lights in the kitchen"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 30,
-        "intent_name": "iot_hue_lightoff",
-        "sample_utterances": [
-            "turn off lights in my room",
-            "turn the lights off",
-            "shift the light off",
-            "turn off bedroom light at nine thirty pm",
-            "turn off this light"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 31,
-        "intent_name": "iot_hue_lighton",
-        "sample_utterances": [
-            "hey turn on disco lights in my apartment and let the party begin",
-            "overhead lights on please",
-            "please turn the lights on",
-            "turn on the lights that are outdoors",
-            "i can't see anything"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 32,
-        "intent_name": "iot_hue_lightup",
-        "sample_utterances": [
-            "i need more light",
-            "make the light more visible",
-            "olly brighten the lights",
-            "can you adjust the lighting for me to be brighter",
-            "increase the intensity of the lighting in the room"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 33,
-        "intent_name": "iot_wemo_off",
-        "sample_utterances": [
-            "i want the smart socket off now",
-            "power down the plug socket one",
-            "power off on",
-            "switch off the plug socket",
-            "please make the smart socket turn off"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 34,
-        "intent_name": "iot_wemo_on",
-        "sample_utterances": [
-            "turn on wemo plug in game room",
-            "i'd like you to turn turn on the tv",
-            "turn wemo on",
-            "turn on the plug socket one",
-            "switch on the wemo plug"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 35,
-        "intent_name": "lists_createoradd",
-        "sample_utterances": [
-            "add a tab to the shopping list",
-            "show a new list",
-            "add grocery shopping to my to do list",
-            "update my list with shoes",
-            "include this"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 36,
-        "intent_name": "lists_query",
-        "sample_utterances": [
-            "i finished my to do list",
-            "list the items on my shopping list",
-            "what are all my lists",
-            "display my list",
-            "what kind of lists do i have saved"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 37,
-        "intent_name": "lists_remove",
-        "sample_utterances": [
-            "delete the dog list for me",
-            "delete item on list",
-            "please delete list titled kickball",
-            "remove this list from the others",
-            "please delete the last song that played from the playlist"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 38,
-        "intent_name": "music_likeness",
-        "sample_utterances": [
-            "save my last playlist",
-            "save this song in my great songs category",
-            "i love the songs of micheal jackson can you save some songs of jackson for me",
-            "i love that song who sings it",
-            "make this my favorite"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 39,
-        "intent_name": "music_query",
-        "sample_utterances": [
-            "show me music by that artist",
-            "name the singer",
-            "what's the song title",
-            "which song is currently playing",
-            "what is the name of the artist that created this song"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 40,
-        "intent_name": "music_settings",
-        "sample_utterances": [
-            "enable shuffle",
-            "please put radio in shuffle",
-            "please check my playlists for jazz music",
-            "replay the required of the musics",
-            "select shuffle all"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 41,
-        "intent_name": "news_query",
-        "sample_utterances": [
-            "latest updates",
-            "hey olly tell my today's top news",
-            "is there any new environmental news",
-            "look up news articles about trump",
-            "headline news for texas"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 42,
-        "intent_name": "play_audiobook",
-        "sample_utterances": [
-            "progress from the last paused point of my audio book",
-            "go back to animal farm",
-            "play next episode of harry potter by j. k. rowling",
-            "resume the two towers",
-            "start playing again"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 43,
-        "intent_name": "play_game",
-        "sample_utterances": [
-            "we are going to play poker together",
-            "can you take a role of enemy in the game of coc",
-            "run game",
-            "open parcheese game for you and i",
-            "let's roll the dice"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 44,
-        "intent_name": "play_music",
-        "sample_utterances": [
-            "try to play old nineties classic music",
-            "play new rihanna song",
-            "turn on some music",
-            "can you play my favorite music",
-            "play party songs"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 45,
-        "intent_name": "play_podcasts",
-        "sample_utterances": [
-            "play the next episode of drunks and dragons please",
-            "play the latest seahawks podcast",
-            "can i see the previous episode",
-            "skip this podcast",
-            "please play next episode"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 46,
-        "intent_name": "play_radio",
-        "sample_utterances": [
-            "play the bob and tom show",
-            "play bbc radio one",
-            "play my favorite station",
-            "i would like to listen to this programme on radio",
-            "turn program on xmtune"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 47,
-        "intent_name": "qa_currency",
-        "sample_utterances": [
-            "what is the exchange rate for pounds and u. s. d.",
-            "display exchange rate of euro to indian rupee",
-            "how much is one u. s. d. in inr",
-            "how many yen for each dollar",
-            "what is the dollar price in inr"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 48,
-        "intent_name": "qa_definition",
-        "sample_utterances": [
-            "give me the definition of the word fondle",
-            "sanctimonious definition",
-            "what does a sea lion look like",
-            "define a phrase blue sky research",
-            "define oscillate"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 49,
-        "intent_name": "qa_factoid",
-        "sample_utterances": [
-            "how many legs does a dog have",
-            "who was the first president of united states",
-            "where is place",
-            "what's the capital of tanzania",
-            "search for pink's youtube channel"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 50,
-        "intent_name": "qa_maths",
-        "sample_utterances": [
-            "what is the linear equation",
-            "tell me sum of five and six",
-            "how much money will i make for the week if i make dollars per hour and work twenty hours",
-            "solution for eighty one divided by nine",
-            "what is ten divided by five"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 51,
-        "intent_name": "qa_stock",
-        "sample_utterances": [
-            "is chase doing good",
-            "please tell me news related to the stock market",
-            "how are the top ten stocks at the moment",
-            "current price of google please",
-            "how expensive is google stock"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 52,
-        "intent_name": "recommendation_events",
-        "sample_utterances": [
-            "show me all the events happening in milan",
-            "what are some local events",
-            "can you tell me some fun things to do in kentucky",
-            "is there anything to do tonight",
-            "what is happening in the area"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 53,
-        "intent_name": "recommendation_locations",
-        "sample_utterances": [
-            "whats the best place to eat near here",
-            "whats around",
-            "show shops around second street",
-            "what's the best chicken place near me",
-            "where is the best pizza on sixth street"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 54,
-        "intent_name": "recommendation_movies",
-        "sample_utterances": [
-            "which rom com movie can i watch in theatres around new york",
-            "what movies are playing at theatres near me",
-            "show me theatre where pirates of caribbean is playing",
-            "what new movies are good",
-            "what is the biggest blockbuster this week"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 55,
-        "intent_name": "social_post",
-        "sample_utterances": [
-            "announce a comment in facebook",
-            "write a tweet telling macy's that they should be shutting down instead of jcpenney",
-            "send a tweet to tmobile for rude employees",
-            "tweet my complaint and mention this costumer service",
-            "please tweet waited sixty five minutes for a table at tgi fridays never going back"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 56,
-        "intent_name": "social_query",
-        "sample_utterances": [
-            "show me my husbands facebook posts today",
-            "please read my facebook feed",
-            "may i know what is trending in twitter",
-            "what new posts are on my page",
-            "is everyone on my facebook list watching the game"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 57,
-        "intent_name": "takeaway_order",
-        "sample_utterances": [
-            "order me some chipotle",
-            "could you please help me to order some sushi from deliveroo",
-            "order chinese food",
-            "show me chinese food near me",
-            "ordering food"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 58,
-        "intent_name": "takeaway_query",
-        "sample_utterances": [
-            "call pizza hut and find out if my order is ready",
-            "find a pizza restaurant open until noon",
-            "does my favourite pizza place available for takeaway",
-            "does pf changs do takeout",
-            "find my thai takeaways around grassmarket"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 59,
-        "intent_name": "transport_query",
-        "sample_utterances": [
-            "what time will i arrive in austin tx",
-            "what time is the train passing by",
-            "what time does the train to iowa leave",
-            "when is my train coming",
-            "directions to sainsburys"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 60,
-        "intent_name": "transport_taxi",
-        "sample_utterances": [
-            "call a taxi for me",
-            "find the nearest taxi",
-            "please book a taxi for me",
-            "book a taxi uber",
-            "book ola cab for now"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 61,
-        "intent_name": "transport_ticket",
-        "sample_utterances": [
-            "book me a train ticket in any train to bombay for tomorrow",
-            "i need the current dart rail schedule from west irving station to north lake college",
-            "schedule a journey to las vegas by train",
-            "book a train ticket to boston tomorrow",
-            "reserve a seat for me on the train march twentieth"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 62,
-        "intent_name": "transport_traffic",
-        "sample_utterances": [
-            "is there any stopped traffic on route eighty today",
-            "traffic alert",
-            "what is the traffic now",
-            "how is the traffic now",
-            "will traffic be good when i leave in five minutes"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    },
-    {
-        "intent_id": 63,
-        "intent_name": "weather_query",
-        "sample_utterances": [
-            "give me the weather for merced at three pm",
-            "i will need a scarf in afternoon to overcome sunlight",
-            "should i wear a hat today",
-            "what should i wear is it cold outside",
-            "is it going to snow tonight"
-        ],
-        "regexp_full_match": [],
-        "regexp_partial_match": []
-    }
-]
+{
+    "utterances": [
+        {
+            "text": "what alarms do i have set right now",
+            "label": 0
+        },
+        {
+            "text": "checkout today alarm of meeting",
+            "label": 0
+        },
+        {
+            "text": "report alarm settings",
+            "label": 0
+        },
+        {
+            "text": "see see for me the alarms that you have set tomorrow morning",
+            "label": 0
+        },
+        {
+            "text": "is there an alarm for ten am",
+            "label": 0
+        },
+        {
+            "text": "delete alarm",
+            "label": 1
+        },
+        {
+            "text": "remove the latest alarm",
+            "label": 1
+        },
+        {
+            "text": "stop wake up calls for this week",
+            "label": 1
+        },
+        {
+            "text": "remove the first alarm",
+            "label": 1
+        },
+        {
+            "text": "remove my earliest alarm for tomorrow",
+            "label": 1
+        },
+        {
+            "text": "set a alarm for the day",
+            "label": 2
+        },
+        {
+            "text": "set an alarm for tomorrow at six in the morning",
+            "label": 2
+        },
+        {
+            "text": "put an alarm and wake me up at six am tomorrow morning",
+            "label": 2
+        },
+        {
+            "text": "set alarm at five am",
+            "label": 2
+        },
+        {
+            "text": "update alarm",
+            "label": 2
+        },
+        {
+            "text": "decrease the volume",
+            "label": 3
+        },
+        {
+            "text": "lower volume to half",
+            "label": 3
+        },
+        {
+            "text": "could you please lower your volume",
+            "label": 3
+        },
+        {
+            "text": "turn down the speakers",
+            "label": 3
+        },
+        {
+            "text": "please slow down volume of speaker",
+            "label": 3
+        },
+        {
+            "text": "go silent until three pm",
+            "label": 4
+        },
+        {
+            "text": "please do not talk for thirty minutes",
+            "label": 4
+        },
+        {
+            "text": "silence speakers",
+            "label": 4
+        },
+        {
+            "text": "silently adjust",
+            "label": 4
+        },
+        {
+            "text": "turn off audio",
+            "label": 4
+        },
+        {
+            "text": "turn up radio volume",
+            "label": 5
+        },
+        {
+            "text": "i can't hear you speak up",
+            "label": 5
+        },
+        {
+            "text": "speak louder please",
+            "label": 5
+        },
+        {
+            "text": "increase the volume please",
+            "label": 5
+        },
+        {
+            "text": "please increase the volume of the current song",
+            "label": 5
+        },
+        {
+            "text": "do i have a dentist appointment on monday morning",
+            "label": 6
+        },
+        {
+            "text": "do i have a meeting on saturday march twenty fifth",
+            "label": 6
+        },
+        {
+            "text": "is my calendar free for thursday",
+            "label": 6
+        },
+        {
+            "text": "what important dates are there in my calendar this month",
+            "label": 6
+        },
+        {
+            "text": "tell me about the meetings over a period of time",
+            "label": 6
+        },
+        {
+            "text": "remove standup on friday at ten am",
+            "label": 7
+        },
+        {
+            "text": "update the calendar with the last event removed",
+            "label": 7
+        },
+        {
+            "text": "take away all events",
+            "label": 7
+        },
+        {
+            "text": "erase next calendar event",
+            "label": 7
+        },
+        {
+            "text": "clear my schedule for today",
+            "label": 7
+        },
+        {
+            "text": "write down that i am going to meet with jenny on the third okay",
+            "label": 8
+        },
+        {
+            "text": "on third april we will go to watch j llb movie set it",
+            "label": 8
+        },
+        {
+            "text": "reminder about meeting from eight am to twelve pm",
+            "label": 8
+        },
+        {
+            "text": "new reminder at three pm",
+            "label": 8
+        },
+        {
+            "text": "set rotating event",
+            "label": 8
+        },
+        {
+            "text": "what does one have to damage in cream to make butter",
+            "label": 9
+        },
+        {
+            "text": "what can i cook with broccoli and chicken",
+            "label": 9
+        },
+        {
+            "text": "in five sentences let me know the procedure of making thanksgiving turkey",
+            "label": 9
+        },
+        {
+            "text": "what food is good",
+            "label": 9
+        },
+        {
+            "text": "i would like instructions on how to cook baked chicken",
+            "label": 9
+        },
+        {
+            "text": "if it is noon in virginia what time is it in california",
+            "label": 10
+        },
+        {
+            "text": "switch to eastern time zone",
+            "label": 10
+        },
+        {
+            "text": "please change time zone to india",
+            "label": 10
+        },
+        {
+            "text": "change this time to ist",
+            "label": 10
+        },
+        {
+            "text": "please convert the time of here at nine pm to brasil time zone",
+            "label": 10
+        },
+        {
+            "text": "give me time",
+            "label": 11
+        },
+        {
+            "text": "could you please tell me what time is in singapore",
+            "label": 11
+        },
+        {
+            "text": "report the current time in oakland",
+            "label": 11
+        },
+        {
+            "text": "the twenty second is on what day of the week",
+            "label": 11
+        },
+        {
+            "text": "what week of the year does the summer season start",
+            "label": 11
+        },
+        {
+            "text": "please add this email to my contacts",
+            "label": 12
+        },
+        {
+            "text": "just add a new email in my contacts from michael",
+            "label": 12
+        },
+        {
+            "text": "save this email in contact",
+            "label": 12
+        },
+        {
+            "text": "add email to existing contact",
+            "label": 12
+        },
+        {
+            "text": "i need you to add this email in my contacts",
+            "label": 12
+        },
+        {
+            "text": "what is the last email i received",
+            "label": 13
+        },
+        {
+            "text": "refresh the inbox and update about any unread mails",
+            "label": 13
+        },
+        {
+            "text": "check inbox for mail from sarah",
+            "label": 13
+        },
+        {
+            "text": "have i gotten any emails from mom lately",
+            "label": 13
+        },
+        {
+            "text": "tell me when i get new emails from principal lowry",
+            "label": 13
+        },
+        {
+            "text": "when was the last time that i spoke to john",
+            "label": 14
+        },
+        {
+            "text": "make a call to",
+            "label": 14
+        },
+        {
+            "text": "what's the email address of silvia",
+            "label": 14
+        },
+        {
+            "text": "please find a mail address of manoj and tell me",
+            "label": 14
+        },
+        {
+            "text": "check in contacts",
+            "label": 14
+        },
+        {
+            "text": "email my friend about our plans tonight",
+            "label": 15
+        },
+        {
+            "text": "send email to cat that i will accept job offer",
+            "label": 15
+        },
+        {
+            "text": "email james about the softball game james we need to get some refreshments before heading over",
+            "label": 15
+        },
+        {
+            "text": "can you open the reply inbox",
+            "label": 15
+        },
+        {
+            "text": "prepare email for susan",
+            "label": 15
+        },
+        {
+            "text": "great response to command.",
+            "label": 16
+        },
+        {
+            "text": "yeap amazing response to the command.",
+            "label": 16
+        },
+        {
+            "text": "yes you've done your understanding correcly.",
+            "label": 16
+        },
+        {
+            "text": "yeap you have done answer exactly.",
+            "label": 16
+        },
+        {
+            "text": "you have understood my instructions perfectly.",
+            "label": 16
+        },
+        {
+            "text": "olly please will you shut off.",
+            "label": 17
+        },
+        {
+            "text": "olly please shut down.",
+            "label": 17
+        },
+        {
+            "text": "olly would you please shut up.",
+            "label": 17
+        },
+        {
+            "text": "olly please will you shut up.",
+            "label": 17
+        },
+        {
+            "text": "will you stop please.",
+            "label": 17
+        },
+        {
+            "text": "confirm last thing said please.",
+            "label": 18
+        },
+        {
+            "text": "please check last thing i said.",
+            "label": 18
+        },
+        {
+            "text": "i like you check and confirm last thing i said please.",
+            "label": 18
+        },
+        {
+            "text": "will you check and confirm instruction.",
+            "label": 18
+        },
+        {
+            "text": "can you check last thing i said please.",
+            "label": 18
+        },
+        {
+            "text": "i do not really know, olly.",
+            "label": 19
+        },
+        {
+            "text": "would not care.",
+            "label": 19
+        },
+        {
+            "text": "anything will be okay with me.",
+            "label": 19
+        },
+        {
+            "text": "does not matter to me.",
+            "label": 19
+        },
+        {
+            "text": "it is unimportant for me, olly.",
+            "label": 19
+        },
+        {
+            "text": "once again clarify me about your answers please.",
+            "label": 20
+        },
+        {
+            "text": "don't get this.",
+            "label": 20
+        },
+        {
+            "text": "explain it further please.",
+            "label": 20
+        },
+        {
+            "text": "s1, rephrase me more on it.",
+            "label": 20
+        },
+        {
+            "text": "would you once again clarify me about your response please.",
+            "label": 20
+        },
+        {
+            "text": "can you tell me a nice joke",
+            "label": 21
+        },
+        {
+            "text": "say joke",
+            "label": 21
+        },
+        {
+            "text": "i need to find a funny joke that is ok for kids",
+            "label": 21
+        },
+        {
+            "text": "do you know any good jokes",
+            "label": 21
+        },
+        {
+            "text": "do you know any jokes",
+            "label": 21
+        },
+        {
+            "text": "i think you messed up with my command.",
+            "label": 22
+        },
+        {
+            "text": "this was not what i am searching for.",
+            "label": 22
+        },
+        {
+            "text": "uhh no, that's not what i am searching for.",
+            "label": 22
+        },
+        {
+            "text": "you told me the incorrect date please correct this.",
+            "label": 22
+        },
+        {
+            "text": "nope, i did not say it.",
+            "label": 22
+        },
+        {
+            "text": "that's helpful,.",
+            "label": 23
+        },
+        {
+            "text": "that's perfect, musch appreciated.",
+            "label": 23
+        },
+        {
+            "text": "thank you so much.",
+            "label": 23
+        },
+        {
+            "text": "fantastic job, you did well, olly.",
+            "label": 23
+        },
+        {
+            "text": "perfect work, you've done well, olly.",
+            "label": 23
+        },
+        {
+            "text": "i had a relaxing day today",
+            "label": 24
+        },
+        {
+            "text": "i want a not only to direct me to an internet site but actually answer any given question",
+            "label": 24
+        },
+        {
+            "text": "can you feel",
+            "label": 24
+        },
+        {
+            "text": "have a anyinput day",
+            "label": 24
+        },
+        {
+            "text": "what is the best chocolate chip cookie recipe",
+            "label": 24
+        },
+        {
+            "text": "let us start over.",
+            "label": 25
+        },
+        {
+            "text": "please would you replay your last phrase said.",
+            "label": 25
+        },
+        {
+            "text": "say the last one said again please.",
+            "label": 25
+        },
+        {
+            "text": "reset.",
+            "label": 25
+        },
+        {
+            "text": "can you tell me what said once more.",
+            "label": 25
+        },
+        {
+            "text": "by ten to eleven am daily start my vacuum cleaner",
+            "label": 26
+        },
+        {
+            "text": "please clean the floor",
+            "label": 26
+        },
+        {
+            "text": "start roomba",
+            "label": 26
+        },
+        {
+            "text": "i want to turn on the robot vacuum cleaner",
+            "label": 26
+        },
+        {
+            "text": "activate robot vacuum",
+            "label": 26
+        },
+        {
+            "text": "please activate my coffee pot for me",
+            "label": 27
+        },
+        {
+            "text": "i need a drink",
+            "label": 27
+        },
+        {
+            "text": "make us a brew",
+            "label": 27
+        },
+        {
+            "text": "please make me a coffee using the coffee machine",
+            "label": 27
+        },
+        {
+            "text": "please get the coffee machine to make me some coffee",
+            "label": 27
+        },
+        {
+            "text": "please make the lights watching friendly",
+            "label": 28
+        },
+        {
+            "text": "change house light colors to blue",
+            "label": 28
+        },
+        {
+            "text": "change the colours please",
+            "label": 28
+        },
+        {
+            "text": "change lights from red to blue",
+            "label": 28
+        },
+        {
+            "text": "i need to change the color of this light",
+            "label": 28
+        },
+        {
+            "text": "lower the lights in the bedroom",
+            "label": 29
+        },
+        {
+            "text": "dim the lights in my bedroom",
+            "label": 29
+        },
+        {
+            "text": "period the light should be in dim",
+            "label": 29
+        },
+        {
+            "text": "lower lights",
+            "label": 29
+        },
+        {
+            "text": "dim the lights in the kitchen",
+            "label": 29
+        },
+        {
+            "text": "turn off lights in my room",
+            "label": 30
+        },
+        {
+            "text": "turn the lights off",
+            "label": 30
+        },
+        {
+            "text": "shift the light off",
+            "label": 30
+        },
+        {
+            "text": "turn off bedroom light at nine thirty pm",
+            "label": 30
+        },
+        {
+            "text": "turn off this light",
+            "label": 30
+        },
+        {
+            "text": "hey turn on disco lights in my apartment and let the party begin",
+            "label": 31
+        },
+        {
+            "text": "overhead lights on please",
+            "label": 31
+        },
+        {
+            "text": "please turn the lights on",
+            "label": 31
+        },
+        {
+            "text": "turn on the lights that are outdoors",
+            "label": 31
+        },
+        {
+            "text": "i can't see anything",
+            "label": 31
+        },
+        {
+            "text": "i need more light",
+            "label": 32
+        },
+        {
+            "text": "make the light more visible",
+            "label": 32
+        },
+        {
+            "text": "olly brighten the lights",
+            "label": 32
+        },
+        {
+            "text": "can you adjust the lighting for me to be brighter",
+            "label": 32
+        },
+        {
+            "text": "increase the intensity of the lighting in the room",
+            "label": 32
+        },
+        {
+            "text": "i want the smart socket off now",
+            "label": 33
+        },
+        {
+            "text": "power down the plug socket one",
+            "label": 33
+        },
+        {
+            "text": "power off on",
+            "label": 33
+        },
+        {
+            "text": "switch off the plug socket",
+            "label": 33
+        },
+        {
+            "text": "please make the smart socket turn off",
+            "label": 33
+        },
+        {
+            "text": "turn on wemo plug in game room",
+            "label": 34
+        },
+        {
+            "text": "i'd like you to turn turn on the tv",
+            "label": 34
+        },
+        {
+            "text": "turn wemo on",
+            "label": 34
+        },
+        {
+            "text": "turn on the plug socket one",
+            "label": 34
+        },
+        {
+            "text": "switch on the wemo plug",
+            "label": 34
+        },
+        {
+            "text": "add a tab to the shopping list",
+            "label": 35
+        },
+        {
+            "text": "show a new list",
+            "label": 35
+        },
+        {
+            "text": "add grocery shopping to my to do list",
+            "label": 35
+        },
+        {
+            "text": "update my list with shoes",
+            "label": 35
+        },
+        {
+            "text": "include this",
+            "label": 35
+        },
+        {
+            "text": "i finished my to do list",
+            "label": 36
+        },
+        {
+            "text": "list the items on my shopping list",
+            "label": 36
+        },
+        {
+            "text": "what are all my lists",
+            "label": 36
+        },
+        {
+            "text": "display my list",
+            "label": 36
+        },
+        {
+            "text": "what kind of lists do i have saved",
+            "label": 36
+        },
+        {
+            "text": "delete the dog list for me",
+            "label": 37
+        },
+        {
+            "text": "delete item on list",
+            "label": 37
+        },
+        {
+            "text": "please delete list titled kickball",
+            "label": 37
+        },
+        {
+            "text": "remove this list from the others",
+            "label": 37
+        },
+        {
+            "text": "please delete the last song that played from the playlist",
+            "label": 37
+        },
+        {
+            "text": "save my last playlist",
+            "label": 38
+        },
+        {
+            "text": "save this song in my great songs category",
+            "label": 38
+        },
+        {
+            "text": "i love the songs of micheal jackson can you save some songs of jackson for me",
+            "label": 38
+        },
+        {
+            "text": "i love that song who sings it",
+            "label": 38
+        },
+        {
+            "text": "make this my favorite",
+            "label": 38
+        },
+        {
+            "text": "show me music by that artist",
+            "label": 39
+        },
+        {
+            "text": "name the singer",
+            "label": 39
+        },
+        {
+            "text": "what's the song title",
+            "label": 39
+        },
+        {
+            "text": "which song is currently playing",
+            "label": 39
+        },
+        {
+            "text": "what is the name of the artist that created this song",
+            "label": 39
+        },
+        {
+            "text": "enable shuffle",
+            "label": 40
+        },
+        {
+            "text": "please put radio in shuffle",
+            "label": 40
+        },
+        {
+            "text": "please check my playlists for jazz music",
+            "label": 40
+        },
+        {
+            "text": "replay the required of the musics",
+            "label": 40
+        },
+        {
+            "text": "select shuffle all",
+            "label": 40
+        },
+        {
+            "text": "latest updates",
+            "label": 41
+        },
+        {
+            "text": "hey olly tell my today's top news",
+            "label": 41
+        },
+        {
+            "text": "is there any new environmental news",
+            "label": 41
+        },
+        {
+            "text": "look up news articles about trump",
+            "label": 41
+        },
+        {
+            "text": "headline news for texas",
+            "label": 41
+        },
+        {
+            "text": "progress from the last paused point of my audio book",
+            "label": 42
+        },
+        {
+            "text": "go back to animal farm",
+            "label": 42
+        },
+        {
+            "text": "play next episode of harry potter by j. k. rowling",
+            "label": 42
+        },
+        {
+            "text": "resume the two towers",
+            "label": 42
+        },
+        {
+            "text": "start playing again",
+            "label": 42
+        },
+        {
+            "text": "we are going to play poker together",
+            "label": 43
+        },
+        {
+            "text": "can you take a role of enemy in the game of coc",
+            "label": 43
+        },
+        {
+            "text": "run game",
+            "label": 43
+        },
+        {
+            "text": "open parcheese game for you and i",
+            "label": 43
+        },
+        {
+            "text": "let's roll the dice",
+            "label": 43
+        },
+        {
+            "text": "try to play old nineties classic music",
+            "label": 44
+        },
+        {
+            "text": "play new rihanna song",
+            "label": 44
+        },
+        {
+            "text": "turn on some music",
+            "label": 44
+        },
+        {
+            "text": "can you play my favorite music",
+            "label": 44
+        },
+        {
+            "text": "play party songs",
+            "label": 44
+        },
+        {
+            "text": "play the next episode of drunks and dragons please",
+            "label": 45
+        },
+        {
+            "text": "play the latest seahawks podcast",
+            "label": 45
+        },
+        {
+            "text": "can i see the previous episode",
+            "label": 45
+        },
+        {
+            "text": "skip this podcast",
+            "label": 45
+        },
+        {
+            "text": "please play next episode",
+            "label": 45
+        },
+        {
+            "text": "play the bob and tom show",
+            "label": 46
+        },
+        {
+            "text": "play bbc radio one",
+            "label": 46
+        },
+        {
+            "text": "play my favorite station",
+            "label": 46
+        },
+        {
+            "text": "i would like to listen to this programme on radio",
+            "label": 46
+        },
+        {
+            "text": "turn program on xmtune",
+            "label": 46
+        },
+        {
+            "text": "what is the exchange rate for pounds and u. s. d.",
+            "label": 47
+        },
+        {
+            "text": "display exchange rate of euro to indian rupee",
+            "label": 47
+        },
+        {
+            "text": "how much is one u. s. d. in inr",
+            "label": 47
+        },
+        {
+            "text": "how many yen for each dollar",
+            "label": 47
+        },
+        {
+            "text": "what is the dollar price in inr",
+            "label": 47
+        },
+        {
+            "text": "give me the definition of the word fondle",
+            "label": 48
+        },
+        {
+            "text": "sanctimonious definition",
+            "label": 48
+        },
+        {
+            "text": "what does a sea lion look like",
+            "label": 48
+        },
+        {
+            "text": "define a phrase blue sky research",
+            "label": 48
+        },
+        {
+            "text": "define oscillate",
+            "label": 48
+        },
+        {
+            "text": "how many legs does a dog have",
+            "label": 49
+        },
+        {
+            "text": "who was the first president of united states",
+            "label": 49
+        },
+        {
+            "text": "where is place",
+            "label": 49
+        },
+        {
+            "text": "what's the capital of tanzania",
+            "label": 49
+        },
+        {
+            "text": "search for pink's youtube channel",
+            "label": 49
+        },
+        {
+            "text": "what is the linear equation",
+            "label": 50
+        },
+        {
+            "text": "tell me sum of five and six",
+            "label": 50
+        },
+        {
+            "text": "how much money will i make for the week if i make dollars per hour and work twenty hours",
+            "label": 50
+        },
+        {
+            "text": "solution for eighty one divided by nine",
+            "label": 50
+        },
+        {
+            "text": "what is ten divided by five",
+            "label": 50
+        },
+        {
+            "text": "is chase doing good",
+            "label": 51
+        },
+        {
+            "text": "please tell me news related to the stock market",
+            "label": 51
+        },
+        {
+            "text": "how are the top ten stocks at the moment",
+            "label": 51
+        },
+        {
+            "text": "current price of google please",
+            "label": 51
+        },
+        {
+            "text": "how expensive is google stock",
+            "label": 51
+        },
+        {
+            "text": "show me all the events happening in milan",
+            "label": 52
+        },
+        {
+            "text": "what are some local events",
+            "label": 52
+        },
+        {
+            "text": "can you tell me some fun things to do in kentucky",
+            "label": 52
+        },
+        {
+            "text": "is there anything to do tonight",
+            "label": 52
+        },
+        {
+            "text": "what is happening in the area",
+            "label": 52
+        },
+        {
+            "text": "whats the best place to eat near here",
+            "label": 53
+        },
+        {
+            "text": "whats around",
+            "label": 53
+        },
+        {
+            "text": "show shops around second street",
+            "label": 53
+        },
+        {
+            "text": "what's the best chicken place near me",
+            "label": 53
+        },
+        {
+            "text": "where is the best pizza on sixth street",
+            "label": 53
+        },
+        {
+            "text": "which rom com movie can i watch in theatres around new york",
+            "label": 54
+        },
+        {
+            "text": "what movies are playing at theatres near me",
+            "label": 54
+        },
+        {
+            "text": "show me theatre where pirates of caribbean is playing",
+            "label": 54
+        },
+        {
+            "text": "what new movies are good",
+            "label": 54
+        },
+        {
+            "text": "what is the biggest blockbuster this week",
+            "label": 54
+        },
+        {
+            "text": "announce a comment in facebook",
+            "label": 55
+        },
+        {
+            "text": "write a tweet telling macy's that they should be shutting down instead of jcpenney",
+            "label": 55
+        },
+        {
+            "text": "send a tweet to tmobile for rude employees",
+            "label": 55
+        },
+        {
+            "text": "tweet my complaint and mention this costumer service",
+            "label": 55
+        },
+        {
+            "text": "please tweet waited sixty five minutes for a table at tgi fridays never going back",
+            "label": 55
+        },
+        {
+            "text": "show me my husbands facebook posts today",
+            "label": 56
+        },
+        {
+            "text": "please read my facebook feed",
+            "label": 56
+        },
+        {
+            "text": "may i know what is trending in twitter",
+            "label": 56
+        },
+        {
+            "text": "what new posts are on my page",
+            "label": 56
+        },
+        {
+            "text": "is everyone on my facebook list watching the game",
+            "label": 56
+        },
+        {
+            "text": "order me some chipotle",
+            "label": 57
+        },
+        {
+            "text": "could you please help me to order some sushi from deliveroo",
+            "label": 57
+        },
+        {
+            "text": "order chinese food",
+            "label": 57
+        },
+        {
+            "text": "show me chinese food near me",
+            "label": 57
+        },
+        {
+            "text": "ordering food",
+            "label": 57
+        },
+        {
+            "text": "call pizza hut and find out if my order is ready",
+            "label": 58
+        },
+        {
+            "text": "find a pizza restaurant open until noon",
+            "label": 58
+        },
+        {
+            "text": "does my favourite pizza place available for takeaway",
+            "label": 58
+        },
+        {
+            "text": "does pf changs do takeout",
+            "label": 58
+        },
+        {
+            "text": "find my thai takeaways around grassmarket",
+            "label": 58
+        },
+        {
+            "text": "what time will i arrive in austin tx",
+            "label": 59
+        },
+        {
+            "text": "what time is the train passing by",
+            "label": 59
+        },
+        {
+            "text": "what time does the train to iowa leave",
+            "label": 59
+        },
+        {
+            "text": "when is my train coming",
+            "label": 59
+        },
+        {
+            "text": "directions to sainsburys",
+            "label": 59
+        },
+        {
+            "text": "call a taxi for me",
+            "label": 60
+        },
+        {
+            "text": "find the nearest taxi",
+            "label": 60
+        },
+        {
+            "text": "please book a taxi for me",
+            "label": 60
+        },
+        {
+            "text": "book a taxi uber",
+            "label": 60
+        },
+        {
+            "text": "book ola cab for now",
+            "label": 60
+        },
+        {
+            "text": "book me a train ticket in any train to bombay for tomorrow",
+            "label": 61
+        },
+        {
+            "text": "i need the current dart rail schedule from west irving station to north lake college",
+            "label": 61
+        },
+        {
+            "text": "schedule a journey to las vegas by train",
+            "label": 61
+        },
+        {
+            "text": "book a train ticket to boston tomorrow",
+            "label": 61
+        },
+        {
+            "text": "reserve a seat for me on the train march twentieth",
+            "label": 61
+        },
+        {
+            "text": "is there any stopped traffic on route eighty today",
+            "label": 62
+        },
+        {
+            "text": "traffic alert",
+            "label": 62
+        },
+        {
+            "text": "what is the traffic now",
+            "label": 62
+        },
+        {
+            "text": "how is the traffic now",
+            "label": 62
+        },
+        {
+            "text": "will traffic be good when i leave in five minutes",
+            "label": 62
+        },
+        {
+            "text": "give me the weather for merced at three pm",
+            "label": 63
+        },
+        {
+            "text": "i will need a scarf in afternoon to overcome sunlight",
+            "label": 63
+        },
+        {
+            "text": "should i wear a hat today",
+            "label": 63
+        },
+        {
+            "text": "what should i wear is it cold outside",
+            "label": 63
+        },
+        {
+            "text": "is it going to snow tonight",
+            "label": 63
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "alarm_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 1,
+            "name": "alarm_remove",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 2,
+            "name": "alarm_set",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 3,
+            "name": "audio_volume_down",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 4,
+            "name": "audio_volume_mute",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 5,
+            "name": "audio_volume_up",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 6,
+            "name": "calendar_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 7,
+            "name": "calendar_remove",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 8,
+            "name": "calendar_set",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 9,
+            "name": "cooking_recipe",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 10,
+            "name": "datetime_convert",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 11,
+            "name": "datetime_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 12,
+            "name": "email_addcontact",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 13,
+            "name": "email_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 14,
+            "name": "email_querycontact",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 15,
+            "name": "email_sendemail",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 16,
+            "name": "general_affirm",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 17,
+            "name": "general_commandstop",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 18,
+            "name": "general_confirm",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 19,
+            "name": "general_dontcare",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 20,
+            "name": "general_explain",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 21,
+            "name": "general_joke",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 22,
+            "name": "general_negate",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 23,
+            "name": "general_praise",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 24,
+            "name": "general_quirky",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 25,
+            "name": "general_repeat",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 26,
+            "name": "iot_cleaning",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 27,
+            "name": "iot_coffee",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 28,
+            "name": "iot_hue_lightchange",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 29,
+            "name": "iot_hue_lightdim",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 30,
+            "name": "iot_hue_lightoff",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 31,
+            "name": "iot_hue_lighton",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 32,
+            "name": "iot_hue_lightup",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 33,
+            "name": "iot_wemo_off",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 34,
+            "name": "iot_wemo_on",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 35,
+            "name": "lists_createoradd",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 36,
+            "name": "lists_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 37,
+            "name": "lists_remove",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 38,
+            "name": "music_likeness",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 39,
+            "name": "music_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 40,
+            "name": "music_settings",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 41,
+            "name": "news_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 42,
+            "name": "play_audiobook",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 43,
+            "name": "play_game",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 44,
+            "name": "play_music",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 45,
+            "name": "play_podcasts",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 46,
+            "name": "play_radio",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 47,
+            "name": "qa_currency",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 48,
+            "name": "qa_definition",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 49,
+            "name": "qa_factoid",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 50,
+            "name": "qa_maths",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 51,
+            "name": "qa_stock",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 52,
+            "name": "recommendation_events",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 53,
+            "name": "recommendation_locations",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 54,
+            "name": "recommendation_movies",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 55,
+            "name": "social_post",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 56,
+            "name": "social_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 57,
+            "name": "takeaway_order",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 58,
+            "name": "takeaway_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 59,
+            "name": "transport_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 60,
+            "name": "transport_taxi",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 61,
+            "name": "transport_ticket",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 62,
+            "name": "transport_traffic",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        },
+        {
+            "id": 63,
+            "name": "weather_query",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": []
+        }
+    ]
+}

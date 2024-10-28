@@ -1,6 +1,8 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 
+from .schemas import Dataset
+
 
 @dataclass
 class Tag:
@@ -12,12 +14,10 @@ class Tag:
     intent_ids: list[int] = field(default_factory=list)  # classes with this tag
 
 
-def collect_tags(intent_records: list[dict]):
-    tagwise_intent_ids = defaultdict(list)
-    for dct in intent_records:
-        if "tags" not in dct:
-            continue
-        for tag_name in dct["tags"]:
-            tagwise_intent_ids[tag_name].append(dct["intent_id"])
-    res = [Tag(tag_name, intent_ids) for tag_name, intent_ids in tagwise_intent_ids.items()]
-    return res
+def collect_tags(dataset: Dataset) -> list[Tag]:
+    tag_mapping = defaultdict(list)
+    for intent in dataset.intents:
+        for tag in intent.tags:
+            tag_mapping[tag].append(intent.id)
+
+    return [Tag(tag_name=tag, intent_ids=intent_ids) for tag, intent_ids in tag_mapping.items()]

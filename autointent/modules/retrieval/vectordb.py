@@ -1,65 +1,60 @@
-from functools import partial
+import json
+from pathlib import Path
 
-import numpy as np
-from chromadb import Collection
+from autointent.context import Context
+from autointent.context.optimization_info import RetrieverArtifact
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.metrics import RetrievalMetricFn
 
-from ...context import (
-    Context,
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
-from ...metrics import RetrievalMetricFn
 from .base import RetrievalModule
 
 
 class VectorDBModule(RetrievalModule):
-    def __init__(self, k: int, model_name: str):
+    vector_index: VectorIndex
+
+    def __init__(self, k: int, model_name: str) -> None:
         self.model_name = model_name
         self.k = k
 
-    def fit(self, context: Context):
-        self.collection = context.vector_index.create_collection(self.model_name, context.data_handler)
+    def fit(self, context: Context) -> None:
+        self.vector_index_client_kwargs = {
+            "device": context.device,
+            "db_dir": context.db_dir,
+        }
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> tuple[float, str]:
-        labels_pred = retrieve_candidates(self.collection, self.k, context.data_handler.utterances_test)
-        metric_value = metric_fn(context.data_handler.labels_test, labels_pred)
-        return metric_value
-    
-    def get_assets(self, context: Context = None):
-        return self.model_name
+        self.vector_index = context.vector_index_client.create_index(self.model_name, context.data_handler)
 
-    def clear_cache(self):
-        model = self.collection._embedding_function._model
-        model.to(device="cpu")
-        del model
-        self.collection = None
+    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
+        labels_pred, _, _ = self.vector_index.query(
+            context.data_handler.utterances_test,
+            self.k,
+        )
+        return metric_fn(context.data_handler.labels_test, labels_pred)
 
+    def get_assets(self) -> RetrieverArtifact:
+        return RetrieverArtifact(embedder_name=self.model_name)
 
-def retrieve_candidates(
-    collection: Collection,
-    k: int,
-    utterances: list[str],
-) -> list[int] | list[list[int]]:
-    """
-    Return
-    ---
-    `labels`:
-        - multiclass case: np.ndarray of shape (n_samples, n_candidates) with integer labels from `[0,n_classes-1]`
-        - multilabel case: np.ndarray of shape (n_samples, n_candidates, n_classes) with binary labels
-    """
-    n_classes = collection.metadata["n_classes"]
-    multilabel = collection.metadata["multilabel"]
+    def clear_cache(self) -> None:
+        self.vector_index.delete()
 
-    query_res = collection.query(
-        query_texts=utterances,
-        n_results=k,
-        include=["metadatas", "documents", "distances"],  # one can add "embeddings"
-    )
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "vector_index_client_kwargs.json").open("w") as file:
+            json.dump(self.vector_index_client_kwargs, file, indent=4)
 
-    if not multilabel:
-        convert = multiclass_metadata_as_labels
-    else:
-        convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / "vector_index_client_kwargs.json").open() as file:
+            self.vector_index_client_kwargs = json.load(file)
 
-    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
-    return res_labels
+        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)
+        self.vector_index = vector_index_client.get_index(self.model_name)
+
+    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+        """
+        return labels, distances and texts of retrieved nearest neighbors
+        """
+        return self.vector_index.query(
+            utterances,
+            self.k,
+        )

@@ -1,7 +1,8 @@
 import numpy as np
+from numpy.typing import NDArray
 
 
-def get_counts(labels, n_classes, weights):
+def get_counts(labels: NDArray[np.int_], n_classes: int, weights: NDArray[np.float64]) -> NDArray[np.int64]:
     """
     Arguments
     ---
@@ -14,13 +15,12 @@ def get_counts(labels, n_classes, weights):
     """
     n_queries = labels.shape[0]
     labels += n_classes * np.arange(n_queries)[:, None]
-    counts = np.bincount(labels.ravel(), minlength=n_classes * n_queries, weights=weights.ravel()).reshape(
+    return np.bincount(labels.ravel(), minlength=n_classes * n_queries, weights=weights.ravel()).reshape(
         n_queries, n_classes
     )
-    return counts
 
 
-def get_counts_multilabel(labels, weights):
+def get_counts_multilabel(labels: NDArray[np.int_], weights: NDArray[np.float64]) -> NDArray[np.float64]:
     """
     Arguments
     ---
@@ -31,4 +31,4 @@ def get_counts_multilabel(labels, weights):
     ---
     np.ndarray of shape (n_samples, n_classes) with statistics of how many times each class label occured in candidates
     """
-    return (labels * weights[..., None]).sum(axis=1)
+    return (labels * weights[..., None]).sum(axis=1)  # type: ignore[no-any-return]

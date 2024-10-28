@@ -25,21 +25,18 @@ def tokenize(text, language):
     # doc = nlp(text)
 
     # tokens = [token.text for token in doc]
-    tokens = word_tokenize(text, language)
-
-    return tokens
+    return word_tokenize(text, language)
 
 
 def preprocess(text, language):
     tokens = tokenize(text, language=language)
     tokens = ["".join([c.lower() for c in word if c.isalnum()]) for word in tokens]
-    tokens = [word for word in tokens if len(word) > 0]
-    return tokens
+    return [word for word in tokens if len(word) > 0]
 
 
-def find_ngrams(
-    text: str, language, n_unigrams=1, n_bigrams=1, n_trigrams=1, stopwords_set=set()
-):
+def find_ngrams(text: str, language, n_unigrams=1, n_bigrams=1, n_trigrams=1, stopwords_set=None):
+    if stopwords_set is None:
+        stopwords_set = set()
     tokens = preprocess(text, language=language)
 
     # from collections import Counter
@@ -72,9 +69,7 @@ def _sample_shots(intent_records: list[dict], n_shots: int, seed: int):
     for intent in intent_records:
         if intent["intent_id"] == -1:
             continue
-        intent["sample_utterances"] = random.sample(
-            intent["sample_utterances"], k=n_shots
-        )
+        intent["sample_utterances"] = random.sample(intent["sample_utterances"], k=n_shots)
     return intent_records
 
 
@@ -97,7 +92,7 @@ def get_banking77(intent_dataset_train, seed=0, shots_per_intent=5, add_ngrams=F
     ]
 
     for b77_batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, intent_id in zip(b77_batch["text"], b77_batch["label"]):
+        for txt, intent_id in zip(b77_batch["text"], b77_batch["label"], strict=False):
             res[intent_id]["sample_utterances"].append(txt)
 
     if add_ngrams:
@@ -109,17 +104,11 @@ def get_banking77(intent_dataset_train, seed=0, shots_per_intent=5, add_ngrams=F
     return res
 
 
-def get_clinc150(
-    intent_dataset_train, seed=0, shots_per_intent=5, add_ngrams=False, oos="ood"
-):
+def get_clinc150(intent_dataset_train, seed=0, shots_per_intent=5, add_ngrams=False, oos="ood"):
     intent_names = sorted(intent_dataset_train.unique("labels"))
     oos_intent_id = intent_names.index(oos)
-    intent_names = (
-        intent_names[:oos_intent_id]
-        + intent_names[oos_intent_id + 1 :]
-        + [intent_names[oos_intent_id]]
-    )
-    name_to_id = dict(zip(intent_names, range(len(intent_names))))
+    intent_names = intent_names[:oos_intent_id] + intent_names[oos_intent_id + 1 :] + [intent_names[oos_intent_id]]
+    name_to_id = dict(zip(intent_names, range(len(intent_names)), strict=False))
     name_to_id[oos] = -1
 
     res = [
@@ -134,7 +123,7 @@ def get_clinc150(
     ]
 
     for batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, name in zip(batch["data"], batch["labels"]):
+        for txt, name in zip(batch["data"], batch["labels"], strict=False):
             intent_id = name_to_id[name]
             res[intent_id]["sample_utterances"].append(txt)
 
@@ -147,9 +136,7 @@ def get_clinc150(
     return res
 
 
-def get_ru_clinc150(
-    intent_dataset_train, shots_per_intent, oos=42, add_ngrams=False, seed=0
-):
+def get_ru_clinc150(intent_dataset_train, shots_per_intent, oos=42, add_ngrams=False, seed=0):
     all_labels = sorted(intent_dataset_train.unique("intent"))
     assert all_labels == list(range(151))
 
@@ -168,7 +155,7 @@ def get_ru_clinc150(
     ]
 
     for batch in in_domain_samples.iter(batch_size=16, drop_last_batch=False):
-        for txt, intent_id in zip(batch["text"], batch["intent"]):
+        for txt, intent_id in zip(batch["text"], batch["intent"], strict=False):
             intent_id -= int(intent_id > oos)
             res[intent_id]["sample_utterances"].append(txt)
 
@@ -191,11 +178,9 @@ def get_ru_clinc150(
     return res
 
 
-def get_snips(
-    intent_dataset_train, label_col, seed=0, shots_per_intent=5, add_ngrams=False
-):
+def get_snips(intent_dataset_train, label_col, seed=0, shots_per_intent=5, add_ngrams=False):
     intent_names = sorted(intent_dataset_train.unique(label_col))
-    name_to_id = dict(zip(intent_names, range(len(intent_names))))
+    name_to_id = dict(zip(intent_names, range(len(intent_names)), strict=False))
 
     res = [
         {
@@ -209,7 +194,7 @@ def get_snips(
     ]
 
     for batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, name in zip(batch["text"], batch[label_col]):
+        for txt, name in zip(batch["text"], batch[label_col], strict=False):
             intent_id = name_to_id[name]
             res[intent_id]["sample_utterances"].append(txt)
 
@@ -224,7 +209,7 @@ def get_snips(
 
 def get_hwu64(hwu_labels, hwu_utterances, seed=0, shots_per_intent=5, add_ngrams=False):
     intent_names = sorted(set(hwu_labels))
-    name_to_id = dict(zip(intent_names, range(len(intent_names))))
+    name_to_id = dict(zip(intent_names, range(len(intent_names)), strict=False))
 
     res = [
         {
@@ -237,7 +222,7 @@ def get_hwu64(hwu_labels, hwu_utterances, seed=0, shots_per_intent=5, add_ngrams
         for i, name in enumerate(intent_names)
     ]
 
-    for txt, name in zip(hwu_utterances, hwu_labels):
+    for txt, name in zip(hwu_utterances, hwu_labels, strict=False):
         intent_id = name_to_id[name]
         res[intent_id]["sample_utterances"].append(txt)
 
@@ -252,7 +237,7 @@ def get_hwu64(hwu_labels, hwu_utterances, seed=0, shots_per_intent=5, add_ngrams
 
 def get_ru_hwu64(intent_dataset_train, shots_per_intent, add_ngrams=False, seed=0):
     intent_names = sorted(intent_dataset_train.unique("intent"))
-    name_to_id = dict(zip(intent_names, range(len(intent_names))))
+    name_to_id = dict(zip(intent_names, range(len(intent_names)), strict=False))
 
     res = [
         {
@@ -266,7 +251,7 @@ def get_ru_hwu64(intent_dataset_train, shots_per_intent, add_ngrams=False, seed=
     ]
 
     for batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, name in zip(batch["text"], batch["intent"]):
+        for txt, name in zip(batch["text"], batch["intent"], strict=False):
             intent_id = name_to_id[name]
             res[intent_id]["sample_utterances"].append(txt)
 
@@ -280,20 +265,22 @@ def get_ru_hwu64(intent_dataset_train, shots_per_intent, add_ngrams=False, seed=
 
 
 def get_minds14(intent_dataset_train, shots_per_intent, text_col, add_ngrams=False, seed=0):
-    res = [{
-        'intent_id': i,
-        'intent_name': None,
-        'sample_utterances': [],
-        'regexp_full_match': [],
-        'regexp_partial_match': []
-    } for i in range(14)]
-
+    res = [
+        {
+            "intent_id": i,
+            "intent_name": None,
+            "sample_utterances": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+        }
+        for i in range(14)
+    ]
 
     for batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, intent_id in zip(batch[text_col], batch['intent_class']):
-            target_list = res[intent_id]['sample_utterances']
+        for txt, intent_id in zip(batch[text_col], batch["intent_class"], strict=False):
+            target_list = res[intent_id]["sample_utterances"]
             target_list.append(txt)
-    
+
     if add_ngrams:
         res = _add_ngrams(res)
 
@@ -304,29 +291,31 @@ def get_minds14(intent_dataset_train, shots_per_intent, text_col, add_ngrams=Fal
 
 
 def get_massive(intent_dataset_train, shots_per_intent, add_ngrams=False, seed=0):
-    intent_names = sorted(intent_dataset_train.unique('label'))
-    name_to_id = dict(zip(intent_names, range(len(intent_names))))
+    intent_names = sorted(intent_dataset_train.unique("label"))
+    name_to_id = dict(zip(intent_names, range(len(intent_names)), strict=False))
 
-    res = [{
-        'intent_id': i,
-        'intent_name': name,
-        'sample_utterances': [],
-        'regexp_full_match': [],
-        'regexp_partial_match': []
-    } for i, name in enumerate(intent_names)]
-
+    res = [
+        {
+            "intent_id": i,
+            "intent_name": name,
+            "sample_utterances": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+        }
+        for i, name in enumerate(intent_names)
+    ]
 
     for batch in intent_dataset_train.iter(batch_size=16, drop_last_batch=False):
-        for txt, name in zip(batch['text'], batch['label']):
+        for txt, name in zip(batch["text"], batch["label"], strict=False):
             intent_id = name_to_id[name]
-            res[intent_id]['sample_utterances'].append(txt)
+            res[intent_id]["sample_utterances"].append(txt)
 
     if add_ngrams:
         res = _add_ngrams(res)
 
     if shots_per_intent is not None:
         res = _sample_shots(res, shots_per_intent, seed)
-    
+
     return res
 
 
@@ -358,7 +347,8 @@ if __name__ == "__main__":
         elif args.language == "english":
             intent_dataset = load_dataset("PolyAI/banking77")
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_banking77(
             intent_dataset["train"],
@@ -374,7 +364,8 @@ if __name__ == "__main__":
             intent_dataset = load_dataset("cmaldona/All-Generalization-OOD-CLINC150")
             func = get_ru_clinc150
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = func(
             intent_dataset["train"],
@@ -390,7 +381,8 @@ if __name__ == "__main__":
             intent_dataset = load_dataset("benayas/snips")
             label_col = "category"
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_snips(
             intent_dataset["train"],
@@ -420,15 +412,17 @@ if __name__ == "__main__":
                 add_ngrams=args.add_ngrams,
             )
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
     elif args.dataset == "minds14":
-        intent_dataset = load_dataset("PolyAI/minds14", 'ru-RU')
+        intent_dataset = load_dataset("PolyAI/minds14", "ru-RU")
         if args.language == "russian":
             text_col = "transcription"
         elif args.language == "english":
             text_col = "english_transcription"
         else:
-            raise ValueError("unsupported language")
+            msg = "unsupported language"
+            raise ValueError(msg)
 
         intent_records = get_minds14(
             intent_dataset["train"],
@@ -438,7 +432,7 @@ if __name__ == "__main__":
             add_ngrams=args.add_ngrams,
         )
     elif args.dataset == "massive":
-        raise NotImplementedError()
+        raise NotImplementedError
         # if args.language == "russian":
         #     intent_dataset = load_dataset("mteb/amazon_massive_intent", 'ru')
         # elif args.language == "english":
@@ -452,7 +446,7 @@ if __name__ == "__main__":
         #     seed=args.seed,
         #     add_ngrams=args.add_ngrams,
         # )
-    
+
     output_dir = os.path.dirname(args.output_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

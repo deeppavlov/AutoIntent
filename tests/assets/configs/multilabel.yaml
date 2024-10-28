@@ -1,0 +1,22 @@
+nodes:
+  - node_type: retrieval
+    metric: retrieval_hit_rate_intersecting
+    search_space:
+      - module_type: vector_db
+        k: [10]
+        model_name:
+          - sentence-transformers/all-MiniLM-L6-v2
+          - avsolatorio/GIST-small-Embedding-v0
+  - node_type: scoring
+    metric: scoring_roc_auc
+    search_space:
+      - module_type: knn
+        k: [5, 10]
+        weights: [uniform, distance, closest]
+      - module_type: linear
+  - node_type: prediction
+    metric: prediction_accuracy
+    search_space:
+      - module_type: threshold
+        thresh: [0.5, [0.5, 0.5, 0.5]]
+      - module_type: tunable

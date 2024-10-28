@@ -1,28 +1,25 @@
 import logging
-from logging import Formatter
-from typing import Literal
-
-LoggingLevelType = Literal['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+from pprint import pformat
 
 
-def setup_logging(level: LoggingLevelType = None):
-    logging.basicConfig(
-        level=level,
-        format='{asctime} - {name} - {levelname} - {message}',
-        style="{",
-        handlers=[logging.StreamHandler()]
-    )
+def get_logger() -> logging.Logger:
+    logger = logging.getLogger(__name__)
 
+    formatter = PPrintFormatter()
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
-def get_logger(name: str, level: LoggingLevelType = None, formatter: Formatter = None):
-    logger = logging.getLogger(name)
-    
-    if level is not None:
-        logger.setLevel(level)
-        
-    if formatter is not None:
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-    
     return logger
+
+
+class PPrintFormatter(logging.Formatter):
+    def __init__(self) -> None:
+        super().__init__(fmt="{asctime} - {name} - {levelname} - {message}", style="{")
+
+    def format(self, record: logging.LogRecord) -> str:
+        if isinstance(record.msg, dict):
+            format_msg = "module scoring results:\n"
+            dct_to_str = pformat(record.msg)
+            record.msg = format_msg + dct_to_str
+        return super().format(record)

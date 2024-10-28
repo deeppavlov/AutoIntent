@@ -1,19 +1,32 @@
-from functools import partial
-from typing import Literal
+import json
+from pathlib import Path
+from typing import Any, TypedDict
 
 import numpy as np
-from chromadb import Collection
+import numpy.typing as npt
 
-from ....context import (
-    multiclass_metadata_as_labels,
-    multilabel_metadata_as_labels,
-)
-from ..base import Context, ScoringModule
+from autointent.context import Context
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.custom_types import WEIGHT_TYPES
+from autointent.modules.scoring.base import ScoringModule
+
 from .weighting import apply_weights
 
 
+class KNNScorerDumpMetadata(TypedDict):
+    device: str
+    db_dir: str
+    n_classes: int
+    multilabel: bool
+    model_name: str
+
+
 class KNNScorer(ScoringModule):
-    def __init__(self, k: int, weights: Literal["uniform", "distance", "closest"] | bool):
+    weights: WEIGHT_TYPES
+    metadata_dict_name: str = "metadata.json"
+    _vector_index: VectorIndex
+
+    def __init__(self, k: int, weights: WEIGHT_TYPES) -> None:
         """
         Arguments
         ---
@@ -25,57 +38,41 @@ class KNNScorer(ScoringModule):
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
         self.k = k
-        if isinstance(weights, bool):
-            weights = "distance" if weights else "uniform"
         self.weights = weights
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         self._multilabel = context.multilabel
-        self._collection = context.get_best_collection()
+        self._vector_index = context.get_best_index()
         self._n_classes = context.n_classes
 
-    def predict(self, utterances: list[str]):
-        labels, distances = query(self._collection, self.k, utterances)
-        probs = apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
-        return probs
+        self.metadata = KNNScorerDumpMetadata(
+            device=context.device,
+            db_dir=context.db_dir,
+            n_classes=self._n_classes,
+            multilabel=self._multilabel,
+            model_name=self._vector_index.model_name,
+        )
 
-    def clear_cache(self):
-        model = self._collection._embedding_function._model
-        model.to(device="cpu")
-        del model
-        self._collection = None
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+        labels, distances, _ = self._vector_index.query(utterances, self.k)
+        return apply_weights(np.array(labels), np.array(distances), self.weights, self._n_classes, self._multilabel)
 
+    def clear_cache(self) -> None:
+        self._vector_index.delete()
 
-def query(
-    collection: Collection,
-    k: int,
-    utterances: list[str],
-):
-    """
-    Return
-    ---
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(self.metadata, file, indent=4)
 
-    `labels`:
-    - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
-    - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
 
-    `distances`: np.ndarray of shape (n_samples, n_neighbors) with integer labels from 0..n_classes-1
-    """
-    n_classes = collection.metadata["n_classes"]
-    multilabel = collection.metadata["multilabel"]
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            self.metadata = json.load(file)
 
-    query_res = collection.query(
-        query_texts=utterances,
-        n_results=k,
-        include=["metadatas", "documents", "distances"],  # one can add "embeddings"
-    )
+        self._n_classes = self.metadata["n_classes"]
+        self._multilabel = self.metadata["multilabel"]
 
-    if not multilabel:
-        convert = multiclass_metadata_as_labels
-    else:
-        convert = partial(multilabel_metadata_as_labels, n_classes=n_classes)
-
-    res_labels = np.array([convert(candidates) for candidates in query_res["metadatas"]])
-    res_distances = np.array(query_res["distances"])
-
-    return res_labels, res_distances
+        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
+        self._vector_index = vector_index_client.get_index(self.metadata["model_name"])

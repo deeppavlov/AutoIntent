@@ -1,9 +1,28 @@
 import itertools as it
+import json
+import logging
+from pathlib import Path
+from typing import Any, TypedDict
 
 import numpy as np
+import numpy.typing as npt
 from sentence_transformers import CrossEncoder
-from ..base import Context, ScoringModule
+
+from autointent import Context
+from autointent.context.vector_index_client import VectorIndexClient
+from autointent.custom_types import LABEL_TYPE
+from autointent.modules.scoring.base import ScoringModule
+
 from .head_training import CrossEncoderWithLogreg
+
+logger = logging.getLogger(__name__)
+
+
+class DNNCScorerDumpMetadata(TypedDict):
+    device: str
+    db_dir: str
+    n_classes: int
+    biencoder_model: str
 
 
 class DNNCScorer(ScoringModule):
@@ -14,77 +33,80 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
-    def __init__(self, model_name: str, k: int, train_head=False):
+    metadata_dict_name: str = "metadata.json"
+    crossencoder_subdir: str = "crossencoder"
+    model: CrossEncoder | CrossEncoderWithLogreg
+
+    def __init__(self, model_name: str, k: int, train_head: bool = False) -> None:
         self.model_name = model_name
         self.k = k
         self.train_head = train_head
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
+        self.n_classes = context.n_classes
         self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
-        self._collection = context.get_best_collection()
+        self.vector_index = context.get_best_index()
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
             model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
             self.model = model
 
-    def predict(self, utterances: list[str]):
+        self.metadata = DNNCScorerDumpMetadata(
+            device=context.device,
+            db_dir=context.db_dir,
+            n_classes=self.n_classes,
+            biencoder_model=self.vector_index.model_name,
+        )
+
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
         Return
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        query_res = self._collection.query(
-            query_texts=utterances,
-            n_results=self.k,
-            include=["metadatas", "documents"],  # one can add "embeddings", "distances"
+        labels, _, texts = self.vector_index.query(
+            utterances,
+            self.k,
         )
 
-        cross_encoder_scores = self._get_cross_encoder_scores(
-            utterances, query_res["documents"]
-        )
+        cross_encoder_scores = self._get_cross_encoder_scores(utterances, texts)
 
-        labels_pred = [
-            [cand["intent_id"] for cand in candidates]
-            for candidates in query_res["metadatas"]
-        ]
+        return self._build_result(cross_encoder_scores, labels)
 
-        res = self._build_result(cross_encoder_scores, labels_pred)
-
-        return res
-
-    def _get_cross_encoder_scores(
-        self, utterances: list[str], candidates: list[list[str]]
-    ):
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
         Arguments
         ---
         `utterances`: list of query utterances
-        `candidates`: for each query, this list contains a list of the k the closest sample utterances (from retrieval module)
+        `candidates`: for each query, this list contains a list of the k the closest sample utterances \
+            (from retrieval module)
 
         Return
         ---
         for each query, return a list of a corresponding cross encoder scores for the k the closest sample utterances
         """
-        assert len(utterances) == len(candidates)
+        if len(utterances) != len(candidates):
+            msg = "Number of utterances doesn't match number of retrieved candidates"
+            logger.error(msg)
+            raise ValueError(msg)
 
-        text_pairs = [
-            [[query, cand] for cand in docs]
-            for query, docs in zip(utterances, candidates)
-        ]
+        text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 
-        assert len(flattened_text_pairs) == len(utterances) * len(candidates[0])
+        if len(flattened_text_pairs) != len(utterances) * len(candidates[0]):
+            msg = "Number of candidates for each query utterance cannot vary"
+            logger.error(msg)
+            raise ValueError(msg)
 
-        flattened_cross_encoder_scores = self.model.predict(flattened_text_pairs)
-        cross_encoder_scores = [
-            flattened_cross_encoder_scores[i : i + self.k]
+        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self.model.predict(flattened_text_pairs)  # type: ignore[assignment]
+        return [
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
-        return cross_encoder_scores
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[int]]):
+    def _build_result(self, scores: list[list[float]], labels: list[list[LABEL_TYPE]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---
@@ -95,20 +117,39 @@ class DNNCScorer(ScoringModule):
         ---
         `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        scores = np.array(scores)
-        labels = np.array(labels)
-        n_classes = self._collection.metadata["n_classes"]
+        n_classes = self.n_classes
 
-        return build_result(scores, labels, n_classes)
-    
-    def clear_cache(self):
-        model = self._collection._embedding_function._model
-        model.to(device='cpu')
-        del model
-        self._collection = None
+        return build_result(np.array(scores), np.array(labels), n_classes)
+
+    def clear_cache(self) -> None:
+        pass
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(self.metadata, file, indent=4)
+
+        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
+        self.model.save(crossencoder_dir)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            self.metadata = json.load(file)
+
+        self.n_classes = self.metadata["n_classes"]
+
+        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
+        self.vector_index = vector_index_client.get_index(self.metadata["biencoder_model"])
+
+        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
+        if not self.train_head:
+            self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
+        else:
+            self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
 
 
-def build_result(scores: np.ndarray, labels: np.ndarray, n_classes: int):
+def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
     res = np.zeros((len(scores), n_classes))
     best_neighbors = np.argmax(scores, axis=1)
     idx_helper = np.arange(len(res))

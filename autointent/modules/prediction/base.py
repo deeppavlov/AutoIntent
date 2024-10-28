@@ -1,56 +1,58 @@
-from abc import abstractmethod
-
+from abc import ABC, abstractmethod
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 
-from ...context.data_handler import Tag
-from ..base import Context, Module
-from ...metrics import PredictionMetricFn
+from autointent import Context
+from autointent.context.data_handler import Tag
+from autointent.context.optimization_info import PredictorArtifact
+from autointent.metrics import PredictionMetricFn
+from autointent.modules.base import Module
 
 
-class PredictionModule(Module):
+class PredictionModule(Module, ABC):
     @abstractmethod
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         pass
 
     @abstractmethod
-    def predict(self, scores: list[list[float]]):
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pass
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> tuple[float, np.ndarray]:
+    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
-        metric_value = metric_fn(labels, self._predictions)
-        return metric_value
+        return metric_fn(labels, self._predictions)
 
-    def get_assets(self, context: Context = None):
-        return self._predictions
+    def get_assets(self) -> PredictorArtifact:
+        return PredictorArtifact(labels=self._predictions)
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         pass
 
 
-def get_prediction_evaluation_data(context: Context):
+def get_prediction_evaluation_data(
+    context: Context,
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     labels = context.data_handler.labels_test
-    scores = context.optimization_logs.get_best_test_scores()
+    scores = context.optimization_info.get_best_test_scores()
 
-    oos_scores = context.optimization_logs.get_best_oos_scores()
+    oos_scores = context.optimization_info.get_best_oos_scores()
     if oos_scores is not None:
-        if context.multilabel:
-            oos_labels = [[0] * context.n_classes] * len(oos_scores)
-        else:
-            oos_labels = [-1] * len(oos_scores)
-        labels = np.concatenate([labels, oos_labels])
+        oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
+        labels = np.concatenate([np.array(labels), np.array(oos_labels)])
         scores = np.concatenate([scores, oos_scores])
 
-    return labels, scores
+    return labels, scores  # type: ignore[return-value]
 
 
-def apply_tags(labels: np.ndarray, scores: np.ndarray, tags: list[Tag]):
+def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
     """
     this function is intended to be used with multilabel predictor
 
-    If some intent classes have common tag (i.e. they are mutually exclusive) and were assigned to one sample, leave only that class that has the highest score.
+    If some intent classes have common tag (i.e. they are mutually exclusive) \
+    and were assigned to one sample, leave only that class that has the highest score.
 
     Arguments
     ---

@@ -4,51 +4,60 @@ from itertools import combinations
 
 import xeger
 
-from .stratification import get_sample_utterances
+from .schemas import Dataset, Intent, Utterance
 
 
-def sample_unique_tuples(k, n, m):
+def sample_unique_tuples(k: int, n: int, m: int) -> list[tuple[int, ...]]:
     all_combinations = list(combinations(range(n), k))
     random.shuffle(all_combinations)
     return all_combinations[:m]
 
 
-def sample_utterance_from_regexp(intent_record: dict, x: xeger.Xeger):
-    n_templates = len(intent_record["regexp_full_match"])
+def sample_utterance_from_regexp(intent: Intent, x: xeger.Xeger) -> str:
+    n_templates = len(intent.regexp_full_match)
     i_template = random.randint(0, n_templates - 1)
-    res = x.xeger(intent_record["regexp_full_match"][i_template])
-    return res.strip()
+    res = x.xeger(intent.regexp_full_match[i_template])
+    return res.strip()  # type: ignore[no-any-return]
 
 
-def sample_multilabel_utterances(intent_records: list[dict], n_samples, n_labels, seed=0):
+def sample_multilabel_utterances(
+    dataset: Dataset,
+    n_samples: int,
+    n_labels: int,
+    random_seed: int,
+) -> list[Utterance]:
     # TODO improve versatility
-    random.seed(seed)
+    random.seed(random_seed)
     x = xeger.Xeger()
-    x.seed(seed)
-    n_given_intents = len(intent_records)
-    res = []
-    for t in sample_unique_tuples(n_labels, n_given_intents, n_samples):
-        sampled_utterances = [sample_utterance_from_regexp(intent_records[i], x) for i in t]
-        utterance = ". ".join(sampled_utterances)
-        res.append(dict(utterance=utterance, labels=t))
-    return res
+    x.seed(random_seed)
+    n_classes = len(dataset.intents)
+
+    sampled_utterances = []
+    for t in sample_unique_tuples(n_labels, n_classes, n_samples):
+        sampled_texts = [sample_utterance_from_regexp(dataset.intents[i], x) for i in t]
+        text = ". ".join(sampled_texts)
+        sampled_utterances.append(Utterance(text=text, label=t))
+    return sampled_utterances
 
 
-def generate_multilabel_version(intent_records, config_string, seed):
+def generate_multilabel_version(
+    dataset: Dataset,
+    config_string: str,
+    random_seed: int,
+) -> Dataset:
     config = json.loads(config_string)
-    res = []
+
+    sampled_utterances = []
     for i in range(len(config)):
-        new_records = sample_multilabel_utterances(
-            intent_records,
-            n_samples=int(config[i]),
-            n_labels=i + 1,
-            seed=seed
+        sampled_utterances.extend(
+            sample_multilabel_utterances(
+                dataset=dataset,
+                n_samples=int(config[i]),
+                n_labels=i + 1,
+                random_seed=random_seed,
+            ),
         )
-        res.extend(new_records)
-    return res
 
+    dataset.utterances.extend(sampled_utterances)
 
-def convert_to_multilabel_format(intent_records):
-    utterances, labels = get_sample_utterances(intent_records)
-    res = [dict(utterance=ut, labels=[lab] if lab != -1 else []) for ut, lab in zip(utterances, labels)]
-    return res
+    return dataset
