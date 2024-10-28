@@ -1,0 +1,118 @@
+{
+    "utterances": [
+        {
+            "text": "can i make a reservation for redrobin",
+            "label": 0
+        },
+        {
+            "text": "is it possible to make a reservation at redrobin",
+            "label": 0
+        },
+        {
+            "text": "does redrobin take reservations",
+            "label": 0
+        },
+        {
+            "text": "are reservations taken at redrobin",
+            "label": 0
+        },
+        {
+            "text": "does redrobin do reservations",
+            "label": 0
+        },
+        {
+            "text": "why is there a hold on my american saving bank account",
+            "label": 1
+        },
+        {
+            "text": "i am nost sure why my account is blocked",
+            "label": 1
+        },
+        {
+            "text": "why is there a hold on my capital one checking account",
+            "label": 1
+        },
+        {
+            "text": "i think my account is blocked but i do not know the reason",
+            "label": 1
+        },
+        {
+            "text": "can you tell me why is my bank account frozen",
+            "label": 1
+        },
+        {
+            "text": "wake me up at noon tomorrow",
+            "label": 2
+        },
+        {
+            "text": "set my alarm for getting up",
+            "label": 2
+        },
+        {
+            "text": "make sure my alarm is set for three thirty in the morning",
+            "label": 2
+        },
+        {
+            "text": "please set an alarm for mid day",
+            "label": 2
+        },
+        {
+            "text": "have an alarm set for three in the morning",
+            "label": 2
+        },
+        {
+            "text": "when will my application for my credit card be processed",
+            "label": 3
+        },
+        {
+            "text": "has the discover card approved my app",
+            "label": 3
+        },
+        {
+            "text": "do you know if my amex card app went through",
+            "label": 3
+        },
+        {
+            "text": "have they looked over my app for the new credit card yet",
+            "label": 3
+        },
+        {
+            "text": "has my application for the mastercard card gone through",
+            "label": 3
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "accept_reservations",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know if Red Robin accepts reservations."
+        },
+        {
+            "id": 1,
+            "name": "account_blocked",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know why their bank account is blocked or frozen."
+        },
+        {
+            "id": 2,
+            "name": "alarm",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to set or manage an alarm."
+        },
+        {
+            "id": 3,
+            "name": "application_status",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to inquire about the status of their credit card application."
+        }
+    ]
+}
