@@ -41,7 +41,9 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = self._vector_index.embed([desc for desc in descriptions if desc is not None])
+        self.description_vectors = self._vector_index.embedder.embed(
+            [desc for desc in descriptions if desc is not None]
+        )
 
         self.metadata = DescriptionScorerDumpMetadata(
             device=context.device,
@@ -52,7 +54,7 @@ class DescriptionScorer(ScoringModule):
         )
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        utterance_vectors = self._vector_index.embed(utterances)
+        utterance_vectors = self._vector_index.embedder.embed(utterances)
         distances: NDArray[np.float64] = pairwise_distances(
             utterance_vectors, self.description_vectors, metric=self.similarity_metric
         )
