@@ -40,7 +40,7 @@ class LinearScorer(ScoringModule):
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
 
-    def __init__(self, cv: int = 3, n_jobs: int = -1) -> None:
+    def __init__(self, cv: int = 3, n_jobs: int = 1) -> None:
         self.cv = cv
         self.n_jobs = n_jobs
 

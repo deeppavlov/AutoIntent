@@ -6,22 +6,15 @@ from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import DNNCScorer, VectorDBModule
 
 
-@pytest.mark.xfail(reason="Scorer can output different scores")
+@pytest.mark.xfail(reason="This test is failing on windows, because have different score")
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1), (False, 0.5)])
-def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score, dump_dir):
-    run_name, db_dir = setup_environment
+def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score):
+    db_dir, dump_dir, logs_dir = setup_environment
 
     context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
-        device="cpu",
-        mode="multiclass",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
+        dataset=load_clinic_subset,
         dump_dir=dump_dir,
-        db_dir=db_dir,
+        db_dir=db_dir(),
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
@@ -41,7 +34,7 @@ def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score
     scorer = DNNCScorer("sergeyzh/rubert-tiny-turbo", k=3, train_head=train_head)
 
     scorer.fit(context)
-    score, _ = scorer.score(context, scoring_roc_auc)
+    score = scorer.score(context, scoring_roc_auc)
     assert score == 1
     test_data = [
         "why is there a hold on my american saving bank account",

@@ -37,7 +37,7 @@ class MLKnnScorer(ScoringModule):
         self._n_classes = context.n_classes
 
         self.metadata = MLKnnScorerDumpMetadata(
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             device=context.device,
             n_classes=self._n_classes,
             model_name=self.vector_index.model_name,

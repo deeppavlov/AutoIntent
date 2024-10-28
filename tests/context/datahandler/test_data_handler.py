@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.context.data_handler import DataHandler, Dataset
+from autointent.context.data_handler import DataAugmenter, DataHandler, Dataset
 
 
 @pytest.fixture
@@ -85,14 +85,11 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
 
 def test_regex_sampling(sample_multiclass_data):
     train_data, test_data = sample_multiclass_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        regex_sampling=5,
-        random_seed=42,
-    )
-
-    assert handler.utterances_train == ["hello", "hi", "goodbye", "bye", "hello", "hi", "goodbye", "bye"]
+    augmenter = DataAugmenter(regex_sampling=5, random_seed=42)
+    dataset = Dataset.model_validate(train_data)
+    augmented_dataset = augmenter(dataset)
+    utterances_train = [ut.text for ut in augmented_dataset.utterances]
+    assert utterances_train == ["hello", "hi", "goodbye", "bye", "hello", "hi", "goodbye", "bye"]
 
 
 def test_dump_method(sample_multiclass_data):
