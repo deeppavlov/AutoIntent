@@ -60,9 +60,9 @@ class DescriptionScorer(ScoringModule):
         )
 
         if self._multilabel:
-            probabilites = scipy.special.expit(distances / self.temperature)
+            probabilites = scipy.special.expit((1 - distances) / self.temperature)
         else:
-            probabilites = scipy.special.softmax(distances / self.temperature, axis=1)
+            probabilites = scipy.special.softmax((1 - distances) / self.temperature, axis=1)
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
