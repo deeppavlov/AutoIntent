@@ -26,7 +26,7 @@ def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
 
         text = utterance.text
         if utterance.type == UtteranceType.multilabel:
-            for label in utterance.label:
+            for label in utterance.label:  # type: ignore[union-attr]
                 intent_utterances[label].append(text)
         else:
             intent_utterances[utterance.label].append(text)
