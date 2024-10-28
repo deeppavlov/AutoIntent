@@ -2,9 +2,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from autointent.context.data_handler.schemas import Utterance
+from autointent.context.data_handler.schemas import Intent, Utterance
 from autointent.generation.description_generation import (
     create_intent_description,
+    generate_intent_descriptions,
     get_utterances_by_id,
 )
 from autointent.generation.prompt_scheme import PromptDescription
@@ -171,24 +172,87 @@ async def test_create_intent_description_large_utterances_patterns():
 
 
 @pytest.mark.asyncio
-async def test_create_intent_description_invalid_response_type():
+async def test_generate_intent_descriptions_basic():
     client = AsyncMock()
     mock_create = client.chat.completions.create
-    mock_create.return_value = AsyncMock(choices=[Mock(message=Mock(content=["Unexpected list type"]))])
+    mock_create.return_value = AsyncMock(choices=[Mock(message=Mock(content="Generated description"))])
 
-    utterances = ["Hi", "Hello"]
-    regexp_patterns = ["^hello$", "^hi$"]
-    prompt = PromptDescription(
-        text="Describe intent {intent_name} with examples: {user_utterances} and patterns: {regexp_patterns}"
+    intent_utterances = {1: ["Hello", "Hi"], 2: ["Goodbye", "See you"]}
+    intents = [
+        Intent(id=1, name="Greeting", description=None, regexp_full_match=[], regexp_partial_match=[]),
+        Intent(id=2, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
+    ]
+    prompt = PromptDescription(text="Describe intent {intent_name} with examples: {user_utterances}")
+
+    updated_intents = await generate_intent_descriptions(
+        client=client,
+        intent_utterances=intent_utterances,
+        intents=intents,
+        prompt=prompt,
+        model_name="gpt4o-mini",
     )
 
-    with pytest.raises(TypeError, match="Unexpected response type: expected str, got list"):
-        await create_intent_description(
-            client=client,
-            intent_name="Greeting",
-            utterances=utterances,
-            regexp_patterns=regexp_patterns,
-            prompt=prompt,
-            model_name="gpt4o-mini",
-        )
-    mock_create.assert_called_once()
+    assert all(intent.description == "Generated description" for intent in updated_intents)
+    assert mock_create.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_generate_intent_descriptions_skip_existing_descriptions():
+    client = AsyncMock()
+    mock_create = client.chat.completions.create
+    mock_create.return_value = AsyncMock(choices=[Mock(message=Mock(content="Generated description"))])
+
+    intent_utterances = {1: ["Hello", "Hi"], 2: ["Goodbye", "See you"]}
+    intents = [
+        Intent(
+            id=1, name="Greeting", description="Existing description", regexp_full_match=[], regexp_partial_match=[]
+        ),
+        Intent(id=2, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
+    ]
+    prompt = PromptDescription(text="Describe intent {intent_name} with examples: {user_utterances}")
+
+    updated_intents = await generate_intent_descriptions(
+        client=client,
+        intent_utterances=intent_utterances,
+        intents=intents,
+        prompt=prompt,
+        model_name="gpt4o-mini",
+    )
+
+    assert updated_intents[0].description == "Existing description"
+    assert updated_intents[1].description == "Generated description"
+    assert mock_create.call_count == 1  # Only one call for the second intent
+
+
+@pytest.mark.asyncio
+async def test_generate_intent_descriptions_empty_utterances_patterns():
+    client = AsyncMock()
+    mock_create = client.chat.completions.create
+    mock_create.return_value = AsyncMock(choices=[Mock(message=Mock(content="Generated description"))])
+
+    intent_utterances = {}  # No utterances for any intent
+    intents = [
+        Intent(id=1, name="Greeting", description=None, regexp_full_match=[], regexp_partial_match=[]),
+    ]
+    prompt = PromptDescription(text="Describe intent {intent_name} with examples: {user_utterances}")
+
+    updated_intents = await generate_intent_descriptions(
+        client=client,
+        intent_utterances=intent_utterances,
+        intents=intents,
+        prompt=prompt,
+        model_name="gpt4o-mini",
+    )
+
+    # Assertions
+    assert updated_intents[0].description == "Generated description"
+    mock_create.assert_called_once_with(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt.text.format(intent_name="Greeting", user_utterances="", regexp_patterns=""),
+            }
+        ],
+        model="gpt4o-mini",
+        temperature=0.2,
+    )
