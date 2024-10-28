@@ -5,7 +5,7 @@ from typing import TypedDict
 import numpy as np
 import scipy
 from numpy.typing import NDArray
-from scipy.spatial.distance import cdist
+from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
@@ -25,7 +25,6 @@ class DescriptionScorer(ScoringModule):
     _vector_index: VectorIndex
 
     def __init__(self, temperature: float = 1.0) -> None:
-        self.similarity_metric = "cosine"
         self.temperature = temperature
 
     def fit(self, context: Context) -> None:
@@ -55,10 +54,7 @@ class DescriptionScorer(ScoringModule):
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         utterance_vectors = self._vector_index.embedder.embed(utterances)
-        distances: NDArray[np.float64] = cdist(
-            utterance_vectors, self.description_vectors, metric=self.similarity_metric
-        )
-        similarities = 1 - distances
+        similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self.description_vectors)
 
         if self._multilabel:
             probabilites = scipy.special.expit(similarities / self.temperature)

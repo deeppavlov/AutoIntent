@@ -9,9 +9,7 @@ from autointent.modules import DescriptionScorer
 
 @pytest.mark.parametrize(("expected_prediction"), [([[1, 0, 0, 0], [1, 0, 0, 0]])])
 @pytest.mark.parametrize("multilabel", [True, False])
-def test_description_scorer(
-    setup_environment, load_clinc_subset, expected_prediction, dump_dir, multilabel
-):
+def test_description_scorer(setup_environment, load_clinc_subset, expected_prediction, dump_dir, multilabel):
     run_name, db_dir = setup_environment
     dataset = load_clinc_subset("description")
 
