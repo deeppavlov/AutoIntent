@@ -14,9 +14,16 @@ class VectorIndex:
     index: faiss.Index
     embedder: Embedder
 
-    def __init__(self, model_name: str, device: str, embedder_batch_size: int = 1) -> None:
+    def __init__(
+        self, model_name: str, device: str, embedder_batch_size: int = 1, embedder_max_length: int | None = None
+    ) -> None:
         self.model_name = model_name
-        self.embedder = Embedder(model_name=model_name, embedder_batch_size=embedder_batch_size, device=device)
+        self.embedder = Embedder(
+            model_name=model_name,
+            batch_size=embedder_batch_size,
+            device=device,
+            max_length=embedder_max_length,
+        )
         self.device = device
 
         self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
@@ -114,7 +121,7 @@ class VectorIndex:
         if dir_path is None:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedding_model = Embedder(model_path=dir_path / "embedding_model")
+        self.embedder = Embedder(model_path=dir_path / "embedding_model", device=self.device)
         with (dir_path / "texts.txt").open() as file:
             self.texts = json.load(file)
         with (dir_path / "labels.txt").open() as file:

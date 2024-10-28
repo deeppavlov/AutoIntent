@@ -69,10 +69,7 @@ class LinearScorer(ScoringModule):
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        pass
-        # it doesn't look like a good idea to try and delete someone's internal attribute
-        # self._embedder.cpu()
-        # del self._embedder
+        self._embedder.delete()
 
     def dump(self, path: str) -> None:
         metadata = LinearScorerDumpDict(
@@ -107,4 +104,4 @@ class LinearScorer(ScoringModule):
 
         # load sentence transformer model
         embedder_dir = dump_dir / self.embedding_model_subdir
-        self._embedder = Embedder(model_path=embedder_dir, device=metadata["device"])
+        self._embedder = Embedder(device=metadata["device"], model_path=embedder_dir)

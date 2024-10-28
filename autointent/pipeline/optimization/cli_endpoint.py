@@ -37,6 +37,7 @@ def main(cfg: OptimizationConfig) -> None:
         dump_dir,
         cfg.force_multilabel,
         cfg.embedder_batch_size,
+        cfg.embedder_max_length,
     )
 
     # run optimization
