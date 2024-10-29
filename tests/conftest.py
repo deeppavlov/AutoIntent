@@ -22,17 +22,13 @@ def setup_environment() -> tuple[str, str]:
     return get_db_dir, dump_dir, logs_dir
 
 
-@pytest.fixture
-def load_clinc_subset():
-    def _load_data(dataset_type: DATASET_TYPE) -> Dataset:
-        dataset_path = ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")
-        return load_data(dataset_path)
-
-    return _load_data
+def load_clinc_subset(dataset_type):
+    dataset_path = ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")
+    return load_data(dataset_path)
 
 
 @pytest.fixture
-def context(load_clinc_subset, setup_environment):
+def context(setup_environment):
     db_dir, dump_dir, logs_dir = setup_environment
 
     def _get_context(dataset_type: DATASET_TYPE) -> Context:

@@ -71,7 +71,7 @@ class KNNScorer(ScoringModule):
             weights=weights,
             n_classes=context.n_classes,
             multilabel=context.multilabel,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             device=context.device,
         )
 

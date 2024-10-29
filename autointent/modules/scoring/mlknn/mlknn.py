@@ -73,7 +73,7 @@ class MLKnnScorer(ScoringModule):
             model_name=model_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             device=context.device,
         )
 
@@ -92,7 +92,7 @@ class MLKnnScorer(ScoringModule):
         )
 
         self.features = (
-            self.vector_index.embed(utterances)
+            self.vector_index.embedder.embed(utterances)
             if self.vector_index.is_empty()
             else self.vector_index.get_all_embeddings()
         )

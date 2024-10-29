@@ -30,8 +30,6 @@ class VectorIndex:
         self.texts: list[str] = []
 
     def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
-        self.texts = texts
-
         embeddings = self.embedder.embed(texts)
 
         if not hasattr(self, "index"):
@@ -64,6 +62,9 @@ class VectorIndex:
         distances = 1 - cos_sim
 
         results = []
+        mm = indices.max()
+        if indices.max() > len(self.labels):
+            pass
         for inds, dists in zip(indices, distances, strict=True):
             cur_res = []
             for ind, dist in zip(inds, dists, strict=True):

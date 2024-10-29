@@ -16,7 +16,7 @@ def test_base_knn(setup_environment, load_clinc_subset):
         db_dir=db_dir(),
     )
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir}
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir()}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate)
@@ -32,7 +32,7 @@ def test_base_knn(setup_environment, load_clinc_subset):
     )
 
     scorer = KNNScorer(
-        k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir, n_classes=3, multilabel=False
+        k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), n_classes=3, multilabel=False
     )
 
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)

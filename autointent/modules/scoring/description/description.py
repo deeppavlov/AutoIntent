@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, Any
+from typing_extensions import Self
 
 import numpy as np
 import scipy
@@ -9,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
 
 
@@ -21,19 +23,33 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
 
 class DescriptionScorer(ScoringModule):
-    metadata_dict_name: str = "metadata.json"
     weights_file_name: str = "description_vectors.npy"
     _vector_index: VectorIndex
 
-    def __init__(self, temperature: float = 1.0) -> None:
+    def __init__(self,db_dir: Path, model_name: str, n_classes: int,  multilabel: bool = True, temperature: float = 1.0, device: str = "cpu") -> None:
         self.temperature = temperature
+        self._n_classes = n_classes
+        self._multilabel = multilabel
+        self.device = device
+        self.db_dir = db_dir
+        self.model_name = model_name
 
-    def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
-        self._vector_index = context.get_best_index()
-        self._n_classes = context.n_classes
+    @classmethod
+    def from_context(cls, context: Context, model_name: str = "sentence-transformers/all-MiniLM-L6-v2", temperature: float = 1.0, **kwargs: dict[str, Any]) -> Self:
+        return cls(
+            n_classes=context.n_classes,
+            multilabel=context.multilabel,
+            temperature=temperature,
+            device=context.device,
+            db_dir=context.db_dir,
+            model_name=model_name,
+        )
 
-        descriptions = context.data_handler.label_description
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], descriptions: list[str | None] | None = None, **kwargs: dict[str, Any]) -> None:
+        vector_index_client = VectorIndexClient(self.device, str(self.db_dir))
+        self.vector_index = vector_index_client.get_or_create_index(self.model_name)
+        self.vector_index.add(utterances, labels)
+
         if any(description is None for description in descriptions):
             error_text = (
                 "Some intent descriptions (label_description) are missing (None). "
@@ -46,8 +62,8 @@ class DescriptionScorer(ScoringModule):
         )
 
         self.metadata = DescriptionScorerDumpMetadata(
-            device=context.device,
-            db_dir=str(context.db_dir),
+            device=self.device,
+            db_dir=str(self.db_dir),
             n_classes=self._n_classes,
             multilabel=self._multilabel,
             model_name=self._vector_index.model_name,
@@ -79,7 +95,7 @@ class DescriptionScorer(ScoringModule):
         self.description_vectors = np.load(dump_dir / self.weights_file_name)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = json.load(file)
+            self.metadata: DescriptionScorerDumpMetadata = json.load(file)
 
         self._n_classes = self.metadata["n_classes"]
         self._multilabel = self.metadata["multilabel"]

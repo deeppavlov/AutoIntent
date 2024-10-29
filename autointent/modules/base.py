@@ -1,17 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 from autointent.metrics import METRIC_FN
-
-
-class BaseMetadataDict(TypedDict):
-    pass
 
 
 class Module(ABC):

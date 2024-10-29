@@ -5,11 +5,11 @@ from autointent.modules import LinearScorer, VectorDBModule
 
 
 def test_base_linear(context, setup_environment):
-    run_name, db_dir = setup_environment
+    get_db_dir, dump_dir, logs_dir = setup_environment
 
     context = context("multiclass")
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": db_dir}
+    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": get_db_dir()}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     metric_value = vector_db.score(context, retrieval_hit_rate)
@@ -24,7 +24,7 @@ def test_base_linear(context, setup_environment):
         module_dump_dir="",
     )
 
-    scorer = LinearScorer(db_dir)
+    scorer = LinearScorer(get_db_dir())
 
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_roc_auc)

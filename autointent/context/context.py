@@ -27,14 +27,14 @@ class Context:
             dataset, test_dataset, random_seed=seed, force_multilabel=force_multilabel, augmenter=augmenter
         )
         self.optimization_info = OptimizationInfo()
-        self.vector_index_client = VectorIndexClient(device, db_dir, embedder_batch_size, embedder_max_length)
+        self.db_dir: Path | None = Path(db_dir) if db_dir is not None else None
+        self.vector_index_client = VectorIndexClient(device, str(self.db_dir), embedder_batch_size, embedder_max_length)
 
         self.embedder_batch_size = embedder_batch_size
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
-        self.db_dir = db_dir
         self.dump_dir = Path.cwd() / "modules_dumps" if dump_dir is None else Path(dump_dir)
 
     def get_best_index(self) -> VectorIndex:

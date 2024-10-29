@@ -12,13 +12,14 @@ from autointent.configs.optimization_cli import (
 )
 from autointent.pipeline import PipelineOptimizer
 from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
+from tests.conftest import load_clinc_subset
 
 
 @pytest.mark.parametrize(
     "dataset_type",
     ["multiclass", "multilabel"],
 )
-def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset_type):
+def test_full_pipeline(setup_environment, get_config, dataset_type):
     db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset(dataset_type)

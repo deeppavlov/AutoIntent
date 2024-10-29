@@ -36,11 +36,16 @@ def test_description_scorer(setup_environment, load_clinc_subset, expected_predi
     mock_vector_index.model_name = "mock-model"
     context.get_best_index = Mock(return_value=mock_vector_index)
 
-    scorer = DescriptionScorer(temperature=0.1)
+    scorer = DescriptionScorer(
+        model_name="sergeyzh/rubert-tiny-turbo",
+        db_dir=db_dir(),
+        n_classes=3,
+        temperature=0.1
+    )
 
-    scorer.fit(context)
+    scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     assert scorer.description_vectors.shape[0] == len(context.data_handler.label_description)
-    assert scorer.metadata["model_name"] == "mock-model"
+    assert scorer.metadata["model_name"] == "sergeyzh/rubert-tiny-turbo"
 
     test_utterances = [
         "What is the balance on my account?",

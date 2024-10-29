@@ -50,7 +50,7 @@ class VectorDBModule(RetrievalModule):
         return cls(
             k=k,
             model_name=model_name,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             device=context.device,
             embedding_batch_size=context.embedder_batch_size,
         )
@@ -59,7 +59,7 @@ class VectorDBModule(RetrievalModule):
         self.vector_index_client_kwargs = {
             "device": self.device,
             "db_dir": str(self.db_dir),
-            "embedder_batch_size": self.embedder_batch_size,
+            "embedder_batch_size": self.embedding_batch_size,
         }
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
@@ -82,13 +82,13 @@ class VectorDBModule(RetrievalModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open("w") as file:
-            json.dump(self.metadata, file, indent=4)
+            json.dump(self.vector_index_client_kwargs, file, indent=4)
         self.vector_index.dump(dump_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
-            self.metadata: VectorDBMetadata = json.load(file)
+            self.vector_index_client_kwargs: VectorDBMetadata = json.load(file)
 
         vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
         self.vector_index = vector_index_client.get_index(self.model_name)
