@@ -100,7 +100,7 @@ class VectorIndexClient:
     def get_or_create_index(self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE],) -> VectorIndex:
         try:
             res = self.get_index(model_name)
-            res.add(utterances, labels)
+            # res.add(utterances, labels)
         except NonExistentIndexError:
             res = self.create_index(model_name, utterances, labels)
         return res

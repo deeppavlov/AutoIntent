@@ -111,7 +111,7 @@ class MLKnnScorer(ScoringModule):
 
         neighbors_labels = self._get_neighbors(self.features)
 
-        for i in range(self.features.shape[0]):
+        for i in range(self.labels.shape[0]):
             deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
             idx_helper = np.arange(self.n_classes)
             deltas_idx = deltas[idx_helper]

@@ -75,7 +75,7 @@ class DNNCScorer(ScoringModule):
             train_head=train_head,
             n_classes=context.n_classes,
             device=context.device,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
         )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
