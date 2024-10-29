@@ -22,6 +22,7 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
 class DescriptionScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
+    weights_file_name: str = "description_vectors.npy"
     _vector_index: VectorIndex
 
     def __init__(self, temperature: float = 1.0) -> None:
@@ -70,8 +71,12 @@ class DescriptionScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
 
+        np.save(dump_dir / self.weights_file_name, self.description_vectors)
+
     def load(self, path: str) -> None:
         dump_dir = Path(path)
+
+        self.description_vectors = np.load(dump_dir / self.weights_file_name)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata = json.load(file)
@@ -80,4 +85,4 @@ class DescriptionScorer(ScoringModule):
         self._multilabel = self.metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        self._vector_index = vector_index_client.get_index(self.metadata["model_name"])
