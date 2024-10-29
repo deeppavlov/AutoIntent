@@ -12,7 +12,7 @@ class OptimizationConfig:
     dataset_path: str = ""
     test_path: str = ""
     db_dir: str = ""
-    logs_dir: str = "./outputs"
+    logs_dir: str = ""
     run_name: str = ""
     device: str = "cuda:0"
     regex_sampling: int = 0
@@ -43,7 +43,7 @@ logger_config = {
             "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
         },
     },
-    "root": {"level": "INFO", "handlers": ["console", "file"]},
+    "root": {"level": "ERROR", "handlers": ["console", "file"]},
     "disable_existing_loggers": "false",
 }
 
