@@ -24,10 +24,11 @@ class VectorDBMetadata(BaseMetadataDict):
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
-    def __init__(self, k: int, model_name: str, db_dir: str, device: str = "cpu") -> None:
+    def __init__(self, k: int, model_name: str, db_dir: str, device: str = "cpu", embedding_batch_size: int = 1) -> None:
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
+        self.embedding_batch_size = embedding_batch_size
 
         self.metadata = VectorDBMetadata(
             k=k,
@@ -51,9 +52,15 @@ class VectorDBModule(RetrievalModule):
             model_name=model_name,
             db_dir=context.db_dir,
             device=context.device,
+            embedding_batch_size=context.embedder_batch_size,
         )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+        self.vector_index_client_kwargs = {
+            "device": self.device,
+            "db_dir": str(self.db_dir),
+            "embedder_batch_size": self.embedder_batch_size,
+        }
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
@@ -83,10 +90,7 @@ class VectorDBModule(RetrievalModule):
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
             self.metadata: VectorDBMetadata = json.load(file)
 
-        vector_index_client = VectorIndexClient(
-            db_dir=self.metadata["db_dir"],
-            device=self.metadata["device"],
-        )
+        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:

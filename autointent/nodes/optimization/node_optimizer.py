@@ -65,8 +65,8 @@ class NodeOptimizer:
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
-    def get_module_dump_dir(self, dump_dir: str, module_type: str, j_combination: int) -> str:
-        dump_dir_ = Path(dump_dir) / self.node_info.node_type / module_type / f"comb_{j_combination}"
+    def get_module_dump_dir(self, dump_dir: Path, module_type: str, j_combination: int) -> str:
+        dump_dir_ = dump_dir / self.node_info.node_type / module_type / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 

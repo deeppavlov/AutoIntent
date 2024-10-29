@@ -31,29 +31,36 @@ pip install .
 В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
 Примеры использования:
 ```bash
-autointent dataset_path=default-multiclass
-autointent dataset_path=default-multilabel
-autointent dataset_path=data/intent_records/ac_robotic_new.json \
-    force_multilabel=true \
-    logs_dir=experiments/multiclass_as_multilabel/ \
-    run_name=robotics_new_testing \
-    regex_sampling=10 \
-    multilabel_generation_config="[0, 4000, 1000]"
-autointent dataset_path=data/intent_records/ac_robotic_new.json \
-           test_path=data/intent_records/ac_robotic_val.json \
-           force_multilabel=true \
-           regex_sampling=20
-autointent dataset_path=default-multiclass \
-           test_path=data/intent_records/banking77_test.json
+autointent data.train_path=default-multiclass
+autointent data.train_path=default-multilabel hydra.job_logging.root.level=INFO
+autointent data.train_path=data/intent_records/ac_robotic_new.json \
+    data.force_multilabel=true \
+    logs.dirpath=experiments/multiclass_as_multilabel/ \
+    logs.run_name=robotics_new_testing \
+    augmentation.regex_sampling=10 \
+    augmentation.multilabel_generation_config="[0, 4000, 1000]"
+autointent data.train_path=data/intent_records/ac_robotic_new.json \
+           data.test_path=data/intent_records/ac_robotic_val.json \
+           data.force_multilabel=true \
+           augmentation.regex_sampling=20
+autointent data.train_path=default-multiclass \
+           data.test_path=data/intent_records/banking77_test.json \
+           seed=42
 ```
 
-Все опции:
+Все опции (по группам):
 ```
+seed               Affects the randomness
+
+== task ==
+
 search_space_path  Path to a yaml configuration file that defines the
                    optimization search space. Omit this to use the
                    default configuration.
 
-dataset_path       Path to a json file with training data. Set to
+== data ==
+
+train_path       Path to a json file with training data. Set to
                    "default" to use banking77 data stored within the
                    autointent package.
 
@@ -61,16 +68,28 @@ test_path          Path to a json file with test records. Skip this
                    option if you want to use a random subset of the
                    training sample as test data.
 
-db_dir             Location where to save faiss database file. Omit to
-                   use your system's default cache directory.
+force_multilabel  Set to true if your data is multiclass but you want to
+                  train the multilabel classifier.
 
-logs_dir           Location where to save optimization logs that will be
+== logs ==
+
+dirpath            Location where to save optimization logs that will be
                    saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
                    Omit to use current working directory.
 
 run_name           Name of the run prepended to optimization assets dirname
 
+log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+                   Omit to use ERROR by default.
+
+== vector_index ==
+
+db_dir             Location where to save faiss database file. Omit to
+                   use your system's default cache directory.
+
 device             Specify device in torch notation
+
+== augmentation ==
 
 regex_sampling     Number of shots per intent to sample from regular
                    expressions. This option extends sample utterances
@@ -78,7 +97,8 @@ regex_sampling     Number of shots per intent to sample from regular
 
 seed               Affects the data partitioning
 
-log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+hydra.job_logging.root.level
+                   String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
                    Omit to use ERROR by default.
 
 multilabel_generation_config 
@@ -86,9 +106,6 @@ multilabel_generation_config
                    label examples, 40 two-label examples, 20 three-label
                    examples, 10 four-label examples. This option extends
                    multilabel utterance records.
-
-force_multilabel  Set to true if your data is multiclass but you want to
-                  train the multilabel classifier.
 ```
 
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
@@ -100,8 +117,8 @@ force_multilabel  Set to true if your data is multiclass but you want to
 После проведённой оптимизации найденный классификатор можно загрузить и использовать для предсказания:
 ```bash
 autointent \
-    dataset_path="tests/assets/data/clinc_subset_multiclass.json" \
-    search_space_path="tests/assets/configs/multiclass.yaml"
+    data.train_path="tests/assets/data/clinc_subset_multiclass.json" \
+    task.search_space_path="tests/assets/configs/multiclass.yaml"
 autointent-inference \
     data_path="experiments/hydra-configs/data/utterances.json" \
     source_dir="tasty_auk_10-21-2024_14-24-48" \
@@ -110,7 +127,7 @@ autointent-inference \
 
 Все опции инференса:
 ```
-data_path    Path to a json list of string containing with utterances
+data_path    Path to a json list of string containing utterances
              for which you want to make a prediction.
 
 source_dir   Path to a directory with optimization assets.

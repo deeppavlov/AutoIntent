@@ -55,6 +55,7 @@ class Intent(BaseModel):
     tags: list[str] = []
     regexp_full_match: list[str] = []
     regexp_partial_match: list[str] = []
+    description: str | None = None
 
 
 class Dataset(BaseModel):

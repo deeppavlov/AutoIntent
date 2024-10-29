@@ -6,6 +6,7 @@ from typing import Any
 
 from autointent.custom_types import LABEL_TYPE
 
+from .cache import get_db_dir
 from .vector_index import VectorIndex
 
 DIRNAMES_TYPE = dict[str, str]
@@ -14,24 +15,26 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str, **kwargs: dict[str, Any]) -> None:  # noqa: ARG002
+    def __init__(self, device: str, db_dir: str,         embedder_batch_size: int = 1,
+        embedder_max_length: int | None = None,
+**kwargs: dict[str, Any]) -> None:  # noqa: ARG002
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.db_dir = Path(db_dir)
+        self.db_dir = get_db_dir(db_dir)
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
 
     def create_index(
-        self, model_name: str, utterances: list[str] | None = None, labels: list[LABEL_TYPE] | None = None
+        self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE]
     ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
         """
         self._logger.info("Creating index for model: %s", model_name)
 
-        index = VectorIndex(model_name, self.device)
-
-        if utterances is not None and labels is not None:
-            index.add(utterances, labels)
-            index.dump(self._get_dump_dirpath(model_name))
+        index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
+        index.add(utterances, labels)
+        index.dump(self._get_dump_dirpath(model_name))
 
         self._add_index_dirname(model_name, str(self.db_dir))
 
@@ -84,7 +87,7 @@ class VectorIndexClient:
     def get_index(self, model_name: str) -> VectorIndex:
         dirpath = self._get_index_dirpath(model_name)
         if dirpath is not None:
-            index = VectorIndex(model_name, self.device)
+            index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
             index.load(dirpath)
             return index
 

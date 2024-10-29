@@ -13,13 +13,13 @@ def data_handler():
 
 
 def test_vector_index_initialization(setup_environment):
-    run_name, db_dir = setup_environment
-    vector_index_client = VectorIndexClient("cpu", db_dir)
+    db_dir, dump_dir, logs_dir = setup_environment
+    vector_index_client = VectorIndexClient("cpu", db_dir())
     assert vector_index_client.device == "cpu"
 
 
 def test_create_collection(data_handler, setup_environment):
-    run_name, db_dir = setup_environment
-    vector_index_client = VectorIndexClient("cpu", db_dir)
+    db_dir, dump_dir, logs_dir = setup_environment
+    vector_index_client = VectorIndexClient("cpu", db_dir())
     vector_index = vector_index_client.create_index("bert-base-uncased", data_handler)
     assert vector_index.model_name == "bert-base-uncased"
