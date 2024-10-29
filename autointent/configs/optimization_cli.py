@@ -43,7 +43,7 @@ logger_config = {
             "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
         },
     },
-    "root": {"level": "ERROR", "handlers": ["console", "file"]},
+    "root": {"level": "WARN", "handlers": ["console", "file"]},
     "disable_existing_loggers": "false",
 }
 
