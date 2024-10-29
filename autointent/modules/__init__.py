@@ -20,6 +20,7 @@ SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = {
     "dnnc": DNNCScorer,
     "knn": KNNScorer,
     "linear": LinearScorer,
+    "description": DescriptionScorer,
 }
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = {
