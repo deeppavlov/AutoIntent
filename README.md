@@ -32,7 +32,7 @@ pip install .
 Примеры использования:
 ```bash
 autointent dataset_path=default-multiclass
-autointent dataset_path=default-multilabel
+autointent dataset_path=default-multilabel hydra.job_logging.root.level=INFO
 autointent dataset_path=data/intent_records/ac_robotic_new.json \
     force_multilabel=true \
     logs_dir=experiments/multiclass_as_multilabel/ \
@@ -78,7 +78,8 @@ regex_sampling     Number of shots per intent to sample from regular
 
 seed               Affects the data partitioning
 
-log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+hydra.job_logging.root.level
+                   String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
                    Omit to use ERROR by default.
 
 multilabel_generation_config 
