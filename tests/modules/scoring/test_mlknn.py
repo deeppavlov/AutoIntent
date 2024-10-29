@@ -7,8 +7,8 @@ from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 
 
-def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
-    run_name, db_dir = setup_environment
+def test_base_mlknn(setup_environment, load_clinc_subset):
+    db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multilabel")
 
@@ -30,11 +30,7 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
     context = Context(
         dataset=dataset,
         test_dataset=test_dataset,
-        device="cpu",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-        db_dir=db_dir,
+        db_dir=db_dir(),
         dump_dir=dump_dir,
     )
 

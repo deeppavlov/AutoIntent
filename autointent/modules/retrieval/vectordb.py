@@ -19,7 +19,7 @@ class VectorDBModule(RetrievalModule):
     def fit(self, context: Context) -> None:
         self.vector_index_client_kwargs = {
             "device": context.device,
-            "db_dir": context.db_dir,
+            "db_dir": str(context.db_dir),
             "embedder_batch_size": context.embedder_batch_size,
         }
 

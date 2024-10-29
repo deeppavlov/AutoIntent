@@ -47,7 +47,7 @@ class DescriptionScorer(ScoringModule):
 
         self.metadata = DescriptionScorerDumpMetadata(
             device=context.device,
-            db_dir=context.db_dir,
+            db_dir=str(context.db_dir),
             n_classes=self._n_classes,
             multilabel=self._multilabel,
             model_name=self._vector_index.model_name,

@@ -172,4 +172,4 @@ data/RuSnips
 eurlex.json
 poetry.lock
 
-tests_logs
+tests/logs

@@ -58,7 +58,7 @@ joblib-stubs = "^1.4.2.5.20240918"
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
-"clear-cache" = "autointent.pipeline.optimization.utils.cache:clear_chroma_cache"
+"clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 
 [tool.ruff]
 line-length = 120

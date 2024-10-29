@@ -1,5 +1,4 @@
 import importlib.resources as ires
-import pathlib
 from typing import Literal
 from uuid import uuid4
 
@@ -7,17 +6,20 @@ import pytest
 
 from autointent import Context
 from autointent.context.data_handler import Dataset
-from autointent.pipeline.optimization.utils import get_db_dir, get_run_name, load_config, load_data
+from autointent.pipeline.optimization.utils import load_config, load_data
 
 DATASET_TYPE = Literal["multiclass", "multilabel"]
 
 
 @pytest.fixture
 def setup_environment() -> tuple[str, str]:
-    uuid = uuid4()
-    run_name = get_run_name(str(uuid))
-    db_dir = get_db_dir("", run_name)
-    return run_name, db_dir
+    logs_dir = ires.files("tests").joinpath("logs")
+
+    def get_db_dir():
+        return logs_dir / "db" / str(uuid4())
+
+    dump_dir = logs_dir / "modules_dump"
+    return get_db_dir, dump_dir, logs_dir
 
 
 @pytest.fixture
@@ -30,8 +32,8 @@ def load_clinc_subset():
 
 
 @pytest.fixture
-def context(load_clinc_subset, dump_dir, setup_environment):
-    run_name, db_dir = setup_environment
+def context(load_clinc_subset, setup_environment):
+    db_dir, dump_dir, logs_dir = setup_environment
 
     def _get_context(dataset_type: DATASET_TYPE) -> Context:
         return Context(
@@ -41,7 +43,7 @@ def context(load_clinc_subset, dump_dir, setup_environment):
             multilabel_generation_config="",
             regex_sampling=0,
             seed=0,
-            db_dir=db_dir,
+            db_dir=db_dir(),
             dump_dir=dump_dir,
         )
 
@@ -55,13 +57,3 @@ def get_config():
         return load_config(str(config_path), multilabel=dataset_type == "multilabel")
 
     return _get_config
-
-
-@pytest.fixture
-def logs_dir() -> pathlib.Path:
-    return pathlib.Path.cwd() / "tests_logs"
-
-
-@pytest.fixture
-def dump_dir(logs_dir) -> str:
-    return str(logs_dir / "module_dumps")

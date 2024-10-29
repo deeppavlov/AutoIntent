@@ -8,7 +8,7 @@ from autointent.modules import RegExp, VectorDBModule
 
 @pytest.mark.xfail(reason="Issues with intent_id")
 def test_base_regex(setup_environment):
-    run_name, db_dir = setup_environment
+    db_dir, dump_dir, logs_dir = setup_environment
 
     data = {
         "utterances": [
@@ -71,11 +71,8 @@ def test_base_regex(setup_environment):
 
     context = Context(
         dataset=Dataset.model_validate(data),
-        test_dataset=None,
-        device="cpu",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
+        dump_dir=dump_dir,
+        db_dir=db_dir(),
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

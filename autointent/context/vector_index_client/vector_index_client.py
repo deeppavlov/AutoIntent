@@ -5,6 +5,7 @@ from pathlib import Path
 
 from autointent.context.data_handler import DataHandler
 
+from .cache import get_db_dir
 from .vector_index import VectorIndex
 
 DIRNAMES_TYPE = dict[str, str]
@@ -14,11 +15,15 @@ class VectorIndexClient:
     model_name: str
 
     def __init__(
-        self, device: str, db_dir: str, embedder_batch_size: int = 1, embedder_max_length: int | None = None
+        self,
+        device: str = "cpu",
+        db_dir: str | Path | None = None,
+        embedder_batch_size: int = 1,
+        embedder_max_length: int | None = None,
     ) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.db_dir = Path(db_dir)
+        self.db_dir = get_db_dir(db_dir)
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
 
