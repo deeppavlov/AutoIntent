@@ -5,9 +5,10 @@ from autointent.context.data_handler import Dataset
 from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
 from autointent.modules import VectorDBModule
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
+from tests.conftest import load_clinc_subset
 
 
-def test_base_mlknn(setup_environment, load_clinc_subset):
+def test_base_mlknn(setup_environment):
     db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multilabel")

@@ -47,8 +47,7 @@ class DescriptionScorer(ScoringModule):
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], descriptions: list[str | None] | None = None, **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, str(self.db_dir))
-        self.vector_index = vector_index_client.get_or_create_index(self.model_name)
-        self.vector_index.add(utterances, labels)
+        self._vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 
         if any(description is None for description in descriptions):
             error_text = (

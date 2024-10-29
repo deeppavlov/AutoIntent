@@ -82,8 +82,7 @@ class DNNCScorer(ScoringModule):
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        self.vector_index = vector_index_client.get_or_create_index(self.search_model_name)
-        self.vector_index.add(utterances, labels)
+        self.vector_index = vector_index_client.get_or_create_index(self.search_model_name, utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)

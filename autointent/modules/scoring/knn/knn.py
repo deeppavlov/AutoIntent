@@ -77,7 +77,7 @@ class KNNScorer(ScoringModule):
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        self._vector_index = vector_index_client.get_or_create_index(self.model_name)
+        self._vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
         self._vector_index.add(utterances, labels)
 
         self.metadata = KNNScorerDumpMetadata(

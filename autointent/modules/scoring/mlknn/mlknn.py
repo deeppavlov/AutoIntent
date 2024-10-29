@@ -79,7 +79,7 @@ class MLKnnScorer(ScoringModule):
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        self.vector_index = vector_index_client.get_or_create_index(self.model_name)
+        self.vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,

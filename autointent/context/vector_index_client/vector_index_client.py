@@ -64,6 +64,8 @@ class VectorIndexClient:
     def _get_index_dirpath(self, model_name: str) -> Path | None:
         """return dirname if vector index exists, otherwise return None"""
         path = self.db_dir / "indexes_dirnames.json"
+        if not path.exists():
+            return None
         with path.open() as file:
             indexes_dirnames: DIRNAMES_TYPE = json.load(file)
         dirname = indexes_dirnames.get(model_name, None)
@@ -95,11 +97,12 @@ class VectorIndexClient:
         self._logger.error(msg)
         raise NonExistentIndexError(msg)
 
-    def get_or_create_index(self, model_name: str) -> VectorIndex:
+    def get_or_create_index(self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE],) -> VectorIndex:
         try:
             res = self.get_index(model_name)
+            res.add(utterances, labels)
         except NonExistentIndexError:
-            res = self.create_index(model_name)
+            res = self.create_index(model_name, utterances, labels)
         return res
 
 

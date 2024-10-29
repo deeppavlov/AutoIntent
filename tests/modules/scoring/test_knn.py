@@ -3,9 +3,10 @@ import numpy as np
 from autointent import Context
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import KNNScorer, VectorDBModule
+from tests.conftest import load_clinc_subset
 
 
-def test_base_knn(setup_environment, load_clinc_subset):
+def test_base_knn(setup_environment):
     db_dir, dump_dir, logs_dir = setup_environment
 
     dataset = load_clinc_subset("multiclass")
