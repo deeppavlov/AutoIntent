@@ -63,6 +63,9 @@ class DataHandler:
             dataset = dataset.to_multilabel()
 
         self.multilabel = dataset.type == DatasetType.multilabel
+        self.label_description: list[str | None] = [
+            intent.description for intent in sorted(dataset.intents, key=lambda x: x.id)
+        ]
 
         if augmenter is not None:
             dataset = augmenter(dataset)

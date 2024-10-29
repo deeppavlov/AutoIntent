@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
@@ -82,6 +83,31 @@ class OptimizationConfig:
     augmentation: AugmentationConfig = field(default_factory=AugmentationConfig)
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
 
+    defaults: list[Any] = field(
+        default_factory=lambda: ["_self_", {"override hydra/job_logging": "autointent_standard_job_logger"}]
+    )
+
+
+logger_config = {
+    "version": 1,
+    "formatters": {"simple": {"format": "%(asctime)s - %(name)s [%(levelname)s] %(message)s"}},
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+            "stream": "ext://sys.stdout",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "formatter": "simple",
+            "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
+        },
+    },
+    "root": {"level": "WARN", "handlers": ["console", "file"]},
+    "disable_existing_loggers": "false",
+}
+
 
 cs = ConfigStore.instance()
 cs.store(name="optimization_config", node=OptimizationConfig)
+cs.store(name="autointent_standard_job_logger", group="hydra/job_logging", node=logger_config)

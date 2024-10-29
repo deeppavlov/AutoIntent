@@ -25,6 +25,7 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
                 "k": [3],
                 "train_head": [False, True],
             },
+            {"module_type": "description", "temperature": [1.0, 0.5, 0.1, 0.05]},
         ],
     }
 

@@ -6,12 +6,11 @@ from autointent import Context
 from autointent.configs.optimization_cli import OptimizationConfig
 
 from .pipeline_optimizer import PipelineOptimizer
-from .utils import load_config, load_data, setup_logging
+from .utils import load_config, load_data
 
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
 def main(cfg: OptimizationConfig) -> None:
-    setup_logging(cfg.logs.level.value)
     logger = logging.getLogger(__name__)
 
     logger.debug("Run Name: %s", cfg.logs.run_name)

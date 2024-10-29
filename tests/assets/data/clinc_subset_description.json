@@ -1,30 +1,4 @@
 {
-    "intents": [
-        {
-            "id": 0,
-            "name": "accept_reservations",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "User wants to know if Red Robin accepts reservations."
-        },
-        {
-            "id": 1,
-            "name": "account_blocked",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "User wants to know why their bank account is blocked or frozen."
-        },
-        {
-            "id": 2,
-            "name": "alarm",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "User wants to set or manage an alarm."
-        }
-    ],
     "utterances": [
         {
             "text": "can i make a reservation for redrobin",
@@ -87,13 +61,58 @@
             "label": 2
         },
         {
-            "text": "how much is an overdraft fee for bank"
+            "text": "when will my application for my credit card be processed",
+            "label": 3
         },
         {
-            "text": "why are exponents preformed before multiplication in the order of operations"
+            "text": "has the discover card approved my app",
+            "label": 3
         },
         {
-            "text": "what size wipers does this car take"
+            "text": "do you know if my amex card app went through",
+            "label": 3
+        },
+        {
+            "text": "have they looked over my app for the new credit card yet",
+            "label": 3
+        },
+        {
+            "text": "has my application for the mastercard card gone through",
+            "label": 3
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": "accept_reservations",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know if Red Robin accepts reservations."
+        },
+        {
+            "id": 1,
+            "name": "account_blocked",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know why their bank account is blocked or frozen."
+        },
+        {
+            "id": 2,
+            "name": "alarm",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to set or manage an alarm."
+        },
+        {
+            "id": 3,
+            "name": "application_status",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to inquire about the status of their credit card application."
         }
     ]
 }

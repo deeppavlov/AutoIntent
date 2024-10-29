@@ -40,10 +40,7 @@ def test_full_pipeline(setup_environment, load_clinc_subset, get_config, dataset
 
 @pytest.mark.parametrize(
     ("dataset_type"),
-    [
-        "multiclass",
-        "multilabel",
-    ],
+    ["multiclass", "multilabel", "description"],
 )
 def test_optimization_pipeline_cli(dataset_type, setup_environment):
     db_dir, dump_dir, logs_dir = setup_environment

@@ -32,7 +32,7 @@ pip install .
 Примеры использования:
 ```bash
 autointent data.train_path=default-multiclass
-autointent data.train_path=default-multilabel
+autointent data.train_path=default-multilabel hydra.job_logging.root.level=INFO
 autointent data.train_path=data/intent_records/ac_robotic_new.json \
     data.force_multilabel=true \
     logs.dirpath=experiments/multiclass_as_multilabel/ \
@@ -94,6 +94,12 @@ device             Specify device in torch notation
 regex_sampling     Number of shots per intent to sample from regular
                    expressions. This option extends sample utterances
                    within multiclass intent records.
+
+seed               Affects the data partitioning
+
+hydra.job_logging.root.level
+                   String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
+                   Omit to use ERROR by default.
 
 multilabel_generation_config 
                    Config string like "[20, 40, 20, 10]" means 20 one-

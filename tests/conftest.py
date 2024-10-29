@@ -6,14 +6,13 @@ import pytest
 
 from autointent import Context
 from autointent.context.data_handler import Dataset
-from autointent.pipeline.optimization.utils import load_config, load_data, setup_logging
+from autointent.pipeline.optimization.utils import load_config, load_data
 
 DATASET_TYPE = Literal["multiclass", "multilabel"]
 
 
 @pytest.fixture
 def setup_environment() -> tuple[str, str]:
-    setup_logging("DEBUG")
     logs_dir = ires.files("tests").joinpath("logs")
 
     def get_db_dir():
