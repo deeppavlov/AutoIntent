@@ -117,8 +117,8 @@ multilabel_generation_config
 После проведённой оптимизации найденный классификатор можно загрузить и использовать для предсказания:
 ```bash
 autointent \
-    train_path="tests/assets/data/clinc_subset_multiclass.json" \
-    search_space_path="tests/assets/configs/multiclass.yaml"
+    data.train_path="tests/assets/data/clinc_subset_multiclass.json" \
+    task.search_space_path="tests/assets/configs/multiclass.yaml"
 autointent-inference \
     data_path="experiments/hydra-configs/data/utterances.json" \
     source_dir="tasty_auk_10-21-2024_14-24-48" \
