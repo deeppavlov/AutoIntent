@@ -120,20 +120,20 @@ autointent \
     train_path="tests/assets/data/clinc_subset_multiclass.json" \
     search_space_path="tests/assets/configs/multiclass.yaml"
 autointent-inference \
-    train_path="experiments/hydra-configs/data/utterances.json" \
+    data_path="experiments/hydra-configs/data/utterances.json" \
     source_dir="tasty_auk_10-21-2024_14-24-48" \
     output_path="test-infer" 
 ```
 
 Все опции инференса:
 ```
-train_path    Path to a json list of string containing with utterances
+data_path    Path to a json list of string containing utterances
              for which you want to make a prediction.
 
 source_dir   Path to a directory with optimization assets.
 
 output_path  Path to a resulting json file with predictions made for 
-             your utterances from train_path
+             your utterances from data_path
 
 log_level    String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
              Omit to use ERROR by default.
