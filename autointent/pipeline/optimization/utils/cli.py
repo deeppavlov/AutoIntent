@@ -1,6 +1,5 @@
 import importlib.resources as ires
 import json
-import logging
 from datetime import datetime
 from logging import Logger
 from pathlib import Path
@@ -40,16 +39,6 @@ def get_logs_dir(logs_dir: str, run_name: str) -> Path:
     res = logs_dir_ / run_name
     res.mkdir(parents=True)
     return res
-
-
-def setup_logging(level: str | None = None) -> logging.Logger:
-    logging.basicConfig(
-        level=level,
-        format="{asctime} - {name} - {levelname} - {message}",
-        style="{",
-        handlers=[logging.StreamHandler()],
-    )
-    return logging.getLogger(__name__)
 
 
 def load_config(config_path: str, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
