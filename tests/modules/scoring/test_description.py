@@ -37,7 +37,7 @@ def test_description_scorer(setup_environment, expected_prediction, multilabel):
     mock_vector_index.model_name = "mock-model"
     context.get_best_index = Mock(return_value=mock_vector_index)
 
-    scorer = DescriptionScorer(model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), n_classes=3, temperature=0.1)
+    scorer = DescriptionScorer(model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), temperature=0.1)
 
     scorer.fit(
         context.data_handler.utterances_train, context.data_handler.labels_train, context.data_handler.label_description

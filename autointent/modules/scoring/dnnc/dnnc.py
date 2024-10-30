@@ -40,13 +40,13 @@ class DNNCScorer(ScoringModule):
 
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
+    prebuilt_index: bool = False
 
     def __init__(
         self,
         cross_encoder_name: str,
         search_model_name: str,
         k: int,
-        n_classes: int = 3,
         db_dir: str | None = None,
         device: str = "cpu",
         train_head: bool = False,
@@ -58,7 +58,6 @@ class DNNCScorer(ScoringModule):
         self.search_model_name = search_model_name
         self.k = k
         self.train_head = train_head
-        self.n_classes = n_classes
         self.device = device
         self.db_dir = db_dir
 
@@ -66,26 +65,41 @@ class DNNCScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        cross_encoder_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
-        search_model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        k: int = 3,
+        cross_encoder_name: str,
+        k: int,
+        search_model_name: str | None = None,
         train_head: bool = False,
     ) -> Self:
-        return cls(
+        prebuilt_index = False
+        if search_model_name is None:
+            search_model_name = context.optimization_info.get_best_embedder()
+            prebuilt_index = True
+        instance = cls(
             cross_encoder_name=cross_encoder_name,
             search_model_name=search_model_name,
             k=k,
             train_head=train_head,
-            n_classes=context.n_classes,
             device=context.device,
             db_dir=str(context.db_dir),
         )
+        instance.prebuilt_index = prebuilt_index
+        return instance
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+        self.n_classes = len(set(labels))
+
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        self.vector_index = vector_index_client.get_or_create_index(self.search_model_name, utterances, labels)
+
+        if self.prebuilt_index:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            self.vector_index = vector_index_client.get_index(self.search_model_name)
+            if len(utterances) != len(self.vector_index.texts):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+        else:
+            self.vector_index = vector_index_client.create_index(self.search_model_name, utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)

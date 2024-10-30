@@ -24,7 +24,7 @@ def test_base_linear(context, setup_environment):
         module_dump_dir="",
     )
 
-    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo", db_dir=get_db_dir())
+    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
 
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_roc_auc)

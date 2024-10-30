@@ -25,22 +25,19 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
 class DescriptionScorer(ScoringModule):
     weights_file_name: str = "description_vectors.npy"
-    _vector_index: VectorIndex
+    vector_index: VectorIndex
+    prebuilt_index: bool = False
 
     def __init__(
         self,
         model_name: str,
-        n_classes: int = 3,
         db_dir: Path | None = None,
-        multilabel: bool = True,
         temperature: float = 1.0,
         device: str = "cpu",
     ) -> None:
         if db_dir is None:
             db_dir = get_db_dir()
         self.temperature = temperature
-        self._n_classes = n_classes
-        self._multilabel = multilabel
         self.device = device
         self.db_dir = db_dir
         self.model_name = model_name
@@ -49,18 +46,23 @@ class DescriptionScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        temperature: float = 1.0,
+        temperature: float,
+        model_name: str | None = None,
         **kwargs: dict[str, Any],
     ) -> Self:
-        return cls(
-            n_classes=context.n_classes,
-            multilabel=context.multilabel,
+        prebuilt_index = False
+        if model_name is None:
+            model_name = context.optimization_info.get_best_embedder()
+            prebuilt_index = True
+
+        instance = cls(
             temperature=temperature,
             device=context.device,
             db_dir=context.db_dir,
             model_name=model_name,
         )
+        instance.prebuilt_index = prebuilt_index
+        return instance
 
     def fit(
         self,
@@ -73,8 +75,23 @@ class DescriptionScorer(ScoringModule):
             msg = "Descriptions are required for training."
             raise ValueError(msg)
 
-        vector_index_client = VectorIndexClient(self.device, str(self.db_dir))
-        self._vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
+        if isinstance(labels[0], list):
+            self.n_classes = len(labels[0])
+            self.multilabel = True
+        else:
+            self.n_classes = len(set(labels))
+            self.multilabel = False
+
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+
+        if self.prebuilt_index:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            self.vector_index = vector_index_client.get_index(self.model_name)
+            if len(utterances) != len(self.vector_index.texts):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+        else:
+            self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
         if any(description is None for description in descriptions):
             error_text = (
@@ -83,30 +100,28 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = self._vector_index.embedder.embed(
-            [desc for desc in descriptions if desc is not None]
-        )
+        self.description_vectors = self.vector_index.embedder.embed([desc for desc in descriptions if desc is not None])
 
         self.metadata = DescriptionScorerDumpMetadata(
             device=self.device,
             db_dir=str(self.db_dir),
-            n_classes=self._n_classes,
-            multilabel=self._multilabel,
-            model_name=self._vector_index.model_name,
+            n_classes=self.n_classes,
+            multilabel=self.multilabel,
+            model_name=self.vector_index.model_name,
         )
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        utterance_vectors = self._vector_index.embedder.embed(utterances)
+        utterance_vectors = self.vector_index.embedder.embed(utterances)
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self.description_vectors)
 
-        if self._multilabel:
+        if self.multilabel:
             probabilites = scipy.special.expit(similarities / self.temperature)
         else:
             probabilites = scipy.special.softmax(similarities / self.temperature, axis=1)
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self._vector_index.delete()
+        self.vector_index.delete()
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -123,8 +138,8 @@ class DescriptionScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata: DescriptionScorerDumpMetadata = json.load(file)
 
-        self._n_classes = self.metadata["n_classes"]
-        self._multilabel = self.metadata["multilabel"]
+        self.n_classes = self.metadata["n_classes"]
+        self.multilabel = self.metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self._vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])

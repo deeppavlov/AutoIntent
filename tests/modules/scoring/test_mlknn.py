@@ -50,7 +50,7 @@ def test_base_mlknn(setup_environment):
         module_dump_dir="",
     )
 
-    scorer = MLKnnScorer(db_dir=db_dir(), k=3, model_name="sergeyzh/rubert-tiny-turbo", n_classes=3)
+    scorer = MLKnnScorer(db_dir=db_dir(), k=3, model_name="sergeyzh/rubert-tiny-turbo")
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_f1)
     np.testing.assert_almost_equal(score, 2 / 9)

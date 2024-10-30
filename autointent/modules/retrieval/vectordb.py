@@ -47,8 +47,8 @@ class VectorDBModule(RetrievalModule):
     def from_context(
         cls,
         context: Context,
-        k: int = 5,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        k: int,
+        model_name: str,
         **kwargs: dict[str, Any],
     ) -> Self:
         return cls(
@@ -68,7 +68,6 @@ class VectorDBModule(RetrievalModule):
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
-        self.vector_index.dump(Path(self.db_dir))
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(

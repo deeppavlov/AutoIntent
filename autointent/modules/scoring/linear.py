@@ -12,7 +12,6 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 
 from .base import ScoringModule
@@ -20,7 +19,6 @@ from .base import ScoringModule
 
 class LinearScorerDumpDict(BaseMetadataDict):
     model_name: str
-    db_dir: str
     cv: int
     n_jobs: int
     device: str
@@ -47,51 +45,68 @@ class LinearScorer(ScoringModule):
 
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
+    precomputed_embeddings: bool = False
+    db_dir: str
 
     def __init__(
         self,
         model_name: str,
-        db_dir: str | None = None,
         cv: int = 3,
         n_jobs: int = -1,
         device: str = "cpu",
         seed: int = 0,
-        multilabel: bool = False,
+        batch_size: int = 1,
+        max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
         self.cv = cv
         self.n_jobs = n_jobs
         self.device = device
-        self.db_dir = db_dir
         self.seed = seed
         self.model_name = model_name
-        self._multilabel = multilabel
+        self.batch_size = batch_size
+        self.max_length = max_length
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        cv: int = 3,
-        n_jobs: int = -1,
+        model_name: str | None = None,
     ) -> Self:
-        return cls(
+        precomputed_embeddings = False
+        if model_name is None:
+            model_name = context.optimization_info.get_best_embedder()
+            precomputed_embeddings = True
+        instance = cls(
             model_name=model_name,
-            db_dir=str(context.db_dir),
-            cv=cv,
-            n_jobs=n_jobs,
             device=context.device,
             seed=context.seed,
+            batch_size=context.embedder_batch_size,
+            max_length=context.embedder_max_length,
         )
+        instance.precomputed_embeddings = precomputed_embeddings
+        instance.db_dir = str(context.db_dir)
+        return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        utterances: list[str],
+        labels: list[LABEL_TYPE],
+        **kwargs: dict[str, Any],
+    ) -> None:
         self._multilabel = isinstance(labels[0], list)
 
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
-
-        features = vector_index.embedder.embed(utterances)
+        if self.precomputed_embeddings:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
+            vector_index = vector_index_client.get_index(self.model_name)
+            features = vector_index.get_all_embeddings()
+            if len(features) != len(utterances):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+            embedder = vector_index.embedder
+        else:
+            embedder = Embedder(self.device, self.model_name, batch_size=self.batch_size, max_length=self.max_length)
+            features = embedder.embed(utterances)
 
         if self._multilabel:
             base_clf = LogisticRegression()
@@ -102,10 +117,9 @@ class LinearScorer(ScoringModule):
         clf.fit(features, labels)
 
         self._clf = clf
-        self._embedder = vector_index.embedder
+        self._embedder = embedder
         self.metadata = LinearScorerDumpDict(
             model_name=self.model_name,
-            db_dir=self.db_dir,
             cv=self.cv,
             n_jobs=self.n_jobs,
             device=self.device,

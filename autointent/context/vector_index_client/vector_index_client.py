@@ -18,7 +18,7 @@ class VectorIndexClient:
     def __init__(
         self,
         device: str,
-        db_dir: str,
+        db_dir: str | Path | None,
         embedder_batch_size: int = 1,
         embedder_max_length: int | None = None,
         **kwargs: dict[str, Any],  # noqa: ARG002
@@ -29,19 +29,26 @@ class VectorIndexClient:
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
 
-    def create_index(self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE]) -> VectorIndex:
+    def create_index(
+        self, model_name: str, utterances: list[str] | None = None, labels: list[LABEL_TYPE] | None = None
+    ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
         """
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
-        index.add(utterances, labels)
-        index.dump(self._get_dump_dirpath(model_name))
-
-        self._add_index_dirname(model_name, str(self.db_dir))
+        if utterances is not None and labels is not None:
+            index.add(utterances, labels)
+            self.dump(index)
+        elif (utterances is not None) != (labels is not None):
+            msg = "You must provide both utterances and labels, or neither"
+            raise ValueError(msg)
 
         return index
+
+    def dump(self, index: VectorIndex) -> None:
+        index.dump(self._get_dump_dirpath(index.model_name))
 
     def _add_index_dirname(self, model_name: str, dir_name: str) -> None:
         path = self.db_dir / "indexes_dirnames.json"
@@ -96,7 +103,7 @@ class VectorIndexClient:
             index.load(dirpath)
             return index
 
-        msg = f"Index for {model_name} wasn't ever created in {dirpath}"
+        msg = f"Index for {model_name} wasn't ever created in {self.db_dir}"
         self._logger.error(msg)
         raise NonExistentIndexError(msg)
 
@@ -108,10 +115,6 @@ class VectorIndexClient:
     ) -> VectorIndex:
         try:
             res = self.get_index(model_name)
-            res.add(utterances, labels)
-            res.dump(self._get_dump_dirpath(model_name))
-
-            self._add_index_dirname(model_name, str(self.db_dir))
         except NonExistentIndexError:
             res = self.create_index(model_name, utterances, labels)
         return res

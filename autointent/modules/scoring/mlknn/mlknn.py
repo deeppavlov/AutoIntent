@@ -39,12 +39,12 @@ class MLKnnScorer(ScoringModule):
     _cond_prob_false: NDArray[np.float64]
     arrays_filename: str = "probs.npz"
     metadata: MLKnnScorerDumpMetadata
+    prebuilt_index: bool = False
 
     def __init__(
         self,
         k: int,
         model_name: str,
-        n_classes: int = 3,
         db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
@@ -52,7 +52,6 @@ class MLKnnScorer(ScoringModule):
     ) -> None:
         if db_dir is None:
             db_dir = str(get_db_dir())
-        self.n_classes = n_classes
         self.k = k
         self.model_name = model_name
         self.s = s
@@ -64,13 +63,17 @@ class MLKnnScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
-        k: int = 3,
+        k: int,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
+        model_name: str | None = None,
     ) -> Self:
-        return cls(
-            n_classes=context.n_classes,
+        prebuilt_index = False
+        if model_name is None:
+            model_name = context.optimization_info.get_best_embedder()
+            prebuilt_index = True
+
+        instance = cls(
             k=k,
             model_name=model_name,
             s=s,
@@ -78,10 +81,26 @@ class MLKnnScorer(ScoringModule):
             db_dir=str(context.db_dir),
             device=context.device,
         )
+        instance.prebuilt_index = prebuilt_index
+        return instance
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+        if not isinstance(labels[0], list):
+            msg = "mlknn scorer support only multilabel input"
+            raise TypeError(msg)
+
+        self.n_classes = len(labels[0])
+
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
-        self.vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
+
+        if self.prebuilt_index:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            self.vector_index = vector_index_client.get_index(self.model_name)
+            if len(utterances) != len(self.vector_index.texts):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+        else:
+            self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
