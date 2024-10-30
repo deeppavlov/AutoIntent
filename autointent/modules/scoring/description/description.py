@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import TypedDict
 
 import numpy as np
 import scipy
@@ -48,7 +48,6 @@ class DescriptionScorer(ScoringModule):
         context: Context,
         temperature: float,
         model_name: str | None = None,
-        **kwargs: dict[str, Any],
     ) -> Self:
         if model_name is None:
             model_name = context.optimization_info.get_best_embedder()
@@ -70,7 +69,6 @@ class DescriptionScorer(ScoringModule):
         utterances: list[str],
         labels: list[LABEL_TYPE],
         descriptions: list[str | None] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         if descriptions is None:
             msg = "Descriptions are required for training."

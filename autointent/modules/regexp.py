@@ -1,5 +1,5 @@
 import re
-from typing import Any, TypedDict
+from typing import TypedDict
 
 from typing_extensions import Self
 
@@ -23,12 +23,12 @@ class RegExp(Module):
         self.regexp_patterns = regexp_patterns
 
     @classmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
+    def from_context(cls, context: Context) -> Self:
         return cls(
             regexp_patterns=context.data_handler.regexp_patterns,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         self.regexp_patterns_compiled: list[RegexPatternsCompiled] = [
             {
                 "id": dct["id"],

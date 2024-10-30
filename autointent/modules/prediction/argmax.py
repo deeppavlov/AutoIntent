@@ -18,7 +18,7 @@ class ArgmaxPredictor(PredictionModule):
         pass
 
     @classmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
+    def from_context(cls, context: Context) -> Self:
         return cls()
 
     def fit(
@@ -26,7 +26,6 @@ class ArgmaxPredictor(PredictionModule):
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
         tags: list[Tag] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         pass
 

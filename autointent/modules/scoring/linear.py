@@ -93,7 +93,6 @@ class LinearScorer(ScoringModule):
         self,
         utterances: list[str],
         labels: list[LABEL_TYPE],
-        **kwargs: dict[str, Any],
     ) -> None:
         self._multilabel = isinstance(labels[0], list)
 

@@ -2,7 +2,6 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Any
 
 from autointent.custom_types import LABEL_TYPE
 
@@ -21,7 +20,6 @@ class VectorIndexClient:
         db_dir: str | Path | None,
         embedder_batch_size: int = 1,
         embedder_max_length: int | None = None,
-        **kwargs: dict[str, Any],  # noqa: ARG002
     ) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device

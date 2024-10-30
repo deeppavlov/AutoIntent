@@ -41,7 +41,7 @@ class ThresholdPredictor(PredictionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5, **kwargs: dict[str, Any]) -> Self:
+    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
         return cls(
             thresh=thresh,
             multilabel=context.multilabel,
@@ -53,7 +53,6 @@ class ThresholdPredictor(PredictionModule):
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
         tags: list[Tag] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         self.tags = tags
 

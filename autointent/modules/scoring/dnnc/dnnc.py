@@ -87,7 +87,7 @@ class DNNCScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         self.n_classes = len(set(labels))
 
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)

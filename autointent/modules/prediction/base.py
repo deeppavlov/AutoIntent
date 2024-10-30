@@ -21,7 +21,6 @@ class PredictionModule(Module, ABC):
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
         tags: list[Tag] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         pass
 

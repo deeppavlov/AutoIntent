@@ -46,7 +46,6 @@ class TunablePredictor(PredictionModule):
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
         tags: list[Tag] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         """
         When data doesn't contain out-of-scope utterances, using

@@ -88,7 +88,7 @@ class KNNScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         if isinstance(labels[0], list):
             self.n_classes = len(labels[0])
             self.multilabel = True

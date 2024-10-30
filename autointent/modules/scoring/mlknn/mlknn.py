@@ -85,7 +85,7 @@ class MLKnnScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         if not isinstance(labels[0], list):
             msg = "mlknn scorer support only multilabel input"
             raise TypeError(msg)

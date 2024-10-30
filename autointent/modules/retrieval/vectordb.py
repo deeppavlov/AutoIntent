@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Any
 
 from typing_extensions import Self
 
@@ -49,7 +48,6 @@ class VectorDBModule(RetrievalModule):
         context: Context,
         k: int,
         model_name: str,
-        **kwargs: dict[str, Any],
     ) -> Self:
         return cls(
             k=k,
@@ -59,7 +57,7 @@ class VectorDBModule(RetrievalModule):
             embedding_batch_size=context.embedder_batch_size,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
         self.vector_index_client_kwargs = {
             "device": self.device,
             "db_dir": str(self.db_dir),

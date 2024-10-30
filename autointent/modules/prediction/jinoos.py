@@ -17,20 +17,20 @@ default_search_space = np.linspace(0, 1, num=100)
 
 
 class JinoosPredictorDumpMetadata(BaseMetadataDict):
-    thresh: list[float]
+    thresh: float
 
 
 class JinoosPredictor(PredictionModule):
+    thresh: float
+
     def __init__(
         self,
         search_space: list[float] | None = None,
-        thresh: float | npt.NDArray[Any] = 0.5,
     ) -> None:
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
-        self._thresh = np.array(thresh)
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None, **kwargs: dict[str, Any]) -> Self:
+    def from_context(cls, context: Context, search_space: list[float] | None = None) -> Self:
         return cls(
             search_space=search_space,
         )
@@ -40,7 +40,6 @@ class JinoosPredictor(PredictionModule):
         scores: npt.NDArray[Any],
         labels: list[LABEL_TYPE],
         tags: list[Tag] | None = None,
-        **kwargs: dict[str, Any],
     ) -> None:
         """
         TODO: use dev split instead of test split
@@ -53,12 +52,12 @@ class JinoosPredictor(PredictionModule):
             metric_value = jinoos_score(labels, y_pred)
             metrics_list.append(metric_value)
 
-        self._thresh = self.search_space[np.argmax(metrics_list)]
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self._thresh.tolist())
+        self.thresh = float(self.search_space[np.argmax(metrics_list)])
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pred_classes, best_scores = _predict(scores)
-        return _detect_oos(pred_classes, best_scores, self._thresh)
+        return _detect_oos(pred_classes, best_scores, self.thresh)
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -72,7 +71,7 @@ class JinoosPredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: JinoosPredictorDumpMetadata = json.load(file)
 
-        self._thresh = np.array(metadata["thresh"])
+        self.thresh = np.array(metadata["thresh"])
         self.metadata = metadata
 
 
