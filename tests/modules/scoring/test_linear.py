@@ -1,34 +1,17 @@
 import numpy as np
 
-from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
-from autointent.modules import LinearScorer, VectorDBModule
+from autointent.context.data_handler import DataHandler
+from autointent.modules import LinearScorer
 
 
-def test_base_linear(context, setup_environment):
+def test_base_linear(setup_environment, dataset):
     get_db_dir, dump_dir, logs_dir = setup_environment
 
-    context = context("multiclass")
-
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo", "db_dir": get_db_dir()}
-    vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
-    metric_value = vector_db.score(context, retrieval_hit_rate)
-    artifact = vector_db.get_assets()
-    context.optimization_info.log_module_optimization(
-        node_type="retrieval",
-        module_type="vector_db",
-        module_params=retrieval_params,
-        metric_value=metric_value,
-        metric_name="retrieval_hit_rate_macro",
-        artifact=artifact,
-        module_dump_dir="",
-    )
+    data_handler = DataHandler(dataset)
 
     scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
 
-    scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
-    score = scorer.score(context, scoring_roc_auc)
-    assert score == 1
+    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

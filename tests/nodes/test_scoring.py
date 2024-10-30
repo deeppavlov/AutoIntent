@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
-    context = context("multiclass")
+    context = context(multilabel=False)
     retrieval_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
@@ -61,7 +61,7 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
 
 
 def test_scoring_multilabel(context, retrieval_optimizer_multilabel):
-    context = context("multilabel")
+    context = context(multilabel=True)
     retrieval_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
