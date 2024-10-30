@@ -2,10 +2,10 @@ from .base import Module
 from .prediction import (
     ArgmaxPredictor,
     JinoosPredictor,
+    LogitAdaptivnessPredictor,
     PredictionModule,
     ThresholdPredictor,
     TunablePredictor,
-    LogitAdaptivnessPredictor
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
@@ -34,7 +34,7 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "jinoos": JinoosPredictor,
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
-    "logit_adapt": LogitAdaptivnessPredictor 
+    "logit_adapt": LogitAdaptivnessPredictor
 }
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
