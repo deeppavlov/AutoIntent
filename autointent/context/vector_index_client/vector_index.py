@@ -62,9 +62,6 @@ class VectorIndex:
         distances = 1 - cos_sim
 
         results = []
-        indices.max()
-        if indices.max() > len(self.labels):
-            pass
         for inds, dists in zip(indices, distances, strict=True):
             cur_res = []
             for ind, dist in zip(inds, dists, strict=True):
