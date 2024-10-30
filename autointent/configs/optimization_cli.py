@@ -6,6 +6,7 @@ from typing import Any
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
+from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LogLevel
 from autointent.pipeline.optimization.utils import generate_name
 
@@ -57,7 +58,7 @@ class LoggingConfig:
 
 @dataclass
 class VectorIndexConfig:
-    db_dir: Path | None = None
+    db_dir: Path = get_db_dir()  # noqa: RUF009
     device: str = "cpu"
 
 

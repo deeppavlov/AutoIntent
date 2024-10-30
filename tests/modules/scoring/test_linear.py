@@ -24,7 +24,7 @@ def test_base_linear(context, setup_environment):
         module_dump_dir="",
     )
 
-    scorer = LinearScorer(get_db_dir())
+    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo", db_dir=get_db_dir())
 
     scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
     score = scorer.score(context, scoring_roc_auc)
@@ -40,30 +40,18 @@ def test_base_linear(context, setup_environment):
     np.testing.assert_almost_equal(
         np.array(
             [
+                [0.17929172, 0.59130114, 0.22940714],
+                [0.15927979, 0.62363961, 0.2170806],
                 [
-                    0.10645702,
-                    0.78091989,
-                    0.11262309,
+                    0.20069508,
+                    0.53883687,
+                    0.26046804,
                 ],
+                [0.17557001, 0.61310582, 0.21132417],
                 [
-                    0.06595671,
-                    0.84008038,
-                    0.09396291,
-                ],
-                [
-                    0.12650829,
-                    0.73910616,
-                    0.13438556,
-                ],
-                [
-                    0.06949465,
-                    0.84499476,
-                    0.08551059,
-                ],
-                [
-                    0.07943653,
-                    0.81020573,
-                    0.11035774,
+                    0.17911179,
+                    0.63123131,
+                    0.1896569,
                 ],
             ]
         ),

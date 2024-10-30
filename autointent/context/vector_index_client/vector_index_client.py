@@ -108,7 +108,10 @@ class VectorIndexClient:
     ) -> VectorIndex:
         try:
             res = self.get_index(model_name)
-            # res.add(utterances, labels)
+            res.add(utterances, labels)
+            res.dump(self._get_dump_dirpath(model_name))
+
+            self._add_index_dirname(model_name, str(self.db_dir))
         except NonExistentIndexError:
             res = self.create_index(model_name, utterances, labels)
         return res

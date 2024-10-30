@@ -91,9 +91,7 @@ class LinearScorer(ScoringModule):
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
         vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 
-        features = (
-            vector_index.embedder.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
-        )
+        features = vector_index.embedder.embed(utterances)
 
         if self._multilabel:
             base_clf = LogisticRegression()
