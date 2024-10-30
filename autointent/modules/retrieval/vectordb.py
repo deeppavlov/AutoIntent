@@ -12,6 +12,7 @@ from autointent.metrics import RetrievalMetricFn
 from autointent.modules.base import BaseMetadataDict
 
 from .base import RetrievalModule
+from autointent.context.vector_index_client.cache import get_db_dir
 
 
 class VectorDBMetadata(BaseMetadataDict):
@@ -24,7 +25,7 @@ class VectorDBMetadata(BaseMetadataDict):
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
-    def __init__(self, k: int, model_name: str, db_dir: str, device: str = "cpu", embedding_batch_size: int = 1) -> None:
+    def __init__(self, k: int, model_name: str, db_dir: str = get_db_dir(), device: str = "cpu", embedding_batch_size: int = 1) -> None:
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
