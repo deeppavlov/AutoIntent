@@ -8,8 +8,8 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
-from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES
-from autointent.modules.base import BaseMetadataDict
+from autointent.context.vector_index_client.cache import get_db_dir
+from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES, BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
@@ -34,9 +34,9 @@ class KNNScorer(ScoringModule):
         model_name: str,
         k: int,
         weights: WEIGHT_TYPES,
-        n_classes: int,
-        multilabel: bool,
-        db_dir: str,
+        n_classes: int = 3,
+        multilabel: bool = False,
+        db_dir: str | None = None,
         device: str = "cpu",
     ) -> None:
         """
@@ -49,6 +49,8 @@ class KNNScorer(ScoringModule):
             - closest: each sample has a non zero weight iff is the closest sample of some class
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
+        if db_dir is None:
+            db_dir = str(get_db_dir())
         self.model_name = model_name
         self.k = k
         self.weights = weights

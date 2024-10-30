@@ -1,8 +1,9 @@
+from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
-from autointent.custom_types import BaseMetadataDict
 from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
@@ -24,7 +25,7 @@ class OptimizationInfo:
         self,
         node_type: str,
         module_type: str,
-        module_params: BaseMetadataDict,
+        module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
         artifact: Artifact,

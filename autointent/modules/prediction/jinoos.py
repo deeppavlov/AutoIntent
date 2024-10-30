@@ -8,9 +8,8 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler import Tag
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 from autointent.metrics.converter import transform
-from autointent.modules.base import BaseMetadataDict
 
 from .base import PredictionModule
 

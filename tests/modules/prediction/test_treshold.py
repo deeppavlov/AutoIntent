@@ -22,8 +22,12 @@ def get_fit_data(context: Context, db_dir):
         module_dump_dir="",
     )
     knn_params = {
-        "k": 3, "weights": "distance", "model_name": "sergeyzh/rubert-tiny-turbo",
-        "db_dir": db_dir, "n_classes": 3, "multilabel": False
+        "k": 3,
+        "weights": "distance",
+        "model_name": "sergeyzh/rubert-tiny-turbo",
+        "db_dir": db_dir,
+        "n_classes": 3,
+        "multilabel": False,
     }
     scorer = KNNScorer(**knn_params)
 

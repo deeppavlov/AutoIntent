@@ -12,8 +12,8 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.custom_types import LABEL_TYPE
-from autointent.modules.base import BaseMetadataDict
+from autointent.context.vector_index_client.cache import get_db_dir
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 
 from .base import ScoringModule
 
@@ -50,14 +50,16 @@ class LinearScorer(ScoringModule):
 
     def __init__(
         self,
-        db_dir: str,
-        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        model_name: str,
+        db_dir: str | None = None,
         cv: int = 3,
         n_jobs: int = -1,
         device: str = "cpu",
         seed: int = 0,
         multilabel: bool = False,
     ) -> None:
+        if db_dir is None:
+            db_dir = str(get_db_dir())
         self.cv = cv
         self.n_jobs = n_jobs
         self.device = device

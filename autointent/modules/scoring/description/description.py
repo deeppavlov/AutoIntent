@@ -10,6 +10,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
 
@@ -28,13 +29,15 @@ class DescriptionScorer(ScoringModule):
 
     def __init__(
         self,
-        db_dir: Path,
         model_name: str,
-        n_classes: int,
+        n_classes: int = 3,
+        db_dir: Path | None = None,
         multilabel: bool = True,
         temperature: float = 1.0,
         device: str = "cpu",
     ) -> None:
+        if db_dir is None:
+            db_dir = get_db_dir()
         self.temperature = temperature
         self._n_classes = n_classes
         self._multilabel = multilabel
@@ -66,6 +69,10 @@ class DescriptionScorer(ScoringModule):
         descriptions: list[str | None] | None = None,
         **kwargs: dict[str, Any],
     ) -> None:
+        if descriptions is None:
+            msg = "Descriptions are required for training."
+            raise ValueError(msg)
+
         vector_index_client = VectorIndexClient(self.device, str(self.db_dir))
         self._vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 

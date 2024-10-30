@@ -8,8 +8,8 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.custom_types import LABEL_TYPE
-from autointent.modules.base import BaseMetadataDict
+from autointent.context.vector_index_client.cache import get_db_dir
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 
@@ -42,14 +42,16 @@ class MLKnnScorer(ScoringModule):
 
     def __init__(
         self,
-        db_dir: str,
-        n_classes: int,
         k: int,
         model_name: str,
+        n_classes: int = 3,
+        db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         device: str = "cpu",
     ) -> None:
+        if db_dir is None:
+            db_dir = str(get_db_dir())
         self.n_classes = n_classes
         self.k = k
         self.model_name = model_name

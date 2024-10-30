@@ -17,8 +17,16 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"k": [3], "module_type": "knn", "weights": ["uniform", "distance", "closest"]},
-            {"module_type": "linear"},
+            {
+                "module_type": "knn",
+                "k": [3],
+                "weights": ["uniform", "distance", "closest"],
+                "model_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
+            {
+                "module_type": "linear",
+                "model_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
             {
                 "module_type": "dnnc",
                 "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
@@ -26,7 +34,11 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
                 "k": [3],
                 "train_head": [False, True],
             },
-            {"module_type": "description", "temperature": [1.0, 0.5, 0.1, 0.05]},
+            {
+                "module_type": "description",
+                "temperature": [1.0, 0.5, 0.1, 0.05],
+                "model_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
         ],
     }
 
@@ -56,9 +68,17 @@ def test_scoring_multilabel(context, retrieval_optimizer_multilabel):
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"k": [3], "module_type": "knn", "weights": ["uniform", "distance", "closest"]},
-            {"module_type": "linear"},
-            {"module_type": "mlknn", "k": [5]},
+            {
+                "module_type": "knn",
+                "weights": ["uniform", "distance", "closest"],
+                "k": [3],
+                "model_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
+            {
+                "module_type": "linear",
+                "model_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
+            {"module_type": "mlknn", "k": [5], "model_name": ["sergeyzh/rubert-tiny-turbo"]},
         ],
     }
 

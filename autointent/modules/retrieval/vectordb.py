@@ -8,9 +8,8 @@ from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 from autointent.metrics import RetrievalMetricFn
-from autointent.modules.base import BaseMetadataDict
 
 from .base import RetrievalModule
 
@@ -26,8 +25,10 @@ class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
     def __init__(
-        self, k: int, model_name: str, db_dir: str = get_db_dir(), device: str = "cpu", embedding_batch_size: int = 1
+        self, k: int, model_name: str, db_dir: str | None = None, device: str = "cpu", embedding_batch_size: int = 1
     ) -> None:
+        if db_dir is None:
+            db_dir = str(get_db_dir())
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
@@ -91,7 +92,7 @@ class VectorDBModule(RetrievalModule):
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / "vector_index_client_kwargs.json").open() as file:
-            self.vector_index_client_kwargs: VectorDBMetadata = json.load(file)
+            self.vector_index_client_kwargs: VectorDBMetadata = json.load(file)  # type: ignore[no-redef]
 
         vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
         self.vector_index = vector_index_client.get_index(self.model_name)

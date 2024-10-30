@@ -9,8 +9,7 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler.tags import Tag
-from autointent.custom_types import LABEL_TYPE
-from autointent.modules.base import BaseMetadataDict
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 
 from .base import PredictionModule, apply_tags
 
@@ -25,7 +24,7 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
 
 
 class ThresholdPredictor(PredictionModule):
-    metadata_dict_name: str = "metadata.json"
+    metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
     tags: list[Tag] | None
 
@@ -60,8 +59,10 @@ class ThresholdPredictor(PredictionModule):
 
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self.n_classes:
-                msg = (f"Wrong number of thresholds provided doesn't match with number of classes."
-                       f" {len(self.thresh)} != {self.n_classes}")
+                msg = (
+                    f"Wrong number of thresholds provided doesn't match with number of classes."
+                    f" {len(self.thresh)} != {self.n_classes}"
+                )
                 logger.error(msg)
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
@@ -81,7 +82,7 @@ class ThresholdPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        self.metadata["tags"] = [dict(tag) for tag in self.tags if self.tags]
+        self.metadata["tags"] = [dict(tag) for tag in self.tags if self.tags]  # type: ignore[misc, arg-type, union-attr]
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
@@ -93,7 +94,7 @@ class ThresholdPredictor(PredictionModule):
             metadata: ThresholdPredictorDumpMetadata = json.load(file)
 
         self.multilabel = metadata["multilabel"]
-        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"]]
+        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
         self.thresh = metadata["thresh"]
         self.n_classes = metadata["n_classes"]
         self.metadata = metadata

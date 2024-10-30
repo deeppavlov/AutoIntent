@@ -11,8 +11,8 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.custom_types import LABEL_TYPE
-from autointent.modules.base import BaseMetadataDict
+from autointent.context.vector_index_client.cache import get_db_dir
+from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
@@ -46,11 +46,14 @@ class DNNCScorer(ScoringModule):
         cross_encoder_name: str,
         search_model_name: str,
         k: int,
-        n_classes: int,
-        db_dir: str,
+        n_classes: int = 3,
+        db_dir: str | None = None,
         device: str = "cpu",
         train_head: bool = False,
     ) -> None:
+        if db_dir is None:
+            db_dir = str(get_db_dir())
+
         self.cross_encoder_name = cross_encoder_name
         self.search_model_name = search_model_name
         self.k = k
