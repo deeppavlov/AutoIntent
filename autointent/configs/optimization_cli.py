@@ -84,7 +84,11 @@ class OptimizationConfig:
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
 
     defaults: list[Any] = field(
-        default_factory=lambda: ["_self_", {"override hydra/job_logging": "autointent_standard_job_logger"}]
+        default_factory=lambda: [
+            "_self_",
+            {"override hydra/job_logging": "autointent_standard_job_logger"},
+            {"override hydra/help": "autointent_help"},
+        ]
     )
 
 
@@ -107,7 +111,29 @@ logger_config = {
     "disable_existing_loggers": "false",
 }
 
+help_config = {
+    "app_name": "AutoIntent",
+    "header": "== ${hydra.help.app_name} ==",
+    "footer": """
+Powered by Hydra (https://hydra.cc)
+Use --hydra-help to view Hydra specific help""",
+    "template": """
+  ${hydra.help.header}
+
+  This is ${hydra.help.app_name}!
+  == Config ==
+  This is the config generated for this run.
+  You can override everything, for example:
+  python my_app.py db.user=foo db.pass=bar
+  -------
+  $CONFIG
+  -------
+
+  ${hydra.help.footer}""",
+}
+
 
 cs = ConfigStore.instance()
 cs.store(name="optimization_config", node=OptimizationConfig)
 cs.store(name="autointent_standard_job_logger", group="hydra/job_logging", node=logger_config)
+cs.store(name="autointent_help", group="hydra/help", node=help_config)
