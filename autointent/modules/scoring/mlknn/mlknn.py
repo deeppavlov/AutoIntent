@@ -68,10 +68,11 @@ class MLKnnScorer(ScoringModule):
         ignore_first_neighbours: int = 0,
         model_name: str | None = None,
     ) -> Self:
-        prebuilt_index = False
         if model_name is None:
             model_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
+        else:
+            prebuilt_index = context.vector_index_client.exists(model_name)
 
         instance = cls(
             k=k,

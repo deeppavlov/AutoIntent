@@ -70,10 +70,12 @@ class DNNCScorer(ScoringModule):
         search_model_name: str | None = None,
         train_head: bool = False,
     ) -> Self:
-        prebuilt_index = False
         if search_model_name is None:
             search_model_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
+        else:
+            prebuilt_index = context.vector_index_client.exists(search_model_name)
+
         instance = cls(
             cross_encoder_name=cross_encoder_name,
             search_model_name=search_model_name,

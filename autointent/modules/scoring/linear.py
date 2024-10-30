@@ -72,10 +72,12 @@ class LinearScorer(ScoringModule):
         context: Context,
         model_name: str | None = None,
     ) -> Self:
-        precomputed_embeddings = False
         if model_name is None:
             model_name = context.optimization_info.get_best_embedder()
             precomputed_embeddings = True
+        else:
+            precomputed_embeddings = context.vector_index_client.exists(model_name)
+
         instance = cls(
             model_name=model_name,
             device=context.device,

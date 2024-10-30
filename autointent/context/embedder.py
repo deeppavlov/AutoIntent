@@ -19,7 +19,7 @@ class Embedder:
 
     def __init__(
         self,
-        device: str | None = None,
+        device: str,
         model_name: str | None = None,
         model_path: Path | None = None,
         batch_size: int = 1,
@@ -29,7 +29,7 @@ class Embedder:
             msg = "Embedder requires either model_name or model_path set"
             raise ValueError(msg)
         if model_path:
-            self.load(model_path)
+            self.load(model_path, device)
         elif model_name:
             self.model_name = model_name
 
@@ -52,13 +52,13 @@ class Embedder:
         with (path / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
-    def load(self, path: Path) -> None:
+    def load(self, path: Path, device: str) -> None:
         with (path / self.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
         self.batch_size = metadata["batch_size"]
         self.max_length = metadata["max_length"]
 
-        self.embedding_model = SentenceTransformer(str(path / self.embedder_subdir))
+        self.embedding_model = SentenceTransformer(str(path / self.embedder_subdir), device=device)
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         if not hasattr(self, "embedding_model"):

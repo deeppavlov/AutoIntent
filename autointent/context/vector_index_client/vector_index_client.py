@@ -119,6 +119,9 @@ class VectorIndexClient:
             res = self.create_index(model_name, utterances, labels)
         return res
 
+    def exists(self, model_name: str) -> bool:
+        return self._get_index_dirpath(model_name) is not None
+
 
 class NonExistentIndexError(Exception):
     def __init__(self, message: str = "non-existent index was requested") -> None:
