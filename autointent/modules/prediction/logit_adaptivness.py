@@ -1,16 +1,18 @@
 import logging
+from typing import ClassVar
 
 import numpy as np
 
 from .base import Context, PredictionModule, get_prediction_evaluation_data
 
-class LogitAdaptivnessPredictor(PredictionModule):
-    default_search_space = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
-    def __init__(self, search_space: list[float] = None):
+class LogitAdaptivnessPredictor(PredictionModule):
+    default_search_space = ClassVar([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+
+    def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else self.default_search_space
 
-    def fit(self, context: Context):
+    def fit(self, context: Context) -> None:
         """
         TODO: use dev split instead of test split
         """
@@ -33,27 +35,30 @@ class LogitAdaptivnessPredictor(PredictionModule):
             metrics_list.append(metric_value)
 
         self._thresh = self.search_space[np.argmax(metrics_list)]
-    def predict(self, scores: list[list[float]]):
+
+    def predict(self, scores: list[list[float]]) -> np.array:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._thresh)
 
-def _find_threshes(r, scores):
-    threshes = r * np.max(scores, axis=0) + (1-r) * np.min(scores, axis=0)
-    return threshes
 
-def _predict(scores):
+def _find_threshes(r: float, scores: np.array) -> np.array:
+    return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)
+
+
+
+def _predict(scores: list[list[float]]) -> tuple[np.array, np.array]:
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
     return pred_classes, best_scores
 
 
-def _detect_oos(classes, scores, threshes):
+def _detect_oos(classes: np.array[int], scores: np.array[float], threshes: np.array[float]) -> np.array:
     rel_threshes = threshes[classes]
     classes[scores < rel_threshes] = -1  # out of scope
     return classes
 
 
-def jinoos_score(y_true: list[int], y_pred: list[int]):
+def jinoos_score(y_true: list[int], y_pred: list[int]) -> float:
     """
     joint in and out of scope score
 
@@ -61,7 +66,8 @@ def jinoos_score(y_true: list[int], y_pred: list[int]):
     \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}},
     ```
 
-    where $C_{in}$ is the number of correctly predicted in-domain labels, and $N_{in}$ is the total number of in-domain labels. The same for OOS samples
+    where $C_{in}$ is the number of correctly predicted in-domain labels, and $N_{in}$ is the total number of
+    in-domain labels. The same for OOS samples
     """
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
