@@ -28,7 +28,6 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 class TunablePredictor(PredictionModule):
     def __init__(
         self,
-        thresh: float | npt.NDArray[Any],
         n_trials: int = 10,
         seed: int = 0,
         multilabel: bool = False,
@@ -37,12 +36,11 @@ class TunablePredictor(PredictionModule):
         self.n_trials = n_trials
         self.seed = seed
         self.multilabel = multilabel
-        self.thresh = thresh
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float = 0.5, n_trials: int = 10) -> Self:
-        return cls(n_trials=n_trials, seed=context.seed, thresh=thresh)
+    def from_context(cls, context: Context, n_trials: int = 10) -> Self:
+        return cls(n_trials=n_trials, seed=context.seed)
 
     def fit(
         self,

@@ -5,7 +5,6 @@ from uuid import uuid4
 import pytest
 
 from autointent import Context
-from autointent.context.data_handler import Dataset
 from autointent.pipeline.optimization.utils import load_config, load_data
 
 DATASET_TYPE = Literal["multiclass", "multilabel"]

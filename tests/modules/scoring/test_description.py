@@ -8,9 +8,7 @@ from autointent.modules import DescriptionScorer
 from tests.conftest import load_clinc_subset
 
 
-@pytest.mark.parametrize("expected_prediction", [
-    ([[1, 0, 0, 0], [1, 0, 0, 0]])
-])
+@pytest.mark.parametrize("expected_prediction", [([[1, 0, 0, 0], [1, 0, 0, 0]])])
 @pytest.mark.parametrize("multilabel", [True, False])
 def test_description_scorer(setup_environment, expected_prediction, multilabel):
     db_dir, dump_dir, logs_dir = setup_environment
@@ -39,14 +37,11 @@ def test_description_scorer(setup_environment, expected_prediction, multilabel):
     mock_vector_index.model_name = "mock-model"
     context.get_best_index = Mock(return_value=mock_vector_index)
 
-    scorer = DescriptionScorer(
-        model_name="sergeyzh/rubert-tiny-turbo",
-        db_dir=db_dir(),
-        n_classes=3,
-        temperature=0.1
-    )
+    scorer = DescriptionScorer(model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), n_classes=3, temperature=0.1)
 
-    scorer.fit(context.data_handler.utterances_train, context.data_handler.labels_train, context.data_handler.label_description)
+    scorer.fit(
+        context.data_handler.utterances_train, context.data_handler.labels_train, context.data_handler.label_description
+    )
     assert scorer.description_vectors.shape[0] == len(context.data_handler.label_description)
     assert scorer.metadata["model_name"] == "sergeyzh/rubert-tiny-turbo"
 

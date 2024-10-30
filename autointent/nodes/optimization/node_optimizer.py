@@ -73,7 +73,11 @@ class NodeOptimizer:
     def module_fit(self, module: Module, context: Context) -> None:
         if self.node_info.node_type in ["retrieval", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":
-                args = (context.data_handler.utterances_train, context.data_handler.labels_train, context.data_handler.label_description)
+                args = (
+                    context.data_handler.utterances_train,
+                    context.data_handler.labels_train,
+                    context.data_handler.label_description,
+                )
             else:
                 args = (context.data_handler.utterances_train, context.data_handler.labels_train)
         elif self.node_info.node_type == "prediction":

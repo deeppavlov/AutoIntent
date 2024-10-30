@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
-    # tags: list[Tag] | None
+    tags: list[Tag] | None
     thresh: float | npt.NDArray[Any]
     n_classes: int | None
 
@@ -39,7 +39,7 @@ class ThresholdPredictor(PredictionModule):
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
-        # self.tags = tags
+        self.tags = tags
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5, **kwargs: dict[str, Any]) -> Self:
@@ -60,14 +60,15 @@ class ThresholdPredictor(PredictionModule):
 
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self.n_classes:
-                msg = "Wrong number of thresholds provided doesn't match with number of classes"
+                msg = (f"Wrong number of thresholds provided doesn't match with number of classes."
+                       f" {len(self.thresh)} != {self.n_classes}")
                 logger.error(msg)
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
         self.metadata = ThresholdPredictorDumpMetadata(
             multilabel=self.multilabel,
-            # tags=self.tags,
+            tags=self.tags,
             thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),
             n_classes=self.n_classes,
         )
@@ -80,6 +81,8 @@ class ThresholdPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
+        self.metadata["tags"] = [dict(tag) for tag in self.tags if self.tags]
+
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
 
@@ -90,7 +93,7 @@ class ThresholdPredictor(PredictionModule):
             metadata: ThresholdPredictorDumpMetadata = json.load(file)
 
         self.multilabel = metadata["multilabel"]
-        # self.tags = metadata["tags"]
+        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"]]
         self.thresh = metadata["thresh"]
         self.n_classes = metadata["n_classes"]
         self.metadata = metadata

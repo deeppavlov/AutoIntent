@@ -10,10 +10,10 @@ from sklearn.multioutput import MultiOutputClassifier
 from typing_extensions import Self
 
 from autointent.context import Context
+from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import LABEL_TYPE
 from autointent.modules.base import BaseMetadataDict
-from autointent.context.embedder import Embedder
 
 from .base import ScoringModule
 
@@ -89,7 +89,9 @@ class LinearScorer(ScoringModule):
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
         vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 
-        features = vector_index.embedder.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
+        features = (
+            vector_index.embedder.embed(utterances) if vector_index.is_empty() else vector_index.get_all_embeddings()
+        )
 
         if self._multilabel:
             base_clf = LogisticRegression()

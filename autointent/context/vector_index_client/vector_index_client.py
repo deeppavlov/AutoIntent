@@ -15,18 +15,21 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str,         embedder_batch_size: int = 1,
+    def __init__(
+        self,
+        device: str,
+        db_dir: str,
+        embedder_batch_size: int = 1,
         embedder_max_length: int | None = None,
-**kwargs: dict[str, Any]) -> None:  # noqa: ARG002
+        **kwargs: dict[str, Any],  # noqa: ARG002
+    ) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = get_db_dir(db_dir)
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
 
-    def create_index(
-        self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE]
-    ) -> VectorIndex:
+    def create_index(self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE]) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
         """
@@ -97,10 +100,15 @@ class VectorIndexClient:
         self._logger.error(msg)
         raise NonExistentIndexError(msg)
 
-    def get_or_create_index(self, model_name: str, utterances: list[str], labels: list[LABEL_TYPE],) -> VectorIndex:
+    def get_or_create_index(
+        self,
+        model_name: str,
+        utterances: list[str],
+        labels: list[LABEL_TYPE],
+    ) -> VectorIndex:
         try:
             res = self.get_index(model_name)
-            res.add(utterances, labels)
+            # res.add(utterances, labels)
         except NonExistentIndexError:
             res = self.create_index(model_name, utterances, labels)
         return res

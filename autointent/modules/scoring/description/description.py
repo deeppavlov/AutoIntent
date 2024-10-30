@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from typing import TypedDict, Any
-from typing_extensions import Self
+from typing import Any, TypedDict
 
 import numpy as np
 import scipy
 from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
+from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
@@ -26,7 +26,15 @@ class DescriptionScorer(ScoringModule):
     weights_file_name: str = "description_vectors.npy"
     _vector_index: VectorIndex
 
-    def __init__(self,db_dir: Path, model_name: str, n_classes: int,  multilabel: bool = True, temperature: float = 1.0, device: str = "cpu") -> None:
+    def __init__(
+        self,
+        db_dir: Path,
+        model_name: str,
+        n_classes: int,
+        multilabel: bool = True,
+        temperature: float = 1.0,
+        device: str = "cpu",
+    ) -> None:
         self.temperature = temperature
         self._n_classes = n_classes
         self._multilabel = multilabel
@@ -35,7 +43,13 @@ class DescriptionScorer(ScoringModule):
         self.model_name = model_name
 
     @classmethod
-    def from_context(cls, context: Context, model_name: str = "sentence-transformers/all-MiniLM-L6-v2", temperature: float = 1.0, **kwargs: dict[str, Any]) -> Self:
+    def from_context(
+        cls,
+        context: Context,
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+        temperature: float = 1.0,
+        **kwargs: dict[str, Any],
+    ) -> Self:
         return cls(
             n_classes=context.n_classes,
             multilabel=context.multilabel,
@@ -45,7 +59,13 @@ class DescriptionScorer(ScoringModule):
             model_name=model_name,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], descriptions: list[str | None] | None = None, **kwargs: dict[str, Any]) -> None:
+    def fit(
+        self,
+        utterances: list[str],
+        labels: list[LABEL_TYPE],
+        descriptions: list[str | None] | None = None,
+        **kwargs: dict[str, Any],
+    ) -> None:
         vector_index_client = VectorIndexClient(self.device, str(self.db_dir))
         self._vector_index = vector_index_client.get_or_create_index(self.model_name, utterances, labels)
 
