@@ -71,17 +71,17 @@ class JinoosPredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: JinoosPredictorDumpMetadata = json.load(file)
 
-        self.thresh = np.array(metadata["thresh"])
+        self.thresh = metadata["thresh"]
         self.metadata = metadata
 
 
-def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
     return pred_classes, best_scores
 
 
-def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: npt.NDArray[Any]) -> npt.NDArray[Any]:
+def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
     classes[scores < thresh] = -1  # out of scope
     return classes
 

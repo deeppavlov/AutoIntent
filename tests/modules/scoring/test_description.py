@@ -20,7 +20,6 @@ def test_description_scorer(setup_environment, dataset, expected_prediction, mul
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train, data_handler.label_description)
     assert scorer.description_vectors.shape[0] == len(data_handler.label_description)
-    assert scorer.metadata["model_name"] == "sergeyzh/rubert-tiny-turbo"
 
     test_utterances = [
         "What is the balance on my account?",

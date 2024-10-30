@@ -21,7 +21,6 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     thresh: list[float]
     tags: list[Tag] | None
-    n_trials: int
 
 
 class TunablePredictor(PredictionModule):
@@ -29,17 +28,15 @@ class TunablePredictor(PredictionModule):
         self,
         n_trials: int = 10,
         seed: int = 0,
-        multilabel: bool = False,
         tags: list[Tag] | None = None,
     ) -> None:
         self.n_trials = n_trials
         self.seed = seed
-        self.multilabel = multilabel
         self.tags = tags
 
     @classmethod
     def from_context(cls, context: Context, n_trials: int = 10) -> Self:
-        return cls(n_trials=n_trials, seed=context.seed)
+        return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
 
     def fit(
         self,
@@ -67,7 +64,7 @@ class TunablePredictor(PredictionModule):
         )
         self.thresh = thresh_optimizer.best_thresholds
         self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_trials=self.n_trials
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
         )
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -91,7 +88,6 @@ class TunablePredictor(PredictionModule):
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]
-        self.n_trials = metadata["n_trials"]
 
 
 class ThreshOptimizer:

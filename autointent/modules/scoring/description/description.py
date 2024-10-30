@@ -9,24 +9,26 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing_extensions import Self
 
 from autointent.context import Context
-from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
+from autointent.context.embedder import Embedder
+from autointent.context.vector_index_client import VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LABEL_TYPE
 from autointent.modules.scoring.base import ScoringModule
 
 
 class DescriptionScorerDumpMetadata(TypedDict):
-    device: str
     db_dir: str
     n_classes: int
     multilabel: bool
-    model_name: str
+    batch_size: int
+    max_length: int | None
 
 
 class DescriptionScorer(ScoringModule):
     weights_file_name: str = "description_vectors.npy"
-    vector_index: VectorIndex
-    prebuilt_index: bool = False
+    embedder: Embedder
+    precomputed_embeddings: bool = False
+    embedding_model_subdir: str = "embedding_model"
 
     def __init__(
         self,
@@ -34,6 +36,8 @@ class DescriptionScorer(ScoringModule):
         db_dir: Path | None = None,
         temperature: float = 1.0,
         device: str = "cpu",
+        batch_size: int = 1,
+        max_length: int | None = None,
     ) -> None:
         if db_dir is None:
             db_dir = get_db_dir()
@@ -41,6 +45,8 @@ class DescriptionScorer(ScoringModule):
         self.device = device
         self.db_dir = db_dir
         self.model_name = model_name
+        self.batch_size = batch_size
+        self.max_length = max_length
 
     @classmethod
     def from_context(
@@ -51,9 +57,9 @@ class DescriptionScorer(ScoringModule):
     ) -> Self:
         if model_name is None:
             model_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
+            precomputed_embeddings = True
         else:
-            prebuilt_index = context.vector_index_client.exists(model_name)
+            precomputed_embeddings = context.vector_index_client.exists(model_name)
 
         instance = cls(
             temperature=temperature,
@@ -61,7 +67,7 @@ class DescriptionScorer(ScoringModule):
             db_dir=context.db_dir,
             model_name=model_name,
         )
-        instance.prebuilt_index = prebuilt_index
+        instance.precomputed_embeddings = precomputed_embeddings
         return instance
 
     def fit(
@@ -83,14 +89,18 @@ class DescriptionScorer(ScoringModule):
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
-        if self.prebuilt_index:
+        if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.model_name)
-            if len(utterances) != len(self.vector_index.texts):
+            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
+            vector_index = vector_index_client.get_index(self.model_name)
+            features = vector_index.get_all_embeddings()
+            if len(features) != len(utterances):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
+            embedder = vector_index.embedder
         else:
-            self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+            embedder = Embedder(self.device, self.model_name, batch_size=self.batch_size, max_length=self.max_length)
+            features = embedder.embed(utterances)
 
         if any(description is None for description in descriptions):
             error_text = (
@@ -99,18 +109,19 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = self.vector_index.embedder.embed([desc for desc in descriptions if desc is not None])
+        self.description_vectors = embedder.embed([desc for desc in descriptions if desc is not None])
+        self.embedder = embedder
 
         self.metadata = DescriptionScorerDumpMetadata(
-            device=self.device,
             db_dir=str(self.db_dir),
             n_classes=self.n_classes,
             multilabel=self.multilabel,
-            model_name=self.vector_index.model_name,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
         )
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        utterance_vectors = self.vector_index.embedder.embed(utterances)
+        utterance_vectors = self.embedder.embed(utterances)
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self.description_vectors)
 
         if self.multilabel:
@@ -120,7 +131,7 @@ class DescriptionScorer(ScoringModule):
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.embedder.delete()
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -128,6 +139,8 @@ class DescriptionScorer(ScoringModule):
             json.dump(self.metadata, file, indent=4)
 
         np.save(dump_dir / self.weights_file_name, self.description_vectors)
+
+        self.embedder.dump(dump_dir / self.embedding_model_subdir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
@@ -140,5 +153,10 @@ class DescriptionScorer(ScoringModule):
         self.n_classes = self.metadata["n_classes"]
         self.multilabel = self.metadata["multilabel"]
 
-        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        embedder_dir = dump_dir / self.embedding_model_subdir
+        self.embedder = Embedder(
+            device=self.device,
+            model_path=embedder_dir,
+            batch_size=self.metadata["batch_size"],
+            max_length=self.metadata["max_length"],
+        )

@@ -14,28 +14,35 @@ from .base import RetrievalModule
 
 
 class VectorDBMetadata(BaseMetadataDict):
-    k: int
-    model_name: str
     device: str
     db_dir: str
+    batch_size: int
+    max_length: int | None
 
 
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
 
     def __init__(
-        self, k: int, model_name: str, db_dir: str | None = None, device: str = "cpu", embedding_batch_size: int = 1
+        self,
+        k: int,
+        model_name: str,
+        db_dir: str | None = None,
+        device: str = "cpu",
+        batch_size: int = 1,
+        max_length: int | None = None,
     ) -> None:
         if db_dir is None:
             db_dir = str(get_db_dir())
         self.model_name = model_name
         self.device = device
         self.db_dir = db_dir
-        self.embedding_batch_size = embedding_batch_size
+        self.batch_size = batch_size
+        self.max_length = max_length
 
         self.metadata = VectorDBMetadata(
-            k=k,
-            model_name=model_name,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
             device=device,
             db_dir=db_dir,
         )
@@ -54,15 +61,11 @@ class VectorDBModule(RetrievalModule):
             model_name=model_name,
             db_dir=str(context.db_dir),
             device=context.device,
-            embedding_batch_size=context.embedder_batch_size,
+            batch_size=context.embedder_batch_size,
+            max_length=context.embedder_max_length,
         )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
-        self.vector_index_client_kwargs = {
-            "device": self.device,
-            "db_dir": str(self.db_dir),
-            "embedder_batch_size": self.embedding_batch_size,
-        }
         vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
@@ -82,16 +85,21 @@ class VectorDBModule(RetrievalModule):
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
-        with (dump_dir / "vector_index_client_kwargs.json").open("w") as file:
-            json.dump(self.vector_index_client_kwargs, file, indent=4)
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(self.metadata, file, indent=4)
         self.vector_index.dump(dump_dir)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
-        with (dump_dir / "vector_index_client_kwargs.json").open() as file:
-            self.vector_index_client_kwargs: VectorDBMetadata = json.load(file)  # type: ignore[no-redef]
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            self.metadata: VectorDBMetadata = json.load(file)
 
-        vector_index_client = VectorIndexClient(**self.vector_index_client_kwargs)  # type: ignore[arg-type]
+        vector_index_client = VectorIndexClient(
+            device=self.metadata["device"],
+            db_dir=self.metadata["db_dir"],
+            embedder_batch_size=self.metadata["batch_size"],
+            embedder_max_length=self.metadata["max_length"],
+        )
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:

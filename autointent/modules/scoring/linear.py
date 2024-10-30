@@ -18,12 +18,9 @@ from .base import ScoringModule
 
 
 class LinearScorerDumpDict(BaseMetadataDict):
-    model_name: str
-    cv: int
-    n_jobs: int
-    device: str
-    seed: int
     multilabel: bool
+    batch_size: int
+    max_length: int | None
 
 
 class LinearScorer(ScoringModule):
@@ -120,12 +117,9 @@ class LinearScorer(ScoringModule):
         self._clf = clf
         self._embedder = embedder
         self.metadata = LinearScorerDumpDict(
-            model_name=self.model_name,
-            cv=self.cv,
-            n_jobs=self.n_jobs,
-            device=self.device,
-            seed=self.seed,
             multilabel=self._multilabel,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -166,4 +160,9 @@ class LinearScorer(ScoringModule):
 
         # load sentence transformer model
         embedder_dir = dump_dir / self.embedding_model_subdir
-        self._embedder = Embedder(device=metadata["device"], model_path=embedder_dir)
+        self._embedder = Embedder(
+            device=self.device,
+            model_path=embedder_dir,
+            batch_size=metadata["batch_size"],
+            max_length=metadata["max_length"],
+        )

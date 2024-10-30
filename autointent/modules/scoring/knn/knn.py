@@ -16,13 +16,9 @@ from .weighting import apply_weights
 
 
 class KNNScorerDumpMetadata(BaseMetadataDict):
-    model_name: str
-    k: int
-    weights: WEIGHT_TYPES
     n_classes: int
     multilabel: bool
     db_dir: str
-    device: str
     batch_size: int
     max_length: int | None
 
@@ -107,13 +103,9 @@ class KNNScorer(ScoringModule):
             self._vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
         self.metadata = KNNScorerDumpMetadata(
-            device=self.device,
             db_dir=self.db_dir,
             n_classes=self.n_classes,
             multilabel=self.multilabel,
-            model_name=self._vector_index.model_name,
-            k=self.k,
-            weights=self.weights,
             batch_size=self.batch_size,
             max_length=self.max_length,
         )
@@ -143,9 +135,9 @@ class KNNScorer(ScoringModule):
         self.multilabel = self.metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(
-            device=self.metadata["device"],
+            device=self.device,
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self._vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        self._vector_index = vector_index_client.get_index(self.model_name)

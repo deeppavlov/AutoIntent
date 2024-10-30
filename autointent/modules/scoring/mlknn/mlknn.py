@@ -15,12 +15,9 @@ from autointent.modules.scoring.base import ScoringModule
 
 class MLKnnScorerDumpMetadata(BaseMetadataDict):
     db_dir: str
-    device: str
     n_classes: int
-    model_name: str
-    k: int
-    s: float
-    ignore_first_neighbours: int
+    batch_size: int
+    max_length: int | None
 
 
 class ArrayToSave(TypedDict):
@@ -49,6 +46,8 @@ class MLKnnScorer(ScoringModule):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         device: str = "cpu",
+        batch_size: int = 1,
+        max_length: int | None = None,
     ) -> None:
         if db_dir is None:
             db_dir = str(get_db_dir())
@@ -58,6 +57,8 @@ class MLKnnScorer(ScoringModule):
         self.ignore_first_neighbours = ignore_first_neighbours
         self.db_dir = db_dir
         self.device = device
+        self.batch_size = batch_size
+        self.max_length = max_length
 
     @classmethod
     def from_context(
@@ -81,6 +82,8 @@ class MLKnnScorer(ScoringModule):
             ignore_first_neighbours=ignore_first_neighbours,
             db_dir=str(context.db_dir),
             device=context.device,
+            batch_size=context.embedder_batch_size,
+            max_length=context.embedder_max_length,
         )
         instance.prebuilt_index = prebuilt_index
         return instance
@@ -105,12 +108,9 @@ class MLKnnScorer(ScoringModule):
 
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
-            device=self.device,
             n_classes=self.n_classes,
-            model_name=self.vector_index.model_name,
-            k=self.k,
-            s=self.s,
-            ignore_first_neighbours=self.ignore_first_neighbours,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
         )
 
         self.features = (
@@ -203,9 +203,6 @@ class MLKnnScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata: MLKnnScorerDumpMetadata = json.load(file)
         self.n_classes = self.metadata["n_classes"]
-        self.k = self.metadata["k"]
-        self.s = self.metadata["s"]
-        self.ignore_first_neighbours = self.metadata["ignore_first_neighbours"]
 
         arrays: ArrayToSave = np.load(dump_dir / self.arrays_filename)
 
@@ -214,5 +211,10 @@ class MLKnnScorer(ScoringModule):
         self._cond_prob_true = arrays["cond_prob_true"]
         self._cond_prob_false = arrays["cond_prob_false"]
 
-        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.metadata["model_name"])
+        vector_index_client = VectorIndexClient(
+            device=self.device,
+            db_dir=self.metadata["db_dir"],
+            embedder_batch_size=self.metadata["batch_size"],
+            embedder_max_length=self.metadata["max_length"],
+        )
+        self.vector_index = vector_index_client.get_index(self.model_name)
