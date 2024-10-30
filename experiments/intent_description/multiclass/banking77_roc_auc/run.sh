@@ -1,0 +1,2 @@
+autointent data.train_path=experiments/intent_description/banking77_fix_with_intent_desc.json logs.dirpath=experiments/intent_description/multiclass_banking77_roc_auc/ l
+ogs.run_name=intent_description_testing_roc_auc seed=42 hydra.job_logging.root.level=INFO

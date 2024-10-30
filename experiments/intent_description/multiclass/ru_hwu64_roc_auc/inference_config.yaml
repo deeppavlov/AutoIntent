@@ -1,0 +1,17 @@
+metadata:
+  device: cpu
+  multilabel: false
+  n_classes: 54
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/retrieval/vector_db/comb_1
+  module_config:
+    k: 10
+    model_name: infgrad/stella-base-en-v2
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/scoring/description/comb_3
+  module_config:
+    temperature: 0.05
+  module_type: description
+  node_type: scoring

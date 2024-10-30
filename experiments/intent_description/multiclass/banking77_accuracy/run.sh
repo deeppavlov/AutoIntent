@@ -1,0 +1,2 @@
+autointent data.train_path=experiments/intent_description/banking77_fix_with_intent_desc.json logs.dirpath=experiments/intent_description/multiclass_banking77_accuracy/ logs
+.run_name=intent_description_testing_accuracy seed=42 hydra.job_logging.root.level=INFO

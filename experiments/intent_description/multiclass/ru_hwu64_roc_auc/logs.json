@@ -1,0 +1,80 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.5735294117647058,
+            0.6470588235294118
+        ],
+        "scoring": [
+            0.7091729902675176,
+            0.7086201986699499,
+            0.7119578873310217,
+            0.7139387238889726
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.5735294117647058,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.6470588235294118,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7091729902675176,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7086201986699499,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7119578873310217,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7139387238889726,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/delightful_snake_10-31-2024_00-20-23/modules_dumps/scoring/description/comb_3"
+            }
+        ],
+        "prediction": []
+    }
+}

@@ -1,0 +1,80 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.5735294117647058,
+            0.6470588235294118
+        ],
+        "scoring": [
+            0.2647058823529412,
+            0.2647058823529412,
+            0.2647058823529412,
+            0.2647058823529412
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.5735294117647058,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.6470588235294118,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.2647058823529412,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.2647058823529412,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.2647058823529412,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.2647058823529412,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_salamander_10-31-2024_00-21-42/modules_dumps/scoring/description/comb_3"
+            }
+        ],
+        "prediction": []
+    }
+}

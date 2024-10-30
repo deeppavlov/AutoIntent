@@ -1,0 +1,2 @@
+autointent data.train_path=experiments/intent_description/ac_robotic_new_fix_with_intent_desc.json logs.dirpath=experiments/intent_description/multilabel_ac_robotic_roc_auc/
+ logs.run_name=intent_description_testing_roc_auc augmentation.regex_sampling=10 seed=42 hydra.job_logging.root.level=INFO data.force_multilabel=true
