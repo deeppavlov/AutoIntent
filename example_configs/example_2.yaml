@@ -1,0 +1,15 @@
+defaults:
+  - optimization_config
+  - _self_
+
+data:
+  train_path: "data/intent_records/ac_robotic_new.json"
+  force_multilabel: true
+
+logs:
+  dirpath: "experiments/multiclass_as_multilabel/"
+  run_name: "robotics_new_testing"
+
+augmentation:
+  regex_sampling: 10
+  multilabel_generation_config: "[0, 4000, 1000]"

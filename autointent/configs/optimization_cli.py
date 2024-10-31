@@ -28,7 +28,6 @@ class TaskConfig:
 class LoggingConfig:
     run_name: str | None = None
     dirpath: Path | None = None
-    level: LogLevel = LogLevel.ERROR
     dump_dir: Path | None = None
 
     def __post_init__(self) -> None:
