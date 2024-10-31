@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.5735294117647058,
+            0.6470588235294118
+        ],
+        "scoring": [
+            0.7091729902675176,
+            0.7086201986699499,
+            0.7086201986699499,
+            0.7091771780826507,
+            0.7119578873310217,
+            0.7139387238889726,
+            0.7025018007605072,
+            0.7025018007605072,
+            0.7035498014975627,
+            0.7326561636263128,
+            0.7279364959713218,
+            0.7359980401025177,
+            0.7652897130509072,
+            0.7613248990736553,
+            0.7699685495083507,
+            0.78264820677756,
+            0.7724142335460742,
+            0.7936171415649028,
+            0.8800149086218739,
+            0.7038261972963467,
+            0.7041664572759101,
+            0.7230273296815587,
+            0.708385681022497,
+            0.7041025930951305,
+            0.6483386937367037,
+            0.6432944704088982,
+            0.6139965157378093
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.5735294117647058,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.6470588235294118,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7091729902675176,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7086201986699499,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7086201986699499,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7091771780826507,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7119578873310217,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7139387238889726,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7025018007605072,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7025018007605072,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7035498014975627,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7326561636263128,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7279364959713218,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7359980401025177,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7652897130509072,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7613248990736553,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7699685495083507,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.78264820677756,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7724142335460742,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7936171415649028,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8800149086218739,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7038261972963467,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7041664572759101,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7230273296815587,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.708385681022497,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7041025930951305,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6483386937367037,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6432944704088982,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6139965157378093,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fine_fox_10-31-2024_16-05-00/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

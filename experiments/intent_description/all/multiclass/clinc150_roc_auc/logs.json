@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9840425531914894,
+            0.9893617021276596
+        ],
+        "scoring": [
+            0.9955430970041974,
+            0.9956500488758553,
+            0.9957570007475132,
+            0.9959531750138961,
+            0.9968267111341114,
+            0.9983421501542944,
+            0.9463096812527552,
+            0.9463096812527552,
+            0.9465505625515114,
+            0.9781015084430644,
+            0.9780658578191783,
+            0.977940697295536,
+            0.989420054434286,
+            0.9890897590707837,
+            0.9891431391716022,
+            0.9909950549134611,
+            0.9883876717842561,
+            0.9917985356410403,
+            0.9995899219903015,
+            0.9464792613037393,
+            0.9330836831311214,
+            0.9364526670883407,
+            0.9147592145362542,
+            0.5635563893201464,
+            0.6003031261380407,
+            0.5935651582236022,
+            0.5952498418722327
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9840425531914894,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9893617021276596,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9955430970041974,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9956500488758553,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9957570007475132,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9959531750138961,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9968267111341114,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9983421501542944,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9463096812527552,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9463096812527552,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9465505625515114,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9781015084430644,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9780658578191783,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.977940697295536,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.989420054434286,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9890897590707837,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9891431391716022,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9909950549134611,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9883876717842561,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9917985356410403,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9995899219903015,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9464792613037393,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9330836831311214,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9364526670883407,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9147592145362542,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5635563893201464,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6003031261380407,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5935651582236022,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5952498418722327,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/bored_dog_10-31-2024_16-45-59/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

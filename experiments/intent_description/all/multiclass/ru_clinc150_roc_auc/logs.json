@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.7872340425531915,
+            0.7287234042553191
+        ],
+        "scoring": [
+            0.8503867901021601,
+            0.8504758208268643,
+            0.8504222490560251,
+            0.8507074540471125,
+            0.8517781227838153,
+            0.85458100933433,
+            0.7550610469016541,
+            0.7550610469016541,
+            0.7557208709485749,
+            0.8344431027542981,
+            0.8356651428900005,
+            0.8352368562283174,
+            0.859394466486497,
+            0.8621424395760259,
+            0.8612322944818201,
+            0.8776747551415481,
+            0.8842330803289057,
+            0.8822173825541946,
+            0.9576760009966842,
+            0.7557565215724609,
+            0.8110959691794606,
+            0.8262385716750044,
+            0.8329232553236349,
+            0.7552215705441512,
+            0.7079569413298066,
+            0.6476359898798227,
+            0.6024128380579993
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7872340425531915,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7287234042553191,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8503867901021601,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8504758208268643,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8504222490560251,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8507074540471125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8517781227838153,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.85458100933433,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7550610469016541,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7550610469016541,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7557208709485749,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8344431027542981,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8356651428900005,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8352368562283174,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.859394466486497,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8621424395760259,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8612322944818201,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8776747551415481,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8842330803289057,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8822173825541946,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9576760009966842,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7557565215724609,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8110959691794606,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8262385716750044,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8329232553236349,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7552215705441512,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7079569413298066,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6476359898798227,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6024128380579993,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/homeless_falcon_10-31-2024_16-52-19/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

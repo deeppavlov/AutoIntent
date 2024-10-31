@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9484536082474226,
+            0.9587628865979382
+        ],
+        "scoring": [
+            0.9856388129414444,
+            0.9855035315561631,
+            0.9855035315561631,
+            0.9863835725677829,
+            0.9878730918204601,
+            0.992885623148781,
+            0.8257525917065391,
+            0.8257525917065391,
+            0.8266682330827068,
+            0.9257896160856686,
+            0.9252783948507632,
+            0.924404049897471,
+            0.9335647357028934,
+            0.9320716564137617,
+            0.9309267486899067,
+            0.9714000911369333,
+            0.9673993221690589,
+            0.9674092902711323,
+            0.9928272385509227,
+            0.8261271075415811,
+            0.8263606459330144,
+            0.8262267885623148,
+            0.7932188425609478,
+            0.530134284575074,
+            0.5689607541581225,
+            0.617290385053543,
+            0.6235475051264525
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9484536082474226,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9587628865979382,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9856388129414444,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9855035315561631,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9855035315561631,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9863835725677829,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9878730918204601,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.992885623148781,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8257525917065391,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8257525917065391,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8266682330827068,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9257896160856686,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9252783948507632,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.924404049897471,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9335647357028934,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9320716564137617,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9309267486899067,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9714000911369333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9673993221690589,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9674092902711323,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9928272385509227,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8261271075415811,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8263606459330144,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8262267885623148,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.7932188425609478,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.530134284575074,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.5689607541581225,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.617290385053543,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.6235475051264525,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/rich_whale_10-31-2024_16-04-42/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9625,
+            0.9625
+        ],
+        "scoring": [
+            0.9779546007789679,
+            0.9783527061019149,
+            0.9783527061019149,
+            0.9793441658552418,
+            0.9840136623661149,
+            0.9881899647030186,
+            0.9086690603700097,
+            0.9086690603700097,
+            0.9092649505030834,
+            0.9508441354268095,
+            0.9511908927702044,
+            0.9508942155550146,
+            0.961030687074002,
+            0.9628132860678351,
+            0.9616240415043817,
+            0.9694796484501785,
+            0.9731950868224601,
+            0.9716052012333658,
+            0.9955460382181109,
+            0.90946273531321,
+            0.8654049010061668,
+            0.8498312489857189,
+            0.814377053919182,
+            0.34904327937358004,
+            0.4107534079844206,
+            0.4227212907740993,
+            0.434635289881532
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9779546007789679,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9783527061019149,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9783527061019149,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9793441658552418,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9840136623661149,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9881899647030186,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9086690603700097,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9086690603700097,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9092649505030834,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9508441354268095,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9511908927702044,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9508942155550146,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.961030687074002,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9628132860678351,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9616240415043817,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9694796484501785,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9731950868224601,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9716052012333658,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9955460382181109,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.90946273531321,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8654049010061668,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8498312489857189,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.814377053919182,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.34904327937358004,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.4107534079844206,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.4227212907740993,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.434635289881532,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/upset_direwolf_10-31-2024_16-16-16/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

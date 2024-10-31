@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.7872340425531915,
+            0.7287234042553191
+        ],
+        "scoring": [
+            0.31382978723404253,
+            0.31382978723404253,
+            0.31382978723404253,
+            0.31382978723404253,
+            0.31382978723404253,
+            0.31382978723404253,
+            0.5212765957446809,
+            0.5212765957446809,
+            0.5212765957446809,
+            0.42021276595744683,
+            0.5372340425531915,
+            0.5212765957446809,
+            0.39361702127659576,
+            0.5425531914893617,
+            0.5212765957446809,
+            0.3723404255319149,
+            0.5159574468085106,
+            0.5212765957446809,
+            0.6382978723404256,
+            0.5212765957446809,
+            0.6170212765957447,
+            0.648936170212766,
+            0.6648936170212766,
+            0.5212765957446809,
+            0.43617021276595747,
+            0.31382978723404253,
+            0.21808510638297873
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7872340425531915,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7287234042553191,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.42021276595744683,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5372340425531915,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.39361702127659576,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5425531914893617,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.3723404255319149,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5159574468085106,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.6382978723404256,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.6170212765957447,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.648936170212766,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.6648936170212766,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.5212765957446809,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.43617021276595747,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.31382978723404253,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.21808510638297873,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_shark_10-31-2024_16-57-27/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}
