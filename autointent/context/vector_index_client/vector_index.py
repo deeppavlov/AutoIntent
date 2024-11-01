@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,7 @@ class VectorIndex:
     embedder: Embedder
 
     def __init__(
-        self, model_name: str, device: str, embedder_batch_size: int = 1, embedder_max_length: int | None = None
+        self, model_name: str, device: str, embedder_batch_size: int = 32, embedder_max_length: int | None = None
     ) -> None:
         self.model_name = model_name
         self.embedder = Embedder(
@@ -29,7 +30,10 @@ class VectorIndex:
         self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
 
+        self.logger = logging.getLogger(__name__)
+
     def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
+        self.logger.debug("adding embeddings to vector_index %s", self.model_name)
         embeddings = self.embedder.embed(texts)
 
         if not hasattr(self, "index"):
@@ -42,6 +46,7 @@ class VectorIndex:
         return len(self.labels) == 0
 
     def delete(self) -> None:
+        self.logger.debug("deleting vector index %s", self.model_name)
         if hasattr(self, "index"):
             self.index.reset()
         self.labels = []
@@ -123,7 +128,7 @@ class VectorIndex:
         if dir_path is None:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedder = Embedder(model_path=dir_path / "embedding_model", device=self.device)
+        self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.device)
         with (dir_path / "texts.json").open() as file:
             self.texts = json.load(file)
         with (dir_path / "labels.json").open() as file:

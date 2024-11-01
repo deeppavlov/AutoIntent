@@ -19,7 +19,7 @@ class Context:
         db_dir: str | Path | None = None,
         dump_dir: str | Path | None = None,
         force_multilabel: bool = False,
-        embedder_batch_size: int = 1,
+        embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
     ) -> None:
         augmenter = DataAugmenter(multilabel_generation_config, regex_sampling, seed)

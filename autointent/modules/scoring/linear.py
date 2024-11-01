@@ -52,7 +52,7 @@ class LinearScorer(ScoringModule):
         n_jobs: int = -1,
         device: str = "cpu",
         seed: int = 0,
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         self.cv = cv

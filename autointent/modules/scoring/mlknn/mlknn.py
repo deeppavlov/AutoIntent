@@ -46,7 +46,7 @@ class MLKnnScorer(ScoringModule):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         device: str = "cpu",
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         if db_dir is None:

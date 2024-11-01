@@ -35,7 +35,7 @@ class KNNScorer(ScoringModule):
         weights: WEIGHT_TYPES,
         db_dir: str | None = None,
         device: str = "cpu",
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         """

@@ -36,7 +36,7 @@ class DescriptionScorer(ScoringModule):
         db_dir: Path | None = None,
         temperature: float = 1.0,
         device: str = "cpu",
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         if db_dir is None:

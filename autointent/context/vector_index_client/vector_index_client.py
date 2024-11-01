@@ -18,7 +18,7 @@ class VectorIndexClient:
         self,
         device: str,
         db_dir: str | Path | None,
-        embedder_batch_size: int = 1,
+        embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
     ) -> None:
         self._logger = logging.getLogger(__name__)

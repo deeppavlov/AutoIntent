@@ -26,7 +26,7 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 class TunablePredictor(PredictionModule):
     def __init__(
         self,
-        n_trials: int = 10,
+        n_trials: int = 320,
         seed: int = 0,
         tags: list[Tag] | None = None,
     ) -> None:
@@ -35,7 +35,7 @@ class TunablePredictor(PredictionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: int = 10) -> Self:
+    def from_context(cls, context: Context, n_trials: int = 320) -> Self:
         return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
 
     def fit(

@@ -59,7 +59,7 @@ CrossEncoderType = TypeVar("CrossEncoderType", bound="CrossEncoderWithLogreg")
 class CrossEncoderWithLogreg:
     # TODO refactor
 
-    def __init__(self, model: CrossEncoder, batch_size: int = 16) -> None:
+    def __init__(self, model: CrossEncoder, batch_size: int = 326) -> None:
         self.cross_encoder = model
         self.batch_size = batch_size
 

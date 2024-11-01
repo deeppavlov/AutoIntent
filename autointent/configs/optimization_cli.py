@@ -69,7 +69,7 @@ class AugmentationConfig:
 
 @dataclass
 class EmbedderConfig:
-    batch_size: int = 1
+    batch_size: int = 32
     max_length: int | None = None
 
 

@@ -29,7 +29,7 @@ class VectorDBModule(RetrievalModule):
         model_name: str,
         db_dir: str | None = None,
         device: str = "cpu",
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         if db_dir is None:
@@ -66,7 +66,9 @@ class VectorDBModule(RetrievalModule):
         )
 
     def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index_client = VectorIndexClient(
+            self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length
+        )
 
         self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 

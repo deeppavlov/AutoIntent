@@ -47,7 +47,7 @@ class DNNCScorer(ScoringModule):
         db_dir: str | None = None,
         device: str = "cpu",
         train_head: bool = False,
-        batch_size: int = 1,
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
         if db_dir is None:
