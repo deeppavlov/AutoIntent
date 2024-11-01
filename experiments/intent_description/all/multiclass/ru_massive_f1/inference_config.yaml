@@ -1,0 +1,18 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 60
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/good_chicken_11-01-2024_11-52-56/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: avsolatorio/GIST-small-Embedding-v0
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/good_chicken_11-01-2024_11-52-56/modules_dumps/scoring/dnnc/comb_2
+  module_config:
+    k: 5
+    model_name: BAAI/bge-reranker-base
+  module_type: dnnc
+  node_type: scoring

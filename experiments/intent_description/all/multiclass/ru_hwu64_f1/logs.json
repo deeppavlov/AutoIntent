@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.5735294117647058,
+            0.6470588235294118
+        ],
+        "scoring": [
+            0.2253086419753086,
+            0.2253086419753086,
+            0.2253086419753086,
+            0.2253086419753086,
+            0.2253086419753086,
+            0.2253086419753086,
+            0.33302469135802465,
+            0.33302469135802465,
+            0.33302469135802465,
+            0.25220458553791886,
+            0.1423280423280423,
+            0.33302469135802465,
+            0.2608465608465608,
+            0.176278659611993,
+            0.33302469135802465,
+            0.22037037037037036,
+            0.15652557319223986,
+            0.33302469135802465,
+            0.37808641975308643,
+            0.33302469135802465,
+            0.337037037037037,
+            0.35802469135802467,
+            0.3507054673721341,
+            0.32685185185185184,
+            0.21059670781893,
+            0.2074074074074074,
+            0.17380952380952377
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.5735294117647058,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.6470588235294118,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2253086419753086,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25220458553791886,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.1423280423280423,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2608465608465608,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.176278659611993,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.22037037037037036,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.15652557319223986,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_f1",
+                "metric_value": 0.37808641975308643,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.33302469135802465,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.337037037037037,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.35802469135802467,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.3507054673721341,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.32685185185185184,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.21059670781893,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.2074074074074074,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.17380952380952377,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/cruel_sheep_11-01-2024_11-24-21/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

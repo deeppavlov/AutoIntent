@@ -1,0 +1,16 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 22
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/inexpensive_beetle_10-31-2024_18-33-57/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: avsolatorio/GIST-small-Embedding-v0
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/inexpensive_beetle_10-31-2024_18-33-57/modules_dumps/scoring/linear/comb_0
+  module_config: {}
+  module_type: linear
+  node_type: scoring

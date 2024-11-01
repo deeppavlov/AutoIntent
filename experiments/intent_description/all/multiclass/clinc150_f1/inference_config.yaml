@@ -1,0 +1,16 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 150
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/obedient_lion_11-01-2024_11-56-01/modules_dumps/retrieval/vector_db/comb_1
+  module_config:
+    k: 10
+    model_name: infgrad/stella-base-en-v2
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/obedient_lion_11-01-2024_11-56-01/modules_dumps/scoring/linear/comb_0
+  module_config: {}
+  module_type: linear
+  node_type: scoring

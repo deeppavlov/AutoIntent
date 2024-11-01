@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.7872340425531915,
+            0.7287234042553191
+        ],
+        "scoring": [
+            0.25389542483660127,
+            0.25389542483660127,
+            0.25389542483660127,
+            0.25389542483660127,
+            0.25389542483660127,
+            0.25389542483660127,
+            0.4499999999999999,
+            0.4499999999999999,
+            0.4499999999999999,
+            0.34408465608465605,
+            0.4726666666666666,
+            0.4499999999999999,
+            0.3216769156769157,
+            0.47349206349206346,
+            0.4499999999999999,
+            0.3093126503126503,
+            0.449957671957672,
+            0.4499999999999999,
+            0.5713333333333332,
+            0.4499999999999999,
+            0.5533333333333333,
+            0.5766666666666667,
+            0.5973333333333333,
+            0.4477777777777777,
+            0.3671428571428571,
+            0.25374521774521774,
+            0.17812698412698413
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7872340425531915,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.7287234042553191,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25389542483660127,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.34408465608465605,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4726666666666666,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.3216769156769157,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.47349206349206346,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.3093126503126503,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.449957671957672,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5713333333333332,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4499999999999999,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5533333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5766666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5973333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4477777777777777,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.3671428571428571,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.25374521774521774,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.17812698412698413,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/arrogant_dodo_11-01-2024_11-24-33/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}

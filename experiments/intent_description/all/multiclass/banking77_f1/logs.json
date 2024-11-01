@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9484536082474226,
+            0.9587628865979382
+        ],
+        "scoring": [
+            0.6498453927025355,
+            0.6498453927025355,
+            0.6498453927025355,
+            0.6498453927025355,
+            0.6498453927025355,
+            0.6498453927025355,
+            0.6043290043290042,
+            0.6043290043290042,
+            0.6043290043290042,
+            0.6155844155844156,
+            0.6034632034632034,
+            0.6043290043290042,
+            0.5887445887445887,
+            0.5528138528138528,
+            0.6043290043290042,
+            0.48441558441558435,
+            0.44675324675324674,
+            0.6043290043290042,
+            0.7774891774891775,
+            0.6043290043290042,
+            0.6038961038961038,
+            0.6006802721088436,
+            0.521067821067821,
+            0.36796536796536794,
+            0.4,
+            0.42875695732838587,
+            0.44830257461836415
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9484536082474226,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9587628865979382,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6498453927025355,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6155844155844156,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6034632034632034,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5887445887445887,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5528138528138528,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.48441558441558435,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.44675324675324674,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7774891774891775,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6043290043290042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6038961038961038,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6006802721088436,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.521067821067821,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.36796536796536794,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.42875695732838587,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.44830257461836415,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/fragile_banana_11-01-2024_11-42-31/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}
