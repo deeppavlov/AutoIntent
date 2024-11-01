@@ -4,7 +4,9 @@ from typing import ClassVar
 import numpy as np
 import numpy.typing as npt
 
-from .base import Context, PredictionModule, get_prediction_evaluation_data
+from autointent import Context
+
+from .base import PredictionModule, get_prediction_evaluation_data
 
 
 class LogitAdaptivnessPredictor(PredictionModule):
@@ -30,20 +32,19 @@ class LogitAdaptivnessPredictor(PredictionModule):
 
         metrics_list = []
         for r in self.search_space:
-            threshes = _find_threshes(r, scores)
-            y_pred = _detect_oos(pred_classes, best_scores, threshes)
+            y_pred = _detect_oos(pred_classes, best_scores, r)
             metric_value = jinoos_score(y_true, y_pred)
             metrics_list.append(metric_value)
 
-        self._thresh = self.search_space[np.argmax(metrics_list)]
+        self._r = self.search_space[np.argmax(metrics_list)]
 
     def predict(self, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
         pred_classes, best_scores = _predict(scores)
-        return _detect_oos(pred_classes, best_scores, self._thresh)
+        return _detect_oos(pred_classes, best_scores, self._r)
 
 
 def _find_threshes(r: float, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-    return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)
+    return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0) # type: ignore[no-any-return]
 
 
 
@@ -55,7 +56,8 @@ def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], np
 
 def _detect_oos(classes: npt.NDArray[np.int64],
                 scores: npt.NDArray[np.float64],
-                threshes: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
+                r: float) -> npt.NDArray[np.int64]:
+    threshes = _find_threshes(r, scores)
     rel_threshes = threshes[classes]
     classes[scores < rel_threshes] = -1  # out of scope
     return classes
@@ -86,4 +88,4 @@ def jinoos_score(y_true: npt.NDArray[np.int64], y_pred: npt.NDArray[np.int64]) -
     total_oos = np.sum(~in_domain_mask)
     accuracy_oos = correct_oos / total_oos
 
-    return accuracy_in_domain + accuracy_oos
+    return accuracy_in_domain + accuracy_oos # type: ignore[no-any-return]
