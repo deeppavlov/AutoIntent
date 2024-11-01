@@ -6,7 +6,6 @@ from typing import Any
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
-from autointent.custom_types import LogLevel
 from autointent.pipeline.optimization.utils import generate_name
 
 
