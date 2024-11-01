@@ -2,14 +2,14 @@ import logging
 from typing import ClassVar
 
 import numpy as np
-import numpy.typing as npt 
+import numpy.typing as npt
 
 from .base import Context, PredictionModule, get_prediction_evaluation_data
 
 
 class LogitAdaptivnessPredictor(PredictionModule):
     default_search_space: ClassVar[list[float]] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-    
+
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else self.default_search_space
 
