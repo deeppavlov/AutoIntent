@@ -1,5 +1,7 @@
+import json
 import logging
-from typing import ClassVar
+from pathlib import Path
+from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -8,9 +10,14 @@ from autointent import Context
 
 from .base import PredictionModule, get_prediction_evaluation_data
 
+default_search_space = np.linspace(0, 1, num=10)
+
+class LogitAdaptivnessPredictorDumpMetadata(TypedDict):
+    thresh: list[float]
+
 
 class LogitAdaptivnessPredictor(PredictionModule):
-    default_search_space: ClassVar[list[float]] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    metadata_dict_name = "metadata.json"
 
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else self.default_search_space
@@ -41,6 +48,22 @@ class LogitAdaptivnessPredictor(PredictionModule):
     def predict(self, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._r)
+
+    def dump(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        metadata = LogitAdaptivnessPredictorDumpMetadata(r=self._r.tolist())
+
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+    def load(self, path: str) -> None:
+        dump_dir = Path(path)
+
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata: LogitAdaptivnessPredictorDumpMetadata = json.load(file)
+
+        self._r = metadata["r"]
 
 
 def _find_threshes(r: float, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
