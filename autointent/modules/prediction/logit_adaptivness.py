@@ -13,7 +13,7 @@ from .base import PredictionModule, get_prediction_evaluation_data
 default_search_space = np.linspace(0, 1, num=10)
 
 class LogitAdaptivnessPredictorDumpMetadata(TypedDict):
-    r: list[float]
+    r: float
 
 
 class LogitAdaptivnessPredictor(PredictionModule):
@@ -52,7 +52,7 @@ class LogitAdaptivnessPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = LogitAdaptivnessPredictorDumpMetadata(r=self._r.tolist())
+        metadata = LogitAdaptivnessPredictorDumpMetadata(r=self._r)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
