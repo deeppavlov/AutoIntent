@@ -6,7 +6,7 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.data_handler.data_handler import RegexPatterns
 from autointent.context.optimization_info.data_models import Artifact
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 from autointent.metrics.regexp import RegexpMetricFn
 
 from .base import Module
@@ -28,7 +28,7 @@ class RegExp(Module):
             regexp_patterns=context.data_handler.regexp_patterns,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         self.regexp_patterns_compiled: list[RegexPatternsCompiled] = [
             {
                 "id": dct["id"],
@@ -38,7 +38,7 @@ class RegExp(Module):
             for dct in self.regexp_patterns
         ]
 
-    def predict(self, utterances: list[str]) -> list[LABEL_TYPE]:
+    def predict(self, utterances: list[str]) -> list[LabelType]:
         return [list(self._predict_single(ut)) for ut in utterances]
 
     def _match(self, text: str, intent_record: RegexPatternsCompiled) -> bool:

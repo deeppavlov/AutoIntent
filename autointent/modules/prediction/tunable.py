@@ -11,7 +11,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.data_handler.tags import Tag
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
@@ -41,7 +41,7 @@ class TunablePredictor(PredictionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         """

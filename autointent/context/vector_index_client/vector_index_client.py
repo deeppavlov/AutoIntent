@@ -3,7 +3,7 @@ import logging
 import shutil
 from pathlib import Path
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 from .cache import get_db_dir
 from .vector_index import VectorIndex
@@ -28,7 +28,7 @@ class VectorIndexClient:
         self.embedder_max_length = embedder_max_length
 
     def create_index(
-        self, model_name: str, utterances: list[str] | None = None, labels: list[LABEL_TYPE] | None = None
+        self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None
     ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
@@ -109,7 +109,7 @@ class VectorIndexClient:
         self,
         model_name: str,
         utterances: list[str],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
     ) -> VectorIndex:
         try:
             res = self.get_index(model_name)

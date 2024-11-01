@@ -8,7 +8,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent.context.embedder import Embedder
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 
 class VectorIndex:
@@ -27,12 +27,12 @@ class VectorIndex:
         )
         self.device = device
 
-        self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
+        self.labels: list[LabelType] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
 
         self.logger = logging.getLogger(__name__)
 
-    def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
+    def add(self, texts: list[str], labels: list[LabelType]) -> None:
         self.logger.debug("adding embeddings to vector_index %s", self.model_name)
         embeddings = self.embedder.embed(texts)
 
@@ -81,12 +81,12 @@ class VectorIndex:
             raise ValueError(msg)
         return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
-    def get_all_labels(self) -> list[LABEL_TYPE]:
+    def get_all_labels(self) -> list[LabelType]:
         return self.labels
 
     def query(
         self, queries: list[str] | npt.NDArray[np.float32], k: int
-    ) -> tuple[list[list[LABEL_TYPE]], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
         """
         Arguments
         ---

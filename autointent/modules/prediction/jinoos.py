@@ -8,7 +8,7 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler import Tag
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule
@@ -38,7 +38,7 @@ class JinoosPredictor(PredictionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -86,7 +86,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[LABEL_TYPE] | npt.NDArray[Any], y_pred: list[LABEL_TYPE] | npt.NDArray[Any]) -> float:
+def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 

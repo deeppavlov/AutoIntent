@@ -12,7 +12,7 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import ScoringModule
 
@@ -89,7 +89,7 @@ class LinearScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
     ) -> None:
         self._multilabel = isinstance(labels[0], list)
 

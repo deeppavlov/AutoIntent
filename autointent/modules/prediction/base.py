@@ -8,7 +8,7 @@ from typing_extensions import overload
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.context.optimization_info import PredictorArtifact
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
@@ -19,7 +19,7 @@ class PredictionModule(Module, ABC):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         pass
@@ -42,7 +42,7 @@ class PredictionModule(Module, ABC):
 
 def get_prediction_evaluation_data(
     context: Context,
-) -> tuple[list[LABEL_TYPE], npt.NDArray[Any]]:
+) -> tuple[list[LabelType], npt.NDArray[Any]]:
     labels = np.array(context.data_handler.labels_test)
     scores = context.optimization_info.get_best_test_scores()
 

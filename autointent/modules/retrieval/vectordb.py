@@ -7,7 +7,7 @@ from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RetrievalMetricFn
 
 from .base import RetrievalModule
@@ -65,7 +65,7 @@ class VectorDBModule(RetrievalModule):
             max_length=context.embedder_max_length,
         )
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         vector_index_client = VectorIndexClient(
             self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length
         )

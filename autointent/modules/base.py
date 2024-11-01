@@ -6,7 +6,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import METRIC_FN
 
 
@@ -15,7 +15,7 @@ class Module(ABC):
     metadata: BaseMetadataDict
 
     @abstractmethod
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE], **kwargs: dict[str, Any]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType], **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod

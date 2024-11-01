@@ -12,7 +12,7 @@ from autointent.context import Context
 from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 from autointent.modules.scoring.base import ScoringModule
 
 
@@ -73,7 +73,7 @@ class DescriptionScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         descriptions: list[str | None] | None = None,
     ) -> None:
         if descriptions is None:

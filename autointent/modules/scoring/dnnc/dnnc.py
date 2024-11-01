@@ -12,7 +12,7 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
@@ -90,7 +90,7 @@ class DNNCScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         self.n_classes = len(set(labels))
 
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
@@ -165,7 +165,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[LABEL_TYPE]]) -> npt.NDArray[Any]:
+    def _build_result(self, scores: list[list[float]], labels: list[list[LabelType]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---

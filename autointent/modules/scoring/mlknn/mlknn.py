@@ -9,7 +9,7 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.scoring.base import ScoringModule
 
 
@@ -88,7 +88,7 @@ class MLKnnScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if not isinstance(labels[0], list):
             msg = "mlknn scorer support only multilabel input"
             raise TypeError(msg)

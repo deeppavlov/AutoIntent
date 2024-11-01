@@ -6,7 +6,7 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler import Tag
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 from .base import PredictionModule
 
@@ -24,7 +24,7 @@ class ArgmaxPredictor(PredictionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         pass

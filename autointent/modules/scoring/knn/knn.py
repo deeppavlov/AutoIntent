@@ -9,7 +9,7 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
-from autointent.custom_types import LABEL_TYPE, WEIGHT_TYPES, BaseMetadataDict
+from autointent.custom_types import WEIGHT_TYPES, BaseMetadataDict, LabelType
 from autointent.modules.scoring.base import ScoringModule
 
 from .weighting import apply_weights
@@ -84,7 +84,7 @@ class KNNScorer(ScoringModule):
         instance.prebuilt_index = prebuilt_index
         return instance
 
-    def fit(self, utterances: list[str], labels: list[LABEL_TYPE]) -> None:
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if isinstance(labels[0], list):
             self.n_classes = len(labels[0])
             self.multilabel = True

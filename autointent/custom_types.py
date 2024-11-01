@@ -14,7 +14,7 @@ class LogLevel(Enum):
 
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
 
-LABEL_TYPE = int | list[int]
+LabelType = int | list[int]
 
 
 class BaseMetadataDict(TypedDict):

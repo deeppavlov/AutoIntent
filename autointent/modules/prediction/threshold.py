@@ -9,7 +9,7 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler.tags import Tag
-from autointent.custom_types import LABEL_TYPE, BaseMetadataDict
+from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import PredictionModule, apply_tags
 
@@ -51,7 +51,7 @@ class ThresholdPredictor(PredictionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LABEL_TYPE],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         self.tags = tags
