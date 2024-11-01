@@ -2,13 +2,14 @@ import logging
 from typing import ClassVar
 
 import numpy as np
+import numpy.typing as npt 
 
 from .base import Context, PredictionModule, get_prediction_evaluation_data
 
 
 class LogitAdaptivnessPredictor(PredictionModule):
     default_search_space: ClassVar[list[float]] = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-
+    
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else self.default_search_space
 
@@ -36,12 +37,12 @@ class LogitAdaptivnessPredictor(PredictionModule):
 
         self._thresh = self.search_space[np.argmax(metrics_list)]
 
-    def predict(self, scores: list[list[float]]) -> np.array:
+    def predict(self, scores: list[list[float]]) -> npt.NDArray:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._thresh)
 
 
-def _find_threshes(r: float, scores: np.array) -> np.array:
+def _find_threshes(r: float, scores: npt.NDArray) -> npt.NDArray:
     return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)
 
 
@@ -52,7 +53,7 @@ def _predict(scores: list[list[float]]) -> tuple[np.array, np.array]:
     return pred_classes, best_scores
 
 
-def _detect_oos(classes: np.array[int], scores: np.array[float], threshes: np.array[float]) -> np.array:
+def _detect_oos(classes: npt.NDArray[int], scores: npt.NDArray[float], threshes: npt.NDArray[float]) -> npt.NDArray:
     rel_threshes = threshes[classes]
     classes[scores < rel_threshes] = -1  # out of scope
     return classes
