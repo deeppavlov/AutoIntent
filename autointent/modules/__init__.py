@@ -49,7 +49,7 @@ __all__ = [
     "PredictionModule",
     "ThresholdPredictor",
     "TunablePredictor",
-    "LogitAdaptivnessPredictor"
+    "LogitAdaptivnessPredictor",
     "RegExp",
     "RetrievalModule",
     "VectorDBModule",
