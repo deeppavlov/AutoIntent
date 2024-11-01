@@ -5101,16 +5101,6 @@
                 "that s",
                 "yes that is"
             ]
-        },
-        {
-            "id": -1,
-            "name": "ood",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [
-                "it was",
-                "i do nt"
-            ]
         }
     ]
 }

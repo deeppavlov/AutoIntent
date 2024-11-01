@@ -5201,14 +5201,6 @@
             "regexp_full_match": [],
             "regexp_partial_match": [],
             "description": "Пользователь хочет установить громкость на 4."
-        },
-        {
-            "id": -1,
-            "name": "ood",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "Описание не предоставлено."
         }
     ]
 }

@@ -4801,13 +4801,6 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": []
-        },
-        {
-            "id": -1,
-            "name": "ood",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": []
         }
     ]
 }

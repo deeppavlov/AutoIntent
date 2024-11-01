@@ -5001,14 +5001,6 @@
             "regexp_full_match": [],
             "regexp_partial_match": [],
             "description": "User is affirming or agreeing with a statement."
-        },
-        {
-            "id": -1,
-            "name": "ood",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "Описание намерения отсутствует."
         }
     ]
 }
