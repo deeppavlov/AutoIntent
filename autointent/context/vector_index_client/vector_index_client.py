@@ -105,18 +105,6 @@ class VectorIndexClient:
         self._logger.error(msg)
         raise NonExistentIndexError(msg)
 
-    def get_or_create_index(
-        self,
-        model_name: str,
-        utterances: list[str],
-        labels: list[LabelType],
-    ) -> VectorIndex:
-        try:
-            res = self.get_index(model_name)
-        except NonExistentIndexError:
-            res = self.create_index(model_name, utterances, labels)
-        return res
-
     def exists(self, model_name: str) -> bool:
         return self._get_index_dirpath(model_name) is not None
 

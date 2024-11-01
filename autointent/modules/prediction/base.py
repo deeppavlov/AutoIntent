@@ -3,7 +3,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import overload
 
 from autointent import Context
 from autointent.context.data_handler import Tag
@@ -14,7 +13,6 @@ from autointent.modules.base import Module
 
 
 class PredictionModule(Module, ABC):
-    @overload  # type: ignore[misc]
     @abstractmethod
     def fit(
         self,

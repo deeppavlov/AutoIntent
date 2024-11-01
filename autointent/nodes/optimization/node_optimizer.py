@@ -87,4 +87,4 @@ class NodeOptimizer:
             msg = "something's wrong"
             self._logger.error(msg)
             raise ValueError(msg)
-        module.fit(*args)  # type: ignore[call-arg]
+        module.fit(*args)  # type: ignore[arg-type]

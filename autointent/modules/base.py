@@ -6,7 +6,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info.data_models import Artifact
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import BaseMetadataDict
 from autointent.metrics import METRIC_FN
 
 
@@ -15,7 +15,7 @@ class Module(ABC):
     metadata: BaseMetadataDict
 
     @abstractmethod
-    def fit(self, utterances: list[str], labels: list[LabelType], **kwargs: dict[str, Any]) -> None:
+    def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
         pass
 
     @abstractmethod
@@ -43,7 +43,7 @@ class Module(ABC):
         """load all data needed for inference"""
 
     @abstractmethod
-    def predict(self, utterances_or_scores: list[str] | npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
         """inference"""
 
     @classmethod
