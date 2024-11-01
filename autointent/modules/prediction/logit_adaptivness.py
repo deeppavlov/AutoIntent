@@ -13,14 +13,14 @@ from .base import PredictionModule, get_prediction_evaluation_data
 default_search_space = np.linspace(0, 1, num=10)
 
 class LogitAdaptivnessPredictorDumpMetadata(TypedDict):
-    thresh: list[float]
+    r: list[float]
 
 
 class LogitAdaptivnessPredictor(PredictionModule):
     metadata_dict_name = "metadata.json"
 
     def __init__(self, search_space: list[float] | None = None) -> None:
-        self.search_space = search_space if search_space is not None else self.default_search_space
+        self.search_space = search_space if search_space is not None else default_search_space
 
     def fit(self, context: Context) -> None:
         """
