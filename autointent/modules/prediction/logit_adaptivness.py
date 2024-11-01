@@ -37,29 +37,31 @@ class LogitAdaptivnessPredictor(PredictionModule):
 
         self._thresh = self.search_space[np.argmax(metrics_list)]
 
-    def predict(self, scores: list[list[float]]) -> npt.NDArray:
+    def predict(self, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self._thresh)
 
 
-def _find_threshes(r: float, scores: npt.NDArray) -> npt.NDArray:
+def _find_threshes(r: float, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)
 
 
 
-def _predict(scores: list[list[float]]) -> tuple[np.array, np.array]:
+def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
     return pred_classes, best_scores
 
 
-def _detect_oos(classes: npt.NDArray[int], scores: npt.NDArray[float], threshes: npt.NDArray[float]) -> npt.NDArray:
+def _detect_oos(classes: npt.NDArray[np.int64],
+                scores: npt.NDArray[np.float64],
+                threshes: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
     rel_threshes = threshes[classes]
     classes[scores < rel_threshes] = -1  # out of scope
     return classes
 
 
-def jinoos_score(y_true: list[int], y_pred: list[int]) -> float:
+def jinoos_score(y_true: npt.NDArray[np.int64], y_pred: npt.NDArray[np.int64]) -> float:
     """
     joint in and out of scope score
 
