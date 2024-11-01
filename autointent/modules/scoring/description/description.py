@@ -99,7 +99,9 @@ class DescriptionScorer(ScoringModule):
                 raise ValueError(msg)
             embedder = vector_index.embedder
         else:
-            embedder = Embedder(self.device, self.model_name, batch_size=self.batch_size, max_length=self.max_length)
+            embedder = Embedder(
+                device=self.device, model_name=self.model_name, batch_size=self.batch_size, max_length=self.max_length
+            )
             features = embedder.embed(utterances)
 
         if any(description is None for description in descriptions):
@@ -156,7 +158,7 @@ class DescriptionScorer(ScoringModule):
         embedder_dir = dump_dir / self.embedding_model_subdir
         self.embedder = Embedder(
             device=self.device,
-            model_path=embedder_dir,
+            model_name=embedder_dir,
             batch_size=self.metadata["batch_size"],
             max_length=self.metadata["max_length"],
         )

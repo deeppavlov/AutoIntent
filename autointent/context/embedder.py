@@ -33,7 +33,7 @@ class Embedder:
         if Path(model_name).exists():
             self.load(model_name)
         else:
-            self.embedding_model = SentenceTransformer(model_name, device=device)
+            self.embedding_model = SentenceTransformer(str(model_name), device=device)
 
         self.logger = logging.getLogger(__name__)
 
@@ -52,7 +52,8 @@ class Embedder:
         with (path / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
-    def load(self, path: Path) -> None:
+    def load(self, path: Path | str) -> None:
+        path = Path(path)
         with (path / self.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
         self.batch_size = metadata["batch_size"]
