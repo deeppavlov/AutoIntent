@@ -74,20 +74,14 @@ class DescriptionScorer(ScoringModule):
         self,
         utterances: list[str],
         labels: list[LabelType],
-        descriptions: list[str | None] | None = None,
+        descriptions: list[str],
     ) -> None:
-        if descriptions is None:
-            msg = "Descriptions are required for training."
-            raise ValueError(msg)
-
         if isinstance(labels[0], list):
             self.n_classes = len(labels[0])
             self.multilabel = True
         else:
             self.n_classes = len(set(labels))
             self.multilabel = False
-
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
 
         if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
@@ -111,7 +105,7 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = embedder.embed([desc for desc in descriptions if desc is not None])
+        self.description_vectors = embedder.embed([desc for desc in descriptions if desc])
         self.embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
