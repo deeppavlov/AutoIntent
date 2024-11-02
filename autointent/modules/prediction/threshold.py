@@ -1,6 +1,5 @@
 import json
 import logging
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -81,8 +80,6 @@ class ThresholdPredictor(PredictionModule):
         )
 
         dump_dir = Path(path)
-
-        self.metadata["tags"] = [asdict(tag) for tag in self.tags if self.tags]  # type: ignore[misc, arg-type, union-attr]
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
