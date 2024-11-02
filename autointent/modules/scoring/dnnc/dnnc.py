@@ -111,13 +111,6 @@ class DNNCScorer(ScoringModule):
             model.fit(utterances, labels)
             self.model = model
 
-        self.metadata = DNNCScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
-
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
         Return
@@ -184,6 +177,13 @@ class DNNCScorer(ScoringModule):
         pass
 
     def dump(self, path: str) -> None:
+        self.metadata = DNNCScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)

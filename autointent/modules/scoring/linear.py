@@ -118,11 +118,6 @@ class LinearScorer(ScoringModule):
 
         self._clf = clf
         self._embedder = embedder
-        self.metadata = LinearScorerDumpDict(
-            multilabel=self._multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._embedder.embed(utterances)
@@ -135,6 +130,12 @@ class LinearScorer(ScoringModule):
         self._embedder.delete()
 
     def dump(self, path: str) -> None:
+        self.metadata = LinearScorerDumpDict(
+            multilabel=self._multilabel,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
         dump_dir = Path(path)
 
         metadata_path = dump_dir / self.metadata_dict_name

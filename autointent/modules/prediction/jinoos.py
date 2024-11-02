@@ -53,13 +53,14 @@ class JinoosPredictor(PredictionModule):
             metrics_list.append(metric_value)
 
         self.thresh = float(self.search_space[np.argmax(metrics_list)])
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
+
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:

@@ -106,13 +106,6 @@ class MLKnnScorer(ScoringModule):
         else:
             self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
-        self.metadata = MLKnnScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
-
         self.features = (
             self.vector_index.embedder.embed(utterances)
             if self.vector_index.is_empty()
@@ -184,6 +177,13 @@ class MLKnnScorer(ScoringModule):
         self.vector_index.delete()
 
     def dump(self, path: str) -> None:
+        self.metadata = MLKnnScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:

@@ -102,14 +102,6 @@ class KNNScorer(ScoringModule):
         else:
             self._vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
-        self.metadata = KNNScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
-
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         labels, distances, _ = self._vector_index.query(utterances, self.k)
         return apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
@@ -118,6 +110,14 @@ class KNNScorer(ScoringModule):
         self._vector_index.delete()
 
     def dump(self, path: str) -> None:
+        self.metadata = KNNScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            multilabel=self.multilabel,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:

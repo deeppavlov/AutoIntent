@@ -66,6 +66,12 @@ class ThresholdPredictor(PredictionModule):
                 raise ValueError(msg)
             self.thresh = np.array(self.thresh)
 
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        if self.multilabel:
+            return multilabel_predict(scores, self.thresh, self.tags)
+        return multiclass_predict(scores, self.thresh)
+
+    def dump(self, path: str) -> None:
         self.metadata = ThresholdPredictorDumpMetadata(
             multilabel=self.multilabel,
             tags=self.tags,
@@ -73,12 +79,6 @@ class ThresholdPredictor(PredictionModule):
             n_classes=self.n_classes,
         )
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        if self.multilabel:
-            return multilabel_predict(scores, self.thresh, self.tags)
-        return multiclass_predict(scores, self.thresh)
-
-    def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
         self.metadata["tags"] = [dict(tag) for tag in self.tags if self.tags]  # type: ignore[misc, arg-type, union-attr]

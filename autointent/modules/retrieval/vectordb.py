@@ -14,7 +14,6 @@ from .base import RetrievalModule
 
 
 class VectorDBMetadata(BaseMetadataDict):
-    device: str
     db_dir: str
     batch_size: int
     max_length: int | None
@@ -39,13 +38,6 @@ class VectorDBModule(RetrievalModule):
         self.db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
-
-        self.metadata = VectorDBMetadata(
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-            device=device,
-            db_dir=db_dir,
-        )
 
         super().__init__(k=k)
 
@@ -86,6 +78,12 @@ class VectorDBModule(RetrievalModule):
         self.vector_index.delete()
 
     def dump(self, path: str) -> None:
+        self.metadata = VectorDBMetadata(
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+            db_dir=self.db_dir,
+        )
+
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
@@ -97,7 +95,7 @@ class VectorDBModule(RetrievalModule):
             self.metadata: VectorDBMetadata = json.load(file)
 
         vector_index_client = VectorIndexClient(
-            device=self.metadata["device"],
+            device=self.device,
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],

@@ -63,9 +63,6 @@ class TunablePredictor(PredictionModule):
             tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
-        self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
-        )
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
@@ -73,6 +70,10 @@ class TunablePredictor(PredictionModule):
         return multiclass_predict(scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        self.metadata = TunablePredictorDumpMetadata(
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
+        )
+
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:

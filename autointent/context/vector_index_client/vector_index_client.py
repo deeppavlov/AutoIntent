@@ -103,13 +103,13 @@ class VectorIndexClient:
 
         msg = f"Index for {model_name} wasn't ever created in {self.db_dir}"
         self._logger.error(msg)
-        raise NonExistentIndexError(msg)
+        raise NonExistingIndexError(msg)
 
     def exists(self, model_name: str) -> bool:
         return self._get_index_dirpath(model_name) is not None
 
 
-class NonExistentIndexError(Exception):
+class NonExistingIndexError(Exception):
     def __init__(self, message: str = "non-existent index was requested") -> None:
         self.message = message
         super().__init__(message)
