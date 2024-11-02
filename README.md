@@ -112,8 +112,7 @@ autointent embedder.batch_size=32
 ```
 
 * Вариант 2 - в конфигурационном yaml файле.
-Создайте в отдельной папке yaml файл со следующей структурой (желательно чтобы имя файла отличалось от
-optimization_config.yaml, чтобы избежать warnings от hydra) **my_config.yaml**:
+Создайте в отдельной папке yaml файл со следующей структурой **my_config.yaml**:
 ```yaml
 defaults:
   - optimization_config
@@ -127,18 +126,24 @@ embedder:
 ```
 Запускаем AutoIntent:
 ```bash
-autointent --config-path=/home/user/config --config-name=my_config
+autointent --config-path=/path/to/config/directory --config-name=my_config
 ```
-!!ВАЖНО!!
+
+Важно:
 * указывайте полный путь в опции config-path.
 * не используйте tab в yaml файле.
+* желательно чтобы имя файла отличалось от
+optimization_config.yaml, чтобы избежать warnings от hydra
 
 Вы можете использовать комбинацию Варианта 1 и 2. Опции из коммандной строки имеют наивысший приоритет.
 
 
+
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
 
-Пример входных данных в директории `data/intent_records`.
+Примеры:
+- примеры входных данных: [data](./data)
+- примеры конфигов: [example_configs](./example_configs)
 
 ### Инференс
 
