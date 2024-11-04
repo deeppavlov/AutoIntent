@@ -1,4 +1,5 @@
 import importlib.resources as ires
+from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
@@ -22,11 +23,14 @@ def setup_environment() -> tuple[str, str]:
     return get_db_dir, dump_dir, logs_dir
 
 
+def get_clinic_path(dataset_type: DATASET_TYPE) -> Path:
+    return Path(ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json"))
+
+
 @pytest.fixture
 def load_clinc_subset():
     def _load_data(dataset_type: DATASET_TYPE) -> Dataset:
-        dataset_path = ires.files("tests.assets.data").joinpath(f"clinc_subset_{dataset_type}.json")
-        return load_data(dataset_path)
+        return load_data(get_clinic_path(dataset_type))
 
     return _load_data
 
