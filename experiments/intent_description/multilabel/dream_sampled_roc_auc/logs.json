@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0
+        ],
+        "scoring": [
+            0.9069264069264069,
+            0.9069264069264069,
+            0.9069264069264069,
+            0.9069264069264069,
+            0.9069264069264069,
+            0.9047619047619048,
+            0.9047619047619048,
+            0.9080086580086579,
+            0.9458874458874459,
+            0.9512987012987014,
+            0.9469696969696971,
+            0.9632034632034632,
+            0.972943722943723,
+            0.9577922077922079,
+            0.9696969696969695,
+            0.9935064935064936,
+            0.9761904761904763,
+            0.9978354978354979
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9047619047619048,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9047619047619048,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9080086580086579,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9458874458874459,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9512987012987014,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9469696969696971,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9632034632034632,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.972943722943723,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9577922077922079,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9696969696969695,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9935064935064936,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9761904761904763,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9978354978354979,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

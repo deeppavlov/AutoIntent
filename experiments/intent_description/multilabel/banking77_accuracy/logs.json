@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.948051948051948
+        ],
+        "scoring": [
+            0.012987012987012988,
+            0.012987012987012988,
+            0.012987012987012988,
+            0.012987012987012988,
+            0.012987012987012988,
+            0.9942654747849553,
+            0.9942654747849553,
+            0.9942654747849553,
+            0.992410187215382,
+            0.9929161747343566,
+            0.9861696744813628,
+            0.9907235621521335,
+            0.9922415247090571,
+            0.974025974025974,
+            0.987012987012987,
+            0.9907235621521335,
+            0.9399561477483556,
+            0.987012987012987
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.948051948051948,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.012987012987012988,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.012987012987012988,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.012987012987012988,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.012987012987012988,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.012987012987012988,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9942654747849553,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9942654747849553,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9942654747849553,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.992410187215382,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9929161747343566,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9861696744813628,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9907235621521335,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9922415247090571,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.974025974025974,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.987012987012987,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9907235621521335,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9399561477483556,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.987012987012987,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/ashamed_salamander_11-05-2024_18-03-15/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

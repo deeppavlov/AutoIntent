@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.953125
+        ],
+        "scoring": [
+            0.015625,
+            0.015625,
+            0.015625,
+            0.015625,
+            0.015625,
+            0.98876953125,
+            0.98876953125,
+            0.98876953125,
+            0.990966796875,
+            0.990966796875,
+            0.9833984375,
+            0.989990234375,
+            0.989990234375,
+            0.9677734375,
+            0.984375,
+            0.987060546875,
+            0.92529296875,
+            0.984375
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.015625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.015625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.015625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.015625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.015625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.98876953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.98876953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.98876953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.990966796875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.990966796875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9833984375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.989990234375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.989990234375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9677734375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.984375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.987060546875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.92529296875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.984375,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/obnoxious_turtle_11-05-2024_18-46-13/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

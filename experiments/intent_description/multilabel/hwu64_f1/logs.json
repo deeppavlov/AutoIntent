@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.953125
+        ],
+        "scoring": [
+            0.03076923076923077,
+            0.03076923076923077,
+            0.03076923076923077,
+            0.03076923076923077,
+            0.03076923076923077,
+            0.5635416666666666,
+            0.5635416666666666,
+            0.5635416666666666,
+            0.5546875,
+            0.5546875,
+            0.6736979166666666,
+            0.4114583333333333,
+            0.4270833333333333,
+            0.5341517857142857,
+            0.0,
+            0.171875,
+            0.3508746028277278,
+            0.0
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.03076923076923077,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.03076923076923077,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.03076923076923077,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.03076923076923077,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.03076923076923077,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5635416666666666,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5635416666666666,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5635416666666666,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5546875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5546875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6736979166666666,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4114583333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4270833333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.5341517857142857,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.171875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.3508746028277278,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_f1",
+                "metric_value": 0.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/happy_stegosaurus_11-05-2024_19-55-19/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

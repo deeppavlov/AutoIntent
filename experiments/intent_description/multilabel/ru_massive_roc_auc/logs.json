@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.95
+        ],
+        "scoring": [
+            0.9355932203389832,
+            0.9355932203389832,
+            0.9355932203389832,
+            0.9355932203389832,
+            0.93545197740113,
+            0.8813559322033898,
+            0.8813559322033898,
+            0.8814971751412429,
+            0.9538135593220339,
+            0.9557909604519775,
+            0.9540960451977402,
+            0.9610169491525423,
+            0.9641242937853107,
+            0.9610169491525424,
+            0.9651129943502824,
+            0.97090395480226,
+            0.9663841807909604,
+            0.9935028248587571
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.95,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9355932203389832,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9355932203389832,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9355932203389832,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9355932203389832,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.93545197740113,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8813559322033898,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8813559322033898,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8814971751412429,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9538135593220339,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9557909604519775,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9540960451977402,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9610169491525423,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9641242937853107,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9610169491525424,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9651129943502824,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.97090395480226,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9663841807909604,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9935028248587571,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/awful_cricket_11-05-2024_17-53-13/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

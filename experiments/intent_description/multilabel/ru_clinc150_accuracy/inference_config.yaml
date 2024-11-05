@@ -1,0 +1,18 @@
+metadata:
+  device: cuda
+  multilabel: true
+  n_classes: 150
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/long_pterodactyl_11-05-2024_18-48-07/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: deepvk/USER-bge-m3
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/long_pterodactyl_11-05-2024_18-48-07/modules_dumps/scoring/knn/comb_0
+  module_config:
+    k: 1
+    weights: uniform
+  module_type: knn
+  node_type: scoring

@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9444444444444444
+        ],
+        "scoring": [
+            0.018518518518518517,
+            0.018518518518518517,
+            0.018518518518518517,
+            0.018518518518518517,
+            0.018518518518518517,
+            0.9862825788751715,
+            0.9862825788751715,
+            0.9862825788751715,
+            0.9862825788751715,
+            0.9866255144032922,
+            0.9708504801097394,
+            0.9859396433470508,
+            0.9869684499314129,
+            0.9550754458161865,
+            0.9814814814814815,
+            0.9842249657064472,
+            0.9056927297668038,
+            0.9814814814814815
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9444444444444444,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.018518518518518517,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.018518518518518517,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.018518518518518517,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.018518518518518517,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.018518518518518517,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9862825788751715,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9862825788751715,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9862825788751715,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9862825788751715,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9866255144032922,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9708504801097394,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9859396433470508,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9869684499314129,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9550754458161865,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9814814814814815,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9842249657064472,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9056927297668038,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9814814814814815,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/mysterious_pigeon_11-05-2024_18-50-41/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

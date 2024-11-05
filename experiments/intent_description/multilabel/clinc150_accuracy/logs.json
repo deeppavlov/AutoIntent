@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9866666666666667
+        ],
+        "scoring": [
+            0.006666666666666667,
+            0.006666666666666667,
+            0.006666666666666667,
+            0.006666666666666667,
+            0.006666666666666667,
+            0.9991111111111111,
+            0.9991111111111111,
+            0.9991111111111111,
+            0.9989333333333333,
+            0.9989333333333333,
+            0.9973333333333333,
+            0.9986222222222222,
+            0.9990222222222223,
+            0.9910222222222222,
+            0.9933333333333333,
+            0.9974222222222222,
+            0.9742222222222222,
+            0.9933333333333333
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9866666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.006666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.006666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.006666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.006666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.006666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9991111111111111,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9991111111111111,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9991111111111111,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9989333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9989333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9973333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9986222222222222,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9990222222222223,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9910222222222222,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9933333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9974222222222222,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9742222222222222,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_accuracy",
+                "metric_value": 0.9933333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/shy_beetle_11-05-2024_18-05-13/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

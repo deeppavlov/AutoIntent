@@ -1,0 +1,18 @@
+metadata:
+  device: cuda
+  multilabel: true
+  n_classes: 150
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/inexpensive_quagga_11-05-2024_20-08-59/modules_dumps/retrieval/vector_db/comb_2
+  module_config:
+    k: 10
+    model_name: infgrad/stella-base-en-v2
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/inexpensive_quagga_11-05-2024_20-08-59/modules_dumps/scoring/knn/comb_0
+  module_config:
+    k: 1
+    weights: uniform
+  module_type: knn
+  node_type: scoring

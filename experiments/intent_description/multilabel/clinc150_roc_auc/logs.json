@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9866666666666667
+        ],
+        "scoring": [
+            0.9593736017897091,
+            0.9593736017897091,
+            0.9593736017897091,
+            0.9593736017897091,
+            0.9594183445190158,
+            0.9664429530201343,
+            0.9664429530201343,
+            0.9666219239373602,
+            0.9765548098434003,
+            0.976532438478747,
+            0.9763982102908279,
+            0.9863087248322148,
+            0.9864653243847874,
+            0.9860178970917226,
+            0.9918791946308727,
+            0.9931319910514541,
+            0.9921476510067115,
+            0.9955257270693513
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9866666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9593736017897091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9593736017897091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9593736017897091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9593736017897091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9594183445190158,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9664429530201343,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9664429530201343,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9666219239373602,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9765548098434003,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.976532438478747,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9763982102908279,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9863087248322148,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9864653243847874,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9860178970917226,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9918791946308727,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9931319910514541,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9921476510067115,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9955257270693513,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/depressed_bird_11-05-2024_17-01-12/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.953125
+        ],
+        "scoring": [
+            0.9293154761904763,
+            0.9293154761904763,
+            0.9293154761904763,
+            0.9293154761904763,
+            0.9294394841269842,
+            0.8174603174603174,
+            0.8174603174603174,
+            0.8190724206349206,
+            0.9419642857142857,
+            0.9419642857142857,
+            0.9418402777777778,
+            0.9635416666666667,
+            0.964781746031746,
+            0.9615575396825398,
+            0.9666418650793651,
+            0.9711061507936508,
+            0.9666418650793651,
+            0.9831349206349207
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9293154761904763,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9293154761904763,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9293154761904763,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9293154761904763,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9294394841269842,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8174603174603174,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8174603174603174,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.8190724206349206,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9419642857142857,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9419642857142857,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9418402777777778,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9635416666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.964781746031746,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9615575396825398,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9666418650793651,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9711061507936508,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9666418650793651,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9831349206349207,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/hurt_stellersea_11-05-2024_17-22-49/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

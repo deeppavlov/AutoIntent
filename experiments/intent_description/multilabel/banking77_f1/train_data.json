@@ -1,0 +1,1850 @@
+[
+    {
+        "utterance": "Please help me with my card.  It won't activate.",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "I want to start using my card.",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "How do I verify my new card?",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "I tried activating my plug-in and it didn't piece of work",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "I want to open an account for my children",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "Whats the minimum age to have an account",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "Can my children open an account?",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "How old do I need to be?",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "Hi, I have an apple watch. How do I use it to top up my card?",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "why top up is not working even if I got my American Express in Apple Bay?",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "Can I deposit money using Apple Pay?",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "Can I use google pay for topping -up",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "I can use this card at which ATMs?",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "What locations can I get money from?",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "What ATMs take this card?",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "Which ATM's can I use to make a withdrawal?",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "Can I add money automatically to my account while traveling?",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "What are the maximum amount you can do for auto top-up?",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "I can't find the auto-top up option.",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "Does the auto top-up have any limits?",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "help my money isnt showing up",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "Hello. Can you help figure out why the recent transfer from my UK bank account isn't showing up?",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "I've made a transfer from France two days ago but I was wondering if international transfers take longer to arrive because it hasn't made it yet.",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "After I transferred money the balance remained the same.",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "Why is my last cheque deposit taking so long?",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "I tried using a check to update my balance, but it isn't work? Is something wrong?",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "I deposited cash but it isn't showing up in my account",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "I put some cash into my account but it's not displaying that on my balance.",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "is there something blocking me from making transfers",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "Is there something wrong with the transferring functions? I keep trying to transfer funds and only get an error message.",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "What are the reasons a beneficiary would be denied?",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "A transfer to my account was denied.",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "Cancel a transaction",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "I needed to make a payment on my account, but I typed in the incorrect number.  The app won't allow me to cancel this transaction.  I need it cancelled ASAP!!",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "I made a mistake this morning when I did a transfer. How do I reverse it?",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "Can I cancel a transaction?",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "Are there any express fees if i want my new card faster?",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "I am overseas in China, can I get a replacement card?",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "Can I get a new card with new expiration date in China?",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "Are there restrictions on new cards in China?",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "Is there anywhere I can't use my card?",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "How do I know where I can use my card?",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "Can I tell what business will take this card?",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "Are there businesses that don't accept this card?",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "I am still waiting on my card?",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "I have been waiting over a week. Is the card still coming?",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "Can I track my card while it is in the process of delivery?",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "How do I know if I will get my card, or if it is lost?",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "Can it specifically be delivered on a certain date?",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "When can I expect my card? I live in the US.",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "Help! When will the card arrive at my home?",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "Can I get my card fast tracked?",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "My card has been found. Is there any way for me to put it back into the app?",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "how do I get my card to show in the app?",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "I just got my card.  It's not linked yet--how do I do that?",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "lost card found, want to put it back in app",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "I can't use my card because it is not working.",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "My card isn't working at all, I need assistance. It's really frustrating.",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "Can you tell me what the problem with my card is? It was declined at a restaurant today.",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "How do I fix a broken card?",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "There was a fee charged when I paid with my card.",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "Why am I being a charged for using my card?",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "Tell me why there is a fee for a card payment.",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "I don't understand why I'm being charged for using my card.",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "There's a payment with my card that I didn't perform. I don't know that name shown.",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "There's a payment with my card that I definitely didn't do myself, never seen that name before.",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "Help! In the app there is a payment that I don't remember.",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "I don't understand where this charge came from.",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "Last Saturday, I was charged extra for the exchange rate on my payment. Is something wrong?",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "I think the currency exchange that's been applied is wrong.",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "The exchange rate I was charged for a purchase was not right.",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "Can you please explain why the exchange rate for the item I bought is wrong?",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "What do I do if the ATM took my card?",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "An ATM machine didn't give me back my card.",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "My card got trapped inside an ATM, what should I do?",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "What do I do if I can't get my card out of the ATM?",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "Why is there a charge when I took out money?",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "I made a cash withdrawl and there is a charge.  What is this?",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "I am inquiring about why there was an extra fee charged when I used an ATM.",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "Why am I being charged extra when I withdrew money?",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "I looked on the app and it says I withdrew cash.  I didn't!",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "I saw on the app that a cash withdrawal was completed on my account; however, I did not complete it.",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "I got a notice from my app that I withdrew cash but I don't remember doing so. How do I fix this?",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "Someone has a copy of my card !! I definitely still have it here but someone just made a 500£ cash withdrawal, HELP!",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "Is it possible for me to change my PIN number?",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "In what way can I change my PIN and where do I need to be?",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "Can I change my PIN at any cash machines?",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "I need to make my card PIN a different number",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "I think someone is using my card without my permission!",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "I think my account has been hacked there are charges on there I don't recognize.",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "I don't recognize some transactions.  Is someone else using it?",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "I just got an email in confirming my purchase with my card. I login to the mobile app on the card and found out there are several purchase were made without me aware of it. Evidently someone had stole my card information and made these fraudulent purchase. I need the transaction to be reverse and have my card suspended.",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "Should i uninstall the app before i try it again?",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "Why is my contactless not working?",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "My contactless payments don't work.",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "how many days processing new card?",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "Which countries are you available in?",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "How do I get a card if I live in the US?",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "Please list the countries you support.",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "Are these cards available in europe?",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "I'm not sure why my card didn't work",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "Do you know why my card payment has been declined?",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "Why isn't my card working? I was pumped to use my new card but it keeps getting declined. Help please.",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "I could not use my card in a store.",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "I tried to withdraw cash and got declined, why is that?",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "I could not access my money at the ATM",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "i needed money for a night out with the girls but i was declined, why?",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "Why was I blocked from withdrawing from the ATM?",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "Transfer unable to be completed, states 'declined'",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "My transfer was rejected",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "I tried to buy something online yesterday and got a message saying declined. I tried again today and got the same message. What's the problem?",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "I am having trouble doing a transfer. A \"Decline \" message appears after making the transfer.",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "Hi, i found a large amount payment in my old statements which i am sure was not made by me. I am aware that the time has passed but is there a way to raise a dispute for this payment now?",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "Please help my find out why there is an odd direct debit in my records.",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "I am seeing in the App a diret debit that its not mine",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "There is a direct debit payment that I did not make.",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "Do the disposable cards have any restrictions on them?",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "A friend was telling me about her disposable cards. What would I have to do to be able to get that feature?",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "Can I have more disposable cards?",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "i tried using a virtual card for a hotel but it didn't work, why not",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "I am interested in changing my personal details.",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "I'd like to make some changes to my personal information.",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "I would like to change my name after marriage.",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "I would like to change my adress",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "How much is the exchange fee?",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "If I exchange currencies on a frequent basis can I receive a discount?",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "Is there any cost to change foreign money to local?",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "What are the currency exchange fees?",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "What is my money worth in other countries?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "Do you know the rate of exchange?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "What foreign exchange rate will I get on weekdays and on the weekends?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "What is the exchange looking like?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "Can I change from AUD to GBP?",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "How can I change to another currency?",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "Does the app allowing exchanges between USD and GBP",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "What if I need to use GBP instead of USD?",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "Why is there an extra fee on my statement?",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "Why is there a 1 euro fee on my statement?",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "Why do I see an extra £1 charge on my statement?",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "I am inquiring about a $1 charge on my statement.",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "What is happening?  I have tried to transfer money 5x already.  Is the system down?  This shouldnt be happening as this is a basic transfer.",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "Why didn't my transfer complete?",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "Why was I unable to finish this transfer?",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "I have made 5 attempts to make a very standard survey, yet I can't get it to work. What is the problem? Is there an issue related to your system?",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "How many different currencies can I hold money in?",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "How many currencies can I have money in in my account?",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "Is the EUR accepted for exchanges?",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "Is it okay to hold money in multiple currencies?",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "What do you use disposable cards on?",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "I want a disposable virtual card, how do I do that?",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "What are the disposable cards for?",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "I need a disposable virtual card. Please tell me how to order one.",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "I'm not sure what to do about the PIN, because I don't have one yet.",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "Where can I get my card PIN?",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "my pin hasn't arrived in the post! How do I cancel it or get a new one?",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "Where is the card PIN located?",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "Are extra charges added for sending out additional cards?",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "I want some extra physical cards.",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "I would like open a second card for my daughter, how can you assist me?",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "Am I gonna be charged for sending out more cards?",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "I would like to order a virtual card, where can I get one?",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "How can I sign up for a virtual card?",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "I haven't received my virtual card yet!!",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "Can you give me a virtual card?",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "Has there been any activity on my card today?",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "I'm panicking!  I lost my card!  Help!",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "I need to report a stolen card",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "How do I replace a stolen card?",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "My phone was stolen, what should I do first?",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "I lost my phone, what should I do?",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "Someone has stolen my phone, what should I do?",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "I think I lost my phone.  Is there a way to prevent anyone from getting into my account on it?",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "How much does it cost for a physical card?",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "What do i do to get a physical card?",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "Can I request a card?",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "Do I have to pay for a physical card?",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "Help me!  I don't know what my password is.",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "I am unable to access my app due to forgetting my passcode.",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "I can't recall my password.",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "What should I do if I don't know my password?",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "What does it mean when a payment is pending?",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "The purchase I made is still pending.",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "Is there a problem with the payment that I see is still pending?",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "There is a payment that I made that hasn't gone through yet.",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "I would like to know why a withdraw I made for some cash shows up as pending.",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "I have the cash already, my account still shows up as pending.  How can my account be still pending?",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "I tried to get cash out of the ATM but it is taking too long",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "Why is the cash withdrawal under pending?",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "How long does a top-up take to go through?",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "How long will it take for my money to be deposited?",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "i put money on my card and i dont see it on the balance",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "I have a top-up that's still pending and wanted to know about it.",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "i put in money for vacation and its not showing. i need that money today, how long will it take",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "Transfers can take up to one day to process before departing for the beneficiary accounts. Please confirm that you've entered your account details correctly. SEPA transfers can take up to two working days, while SWIFT transfers can take up to five working days.",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "When will my transfer finish pending?",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "How long do transfers take, mine just says pending?",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "I have exceeded the number of PIN attempts",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "Please help me unblock my pin which I put the wrong one too many times.",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "Help me unblock my account.  I entered the PIN wrong too many times.",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "I locked myself out of my account, how do I unblock my PIN?",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "Can my salary be received here?",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "Salary in GBP has been received. Does it need to be configured into another place?",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "I am paid by my employer in GBP; do I need to do anything in the app to indicate this?",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "How can my friend give me money?",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "I don't see my refund money yet in my account. I asked the merchant a while ago for a refund, so I don't know what's taking so long.  Can you look into it and see if the money is there, just not in my account yet?",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "Please help me.  I am still waiting on a refund.",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "I requested a refund but am unable to see it in my account. Why is that?",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "When will my refund come through",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "How long does it take to get a refund on something I bought?",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "Can i cancel this purchase?",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "I want to return an item for a refund can I do that?",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "Can I request a refund",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "I wanted to purchase something online but the payment was returned back to me. This has been going on for a couple of weeks. Please tell me what is going on here?",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "Hi, I had an issue with my card payment and It shows on my account that my payment went through. Then I got contacted from the seller saying \"they did not receive my payment\" then the payment was returned to my account. so I would like to see why it did that please.",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "I think my card payment has been reverted",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "Tell me why my card payment would be reverted.",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "How do I use American express to top up my account?",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "Is my credit card supported for top-ups?",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "Am I able to add money into my account using my American Express?",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "Can I use my American Express card to add money into my account?",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "How do I deactivate my account?",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "Are you able to delete my account?",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "How do I discontinue my account?",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "please delete account",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "Is there a top up fee for transfer?",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "What are the charges for receiving a SEPA transfer?",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "Is there a charge for SEPA transfers?",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "Will I be charged a fee for a SEPA transfer?",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "What is the charge for using a Top up card in the US?",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "What fees are charged when I top up",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "Is there a charge for topping up by card?",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "Which US cards have top up charges?",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "Help me please, I need to top up cash.",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "Is there somewhere I can send a check to add to my account?",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "Will a cheque suffice?",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "I can't find any option to top up with a cheque?",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "I think my top-up has failed.",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "My top up is not working",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "My top-up hasn't gone through, what happened?",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "My top-up was rejected by an app.",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "What is the max amount of top-ups?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "Can I increase my top-up maximum?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "Can I top-up any amount?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "What's the limit to how much I can top up?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "My top up did not show up as shown and my money has disappeared, can you help me fix this glitch problem?",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "I topped up recently and saw the money go through, but now it's just gone? What's going on",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "For what reason did my top-up get cancelled?",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "I think my top up has been reverted",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "My money I had was gone and I could not get gas!",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "I can't see my top up in my wallet!",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "I want to transfer money using my credit card.",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "I tried topping up using my card, but the money is gone?",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "A transaction shows duplicate times.",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "How can I fix this?  There is a double charge on my account.",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "My card got charged twice for the same thing!",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "My husband and I went out for our weekly \"dinner and a movie,\" and it was my turn to pick up the check. Now I see that my card was charged twice. Who should I contact about negating the second charge and getting my card credited?",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "I was transferring some money to a friend, which I thought would be free, but I see there is a charge.  What's up with that?",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "I didn't know there was a charge for tranferring. What is the charge?",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "I transferred money, why was charged for an extra fee?",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "When I made a transfer I was charged extra.",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "I want to transfer money. How do I do that for my account?",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "How can I link my bank to my top up account?",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "I have an account that is empty of funds. Can I transfer some from another bank?",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "HOW DO I TRANSFER MONEY FROM MY BANK ACCOUNT?",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "I am worried that too much time has gone by for a transfer to be completed.",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "My money transaction can't be seen by the person I sent it to",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "How long does it typically take a transfer to go through?  I sent some money to a friend earlier today, and she really needs it.  It still is a pending transfer, even though I sent it a few hours ago.",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "I have done a transfer within the country the day before yesterday, but it's still not there yet. Can you please check what's going on with that, the account number definitely is the right one, I've checked that already.",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "How long am I to wait before the transfer gets to my account?",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "What time will a transfer from the US take?",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "When will the money reach my  account?",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "How long does it take to get my money",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "Can you help me with proving my identity?",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "Are there any reasons that my identity wouldn't be accepted even though everything I've provided is factual?",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "I am having some difficulty verifying my id.",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "I am not able to verify my id. Why?",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "What do you require for identity verification?",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "I need to verify my identity. How do I do that?",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "How do I verify my identity?",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "How do I verify my identity online",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "where exactly does money come from",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "Can I check to see where the funds came from?",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "What are the sources for the funds in my account?",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "need to know where money comes from",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "Do you know how I can verify that I did a top-up to my card?",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "The top-up card is verified how?",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "Tell me about verifying top-up",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "What is the verification code for my top up card?",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "Why isn't my disposable virtual card working?",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "Why won't my virtual card work?",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "My virtual card is just not going through.",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "My virtual card isn't working.",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "Is there a way I can have a mastercard?",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "I do not want a VISA card.",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "I prefer using Mastercard, can I substitute?",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "I prefer Mastecard.",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "Why do you have an identity check?",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "Why on earth do you need so much personal id info from me?",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "DO you know the reason for the identity check?",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "I answered so many questions about my identity. Why do you need this info?",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "Why did I only receive a partial amount of what I tried to withdraw?",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "why did i only get 20.00",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "Why is my cash request and the amount I received different?",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "I tried to withdraw $100, all it gave me was $20.",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "The wrong exchange rate was applied to me while pulling out cash.",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "Why is the fee for taking money out so high?  I feel I was overcharged and I would have never used this ATM if I would have known ahead of time.",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "I believe a wrong exchange rate was applied towards a cash transaction I made abroad.",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "When I got my cash, the amount was not what it should have been, based on the exchange rate.",
+        "labels": [
+            76
+        ]
+    }
+]

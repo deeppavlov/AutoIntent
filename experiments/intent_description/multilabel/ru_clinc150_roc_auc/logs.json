@@ -1,0 +1,219 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9866666666666667
+        ],
+        "scoring": [
+            0.965771812080537,
+            0.965771812080537,
+            0.965771812080537,
+            0.965771812080537,
+            0.9658165548098433,
+            0.9664429530201343,
+            0.9664429530201343,
+            0.9665771812080537,
+            0.9830648769574944,
+            0.9831543624161073,
+            0.9831991051454138,
+            0.9893959731543625,
+            0.9897539149888144,
+            0.9895749440715883,
+            0.9910067114093961,
+            0.9929082774049217,
+            0.9924608501118568,
+            0.99744966442953
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9866666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.965771812080537,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.965771812080537,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.965771812080537,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.965771812080537,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9658165548098433,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9664429530201343,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9664429530201343,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9665771812080537,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9830648769574944,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9831543624161073,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9831991051454138,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9893959731543625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9897539149888144,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9895749440715883,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9910067114093961,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9929082774049217,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.9924608501118568,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_roc_auc",
+                "metric_value": 0.99744966442953,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wide-eyed_snake_11-05-2024_17-24-42/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

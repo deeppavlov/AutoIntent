@@ -1,0 +1,530 @@
+[
+    {
+        "utterance": "what are we discussing",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "alexa i do not get it",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "alexa what is that",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "i don't know what you just said",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "i don't wanna talk about it anymore",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "i don't like to talk about this boring topic any more",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "i am fed up with this subject",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "i'm fed up with this topic",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "stop talk to you about books",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "talk with you about roblox",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "stop talk with you about teddy bears",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "talk to me about engineering",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "i am going to go to bed now",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "alexa off",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "alexa shut your face",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "turn off alexa",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "tell me another story",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "can you read a story",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "please read  a story",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "i want you to read me  a story",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "what did you say",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "repeat  the question",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "repeat, please",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "excuse me",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "cool i agree",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "whatever",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "ho on",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "sure why not",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "surely not",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "no, never again  alexa",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "Uhh never alexa",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "definetely not",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "what are you saying",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "sorry, I did not know what you say alexa",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "what, it doesn't make sense",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "we're not on the same page",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "why are you this dump",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "that's a dumb question",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "alexa it's not much fun to talk to you",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "alexa stop being stupid",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "play me music",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "decrease sound",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "stop playing music",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "alexa did you set alarmfor one o'clockfor my me",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "tell me about these things",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "would you tell me more about it",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "would you tell me more about it",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "tell me more about it alexa",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "alexa what's the weather in bbc",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "so how's the weather",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "what is today's weather",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "what the weather like in mosco",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "do you have a surname",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "how to call you",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "how can i name you",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "how can i call you",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "Where are you from, Alexa",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "What's country of origin",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "Where do you exist, Alexa",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "Where are you right now",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "tell me what are you able to do",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "what are your abilities",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "tell me your skills",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "tell me more about yourself",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "what do you want to talk about",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "what can you talk about",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "what can you talk about",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "what can you talk about",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "who create you",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "which team owns you",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "who is your manager",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "who do you belong to",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "tell me your profession",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "who are you working",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "who are you working",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "what is your job",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": " tell your thought on book",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "Would you approve views that work was nice",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "i'd wish to listen your opinions, on Leonardo DiCaprio",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "Could it be okay to say that this",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "i am all right thanks",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "i'm cool thanks",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "i'm cool thanks",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "i'm cool thanks",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "can you tell me the time",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "what time is it",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "say me the time",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "tell me the time",
+        "labels": [
+            21
+        ]
+    }
+]

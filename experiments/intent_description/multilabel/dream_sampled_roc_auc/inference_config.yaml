@@ -1,0 +1,16 @@
+metadata:
+  device: cuda
+  multilabel: true
+  n_classes: 22
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: deepvk/USER-bge-m3
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/happy_dodo_11-05-2024_17-04-39/modules_dumps/scoring/linear/comb_0
+  module_config: {}
+  module_type: linear
+  node_type: scoring

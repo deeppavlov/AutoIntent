@@ -1,0 +1,231 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "scoring": [
+            0.08695652173913042,
+            0.08695652173913042,
+            0.08695652173913042,
+            0.08695652173913042,
+            0.7727272727272727,
+            0.7727272727272727,
+            0.7727272727272727,
+            0.8030303030303029,
+            0.8333333333333333,
+            0.7454545454545454,
+            0.6969696969696969,
+            0.7424242424242423,
+            0.6106060606060605,
+            0.0,
+            0.4090909090909091,
+            0.38251016660107573,
+            0.0
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/retrieval/vector_db/comb_1"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/retrieval/vector_db/comb_2"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.08695652173913042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.08695652173913042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.08695652173913042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.08695652173913042,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7727272727272727,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7727272727272727,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7727272727272727,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.8030303030303029,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.8333333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7454545454545454,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6969696969696969,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.7424242424242423,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.6106060606060605,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.4090909090909091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_f1",
+                "metric_value": 0.38251016660107573,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_f1",
+                "metric_value": 0.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/nutty_zebra_11-05-2024_20-10-13/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

@@ -1,0 +1,3602 @@
+[
+    {
+        "utterance": "can i make a reservation for redrobin",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "does redrobin take reservations",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "are reservations taken at redrobin",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "does redrobin do reservations",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "why is there a hold on my american saving bank account",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "why is there a hold on my capital one checking account",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "i think my account is blocked but i do not know the reason",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "can you tell me why is my bank account frozen",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "wake me up at noon tomorrow",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "make sure my alarm is set for three thirty in the morning",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "please set an alarm for mid day",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "have an alarm set for three in the morning",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "when will my application for my credit card be processed",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "do you know if my amex card app went through",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "have they looked over my app for the new credit card yet",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "has my application for the mastercard card gone through",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "is the apr on my credit card good",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "do i have a good apr on my credit card",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "does my credit card apr fall into a good range",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "tell me how the apr on my hy-vee card is",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "may i know if you are a real person or an ai",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "i want to know if you are a real person or an ai",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "tell me if you are a real person or an ai",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "are your real or artificial",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "savings account balance at chase bank please",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "what is my checking account balance at chase",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "i want my checking balance at chase",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "what's my savings balance at chase",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "the bill for water and electricity is how much",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "for my water and electricity, how much is the bill",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "how much is the bill for my water and electricity",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "my water and electricity bill is how much",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "when should i pay my bill by",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "when's the gas bill due",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "when do i pay the utilities",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "do i pay my rent this week",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "what's the cheapest fares from lax to sfo for round trip flights leaving april 1st and returning april 7th",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "what southwest flights are there for lax to sfo arriving april 1st and returning april 7th",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "what airlines have flights round trip on april 1st to april 7th from lax to sfo",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "find me round trip flights out of lax to sfox",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "i need a bed in brownsburg near walmart from apil 4th until the 5th",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "i need lodging in lizton near the ice cream parlor from may 3rd until the 8th",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "need a place to crash in elizabeth near the refinery from june 4th until the 9th",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "i need a place to stay in newark near a bodega from may 2nd through the 4th",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "what is 7 x 7",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "what is 8 factorial",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "can you tell me what 30% off 279 is",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "can you tell me what 30% off 235 is, please",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "does my calendar have anything for january 1st",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "are there any events on my calendar for january 1st",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "what do i have to do on january 1st",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "do i have anything scheduled on january 1st",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "add my dentist appointment to the calendar",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "i need to edit this event out of my calendar",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "please remove an event from this calendar",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "i no longer want this event in my calendar",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "can you provide me the calories in the smoothie",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "i'd like the calories for this chicken breast",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "how many calories in this slice of pizza",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "what about the calories for this chicken salad",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "please cancel what you are doing, i've changed my mind",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "stop working on it, i need something else",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "cancel my last request, i know the answer",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "forget it, i do not need it anymore",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "remove my reservation at outback for timmy",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "cancel my party reservation for brad at longhorn",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "get rid of my reservation at chez francois for jennifer",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "cancel the reservation at olive garden for tommy",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "i want to reserve a convertible from july 2nd through july 18th for los angeles",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "i want to rent the cheapest car for charlottesville, virginia for march 7th through 10th, that's monday, tuesday, wednesday and thursday",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "i'd like to reserve a high-end car that seats 5 comfortably for april 12th through 18th for st louis missouri",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "i need a van that seats 8 or more for new york city, august 12th, 13th, and 14th",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "why did my card not get accepted",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "please tell me why did my card not get accepted",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "why did my card not get accepted please",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "why did my card not get accepted then",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "if i fly american to los angeles, how many carry ons am i allowed",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "if i take a flight on pan am to denver, how many carry ons are included",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "if i fly on virgin to chicago, how many carry ons can i take",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "how my carry ons does spirit airlines allow me for a flight to dallas",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "use a different accent",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "speak in a different accent",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "change the accent you're speaking in",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "could you change the accent you're using",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "rename yourself to betty",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "rename bob to betty",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "is there a way to change your name to betty",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "i will call you zander",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "adjust your language setting to english",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "set your language setting to english",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "make your preferred language english",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "i would like to have language set to spanish, please",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "can you slow your speaking down",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "you're talking too fast i need you to slow it down",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "you're speaking too fast, slow down",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "can you speak slower please",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "please change the name you refer to me by",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "is there a way i can change the name you use to address me",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "i need to change my name to something else for you to call me",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "can i have you call me something else",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "raise the volume to 4 please",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "please increase the volume to 4",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "please raise the volume to 4",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "set the volume to 4 please",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "verify that i have reservations at chilis for john doe",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "can you check for reservations at wongs chinese for john acer",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "check and confirm reservations at ruth chris for carol lee",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "verify that my reservations at won wons for joe lee are good",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "how long will the turkey take to cook",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "how long does pizza take to cook",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "how long is the chicken gonna take",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "how long will the chicken take to cook",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "how high is my credit limit for my old navy card",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "what is the credit limit for my usaa card",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "how high is my credit limit for my childrens place card",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "how high is my credit limit for my walmart card",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "can you see if i can get a higher limit on my discovery card",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "may i have a higher limit on my mastercard",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "can i get a higher credit limit on my amex card",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "is there a way to get a larger limit on my bank of america card",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "how do i look up my credit score",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "can you figure out how to find my credit score",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "are you able to lookup my credit rating",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "how can i find my credit rating",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "check maps for my location",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "how can i go about finding my location right now",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "please tell me my location using gps",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "where exactly am i",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "let my credit card company know that my card split in half",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "my card split in half, how do i report it",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "report my burned card to the company",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "what do i say when i report a split credit card",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "i would like to know what today's date is",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "tell me what date it is please",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "tell me what day today is",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "can you tell me tomorrow's date",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "what is the meaning of realism",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "what is the meaning of interorganizational",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "what is it is all relative mean",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "what is intercontinental mean",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "do a websearch for direct deposit set up",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "info on setting up direct deposit",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "info on direct deposit set-up",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "tell me how to get my paycheck on direct deposit",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "i'm at home, so where is the closest starbucks",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "is there a starbucks close to home",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "direct me to the closest starbucks near home",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "does home have a starbucks nearby",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "estimated time to airport from current location, la",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "how early should i leave to the airport in la",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "does it take a long time to get to the airport in la",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "is the ride short to the airport in la",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "what type of pet do you have",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "do you have any type of pet",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "do you own pets",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "what are the pets that you have in your possession",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "how many pesos can i get for one dollar",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "tell me the exchange rate between dollars and pesos",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "let me know what the exchange rate between dollars and pesos is",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "what's the exchange rate between dollars and pesos",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "how long til my visa card expires",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "on what month and year does my card expire",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "how soon does my visa card expire",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "how much time do i have before my credit card expires",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "i need help finding my mobile phone",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "give me a hand finding my mobile device",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "i can't find my cell and need help locating it",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "can you help me find my cell",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "what is the projected time frame for the flight to land",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "what is the word on flight dl123",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "when will we begin to board my scheduled flight",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "whats the status of my frontier flight",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "please flip a coin and tell me what side it lands on",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "flip a two sided coin and tell me what it lands on",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "i need you to flip a coin so i can decide",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "begin the coin flip now",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "jello should stay in the fridge for how long",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "when will my eggs go bad",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "how long will my eggs be good for",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "what date does my apple juice expire",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "can you block my chase account right away please",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "i need you to block my chase account immediately",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "can you put a block on my chase account right away",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "please block my chase account right away",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "lets hear an interesting fact about funko pops",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "what is one fun fact",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "tell me a fact",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "lets hear a fact",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "what level is my gas tank at",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "how does my gas tank look",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "what line is the gas tank at",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "how much gas is in my gas tank",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "what kind of gasoline can this car take",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "i need to know what kind of gas i can use on this car",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "is any type of gas ok on this car",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "is there a certain type of gas i need to use for this car",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "syonara, ai device!",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "bye-bye",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "goodbye, ai assistant",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "glad we got to talk",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "how's everything",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "hello, anyone there",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "are you okay right now",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "are you doing okay",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "do you know how long of a wait it will be",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "how long will it take to get seated at needham's",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "how long will the wait be at noon if we went to nagomi",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "will i have to wait for long before being seated at the cheese cake factory",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "what is your birthday again",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "what year were you born",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "how many days old are you",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "when were you created",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "what steps should i take to improve my credit score",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "what can i do to raise my credit score",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "steps to raise my credit score",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "is there a quick way to improve my credit score",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "can you tell me what my total income is for the pay period",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "i need you to tell me my salary",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "what is my gross income per pay period",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "what is my total annual income",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "what about changing the sugar for baking soda",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "would it be possible to replace the salt with baking soda",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "instead of pepper, can i use salt",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "can i take out the olive oil and use lard",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "what do you put in chicken noodle casserole",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "what do i need to make chicken noodle casserole",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "how do you make chicken noodle casserole",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "chicken noodle casserole is made from what",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "what do my health benefits consist of",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "what health benefits can i use",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "what are the health benefits i have",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "what health benefits do i have",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "how to create a new aaa insurance plan",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "aaa insurance start new plan",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "i want to start a new aaa insurance plan",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "is new this a good insurance plan for me",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "i want to know my interest rate",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "what interest rate am i paying",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "my interest rate please",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "how do i know the interest rate for my signature account",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "are there any transaction fees associated with my chase card if i am in tokyo",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "does my bank of the west card have international transaction fees",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "are there any transaction fees associated with my usaa card if i am in india",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "does my navy federal card have international transaction fees",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "to visit cambodia, do i need an international visa",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "will i need a visa to visit ireland",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "will i need a travel visa to go to canary islands",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "i want to visit portugal do i need a travel visa",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "what do i do if my car battery is dead",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "how can i replace my car battery",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "tell me how to jump start a battery",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "what can i do since my car battery died",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "tell me when my car last had its oil changed",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "when did i last take my car in for maintenance",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "can you find the date of my last oil change",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "when did i last bring my car in to have it looked at",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "locate lost luggage from flight america airlines in o'hare",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "in o'hare lost luggage on flight america airlines",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "lost luggage on flight america airlines in o'hare",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "while on flight america airlines i lost luggage in o'hare",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "place a phone call to yiming",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "can you call dominos pizza",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "can you redial the last number dialed",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "call 911",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "i don't know the answer",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "shit if i know",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "no idea",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "hell if i know",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "can you give me a french dinner suggestion",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "can you give me a vietnamese meal suggestion",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "suggest a meal from burma to me",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "can you give me a vietnamese dinner suggestion",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "does life have meaning",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "what is the real meaning of life",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "what is the answer to the meaning of life",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "is there really an answer to the meaning of life",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "how many centimeters are in an inch",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "what's 32 degrees fahrenheit in celsisus",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "what amount of millimeters are in 50 kilometers",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "how many crows are in 10 murders",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "when is today's meeting with john",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "when is the meeting with homer scheduled for",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "do i have any meetings with stan today",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "how many meetings do i have scheduled between 10 and 3",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "what's the minimum i owe on the car payment",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "what's the smallest amount i can pay on the water bill",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "what's the minimum amount for my electric bill",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "what's the least i can pay on the medical payments for february",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "what kind of mileage do i get out of gas",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "how many miles per gallon do i get in my car",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "tell me my car's fuel economy",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "what kind of gas mileage do i get",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "how can i apply for a discover card",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "how do applications for discover cards work",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "is this how i apply for a discover card",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "what does it take to get a new card",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "when is the upcoming holiday, please",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "what day is our next free day",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "when is the next scheduled holiday",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "when is the next scheduled holiday, please",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "go past this song",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "please play the next song",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "go forward to the next song on the playlist",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "change the song to the next one",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "no, that's incorrect",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "that is not true, it's false",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "no way",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "not really",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "what's the nutritional info for spaghetti",
+        "labels": [
+            77
+        ]
+    },
+    {
+        "utterance": "how healthy are potato skins",
+        "labels": [
+            77
+        ]
+    },
+    {
+        "utterance": "how healthy is spaghetti",
+        "labels": [
+            77
+        ]
+    },
+    {
+        "utterance": "share the nutrition info for brownies with me",
+        "labels": [
+            77
+        ]
+    },
+    {
+        "utterance": "how do i change a car's oil",
+        "labels": [
+            78
+        ]
+    },
+    {
+        "utterance": "what do i need to change my oil",
+        "labels": [
+            78
+        ]
+    },
+    {
+        "utterance": "how do i change the oil in a car",
+        "labels": [
+            78
+        ]
+    },
+    {
+        "utterance": "how do i change the oil in my passat",
+        "labels": [
+            78
+        ]
+    },
+    {
+        "utterance": "when should i change my car oil",
+        "labels": [
+            79
+        ]
+    },
+    {
+        "utterance": "how often do you have to change your oil",
+        "labels": [
+            79
+        ]
+    },
+    {
+        "utterance": "how do i know when i have to change my oil",
+        "labels": [
+            79
+        ]
+    },
+    {
+        "utterance": "when do i need to change my oil",
+        "labels": [
+            79
+        ]
+    },
+    {
+        "utterance": "can you please order me more plastic bags",
+        "labels": [
+            80
+        ]
+    },
+    {
+        "utterance": "i need some more lysol, could you order me some",
+        "labels": [
+            80
+        ]
+    },
+    {
+        "utterance": "i'm out of lysol could you order me some",
+        "labels": [
+            80
+        ]
+    },
+    {
+        "utterance": "could you please reorder me some lysol",
+        "labels": [
+            80
+        ]
+    },
+    {
+        "utterance": "what is the process to get some more checkbooks mailed to me",
+        "labels": [
+            81
+        ]
+    },
+    {
+        "utterance": "if i need more checkbooks maild to me what should i do",
+        "labels": [
+            81
+        ]
+    },
+    {
+        "utterance": "can you mail more checkbooks to me please",
+        "labels": [
+            81
+        ]
+    },
+    {
+        "utterance": "can you explain to me how to get some more checkbooks mailed to me",
+        "labels": [
+            81
+        ]
+    },
+    {
+        "utterance": "can you find my package in transit",
+        "labels": [
+            82
+        ]
+    },
+    {
+        "utterance": "help me find my package",
+        "labels": [
+            82
+        ]
+    },
+    {
+        "utterance": "i need to track my package",
+        "labels": [
+            82
+        ]
+    },
+    {
+        "utterance": "what's going on with my order",
+        "labels": [
+            82
+        ]
+    },
+    {
+        "utterance": "i want to pay my bill, please",
+        "labels": [
+            83
+        ]
+    },
+    {
+        "utterance": "i'd like to pay my bill",
+        "labels": [
+            83
+        ]
+    },
+    {
+        "utterance": "pay my internet bill with my discover account",
+        "labels": [
+            83
+        ]
+    },
+    {
+        "utterance": "can you help me pay a bill",
+        "labels": [
+            83
+        ]
+    },
+    {
+        "utterance": "on what date do i get paid",
+        "labels": [
+            84
+        ]
+    },
+    {
+        "utterance": "i need to know when to expect my next paycheck",
+        "labels": [
+            84
+        ]
+    },
+    {
+        "utterance": "tell me when my next paycheck will arrive",
+        "labels": [
+            84
+        ]
+    },
+    {
+        "utterance": "what date do i get my next paycheck",
+        "labels": [
+            84
+        ]
+    },
+    {
+        "utterance": "how do i change my pin for number for my abc bank account",
+        "labels": [
+            85
+        ]
+    },
+    {
+        "utterance": "i have no idea what the pin is for my checking account",
+        "labels": [
+            85
+        ]
+    },
+    {
+        "utterance": "i cannot recall the pin for my savings account",
+        "labels": [
+            85
+        ]
+    },
+    {
+        "utterance": "i forgot the pin number for my college fund account",
+        "labels": [
+            85
+        ]
+    },
+    {
+        "utterance": "can i get some music by three six mafia in here",
+        "labels": [
+            86
+        ]
+    },
+    {
+        "utterance": "may i hear some music by fleet foxes",
+        "labels": [
+            86
+        ]
+    },
+    {
+        "utterance": "can i hear some music by cloud control",
+        "labels": [
+            86
+        ]
+    },
+    {
+        "utterance": "can x’s music be played",
+        "labels": [
+            86
+        ]
+    },
+    {
+        "utterance": "do i need a socket converter if i'm going to mexico",
+        "labels": [
+            87
+        ]
+    },
+    {
+        "utterance": "is there a conversion plug if you travel to australia",
+        "labels": [
+            87
+        ]
+    },
+    {
+        "utterance": "what kind of plug type do they use in russia",
+        "labels": [
+            87
+        ]
+    },
+    {
+        "utterance": "what type of plug do i need to bring if i visit japan",
+        "labels": [
+            87
+        ]
+    },
+    {
+        "utterance": "what is my vacation schedule look like",
+        "labels": [
+            88
+        ]
+    },
+    {
+        "utterance": "what type of vacation schedule do i have left",
+        "labels": [
+            88
+        ]
+    },
+    {
+        "utterance": "can i get vacation day totals i have left",
+        "labels": [
+            88
+        ]
+    },
+    {
+        "utterance": "how many vacation days do i have saved up, please",
+        "labels": [
+            88
+        ]
+    },
+    {
+        "utterance": "how do i put in a pto request for the first to the ninth",
+        "labels": [
+            89
+        ]
+    },
+    {
+        "utterance": "is there a time i can put in a pto request for dec 2 to new years",
+        "labels": [
+            89
+        ]
+    },
+    {
+        "utterance": "when can i put a pto request in for feb 22 to march 1",
+        "labels": [
+            89
+        ]
+    },
+    {
+        "utterance": "i need a pto request on march 1 to 2",
+        "labels": [
+            89
+        ]
+    },
+    {
+        "utterance": "have they approved my vacation request yet",
+        "labels": [
+            90
+        ]
+    },
+    {
+        "utterance": "am i going to be able to get my vacation request",
+        "labels": [
+            90
+        ]
+    },
+    {
+        "utterance": "i want to check on my vacation request",
+        "labels": [
+            90
+        ]
+    },
+    {
+        "utterance": "is my vacation approved yet",
+        "labels": [
+            90
+        ]
+    },
+    {
+        "utterance": "have i used half of my days off yet",
+        "labels": [
+            91
+        ]
+    },
+    {
+        "utterance": "what amount of days off have i already utilized",
+        "labels": [
+            91
+        ]
+    },
+    {
+        "utterance": "call hr so i can figure out how many days off i've taken",
+        "labels": [
+            91
+        ]
+    },
+    {
+        "utterance": "how many times have i taken off from work this year",
+        "labels": [
+            91
+        ]
+    },
+    {
+        "utterance": "whats the best way to roast a chicken",
+        "labels": [
+            92
+        ]
+    },
+    {
+        "utterance": "find a recipe for german chocolate cake",
+        "labels": [
+            92
+        ]
+    },
+    {
+        "utterance": "how do i fry pork chops",
+        "labels": [
+            92
+        ]
+    },
+    {
+        "utterance": "how do i cook boiled eggs",
+        "labels": [
+            92
+        ]
+    },
+    {
+        "utterance": "i am ready now to cash in on the many credit card points i have saved up",
+        "labels": [
+            93
+        ]
+    },
+    {
+        "utterance": "walk me through the best ways to use my credit card points",
+        "labels": [
+            93
+        ]
+    },
+    {
+        "utterance": "i am ready now to use some of the credit card points i have saved",
+        "labels": [
+            93
+        ]
+    },
+    {
+        "utterance": "i want to hear more about how i can use my credit card points",
+        "labels": [
+            93
+        ]
+    },
+    {
+        "utterance": "tell me my reminders",
+        "labels": [
+            94
+        ]
+    },
+    {
+        "utterance": "please read my reminders",
+        "labels": [
+            94
+        ]
+    },
+    {
+        "utterance": "will you repeat my reminder list",
+        "labels": [
+            94
+        ]
+    },
+    {
+        "utterance": "check my reminders for mop and floor",
+        "labels": [
+            94
+        ]
+    },
+    {
+        "utterance": "remind me to call my mother saturday morning",
+        "labels": [
+            95
+        ]
+    },
+    {
+        "utterance": "make a reminder for me to do my resume",
+        "labels": [
+            95
+        ]
+    },
+    {
+        "utterance": "remind me to take out the garbage in the morning",
+        "labels": [
+            95
+        ]
+    },
+    {
+        "utterance": "the next time it rains, remind me to close the windows",
+        "labels": [
+            95
+        ]
+    },
+    {
+        "utterance": "i didn't hear you please repeat",
+        "labels": [
+            96
+        ]
+    },
+    {
+        "utterance": "i want you to repeat that",
+        "labels": [
+            96
+        ]
+    },
+    {
+        "utterance": "one more time please",
+        "labels": [
+            96
+        ]
+    },
+    {
+        "utterance": "i need you to repeat that",
+        "labels": [
+            96
+        ]
+    },
+    {
+        "utterance": "tell me about today weather",
+        "labels": [
+            97
+        ]
+    },
+    {
+        "utterance": "how long does visa take to get me a new card",
+        "labels": [
+            97
+        ]
+    },
+    {
+        "utterance": "is my card made immedietly after reporting stolen",
+        "labels": [
+            97
+        ]
+    },
+    {
+        "utterance": "can i replace a stolen card soon",
+        "labels": [
+            97
+        ]
+    },
+    {
+        "utterance": "i'm afraid this charge on my account is fraud",
+        "labels": [
+            98
+        ]
+    },
+    {
+        "utterance": "i think i have fraud on my account from walmart",
+        "labels": [
+            98
+        ]
+    },
+    {
+        "utterance": "there's been some fraudulent activity on my card",
+        "labels": [
+            98
+        ]
+    },
+    {
+        "utterance": "i'm pretty sure this charge from sam's club is fraudulent",
+        "labels": [
+            98
+        ]
+    },
+    {
+        "utterance": "immediately the credit card company must be told that i lost my card from them",
+        "labels": [
+            99
+        ]
+    },
+    {
+        "utterance": "i can't seem to find my gold card and want it reported as lost",
+        "labels": [
+            99
+        ]
+    },
+    {
+        "utterance": "i lost my chase bank card and want it labeled as lost",
+        "labels": [
+            99
+        ]
+    },
+    {
+        "utterance": "can you report my td bank card as lost",
+        "labels": [
+            99
+        ]
+    },
+    {
+        "utterance": "make the settings go back to the original",
+        "labels": [
+            100
+        ]
+    },
+    {
+        "utterance": "change settings to how they were originally",
+        "labels": [
+            100
+        ]
+    },
+    {
+        "utterance": "go back to your original settings",
+        "labels": [
+            100
+        ]
+    },
+    {
+        "utterance": "reset the factory settings",
+        "labels": [
+            100
+        ]
+    },
+    {
+        "utterance": "you need to call the melt in lakewood for a table for at 2:00, monday, the first week in march",
+        "labels": [
+            101
+        ]
+    },
+    {
+        "utterance": "i think we should reserve dad's regular table friday for 6 people, use his name, make that close to 4:00 pm at the club",
+        "labels": [
+            101
+        ]
+    },
+    {
+        "utterance": "listen i need to get a reservation for , me and teresa at georgetown cafe on tuesday at 7:00 pm",
+        "labels": [
+            101
+        ]
+    },
+    {
+        "utterance": "can you make me a reservation for 4 pm on the 22nd at ruth's",
+        "labels": [
+            101
+        ]
+    },
+    {
+        "utterance": "do people like the donuts at tgi",
+        "labels": [
+            102
+        ]
+    },
+    {
+        "utterance": "how are the donuts reviews at tgi",
+        "labels": [
+            102
+        ]
+    },
+    {
+        "utterance": "what are the comments on the donuts at tgi",
+        "labels": [
+            102
+        ]
+    },
+    {
+        "utterance": "are people recommending the donuts at tgi",
+        "labels": [
+            102
+        ]
+    },
+    {
+        "utterance": "can you suggest a restaurant for me to eat tonight",
+        "labels": [
+            103
+        ]
+    },
+    {
+        "utterance": "i'm craving for italian food, where should i go",
+        "labels": [
+            103
+        ]
+    },
+    {
+        "utterance": "suggest a restaurant for me to eat tonight, please",
+        "labels": [
+            103
+        ]
+    },
+    {
+        "utterance": "i'm not going to cook today, can you suggest a restaurant",
+        "labels": [
+            103
+        ]
+    },
+    {
+        "utterance": "how high are the rewards on my discover card",
+        "labels": [
+            104
+        ]
+    },
+    {
+        "utterance": "what's the current reward amount on my mastercard",
+        "labels": [
+            104
+        ]
+    },
+    {
+        "utterance": "what's my current reward balance on my amex card",
+        "labels": [
+            104
+        ]
+    },
+    {
+        "utterance": "what's my visa's current rewards balance",
+        "labels": [
+            104
+        ]
+    },
+    {
+        "utterance": "will you roll a d20",
+        "labels": [
+            105
+        ]
+    },
+    {
+        "utterance": "will you roll a 10 sided dice",
+        "labels": [
+            105
+        ]
+    },
+    {
+        "utterance": "i'd like you to roll dice",
+        "labels": [
+            105
+        ]
+    },
+    {
+        "utterance": "i'd like a 7 sided dice roll please",
+        "labels": [
+            105
+        ]
+    },
+    {
+        "utterance": "ways to transfer my 401k",
+        "labels": [
+            106
+        ]
+    },
+    {
+        "utterance": "who do i go to, to transfer my 401k",
+        "labels": [
+            106
+        ]
+    },
+    {
+        "utterance": "what are the ways i can transfer my 401k",
+        "labels": [
+            106
+        ]
+    },
+    {
+        "utterance": "i need guidance on how to rollover my 401k",
+        "labels": [
+            106
+        ]
+    },
+    {
+        "utterance": "where can i see the routing number for bmo",
+        "labels": [
+            107
+        ]
+    },
+    {
+        "utterance": "how do i locate my routing number for tax reasons",
+        "labels": [
+            107
+        ]
+    },
+    {
+        "utterance": "where can i look up x's routing number",
+        "labels": [
+            107
+        ]
+    },
+    {
+        "utterance": "please give my routing number for my national account",
+        "labels": [
+            107
+        ]
+    },
+    {
+        "utterance": "my car needs to be brought for maintenance",
+        "labels": [
+            108
+        ]
+    },
+    {
+        "utterance": "i need someone to look at my car because my check engine light is on",
+        "labels": [
+            108
+        ]
+    },
+    {
+        "utterance": "locate someone to look at my car because my check engine light is on",
+        "labels": [
+            108
+        ]
+    },
+    {
+        "utterance": "i require a car maintenance",
+        "labels": [
+            108
+        ]
+    },
+    {
+        "utterance": "i want to know if there is meeting room available at 8",
+        "labels": [
+            109
+        ]
+    },
+    {
+        "utterance": "are there any meetings room available between 8:00 and 9:00 am",
+        "labels": [
+            109
+        ]
+    },
+    {
+        "utterance": "i want to check if there is any meeting room available between 8:00 and 10:00 am",
+        "labels": [
+            109
+        ]
+    },
+    {
+        "utterance": "tell me how do i schedule a meeting",
+        "labels": [
+            109
+        ]
+    },
+    {
+        "utterance": "tell lydia and laura where i am located",
+        "labels": [
+            110
+        ]
+    },
+    {
+        "utterance": "tell john and sam where i am",
+        "labels": [
+            110
+        ]
+    },
+    {
+        "utterance": "share my location with darren and stacey",
+        "labels": [
+            110
+        ]
+    },
+    {
+        "utterance": "let cora and nancy know were i am now",
+        "labels": [
+            110
+        ]
+    },
+    {
+        "utterance": "would you let me know what is on my shopping list",
+        "labels": [
+            111
+        ]
+    },
+    {
+        "utterance": "i need for you to tell me what is on my shopping list",
+        "labels": [
+            111
+        ]
+    },
+    {
+        "utterance": "do you want me to shop for peanut butter",
+        "labels": [
+            111
+        ]
+    },
+    {
+        "utterance": "do you want peanut butter for your lunches this week",
+        "labels": [
+            111
+        ]
+    },
+    {
+        "utterance": "delete fries from shopping list",
+        "labels": [
+            112
+        ]
+    },
+    {
+        "utterance": "please take away the fries from the shopping list",
+        "labels": [
+            112
+        ]
+    },
+    {
+        "utterance": "remove fries from my shopping list",
+        "labels": [
+            112
+        ]
+    },
+    {
+        "utterance": "we no longer need fries on the shopping lisr",
+        "labels": [
+            112
+        ]
+    },
+    {
+        "utterance": "can you please turn on my furnace",
+        "labels": [
+            113
+        ]
+    },
+    {
+        "utterance": "what temp is the ac at",
+        "labels": [
+            113
+        ]
+    },
+    {
+        "utterance": "tell me who is by the garage door",
+        "labels": [
+            113
+        ]
+    },
+    {
+        "utterance": "set my oven to 350 please",
+        "labels": [
+            113
+        ]
+    },
+    {
+        "utterance": "what is the spelling of potato",
+        "labels": [
+            114
+        ]
+    },
+    {
+        "utterance": "give me the spelling of potato",
+        "labels": [
+            114
+        ]
+    },
+    {
+        "utterance": "spell out potato",
+        "labels": [
+            114
+        ]
+    },
+    {
+        "utterance": "how do you spell tomato",
+        "labels": [
+            114
+        ]
+    },
+    {
+        "utterance": "how much did i spend at restaurants last week",
+        "labels": [
+            115
+        ]
+    },
+    {
+        "utterance": "what did i spend at the grocery store yesterday",
+        "labels": [
+            115
+        ]
+    },
+    {
+        "utterance": "how much money did i spend at starbucks in the last week",
+        "labels": [
+            115
+        ]
+    },
+    {
+        "utterance": "what was the total i spent at home depot last month",
+        "labels": [
+            115
+        ]
+    },
+    {
+        "utterance": "please link with my phone",
+        "labels": [
+            116
+        ]
+    },
+    {
+        "utterance": "please link up to my phone",
+        "labels": [
+            116
+        ]
+    },
+    {
+        "utterance": "could you link with my phone",
+        "labels": [
+            116
+        ]
+    },
+    {
+        "utterance": "please turn off your wifi from my phone",
+        "labels": [
+            116
+        ]
+    },
+    {
+        "utterance": "how much are my state taxes",
+        "labels": [
+            117
+        ]
+    },
+    {
+        "utterance": "how much are taxes in my state",
+        "labels": [
+            117
+        ]
+    },
+    {
+        "utterance": "how much state taxes do i owe",
+        "labels": [
+            117
+        ]
+    },
+    {
+        "utterance": "tell me how much in tax on this",
+        "labels": [
+            117
+        ]
+    },
+    {
+        "utterance": "please, recite to me some good one liners",
+        "labels": [
+            118
+        ]
+    },
+    {
+        "utterance": "can you tell me any truly funny knock knock jokes",
+        "labels": [
+            118
+        ]
+    },
+    {
+        "utterance": "what do people find funny about food",
+        "labels": [
+            118
+        ]
+    },
+    {
+        "utterance": "what are some funny things about food",
+        "labels": [
+            118
+        ]
+    },
+    {
+        "utterance": "can you text elizabeth and tell them i forgot to bring drinks",
+        "labels": [
+            119
+        ]
+    },
+    {
+        "utterance": "text christopher and tell him i will stop by",
+        "labels": [
+            119
+        ]
+    },
+    {
+        "utterance": "text audrey and tell her i will be there soon",
+        "labels": [
+            119
+        ]
+    },
+    {
+        "utterance": "text christy and ask her what she wants for dinner",
+        "labels": [
+            119
+        ]
+    },
+    {
+        "utterance": "you have been a big help, thank you so much",
+        "labels": [
+            120
+        ]
+    },
+    {
+        "utterance": "i really appreciate your help, thank you",
+        "labels": [
+            120
+        ]
+    },
+    {
+        "utterance": "i am very grateful",
+        "labels": [
+            120
+        ]
+    },
+    {
+        "utterance": "i appreciate the assistance",
+        "labels": [
+            120
+        ]
+    },
+    {
+        "utterance": "what time is it in punta gorda, florida",
+        "labels": [
+            121
+        ]
+    },
+    {
+        "utterance": "what time is it in fredericksburg, tx",
+        "labels": [
+            121
+        ]
+    },
+    {
+        "utterance": "what time is it in las vegas, nv",
+        "labels": [
+            121
+        ]
+    },
+    {
+        "utterance": "what time is it in houston, tx",
+        "labels": [
+            121
+        ]
+    },
+    {
+        "utterance": "please set a 4 minute timer",
+        "labels": [
+            122
+        ]
+    },
+    {
+        "utterance": "set a timer for 5 minutes",
+        "labels": [
+            122
+        ]
+    },
+    {
+        "utterance": "i need a 7 minute timer",
+        "labels": [
+            122
+        ]
+    },
+    {
+        "utterance": "i need to set the timer for two minutes",
+        "labels": [
+            122
+        ]
+    },
+    {
+        "utterance": "timezone of cuba",
+        "labels": [
+            123
+        ]
+    },
+    {
+        "utterance": "french time zone",
+        "labels": [
+            123
+        ]
+    },
+    {
+        "utterance": "which timezone is colombia",
+        "labels": [
+            123
+        ]
+    },
+    {
+        "utterance": "time zone in france",
+        "labels": [
+            123
+        ]
+    },
+    {
+        "utterance": "tell me the status of my tires and when i need to replace them",
+        "labels": [
+            124
+        ]
+    },
+    {
+        "utterance": "how many miles can i drive before changing my tires",
+        "labels": [
+            124
+        ]
+    },
+    {
+        "utterance": "when will my tires need to be replaced",
+        "labels": [
+            124
+        ]
+    },
+    {
+        "utterance": "how is the tread on my tires",
+        "labels": [
+            124
+        ]
+    },
+    {
+        "utterance": "how's the air pressure in my tires",
+        "labels": [
+            125
+        ]
+    },
+    {
+        "utterance": "what's the amount of air in my tires right now",
+        "labels": [
+            125
+        ]
+    },
+    {
+        "utterance": "are my tire's air pressure good enough to drive on",
+        "labels": [
+            125
+        ]
+    },
+    {
+        "utterance": "what's the inflation of my tires",
+        "labels": [
+            125
+        ]
+    },
+    {
+        "utterance": "what are the things that i have for today",
+        "labels": [
+            126
+        ]
+    },
+    {
+        "utterance": "what do i have to do today",
+        "labels": [
+            126
+        ]
+    },
+    {
+        "utterance": "the tasks for today, what are they",
+        "labels": [
+            126
+        ]
+    },
+    {
+        "utterance": "i need to know what my to-do list is looking like",
+        "labels": [
+            126
+        ]
+    },
+    {
+        "utterance": "i need to add the chore of vacuuming to my task list",
+        "labels": [
+            127
+        ]
+    },
+    {
+        "utterance": "take doing the dishes off my todo list",
+        "labels": [
+            127
+        ]
+    },
+    {
+        "utterance": "blank out my todo list",
+        "labels": [
+            127
+        ]
+    },
+    {
+        "utterance": "erase all items on my todo list",
+        "labels": [
+            127
+        ]
+    },
+    {
+        "utterance": "is there any traffic congestion on my way to the closest whole foods",
+        "labels": [
+            128
+        ]
+    },
+    {
+        "utterance": "is traffic bad on my way to the next mcdonalds",
+        "labels": [
+            128
+        ]
+    },
+    {
+        "utterance": "what will traffic be like at 5:00 going towards the mall",
+        "labels": [
+            128
+        ]
+    },
+    {
+        "utterance": "is the traffic bad at 5:00 if i'm going to the mall",
+        "labels": [
+            128
+        ]
+    },
+    {
+        "utterance": "before i make my mastercard payment can you tell me what i've recently charged on it",
+        "labels": [
+            129
+        ]
+    },
+    {
+        "utterance": "i want to pay my amazon credit card but i need to know the last few transactions",
+        "labels": [
+            129
+        ]
+    },
+    {
+        "utterance": "before i pay my walmart credit card did i make any purchases using it recently",
+        "labels": [
+            129
+        ]
+    },
+    {
+        "utterance": "i need to know all the recent transactions i've made",
+        "labels": [
+            129
+        ]
+    },
+    {
+        "utterance": "i need $20000 transferred from my savings to my checking",
+        "labels": [
+            130
+        ]
+    },
+    {
+        "utterance": "transfer $20000 from my savings account to checking account",
+        "labels": [
+            130
+        ]
+    },
+    {
+        "utterance": "take $20000 from savings and put it in checking",
+        "labels": [
+            130
+        ]
+    },
+    {
+        "utterance": "put $20000 into my checking account from my savings account",
+        "labels": [
+            130
+        ]
+    },
+    {
+        "utterance": "what expression would i use to say i love you if i were an italian",
+        "labels": [
+            131
+        ]
+    },
+    {
+        "utterance": "what is the equivalent of, 'life is good' in french",
+        "labels": [
+            131
+        ]
+    },
+    {
+        "utterance": "tell me how to say, 'it is a beautiful morning' in italian",
+        "labels": [
+            131
+        ]
+    },
+    {
+        "utterance": "if i were mongolian, how would i say that i am a tourist",
+        "labels": [
+            131
+        ]
+    },
+    {
+        "utterance": "does ireland have any travel alerts i should be aware of",
+        "labels": [
+            132
+        ]
+    },
+    {
+        "utterance": "are there any travel alerts for russia",
+        "labels": [
+            132
+        ]
+    },
+    {
+        "utterance": "does spain have any travel alerts i should be aware of",
+        "labels": [
+            132
+        ]
+    },
+    {
+        "utterance": "are there any travel alerts for north korea",
+        "labels": [
+            132
+        ]
+    },
+    {
+        "utterance": "im going to be in canada from august 10th until august 12th",
+        "labels": [
+            133
+        ]
+    },
+    {
+        "utterance": "im going to be in paraguay from january 7th until january 10th",
+        "labels": [
+            133
+        ]
+    },
+    {
+        "utterance": "i'm going to be in thailand from october 15th until october 23rd",
+        "labels": [
+            133
+        ]
+    },
+    {
+        "utterance": "im going to be in jamaica from october 4th until october 8th",
+        "labels": [
+            133
+        ]
+    },
+    {
+        "utterance": "can you give me some suggestions to go site seeing when i get there",
+        "labels": [
+            134
+        ]
+    },
+    {
+        "utterance": "please suggest some fun tourist activities in tokyo",
+        "labels": [
+            134
+        ]
+    },
+    {
+        "utterance": "i need help with some fun tourist things to do in tokyo",
+        "labels": [
+            134
+        ]
+    },
+    {
+        "utterance": "could you tell me what fun tourist things i could do in tokyo",
+        "labels": [
+            134
+        ]
+    },
+    {
+        "utterance": "book an uber for 6 people to go to the movies",
+        "labels": [
+            135
+        ]
+    },
+    {
+        "utterance": "book a 6 person uber to the movies",
+        "labels": [
+            135
+        ]
+    },
+    {
+        "utterance": "i need an uber to the movies for me and 5 other people",
+        "labels": [
+            135
+        ]
+    },
+    {
+        "utterance": "i'm going to the movies book an uber for 6 people",
+        "labels": [
+            135
+        ]
+    },
+    {
+        "utterance": "insert what i am listening to into my jazz playlist",
+        "labels": [
+            136
+        ]
+    },
+    {
+        "utterance": "can you add this song to my jazz playlist",
+        "labels": [
+            136
+        ]
+    },
+    {
+        "utterance": "please add this song to my jazz playlist",
+        "labels": [
+            136
+        ]
+    },
+    {
+        "utterance": "add this song to my jazz playlist",
+        "labels": [
+            136
+        ]
+    },
+    {
+        "utterance": "you refer to me as what",
+        "labels": [
+            137
+        ]
+    },
+    {
+        "utterance": "what name do you use when addressing me",
+        "labels": [
+            137
+        ]
+    },
+    {
+        "utterance": "is there a name that you call me",
+        "labels": [
+            137
+        ]
+    },
+    {
+        "utterance": "how do you usually refer to me",
+        "labels": [
+            137
+        ]
+    },
+    {
+        "utterance": "are there any specific shots i should get before traveling to england",
+        "labels": [
+            138
+        ]
+    },
+    {
+        "utterance": "what are the recommended shots to get before i travel to england",
+        "labels": [
+            138
+        ]
+    },
+    {
+        "utterance": "are there recommendations to get any specific shots before i travel to germany",
+        "labels": [
+            138
+        ]
+    },
+    {
+        "utterance": "do i need certain shots before flying to eithiopia",
+        "labels": [
+            138
+        ]
+    },
+    {
+        "utterance": "where can i locate my w2 so i can do my taxes",
+        "labels": [
+            139
+        ]
+    },
+    {
+        "utterance": "where can i locate my w-2 form",
+        "labels": [
+            139
+        ]
+    },
+    {
+        "utterance": "where can one receive their w-2 form",
+        "labels": [
+            139
+        ]
+    },
+    {
+        "utterance": "what is the location of my w2 that is needed for taxes",
+        "labels": [
+            139
+        ]
+    },
+    {
+        "utterance": "what are the conditions like in orlando",
+        "labels": [
+            140
+        ]
+    },
+    {
+        "utterance": "what's the forecast like for pittsburgh",
+        "labels": [
+            140
+        ]
+    },
+    {
+        "utterance": "what are the conditions like in sarasota",
+        "labels": [
+            140
+        ]
+    },
+    {
+        "utterance": "what's the climate like in chicago",
+        "labels": [
+            140
+        ]
+    },
+    {
+        "utterance": "what kinds of things are you into",
+        "labels": [
+            141
+        ]
+    },
+    {
+        "utterance": "what do you like to do in your spare time",
+        "labels": [
+            141
+        ]
+    },
+    {
+        "utterance": "what do you do for fun",
+        "labels": [
+            141
+        ]
+    },
+    {
+        "utterance": "do you have any hobbies",
+        "labels": [
+            141
+        ]
+    },
+    {
+        "utterance": "what things can you help me with exactly",
+        "labels": [
+            142
+        ]
+    },
+    {
+        "utterance": "what exactly can you help me with",
+        "labels": [
+            142
+        ]
+    },
+    {
+        "utterance": "what can you help me with exactly",
+        "labels": [
+            142
+        ]
+    },
+    {
+        "utterance": "what can you help me with",
+        "labels": [
+            142
+        ]
+    },
+    {
+        "utterance": "what's your full name",
+        "labels": [
+            143
+        ]
+    },
+    {
+        "utterance": "what's should i call you by",
+        "labels": [
+            143
+        ]
+    },
+    {
+        "utterance": "can you tell me the ai's name",
+        "labels": [
+            143
+        ]
+    },
+    {
+        "utterance": "what is the ai's name",
+        "labels": [
+            143
+        ]
+    },
+    {
+        "utterance": "which song is playing",
+        "labels": [
+            144
+        ]
+    },
+    {
+        "utterance": "what song is this",
+        "labels": [
+            144
+        ]
+    },
+    {
+        "utterance": "what's the name of this song",
+        "labels": [
+            144
+        ]
+    },
+    {
+        "utterance": "what is this song",
+        "labels": [
+            144
+        ]
+    },
+    {
+        "utterance": "where is your place of origin",
+        "labels": [
+            145
+        ]
+    },
+    {
+        "utterance": "what is your country of origin",
+        "labels": [
+            145
+        ]
+    },
+    {
+        "utterance": "where is your country of origin",
+        "labels": [
+            145
+        ]
+    },
+    {
+        "utterance": "what is your nationality",
+        "labels": [
+            145
+        ]
+    },
+    {
+        "utterance": "change to whisper mode",
+        "labels": [
+            146
+        ]
+    },
+    {
+        "utterance": "whisper mode off",
+        "labels": [
+            146
+        ]
+    },
+    {
+        "utterance": "change out of whisper mode",
+        "labels": [
+            146
+        ]
+    },
+    {
+        "utterance": "turn off whisper mode",
+        "labels": [
+            146
+        ]
+    },
+    {
+        "utterance": "who is your employeer",
+        "labels": [
+            147
+        ]
+    },
+    {
+        "utterance": "i gotta know who is your boss",
+        "labels": [
+            147
+        ]
+    },
+    {
+        "utterance": "tell me who is your boss",
+        "labels": [
+            147
+        ]
+    },
+    {
+        "utterance": "let me know who is your boss",
+        "labels": [
+            147
+        ]
+    },
+    {
+        "utterance": "who formed you",
+        "labels": [
+            148
+        ]
+    },
+    {
+        "utterance": "what's your design company",
+        "labels": [
+            148
+        ]
+    },
+    {
+        "utterance": "what company coded you",
+        "labels": [
+            148
+        ]
+    },
+    {
+        "utterance": "who fabricated you",
+        "labels": [
+            148
+        ]
+    },
+    {
+        "utterance": "yep",
+        "labels": [
+            149
+        ]
+    },
+    {
+        "utterance": "what you just said is true",
+        "labels": [
+            149
+        ]
+    },
+    {
+        "utterance": "that is not false",
+        "labels": [
+            149
+        ]
+    },
+    {
+        "utterance": "that is a fact",
+        "labels": [
+            149
+        ]
+    }
+]
