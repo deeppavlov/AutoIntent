@@ -84,7 +84,7 @@ def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
 
 
 def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
-    thresh = _find_threshes(r, scores)
+    thresh = _find_threshes(scores, r)
     res = (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
@@ -95,7 +95,7 @@ def multiclass_predict(scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
     return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
 
 
-def multilabel_score(y_true: list, y_pred: npt.NDArray[Any]) -> float:
+def multilabel_score(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 
