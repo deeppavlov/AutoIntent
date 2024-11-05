@@ -1,0 +1,11 @@
+defaults:
+  - optimization_config
+  - _self_
+
+data:
+  train_path: "data/intent_records/ac_robotic_new.json"
+  test_path: "data/intent_records/ac_robotic_val.json"
+  force_multilabel: true
+
+augmentation:
+  regex_sampling: 20

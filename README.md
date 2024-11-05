@@ -49,69 +49,102 @@ autointent data.train_path=default-multiclass \
            seed=42
 ```
 
-Все опции (по группам):
+Все опции в виде yaml (показаны дефолтные значения):
+```yaml
+data:
+# Path to a json file with training data. Set to "default" to use banking77 data stored within the
+# autointent package.
+  train_path: ???
+
+# Path to a json file with test records. Skip this option if you want to use a random subset of the
+# training sample as test data.
+  test_path: null
+
+# Set to true if your data is multiclass but you want to train the multilabel classifier.
+  force_multilabel: false
+
+task:
+# Path to a yaml configuration file that defines the optimization search space.
+# Omit this to use the default configuration.
+  search_space_path: null
+logs:
+# Name of the run prepended to optimization assets dirname (generated randomly if omitted)
+  run_name: "awful_hippo_10-30-2024_19-42-12"
+
+# Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
+# Omit to use current working directory. <-- on Windows it is not correct
+  dirpath: "/home/user/AutoIntent/awful_hippo_10-30-2024_19-42-12"
+
+  dump_dir: "/home/user/AutoIntent/runs/awful_hippo_10-30-2024_19-42-12/modules_dumps"
+
+vector_index:
+# Location where to save faiss database file. Omit to use your system's default cache directory.
+  db_dir: null
+
+# Specify device in torch notation
+  device: cpu
+
+augmentation:
+# Number of shots per intent to sample from regular expressions. This option extends sample utterance
+# within multiclass intent records.
+  regex_sampling: 0
+
+# Config string like "[20, 40, 20, 10]" means 20 one-label examples, 40 two-label examples, 20 three-label examples,
+# 10 four-label examples. This option extends multilabel utterance records.
+  multilabel_generation_config: null
+
+embedder:
+# batch size for embedding computation.
+  batch_size: 1
+# sentence length limit for embedding computation
+  max_length: null
+
+#Affects the randomness
+seed: 0
+
+# String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}. Omit to use ERROR by default.
+hydra.job_logging.root.level: "ERROR"
 ```
-seed               Affects the randomness
 
-== task ==
-
-search_space_path  Path to a yaml configuration file that defines the
-                   optimization search space. Omit this to use the
-                   default configuration.
-
-== data ==
-
-train_path       Path to a json file with training data. Set to
-                   "default" to use banking77 data stored within the
-                   autointent package.
-
-test_path          Path to a json file with test records. Skip this
-                   option if you want to use a random subset of the
-                   training sample as test data.
-
-force_multilabel  Set to true if your data is multiclass but you want to
-                  train the multilabel classifier.
-
-== logs ==
-
-dirpath            Location where to save optimization logs that will be
-                   saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
-                   Omit to use current working directory.
-
-run_name           Name of the run prepended to optimization assets dirname
-
-log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
-                   Omit to use ERROR by default.
-
-== vector_index ==
-
-db_dir             Location where to save faiss database file. Omit to
-                   use your system's default cache directory.
-
-device             Specify device in torch notation
-
-== augmentation ==
-
-regex_sampling     Number of shots per intent to sample from regular
-                   expressions. This option extends sample utterances
-                   within multiclass intent records.
-
-seed               Affects the data partitioning
-
-hydra.job_logging.root.level
-                   String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
-                   Omit to use ERROR by default.
-
-multilabel_generation_config 
-                   Config string like "[20, 40, 20, 10]" means 20 one-
-                   label examples, 40 two-label examples, 20 three-label
-                   examples, 10 four-label examples. This option extends
-                   multilabel utterance records.
+### Как задавать конфигурационные опции
+* Вариант 1 - в коммандной строке в виде key=value. Пример:
+```bash
+autointent embedder.batch_size=32
 ```
+
+* Вариант 2 - в конфигурационном yaml файле.
+Создайте в отдельной папке yaml файл со следующей структурой **my_config.yaml**:
+```yaml
+defaults:
+  - optimization_config
+  - _self_
+  - override hydra/job_logging: custom
+
+# put the configuration options you want to override here. The full structure is presented above.
+# Here is just an example with the same options as for the command line variant above.
+embedder:
+  embedder_batch_size: 32
+```
+Запускаем AutoIntent:
+```bash
+autointent --config-path=/path/to/config/directory --config-name=my_config
+```
+
+Важно:
+* указывайте полный путь в опции config-path.
+* не используйте tab в yaml файле.
+* желательно чтобы имя файла отличалось от
+optimization_config.yaml, чтобы избежать warnings от hydra
+
+Вы можете использовать комбинацию Варианта 1 и 2. Опции из коммандной строки имеют наивысший приоритет.
+
+
 
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
 
-Пример входных данных в директории `data/intent_records`.
+Примеры:
+- примеры входных данных: [data](./data)
+- примеры конфигов: [example_configs](./example_configs)
 
 ### Инференс
 

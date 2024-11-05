@@ -1,0 +1,11 @@
+defaults:
+  - optimization_config
+  - _self_
+
+data:
+  train_path: "default-multilabel"
+
+hydra:
+  job_logging:
+    root:
+      level: "INFO"
