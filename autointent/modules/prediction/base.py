@@ -7,13 +7,19 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.context.optimization_info import PredictorArtifact
+from autointent.custom_types import LabelType
 from autointent.metrics import PredictionMetricFn
 from autointent.modules.base import Module
 
 
 class PredictionModule(Module, ABC):
     @abstractmethod
-    def fit(self, context: Context) -> None:
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LabelType],
+        tags: list[Tag] | None = None,
+    ) -> None:
         pass
 
     @abstractmethod
@@ -34,17 +40,22 @@ class PredictionModule(Module, ABC):
 
 def get_prediction_evaluation_data(
     context: Context,
-) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
-    labels = context.data_handler.labels_test
+) -> tuple[list[LabelType], npt.NDArray[Any]]:
+    labels = np.array(context.data_handler.labels_test)
     scores = context.optimization_info.get_best_test_scores()
 
+    if scores is None:
+        msg = "No test scores found in the optimization info"
+        raise ValueError(msg)
+
     oos_scores = context.optimization_info.get_best_oos_scores()
+    return_scores = scores
     if oos_scores is not None:
         oos_labels = [[0] * context.n_classes] * len(oos_scores) if context.multilabel else [-1] * len(oos_scores)  # type: ignore[list-item]
-        labels = np.concatenate([np.array(labels), np.array(oos_labels)])
-        scores = np.concatenate([scores, oos_scores])
+        labels = np.concatenate([labels, np.array(oos_labels)])
+        return_scores = np.concatenate([scores, oos_scores])
 
-    return labels, scores  # type: ignore[return-value]
+    return labels.tolist(), return_scores
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:

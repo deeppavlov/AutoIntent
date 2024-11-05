@@ -38,7 +38,8 @@ autointent data.train_path=data/intent_records/ac_robotic_new.json \
     logs.dirpath=experiments/multiclass_as_multilabel/ \
     logs.run_name=robotics_new_testing \
     augmentation.regex_sampling=10 \
-    augmentation.multilabel_generation_config="[0, 4000, 1000]"
+    augmentation.multilabel_generation_config="[0, 4000, 1000]"  # currently doesn't work, omit this line
+# currently doesn't work due to problems with to_multilabel when dataset contains only regexp but no utterances
 autointent data.train_path=data/intent_records/ac_robotic_new.json \
            data.test_path=data/intent_records/ac_robotic_val.json \
            data.force_multilabel=true \

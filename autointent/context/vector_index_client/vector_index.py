@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -7,7 +8,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent.context.embedder import Embedder
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 
 class VectorIndex:
@@ -15,7 +16,7 @@ class VectorIndex:
     embedder: Embedder
 
     def __init__(
-        self, model_name: str, device: str, embedder_batch_size: int = 1, embedder_max_length: int | None = None
+        self, model_name: str, device: str, embedder_batch_size: int = 32, embedder_max_length: int | None = None
     ) -> None:
         self.model_name = model_name
         self.embedder = Embedder(
@@ -26,20 +27,26 @@ class VectorIndex:
         )
         self.device = device
 
-        self.labels: list[LABEL_TYPE] = []  # (n_samples,) or (n_samples, n_classes)
+        self.labels: list[LabelType] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
 
-    def add(self, texts: list[str], labels: list[LABEL_TYPE]) -> None:
-        self.texts = texts
+        self.logger = logging.getLogger(__name__)
 
+    def add(self, texts: list[str], labels: list[LabelType]) -> None:
+        self.logger.debug("adding embeddings to vector_index %s", self.model_name)
         embeddings = self.embedder.embed(texts)
 
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)
         self.labels.extend(labels)
+        self.texts.extend(texts)
+
+    def is_empty(self) -> bool:
+        return len(self.labels) == 0
 
     def delete(self) -> None:
+        self.logger.debug("deleting vector index %s", self.model_name)
         if hasattr(self, "index"):
             self.index.reset()
         self.labels = []
@@ -74,12 +81,12 @@ class VectorIndex:
             raise ValueError(msg)
         return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
-    def get_all_labels(self) -> list[LABEL_TYPE]:
+    def get_all_labels(self) -> list[LabelType]:
         return self.labels
 
     def query(
         self, queries: list[str] | npt.NDArray[np.float32], k: int
-    ) -> tuple[list[list[LABEL_TYPE]], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
         """
         Arguments
         ---
@@ -110,9 +117,9 @@ class VectorIndex:
         self.dump_dir = dir_path
         faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
         self.embedder.dump(self.dump_dir / "embedding_model")
-        with (self.dump_dir / "texts.txt").open("w") as file:
+        with (self.dump_dir / "texts.json").open("w") as file:
             json.dump(self.texts, file, indent=4, ensure_ascii=False)
-        with (self.dump_dir / "labels.txt").open("w") as file:
+        with (self.dump_dir / "labels.json").open("w") as file:
             json.dump(self.labels, file, indent=4, ensure_ascii=False)
 
     def load(self, dir_path: Path | None = None) -> None:
@@ -121,8 +128,8 @@ class VectorIndex:
         if dir_path is None:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedder = Embedder(model_path=dir_path / "embedding_model", device=self.device)
-        with (dir_path / "texts.txt").open() as file:
+        self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.device)
+        with (dir_path / "texts.json").open() as file:
             self.texts = json.load(file)
-        with (dir_path / "labels.txt").open() as file:
+        with (dir_path / "labels.json").open() as file:
             self.labels = json.load(file)

@@ -1,5 +1,6 @@
 import pytest
 
+from autointent import Context
 from autointent.nodes.optimization import NodeOptimizer
 
 
@@ -36,7 +37,7 @@ def get_retrieval_optimizer(multilabel: bool):
 
 @pytest.fixture
 def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
-    context = context("multiclass")
+    context = context(multilabel=False)
     retrieval_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
@@ -52,7 +53,7 @@ def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
 
 @pytest.fixture
 def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
-    context = context("multilabel")
+    context = context(multilabel=True)
     retrieval_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
@@ -64,3 +65,13 @@ def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
     }
 
     return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)
+
+
+@pytest.fixture
+def context(setup_environment, dataset):
+    db_dir, dump_dir, logs_dir = setup_environment
+
+    def _context(multilabel: bool):
+        return Context(dataset=dataset, db_dir=db_dir(), dump_dir=dump_dir, force_multilabel=multilabel)
+
+    return _context

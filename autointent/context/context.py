@@ -19,7 +19,7 @@ class Context:
         db_dir: str | Path | None = None,
         dump_dir: str | Path | None = None,
         force_multilabel: bool = False,
-        embedder_batch_size: int = 1,
+        embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
     ) -> None:
         augmenter = DataAugmenter(multilabel_generation_config, regex_sampling, seed)
@@ -29,12 +29,13 @@ class Context:
         self.optimization_info = OptimizationInfo()
         self.vector_index_client = VectorIndexClient(device, db_dir, embedder_batch_size, embedder_max_length)
 
+        self.db_dir = self.vector_index_client.db_dir
+        self.embedder_max_length = embedder_max_length
         self.embedder_batch_size = embedder_batch_size
         self.device = device
         self.multilabel = self.data_handler.multilabel
         self.n_classes = self.data_handler.n_classes
         self.seed = seed
-        self.db_dir = db_dir
         self.dump_dir = Path.cwd() / "modules_dumps" if dump_dir is None else Path(dump_dir)
 
     def get_best_index(self) -> VectorIndex:

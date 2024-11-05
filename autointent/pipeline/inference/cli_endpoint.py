@@ -12,7 +12,7 @@ from autointent.pipeline.optimization.utils import NumpyEncoder
 from .inference_pipeline import InferencePipeline
 
 if TYPE_CHECKING:
-    from autointent.custom_types import LABEL_TYPE
+    from autointent.custom_types import LabelType
 
 
 @hydra.main(config_name="inference_config", config_path=".", version_base=None)
@@ -33,7 +33,7 @@ def main(cfg: InferenceConfig) -> None:
     pipeline = InferencePipeline.from_dict_config(pipeline_config)
 
     # send data to pipeline
-    labels: list[LABEL_TYPE] = pipeline.predict(data)
+    labels: list[LabelType] = pipeline.predict(data)
 
     # save results
     with Path(cfg.output_path).open("w") as file:

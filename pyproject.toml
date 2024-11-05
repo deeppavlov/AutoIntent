@@ -82,6 +82,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
+"autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 
 [tool.ruff.lint.pylint]
 max-args = 10
@@ -138,5 +139,6 @@ module = [
     "hydra.*",
     "transformers",
     "faiss",
+    "joblib",
 ]
 ignore_missing_imports = true
