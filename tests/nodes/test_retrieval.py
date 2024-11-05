@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_retrieval_multiclass(context):
-    context = context("multiclass")
+    context = context(multilabel=False)
     retrieval_optimizer = get_retrieval_optimizer(multilabel=False)
     retrieval_optimizer.fit(context)
 
@@ -28,7 +28,7 @@ def test_retrieval_multiclass(context):
 
 
 def test_retrieval_multilabel(context):
-    context = context("multilabel")
+    context = context(multilabel=True)
     retrieval_optimizer = get_retrieval_optimizer(multilabel=True)
     retrieval_optimizer.fit(context)
 

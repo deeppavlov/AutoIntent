@@ -4,7 +4,7 @@ from typing import Any, TypedDict
 
 from transformers import set_seed
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
@@ -115,7 +115,7 @@ class DataHandler:
 
 def _dump_train(
     utterances: list[str],
-    labels: list[LABEL_TYPE],
+    labels: list[LabelType],
     n_classes: int,
     multilabel: bool,
 ) -> Sequence[dict[str, Any]]:
@@ -138,7 +138,7 @@ def _dump_train(
 
 def _dump_test(
     utterances: list[str],
-    labels: list[LABEL_TYPE],
+    labels: list[LabelType],
     n_classes: int,
     multilabel: bool,
 ) -> list[UtteranceRecord]:
