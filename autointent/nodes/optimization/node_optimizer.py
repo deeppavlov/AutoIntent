@@ -10,7 +10,9 @@ from hydra.utils import instantiate
 from typing_extensions import Self
 
 from autointent.configs.node import NodeOptimizerConfig
+from autointent.configs.optimization_cli import LoggingConfig
 from autointent.context import Context
+from autointent.context.data_handler import Dataset
 from autointent.modules import Module
 from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
@@ -46,8 +48,12 @@ class NodeOptimizer:
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
-                module_dump_dir = self.get_module_dump_dir(context.get_dump_dir(), module_type, j_combination)
-                module.dump(module_dump_dir)
+
+                dump_dir = context.get_dump_dir()
+
+                if dump_dir is not None:
+                    dump_dir = self.get_module_dump_dir(dump_dir, module_type, j_combination)
+                    module.dump(dump_dir)
 
                 context.optimization_info.log_module_optimization(
                     self.node_info.node_type,
@@ -56,7 +62,7 @@ class NodeOptimizer:
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
-                    module_dump_dir,
+                    dump_dir,
                 )
 
                 module.clear_cache()
@@ -89,15 +95,9 @@ class NodeOptimizer:
             raise ValueError(msg)
         module.fit(*args)  # type: ignore[arg-type]
 
-    # @overload
-    # def fit(
-    #     self,
-    #     utterances: list[str],
-    #     labels: list[LabelType],
-    #     tags: list[Tag] | None = None,
-    #     label_descriptions: list[str] | None = None,
-    # ) -> None:
-    #     # create context object from given data
-    #     ...
+    def fit_from_dataset(self, train_data: Dataset, val_data: Dataset | None = None) -> None:
+        context = Context()
+        context.set_datasets(train_data, val_data)
+        context.config_logs(LoggingConfig(dump_dir=None))
 
-    #     # call fit(context)
+        self.fit(context)

@@ -14,7 +14,7 @@ from autointent.configs.optimization_cli import (
     VectorIndexConfig,
 )
 
-from .data_handler import DataAugmenter, DataHandler
+from .data_handler import DataAugmenter, DataHandler, Dataset
 from .optimization_info import OptimizationInfo
 from .utils import NumpyEncoder, load_data
 from .vector_index_client import VectorIndex, VectorIndexClient
@@ -67,6 +67,9 @@ class Context:
             force_multilabel=config.force_multilabel,
             augmenter=augmenter,
         )
+
+    def set_datasets(self, train_data: Dataset, val_data: Dataset | None = None) -> None:
+        self.data_handler = DataHandler(dataset=train_data, test_dataset=val_data, random_seed=self.seed)
 
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()
@@ -137,12 +140,10 @@ class Context:
     def get_max_length(self) -> int | None:
         return self.vector_index_client.embedder_max_length
 
-    def get_dump_dir(self) -> Path:
-        res = self.logging_config.dump_dir
-        if res is None:
-            msg = "something's wrong with LoggingConfig"
-            raise ValueError(msg)
-        return res
+    def get_dump_dir(self) -> Path | None:
+        if self.logging_config.dump_modules:
+            return self.logging_config.dump_dir
+        return None
 
     def is_multilabel(self) -> bool:
         return self.data_handler.multilabel
