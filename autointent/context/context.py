@@ -91,6 +91,9 @@ class Context:
         optimization_results = self.optimization_info.dump_evaluation_results()
 
         logs_dir = self.logging_config.dirpath
+        if logs_dir is None:
+            msg = "something's wrong with LoggingConfig"
+            raise ValueError(msg)
 
         # create appropriate directory
         logs_dir.mkdir(parents=True, exist_ok=True)
@@ -135,7 +138,11 @@ class Context:
         return self.vector_index_client.embedder_max_length
 
     def get_dump_dir(self) -> Path:
-        return self.logging_config.dump_dir
+        res = self.logging_config.dump_dir
+        if res is None:
+            msg = "something's wrong with LoggingConfig"
+            raise ValueError(msg)
+        return res
 
     def is_multilabel(self) -> bool:
         return self.data_handler.multilabel

@@ -7,7 +7,7 @@ import hydra
 import yaml
 
 from autointent.configs.inference_cli import InferenceConfig
-from autointent.pipeline.optimization.utils import NumpyEncoder
+from autointent.context.utils import NumpyEncoder
 
 from .inference_pipeline import InferencePipeline
 
