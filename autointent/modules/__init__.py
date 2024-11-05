@@ -38,6 +38,7 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
 }
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
+    "adapt": AdaptivePredictor,
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
 }
