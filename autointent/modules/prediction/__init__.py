@@ -6,10 +6,10 @@ from .threshold import ThresholdPredictor
 from .tunable import TunablePredictor
 
 __all__ = [
+    "AdaptivePredictor",
     "ArgmaxPredictor",
     "JinoosPredictor",
     "PredictionModule",
     "ThresholdPredictor",
     "TunablePredictor",
-    "AdaptivePredictor",
 ]
