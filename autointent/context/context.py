@@ -70,9 +70,6 @@ class Context:
             augmenter=augmenter,
         )
 
-        self.multilabel = self.data_handler.multilabel
-        self.n_classes = self.data_handler.n_classes
-
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()
         return self.vector_index_client.get_index(model_name)
@@ -83,9 +80,9 @@ class Context:
             cfg.pop("_target_")
         return {
             "metadata": {
-                "device": self.device,
-                "multilabel": self.multilabel,
-                "n_classes": self.n_classes,
+                "device": self.get_device(),
+                "multilabel": self.is_multilabel(),
+                "n_classes": self.get_n_classes(),
                 "seed": self.seed,
             },
             "nodes_configs": nodes_configs,
@@ -141,6 +138,13 @@ class Context:
 
     def get_dump_dir(self) -> Path:
         return self.logging_config.dump_dir
+
+    def is_multilabel(self) -> bool:
+        return self.data_handler.multilabel
+
+    def get_n_classes(self) -> int:
+        return self.data_handler.n_classes
+
 
 class NumpyEncoder(json.JSONEncoder):
     """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""

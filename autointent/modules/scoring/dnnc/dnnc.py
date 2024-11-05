@@ -82,10 +82,10 @@ class DNNCScorer(ScoringModule):
             search_model_name=search_model_name,
             k=k,
             train_head=train_head,
-            device=context.device,
-            db_dir=str(context.db_dir),
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            device=context.get_device(),
+            db_dir=str(context.get_db_dir()),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance

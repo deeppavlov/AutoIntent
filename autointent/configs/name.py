@@ -344,6 +344,7 @@ def generate_name() -> str:
     noun = random.choice(nouns)
     return f"{adjective}_{noun}"
 
+
 def get_run_name(run_name: str | None = None) -> str:
     if run_name is None:
         run_name = generate_name()

@@ -24,7 +24,7 @@ def main(cfg: OptimizationConfig) -> None:
     context.config_data(cfg.data, cfg.augmentation)
 
     # run optimization
-    search_space_config = load_config(cfg.task.search_space_path, context.multilabel, logger)
+    search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)
     pipeline = PipelineOptimizer.from_dict_config(search_space_config)
     pipeline.optimize(context)
 

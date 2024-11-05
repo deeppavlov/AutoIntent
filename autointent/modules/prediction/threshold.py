@@ -44,8 +44,8 @@ class ThresholdPredictor(PredictionModule):
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
         return cls(
             thresh=thresh,
-            multilabel=context.multilabel,
-            n_classes=context.n_classes,
+            multilabel=context.is_multilabel(),
+            n_classes=context.get_n_classes(),
         )
 
     def fit(
