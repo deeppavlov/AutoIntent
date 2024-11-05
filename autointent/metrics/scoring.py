@@ -24,7 +24,7 @@ class ScoringMetricFn(Protocol):
         ...
 
 
-def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE, eps: float = 1e-10) -> float:
     """
     supports multiclass and multilabel
 
@@ -45,9 +45,10 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE)
     where `s[i,c]` is a predicted score of `i`th utterance having ground truth label `c`
     """
     labels_array, scores_array = transform(labels, scores)
+    scores_array[scores_array == 0] = eps
 
     if np.any((scores_array <= 0) | (scores_array > 1)):
-        msg = "One or more scores are not from [0,1]. It is incompatible with `scoring_log_likelihood` metric"
+        msg = "One or more scores are not from (0,1]. It is incompatible with `scoring_log_likelihood` metric"
         logger.error(msg)
         raise ValueError(msg)
 
