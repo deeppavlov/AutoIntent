@@ -10,8 +10,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.embedder import Embedder
-from autointent.context.vector_index_client import VectorIndex
-from autointent.context.vector_index_client import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LabelType
 from autointent.modules.scoring.base import ScoringModule

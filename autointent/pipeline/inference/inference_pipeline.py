@@ -3,8 +3,7 @@ from typing import Any
 from hydra.utils import instantiate
 
 from autointent.configs.inference_pipeline import InferencePipelineConfig
-from autointent.custom_types import LabelType
-from autointent.custom_types import NodeType
+from autointent.custom_types import LabelType, NodeType
 from autointent.nodes.inference import InferenceNode
 
 

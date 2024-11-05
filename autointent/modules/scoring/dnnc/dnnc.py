@@ -37,7 +37,6 @@ class DNNCScorer(ScoringModule):
 
     name = "dnnc"
 
-    metadata_dict_name: str = "metadata.json"
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
     prebuilt_index: bool = False

@@ -9,10 +9,10 @@ from hydra.utils import instantiate
 
 from autointent import Context
 from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
+from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 
 from .utils import NumpyEncoder
-from autointent.custom_types import NodeType
 
 
 class PipelineOptimizer:
