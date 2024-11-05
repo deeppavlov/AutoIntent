@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -49,25 +49,16 @@ class AdaptivePredictor(PredictionModule):
 
             metrics_list = []
             for r in self.search_space:
-                y_pred = self.multilabel_predict(scores, r, self.tags)
+                y_pred = multilabel_predict(scores, r, self.tags)
                 metric_value = multilabel_score(y_true, y_pred)
                 metrics_list.append(metric_value)
 
             self._r = self.search_space[np.argmax(metrics_list)]
 
-    def predict(self, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
-            return self.multilabel_predict(scores, self._r, self.tags)
-        return self.multiclass_predict(scores)
-
-    def multilabel_predict(
-        self, scores: npt.NDArray[np.float64], r: float, tags: list[Tag] | None
-    ) -> npt.NDArray[np.int64]:
-        thresh = self._find_threshes(scores, r)
-        res = (scores >= thresh[None, :]).astype(int)
-        if tags:
-            res = apply_tags(res, scores, tags)
-        return res
+            return multilabel_predict(scores, self._r, self.tags)
+        return multiclass_predict(scores)
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -88,15 +79,23 @@ class AdaptivePredictor(PredictionModule):
         self.tags = metadata["tags"]
 
 
-def _find_threshes(r: float, scores: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
     return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)  # type: ignore[no-any-return]
 
 
-def multiclass_predict(scores: npt.NDArray[np.float64]) -> npt.NDArray[np.int64]:
-    return np.argmax(scores, axis=1)
+def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
+    thresh = _find_threshes(r, scores)
+    res = (scores >= thresh[None, :]).astype(int)
+    if tags:
+        res = apply_tags(res, scores, tags)
+    return res
 
 
-def multilabel_score(y_true: npt.NDArray[np.int64], y_pred: npt.NDArray[np.int64]) -> float:
+def multiclass_predict(scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
+
+
+def multilabel_score(y_true: list, y_pred: npt.NDArray[Any]) -> float:
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 

@@ -30,11 +30,11 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = {
 }
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
+    "adapt": AdaptivePredictor,
     "argmax": ArgmaxPredictor,
     "jinoos": JinoosPredictor,
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
-    "logit_adapt": AdaptivePredictor,
 }
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
@@ -44,12 +44,12 @@ PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
 
 __all__ = [
     "Module",
+    "AdaptivePredictor",
     "ArgmaxPredictor",
     "JinoosPredictor",
     "PredictionModule",
     "ThresholdPredictor",
     "TunablePredictor",
-    "AdaptivePredictor",
     "RegExp",
     "RetrievalModule",
     "VectorDBModule",
