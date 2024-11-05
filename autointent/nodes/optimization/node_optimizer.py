@@ -10,9 +10,7 @@ from hydra.utils import instantiate
 from typing_extensions import Self
 
 from autointent.configs.node import NodeOptimizerConfig
-from autointent.configs.optimization_cli import LoggingConfig
 from autointent.context import Context
-from autointent.context.data_handler import Dataset
 from autointent.modules import Module
 from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
@@ -94,10 +92,3 @@ class NodeOptimizer:
             self._logger.error(msg)
             raise ValueError(msg)
         module.fit(*args)  # type: ignore[arg-type]
-
-    def fit_from_dataset(self, train_data: Dataset, val_data: Dataset | None = None) -> None:
-        context = Context()
-        context.set_datasets(train_data, val_data)
-        context.config_logs(LoggingConfig(dump_dir=None))
-
-        self.fit(context)
