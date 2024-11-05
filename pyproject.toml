@@ -138,5 +138,7 @@ module = [
     "hydra.*",
     "transformers",
     "faiss",
+    "datasets",
+    "joblib",
 ]
 ignore_missing_imports = true

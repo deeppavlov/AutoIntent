@@ -101,8 +101,9 @@ class Dataset(BaseModel):
         utterances = []
         intents = []
         if "utterances" in configs:
-            utterance_ds = datasets.load_dataset(dataset_name, name="utterances", split=split,
-                                                 **(utterances_kwargs or {}))
+            utterance_ds = datasets.load_dataset(
+                dataset_name, name="utterances", split=split, **(utterances_kwargs or {})
+            )
             utterances = [Utterance(**item) for item in utterance_ds]
         # tags = []
         # if "tags" in configs:
@@ -110,7 +111,7 @@ class Dataset(BaseModel):
         if "intents" in configs:
             intents_ds = datasets.load_dataset(dataset_name, name="intents", split=split, **(intents_kwargs or {}))
             intents = [Intent(**item) for item in intents_ds]
-        return Dataset(utterances=utterances, intents=intents)
+        return cls(utterances=utterances, intents=intents)
 
     def push_to_hub(self, dataset_name: str, split: str = "train") -> None:
         utterances_ds = datasets.Dataset.from_list([utterance.model_dump() for utterance in self.utterances])
