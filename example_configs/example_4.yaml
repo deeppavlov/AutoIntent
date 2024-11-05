@@ -1,0 +1,9 @@
+defaults:
+  - optimization_config
+  - _self_
+
+data:
+  train_path: "default-multiclass"
+  test_path: "data/intent_records/banking77_test.json"
+
+seed: 42
