@@ -15,3 +15,13 @@ class LogLevel(Enum):
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
 
 LABEL_TYPE = int | list[int]
+
+
+class NodeType(str, Enum):
+    retrieval = "retrieval"
+    prediction = "prediction"
+    scoring = "scoring"
+    regexp = "regexp"
+
+
+NODE_TYPES = [NodeType.retrieval, NodeType.prediction, NodeType.scoring, NodeType.regexp]

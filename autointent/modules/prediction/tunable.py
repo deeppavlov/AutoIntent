@@ -24,6 +24,7 @@ class TunablePredictorDumpMetadata(TypedDict):
 
 class TunablePredictor(PredictionModule):
     metadata_dict_name: str = "metadata.json"
+    name = "tunable"
 
     def __init__(self, n_trials: int | None = None) -> None:
         self.n_trials = n_trials

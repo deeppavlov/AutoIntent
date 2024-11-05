@@ -10,6 +10,8 @@ from .base import Module
 
 
 class RegExp(Module):
+    name = "regexp"
+
     def fit(self, context: Context) -> None:
         self.regexp_patterns = [
             {

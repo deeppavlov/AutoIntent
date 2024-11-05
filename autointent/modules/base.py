@@ -9,6 +9,8 @@ from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):
+    name: str
+
     @abstractmethod
     def fit(self, context: Context) -> None:
         pass

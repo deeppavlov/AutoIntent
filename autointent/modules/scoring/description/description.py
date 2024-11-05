@@ -24,6 +24,7 @@ class DescriptionScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
     weights_file_name: str = "description_vectors.npy"
     _vector_index: VectorIndex
+    name = "description"
 
     def __init__(self, temperature: float = 1.0) -> None:
         self.temperature = temperature

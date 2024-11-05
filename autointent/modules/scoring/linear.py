@@ -39,6 +39,7 @@ class LinearScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
+    name = "linear"
 
     def __init__(self, cv: int = 3, n_jobs: int = 1) -> None:
         self.cv = cv

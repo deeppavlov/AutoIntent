@@ -10,6 +10,8 @@ from .base import PredictionModule
 
 
 class ArgmaxPredictor(PredictionModule):
+    name = "argmax"
+
     def fit(self, context: Context) -> None:
         if context.data_handler.has_oos_samples():
             logger = logging.getLogger(__name__)

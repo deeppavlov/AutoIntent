@@ -12,6 +12,7 @@ from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
 from autointent.nodes import NodeOptimizer
 
 from .utils import NumpyEncoder
+from autointent.custom_types import NodeType
 
 
 class PipelineOptimizer:
@@ -70,7 +71,7 @@ class PipelineOptimizer:
             yaml.dump(inference_config, file)
 
 
-def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
+def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes, strict=False):

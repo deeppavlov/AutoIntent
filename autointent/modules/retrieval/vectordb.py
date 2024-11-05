@@ -11,6 +11,7 @@ from .base import RetrievalModule
 
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
+    name = "vector_db"
 
     def __init__(self, k: int, model_name: str) -> None:
         self.model_name = model_name

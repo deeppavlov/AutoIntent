@@ -23,6 +23,7 @@ class ThresholdPredictor(PredictionModule):
     metadata_dict_name: str = "metadata.json"
     multilabel: bool
     tags: list[Tag]
+    name = "threshold"
 
     def __init__(self, thresh: float | npt.NDArray[Any]) -> None:
         self.thresh = thresh

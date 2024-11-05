@@ -25,6 +25,7 @@ class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     metadata_dict_name: str = "metadata.json"
     _vector_index: VectorIndex
+    name = "knn"
 
     def __init__(self, k: int, weights: WEIGHT_TYPES) -> None:
         """
