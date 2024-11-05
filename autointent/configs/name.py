@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 adjectives = [
     "adorable",
@@ -342,3 +343,8 @@ def generate_name() -> str:
     adjective = random.choice(adjectives)
     noun = random.choice(nouns)
     return f"{adjective}_{noun}"
+
+def get_run_name(run_name: str | None = None) -> str:
+    if run_name is None:
+        run_name = generate_name()
+    return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005

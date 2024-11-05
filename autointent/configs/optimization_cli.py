@@ -6,7 +6,7 @@ from typing import Any
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
-from autointent.pipeline.optimization.utils import generate_name
+from .name import generate_name
 
 
 @dataclass

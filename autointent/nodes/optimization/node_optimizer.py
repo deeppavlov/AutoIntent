@@ -46,7 +46,7 @@ class NodeOptimizer:
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
-                module_dump_dir = self.get_module_dump_dir(context.dump_dir, module_type, j_combination)
+                module_dump_dir = self.get_module_dump_dir(context.get_dump_dir(), module_type, j_combination)
                 module.dump(module_dump_dir)
 
                 context.optimization_info.log_module_optimization(
@@ -88,3 +88,16 @@ class NodeOptimizer:
             self._logger.error(msg)
             raise ValueError(msg)
         module.fit(*args)  # type: ignore[arg-type]
+
+    # @overload
+    # def fit(
+    #     self,
+    #     utterances: list[str],
+    #     labels: list[LabelType],
+    #     tags: list[Tag] | None = None,
+    #     label_descriptions: list[str] | None = None,
+    # ) -> None:
+    #     # create context object from given data
+    #     ...
+
+    #     # call fit(context)
