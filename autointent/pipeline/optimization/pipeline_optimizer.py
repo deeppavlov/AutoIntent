@@ -13,9 +13,30 @@ from autointent.nodes import NodeOptimizer
 
 
 class PipelineOptimizer:
-    def __init__(self, nodes: list[NodeOptimizer]) -> None:
+    def __init__(
+        self,
+        nodes: list[NodeOptimizer],
+    ) -> None:
         self._logger = logging.getLogger(__name__)
         self.nodes = nodes
+
+        self.logging_config = LoggingConfig(dump_dir=None)
+        self.vector_index_config = VectorIndexConfig()
+        self.embedder_config = EmbedderConfig()
+
+    def set_config(
+        self,
+        config: LoggingConfig | VectorIndexConfig | EmbedderConfig
+    ) -> None:
+        if isinstance(config, LoggingConfig):
+            self.logging_config = config
+        elif isinstance(config, VectorIndexConfig):
+            self.vector_index_config = config
+        elif isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        else:
+            msg = "unknown config type"
+            raise TypeError(msg)
 
     @classmethod
     def from_dict_config(cls, config: dict[str, Any]) -> "PipelineOptimizer":
@@ -30,8 +51,8 @@ class PipelineOptimizer:
     def optimize_from_dataset(self, train_data: Dataset, val_data: Dataset | None = None) -> Context:
         context = Context()
         context.set_datasets(train_data, val_data)
-        context.config_logs(LoggingConfig(dump_dir=None))
-        context.config_vector_index(VectorIndexConfig(), EmbedderConfig())
+        context.config_logs(self.logging_config)
+        context.config_vector_index(self.vector_index_config, self.embedder_config)
 
         self.optimize(context)
         self.inference_config = context.optimization_info.get_inference_nodes_config()
