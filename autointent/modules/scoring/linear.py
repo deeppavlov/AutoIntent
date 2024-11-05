@@ -1,22 +1,26 @@
 import json
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import joblib
 import numpy as np
 import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
+from typing_extensions import Self
 
-from autointent import Context
+from autointent.context import Context
 from autointent.context.embedder import Embedder
+from autointent.context.vector_index_client import VectorIndexClient
+from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import ScoringModule
 
 
-class LinearScorerDumpDict(TypedDict):
+class LinearScorerDumpDict(BaseMetadataDict):
     multilabel: bool
-    device: str
+    batch_size: int
+    max_length: int | None
 
 
 class LinearScorer(ScoringModule):
@@ -36,31 +40,85 @@ class LinearScorer(ScoringModule):
     ```
     """
 
-    metadata_dict_name: str = "metadata.json"
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
+    precomputed_embeddings: bool = False
+    db_dir: str
     name = "linear"
 
-    def __init__(self, cv: int = 3, n_jobs: int = 1) -> None:
+    def __init__(
+        self,
+        model_name: str,
+        cv: int = 3,
+        n_jobs: int = -1,
+        device: str = "cpu",
+        seed: int = 0,
+        batch_size: int = 32,
+        max_length: int | None = None,
+    ) -> None:
         self.cv = cv
         self.n_jobs = n_jobs
+        self.device = device
+        self.seed = seed
+        self.model_name = model_name
+        self.batch_size = batch_size
+        self.max_length = max_length
 
-    def fit(self, context: Context) -> None:
-        self._multilabel = context.multilabel
-        vector_index = context.get_best_index()
-        features = vector_index.get_all_embeddings()
-        labels = vector_index.get_all_labels()
+    @classmethod
+    def from_context(
+        cls,
+        context: Context,
+        model_name: str | None = None,
+    ) -> Self:
+        if model_name is None:
+            model_name = context.optimization_info.get_best_embedder()
+            precomputed_embeddings = True
+        else:
+            precomputed_embeddings = context.vector_index_client.exists(model_name)
+
+        instance = cls(
+            model_name=model_name,
+            device=context.device,
+            seed=context.seed,
+            batch_size=context.embedder_batch_size,
+            max_length=context.embedder_max_length,
+        )
+        instance.precomputed_embeddings = precomputed_embeddings
+        instance.db_dir = str(context.db_dir)
+        return instance
+
+    def fit(
+        self,
+        utterances: list[str],
+        labels: list[LabelType],
+    ) -> None:
+        self._multilabel = isinstance(labels[0], list)
+
+        if self.precomputed_embeddings:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
+            vector_index = vector_index_client.get_index(self.model_name)
+            features = vector_index.get_all_embeddings()
+            if len(features) != len(utterances):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+            embedder = vector_index.embedder
+        else:
+            embedder = Embedder(
+                device=self.device, model_name=self.model_name, batch_size=self.batch_size, max_length=self.max_length
+            )
+            features = embedder.embed(utterances)
 
         if self._multilabel:
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=context.seed)
+            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=self.seed)
 
         clf.fit(features, labels)
 
         self._clf = clf
-        self._embedder = vector_index.embedder
+        self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         features = self._embedder.embed(utterances)
@@ -73,16 +131,17 @@ class LinearScorer(ScoringModule):
         self._embedder.delete()
 
     def dump(self, path: str) -> None:
-        metadata = LinearScorerDumpDict(
+        self.metadata = LinearScorerDumpDict(
             multilabel=self._multilabel,
-            device=str(self._embedder.device),
+            batch_size=self.batch_size,
+            max_length=self.max_length,
         )
 
         dump_dir = Path(path)
 
         metadata_path = dump_dir / self.metadata_dict_name
         with metadata_path.open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
         # dump sklearn model
         clf_path = dump_dir / self.classifier_file_name
@@ -105,4 +164,9 @@ class LinearScorer(ScoringModule):
 
         # load sentence transformer model
         embedder_dir = dump_dir / self.embedding_model_subdir
-        self._embedder = Embedder(device=metadata["device"], model_path=embedder_dir)
+        self._embedder = Embedder(
+            device=self.device,
+            model_name=embedder_dir,
+            batch_size=metadata["batch_size"],
+            max_length=metadata["max_length"],
+        )

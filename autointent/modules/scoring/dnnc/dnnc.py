@@ -2,15 +2,17 @@ import itertools as it
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
+from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient
-from autointent.custom_types import LABEL_TYPE
+from autointent.context.vector_index_client.cache import get_db_dir
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.scoring.base import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
@@ -18,11 +20,11 @@ from .head_training import CrossEncoderWithLogreg
 logger = logging.getLogger(__name__)
 
 
-class DNNCScorerDumpMetadata(TypedDict):
-    device: str
+class DNNCScorerDumpMetadata(BaseMetadataDict):
     db_dir: str
     n_classes: int
-    biencoder_model: str
+    batch_size: int
+    max_length: int | None
 
 
 class DNNCScorer(ScoringModule):
@@ -38,28 +40,79 @@ class DNNCScorer(ScoringModule):
     metadata_dict_name: str = "metadata.json"
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
+    prebuilt_index: bool = False
 
-    def __init__(self, model_name: str, k: int, train_head: bool = False) -> None:
-        self.model_name = model_name
+    def __init__(
+        self,
+        cross_encoder_name: str,
+        search_model_name: str,
+        k: int,
+        db_dir: str | None = None,
+        device: str = "cpu",
+        train_head: bool = False,
+        batch_size: int = 32,
+        max_length: int | None = None,
+    ) -> None:
+        if db_dir is None:
+            db_dir = str(get_db_dir())
+
+        self.cross_encoder_name = cross_encoder_name
+        self.search_model_name = search_model_name
         self.k = k
         self.train_head = train_head
+        self.device = device
+        self.db_dir = db_dir
+        self.batch_size = batch_size
+        self.max_length = max_length
 
-    def fit(self, context: Context) -> None:
-        self.n_classes = context.n_classes
-        self.model = CrossEncoder(self.model_name, trust_remote_code=True, device=context.device)
-        self.vector_index = context.get_best_index()
+    @classmethod
+    def from_context(
+        cls,
+        context: Context,
+        cross_encoder_name: str,
+        k: int,
+        search_model_name: str | None = None,
+        train_head: bool = False,
+    ) -> Self:
+        if search_model_name is None:
+            search_model_name = context.optimization_info.get_best_embedder()
+            prebuilt_index = True
+        else:
+            prebuilt_index = context.vector_index_client.exists(search_model_name)
+
+        instance = cls(
+            cross_encoder_name=cross_encoder_name,
+            search_model_name=search_model_name,
+            k=k,
+            train_head=train_head,
+            device=context.device,
+            db_dir=str(context.db_dir),
+            batch_size=context.embedder_batch_size,
+            max_length=context.embedder_max_length,
+        )
+        instance.prebuilt_index = prebuilt_index
+        return instance
+
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+        self.n_classes = len(set(labels))
+
+        self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
+
+        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+
+        if self.prebuilt_index:
+            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            self.vector_index = vector_index_client.get_index(self.search_model_name)
+            if len(utterances) != len(self.vector_index.texts):
+                msg = "Vector index mismatches provided utterances"
+                raise ValueError(msg)
+        else:
+            self.vector_index = vector_index_client.create_index(self.search_model_name, utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
-            model.fit(context.data_handler.utterances_train, context.data_handler.labels_train)
+            model.fit(utterances, labels)
             self.model = model
-
-        self.metadata = DNNCScorerDumpMetadata(
-            device=context.device,
-            db_dir=str(context.db_dir),
-            n_classes=self.n_classes,
-            biencoder_model=self.vector_index.model_name,
-        )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -108,7 +161,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[LABEL_TYPE]]) -> npt.NDArray[Any]:
+    def _build_result(self, scores: list[list[float]], labels: list[list[LabelType]]) -> npt.NDArray[Any]:
         """
         Arguments
         ---
@@ -127,28 +180,41 @@ class DNNCScorer(ScoringModule):
         pass
 
     def dump(self, path: str) -> None:
+        self.metadata = DNNCScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.metadata, file, indent=4)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         self.model.save(crossencoder_dir)
+        self.vector_index.dump(Path(self.db_dir))
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata = json.load(file)
+            self.metadata: DNNCScorerDumpMetadata = json.load(file)
 
         self.n_classes = self.metadata["n_classes"]
 
-        vector_index_client = VectorIndexClient(device=self.metadata["device"], db_dir=self.metadata["db_dir"])
-        self.vector_index = vector_index_client.get_index(self.metadata["biencoder_model"])
+        vector_index_client = VectorIndexClient(
+            device=self.device,
+            db_dir=self.metadata["db_dir"],
+            embedder_batch_size=self.metadata["batch_size"],
+            embedder_max_length=self.metadata["max_length"],
+        )
+        self.vector_index = vector_index_client.get_index(self.search_model_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
-        if not self.train_head:
-            self.model = CrossEncoder(crossencoder_dir, device=self.metadata["device"])
-        else:
+        if self.train_head:
             self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
+        else:
+            self.model = CrossEncoder(crossencoder_dir, device=self.device)
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

@@ -1,41 +1,17 @@
 import numpy as np
 
-from autointent import Context
-from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
-from autointent.modules import KNNScorer, VectorDBModule
+from autointent.context.data_handler import DataHandler
+from autointent.modules import KNNScorer
 
 
-def test_base_knn(setup_environment, load_clinc_subset):
+def test_base_knn(setup_environment, dataset):
     db_dir, dump_dir, logs_dir = setup_environment
 
-    dataset = load_clinc_subset("multiclass")
+    data_handler = DataHandler(dataset)
 
-    context = Context(
-        dataset=dataset,
-        dump_dir=dump_dir,
-        db_dir=db_dir(),
-    )
+    scorer = KNNScorer(k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir())
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
-    vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate)
-    artifact = vector_db.get_assets()
-    context.optimization_info.log_module_optimization(
-        node_type="retrieval",
-        module_type="vector_db",
-        module_params=retrieval_params,
-        metric_value=metric_value,
-        metric_name="retrieval_hit_rate_macro",
-        artifact=artifact,
-        module_dump_dir="",
-    )
-
-    scorer = KNNScorer(k=3, weights="distance")
-
-    scorer.fit(context)
-    score = scorer.score(context, scoring_roc_auc)
-    assert score == 1
+    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     predictions = scorer.predict(
         [
             "why is there a hold on my american saving bank account",

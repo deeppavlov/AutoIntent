@@ -16,6 +16,6 @@ class RegExpNode(NodeInfo):
         regexp_partial_precision,
     )
 
-    modules_available: ClassVar[Mapping[str, type[Module]]] = {NodeType.regexp: RegExp}  # type: ignore[type-abstract]
+    modules_available: ClassVar[Mapping[str, type[Module]]] = {NodeType.regexp: RegExp}
 
     node_type = NodeType.regexp
