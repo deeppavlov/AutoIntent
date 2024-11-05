@@ -45,9 +45,11 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def optimize_from_dataset(self, train_data: Dataset, val_data: Dataset | None = None) -> Context:
+    def optimize_from_dataset(
+        self, train_data: Dataset, val_data: Dataset | None = None, force_multilabel: bool = False
+    ) -> Context:
         context = Context()
-        context.set_datasets(train_data, val_data)
+        context.set_datasets(train_data, val_data, force_multilabel)
         context.config_logs(self.logging_config)
         context.config_vector_index(self.vector_index_config, self.embedder_config)
 

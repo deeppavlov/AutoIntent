@@ -1,50 +1,71 @@
 import importlib.resources as ires
+from pathlib import Path
 from typing import Literal
 
 import pytest
 
 from autointent.configs.optimization_cli import (
     DataConfig,
+    EmbedderConfig,
     LoggingConfig,
     OptimizationConfig,
     TaskConfig,
     VectorIndexConfig,
 )
+from autointent.pipeline.optimization import PipelineOptimizer
 from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
 from autointent.pipeline.optimization.utils import load_config
 from tests.conftest import setup_environment
 
-ConfigType = Literal["multiclass", "multilabel"]
+TaskType = Literal["multiclass", "multilabel", "description"]
 
 
-@pytest.fixture
-def get_config():
-    def _get_config(config_type: ConfigType):
-        config_path = ires.files("tests.assets.configs").joinpath(f"{config_type}.yaml")
-        return load_config(str(config_path), multilabel=config_type == "multilabel")
+def get_search_space_path(task_type: TaskType):
+    return ires.files("tests.assets.configs").joinpath(f"{task_type}.yaml")
 
-    return _get_config
+
+def get_search_space(task_type: TaskType):
+    path = get_search_space_path(task_type)
+    return load_config(str(path), multilabel=task_type == "multilabel")
 
 
 @pytest.mark.parametrize(
-    "dataset_type",
+    "task_type",
     ["multiclass", "multilabel", "description"],
 )
-def test_optimization_pipeline_cli(dataset_type):
+def test_no_context_optimization(dataset, task_type):
+    db_dir, dump_dir, logs_dir = setup_environment()
+    search_space = get_search_space(task_type)
+
+    pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+
+    context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
+    context.dump()
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    ["multiclass", "multilabel", "description"],
+)
+def test_optimization_pipeline_cli(task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     config = OptimizationConfig(
         data=DataConfig(
             train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
-            force_multilabel=(dataset_type == "multilabel"),
+            force_multilabel=(task_type == "multilabel"),
         ),
         task=TaskConfig(
-            search_space_path=ires.files("tests.assets.configs").joinpath(f"{dataset_type}.yaml"),
+            search_space_path=get_search_space_path(task_type),
         ),
         vector_index=VectorIndexConfig(
             device="cpu",
         ),
         logs=LoggingConfig(
-            dirpath=logs_dir,
+            dirpath=Path(logs_dir),
         ),
     )
     optimize_pipeline(config)

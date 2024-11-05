@@ -68,8 +68,12 @@ class Context:
             augmenter=augmenter,
         )
 
-    def set_datasets(self, train_data: Dataset, val_data: Dataset | None = None) -> None:
-        self.data_handler = DataHandler(dataset=train_data, test_dataset=val_data, random_seed=self.seed)
+    def set_datasets(
+        self, train_data: Dataset, val_data: Dataset | None = None, force_multilabel: bool = False
+    ) -> None:
+        self.data_handler = DataHandler(
+            dataset=train_data, test_dataset=val_data, random_seed=self.seed, force_multilabel=force_multilabel
+        )
 
     def get_best_index(self) -> VectorIndex:
         model_name = self.optimization_info.get_best_embedder()
