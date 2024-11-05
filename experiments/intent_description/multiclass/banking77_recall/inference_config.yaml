@@ -1,0 +1,16 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 77
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/upset_megalodon_11-05-2024_12-27-10/modules_dumps/retrieval/vector_db/comb_1
+  module_config:
+    k: 10
+    model_name: infgrad/stella-base-en-v2
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/upset_megalodon_11-05-2024_12-27-10/modules_dumps/scoring/linear/comb_0
+  module_config: {}
+  module_type: linear
+  node_type: scoring

@@ -1,0 +1,328 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9642857142857143,
+            0.9642857142857143
+        ],
+        "scoring": [
+            0.5909090909090909,
+            0.5909090909090909,
+            0.5909090909090909,
+            0.5909090909090909,
+            0.5909090909090909,
+            0.5909090909090909,
+            0.8409090909090909,
+            0.8409090909090909,
+            0.8409090909090909,
+            0.75,
+            0.75,
+            0.8409090909090909,
+            0.6363636363636364,
+            0.7954545454545454,
+            0.8409090909090909,
+            0.6590909090909091,
+            0.7272727272727273,
+            0.8409090909090909,
+            0.8409090909090909,
+            0.8409090909090909,
+            0.7272727272727273,
+            0.7045454545454546,
+            0.6590909090909091,
+            0.38636363636363635,
+            0.38636363636363635,
+            0.38636363636363635,
+            0.38636363636363635
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9642857142857143,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9642857142857143,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5909090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 1,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.75,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_3"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.75,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_5"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6363636363636364,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_6"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7954545454545454,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_7"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 5,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_8"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6590909090909091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_9"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_10"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 10,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/knn/comb_11"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/linear/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.8409090909090909,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_0"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_1"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7045454545454546,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_2"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "BAAI/bge-reranker-base",
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6590909090909091,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_3"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.38636363636363635,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_4"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.38636363636363635,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_5"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.38636363636363635,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_6"
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.38636363636363635,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_alligator_11-05-2024_12-27-30/modules_dumps/scoring/dnnc/comb_7"
+            }
+        ],
+        "prediction": []
+    }
+}
