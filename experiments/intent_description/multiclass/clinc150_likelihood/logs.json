@@ -1,0 +1,108 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9840425531914894,
+            0.9893617021276596
+        ],
+        "scoring": [
+            -4.779040336608887,
+            -4.680659294128418,
+            -4.5503387451171875,
+            -4.102535724639893,
+            -2.862027645111084,
+            -1.4059178829193115,
+            -0.32369716697424505
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9840425531914894,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9893617021276596,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.779040336608887,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.680659294128418,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.5503387451171875,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.102535724639893,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.862027645111084,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -1.4059178829193115,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -0.32369716697424505,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wrong_fly_11-05-2024_13-19-47/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

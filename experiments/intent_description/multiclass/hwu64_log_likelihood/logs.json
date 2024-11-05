@@ -1,0 +1,108 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9625,
+            0.9625
+        ],
+        "scoring": [
+            -3.9883246421813965,
+            -3.915996551513672,
+            -3.820319414138794,
+            -3.4929733276367188,
+            -2.6051392555236816,
+            -1.61111319065094,
+            -0.7037346216725802
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9625,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.9883246421813965,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.915996551513672,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.820319414138794,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.4929733276367188,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.6051392555236816,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -1.61111319065094,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -0.7037346216725802,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clean_quagga_11-05-2024_13-18-50/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

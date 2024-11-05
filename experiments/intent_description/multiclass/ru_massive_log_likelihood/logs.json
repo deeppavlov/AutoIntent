@@ -1,0 +1,108 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.64,
+            0.6133333333333333
+        ],
+        "scoring": [
+            -4.065271854400635,
+            -4.052976131439209,
+            -4.036735534667969,
+            -3.981289863586426,
+            -3.828333854675293,
+            -3.6208934783935547,
+            -2.7532229600755382
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.64,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.6133333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.065271854400635,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.052976131439209,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -4.036735534667969,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.981289863586426,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.828333854675293,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.6208934783935547,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.7532229600755382,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/successful_dimetrodon_11-05-2024_13-11-46/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

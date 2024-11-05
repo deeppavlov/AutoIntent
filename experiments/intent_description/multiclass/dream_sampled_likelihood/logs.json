@@ -1,0 +1,108 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9642857142857143,
+            0.9642857142857143
+        ],
+        "scoring": [
+            -3.0045788288116455,
+            -2.9681146144866943,
+            -2.9200680255889893,
+            -2.7573418617248535,
+            -2.3287734985351562,
+            -1.8667916059494019,
+            -0.5015182590272912
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "avsolatorio/GIST-small-Embedding-v0"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9642857142857143,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/retrieval/vector_db/comb_0"
+            },
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "infgrad/stella-base-en-v2"
+                },
+                "metric_name": "retrieval_hit_rate",
+                "metric_value": 0.9642857142857143,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/retrieval/vector_db/comb_1"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -3.0045788288116455,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.7
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.9681146144866943,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.9200680255889893,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.7573418617248535,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -2.3287734985351562,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -1.8667916059494019,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/description/comb_5"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_log_likelihood",
+                "metric_value": -0.5015182590272912,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/real_dragonfly_11-05-2024_13-18-14/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}
