@@ -1,8 +1,8 @@
 from .base import Module
 from .prediction import (
+    AdaptivePredictor,
     ArgmaxPredictor,
     JinoosPredictor,
-    LogitAdaptivnessPredictor,
     PredictionModule,
     ThresholdPredictor,
     TunablePredictor,
@@ -34,7 +34,7 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
     "jinoos": JinoosPredictor,
     "threshold": ThresholdPredictor,
     "tunable": TunablePredictor,
-    "logit_adapt": LogitAdaptivnessPredictor
+    "logit_adapt": AdaptivePredictor,
 }
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
@@ -49,7 +49,7 @@ __all__ = [
     "PredictionModule",
     "ThresholdPredictor",
     "TunablePredictor",
-    "LogitAdaptivnessPredictor",
+    "AdaptivePredictor",
     "RegExp",
     "RetrievalModule",
     "VectorDBModule",
