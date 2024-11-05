@@ -63,8 +63,8 @@ class DescriptionScorer(ScoringModule):
 
         instance = cls(
             temperature=temperature,
-            device=context.device,
-            db_dir=context.db_dir,
+            device=context.get_device(),
+            db_dir=context.get_db_dir(),
             model_name=model_name,
         )
         instance.precomputed_embeddings = precomputed_embeddings

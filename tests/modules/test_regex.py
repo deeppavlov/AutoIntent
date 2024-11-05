@@ -4,11 +4,12 @@ from autointent import Context
 from autointent.context.data_handler import Dataset
 from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
 from autointent.modules import RegExp, VectorDBModule
+from tests.conftest import setup_environment
 
 
 @pytest.mark.xfail(reason="Issues with intent_id")
-def test_base_regex(setup_environment):
-    db_dir, dump_dir, logs_dir = setup_environment
+def test_base_regex():
+    db_dir, dump_dir, logs_dir = setup_environment()
 
     data = {
         "utterances": [
@@ -72,7 +73,7 @@ def test_base_regex(setup_environment):
     context = Context(
         dataset=Dataset.model_validate(data),
         dump_dir=dump_dir,
-        db_dir=db_dir(),
+        db_dir=db_dir,
     )
 
     retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}

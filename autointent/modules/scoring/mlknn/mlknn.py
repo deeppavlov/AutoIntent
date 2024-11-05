@@ -80,10 +80,10 @@ class MLKnnScorer(ScoringModule):
             model_name=model_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            db_dir=str(context.db_dir),
-            device=context.device,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            db_dir=str(context.get_db_dir()),
+            device=context.get_device(),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
