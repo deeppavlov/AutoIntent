@@ -29,7 +29,7 @@ class OptimizationInfo:
         metric_value: float,
         metric_name: str,
         artifact: Artifact,
-        module_dump_dir: str,
+        module_dump_dir: str | None,
     ) -> None:
         """
         Purposes:

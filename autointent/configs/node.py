@@ -9,7 +9,7 @@ class InferenceNodeConfig:
     node_type: str = MISSING
     module_type: str = MISSING
     module_config: dict[str, Any] = MISSING
-    load_path: str = MISSING
+    load_path: str | None = None
     _target_: str = "autointent.nodes.InferenceNode"
 
 

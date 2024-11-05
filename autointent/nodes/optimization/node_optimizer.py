@@ -50,8 +50,10 @@ class NodeOptimizer:
                 dump_dir = context.get_dump_dir()
 
                 if dump_dir is not None:
-                    dump_dir = self.get_module_dump_dir(dump_dir, module_type, j_combination)
-                    module.dump(dump_dir)
+                    module_dump_dir = self.get_module_dump_dir(dump_dir, module_type, j_combination)
+                    module.dump(module_dump_dir)
+                else:
+                    module_dump_dir = None
 
                 context.optimization_info.log_module_optimization(
                     self.node_info.node_type,
@@ -60,7 +62,7 @@ class NodeOptimizer:
                     metric_value,
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
-                    dump_dir,
+                    module_dump_dir,
                 )
 
                 module.clear_cache()

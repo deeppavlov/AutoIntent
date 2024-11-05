@@ -24,10 +24,7 @@ class PipelineOptimizer:
         self.vector_index_config = VectorIndexConfig()
         self.embedder_config = EmbedderConfig()
 
-    def set_config(
-        self,
-        config: LoggingConfig | VectorIndexConfig | EmbedderConfig
-    ) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig) -> None:
         if isinstance(config, LoggingConfig):
             self.logging_config = config
         elif isinstance(config, VectorIndexConfig):
