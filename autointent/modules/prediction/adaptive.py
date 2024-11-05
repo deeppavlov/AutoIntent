@@ -95,7 +95,7 @@ def multiclass_predict(scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
     return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
 
 
-def multilabel_score(y_true: list[int | list[int]], y_pred: npt.NDArray[Any]) -> float:
+def multilabel_score(y_true: list[list[int]], y_pred: npt.NDArray[Any]) -> float:
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
 
