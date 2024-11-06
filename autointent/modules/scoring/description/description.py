@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.embedder import Embedder
-from autointent.context.vector_index_client import VectorIndexClient
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LabelType
 from autointent.modules.scoring.base import ScoringModule
@@ -29,6 +29,8 @@ class DescriptionScorer(ScoringModule):
     embedder: Embedder
     precomputed_embeddings: bool = False
     embedding_model_subdir: str = "embedding_model"
+    _vector_index: VectorIndex
+    name = "description"
 
     def __init__(
         self,

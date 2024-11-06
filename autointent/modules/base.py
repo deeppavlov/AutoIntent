@@ -11,6 +11,8 @@ from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):
+    name: str
+
     metadata_dict_name: str = "metadata.json"
     metadata: BaseMetadataDict
 

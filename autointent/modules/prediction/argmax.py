@@ -13,9 +13,11 @@ from .base import PredictionModule
 
 class ArgmaxPredictor(PredictionModule):
     metadata = {}  # noqa: RUF012
+    name = "argmax"
 
     def __init__(self) -> None:
         pass
+
 
     @classmethod
     def from_context(cls, context: Context) -> Self:

@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
+from autointent.custom_types import NodeType
 from autointent.metrics import (
     RETRIEVAL_METRICS_MULTICLASS,
     RETRIEVAL_METRICS_MULTILABEL,
@@ -20,4 +21,4 @@ class RetrievalNodeInfo(NodeInfo):
         RETRIEVAL_MODULES_MULTICLASS | RETRIEVAL_MODULES_MULTILABEL
     )
 
-    node_type = "retrieval"
+    node_type = NodeType.retrieval
