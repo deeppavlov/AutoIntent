@@ -18,7 +18,7 @@ class ArgmaxPredictor(PredictionModule):
         pass
 
     @classmethod
-    def from_context(cls, context: Context) -> Self:
+    def from_context(cls) -> Self:
         return cls()
 
     def fit(
