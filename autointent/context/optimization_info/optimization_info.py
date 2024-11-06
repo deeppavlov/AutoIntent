@@ -4,6 +4,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
+from autointent.custom_types import NODE_TYPES, NodeType
+from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, ModulesList, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
@@ -77,32 +79,28 @@ class OptimizationInfo:
         return self.artifacts.get_best_artifact(node_type, i_best)
 
     def get_best_embedder(self) -> str:
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type="retrieval")  # type: ignore[assignment]
+        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
 
     def get_best_oos_scores(self) -> NDArray[np.float64] | None:
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type="scoring")  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.oos_scores
 
     def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
-        node_wise_metrics = {
-            node_type: self._get_metrics_values(node_type)
-            for node_type in ["regexp", "retrieval", "scoring", "prediction"]
-        }
+        node_wise_metrics = {node_type.value: self._get_metrics_values(node_type) for node_type in NODE_TYPES}
         return {
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
         }
 
     def get_inference_nodes_config(self) -> list[InferenceNodeConfig]:
-        node_types = ["regexp", "retrieval", "scoring", "prediction"]
-        trial_ids = [self._get_best_trial_idx(node_type) for node_type in node_types]
+        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NODE_TYPES]
         res = []
-        for idx, node_type in zip(trial_ids, node_types, strict=True):
+        for idx, node_type in zip(trial_ids, NODE_TYPES, strict=True):
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)

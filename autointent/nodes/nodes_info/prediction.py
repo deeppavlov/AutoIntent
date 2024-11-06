@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
+from autointent.custom_types import NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTICLASS, PREDICTION_METRICS_MULTILABEL, PredictionMetricFn
 from autointent.modules import PREDICTION_MODULES_MULTICLASS, PREDICTION_MODULES_MULTILABEL, Module
 
@@ -14,4 +15,4 @@ class PredictionNodeInfo(NodeInfo):
 
     modules_available: ClassVar[dict[str, type[Module]]] = PREDICTION_MODULES_MULTICLASS | PREDICTION_MODULES_MULTILABEL
 
-    node_type = "prediction"
+    node_type = NodeType.prediction

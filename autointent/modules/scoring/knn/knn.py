@@ -26,6 +26,7 @@ class KNNScorerDumpMetadata(BaseMetadataDict):
 class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
+    name = "knn"
     prebuilt_index: bool = False
 
     def __init__(

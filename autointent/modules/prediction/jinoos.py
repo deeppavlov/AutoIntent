@@ -22,6 +22,7 @@ class JinoosPredictorDumpMetadata(BaseMetadataDict):
 
 class JinoosPredictor(PredictionModule):
     thresh: float
+    name = "jinoos"
 
     def __init__(
         self,

@@ -37,6 +37,7 @@ class MLKnnScorer(ScoringModule):
     arrays_filename: str = "probs.npz"
     metadata: MLKnnScorerDumpMetadata
     prebuilt_index: bool = False
+    name = "mlknn"
 
     def __init__(
         self,

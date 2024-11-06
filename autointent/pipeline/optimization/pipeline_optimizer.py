@@ -9,6 +9,7 @@ from autointent import Context
 from autointent.configs.optimization_cli import EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
 from autointent.context.data_handler import Dataset
+from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 
 
@@ -60,7 +61,7 @@ class PipelineOptimizer:
         return context
 
 
-def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
+def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes, strict=False):
