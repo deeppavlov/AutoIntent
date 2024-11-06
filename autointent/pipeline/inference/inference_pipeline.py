@@ -9,7 +9,7 @@ class InferencePipeline:
         self.nodes = {n.node_type: n for n in nodes}
 
     @classmethod
-    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> None:
+    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> "InferencePipeline":
         nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         return cls(nodes)
 
