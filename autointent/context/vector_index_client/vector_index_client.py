@@ -108,6 +108,9 @@ class VectorIndexClient:
     def exists(self, model_name: str) -> bool:
         return self._get_index_dirpath(model_name) is not None
 
+    def delete_db(self) -> None:
+        shutil.rmtree(self.db_dir)
+
 
 class NonExistingIndexError(Exception):
     def __init__(self, message: str = "non-existent index was requested") -> None:

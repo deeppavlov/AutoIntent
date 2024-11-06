@@ -58,6 +58,7 @@ class LoggingConfig:
 class VectorIndexConfig:
     db_dir: Path | None = None
     device: str = "cpu"
+    save_db: bool = False
 
 
 @dataclass
