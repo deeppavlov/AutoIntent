@@ -1,18 +1,13 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import hydra
 import yaml
 
 from autointent.configs.inference_cli import InferenceConfig
-from autointent.pipeline.optimization.utils import NumpyEncoder
 
 from .inference_pipeline import InferencePipeline
-
-if TYPE_CHECKING:
-    from autointent.custom_types import LabelType
 
 
 @hydra.main(config_name="inference_config", config_path=".", version_base=None)
@@ -33,8 +28,8 @@ def main(cfg: InferenceConfig) -> None:
     pipeline = InferencePipeline.from_dict_config(pipeline_config)
 
     # send data to pipeline
-    labels: list[LabelType] = pipeline.predict(data)
+    output = pipeline.predict_with_metadata(data)
 
     # save results
     with Path(cfg.output_path).open("w") as file:
-        json.dump(labels, file, cls=NumpyEncoder)
+        json.dump(output.model_dump(), file, indent=4)

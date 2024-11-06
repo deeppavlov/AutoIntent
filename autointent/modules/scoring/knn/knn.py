@@ -103,8 +103,14 @@ class KNNScorer(ScoringModule):
             self._vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        labels, distances, _ = self._vector_index.query(utterances, self.k)
-        return apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
+        return self._predict(utterances)[0]
+
+    def predict_with_metadata(
+        self, utterances: list[str],
+    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        scores, neighbors = self._predict(utterances)
+        metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
+        return scores, metadata
 
     def clear_cache(self) -> None:
         self._vector_index.delete()
@@ -141,3 +147,8 @@ class KNNScorer(ScoringModule):
             embedder_max_length=self.metadata["max_length"],
         )
         self._vector_index = vector_index_client.get_index(self.model_name)
+
+    def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
+        labels, distances, neigbors = self._vector_index.query(utterances, self.k)
+        scores = apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
+        return scores, neigbors
