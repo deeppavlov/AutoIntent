@@ -50,8 +50,6 @@ class ThresholdPredictor(PredictionModule):
 
     def fit(
         self,
-        scores: npt.NDArray[Any],
-        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         self.tags = tags
