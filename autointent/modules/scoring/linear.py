@@ -44,6 +44,7 @@ class LinearScorer(ScoringModule):
     embedding_model_subdir: str = "embedding_model"
     precomputed_embeddings: bool = False
     db_dir: str
+    name = "linear"
 
     def __init__(
         self,

@@ -21,6 +21,7 @@ class VectorDBMetadata(BaseMetadataDict):
 
 class VectorDBModule(RetrievalModule):
     vector_index: VectorIndex
+    name = "vector_db"
 
     def __init__(
         self,

@@ -19,6 +19,8 @@ class RegexPatternsCompiled(TypedDict):
 
 
 class RegExp(Module):
+    name = "regexp"
+
     def __init__(self, regexp_patterns: list[RegexPatterns]) -> None:
         self.regexp_patterns = regexp_patterns
 
