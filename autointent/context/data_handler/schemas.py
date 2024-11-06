@@ -6,7 +6,7 @@ import datasets
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 
 class UtteranceType(str, Enum):
@@ -22,9 +22,9 @@ class DatasetType(str, Enum):
 
 class Utterance(BaseModel):
     text: str
-    label: LABEL_TYPE | None = None
+    label: LabelType | None = None
 
-    def one_hot_label(self, n_classes: int) -> LABEL_TYPE:
+    def one_hot_label(self, n_classes: int) -> LabelType:
         encoding = [0] * n_classes
         label = [self.label] if isinstance(self.label, int) else self.label
         if label is None:

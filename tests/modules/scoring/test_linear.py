@@ -1,32 +1,17 @@
 import numpy as np
 
-from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
-from autointent.modules import LinearScorer, VectorDBModule
+from autointent.context.data_handler import DataHandler
+from autointent.modules import LinearScorer
 
 
-def test_base_linear(context):
-    context = context("multiclass")
+def test_base_linear(setup_environment, dataset):
+    get_db_dir, dump_dir, logs_dir = setup_environment
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
-    vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate)
-    artifact = vector_db.get_assets()
-    context.optimization_info.log_module_optimization(
-        node_type="retrieval",
-        module_type="vector_db",
-        module_params=retrieval_params,
-        metric_value=metric_value,
-        metric_name="retrieval_hit_rate_macro",
-        artifact=artifact,
-        module_dump_dir="",
-    )
+    data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer()
+    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
 
-    scorer.fit(context)
-    score = scorer.score(context, scoring_roc_auc)
-    assert score == 1
+    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -35,15 +20,22 @@ def test_base_linear(context):
         "can you tell me why is my bank account frozen",
     ]
     predictions = scorer.predict(test_data)
-
     np.testing.assert_almost_equal(
         np.array(
             [
-                [0.17928316, 0.59134606, 0.22937078],
-                [0.15927759, 0.62366319, 0.21705922],
-                [0.20068982, 0.53887681, 0.26043337],
-                [0.17557128, 0.61313277, 0.21129594],
-                [0.17908815, 0.63129863, 0.18961322],
+                [0.17929172, 0.59130114, 0.22940714],
+                [0.15927979, 0.62363961, 0.2170806],
+                [
+                    0.20069508,
+                    0.53883687,
+                    0.26046804,
+                ],
+                [0.17557001, 0.61310582, 0.21132417],
+                [
+                    0.17911179,
+                    0.63123131,
+                    0.1896569,
+                ],
             ]
         ),
         predictions,

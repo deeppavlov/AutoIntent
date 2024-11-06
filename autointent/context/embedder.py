@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import TypedDict
 
@@ -19,28 +20,27 @@ class Embedder:
 
     def __init__(
         self,
-        device: str | None = None,
-        model_name: str | None = None,
-        model_path: Path | None = None,
-        batch_size: int = 1,
+        model_name: str | Path,
+        device: str = "cpu",
+        batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if (model_name and model_path) or (model_name is None and model_path is None):
-            msg = "Embedder requires either model_name or model_path set"
-            raise ValueError(msg)
-        if model_path:
-            self.load(model_path)
-        elif model_name:
-            self.model_name = model_name
-
+        self.model_name = model_name
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
 
+        if Path(model_name).exists():
+            self.load(model_name)
+        else:
+            self.embedding_model = SentenceTransformer(str(model_name), device=device)
+
+        self.logger = logging.getLogger(__name__)
+
     def delete(self) -> None:
-        if hasattr(self, "embedding_model"):
-            self.embedding_model.cpu()
-            del self.embedding_model
+        self.logger.debug("deleting embedder %s", self.model_name)
+        self.embedding_model.cpu()
+        del self.embedding_model
 
     def dump(self, path: Path) -> None:
         metadata = EmbedderDumpMetadata(
@@ -52,17 +52,23 @@ class Embedder:
         with (path / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
-    def load(self, path: Path) -> None:
+    def load(self, path: Path | str) -> None:
+        path = Path(path)
         with (path / self.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
         self.batch_size = metadata["batch_size"]
         self.max_length = metadata["max_length"]
 
-        self.embedding_model = SentenceTransformer(str(path / self.embedder_subdir))
+        self.embedding_model = SentenceTransformer(str(path / self.embedder_subdir), device=self.device)
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
-        if not hasattr(self, "embedding_model"):
-            self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
+        self.logger.debug(
+            "calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
+            self.model_name,
+            self.batch_size,
+            str(self.max_length),
+            self.device,
+        )
         if self.max_length is not None:
             self.embedding_model.max_seq_length = self.max_length
         return self.embedding_model.encode(utterances, convert_to_numpy=True, batch_size=self.batch_size)  # type: ignore[return-value]
