@@ -63,7 +63,7 @@ class NodeOptimizer:
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                     module_dump_dir,
-                    module=module if not context.is_ram_to_clear() else None
+                    module=module if not context.is_ram_to_clear() else None,
                 )
 
                 if context.is_ram_to_clear():

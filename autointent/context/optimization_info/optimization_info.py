@@ -5,7 +5,6 @@ from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
 
-# from autointent.modules.base import Module
 from .data_models import Artifact, Artifacts, ModulesList, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
 
@@ -32,7 +31,7 @@ class OptimizationInfo:
         metric_name: str,
         artifact: Artifact,
         module_dump_dir: str | None,
-        module = None,
+        module=None,
     ) -> None:
         """
         Purposes:

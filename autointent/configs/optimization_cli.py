@@ -46,7 +46,6 @@ class LoggingConfig:
         if self.run_name is None:
             raise ValueError
         self.dirpath = dirpath / self.run_name
-        self.dirpath.mkdir(parents=True)
 
     def define_dump_dir(self) -> None:
         if self.dump_dir is None:

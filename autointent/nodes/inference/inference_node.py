@@ -13,9 +13,7 @@ class InferenceNode:
         self.node_type = node_type
 
     @classmethod
-    def from_config(
-        cls, config: InferenceNodeConfig
-    ) -> "InferenceNode":
+    def from_config(cls, config: InferenceNodeConfig) -> "InferenceNode":
         node_info = NODES_INFO[config.node_type]
         module = node_info.modules_available[config.module_type](**config.module_config)
         module.load(config.load_path)

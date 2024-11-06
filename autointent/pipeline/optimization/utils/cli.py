@@ -6,14 +6,6 @@ from typing import Any
 import yaml
 
 
-def get_logs_dir(run_name: str, logs_dir: Path | None = None) -> Path:
-    if logs_dir is None:
-        logs_dir = Path.cwd()
-    res = logs_dir / run_name
-    res.mkdir(parents=True)
-    return res
-
-
 def load_config(config_path: str | Path | None, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
     """load config from the given path or load default config which is distributed along with the autointent package"""
     if config_path is not None:
