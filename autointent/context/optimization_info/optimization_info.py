@@ -1,14 +1,30 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
+from pydantic import BaseModel
 
 from autointent.configs.node import InferenceNodeConfig
 from autointent.custom_types import NODE_TYPES, NodeType
-from autointent.logger import get_logger
 
-from .data_models import Artifact, Artifacts, ModulesList, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
+
+if TYPE_CHECKING:
+    from autointent.modules import Module
+
+
+class ModulesList(BaseModel):
+    regexp: list["Module"] = []
+    retrieval: list["Module"] = []
+    scoring: list["Module"] = []
+    prediction: list["Module"] = []
+
+    def get(self, node_type: str) -> list["Module"]:
+        return getattr(self, node_type)  # type: ignore[no-any-return]
+
+    def add_module(self, node_type: str, module: "Module") -> None:
+        self.get(node_type).append(module)
 
 
 class OptimizationInfo:
@@ -33,7 +49,7 @@ class OptimizationInfo:
         metric_name: str,
         artifact: Artifact,
         module_dump_dir: str | None,
-        module=None,
+        module: "Module | None" = None,
     ) -> None:
         """
         Purposes:
@@ -53,8 +69,8 @@ class OptimizationInfo:
         self._logger.info(trial.model_dump())
 
         # save module
-        if module is not None:
-            self.modules.get(node_type).append(module)
+        if module:
+            self.modules.add_module(node_type, module)
 
         # save artifact
         self.artifacts.add_artifact(node_type, artifact)
@@ -114,13 +130,12 @@ class OptimizationInfo:
             )
         return res
 
-    def _get_best_module(self, node_type: str):
+    def _get_best_module(self, node_type: str) -> "Module | None":
         idx = self._get_best_trial_idx(node_type)
         if idx is not None:
             return self.modules.get(node_type)[idx]
         return None
 
-    def get_best_modules(self):
-        node_types = ["regexp", "retrieval", "scoring", "prediction"]
-        res = {nt: self._get_best_module(nt) for nt in node_types}
+    def get_best_modules(self) -> dict[str, "Module"]:
+        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
         return {nt: m for nt, m in res.items() if m is not None}
