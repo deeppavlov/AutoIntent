@@ -80,7 +80,7 @@ class AdaptivePredictor(PredictionModule):
 
 
 def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
-    return r * np.max(scores, axis=0) + (1 - r) * np.min(scores, axis=0)  # type: ignore[no-any-return]
+    return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
 def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
