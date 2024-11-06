@@ -157,3 +157,7 @@ class Context:
 
     def is_ram_to_clear(self) -> bool:
         return self.logging_config.clear_ram
+
+    def has_saved_modules(self) -> bool:
+        node_types = ["regexp", "retrieval", "scoring", "prediction"]
+        return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)

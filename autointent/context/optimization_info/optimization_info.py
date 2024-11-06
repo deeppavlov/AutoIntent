@@ -4,8 +4,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
-# from autointent.modules.base import Module
 
+# from autointent.modules.base import Module
 from .data_models import Artifact, Artifacts, ModulesList, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
 
@@ -116,3 +116,14 @@ class OptimizationInfo:
                 )
             )
         return res
+
+    def _get_best_module(self, node_type: str):
+        idx = self._get_best_trial_idx(node_type)
+        if idx is not None:
+            return self.modules.get(node_type)[idx]
+        return None
+
+    def get_best_modules(self):
+        node_types = ["regexp", "retrieval", "scoring", "prediction"]
+        res = {nt: self._get_best_module(nt) for nt in node_types}
+        return {nt: m for nt, m in res.items() if m is not None}
