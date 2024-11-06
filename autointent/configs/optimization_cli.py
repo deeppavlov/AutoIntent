@@ -28,7 +28,8 @@ class LoggingConfig:
     run_name: str | None = None
     dirpath: Path | None = None
     dump_dir: Path | None = None
-    dump_modules: bool = True
+    dump_modules: bool = False
+    clear_ram: bool = True
 
     def __post_init__(self) -> None:
         self.define_run_name()

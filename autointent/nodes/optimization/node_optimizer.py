@@ -63,11 +63,13 @@ class NodeOptimizer:
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                     module_dump_dir,
+                    module=module if not context.is_ram_to_clear() else None
                 )
 
-                module.clear_cache()
-                gc.collect()
-                torch.cuda.empty_cache()
+                if context.is_ram_to_clear():
+                    module.clear_cache()
+                    gc.collect()
+                    torch.cuda.empty_cache()
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 

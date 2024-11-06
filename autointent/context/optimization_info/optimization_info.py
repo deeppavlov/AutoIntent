@@ -4,8 +4,9 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
+# from autointent.modules.base import Module
 
-from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from .data_models import Artifact, Artifacts, ModulesList, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
 
 
@@ -20,6 +21,7 @@ class OptimizationInfo:
         self.artifacts = Artifacts()
         self.trials = Trials()
         self._trials_best_ids = TrialsIds()
+        self.modules = ModulesList()
 
     def log_module_optimization(
         self,
@@ -30,6 +32,7 @@ class OptimizationInfo:
         metric_name: str,
         artifact: Artifact,
         module_dump_dir: str | None,
+        module = None,
     ) -> None:
         """
         Purposes:
@@ -47,6 +50,10 @@ class OptimizationInfo:
         )
         self.trials.add_trial(node_type, trial)
         self._logger.info(trial.model_dump())
+
+        # save module
+        if module is not None:
+            self.modules.get(node_type).append(module)
 
         # save artifact
         self.artifacts.add_artifact(node_type, artifact)

@@ -4,6 +4,8 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
+# from autointent.modules.base import str
+
 
 class Artifact(BaseModel): ...
 
@@ -115,3 +117,13 @@ class TrialsIds(BaseModel):
 
     def set_best_trial_idx(self, node_type: str, idx: int) -> None:
         setattr(self, validate_node_name(node_type), idx)
+
+
+class ModulesList(BaseModel):
+    regexp: list[str] = []
+    retrieval: list[str] = []
+    scoring: list[str] = []
+    prediction: list[str] = []
+
+    def get(self, node_type: str) -> list[str]:
+        return getattr(self, node_type)

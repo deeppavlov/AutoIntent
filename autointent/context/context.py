@@ -154,3 +154,6 @@ class Context:
 
     def get_n_classes(self) -> int:
         return self.data_handler.n_classes
+
+    def is_ram_to_clear(self) -> bool:
+        return self.logging_config.clear_ram
