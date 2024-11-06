@@ -11,12 +11,15 @@ from autointent.nodes.inference import InferenceNode
 class InferencePipelineUtteranceOutput(BaseModel):
     utterance: str
     prediction: LabelType
+    regexp_prediction: LabelType
+    regexp_prediction_metadata: Any
     score: list[float]
     score_metadata: Any
 
 
 class InferencePipelineOutput(BaseModel):
     predictions: list[LabelType]
+    regexp_predictions: list[LabelType] | None = None
     utterances: list[InferencePipelineUtteranceOutput] | None = None
 
 
@@ -31,17 +34,27 @@ class InferencePipeline:
     def predict(self, utterances: list[str]) -> InferencePipelineOutput:
         scores = self.nodes["scoring"].module.predict(utterances)
         predictions = self.nodes["prediction"].module.predict(scores)
-        return InferencePipelineOutput(predictions=predictions)
+        regexp_predictions = None
+        if "regexp" in self.nodes:
+            regexp_predictions = self.nodes["regexp"].module.predict(utterances)
+        return InferencePipelineOutput(predictions=predictions, regexp_predictions=regexp_predictions)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         scores, scores_metadata = self.nodes["scoring"].module.predict_with_metadata(utterances)
         predictions = self.nodes["prediction"].module.predict(scores)
+        regexp_predictions, regexp_predictions_metadata = None, None
+        if "regexp" in self.nodes:
+            regexp_predictions, regexp_predictions_metadata  = self.nodes["regexp"].module.predict_with_metadata(
+                utterances,
+            )
 
         outputs = []
         for idx, utterance in enumerate(utterances):
             output = InferencePipelineUtteranceOutput(
                 utterance=utterance,
                 prediction=predictions[idx],
+                regexp_prediction=regexp_predictions[idx] if regexp_predictions is not None else None,
+                regexp_prediction_metadata=regexp_predictions_metadata[idx] if regexp_predictions_metadata is not None else None, # noqa: E501
                 score=scores[idx],
                 score_metadata=scores_metadata[idx] if scores_metadata is not None else None,
             )

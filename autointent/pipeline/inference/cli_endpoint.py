@@ -32,4 +32,4 @@ def main(cfg: InferenceConfig) -> None:
 
     # save results
     with Path(cfg.output_path).open("w") as file:
-        json.dump(output.model_dump(), file, indent=4)
+        json.dump(output.model_dump(exclude_none=True), file, indent=4)
