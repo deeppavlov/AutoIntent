@@ -39,7 +39,7 @@ def test_inference_config(dataset, task_type):
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cuda", save_db=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
@@ -66,7 +66,7 @@ def test_inference_context(dataset, task_type):
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cuda", save_db=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
