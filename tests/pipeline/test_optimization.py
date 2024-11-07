@@ -1,4 +1,5 @@
 import importlib.resources as ires
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -45,6 +46,46 @@ def test_no_context_optimization(dataset, task_type):
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
     context.dump()
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    ["multiclass", "multilabel", "description"],
+)
+def test_save_db(dataset, task_type):
+    db_dir, dump_dir, logs_dir = setup_environment()
+    search_space = get_search_space(task_type)
+
+    pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+
+    context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
+    context.dump()
+
+    assert os.listdir(db_dir)
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    ["multiclass", "multilabel", "description"],
+)
+def test_dump_modules(dataset, task_type):
+    db_dir, dump_dir, logs_dir = setup_environment()
+    search_space = get_search_space(task_type)
+
+    pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+
+    context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
+    context.dump()
+
+    assert os.listdir(dump_dir)
 
 
 @pytest.mark.parametrize(
