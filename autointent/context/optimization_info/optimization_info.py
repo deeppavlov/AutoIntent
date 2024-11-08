@@ -1,8 +1,8 @@
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel
 
 from autointent.configs.node import InferenceNodeConfig
 from autointent.custom_types import NODE_TYPES, NodeType
@@ -14,11 +14,12 @@ if TYPE_CHECKING:
     from autointent.modules import Module
 
 
-class ModulesList(BaseModel):
-    regexp: list["Module"] = []
-    retrieval: list["Module"] = []
-    scoring: list["Module"] = []
-    prediction: list["Module"] = []
+@dataclass
+class ModulesList:
+    regexp: list["Module"] = field(default_factory=list)
+    retrieval: list["Module"] = field(default_factory=list)
+    scoring: list["Module"] = field(default_factory=list)
+    prediction: list["Module"] = field(default_factory=list)
 
     def get(self, node_type: str) -> list["Module"]:
         return getattr(self, node_type)  # type: ignore[no-any-return]
