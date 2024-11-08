@@ -35,6 +35,8 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
+    name = "dnnc"
+
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
     prebuilt_index: bool = False

@@ -19,3 +19,13 @@ LabelType = int | list[int]
 
 class BaseMetadataDict(TypedDict):
     pass
+
+
+class NodeType(str, Enum):
+    retrieval = "retrieval"
+    prediction = "prediction"
+    scoring = "scoring"
+    regexp = "regexp"
+
+
+NODE_TYPES = [NodeType.retrieval, NodeType.prediction, NodeType.scoring, NodeType.regexp]

@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
-# from autointent.modules.base import str
+from autointent.custom_types import NodeType
 
 
 class Artifact(BaseModel): ...
@@ -42,7 +42,7 @@ class PredictorArtifact(Artifact):
 
 
 def validate_node_name(value: str) -> str:
-    if value in ["regexp", "retrieval", "scoring", "prediction"]:
+    if value in [NodeType.retrieval, NodeType.scoring, NodeType.prediction, NodeType.regexp]:
         return value
     msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'prediction']"
     raise ValueError(msg)
@@ -117,13 +117,3 @@ class TrialsIds(BaseModel):
 
     def set_best_trial_idx(self, node_type: str, idx: int) -> None:
         setattr(self, validate_node_name(node_type), idx)
-
-
-class ModulesList(BaseModel):
-    regexp: list[str] = []
-    retrieval: list[str] = []
-    scoring: list[str] = []
-    prediction: list[str] = []
-
-    def get(self, node_type: str) -> list[str]:
-        return getattr(self, node_type)

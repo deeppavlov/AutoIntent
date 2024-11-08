@@ -70,7 +70,7 @@ autointent hydra.job_logging.root.level=ERROR
 Еще можно изменить параметры логгера через yaml файлы:
 1. Создадим папку с конфиг. файлами: test_config
 2. test_config/config.yaml:
-```
+```yaml
 defaults:
   - optimization_config
   - _self_

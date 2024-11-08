@@ -16,7 +16,8 @@ class InferenceNode:
     def from_config(cls, config: InferenceNodeConfig) -> "InferenceNode":
         node_info = NODES_INFO[config.node_type]
         module = node_info.modules_available[config.module_type](**config.module_config)
-        module.load(config.load_path)
+        if config.load_path is not None:
+            module.load(config.load_path)
         return cls(module, config.node_type)
 
     def clear_cache(self) -> None:

@@ -27,6 +27,7 @@ class ThresholdPredictor(PredictionModule):
     metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
     tags: list[Tag] | None
+    name = "threshold"
 
     def __init__(
         self,

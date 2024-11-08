@@ -3,6 +3,7 @@ import logging
 
 import torch
 
+from autointent.configs.node import InferenceNodeConfig
 from autointent.nodes import InferenceNode
 from autointent.nodes.optimization import NodeOptimizer
 
@@ -47,13 +48,13 @@ def test_scoring_multiclass(context, retrieval_optimizer_multiclass):
     scoring_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.scoring:
-        config = {
-            "node_type": "scoring",
-            "module_type": trial.module_type,
-            "module_config": trial.module_params,
-            "load_path": trial.module_dump_dir,
-        }
-        node = InferenceNode(**config)
+        config = InferenceNodeConfig(
+            node_type="scoring",
+            module_type=trial.module_type,
+            module_config=trial.module_params,
+            load_path=trial.module_dump_dir,
+        )
+        node = InferenceNode.from_config(config)
         scores = node.module.predict(["hello", "world"])  # noqa: F841
         node.module.clear_cache()
         gc.collect()
@@ -87,13 +88,13 @@ def test_scoring_multilabel(context, retrieval_optimizer_multilabel):
     scoring_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.scoring:
-        config = {
-            "node_type": "scoring",
-            "module_type": trial.module_type,
-            "module_config": trial.module_params,
-            "load_path": trial.module_dump_dir,
-        }
-        node = InferenceNode(**config)
+        config = InferenceNodeConfig(
+            node_type="scoring",
+            module_type=trial.module_type,
+            module_config=trial.module_params,
+            load_path=trial.module_dump_dir,
+        )
+        node = InferenceNode.from_config(config)
         scores = node.module.predict(["hello", "world"])  # noqa: F841
         node.module.clear_cache()
         gc.collect()
