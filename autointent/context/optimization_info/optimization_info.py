@@ -123,7 +123,7 @@ class OptimizationInfo:
             trial = self.trials.get_trial(node_type, idx)
             res.append(
                 InferenceNodeConfig(
-                    node_type=node_type,
+                    node_type=node_type.value,
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
