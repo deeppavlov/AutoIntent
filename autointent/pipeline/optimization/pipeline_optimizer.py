@@ -46,6 +46,7 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
         if not context.vector_index_config.save_db:
+            self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
 
     def optimize_from_dataset(
