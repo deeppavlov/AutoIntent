@@ -11,7 +11,7 @@ def get_fit_data(db_dir, dataset):
     knn_params = {
         "k": 3,
         "weights": "distance",
-        "model_name": "sergeyzh/rubert-tiny-turbo",
+        "embedder_name": "sergeyzh/rubert-tiny-turbo",
         "db_dir": db_dir,
     }
     scorer = KNNScorer(**knn_params)

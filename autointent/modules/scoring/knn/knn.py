@@ -31,7 +31,7 @@ class KNNScorer(ScoringModule):
 
     def __init__(
         self,
-        model_name: str,
+        embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES,
         db_dir: str | None = None,
@@ -51,7 +51,7 @@ class KNNScorer(ScoringModule):
         """
         if db_dir is None:
             db_dir = str(get_db_dir())
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.k = k
         self.weights = weights
         self.db_dir = db_dir
@@ -65,16 +65,16 @@ class KNNScorer(ScoringModule):
         context: Context,
         k: int,
         weights: WEIGHT_TYPES,
-        model_name: str | None = None,
+        embedder_name: str | None = None,
     ) -> Self:
-        if model_name is None:
-            model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
         else:
-            prebuilt_index = context.vector_index_client.exists(model_name)
+            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
-            model_name=model_name,
+            embedder_name=embedder_name,
             k=k,
             weights=weights,
             db_dir=str(context.get_db_dir()),
@@ -84,6 +84,9 @@ class KNNScorer(ScoringModule):
         )
         instance.prebuilt_index = prebuilt_index
         return instance
+
+    def get_embedder_name(self) -> str:
+        return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if isinstance(labels[0], list):
@@ -96,12 +99,12 @@ class KNNScorer(ScoringModule):
 
         if self.prebuilt_index:
             # this happens only after RetrievalNode optimization
-            self._vector_index = vector_index_client.get_index(self.model_name)
+            self._vector_index = vector_index_client.get_index(self.embedder_name)
             if len(utterances) != len(self._vector_index.texts):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
         else:
-            self._vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+            self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         labels, distances, _ = self._vector_index.query(utterances, self.k)
@@ -141,4 +144,4 @@ class KNNScorer(ScoringModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self._vector_index = vector_index_client.get_index(self.model_name)
+        self._vector_index = vector_index_client.get_index(self.embedder_name)

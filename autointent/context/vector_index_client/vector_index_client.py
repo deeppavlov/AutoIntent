@@ -12,8 +12,6 @@ DIRNAMES_TYPE = dict[str, str]
 
 
 class VectorIndexClient:
-    model_name: str
-
     def __init__(
         self,
         device: str,

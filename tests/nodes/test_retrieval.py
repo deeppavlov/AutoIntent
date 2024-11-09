@@ -57,7 +57,7 @@ def get_retrieval_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "model_name": [
+                "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],

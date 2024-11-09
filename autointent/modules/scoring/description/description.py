@@ -34,7 +34,7 @@ class DescriptionScorer(ScoringModule):
 
     def __init__(
         self,
-        model_name: str,
+        embedder_name: str,
         db_dir: Path | None = None,
         temperature: float = 1.0,
         device: str = "cpu",
@@ -46,7 +46,7 @@ class DescriptionScorer(ScoringModule):
         self.temperature = temperature
         self.device = device
         self.db_dir = db_dir
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.batch_size = batch_size
         self.max_length = max_length
 
@@ -55,22 +55,25 @@ class DescriptionScorer(ScoringModule):
         cls,
         context: Context,
         temperature: float,
-        model_name: str | None = None,
+        embedder_name: str | None = None,
     ) -> Self:
-        if model_name is None:
-            model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             precomputed_embeddings = True
         else:
-            precomputed_embeddings = context.vector_index_client.exists(model_name)
+            precomputed_embeddings = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
             temperature=temperature,
             device=context.get_device(),
             db_dir=context.get_db_dir(),
-            model_name=model_name,
+            embedder_name=embedder_name,
         )
         instance.precomputed_embeddings = precomputed_embeddings
         return instance
+
+    def get_embedder_name(self) -> str:
+        return self.embedder_name
 
     def fit(
         self,
@@ -88,7 +91,7 @@ class DescriptionScorer(ScoringModule):
         if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
             vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
-            vector_index = vector_index_client.get_index(self.model_name)
+            vector_index = vector_index_client.get_index(self.embedder_name)
             features = vector_index.get_all_embeddings()
             if len(features) != len(utterances):
                 msg = "Vector index mismatches provided utterances"
@@ -96,7 +99,10 @@ class DescriptionScorer(ScoringModule):
             embedder = vector_index.embedder
         else:
             embedder = Embedder(
-                device=self.device, model_name=self.model_name, batch_size=self.batch_size, max_length=self.max_length
+                device=self.device,
+                model_name=self.embedder_name,
+                batch_size=self.batch_size,
+                max_length=self.max_length,
             )
             features = embedder.embed(utterances)
 

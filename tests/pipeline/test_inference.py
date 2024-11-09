@@ -103,9 +103,9 @@ def test_inference_pipeline_cli(dataset, task_type):
     context.dump()
 
     config = InferenceConfig(
-        data_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
+        data_path=ires.files("tests.assets.data").joinpath("utterances.json"),
         source_dir=logging_config.dirpath,
-        output_path=logging_config.dump_dir,
+        output_path=logging_config.dump_dir / "predictions.json",
         log_level="CRITICAL",
     )
     inference_pipeline(config)

@@ -10,7 +10,7 @@ def test_base_knn(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     predictions = scorer.predict(

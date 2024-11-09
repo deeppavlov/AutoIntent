@@ -76,7 +76,7 @@ def test_base_regex():
         db_dir=db_dir,
     )
 
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
+    retrieval_params = {"k": 3, "embedder_name": "sergeyzh/rubert-tiny-turbo"}
     vector_db = VectorDBModule(**retrieval_params)
     vector_db.fit(context)
     metric_value = vector_db.score(context, retrieval_hit_rate)
