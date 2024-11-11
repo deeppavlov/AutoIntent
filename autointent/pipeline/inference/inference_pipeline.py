@@ -40,7 +40,7 @@ class InferencePipeline:
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
         scores = self.nodes[NodeType.scoring].module.predict(utterances)
-        return self.nodes[NodeType.prediction].module.predict(scores)
+        return self.nodes[NodeType.prediction].module.predict(scores)  # type: ignore[return-value]
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         scores, scores_metadata = self.nodes["scoring"].module.predict_with_metadata(utterances)

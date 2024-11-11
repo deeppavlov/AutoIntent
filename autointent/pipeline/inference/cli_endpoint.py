@@ -6,6 +6,7 @@ import hydra
 import yaml
 
 from autointent.configs.inference_cli import InferenceConfig
+from autointent.context.utils import NumpyEncoder
 
 from .inference_pipeline import InferencePipeline
 
@@ -26,9 +27,12 @@ def main(cfg: InferenceConfig) -> None:
     # instantiate pipeline
     pipeline = InferencePipeline.from_dict_config(inference_config["nodes_configs"])
 
-    # send data to pipeline
-    output = pipeline.predict_with_metadata(data) if cfg.with_metadata else pipeline.predict(data)
+    if cfg.with_metadata:
+        rich_output = pipeline.predict_with_metadata(data)
+        with Path(cfg.output_path).open("w") as file:
+            json.dump(rich_output.model_dump(exclude_none=True), file, indent=4)
 
-    # save results
-    with Path(cfg.output_path).open("w") as file:
-        json.dump(output.model_dump(exclude_none=True), file, indent=4)
+    else:
+        output = pipeline.predict(data)
+        with Path(cfg.output_path).open("w") as file:
+            json.dump(output, file, indent=4, cls=NumpyEncoder)
