@@ -11,7 +11,7 @@ from autointent.nodes.inference import InferenceNode
 class InferencePipelineUtteranceOutput(BaseModel):
     utterance: str
     prediction: LabelType
-    regexp_prediction: LabelType
+    regexp_prediction: LabelType | None
     regexp_prediction_metadata: Any
     score: list[float]
     score_metadata: Any
@@ -38,14 +38,9 @@ class InferencePipeline:
         nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         return cls(nodes)
 
-    def predict(self, utterances: list[str]) -> InferencePipelineOutput:
+    def predict(self, utterances: list[str]) -> list[LabelType]:
         scores = self.nodes[NodeType.scoring].module.predict(utterances)
-        predictions = self.nodes[NodeType.prediction].module.predict(scores)
-
-        regexp_predictions = None
-        if "regexp" in self.nodes:
-            regexp_predictions = self.nodes["regexp"].module.predict(utterances)
-        return InferencePipelineOutput(predictions=predictions, regexp_predictions=regexp_predictions)
+        return self.nodes[NodeType.prediction].module.predict(scores)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         scores, scores_metadata = self.nodes["scoring"].module.predict_with_metadata(utterances)

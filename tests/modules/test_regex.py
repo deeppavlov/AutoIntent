@@ -1,8 +1,14 @@
+import pytest
+
 from autointent.modules import RegExp
 from tests.conftest import setup_environment
 
 
-def test_base_regex():
+@pytest.mark.parametrize(
+    ("partial_match", "expected_predictions"),
+    [(".*", [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]), ("frozen", [[0], [0], [0], [0], [0, 1]])],
+)
+def test_base_regex(partial_match, expected_predictions):
     db_dir, dump_dir, logs_dir = setup_environment()
 
     train_data = [
@@ -15,8 +21,7 @@ def test_base_regex():
         {
             "id": 1,
             "name": "account_blocked",
-            "regexp_full_match": [".*"],
-            "regexp_partial_match": [".*"],
+            "regexp_partial_match": [partial_match],
         },
     ]
 
@@ -31,4 +36,4 @@ def test_base_regex():
         "can you tell me why is my bank account frozen",
     ]
     predictions = matcher.predict(test_data)
-    assert predictions == [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]
+    assert predictions == expected_predictions

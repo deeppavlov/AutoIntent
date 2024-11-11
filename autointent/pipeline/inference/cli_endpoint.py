@@ -27,7 +27,7 @@ def main(cfg: InferenceConfig) -> None:
     pipeline = InferencePipeline.from_dict_config(inference_config["nodes_configs"])
 
     # send data to pipeline
-    output = pipeline.predict_with_metadata(data)
+    output = pipeline.predict_with_metadata(data) if cfg.with_metadata else pipeline.predict(data)
 
     # save results
     with Path(cfg.output_path).open("w") as file:

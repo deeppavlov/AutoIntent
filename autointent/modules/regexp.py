@@ -59,7 +59,9 @@ class RegExp(Module):
             if pattern.fullmatch(utterance) is not None
         ]
         partial_matches = [
-            pattern.pattern for pattern in intent_record["regexp_partial_match"] if pattern.match(utterance) is not None
+            pattern.pattern
+            for pattern in intent_record["regexp_partial_match"]
+            if pattern.search(utterance) is not None
         ]
         return {"full_matches": full_matches, "partial_matches": partial_matches}
 

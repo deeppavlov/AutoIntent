@@ -46,11 +46,14 @@ def test_inference_config(dataset, task_type):
     inference_config = context.optimization_info.get_inference_nodes_config()
 
     inference_pipeline = InferencePipeline.from_config(inference_config)
-    prediction = inference_pipeline.predict(["123", "hello world"])
+    utterances = ["123", "hello world"]
+    prediction = inference_pipeline.predict(utterances)
     if task_type == "multilabel":
         assert prediction.shape == (2, len(dataset.intents))
     else:
         assert prediction.shape == (2,)
+
+    inference_pipeline.predict_with_metadata(utterances)
 
     context.dump()
     context.vector_index_client.delete_db()
@@ -72,12 +75,15 @@ def test_inference_context(dataset, task_type):
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
     inference_pipeline = InferencePipeline.from_context(context)
-    prediction = inference_pipeline.predict(["123", "hello world"])
+    utterances = ["123", "hello world"]
+    prediction = inference_pipeline.predict(utterances)
 
     if task_type == "multilabel":
         assert prediction.shape == (2, len(dataset.intents))
     else:
         assert prediction.shape == (2,)
+
+    inference_pipeline.predict_with_metadata(utterances)
 
     context.dump()
     context.vector_index_client.delete_db()
@@ -107,6 +113,7 @@ def test_inference_pipeline_cli(dataset, task_type):
         source_dir=logging_config.dirpath,
         output_path=logging_config.dump_dir / "predictions.json",
         log_level="CRITICAL",
+        with_metadata=False,
     )
     inference_pipeline(config)
     context.vector_index_client.delete_db()
