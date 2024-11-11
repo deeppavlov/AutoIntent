@@ -71,4 +71,6 @@ class Embedder:
         )
         if self.max_length is not None:
             self.embedding_model.max_seq_length = self.max_length
-        return self.embedding_model.encode(utterances, convert_to_numpy=True, batch_size=self.batch_size)  # type: ignore[return-value]
+        return self.embedding_model.encode(
+            utterances, convert_to_numpy=True, batch_size=self.batch_size, normalize_embeddings=True,
+        )  # type: ignore[return-value]
