@@ -1,0 +1,120 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0
+        ],
+        "scoring": [
+            0.9502164502164502,
+            0.9502164502164502,
+            0.9502164502164502,
+            0.9502164502164502,
+            0.9502164502164502,
+            0.9025974025974026,
+            0.9069264069264069,
+            0.9047619047619048,
+            0.9956709956709957
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9502164502164502,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9502164502164502,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9502164502164502,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9502164502164502,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9502164502164502,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9025974025974026,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9069264069264069,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9047619047619048,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9956709956709957,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/black_dog_11-11-2024_17-11-02/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

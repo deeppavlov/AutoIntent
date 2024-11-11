@@ -1,0 +1,22 @@
+metadata:
+  device: cuda
+  multilabel: true
+  n_classes: 64
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/scary_dodo_11-11-2024_16-22-04/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: deepvk/USER-bge-m3
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/scary_dodo_11-11-2024_16-22-04/modules_dumps/scoring/description/comb_0
+  module_config:
+    temperature: 1.0
+  module_type: description
+  node_type: scoring
+- load_path: /home/darinka/AutoIntent/runs/scary_dodo_11-11-2024_16-22-04/modules_dumps/prediction/threshold/comb_0
+  module_config:
+    thresh: 0.5
+  module_type: threshold
+  node_type: prediction

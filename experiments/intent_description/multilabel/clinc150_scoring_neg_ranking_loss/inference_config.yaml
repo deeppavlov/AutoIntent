@@ -1,0 +1,21 @@
+metadata:
+  device: cuda
+  multilabel: true
+  n_classes: 150
+  seed: 42
+nodes_configs:
+- load_path: /home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/retrieval/vector_db/comb_0
+  module_config:
+    k: 10
+    model_name: deepvk/USER-bge-m3
+  module_type: vector_db
+  node_type: retrieval
+- load_path: /home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/linear/comb_0
+  module_config: {}
+  module_type: linear
+  node_type: scoring
+- load_path: /home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/prediction/threshold/comb_0
+  module_config:
+    thresh: 0.5
+  module_type: threshold
+  node_type: prediction

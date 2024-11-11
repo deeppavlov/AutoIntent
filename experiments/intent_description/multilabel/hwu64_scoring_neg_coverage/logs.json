@@ -1,0 +1,120 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.953125
+        ],
+        "scoring": [
+            0.9818948412698413,
+            0.9818948412698413,
+            0.9818948412698413,
+            0.9818948412698413,
+            0.9813988095238095,
+            0.8836805555555556,
+            0.8864087301587301,
+            0.8861607142857143,
+            0.9811507936507936
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.953125,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9818948412698413,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9818948412698413,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9818948412698413,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9818948412698413,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9813988095238095,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.8836805555555556,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.8864087301587301,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.8861607142857143,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_neg_coverage",
+                "metric_value": 0.9811507936507936,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/wicked_cat_11-11-2024_17-12-06/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

@@ -1,0 +1,120 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            1.0
+        ],
+        "scoring": [
+            0.7272727272727273,
+            0.7272727272727273,
+            0.7272727272727273,
+            0.7272727272727273,
+            0.7272727272727273,
+            0.8181818181818182,
+            0.8636363636363636,
+            0.8181818181818182,
+            0.9545454545454546
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 1.0,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7272727272727273,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.8181818181818182,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.8636363636363636,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.8181818181818182,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.9545454545454546,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/excited_direwolf_11-11-2024_17-53-20/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

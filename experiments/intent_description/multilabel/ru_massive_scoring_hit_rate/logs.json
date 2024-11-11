@@ -1,0 +1,120 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.95
+        ],
+        "scoring": [
+            0.7333333333333333,
+            0.7333333333333333,
+            0.7333333333333333,
+            0.7333333333333333,
+            0.75,
+            0.7,
+            0.7666666666666667,
+            0.7666666666666667,
+            0.8166666666666667
+        ],
+        "prediction": []
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.95,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7333333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7333333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7333333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7333333333333333,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.75,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.7666666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_hit_rate",
+                "metric_value": 0.8166666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/clear_mosquito_11-11-2024_17-58-02/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": []
+    }
+}

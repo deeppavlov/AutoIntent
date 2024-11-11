@@ -1,0 +1,132 @@
+{
+    "metrics": {
+        "regexp": [],
+        "retrieval": [
+            0.9866666666666667
+        ],
+        "scoring": [
+            -0.007829977628635347,
+            -0.007829977628635347,
+            -0.007829977628635347,
+            -0.007829977628635347,
+            -0.008008948545861297,
+            -0.04711409395973155,
+            -0.04684563758389262,
+            -0.046800894854586134,
+            -0.004429530201342282
+        ],
+        "prediction": [
+            0.9971428571428571
+        ]
+    },
+    "configs": {
+        "regexp": [],
+        "retrieval": [
+            {
+                "module_type": "vector_db",
+                "module_params": {
+                    "k": 10,
+                    "model_name": "deepvk/USER-bge-m3"
+                },
+                "metric_name": "retrieval_hit_rate_intersecting",
+                "metric_value": 0.9866666666666667,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/retrieval/vector_db/comb_0"
+            }
+        ],
+        "scoring": [
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 1.0
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.007829977628635347,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/description/comb_0"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.5
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.007829977628635347,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/description/comb_1"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.25
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.007829977628635347,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/description/comb_2"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.1
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.007829977628635347,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/description/comb_3"
+            },
+            {
+                "module_type": "description",
+                "module_params": {
+                    "temperature": 0.05
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.008008948545861297,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/description/comb_4"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "uniform"
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.04711409395973155,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/knn/comb_0"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "distance"
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.04684563758389262,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/knn/comb_1"
+            },
+            {
+                "module_type": "knn",
+                "module_params": {
+                    "k": 3,
+                    "weights": "closest"
+                },
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.046800894854586134,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/knn/comb_2"
+            },
+            {
+                "module_type": "linear",
+                "module_params": {},
+                "metric_name": "scoring_neg_ranking_loss",
+                "metric_value": -0.004429530201342282,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/scoring/linear/comb_0"
+            }
+        ],
+        "prediction": [
+            {
+                "module_type": "threshold",
+                "module_params": {
+                    "thresh": 0.5
+                },
+                "metric_name": "prediction_accuracy",
+                "metric_value": 0.9971428571428571,
+                "module_dump_dir": "/home/darinka/AutoIntent/runs/energetic_deer_11-11-2024_16-18-57/modules_dumps/prediction/threshold/comb_0"
+            }
+        ]
+    }
+}
