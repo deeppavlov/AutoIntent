@@ -24,6 +24,8 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 
 
 class TunablePredictor(PredictionModule):
+    name = "tunable"
+
     def __init__(
         self,
         n_trials: int = 320,

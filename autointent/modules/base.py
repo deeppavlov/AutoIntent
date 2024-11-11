@@ -11,6 +11,8 @@ from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):
+    name: str
+
     metadata_dict_name: str = "metadata.json"
     metadata: BaseMetadataDict
 
@@ -47,7 +49,9 @@ class Module(ABC):
         """inference"""
 
     def predict_with_metadata(
-        self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any],
+        self,
+        *args: list[str] | npt.NDArray[Any],
+        **kwargs: dict[str, Any],
     ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
         return self.predict(*args, **kwargs), None
 

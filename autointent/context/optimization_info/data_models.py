@@ -4,6 +4,8 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
+from autointent.custom_types import NodeType
+
 
 class Artifact(BaseModel): ...
 
@@ -40,7 +42,7 @@ class PredictorArtifact(Artifact):
 
 
 def validate_node_name(value: str) -> str:
-    if value in ["regexp", "retrieval", "scoring", "prediction"]:
+    if value in [NodeType.retrieval, NodeType.scoring, NodeType.prediction, NodeType.regexp]:
         return value
     msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'prediction']"
     raise ValueError(msg)

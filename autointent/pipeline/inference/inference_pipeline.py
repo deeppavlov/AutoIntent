@@ -4,7 +4,7 @@ from hydra.utils import instantiate
 from pydantic import BaseModel
 
 from autointent.configs.inference_pipeline import InferencePipelineConfig
-from autointent.custom_types import LabelType
+from autointent.custom_types import LabelType, NodeType
 from autointent.nodes.inference import InferenceNode
 
 
@@ -31,9 +31,10 @@ class InferencePipeline:
     def from_dict_config(cls, config: dict[str, Any]) -> "InferencePipeline":
         return instantiate(InferencePipelineConfig, **config)  # type: ignore[no-any-return]
 
-    def predict(self, utterances: list[str]) -> InferencePipelineOutput:
-        scores = self.nodes["scoring"].module.predict(utterances)
-        predictions = self.nodes["prediction"].module.predict(scores)
+    def predict(self, utterances: list[str]) -> list[LabelType]:
+        scores = self.nodes[NodeType.scoring].module.predict(utterances)
+        predictions = self.nodes[NodeType.prediction].module.predict(scores)  # type: ignore[return-value]
+
         regexp_predictions = None
         if "regexp" in self.nodes:
             regexp_predictions = self.nodes["regexp"].module.predict(utterances)
@@ -44,7 +45,7 @@ class InferencePipeline:
         predictions = self.nodes["prediction"].module.predict(scores)
         regexp_predictions, regexp_predictions_metadata = None, None
         if "regexp" in self.nodes:
-            regexp_predictions, regexp_predictions_metadata  = self.nodes["regexp"].module.predict_with_metadata(
+            regexp_predictions, regexp_predictions_metadata = self.nodes["regexp"].module.predict_with_metadata(
                 utterances,
             )
 
@@ -54,7 +55,9 @@ class InferencePipeline:
                 utterance=utterance,
                 prediction=predictions[idx],
                 regexp_prediction=regexp_predictions[idx] if regexp_predictions is not None else None,
-                regexp_prediction_metadata=regexp_predictions_metadata[idx] if regexp_predictions_metadata is not None else None, # noqa: E501
+                regexp_prediction_metadata=regexp_predictions_metadata[idx]
+                if regexp_predictions_metadata is not None
+                else None,
                 score=scores[idx],
                 score_metadata=scores_metadata[idx] if scores_metadata is not None else None,
             )

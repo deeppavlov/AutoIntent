@@ -42,8 +42,9 @@ class RegExp(Module):
         return [self._predict_single(utterance)[0] for utterance in utterances]
 
     def predict_with_metadata(
-            self, utterances: list[str],
-        ) -> tuple[list[LabelType], list[dict[str, Any]] | None]:
+        self,
+        utterances: list[str],
+    ) -> tuple[list[LabelType], list[dict[str, Any]] | None]:
         predictions, metadata = [], []
         for utterance in utterances:
             prediction, matches = self._predict_single(utterance)
@@ -58,9 +59,7 @@ class RegExp(Module):
             if pattern.fullmatch(utterance) is not None
         ]
         partial_matches = [
-            pattern.pattern
-            for pattern in intent_record["regexp_partial_match"]
-            if pattern.match(utterance) is not None
+            pattern.pattern for pattern in intent_record["regexp_partial_match"] if pattern.match(utterance) is not None
         ]
         return {"full_matches": full_matches, "partial_matches": partial_matches}
 
@@ -115,12 +114,10 @@ class RegExp(Module):
             {
                 "id": regexp_patterns["id"],
                 "regexp_full_match": [
-                    re.compile(pattern, flags=re.IGNORECASE)
-                    for pattern in regexp_patterns["regexp_full_match"]
+                    re.compile(pattern, flags=re.IGNORECASE) for pattern in regexp_patterns["regexp_full_match"]
                 ],
                 "regexp_partial_match": [
-                    re.compile(ptn, flags=re.IGNORECASE)
-                    for ptn in regexp_patterns["regexp_partial_match"]
+                    re.compile(ptn, flags=re.IGNORECASE) for ptn in regexp_patterns["regexp_partial_match"]
                 ],
             }
             for regexp_patterns in self.regexp_patterns

@@ -35,6 +35,8 @@ class DNNCScorer(ScoringModule):
     - inspect batch size of model.predict?
     """
 
+    name = "dnnc"
+
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
     prebuilt_index: bool = False
@@ -115,7 +117,8 @@ class DNNCScorer(ScoringModule):
         return self._predict(utterances)[0]
 
     def predict_with_metadata(
-        self, utterances: list[str],
+        self,
+        utterances: list[str],
     ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
         scores, neighbors, neighbors_scores = self._predict(utterances)
         metadata = [
@@ -212,7 +215,8 @@ class DNNCScorer(ScoringModule):
             self.model = CrossEncoder(crossencoder_dir, device=self.device)
 
     def _predict(
-        self, utterances: list[str],
+        self,
+        utterances: list[str],
     ) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         labels, _, neigbors = self.vector_index.query(
             utterances,

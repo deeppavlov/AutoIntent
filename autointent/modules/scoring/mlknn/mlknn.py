@@ -37,6 +37,7 @@ class MLKnnScorer(ScoringModule):
     arrays_filename: str = "probs.npz"
     metadata: MLKnnScorerDumpMetadata
     prebuilt_index: bool = False
+    name = "mlknn"
 
     def __init__(
         self,
@@ -142,7 +143,8 @@ class MLKnnScorer(ScoringModule):
         return cond_prob_true, cond_prob_false
 
     def _get_neighbors(
-        self, queries: list[str] | NDArray[Any],
+        self,
+        queries: list[str] | NDArray[Any],
     ) -> tuple[NDArray[np.int64], list[list[str]]]:
         labels, _, neighbors = self.vector_index.query(
             queries,
@@ -161,7 +163,8 @@ class MLKnnScorer(ScoringModule):
         return self._predict(utterances)[0]
 
     def predict_with_metadata(
-        self, utterances: list[str],
+        self,
+        utterances: list[str],
     ) -> tuple[NDArray[Any], list[dict[str, Any]] | None]:
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
@@ -214,7 +217,8 @@ class MLKnnScorer(ScoringModule):
         self.vector_index = vector_index_client.get_index(self.model_name)
 
     def _predict(
-        self, utterances: list[str],
+        self,
+        utterances: list[str],
     ) -> tuple[NDArray[np.float64], list[list[str]]]:
         result = np.zeros((len(utterances), self.n_classes), dtype=float)
         neighbors_labels, neighbors = self._get_neighbors(utterances)

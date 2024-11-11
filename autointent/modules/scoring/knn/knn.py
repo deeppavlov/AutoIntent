@@ -26,6 +26,7 @@ class KNNScorerDumpMetadata(BaseMetadataDict):
 class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
+    name = "knn"
     prebuilt_index: bool = False
 
     def __init__(
@@ -106,7 +107,8 @@ class KNNScorer(ScoringModule):
         return self._predict(utterances)[0]
 
     def predict_with_metadata(
-        self, utterances: list[str],
+        self,
+        utterances: list[str],
     ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]

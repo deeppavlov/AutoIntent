@@ -6,19 +6,19 @@ def test_base_regex():
     db_dir, dump_dir, logs_dir = setup_environment()
 
     train_data = [
-            {
-                "id": 0,
-                "name": "accept_reservations",
-                "regexp_full_match": [".*"],
-                "regexp_partial_match": [".*"],
-            },
-            {
-                "id": 1,
-                "name": "account_blocked",
-                "regexp_full_match": [".*"],
-                "regexp_partial_match": [".*"],
-            },
-        ]
+        {
+            "id": 0,
+            "name": "accept_reservations",
+            "regexp_full_match": [".*"],
+            "regexp_partial_match": [".*"],
+        },
+        {
+            "id": 1,
+            "name": "account_blocked",
+            "regexp_full_match": [".*"],
+            "regexp_partial_match": [".*"],
+        },
+    ]
 
     matcher = RegExp()
     matcher.fit(train_data)

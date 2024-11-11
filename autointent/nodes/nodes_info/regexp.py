@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
+from autointent.custom_types import NodeType
 from autointent.metrics import regexp_partial_accuracy, regexp_partial_precision
 from autointent.metrics.regexp import RegexpMetricFn
 from autointent.modules import Module, RegExp
@@ -15,6 +16,6 @@ class RegExpNodeInfo(NodeInfo):
         regexp_partial_precision,
     )
 
-    modules_available: ClassVar[Mapping[str, type[Module]]] = {"regexp": RegExp}
+    modules_available: ClassVar[Mapping[str, type[Module]]] = {NodeType.regexp: RegExp}
 
-    node_type = "regexp"
+    node_type = NodeType.regexp
