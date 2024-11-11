@@ -1,16 +1,11 @@
 import numpy as np
 
-from autointent import Context
-from autointent.context.data_handler import Dataset
-from autointent.metrics import retrieval_hit_rate_macro, scoring_f1
-from autointent.modules import VectorDBModule
+from autointent.context.data_handler import DataHandler, Dataset
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 
 
-def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
-    run_name, db_dir = setup_environment
-
-    dataset = load_clinc_subset("multilabel")
+def test_base_mlknn(setup_environment, dataset):
+    db_dir, dump_dir, logs_dir = setup_environment
 
     test_dataset = Dataset.model_validate(
         {
@@ -26,37 +21,10 @@ def test_base_mlknn(setup_environment, load_clinc_subset, dump_dir):
             ],
         },
     )
+    data_handler = DataHandler(dataset, test_dataset, force_multilabel=True)
 
-    context = Context(
-        dataset=dataset,
-        test_dataset=test_dataset,
-        device="cpu",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-        db_dir=db_dir,
-        dump_dir=dump_dir,
-    )
-
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
-    vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate_macro)
-    artifact = vector_db.get_assets()
-    context.optimization_info.log_module_optimization(
-        node_type="retrieval",
-        module_type="vector_db",
-        module_params=retrieval_params,
-        metric_value=metric_value,
-        metric_name="retrieval_hit_rate_macro",
-        artifact=artifact,
-        module_dump_dir="",
-    )
-
-    scorer = MLKnnScorer(k=3)
-    scorer.fit(context)
-    score = scorer.score(context, scoring_f1)
-    np.testing.assert_almost_equal(score, 2 / 9)
+    scorer = MLKnnScorer(db_dir=db_dir(), k=3, model_name="sergeyzh/rubert-tiny-turbo")
+    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
 
     predictions = scorer.predict_labels(
         [

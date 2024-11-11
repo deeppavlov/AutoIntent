@@ -7,9 +7,12 @@ from typing import Any
 
 import torch
 from hydra.utils import instantiate
+from typing_extensions import Self
 
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.context import Context
+from autointent.modules import Module
+from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
 
 
@@ -21,7 +24,7 @@ class NodeOptimizer:
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> "NodeOptimizer":
+    def from_dict_config(cls, config: dict[str, Any]) -> Self:
         return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def fit(self, context: Context) -> None:
@@ -34,10 +37,10 @@ class NodeOptimizer:
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_type)
-                module = self.node_info.modules_available[module_type](**module_kwargs)
+                module = self.node_info.modules_available[module_type].from_context(context, **module_kwargs)
 
                 self._logger.debug("optimizing %s module...", module_type)
-                module.fit(context)
+                self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_type)
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
@@ -62,7 +65,26 @@ class NodeOptimizer:
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
-    def get_module_dump_dir(self, dump_dir: str, module_type: str, j_combination: int) -> str:
-        dump_dir_ = Path(dump_dir) / self.node_info.node_type / module_type / f"comb_{j_combination}"
+    def get_module_dump_dir(self, dump_dir: Path, module_type: str, j_combination: int) -> str:
+        dump_dir_ = dump_dir / self.node_info.node_type / module_type / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
+
+    def module_fit(self, module: Module, context: Context) -> None:
+        if self.node_info.node_type in ["retrieval", "scoring"]:
+            if module.__class__.__name__ == "DescriptionScorer":
+                args = (
+                    context.data_handler.utterances_train,
+                    context.data_handler.labels_train,
+                    context.data_handler.label_description,
+                )
+            else:
+                args = (context.data_handler.utterances_train, context.data_handler.labels_train)  # type: ignore[assignment]
+        elif self.node_info.node_type == "prediction":
+            labels, scores = get_prediction_evaluation_data(context)
+            args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
+        else:
+            msg = "something's wrong"
+            self._logger.error(msg)
+            raise ValueError(msg)
+        module.fit(*args)  # type: ignore[arg-type]

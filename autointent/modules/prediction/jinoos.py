@@ -1,64 +1,71 @@
 import json
-import logging
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import Self
 
 from autointent import Context
-from autointent.custom_types import LABEL_TYPE
+from autointent.context.data_handler import Tag
+from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics.converter import transform
 
-from .base import PredictionModule, get_prediction_evaluation_data
+from .base import PredictionModule
 
 default_search_space = np.linspace(0, 1, num=100)
 
 
-class JinoosPredictorDumpMetadata(TypedDict):
-    thresh: list[float]
+class JinoosPredictorDumpMetadata(BaseMetadataDict):
+    thresh: float
 
 
 class JinoosPredictor(PredictionModule):
-    metadata_dict_name = "metadata.json"
+    thresh: float
+    name = "jinoos"
 
-    def __init__(self, search_space: list[float] | None = None) -> None:
+    def __init__(
+        self,
+        search_space: list[float] | None = None,
+    ) -> None:
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
-    def fit(self, context: Context) -> None:
+    @classmethod
+    def from_context(cls, context: Context, search_space: list[float] | None = None) -> Self:
+        return cls(
+            search_space=search_space,
+        )
+
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LabelType],
+        tags: list[Tag] | None = None,
+    ) -> None:
         """
         TODO: use dev split instead of test split
         """
-
-        if not context.data_handler.has_oos_samples():
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                "Your data doesn't contain out-of-scope utterances."
-                "Using JinoosPredictor imposes unnecessary computational overhead."
-            )
-
-        y_true, scores = get_prediction_evaluation_data(context)
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []
         for thresh in self.search_space:
             y_pred = _detect_oos(pred_classes, best_scores, thresh)
-            metric_value = jinoos_score(y_true, y_pred)
+            metric_value = jinoos_score(labels, y_pred)
             metrics_list.append(metric_value)
 
-        self._thresh = self.search_space[np.argmax(metrics_list)]
+        self.thresh = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         pred_classes, best_scores = _predict(scores)
-        return _detect_oos(pred_classes, best_scores, self._thresh)
+        return _detect_oos(pred_classes, best_scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
+
         dump_dir = Path(path)
 
-        metadata = JinoosPredictorDumpMetadata(thresh=self._thresh.tolist())
-
         with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
@@ -66,10 +73,11 @@ class JinoosPredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: JinoosPredictorDumpMetadata = json.load(file)
 
-        self._thresh = metadata["thresh"]
+        self.thresh = metadata["thresh"]
+        self.metadata = metadata
 
 
-def _predict(scores: npt.NDArray[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
+def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
     return pred_classes, best_scores
@@ -80,7 +88,7 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
     return classes
 
 
-def jinoos_score(y_true: list[LABEL_TYPE] | npt.NDArray[Any], y_pred: list[LABEL_TYPE] | npt.NDArray[Any]) -> float:
+def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:
     """
     joint in and out of scope score
 

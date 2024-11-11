@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 from .base import Module
 from .prediction import (
     AdaptivePredictor,
@@ -9,39 +11,33 @@ from .prediction import (
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
+from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
 
-RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = {
-    "vector_db": VectorDBModule,
-}
+T = TypeVar("T", bound=Module)
+
+
+def create_modules_dict(modules: list[type[T]]) -> dict[str, type[T]]:
+    return {module.name: module for module in modules}
+
+
+RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict([VectorDBModule])
 
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
 
-SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = {
-    "dnnc": DNNCScorer,
-    "knn": KNNScorer,
-    "linear": LinearScorer,
-}
 
-SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = {
-    "knn": KNNScorer,
-    "linear": LinearScorer,
-    "mlknn": MLKnnScorer,
-}
+SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict(
+    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer]
+)
 
-PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = {
-    "adapt": AdaptivePredictor,
-    "argmax": ArgmaxPredictor,
-    "jinoos": JinoosPredictor,
-    "threshold": ThresholdPredictor,
-    "tunable": TunablePredictor,
-}
+SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
+    [MLKnnScorer, LinearScorer, DescriptionScorer]
+)
 
-PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = {
-    "adapt": AdaptivePredictor,
-    "threshold": ThresholdPredictor,
-    "tunable": TunablePredictor,
-}
+PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
+    [AdaptivePredictor, ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
+)
+
+PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict([AdaptivePredictor, ThresholdPredictor, TunablePredictor])
 
 __all__ = [
     "Module",
@@ -58,6 +54,7 @@ __all__ = [
     "KNNScorer",
     "LinearScorer",
     "MLKnnScorer",
+    "DescriptionScorer",
     "ScoringModule",
     "RETRIEVAL_MODULES_MULTICLASS",
     "RETRIEVAL_MODULES_MULTILABEL",

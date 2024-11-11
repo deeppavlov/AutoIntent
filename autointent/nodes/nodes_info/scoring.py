@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
+from autointent.custom_types import NodeType
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL, ScoringMetricFn
 from autointent.modules import SCORING_MODULES_MULTICLASS, SCORING_MODULES_MULTILABEL, ScoringModule
 
@@ -14,4 +15,4 @@ class ScoringNodeInfo(NodeInfo):
         SCORING_MODULES_MULTICLASS | SCORING_MODULES_MULTILABEL
     )
 
-    node_type = "scoring"
+    node_type = NodeType.scoring

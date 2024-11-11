@@ -1,9 +1,12 @@
 from enum import Enum
 from functools import cached_property
+from typing import Any
 
+import datasets
 from pydantic import BaseModel
+from typing_extensions import Self
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 
 class UtteranceType(str, Enum):
@@ -19,9 +22,9 @@ class DatasetType(str, Enum):
 
 class Utterance(BaseModel):
     text: str
-    label: LABEL_TYPE | None = None
+    label: LabelType | None = None
 
-    def one_hot_label(self, n_classes: int) -> LABEL_TYPE:
+    def one_hot_label(self, n_classes: int) -> LabelType:
         encoding = [0] * n_classes
         label = [self.label] if isinstance(self.label, int) else self.label
         if label is None:
@@ -55,6 +58,7 @@ class Intent(BaseModel):
     tags: list[str] = []
     regexp_full_match: list[str] = []
     regexp_partial_match: list[str] = []
+    description: str | None = None
 
 
 class Dataset(BaseModel):
@@ -82,3 +86,35 @@ class Dataset(BaseModel):
 
     def to_multilabel(self) -> "Dataset":
         return Dataset(utterances=[utterance.to_multilabel() for utterance in self.utterances], intents=self.intents)
+
+    @classmethod
+    def from_datasets(
+        cls,
+        dataset_name: str,
+        split: str = "train",
+        utterances_kwargs: dict[str, Any] | None = None,
+        intents_kwargs: dict[str, Any] | None = None,
+        # tags_kwargs: dict[str, Any] | None = None,
+    ) -> Self:
+        configs = datasets.get_dataset_config_names(dataset_name)
+
+        utterances = []
+        intents = []
+        if "utterances" in configs:
+            utterance_ds = datasets.load_dataset(
+                dataset_name, name="utterances", split=split, **(utterances_kwargs or {})
+            )
+            utterances = [Utterance(**item) for item in utterance_ds]
+        # tags = []
+        # if "tags" in configs:
+        #     tags_ds = datasets.load_dataset(dataset_name, name="tags", split=split, **(tags_kwargs or {}))
+        if "intents" in configs:
+            intents_ds = datasets.load_dataset(dataset_name, name="intents", split=split, **(intents_kwargs or {}))
+            intents = [Intent(**item) for item in intents_ds]
+        return cls(utterances=utterances, intents=intents)
+
+    def push_to_hub(self, dataset_name: str, split: str = "train") -> None:
+        utterances_ds = datasets.Dataset.from_list([utterance.model_dump() for utterance in self.utterances])
+        intents_ds = datasets.Dataset.from_list([intent.model_dump() for intent in self.intents])
+        utterances_ds.push_to_hub(dataset_name, config_name="utterances", split=split)
+        intents_ds.push_to_hub(dataset_name, config_name="intents", split=split)

@@ -9,6 +9,7 @@ from hydra.utils import instantiate
 
 from autointent import Context
 from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
+from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 
 from .utils import NumpyEncoder
@@ -29,9 +30,14 @@ class PipelineOptimizer:
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
 
-    def dump(self, logs_dir: Path) -> None:
+    def dump(self, logs_dir: str | Path | None) -> None:
         self._logger.debug("dumping logs...")
         optimization_results = self.context.optimization_info.dump_evaluation_results()
+
+        if logs_dir is None:
+            logs_dir = Path.cwd() / "pipeline_optimize"
+        if isinstance(logs_dir, str):
+            logs_dir = Path(logs_dir)
 
         # create appropriate directory
         logs_dir.mkdir(parents=True, exist_ok=True)
@@ -65,7 +71,7 @@ class PipelineOptimizer:
             yaml.dump(inference_config, file)
 
 
-def make_report(logs: dict[str, Any], nodes: list[str]) -> str:
+def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []
     for i, node in zip(ids, nodes, strict=False):

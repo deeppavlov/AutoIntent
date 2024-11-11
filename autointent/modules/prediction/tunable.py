@@ -1,52 +1,67 @@
 import json
-import logging
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
+from typing_extensions import Self
 
-from autointent import Context
+from autointent.context import Context
 from autointent.context.data_handler.tags import Tag
+from autointent.custom_types import BaseMetadataDict, LabelType
 
-from .base import PredictionModule, get_prediction_evaluation_data
+from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
 
 
-class TunablePredictorDumpMetadata(TypedDict):
+class TunablePredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     thresh: list[float]
-    tags: list[Tag]
+    tags: list[Tag] | None
 
 
 class TunablePredictor(PredictionModule):
-    metadata_dict_name: str = "metadata.json"
+    name = "tunable"
 
-    def __init__(self, n_trials: int | None = None) -> None:
+    def __init__(
+        self,
+        n_trials: int = 320,
+        seed: int = 0,
+        tags: list[Tag] | None = None,
+    ) -> None:
         self.n_trials = n_trials
+        self.seed = seed
+        self.tags = tags
 
-    def fit(self, context: Context) -> None:
-        self.tags = context.data_handler.tags
-        self.multilabel = context.multilabel
+    @classmethod
+    def from_context(cls, context: Context, n_trials: int = 320) -> Self:
+        return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
 
-        if not context.data_handler.has_oos_samples():
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                "Your data doesn't contain out-of-scope utterances."
-                "Using TunablePredictor imposes unnecessary computational overhead."
-            )
-
-        thresh_optimizer = ThreshOptimizer(
-            n_classes=context.n_classes, multilabel=context.multilabel, n_trials=self.n_trials
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LabelType],
+        tags: list[Tag] | None = None,
+    ) -> None:
+        """
+        When data doesn't contain out-of-scope utterances, using
+        TunablePredictor imposes unnecessary computational overhead.
+        """
+        self.tags = tags
+        self.multilabel = isinstance(labels[0], list)
+        n_classes = (
+            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
         )
-        labels, scores = get_prediction_evaluation_data(context)
+
+        thresh_optimizer = ThreshOptimizer(n_classes=n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
+
         thresh_optimizer.fit(
             probas=scores,
-            labels=labels,
-            seed=context.seed,
+            labels=np.array(labels),
+            seed=self.seed,
             tags=self.tags,
         )
         self.thresh = thresh_optimizer.best_thresholds
@@ -57,12 +72,14 @@ class TunablePredictor(PredictionModule):
         return multiclass_predict(scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        self.metadata = TunablePredictorDumpMetadata(
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
+        )
+
         dump_dir = Path(path)
 
-        metadata = TunablePredictorDumpMetadata(multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags)
-
         with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         dump_dir = Path(path)
@@ -70,6 +87,7 @@ class TunablePredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: TunablePredictorDumpMetadata = json.load(file)
 
+        self.metadata = metadata
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]
@@ -94,7 +112,7 @@ class ThreshOptimizer:
         probas: npt.NDArray[Any],
         labels: npt.NDArray[Any],
         seed: int,
-        tags: list[Tag],
+        tags: list[Tag] | None = None,
     ) -> None:
         self.probas = probas
         self.labels = labels
