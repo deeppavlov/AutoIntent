@@ -1,48 +1,20 @@
 import numpy as np
 import pytest
 
-from autointent import Context
-from autointent.metrics import retrieval_hit_rate, scoring_roc_auc
-from autointent.modules import DNNCScorer, VectorDBModule
+from autointent.context.data_handler import DataHandler
+from autointent.modules import DNNCScorer
 
 
-@pytest.mark.xfail(reason="Scorer can output different scores")
+@pytest.mark.xfail(reason="This test is failing on windows, because have different score")
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1), (False, 0.5)])
-def test_base_dnnc(setup_environment, load_clinic_subset, train_head, pred_score, dump_dir):
-    run_name, db_dir = setup_environment
+def test_base_dnnc(setup_environment, dataset, train_head, pred_score):
+    db_dir, dump_dir, logs_dir = setup_environment
 
-    context = Context(
-        multiclass_intent_records=load_clinic_subset,
-        multilabel_utterance_records=[],
-        test_utterance_records=[],
-        device="cpu",
-        mode="multiclass",
-        multilabel_generation_config="",
-        regex_sampling=0,
-        seed=0,
-        dump_dir=dump_dir,
-        db_dir=db_dir,
-    )
-
-    retrieval_params = {"k": 3, "model_name": "sergeyzh/rubert-tiny-turbo"}
-    vector_db = VectorDBModule(**retrieval_params)
-    vector_db.fit(context)
-    metric_value = vector_db.score(context, retrieval_hit_rate)
-    artifact = vector_db.get_assets()
-    context.optimization_info.log_module_optimization(
-        node_type="retrieval",
-        module_type="vector_db",
-        module_params=retrieval_params,
-        metric_value=metric_value,
-        metric_name="retrieval_hit_rate_macro",
-        artifact=artifact,
-    )
+    data_handler = DataHandler(dataset)
 
     scorer = DNNCScorer("sergeyzh/rubert-tiny-turbo", k=3, train_head=train_head)
 
-    scorer.fit(context)
-    score, _ = scorer.score(context, scoring_roc_auc)
-    assert score == 1
+    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

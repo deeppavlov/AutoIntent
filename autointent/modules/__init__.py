@@ -33,7 +33,7 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
-    [JinoosPredictor, ThresholdPredictor, TunablePredictor]
+    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(

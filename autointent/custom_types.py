@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Literal
+from typing import Literal, TypedDict
 
 TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
 
@@ -14,4 +14,18 @@ class LogLevel(Enum):
 
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
 
-LABEL_TYPE = int | list[int]
+LabelType = int | list[int]
+
+
+class BaseMetadataDict(TypedDict):
+    pass
+
+
+class NodeType(str, Enum):
+    retrieval = "retrieval"
+    prediction = "prediction"
+    scoring = "scoring"
+    regexp = "regexp"
+
+
+NODE_TYPES = [NodeType.retrieval, NodeType.prediction, NodeType.scoring, NodeType.regexp]

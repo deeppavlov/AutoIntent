@@ -14,6 +14,8 @@ nodes:
         k: [5, 10]
         weights: [uniform, distance, closest]
       - module_type: linear
+      - module_type: mlknn
+        k: [5]
   - node_type: prediction
     metric: prediction_accuracy
     search_space:

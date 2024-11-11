@@ -1,6 +1,6 @@
 from typing import TypedDict
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 
 class IntentRecord(TypedDict):
@@ -11,4 +11,4 @@ class IntentRecord(TypedDict):
 
 class UtteranceRecord(TypedDict):
     utterance: str
-    labels: LABEL_TYPE | tuple[int, ...]
+    labels: LabelType | tuple[int, ...]

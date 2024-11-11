@@ -2,15 +2,27 @@
     "intents": [
         {
             "id": 0,
-            "name": "accept_reservations"
+            "name": "accept_reservations",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know if Red Robin accepts reservations."
         },
         {
             "id": 1,
-            "name": "account_blocked"
+            "name": "account_blocked",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to know why their bank account is blocked or frozen."
         },
         {
             "id": 2,
-            "name": "alarm"
+            "name": "alarm",
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to set or manage an alarm."
         }
     ],
     "utterances": [

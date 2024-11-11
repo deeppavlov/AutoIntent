@@ -31,77 +31,128 @@ pip install .
 В текущей alpha-версии оптимизацию можно запустить командой `autointent`:
 Примеры использования:
 ```bash
-autointent dataset_path=default-multiclass
-autointent dataset_path=default-multilabel
-autointent dataset_path=data/intent_records/ac_robotic_new.json \
-    force_multilabel=true \
-    logs_dir=experiments/multiclass_as_multilabel/ \
-    run_name=robotics_new_testing \
-    regex_sampling=10 \
-    multilabel_generation_config="[0, 4000, 1000]"
-autointent dataset_path=data/intent_records/ac_robotic_new.json \
-           test_path=data/intent_records/ac_robotic_val.json \
-           force_multilabel=true \
-           regex_sampling=20
-autointent dataset_path=default-multiclass \
-           test_path=data/intent_records/banking77_test.json
+autointent data.train_path=default-multiclass
+autointent data.train_path=default-multilabel hydra.job_logging.root.level=INFO
+autointent data.train_path=data/intent_records/ac_robotic_new.json \
+    data.force_multilabel=true \
+    logs.dirpath=experiments/multiclass_as_multilabel/ \
+    logs.run_name=robotics_new_testing \
+    augmentation.regex_sampling=10 \
+    augmentation.multilabel_generation_config="[0, 4000, 1000]"  # currently doesn't work, omit this line
+# currently doesn't work due to problems with to_multilabel when dataset contains only regexp but no utterances
+autointent data.train_path=data/intent_records/ac_robotic_new.json \
+           data.test_path=data/intent_records/ac_robotic_val.json \
+           data.force_multilabel=true \
+           augmentation.regex_sampling=20
+autointent data.train_path=default-multiclass \
+           data.test_path=data/intent_records/banking77_test.json \
+           seed=42
 ```
 
-Все опции:
+Все опции в виде yaml (показаны дефолтные значения):
+```yaml
+data:
+# Path to a json file with training data. Set to "default" to use banking77 data stored within the
+# autointent package.
+  train_path: ???
+
+# Path to a json file with test records. Skip this option if you want to use a random subset of the
+# training sample as test data.
+  test_path: null
+
+# Set to true if your data is multiclass but you want to train the multilabel classifier.
+  force_multilabel: false
+
+task:
+# Path to a yaml configuration file that defines the optimization search space.
+# Omit this to use the default configuration.
+  search_space_path: null
+logs:
+# Name of the run prepended to optimization assets dirname (generated randomly if omitted)
+  run_name: "awful_hippo_10-30-2024_19-42-12"
+
+# Location where to save optimization logs that will be saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
+# Omit to use current working directory. <-- on Windows it is not correct
+  dirpath: "/home/user/AutoIntent/awful_hippo_10-30-2024_19-42-12"
+
+  dump_dir: "/home/user/AutoIntent/runs/awful_hippo_10-30-2024_19-42-12/modules_dumps"
+
+vector_index:
+# Location where to save faiss database file. Omit to use your system's default cache directory.
+  db_dir: null
+
+# Specify device in torch notation
+  device: cpu
+
+augmentation:
+# Number of shots per intent to sample from regular expressions. This option extends sample utterance
+# within multiclass intent records.
+  regex_sampling: 0
+
+# Config string like "[20, 40, 20, 10]" means 20 one-label examples, 40 two-label examples, 20 three-label examples,
+# 10 four-label examples. This option extends multilabel utterance records.
+  multilabel_generation_config: null
+
+embedder:
+# batch size for embedding computation.
+  batch_size: 1
+# sentence length limit for embedding computation
+  max_length: null
+
+#Affects the randomness
+seed: 0
+
+# String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}. Omit to use ERROR by default.
+hydra.job_logging.root.level: "ERROR"
 ```
-search_space_path  Path to a yaml configuration file that defines the
-                   optimization search space. Omit this to use the
-                   default configuration.
 
-dataset_path       Path to a json file with training data. Set to
-                   "default" to use banking77 data stored within the
-                   autointent package.
-
-test_path          Path to a json file with test records. Skip this
-                   option if you want to use a random subset of the
-                   training sample as test data.
-
-db_dir             Location where to save faiss database file. Omit to
-                   use your system's default cache directory.
-
-logs_dir           Location where to save optimization logs that will be
-                   saved as `<logs_dir>/<run_name>_<cur_datetime>/logs.json`.
-                   Omit to use current working directory.
-
-run_name           Name of the run prepended to optimization assets dirname
-
-device             Specify device in torch notation
-
-regex_sampling     Number of shots per intent to sample from regular
-                   expressions. This option extends sample utterances
-                   within multiclass intent records.
-
-seed               Affects the data partitioning
-
-log_level          String from {DEBUG,INFO,WARNING,ERROR,CRITICAL}.
-                   Omit to use ERROR by default.
-
-multilabel_generation_config 
-                   Config string like "[20, 40, 20, 10]" means 20 one-
-                   label examples, 40 two-label examples, 20 three-label
-                   examples, 10 four-label examples. This option extends
-                   multilabel utterance records.
-
-force_multilabel  Set to true if your data is multiclass but you want to
-                  train the multilabel classifier.
+### Как задавать конфигурационные опции
+* Вариант 1 - в коммандной строке в виде key=value. Пример:
+```bash
+autointent embedder.batch_size=32
 ```
+
+* Вариант 2 - в конфигурационном yaml файле.
+Создайте в отдельной папке yaml файл со следующей структурой **my_config.yaml**:
+```yaml
+defaults:
+  - optimization_config
+  - _self_
+  - override hydra/job_logging: custom
+
+# put the configuration options you want to override here. The full structure is presented above.
+# Here is just an example with the same options as for the command line variant above.
+embedder:
+  embedder_batch_size: 32
+```
+Запускаем AutoIntent:
+```bash
+autointent --config-path=/path/to/config/directory --config-name=my_config
+```
+
+Важно:
+* указывайте полный путь в опции config-path.
+* не используйте tab в yaml файле.
+* желательно чтобы имя файла отличалось от
+optimization_config.yaml, чтобы избежать warnings от hydra
+
+Вы можете использовать комбинацию Варианта 1 и 2. Опции из коммандной строки имеют наивысший приоритет.
+
+
 
 Вместе с пакетом предоставляются дефолтные конфиг и данные (5-shot banking77 / 20-shot dstc3).
 
-Пример входных данных в директории `data/intent_records`.
+Примеры:
+- примеры входных данных: [data](./data)
+- примеры конфигов: [example_configs](./example_configs)
 
 ### Инференс
 
 После проведённой оптимизации найденный классификатор можно загрузить и использовать для предсказания:
 ```bash
 autointent \
-    dataset_path="tests/assets/data/clinc_subset_multiclass.json" \
-    search_space_path="tests/assets/configs/multiclass.yaml"
+    data.train_path="tests/assets/data/clinc_subset_multiclass.json" \
+    task.search_space_path="tests/assets/configs/multiclass.yaml"
 autointent-inference \
     data_path="experiments/hydra-configs/data/utterances.json" \
     source_dir="tasty_auk_10-21-2024_14-24-48" \
@@ -110,7 +161,7 @@ autointent-inference \
 
 Все опции инференса:
 ```
-data_path    Path to a json list of string containing with utterances
+data_path    Path to a json list of string containing utterances
              for which you want to make a prediction.
 
 source_dir   Path to a directory with optimization assets.

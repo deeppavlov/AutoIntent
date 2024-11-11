@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import _safe_indexing, indexable
 from skmultilearn.model_selection import IterativeStratification
 
-from autointent.custom_types import LABEL_TYPE
+from autointent.custom_types import LabelType
 
 from .schemas import Dataset, DatasetType
 
@@ -24,7 +24,7 @@ def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[An
     return utterances, labels
 
 
-def get_samples(dataset: Dataset) -> tuple[list[str], list[LABEL_TYPE | None]]:
+def get_samples(dataset: Dataset) -> tuple[list[str], list[LabelType | None]]:
     utterances, labels = [], []
     for utterance in dataset.utterances:
         if utterance.oos:
@@ -50,8 +50,8 @@ def split_sample_utterances(
     list[str],
     list[str],
     list[str],
-    list[LABEL_TYPE],
-    list[LABEL_TYPE],
+    list[LabelType],
+    list[LabelType],
 ]:
     """
     Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
@@ -99,7 +99,7 @@ def multilabel_train_test_split(
     test_size: float = 0.25,
     random_state: int = 0,
     shuffle: bool = False,
-    stratify: list[LABEL_TYPE] | None = None,
+    stratify: list[LabelType] | None = None,
 ) -> list[npt.NDArray[Any]]:
     """
     Arguments
@@ -124,7 +124,7 @@ def multilabel_train_test_split(
     return list(it.chain.from_iterable((_safe_indexing(a, train), _safe_indexing(a, test)) for a in arrays))
 
 
-def validate_test_labels(test_labels: list[LABEL_TYPE], multilabel: bool, n_classes: int) -> bool:
+def validate_test_labels(test_labels: list[LabelType], multilabel: bool, n_classes: int) -> bool:
     """
     ensure that all classes are presented in the presented labels set
     """

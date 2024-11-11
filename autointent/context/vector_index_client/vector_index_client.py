@@ -3,8 +3,9 @@ import logging
 import shutil
 from pathlib import Path
 
-from autointent.context.data_handler import DataHandler
+from autointent.custom_types import LabelType
 
+from .cache import get_db_dir
 from .vector_index import VectorIndex
 
 DIRNAMES_TYPE = dict[str, str]
@@ -13,23 +14,39 @@ DIRNAMES_TYPE = dict[str, str]
 class VectorIndexClient:
     model_name: str
 
-    def __init__(self, device: str, db_dir: str) -> None:
+    def __init__(
+        self,
+        device: str,
+        db_dir: str | Path | None,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
+    ) -> None:
         self._logger = logging.getLogger(__name__)
         self.device = device
-        self.db_dir = Path(db_dir)
+        self.db_dir = get_db_dir(db_dir)
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
 
-    def create_index(self, model_name: str, data_handler: DataHandler) -> VectorIndex:
+    def create_index(
+        self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None
+    ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model
         """
         self._logger.info("Creating index for model: %s", model_name)
 
-        index = VectorIndex(model_name, self.device)
-        index.add(data_handler.utterances_train, data_handler.labels_train)
-
-        index.dump(self._get_dump_dirpath(model_name))
+        index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
+        if utterances is not None and labels is not None:
+            index.add(utterances, labels)
+            self.dump(index)
+        elif (utterances is not None) != (labels is not None):
+            msg = "You must provide both utterances and labels, or neither"
+            raise ValueError(msg)
 
         return index
+
+    def dump(self, index: VectorIndex) -> None:
+        index.dump(self._get_dump_dirpath(index.model_name))
 
     def _add_index_dirname(self, model_name: str, dir_name: str) -> None:
         path = self.db_dir / "indexes_dirnames.json"
@@ -55,6 +72,8 @@ class VectorIndexClient:
     def _get_index_dirpath(self, model_name: str) -> Path | None:
         """return dirname if vector index exists, otherwise return None"""
         path = self.db_dir / "indexes_dirnames.json"
+        if not path.exists():
+            return None
         with path.open() as file:
             indexes_dirnames: DIRNAMES_TYPE = json.load(file)
         dirname = indexes_dirnames.get(model_name, None)
@@ -63,6 +82,8 @@ class VectorIndexClient:
         return self.db_dir / dirname
 
     def _get_dump_dirpath(self, model_name: str) -> Path:
+        if not self.db_dir.exists():
+            self.db_dir.mkdir(parents=True, exist_ok=True)
         dir_name = model_name.replace("/", "-")
         self._add_index_dirname(model_name, dir_name)
         return self.db_dir / dir_name
@@ -76,10 +97,19 @@ class VectorIndexClient:
     def get_index(self, model_name: str) -> VectorIndex:
         dirpath = self._get_index_dirpath(model_name)
         if dirpath is not None:
-            index = VectorIndex(model_name, self.device)
+            index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
             index.load(dirpath)
             return index
 
-        msg = f"index for {model_name} wasn't ever createds"
+        msg = f"Index for {model_name} wasn't ever created in {self.db_dir}"
         self._logger.error(msg)
-        raise ValueError(msg)
+        raise NonExistingIndexError(msg)
+
+    def exists(self, model_name: str) -> bool:
+        return self._get_index_dirpath(model_name) is not None
+
+
+class NonExistingIndexError(Exception):
+    def __init__(self, message: str = "non-existent index was requested") -> None:
+        self.message = message
+        super().__init__(message)
