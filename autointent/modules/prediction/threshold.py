@@ -27,6 +27,7 @@ class ThresholdPredictor(PredictionModule):
     metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
     tags: list[Tag] | None
+    name = "threshold"
 
     def __init__(
         self,
@@ -50,6 +51,8 @@ class ThresholdPredictor(PredictionModule):
 
     def fit(
         self,
+        scores: npt.NDArray[Any],
+        labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
         self.tags = tags
