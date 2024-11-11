@@ -1,24 +1,40 @@
 import json
 import logging
-from pathlib import Path
 from typing import Any
 
 import numpy as np
-import yaml
 from hydra.utils import instantiate
 
 from autointent import Context
+from autointent.configs.optimization_cli import EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.configs.pipeline_optimizer import PipelineOptimizerConfig
+from autointent.context.data_handler import Dataset
 from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 
-from .utils import NumpyEncoder
-
 
 class PipelineOptimizer:
-    def __init__(self, nodes: list[NodeOptimizer]) -> None:
+    def __init__(
+        self,
+        nodes: list[NodeOptimizer],
+    ) -> None:
         self._logger = logging.getLogger(__name__)
         self.nodes = nodes
+
+        self.logging_config = LoggingConfig(dump_dir=None)
+        self.vector_index_config = VectorIndexConfig()
+        self.embedder_config = EmbedderConfig()
+
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig) -> None:
+        if isinstance(config, LoggingConfig):
+            self.logging_config = config
+        elif isinstance(config, VectorIndexConfig):
+            self.vector_index_config = config
+        elif isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        else:
+            msg = "unknown config type"
+            raise TypeError(msg)
 
     @classmethod
     def from_dict_config(cls, config: dict[str, Any]) -> "PipelineOptimizer":
@@ -29,46 +45,21 @@ class PipelineOptimizer:
         self._logger.info("starting pipeline optimization...")
         for node_optimizer in self.nodes:
             node_optimizer.fit(context)
+        if not context.vector_index_config.save_db:
+            self._logger.info("removing vector database from file system...")
+            context.vector_index_client.delete_db()
 
-    def dump(self, logs_dir: str | Path | None) -> None:
-        self._logger.debug("dumping logs...")
-        optimization_results = self.context.optimization_info.dump_evaluation_results()
+    def optimize_from_dataset(
+        self, train_data: Dataset, val_data: Dataset | None = None, force_multilabel: bool = False
+    ) -> Context:
+        context = Context()
+        context.set_datasets(train_data, val_data, force_multilabel)
+        context.configure_logging(self.logging_config)
+        context.configure_vector_index(self.vector_index_config, self.embedder_config)
 
-        if logs_dir is None:
-            logs_dir = Path.cwd() / "pipeline_optimize"
-        if isinstance(logs_dir, str):
-            logs_dir = Path(logs_dir)
-
-        # create appropriate directory
-        logs_dir.mkdir(parents=True, exist_ok=True)
-
-        # dump search space and evaluation results
-        logs_path = logs_dir / "logs.json"
-        with logs_path.open("w") as file:
-            json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-        # config_path = logs_dir / "config.yaml"
-        # with config_path.open("w") as file:
-        #     yaml.dump(self.config, file)
-
-        nodes = [node_config.node_info.node_type for node_config in self.nodes]
-        self._logger.info(make_report(optimization_results, nodes=nodes))
-
-        # dump train and test data splits
-        train_data, test_data = self.context.data_handler.dump()
-        train_path = logs_dir / "train_data.json"
-        test_path = logs_dir / "test_data.json"
-        with train_path.open("w") as file:
-            json.dump(train_data, file, indent=4, ensure_ascii=False)
-        with test_path.open("w") as file:
-            json.dump(test_data, file, indent=4, ensure_ascii=False)
-
-        self._logger.info("logs and other assets are saved to %s", logs_dir)
-
-        # dump optimization results (config for inference)
-        inference_config = self.context.get_inference_config()
-        inference_config_path = logs_dir / "inference_config.yaml"
-        with inference_config_path.open("w") as file:
-            yaml.dump(inference_config, file)
+        self.optimize(context)
+        self.inference_config = context.optimization_info.get_inference_nodes_config()
+        return context
 
 
 def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:

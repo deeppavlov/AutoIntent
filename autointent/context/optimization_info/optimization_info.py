@@ -1,13 +1,31 @@
-from typing import Any
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
 from autointent.custom_types import NODE_TYPES, NodeType
-from autointent.logger import get_logger
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from .logger import get_logger
+
+if TYPE_CHECKING:
+    from autointent.modules import Module
+
+
+@dataclass
+class ModulesList:
+    regexp: list["Module"] = field(default_factory=list)
+    retrieval: list["Module"] = field(default_factory=list)
+    scoring: list["Module"] = field(default_factory=list)
+    prediction: list["Module"] = field(default_factory=list)
+
+    def get(self, node_type: str) -> list["Module"]:
+        return getattr(self, node_type)  # type: ignore[no-any-return]
+
+    def add_module(self, node_type: str, module: "Module") -> None:
+        self.get(node_type).append(module)
 
 
 class OptimizationInfo:
@@ -21,6 +39,7 @@ class OptimizationInfo:
         self.artifacts = Artifacts()
         self.trials = Trials()
         self._trials_best_ids = TrialsIds()
+        self.modules = ModulesList()
 
     def log_module_optimization(
         self,
@@ -30,7 +49,8 @@ class OptimizationInfo:
         metric_value: float,
         metric_name: str,
         artifact: Artifact,
-        module_dump_dir: str,
+        module_dump_dir: str | None,
+        module: "Module | None" = None,
     ) -> None:
         """
         Purposes:
@@ -48,6 +68,10 @@ class OptimizationInfo:
         )
         self.trials.add_trial(node_type, trial)
         self._logger.info(trial.model_dump())
+
+        # save module
+        if module:
+            self.modules.add_module(node_type, module)
 
         # save artifact
         self.artifacts.add_artifact(node_type, artifact)
@@ -99,10 +123,20 @@ class OptimizationInfo:
             trial = self.trials.get_trial(node_type, idx)
             res.append(
                 InferenceNodeConfig(
-                    node_type=node_type,
+                    node_type=node_type.value,
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
                 )
             )
         return res
+
+    def _get_best_module(self, node_type: str) -> "Module | None":
+        idx = self._get_best_trial_idx(node_type)
+        if idx is not None:
+            return self.modules.get(node_type)[idx]
+        return None
+
+    def get_best_modules(self) -> dict[str, "Module"]:
+        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
+        return {nt: m for nt, m in res.items() if m is not None}

@@ -44,7 +44,7 @@ class DNNCScorer(ScoringModule):
     def __init__(
         self,
         cross_encoder_name: str,
-        search_model_name: str,
+        embedder_name: str,
         k: int,
         db_dir: str | None = None,
         device: str = "cpu",
@@ -56,7 +56,7 @@ class DNNCScorer(ScoringModule):
             db_dir = str(get_db_dir())
 
         self.cross_encoder_name = cross_encoder_name
-        self.search_model_name = search_model_name
+        self.embedder_name = embedder_name
         self.k = k
         self.train_head = train_head
         self.device = device
@@ -70,24 +70,24 @@ class DNNCScorer(ScoringModule):
         context: Context,
         cross_encoder_name: str,
         k: int,
-        search_model_name: str | None = None,
+        embedder_name: str | None = None,
         train_head: bool = False,
     ) -> Self:
-        if search_model_name is None:
-            search_model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
         else:
-            prebuilt_index = context.vector_index_client.exists(search_model_name)
+            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
             cross_encoder_name=cross_encoder_name,
-            search_model_name=search_model_name,
+            embedder_name=embedder_name,
             k=k,
             train_head=train_head,
-            device=context.device,
-            db_dir=str(context.db_dir),
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            device=context.get_device(),
+            db_dir=str(context.get_db_dir()),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
@@ -101,12 +101,12 @@ class DNNCScorer(ScoringModule):
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.search_model_name)
+            self.vector_index = vector_index_client.get_index(self.embedder_name)
             if len(utterances) != len(self.vector_index.texts):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
         else:
-            self.vector_index = vector_index_client.create_index(self.search_model_name, utterances, labels)
+            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -206,7 +206,7 @@ class DNNCScorer(ScoringModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self.vector_index = vector_index_client.get_index(self.search_model_name)
+        self.vector_index = vector_index_client.get_index(self.embedder_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
         if self.train_head:

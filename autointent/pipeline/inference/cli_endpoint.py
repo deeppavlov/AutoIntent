@@ -24,8 +24,7 @@ def main(cfg: InferenceConfig) -> None:
     logger.debug("Inference config loaded")
 
     # instantiate pipeline
-    pipeline_config = {"nodes": inference_config["nodes_configs"]}
-    pipeline = InferencePipeline.from_dict_config(pipeline_config)
+    pipeline = InferencePipeline.from_dict_config(inference_config["nodes_configs"])
 
     # send data to pipeline
     output = pipeline.predict_with_metadata(data)

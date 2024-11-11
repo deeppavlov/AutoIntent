@@ -2,14 +2,15 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
+from tests.conftest import setup_environment
 
 
-def test_base_knn(setup_environment, dataset):
-    db_dir, dump_dir, logs_dir = setup_environment
+def test_base_knn(dataset):
+    db_dir, dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir())
+    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     predictions = scorer.predict(

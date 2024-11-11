@@ -3,6 +3,7 @@ import logging
 
 import torch
 
+from autointent.configs.node import InferenceNodeConfig
 from autointent.nodes import InferenceNode, NodeOptimizer
 
 logger = logging.getLogger(__name__)
@@ -14,13 +15,13 @@ def test_retrieval_multiclass(context):
     retrieval_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.retrieval:
-        config = {
-            "node_type": "retrieval",
-            "module_type": trial.module_type,
-            "module_config": trial.module_params,
-            "load_path": trial.module_dump_dir,
-        }
-        node = InferenceNode(**config)
+        config = InferenceNodeConfig(
+            node_type="retrieval",
+            module_type=trial.module_type,
+            module_config=trial.module_params,
+            load_path=trial.module_dump_dir,
+        )
+        node = InferenceNode.from_config(config)
         labels, distances, texts = node.module.predict(["hello", "card"])
         node.module.clear_cache()
         gc.collect()
@@ -33,13 +34,13 @@ def test_retrieval_multilabel(context):
     retrieval_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.retrieval:
-        config = {
-            "node_type": "retrieval",
-            "module_type": trial.module_type,
-            "module_config": trial.module_params,
-            "load_path": trial.module_dump_dir,
-        }
-        node = InferenceNode(**config)
+        config = InferenceNodeConfig(
+            node_type="retrieval",
+            module_type=trial.module_type,
+            module_config=trial.module_params,
+            load_path=trial.module_dump_dir,
+        )
+        node = InferenceNode.from_config(config)
         labels, distances, texts = node.module.predict(["hello", "card"])
         node.module.clear_cache()
         gc.collect()
@@ -56,7 +57,7 @@ def get_retrieval_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "model_name": [
+                "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],

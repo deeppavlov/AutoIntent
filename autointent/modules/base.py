@@ -59,3 +59,7 @@ class Module(ABC):
     @abstractmethod
     def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
         pass
+
+    def get_embedder_name(self) -> str | None:
+        """experimental method"""
+        return None

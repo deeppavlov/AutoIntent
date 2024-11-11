@@ -111,14 +111,14 @@ class RegExp(Module):
 
     def _compile_regex_patterns(self) -> None:
         self.regexp_patterns_compiled = [
-            {
-                "id": regexp_patterns["id"],
-                "regexp_full_match": [
+            RegexPatternsCompiled(
+                id=regexp_patterns["id"],
+                regexp_full_match=[
                     re.compile(pattern, flags=re.IGNORECASE) for pattern in regexp_patterns["regexp_full_match"]
                 ],
-                "regexp_partial_match": [
+                regexp_partial_match=[
                     re.compile(ptn, flags=re.IGNORECASE) for ptn in regexp_patterns["regexp_partial_match"]
                 ],
-            }
+            )
             for regexp_patterns in self.regexp_patterns
         ]

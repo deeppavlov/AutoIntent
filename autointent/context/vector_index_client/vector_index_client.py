@@ -12,8 +12,6 @@ DIRNAMES_TYPE = dict[str, str]
 
 
 class VectorIndexClient:
-    model_name: str
-
     def __init__(
         self,
         device: str,
@@ -107,6 +105,9 @@ class VectorIndexClient:
 
     def exists(self, model_name: str) -> bool:
         return self._get_index_dirpath(model_name) is not None
+
+    def delete_db(self) -> None:
+        shutil.rmtree(self.db_dir)
 
 
 class NonExistingIndexError(Exception):
