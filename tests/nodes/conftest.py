@@ -75,9 +75,9 @@ def context(dataset_path):
 
     def _context(multilabel: bool):
         res = Context()
-        res.config_data(DataConfig(dataset_path, force_multilabel=multilabel))
-        res.config_logs(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
-        res.config_vector_index(VectorIndexConfig(db_dir=db_dir))
+        res.configure_data(DataConfig(dataset_path, force_multilabel=multilabel))
+        res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
+        res.configure_vector_index(VectorIndexConfig(db_dir=db_dir))
         return res
 
     return _context

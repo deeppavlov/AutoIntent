@@ -54,4 +54,5 @@ class Module(ABC):
         pass
 
     def get_embedder_name(self) -> str | None:
+        """experimental method"""
         return None

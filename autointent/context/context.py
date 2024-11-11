@@ -32,11 +32,11 @@ class Context:
         self.seed = seed
         self._logger = logging.getLogger(__name__)
 
-    def config_logs(self, config: LoggingConfig) -> None:
+    def configure_logging(self, config: LoggingConfig) -> None:
         self.logging_config = config
         self.optimization_info = OptimizationInfo()
 
-    def config_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:
+    def configure_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:
         self.vector_index_config = config
         if embedder_config is None:
             embedder_config = EmbedderConfig()
@@ -49,7 +49,7 @@ class Context:
             self.embedder_config.max_length,
         )
 
-    def config_data(self, config: DataConfig, augmentation_config: AugmentationConfig | None = None) -> None:
+    def configure_data(self, config: DataConfig, augmentation_config: AugmentationConfig | None = None) -> None:
         if augmentation_config is not None:
             self.augmentation_config = AugmentationConfig()
             augmenter = DataAugmenter(

@@ -54,8 +54,8 @@ class PipelineOptimizer:
     ) -> Context:
         context = Context()
         context.set_datasets(train_data, val_data, force_multilabel)
-        context.config_logs(self.logging_config)
-        context.config_vector_index(self.vector_index_config, self.embedder_config)
+        context.configure_logging(self.logging_config)
+        context.configure_vector_index(self.vector_index_config, self.embedder_config)
 
         self.optimize(context)
         self.inference_config = context.optimization_info.get_inference_nodes_config()
