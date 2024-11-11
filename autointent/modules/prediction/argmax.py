@@ -20,7 +20,7 @@ class ArgmaxPredictor(PredictionModule):
 
 
     @classmethod
-    def from_context(cls, context: Context) -> Self: # noqa: ARG003
+    def from_context(cls, context: Context) -> Self:
         return cls()
 
     def fit(
