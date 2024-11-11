@@ -65,7 +65,9 @@ class InferencePipeline:
             )
             outputs.append(output)
 
-        return InferencePipelineOutput(predictions=predictions, utterances=outputs)
+        return InferencePipelineOutput(
+            predictions=predictions, regexp_predictions=regexp_predictions, utterances=outputs,
+        )
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         pass
