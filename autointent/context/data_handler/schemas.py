@@ -25,14 +25,13 @@ class Utterance(BaseModel):
     label: LabelType | None = None
 
     def one_hot_label(self, n_classes: int) -> LabelType:
-        encoding = [0] * n_classes
+        one_hot_label = [0] * n_classes
+        if self.label is None:
+            return one_hot_label
         label = [self.label] if isinstance(self.label, int) else self.label
-        if label is None:
-            msg = "Cannot one-hot encode OOS utterance"
-            raise ValueError(msg)
         for idx in label:
-            encoding[idx] = 1
-        return encoding
+            one_hot_label[idx] = 1
+        return one_hot_label
 
     @cached_property
     def type(self) -> UtteranceType:
@@ -46,7 +45,7 @@ class Utterance(BaseModel):
     def oos(self) -> bool:
         return self.label is None
 
-    def to_multilabel(self) -> "Utterance":
+    def to_multilabel(self) -> Self:
         if self.type in {UtteranceType.multilabel, UtteranceType.oos}:
             return self
         return Utterance(text=self.text, label=[self.label])
@@ -84,8 +83,11 @@ class Dataset(BaseModel):
                     classes.add(label)
         return len(classes)
 
-    def to_multilabel(self) -> "Dataset":
-        return Dataset(utterances=[utterance.to_multilabel() for utterance in self.utterances], intents=self.intents)
+    def to_multilabel(self) -> Self:
+        return Dataset(
+            utterances=[utterance.to_multilabel() for utterance in self.utterances],
+            intents=self.intents,
+        )
 
     @classmethod
     def from_datasets(
