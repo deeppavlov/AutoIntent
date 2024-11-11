@@ -37,3 +37,9 @@ def test_base_regex(partial_match, expected_predictions):
     ]
     predictions = matcher.predict(test_data)
     assert predictions == expected_predictions
+
+    predictions, metadata = matcher.predict_with_metadata(test_data)
+    assert len(predictions) == len(test_data) == len(metadata)
+
+    assert "partial_matches" in metadata[0]
+    assert "full_matches" in metadata[0]

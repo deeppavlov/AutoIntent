@@ -36,4 +36,8 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     assert predictions.shape == (len(test_utterances), len(data_handler.label_description))
     np.testing.assert_almost_equal(predictions, np.array(expected_prediction).reshape(predictions.shape), decimal=1)
 
+    predictions, metadata = scorer.predict_with_metadata(test_utterances)
+    assert len(predictions) == len(test_utterances)
+    assert metadata is None
+
     scorer.clear_cache()

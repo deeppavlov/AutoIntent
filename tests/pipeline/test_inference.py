@@ -53,7 +53,8 @@ def test_inference_config(dataset, task_type):
     else:
         assert prediction.shape == (2,)
 
-    inference_pipeline.predict_with_metadata(utterances)
+    rich_outputs = inference_pipeline.predict_with_metadata(utterances)
+    assert len(rich_outputs.predictions) == len(utterances)
 
     context.dump()
     context.vector_index_client.delete_db()
@@ -69,7 +70,7 @@ def test_inference_context(dataset, task_type):
 
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False, clear_ram=False))
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
@@ -83,7 +84,8 @@ def test_inference_context(dataset, task_type):
     else:
         assert prediction.shape == (2,)
 
-    inference_pipeline.predict_with_metadata(utterances)
+    rich_outputs = inference_pipeline.predict_with_metadata(utterances)
+    assert len(rich_outputs.predictions) == len(utterances)
 
     context.dump()
     context.vector_index_client.delete_db()
