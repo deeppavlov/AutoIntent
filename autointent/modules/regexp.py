@@ -7,6 +7,7 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler.data_handler import RegexPatterns
+from autointent.context.data_handler.schemas import Intent
 from autointent.context.optimization_info.data_models import Artifact
 from autointent.custom_types import LabelType
 from autointent.metrics.regexp import RegexpMetricFn
@@ -21,14 +22,20 @@ class RegexPatternsCompiled(TypedDict):
 
 
 class RegExp(Module):
-    regexp_patterns: list[RegexPatterns]
-    regexp_patterns_compiled: list[RegexPatternsCompiled]
-
     @classmethod
     def from_context(cls, context: Context) -> Self:
         return cls()
 
-    def fit(self) -> None:
+    def fit(self, intents: list[dict[str, Any]]) -> None:
+        intents_parsed = [Intent(**dct) for dct in intents]
+        self.regexp_patterns = [
+            RegexPatterns(
+                id=intent.id,
+                regexp_full_match=intent.regexp_full_match,
+                regexp_partial_match=intent.regexp_partial_match,
+            )
+            for intent in intents_parsed
+        ]
         self._compile_regex_patterns()
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
