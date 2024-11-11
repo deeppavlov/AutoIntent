@@ -10,6 +10,7 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.custom_types import LabelType
+from autointent.metrics.converter import transform
 
 from .base import PredictionModule, apply_tags
 
@@ -78,7 +79,8 @@ class AdaptivePredictor(PredictionModule):
 
         self._r = metadata["r"]
         self.multilabel = metadata["multilabel"]
-        self.tags = metadata["tags"]
+        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
+        self.metadata = metadata
 
 
 def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -93,8 +95,8 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     return res
 
 
-def multilabel_score(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
+def multilabel_score(y_true: list[LabelType] | list[list[LabelType]], y_pred: list[LabelType] | list[list[LabelType]]) -> float:
+
+    y_true_, y_pred_ = transform(y_true, y_pred)
 
     return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]
