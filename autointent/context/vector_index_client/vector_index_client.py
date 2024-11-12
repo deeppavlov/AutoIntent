@@ -1,6 +1,8 @@
 import json
 import logging
 import shutil
+import stat
+from collections.abc import Callable
 from pathlib import Path
 
 from autointent.custom_types import LabelType
@@ -107,10 +109,15 @@ class VectorIndexClient:
         return self._get_index_dirpath(model_name) is not None
 
     def delete_db(self) -> None:
-        shutil.rmtree(self.db_dir)
+        shutil.rmtree(self.db_dir, onexc=redo_with_write)
 
 
 class NonExistingIndexError(Exception):
     def __init__(self, message: str = "non-existent index was requested") -> None:
         self.message = message
         super().__init__(message)
+
+
+def redo_with_write(redo_func: Callable, path: Path, err: Exception) -> None:  # noqa: ARG001
+    Path.chmod(path, stat.S_IWRITE)
+    redo_func(path)
