@@ -4,6 +4,7 @@ import shutil
 import stat
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from autointent.custom_types import LabelType
 
@@ -109,7 +110,7 @@ class VectorIndexClient:
         return self._get_index_dirpath(model_name) is not None
 
     def delete_db(self) -> None:
-        shutil.rmtree(self.db_dir, onerror=redo_with_write)  # type: ignore[call-arg]
+        shutil.rmtree(self.db_dir, onerror=redo_with_write)  # type: ignore[arg-type]
 
 
 class NonExistingIndexError(Exception):
@@ -118,6 +119,6 @@ class NonExistingIndexError(Exception):
         super().__init__(message)
 
 
-def redo_with_write(redo_func: Callable, path: Path, err: Exception) -> None:  # noqa: ARG001 # type: ignore[type-arg]
-    Path.chmod(path, stat.S_IWRITE)
+def redo_with_write(redo_func: Callable[..., Any], path: str, err: Exception) -> None:  # noqa: ARG001
+    Path.chmod(Path(path), stat.S_IWRITE)
     redo_func(path)
