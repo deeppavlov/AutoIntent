@@ -111,7 +111,7 @@ class KNNScorer(ScoringModule):
         return apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
 
     def clear_cache(self) -> None:
-        self._vector_index.delete()
+        self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = KNNScorerDumpMetadata(

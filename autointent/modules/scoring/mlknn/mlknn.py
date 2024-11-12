@@ -178,7 +178,7 @@ class MLKnnScorer(ScoringModule):
         return result
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = MLKnnScorerDumpMetadata(

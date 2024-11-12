@@ -1,5 +1,6 @@
 import json
 import logging
+import shutil
 from pathlib import Path
 from typing import TypedDict
 
@@ -37,12 +38,17 @@ class Embedder:
 
         self.logger = logging.getLogger(__name__)
 
-    def delete(self) -> None:
+    def clear_ram(self) -> None:
         self.logger.debug("deleting embedder %s", self.model_name)
         self.embedding_model.cpu()
         del self.embedding_model
 
+    def delete(self) -> None:
+        self.clear_ram()
+        shutil.rmtree(self.dump_dir)
+
     def dump(self, path: Path) -> None:
+        self.dump_dir = path
         metadata = EmbedderDumpMetadata(
             batch_size=self.batch_size,
             max_length=self.max_length,
@@ -53,6 +59,7 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     def load(self, path: Path | str) -> None:
+        self.dump_dir = path
         path = Path(path)
         with (path / self.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)

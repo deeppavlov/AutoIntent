@@ -76,7 +76,7 @@ class VectorDBModule(RetrievalModule):
         return RetrieverArtifact(embedder_name=self.embedder_name)
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = VectorDBMetadata(

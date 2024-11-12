@@ -134,7 +134,7 @@ class LinearScorer(ScoringModule):
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self._embedder.delete()
+        self._embedder.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = LinearScorerDumpDict(

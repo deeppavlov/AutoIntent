@@ -1,5 +1,6 @@
 import json
 import logging
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -47,12 +48,15 @@ class VectorIndex:
 
     def delete(self) -> None:
         self.logger.debug("deleting vector index %s", self.model_name)
-        if hasattr(self, "index"):
-            self.index.reset()
+        self.embedder.delete()
+        self.clear_ram()
+        shutil.rmtree(self.dump_dir)
+
+    def clear_ram(self) -> None:
+        self.logger.debug("clearing vector index %s from ram", self.model_name)
+        self.index.reset()
         self.labels = []
         self.texts = []
-
-        self.embedder.delete()
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
         query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts)  # type: ignore[assignment]
@@ -123,8 +127,7 @@ class VectorIndex:
             json.dump(self.labels, file, indent=4, ensure_ascii=False)
 
     def load(self, dir_path: Path | None = None) -> None:
-        self.delete()
-
+        self.dump_dir = dir_path
         if dir_path is None:
             dir_path = self.dump_dir
         self.index = faiss.read_index(str(dir_path / "index.faiss"))

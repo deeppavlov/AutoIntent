@@ -176,7 +176,7 @@ class DNNCScorer(ScoringModule):
         return build_result(np.array(scores), np.array(labels), n_classes)
 
     def clear_cache(self) -> None:
-        pass
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = DNNCScorerDumpMetadata(

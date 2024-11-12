@@ -127,7 +127,7 @@ class DescriptionScorer(ScoringModule):
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self.embedder.delete()
+        self.embedder.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = DescriptionScorerDumpMetadata(
