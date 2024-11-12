@@ -6,11 +6,12 @@ from transformers import set_seed
 
 from autointent.custom_types import LabelType
 
+from .dataset import DatasetDict
 from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
-from .schemas import Dataset, DatasetType
+from .schemas import Dataset
 from .scheme import UtteranceRecord
-from .stratification import split_sample_utterances
+from .stratification import split
 from .tags import collect_tags
 
 logger = logging.getLogger(__name__)
@@ -51,41 +52,39 @@ class DataAugmenter:
 class DataHandler:
     def __init__(
         self,
-        dataset: Dataset,
-        test_dataset: Dataset | None = None,
+        dataset: DatasetDict,
         force_multilabel: bool = False,
         random_seed: int = 0,
         augmenter: DataAugmenter | None = None,
     ) -> None:
         set_seed(random_seed)
 
+        dataset = dataset.filter_oos()
+
         if force_multilabel:
             dataset = dataset.to_multilabel()
 
-        self.multilabel = dataset.type == DatasetType.multilabel
+        if dataset.multilabel:
+            dataset = dataset.one_hot_labels()
+
+        self.multilabel = dataset.multilabel
+        self.n_classes = dataset.n_classes
+
         self.label_description: list[str | None] = [
             intent.description for intent in sorted(dataset.intents, key=lambda x: x.id)
-        ]
+        ] # TODO
 
         if augmenter is not None:
-            dataset = augmenter(dataset)
+            dataset = augmenter(dataset) # TODO
 
         logger.debug("collecting tags from multiclass intent_records if present...")
-        self.tags = collect_tags(dataset)
+        self.tags = collect_tags(dataset) # TODO
 
         logger.info("defining train and test splits...")
-        (
-            self.n_classes,
-            self.oos_utterances,
-            self.utterances_train,
-            self.utterances_test,
-            self.labels_train,
-            self.labels_test,
-        ) = split_sample_utterances(
-            dataset=dataset,
-            test_dataset=test_dataset,
-            random_seed=random_seed,
-        )
+        dataset = split(dataset, random_seed=random_seed)
+        self.utterances_train, self.labels_train = dataset["train"]["text"], dataset["train"]["label"]
+        self.utterances_test, self.labels_test = dataset["test"]["text"], dataset["test"]["label"]
+        self.utterances_oos = dataset["oos"]["text"]
 
         logger.debug("collection regexp patterns from multiclass intent records")
         self.regexp_patterns = [
@@ -95,7 +94,7 @@ class DataHandler:
                 regexp_partial_match=intent.regexp_partial_match,
             )
             for intent in dataset.intents
-        ]
+        ] # TODO
 
         self._logger = logger
 

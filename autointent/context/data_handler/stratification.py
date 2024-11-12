@@ -10,7 +10,42 @@ from skmultilearn.model_selection import IterativeStratification
 
 from autointent.custom_types import LabelType
 
+from .dataset import DatasetDict
 from .schemas import Dataset, DatasetType
+
+
+class StratifiedSplitter:
+    def __init__(self, test_size: float, random_seed: int) -> None:
+        self.test_size = test_size
+        self.random_seed = random_seed
+
+    def __call__(self, dataset: Dataset, multilabel: bool) -> tuple[Dataset, Dataset]:
+        splits = self._split_multilabel(dataset) if multilabel else self._split(dataset)
+        return dataset.select(splits[0]), dataset.select(splits[1])
+
+    def _split(self, dataset: Dataset) -> ...:
+        return train_test_split(
+            np.arange(len(dataset)),
+            test_size=self.test_size,
+            random_state=self.random_seed,
+            shuffle=True,
+            stratify=dataset["label"],
+        )
+
+    def _split_multilabel(self, dataset: Dataset) -> ...:
+        splitter = IterativeStratification(
+            n_splits=2,
+            order=2,
+            sample_distribution_per_fold=[self.test_size, 1.0 - self.test_size],
+        )
+        return next(splitter.split(np.arange(len(dataset)), np.array(dataset["label"])))
+
+
+def split(dataset: DatasetDict, random_seed: int) -> DatasetDict:
+    splitter = StratifiedSplitter(test_size=0.25, random_seed=random_seed)
+    train_dataset, test_dataset = splitter(dataset["train"], dataset.multilabel)
+    dataset["train"], dataset["test"] = train_dataset, test_dataset
+    return dataset
 
 
 def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[Any], list[Any]]:
