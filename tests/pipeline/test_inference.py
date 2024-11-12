@@ -1,20 +1,18 @@
 import importlib.resources as ires
-import os
 from pathlib import Path
 from typing import Literal
 
 import pytest
 
+from autointent.configs.inference_cli import InferenceConfig
 from autointent.configs.optimization_cli import (
-    DataConfig,
     EmbedderConfig,
     LoggingConfig,
-    OptimizationConfig,
-    TaskConfig,
     VectorIndexConfig,
 )
+from autointent.pipeline.inference import InferencePipeline
+from autointent.pipeline.inference.cli_endpoint import main as inference_pipeline
 from autointent.pipeline.optimization import PipelineOptimizer
-from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
 from autointent.pipeline.optimization.utils import load_config
 from tests.conftest import setup_environment
 
@@ -34,79 +32,81 @@ def get_search_space(task_type: TaskType):
     "task_type",
     ["multiclass", "multilabel", "description"],
 )
-def test_no_context_optimization(dataset, task_type):
+def test_inference_config(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
+    inference_config = context.optimization_info.get_inference_nodes_config()
+
+    inference_pipeline = InferencePipeline.from_config(inference_config)
+    prediction = inference_pipeline.predict(["123", "hello world"])
+    if task_type == "multilabel":
+        assert prediction.shape == (2, len(dataset.intents))
+    else:
+        assert prediction.shape == (2,)
+
     context.dump()
+    context.vector_index_client.delete_db()
 
 
 @pytest.mark.parametrize(
     "task_type",
     ["multiclass", "multilabel", "description"],
 )
-def test_save_db(dataset, task_type):
+def test_inference_context(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
     context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
-    context.dump()
+    inference_pipeline = InferencePipeline.from_context(context)
+    prediction = inference_pipeline.predict(["123", "hello world"])
 
-    assert os.listdir(db_dir)
+    if task_type == "multilabel":
+        assert prediction.shape == (2, len(dataset.intents))
+    else:
+        assert prediction.shape == (2,)
+
+    context.dump()
+    context.vector_index_client.delete_db()
 
 
 @pytest.mark.parametrize(
     "task_type",
     ["multiclass", "multilabel", "description"],
 )
-def test_dump_modules(dataset, task_type):
+def test_inference_pipeline_cli(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
-
-    context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
-    context.dump()
-
-    assert os.listdir(dump_dir)
-
-
-@pytest.mark.parametrize(
-    "task_type",
-    ["multiclass", "multilabel", "description"],
-)
-def test_optimization_pipeline_cli(task_type):
-    db_dir, dump_dir, logs_dir = setup_environment()
-    config = OptimizationConfig(
-        data=DataConfig(
-            train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
-            force_multilabel=(task_type == "multilabel"),
-        ),
-        task=TaskConfig(
-            search_space_path=get_search_space_path(task_type),
-        ),
-        vector_index=VectorIndexConfig(
-            device="cpu",
-        ),
-        logs=LoggingConfig(
-            dirpath=Path(logs_dir),
-        ),
+    pipeline_optimizer.set_config(
+        logging_config := LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True)
     )
-    optimize_pipeline(config)
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    context = pipeline_optimizer.optimize_from_dataset(dataset, force_multilabel=(task_type == "multilabel"))
+
+    context.dump()
+
+    config = InferenceConfig(
+        data_path=ires.files("tests.assets.data").joinpath("utterances.json"),
+        source_dir=logging_config.dirpath,
+        output_path=logging_config.dump_dir / "predictions.json",
+        log_level="CRITICAL",
+    )
+    inference_pipeline(config)
+    context.vector_index_client.delete_db()

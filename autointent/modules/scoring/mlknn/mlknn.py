@@ -42,7 +42,7 @@ class MLKnnScorer(ScoringModule):
     def __init__(
         self,
         k: int,
-        model_name: str,
+        embedder_name: str,
         db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
@@ -53,7 +53,7 @@ class MLKnnScorer(ScoringModule):
         if db_dir is None:
             db_dir = str(get_db_dir())
         self.k = k
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
         self.db_dir = db_dir
@@ -68,26 +68,29 @@ class MLKnnScorer(ScoringModule):
         k: int,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        model_name: str | None = None,
+        embedder_name: str | None = None,
     ) -> Self:
-        if model_name is None:
-            model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
         else:
-            prebuilt_index = context.vector_index_client.exists(model_name)
+            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
             k=k,
-            model_name=model_name,
+            embedder_name=embedder_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            db_dir=str(context.db_dir),
-            device=context.device,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            db_dir=str(context.get_db_dir()),
+            device=context.get_device(),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
+
+    def get_embedder_name(self) -> str:
+        return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if not isinstance(labels[0], list):
@@ -100,12 +103,12 @@ class MLKnnScorer(ScoringModule):
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.model_name)
+            self.vector_index = vector_index_client.get_index(self.embedder_name)
             if len(utterances) != len(self.vector_index.texts):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
         else:
-            self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         self.features = (
             self.vector_index.embedder.embed(utterances)
@@ -175,7 +178,7 @@ class MLKnnScorer(ScoringModule):
         return result
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = MLKnnScorerDumpMetadata(
@@ -218,4 +221,4 @@ class MLKnnScorer(ScoringModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self.vector_index = vector_index_client.get_index(self.model_name)
+        self.vector_index = vector_index_client.get_index(self.embedder_name)

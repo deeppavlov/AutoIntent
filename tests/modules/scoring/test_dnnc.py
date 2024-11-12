@@ -3,12 +3,13 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DNNCScorer
+from tests.conftest import setup_environment
 
 
 @pytest.mark.xfail(reason="This test is failing on windows, because have different score")
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1), (False, 0.5)])
-def test_base_dnnc(setup_environment, dataset, train_head, pred_score):
-    db_dir, dump_dir, logs_dir = setup_environment
+def test_base_dnnc(dataset, train_head, pred_score):
+    db_dir, dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
