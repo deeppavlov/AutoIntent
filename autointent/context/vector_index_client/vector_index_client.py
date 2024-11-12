@@ -1,6 +1,5 @@
 import json
 import logging
-import shutil
 from pathlib import Path
 
 from autointent.custom_types import LabelType
@@ -114,7 +113,7 @@ class VectorIndexClient:
             indexes_dirnames: DIRNAMES_TYPE = json.load(file)
         for embedder_name in indexes_dirnames:
             self.delete_index(embedder_name)
-        shutil.rmtree(self.db_dir)
+        path.unlink()
 
 
 class NonExistingIndexError(Exception):

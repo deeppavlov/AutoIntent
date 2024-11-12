@@ -1,6 +1,5 @@
 import json
 import logging
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -50,7 +49,9 @@ class VectorIndex:
         self.logger.debug("deleting vector index %s", self.model_name)
         self.embedder.delete()
         self.clear_ram()
-        shutil.rmtree(self.dump_dir)
+        (self.dump_dir / "index.faiss").unlink()
+        (self.dump_dir / "texts.json").unlink()
+        (self.dump_dir / "labels.json").unlink()
 
     def clear_ram(self) -> None:
         self.logger.debug("clearing vector index %s from ram", self.model_name)
@@ -126,10 +127,8 @@ class VectorIndex:
         with (self.dump_dir / "labels.json").open("w") as file:
             json.dump(self.labels, file, indent=4, ensure_ascii=False)
 
-    def load(self, dir_path: Path | None = None) -> None:
-        self.dump_dir = dir_path
-        if dir_path is None:
-            dir_path = self.dump_dir
+    def load(self, dir_path: Path) -> None:
+        self.dump_dir = Path(dir_path)
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
         self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.device)
         with (dir_path / "texts.json").open() as file:

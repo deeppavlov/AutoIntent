@@ -45,7 +45,9 @@ class Embedder:
 
     def delete(self) -> None:
         self.clear_ram()
-        shutil.rmtree(self.dump_dir)
+        shutil.rmtree(
+            self.dump_dir, ignore_errors=True
+        )  # TODO: `ignore_errors=True` is workaround for PermissionError: [WinError 5] Access is denied
 
     def dump(self, path: Path) -> None:
         self.dump_dir = path
@@ -59,7 +61,7 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     def load(self, path: Path | str) -> None:
-        self.dump_dir = path
+        self.dump_dir = Path(path)
         path = Path(path)
         with (path / self.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
