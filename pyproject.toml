@@ -55,6 +55,12 @@ types-pygments = "^2.18.0.20240506"
 types-setuptools = "^75.2.0.20241019"
 joblib-stubs = "^1.4.2.5.20240918"
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^8.1.3"
+
 [tool.poetry.scripts]
 "autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
