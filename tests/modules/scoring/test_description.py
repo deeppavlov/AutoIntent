@@ -17,7 +17,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     db_dir, dump_dir, logs_dir = setup_environment()
     data_handler = DataHandler(dataset, force_multilabel=multilabel)
 
-    scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir, temperature=0.3, device="cpu")
+    scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, device="cpu")
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train, data_handler.label_description)
     assert scorer.description_vectors.shape[0] == len(data_handler.label_description)
