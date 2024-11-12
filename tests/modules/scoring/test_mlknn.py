@@ -2,10 +2,11 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler, Dataset
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
+from tests.conftest import setup_environment
 
 
-def test_base_mlknn(setup_environment, dataset):
-    db_dir, dump_dir, logs_dir = setup_environment
+def test_base_mlknn(dataset):
+    db_dir, dump_dir, logs_dir = setup_environment()
 
     test_dataset = Dataset.model_validate(
         {
@@ -23,7 +24,7 @@ def test_base_mlknn(setup_environment, dataset):
     )
     data_handler = DataHandler(dataset, test_dataset, force_multilabel=True)
 
-    scorer = MLKnnScorer(db_dir=db_dir(), k=3, model_name="sergeyzh/rubert-tiny-turbo")
+    scorer = MLKnnScorer(db_dir=db_dir, k=3, embedder_name="sergeyzh/rubert-tiny-turbo")
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
 
     predictions = scorer.predict_labels(

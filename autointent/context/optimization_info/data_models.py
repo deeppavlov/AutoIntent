@@ -79,7 +79,7 @@ class Trial(BaseModel):
     module_params: dict[str, Any]
     metric_name: str
     metric_value: float
-    module_dump_dir: str
+    module_dump_dir: str | None
 
 
 class Trials(BaseModel):

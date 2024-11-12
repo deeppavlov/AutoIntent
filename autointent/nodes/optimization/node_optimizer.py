@@ -39,6 +39,10 @@ class NodeOptimizer:
                 self._logger.debug("initializing %s module...", module_type)
                 module = self.node_info.modules_available[module_type].from_context(context, **module_kwargs)
 
+                embedder_name = module.get_embedder_name()
+                if embedder_name is not None:
+                    module_kwargs["embedder_name"] = embedder_name
+
                 self._logger.debug("optimizing %s module...", module_type)
                 self.module_fit(module, context)
 
@@ -46,8 +50,14 @@ class NodeOptimizer:
                 metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
 
                 assets = module.get_assets()
-                module_dump_dir = self.get_module_dump_dir(context.dump_dir, module_type, j_combination)
-                module.dump(module_dump_dir)
+
+                dump_dir = context.get_dump_dir()
+
+                if dump_dir is not None:
+                    module_dump_dir = self.get_module_dump_dir(dump_dir, module_type, j_combination)
+                    module.dump(module_dump_dir)
+                else:
+                    module_dump_dir = None
 
                 context.optimization_info.log_module_optimization(
                     self.node_info.node_type,
@@ -57,11 +67,13 @@ class NodeOptimizer:
                     self.metric_name,
                     assets,  # retriever name / scores / predictions
                     module_dump_dir,
+                    module=module if not context.is_ram_to_clear() else None,
                 )
 
-                module.clear_cache()
-                gc.collect()
-                torch.cuda.empty_cache()
+                if context.is_ram_to_clear():
+                    module.clear_cache()
+                    gc.collect()
+                    torch.cuda.empty_cache()
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 

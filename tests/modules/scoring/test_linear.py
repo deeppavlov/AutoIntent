@@ -2,10 +2,11 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
+from tests.conftest import setup_environment
 
 
-def test_base_linear(setup_environment, dataset):
-    get_db_dir, dump_dir, logs_dir = setup_environment
+def test_base_linear(dataset):
+    get_db_dir, dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 

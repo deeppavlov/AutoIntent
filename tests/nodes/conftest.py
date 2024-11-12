@@ -1,7 +1,9 @@
 import pytest
 
 from autointent import Context
+from autointent.configs.optimization_cli import DataConfig, LoggingConfig, VectorIndexConfig
 from autointent.nodes.optimization import NodeOptimizer
+from tests.conftest import setup_environment
 
 
 @pytest.fixture
@@ -24,7 +26,7 @@ def get_retrieval_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "model_name": [
+                "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
                 "module_type": "vector_db",
@@ -68,10 +70,14 @@ def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
 
 
 @pytest.fixture
-def context(setup_environment, dataset):
-    db_dir, dump_dir, logs_dir = setup_environment
+def context(dataset_path):
+    db_dir, dump_dir, logs_dir = setup_environment()
 
     def _context(multilabel: bool):
-        return Context(dataset=dataset, db_dir=db_dir(), dump_dir=dump_dir, force_multilabel=multilabel)
+        res = Context()
+        res.configure_data(DataConfig(dataset_path, force_multilabel=multilabel))
+        res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
+        res.configure_vector_index(VectorIndexConfig(db_dir=db_dir))
+        return res
 
     return _context
