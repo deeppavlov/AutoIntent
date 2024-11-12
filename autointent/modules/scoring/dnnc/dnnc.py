@@ -52,17 +52,20 @@ class DNNCScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
-
         self.cross_encoder_name = cross_encoder_name
         self.embedder_name = embedder_name
         self.k = k
         self.train_head = train_head
         self.device = device
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -114,19 +117,18 @@ class DNNCScorer(ScoringModule):
             self.model = model
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Return
-        ---
-        `(n_queries, n_classes)` matrix with zeros everywhere except the class of the best neighbor utterance
-        """
-        labels, _, texts = self.vector_index.query(
-            utterances,
-            self.k,
-        )
+        return self._predict(utterances)[0]
 
-        cross_encoder_scores = self._get_cross_encoder_scores(utterances, texts)
-
-        return self._build_result(cross_encoder_scores, labels)
+    def predict_with_metadata(
+        self,
+        utterances: list[str],
+    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        scores, neighbors, neighbors_scores = self._predict(utterances)
+        metadata = [
+            {"neighbors": utterance_neighbors, "scores": utterance_neighbors_scores}
+            for utterance_neighbors, utterance_neighbors_scores in zip(neighbors, neighbors_scores, strict=True)
+        ]
+        return scores, metadata
 
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
         """
@@ -214,6 +216,19 @@ class DNNCScorer(ScoringModule):
             self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
         else:
             self.model = CrossEncoder(crossencoder_dir, device=self.device)
+
+    def _predict(
+        self,
+        utterances: list[str],
+    ) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
+        labels, _, neigbors = self.vector_index.query(
+            utterances,
+            self.k,
+        )
+
+        cross_encoder_scores = self._get_cross_encoder_scores(utterances, neigbors)
+
+        return self._build_result(cross_encoder_scores, labels), neigbors, cross_encoder_scores
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

@@ -32,11 +32,9 @@ class VectorDBModule(RetrievalModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
         self.embedder_name = embedder_name
         self.device = device
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
 
@@ -57,6 +55,12 @@ class VectorDBModule(RetrievalModule):
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
         )
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         vector_index_client = VectorIndexClient(

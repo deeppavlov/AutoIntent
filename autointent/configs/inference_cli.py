@@ -11,6 +11,7 @@ class InferenceConfig:
     source_dir: str
     output_path: str
     log_level: LogLevel = LogLevel.ERROR
+    with_metadata: bool = False
 
 
 cs = ConfigStore.instance()
