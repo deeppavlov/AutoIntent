@@ -10,7 +10,7 @@ def test_base_linear(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
+    scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu")
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     test_data = [
@@ -42,3 +42,7 @@ def test_base_linear(dataset):
         predictions,
         decimal=2,
     )
+
+    predictions, metadata = scorer.predict_with_metadata(test_data)
+    assert len(predictions) == len(test_data)
+    assert metadata is None

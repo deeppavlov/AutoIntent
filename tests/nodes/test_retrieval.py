@@ -6,11 +6,13 @@ import torch
 from autointent.configs.node import InferenceNodeConfig
 from autointent.nodes import InferenceNode, NodeOptimizer
 
+from .conftest import get_context
+
 logger = logging.getLogger(__name__)
 
 
-def test_retrieval_multiclass(context):
-    context = context(multilabel=False)
+def test_retrieval_multiclass():
+    context = get_context(multilabel=False)
     retrieval_optimizer = get_retrieval_optimizer(multilabel=False)
     retrieval_optimizer.fit(context)
 
@@ -28,8 +30,8 @@ def test_retrieval_multiclass(context):
         torch.cuda.empty_cache()
 
 
-def test_retrieval_multilabel(context):
-    context = context(multilabel=True)
+def test_retrieval_multilabel():
+    context = get_context(multilabel=True)
     retrieval_optimizer = get_retrieval_optimizer(multilabel=True)
     retrieval_optimizer.fit(context)
 

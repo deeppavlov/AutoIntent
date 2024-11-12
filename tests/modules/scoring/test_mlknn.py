@@ -24,16 +24,20 @@ def test_base_mlknn(dataset):
     )
     data_handler = DataHandler(dataset, test_dataset, force_multilabel=True)
 
-    scorer = MLKnnScorer(db_dir=db_dir, k=3, embedder_name="sergeyzh/rubert-tiny-turbo")
+    scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, db_dir=db_dir, device="cpu")
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
 
-    predictions = scorer.predict_labels(
-        [
-            "why is there a hold on my american saving bank account",
-            "i am nost sure why my account is blocked",
-            "why is there a hold on my capital one checking account",
-            "i think my account is blocked but i do not know the reason",
-            "can you tell me why is my bank account frozen",
-        ]
-    )
+    test_data = [
+        "why is there a hold on my american saving bank account",
+        "i am nost sure why my account is blocked",
+        "why is there a hold on my capital one checking account",
+        "i think my account is blocked but i do not know the reason",
+        "can you tell me why is my bank account frozen",
+    ]
+
+    predictions = scorer.predict_labels(test_data)
     assert (predictions == np.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]])).all()
+
+    predictions, metadata = scorer.predict_with_metadata(test_data)
+    assert len(predictions) == len(test_data)
+    assert "neighbors" in metadata[0]

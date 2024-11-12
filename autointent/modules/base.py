@@ -48,6 +48,13 @@ class Module(ABC):
     def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
         """inference"""
 
+    def predict_with_metadata(
+        self,
+        *args: list[str] | npt.NDArray[Any],
+        **kwargs: dict[str, Any],
+    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        return self.predict(*args, **kwargs), None
+
     @classmethod
     @abstractmethod
     def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:

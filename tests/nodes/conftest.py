@@ -3,7 +3,7 @@ import pytest
 from autointent import Context
 from autointent.configs.optimization_cli import DataConfig, LoggingConfig, VectorIndexConfig
 from autointent.nodes.optimization import NodeOptimizer
-from tests.conftest import setup_environment
+from tests.conftest import get_dataset_path, setup_environment
 
 
 @pytest.fixture
@@ -38,8 +38,8 @@ def get_retrieval_optimizer(multilabel: bool):
 
 
 @pytest.fixture
-def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
-    context = context(multilabel=False)
+def scoring_optimizer_multiclass(retrieval_optimizer_multiclass):
+    context = get_context(multilabel=False)
     retrieval_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
@@ -54,8 +54,8 @@ def scoring_optimizer_multiclass(context, retrieval_optimizer_multiclass):
 
 
 @pytest.fixture
-def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
-    context = context(multilabel=True)
+def scoring_optimizer_multilabel(retrieval_optimizer_multilabel):
+    context = get_context(multilabel=True)
     retrieval_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
@@ -69,15 +69,11 @@ def scoring_optimizer_multilabel(context, retrieval_optimizer_multilabel):
     return context, NodeOptimizer.from_dict_config(scoring_optimizer_config)
 
 
-@pytest.fixture
-def context(dataset_path):
+def get_context(multilabel):
     db_dir, dump_dir, logs_dir = setup_environment()
 
-    def _context(multilabel: bool):
-        res = Context()
-        res.configure_data(DataConfig(dataset_path, force_multilabel=multilabel))
-        res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
-        res.configure_vector_index(VectorIndexConfig(db_dir=db_dir))
-        return res
-
-    return _context
+    res = Context()
+    res.configure_data(DataConfig(get_dataset_path(), force_multilabel=multilabel))
+    res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
+    res.configure_vector_index(VectorIndexConfig(db_dir=db_dir, device="cpu"))
+    return res

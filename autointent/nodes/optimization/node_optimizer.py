@@ -95,6 +95,8 @@ class NodeOptimizer:
         elif self.node_info.node_type == "prediction":
             labels, scores = get_prediction_evaluation_data(context)
             args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
+        elif self.node_info.node_type == "regexp":
+            args = ()  # type: ignore[assignment]
         else:
             msg = "something's wrong"
             self._logger.error(msg)
