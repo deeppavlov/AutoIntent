@@ -10,15 +10,15 @@ def test_base_knn(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir, device="cpu")
 
     test_data = [
-            "why is there a hold on my american saving bank account",
-            "i am nost sure why my account is blocked",
-            "why is there a hold on my capital one checking account",
-            "i think my account is blocked but i do not know the reason",
-            "can you tell me why is my bank account frozen",
-        ]
+        "why is there a hold on my american saving bank account",
+        "i am nost sure why my account is blocked",
+        "why is there a hold on my capital one checking account",
+        "i think my account is blocked but i do not know the reason",
+        "can you tell me why is my bank account frozen",
+    ]
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)
     predictions = scorer.predict(test_data)

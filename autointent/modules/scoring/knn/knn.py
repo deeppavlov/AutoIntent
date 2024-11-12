@@ -49,15 +49,19 @@ class KNNScorer(ScoringModule):
             - closest: each sample has a non zero weight iff is the closest sample of some class
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
-        if db_dir is None:
-            db_dir = str(get_db_dir())
         self.embedder_name = embedder_name
         self.k = k
         self.weights = weights
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -118,7 +122,7 @@ class KNNScorer(ScoringModule):
         return scores, metadata
 
     def clear_cache(self) -> None:
-        self._vector_index.delete()
+        self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = KNNScorerDumpMetadata(

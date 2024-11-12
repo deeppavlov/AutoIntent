@@ -50,16 +50,20 @@ class MLKnnScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
         self.k = k
         self.embedder_name = embedder_name
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -174,7 +178,7 @@ class MLKnnScorer(ScoringModule):
         return scores, metadata
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = MLKnnScorerDumpMetadata(

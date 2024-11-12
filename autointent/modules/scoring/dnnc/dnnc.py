@@ -52,17 +52,20 @@ class DNNCScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
-
         self.cross_encoder_name = cross_encoder_name
         self.embedder_name = embedder_name
         self.k = k
         self.train_head = train_head
         self.device = device
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -175,7 +178,7 @@ class DNNCScorer(ScoringModule):
         return build_result(np.array(scores), np.array(labels), n_classes)
 
     def clear_cache(self) -> None:
-        pass
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = DNNCScorerDumpMetadata(

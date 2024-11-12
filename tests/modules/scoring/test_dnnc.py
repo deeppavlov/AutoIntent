@@ -17,6 +17,8 @@ def test_base_dnnc(dataset, train_head, pred_score):
         embedder_name="sergeyzh/rubert-tiny-turbo",
         k=3,
         train_head=train_head,
+        db_dir=db_dir,
+        device="cpu",
     )
 
     scorer.fit(data_handler.utterances_train, data_handler.labels_train)

@@ -1,7 +1,6 @@
 import pytest
 
 from autointent.modules import RegExp
-from tests.conftest import setup_environment
 
 
 @pytest.mark.parametrize(
@@ -9,8 +8,6 @@ from tests.conftest import setup_environment
     [(".*", [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]), ("frozen", [[0], [0], [0], [0], [0, 1]])],
 )
 def test_base_regex(partial_match, expected_predictions):
-    db_dir, dump_dir, logs_dir = setup_environment()
-
     train_data = [
         {
             "id": 0,

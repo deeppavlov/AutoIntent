@@ -13,11 +13,10 @@ def setup_environment() -> tuple[str, str]:
     return db_dir, dump_dir, logs_dir
 
 
-@pytest.fixture
-def dataset_path():
+def get_dataset_path():
     return ires.files("tests.assets.data").joinpath("clinc_subset.json")
 
 
 @pytest.fixture
-def dataset(dataset_path):
-    return load_data(dataset_path)
+def dataset():
+    return load_data(get_dataset_path())

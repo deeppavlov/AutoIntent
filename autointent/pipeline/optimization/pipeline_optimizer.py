@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 from hydra.utils import instantiate
+from typing_extensions import Self
 
 from autointent import Context
 from autointent.configs.optimization_cli import EmbedderConfig, LoggingConfig, VectorIndexConfig
@@ -37,7 +38,7 @@ class PipelineOptimizer:
             raise TypeError(msg)
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> "PipelineOptimizer":
+    def from_dict_config(cls, config: dict[str, Any]) -> Self:
         return instantiate(PipelineOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def optimize(self, context: Context) -> None:

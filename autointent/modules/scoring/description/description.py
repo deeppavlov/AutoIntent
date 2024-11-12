@@ -11,7 +11,6 @@ from typing_extensions import Self
 from autointent.context import Context
 from autointent.context.embedder import Embedder
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
-from autointent.context.vector_index_client.cache import get_db_dir
 from autointent.custom_types import LabelType
 from autointent.modules.scoring.base import ScoringModule
 
@@ -30,22 +29,19 @@ class DescriptionScorer(ScoringModule):
     precomputed_embeddings: bool = False
     embedding_model_subdir: str = "embedding_model"
     _vector_index: VectorIndex
+    db_dir: str
     name = "description"
 
     def __init__(
         self,
         embedder_name: str,
-        db_dir: Path | None = None,
         temperature: float = 1.0,
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = get_db_dir()
         self.temperature = temperature
         self.device = device
-        self.db_dir = db_dir
         self.embedder_name = embedder_name
         self.batch_size = batch_size
         self.max_length = max_length
@@ -66,10 +62,10 @@ class DescriptionScorer(ScoringModule):
         instance = cls(
             temperature=temperature,
             device=context.get_device(),
-            db_dir=context.get_db_dir(),
             embedder_name=embedder_name,
         )
         instance.precomputed_embeddings = precomputed_embeddings
+        instance.db_dir = str(context.get_db_dir())
         return instance
 
     def get_embedder_name(self) -> str:
@@ -127,7 +123,7 @@ class DescriptionScorer(ScoringModule):
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
-        self.embedder.delete()
+        self.embedder.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = DescriptionScorerDumpMetadata(
