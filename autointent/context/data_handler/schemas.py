@@ -35,20 +35,24 @@ class Utterance(BaseModel):
 
     @cached_property
     def type(self) -> UtteranceType:
-        if self.label is None:
-            return UtteranceType.oos
-        if isinstance(self.label, int):
-            return UtteranceType.multiclass
-        return UtteranceType.multilabel
+        match self.label:
+            case None:
+                return UtteranceType.oos
+            case int():
+                return UtteranceType.multiclass
+            case _:
+                return UtteranceType.multilabel
 
     @cached_property
     def oos(self) -> bool:
-        return self.label is None
+        return self.type == UtteranceType.oos
 
     def to_multilabel(self) -> Self:
-        if self.type in {UtteranceType.multilabel, UtteranceType.oos}:
-            return self
-        return Utterance(text=self.text, label=[self.label])
+        match self.type:
+            case UtteranceType.multilabel | UtteranceType.oos:
+                return self
+            case _:
+                return Utterance(text=self.text, label=[self.label])
 
 
 class Intent(BaseModel):
