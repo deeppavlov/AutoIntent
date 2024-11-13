@@ -7,23 +7,6 @@ from openai import AsyncOpenAI
 from autointent.context.data_handler.schemas import Dataset, Intent, Utterance, UtteranceType
 from autointent.generation.prompt_scheme import PromptDescription
 
-def test_functions(
-        arg1: int,
-        arg2: str,
-) -> bool:
-    """
-    Summary line.
-
-    Extended description of function.
-
-    :param arg1: Description of arg1
-    :type arg1: int
-    :param arg2: Description of arg2
-    :type arg2: str
-    :returns: Description of return value
-    :rtype: bool
-    """
-    pass
 
 def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     """

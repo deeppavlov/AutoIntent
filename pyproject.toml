@@ -94,7 +94,7 @@ ignore = [
 max-args = 10
 
 [tool.ruff.lint.pydocstyle]
-convention = "google"
+convention = "pep257"
 
 [build-system]
 requires = ["poetry-core"]
