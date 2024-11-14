@@ -1,4 +1,5 @@
 from functools import cached_property
+from pathlib import Path
 from typing import Any, TypedDict
 
 from datasets import Dataset as HFDataset
@@ -8,7 +9,7 @@ from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
-from .data_loader import DatasetLoader, Intent
+from .data_reader import Intent, JsonReader
 
 
 class Split:
@@ -49,20 +50,16 @@ class Dataset(HFDatasetDict):
         return len(classes)
 
     @classmethod
-    def from_dataset_loader(cls, data_loader: DatasetLoader) -> Self:
-        splits = data_loader.model_dump(exclude_defaults=True)
-        intents = splits.pop("intents", [])
+    def load(cls, filepath: str | Path) -> Self:
+        reader = JsonReader().read(filepath)
+        splits = reader.model_dump(exclude={"intents"}, exclude_defaults=True)
         return cls(
-            {
-                split_name: HFDataset.from_list(split)
-                for split_name, split in splits.items()
-            },
-            intents=intents,
+            {split_name: HFDataset.from_list(split) for split_name, split in splits.items()},
+            intents=reader.intents,
         )
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         return {split: self[split].to_list() for split in self}
-
 
     def create_oos_split(self) -> None:
         oos_splits = self.filter(self._is_oos).values()
