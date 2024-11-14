@@ -18,7 +18,7 @@ def test_description_scorer(setup_environment, dataset, expected_prediction, mul
 
     scorer = DescriptionScorer(model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), temperature=0.3)
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train, data_handler.label_description)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels, data_handler.label_description)
     assert scorer.description_vectors.shape[0] == len(data_handler.label_description)
 
     test_utterances = [

@@ -74,12 +74,12 @@ class NodeOptimizer:
         if self.node_info.node_type in ["retrieval", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":
                 args = (
-                    context.data_handler.utterances_train,
-                    context.data_handler.labels_train,
+                    context.data_handler.train_utterances,
+                    context.data_handler.train_labels,
                     context.data_handler.label_description,
                 )
             else:
-                args = (context.data_handler.utterances_train, context.data_handler.labels_train)  # type: ignore[assignment]
+                args = (context.data_handler.train_utterances, context.data_handler.train_labels)  # type: ignore[assignment]
         elif self.node_info.node_type == "prediction":
             labels, scores = get_prediction_evaluation_data(context)
             args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]

@@ -24,7 +24,7 @@ def test_base_mlknn(setup_environment, dataset):
     data_handler = DataHandler(dataset, test_dataset, force_multilabel=True)
 
     scorer = MLKnnScorer(db_dir=db_dir(), k=3, model_name="sergeyzh/rubert-tiny-turbo")
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
 
     predictions = scorer.predict_labels(
         [

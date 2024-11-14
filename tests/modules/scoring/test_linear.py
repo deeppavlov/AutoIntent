@@ -11,7 +11,7 @@ def test_base_linear(setup_environment, dataset):
 
     scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

@@ -41,7 +41,7 @@ class PredictionModule(Module, ABC):
 def get_prediction_evaluation_data(
     context: Context,
 ) -> tuple[list[LabelType], npt.NDArray[Any]]:
-    labels = np.array(context.data_handler.labels_test)
+    labels = np.array(context.data_handler.test_labels)
     scores = context.optimization_info.get_best_test_scores()
 
     if scores is None:

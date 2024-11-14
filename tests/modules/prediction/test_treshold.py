@@ -15,9 +15,9 @@ def get_fit_data(db_dir, dataset):
     }
     scorer = KNNScorer(**knn_params)
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
-    scores = scorer.predict(data_handler.utterances_test + data_handler.oos_utterances)
-    labels = data_handler.labels_train + [-1] * len(data_handler.oos_utterances)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
+    scores = scorer.predict(data_handler.test_utterances + data_handler.oos_utterances)
+    labels = data_handler.train_labels + [-1] * len(data_handler.oos_utterances)
     return scores, labels
 
 

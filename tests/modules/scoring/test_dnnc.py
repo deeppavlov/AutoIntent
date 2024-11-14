@@ -14,7 +14,7 @@ def test_base_dnnc(setup_environment, dataset, train_head, pred_score):
 
     scorer = DNNCScorer("sergeyzh/rubert-tiny-turbo", k=3, train_head=train_head)
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

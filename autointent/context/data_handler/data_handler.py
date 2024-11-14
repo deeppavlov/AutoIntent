@@ -1,16 +1,13 @@
 import logging
-from collections.abc import Sequence
 from typing import Any, TypedDict
 
 from transformers import set_seed
 
 from autointent.custom_types import LabelType
 
-from .dataset import DatasetDict
+from .dataset import Dataset, Split
 from .multilabel_generation import generate_multilabel_version
 from .sampling import sample_from_regex
-from .schemas import Dataset
-from .scheme import UtteranceRecord
 from .stratification import split
 from .tags import collect_tags
 
@@ -52,41 +49,33 @@ class DataAugmenter:
 class DataHandler:
     def __init__(
         self,
-        dataset: DatasetDict,
+        dataset: Dataset,
         force_multilabel: bool = False,
         random_seed: int = 0,
         augmenter: DataAugmenter | None = None,
     ) -> None:
         set_seed(random_seed)
 
-        dataset = dataset.filter_oos()
-
+        self.dataset = dataset
         if force_multilabel:
-            dataset = dataset.to_multilabel()
-
+            self.dataset = self.dataset.to_multilabel()
         if dataset.multilabel:
-            dataset = dataset.one_hot_labels()
+            self.dataset = self.dataset.encode_labels()
 
-        self.multilabel = dataset.multilabel
-        self.n_classes = dataset.n_classes
-
-        self.label_description: list[str | None] = [
-            intent.description for intent in sorted(dataset.intents, key=lambda x: x.id)
-        ] # TODO
+        self.label_descriptions: list[str | None] = [
+            intent.description
+            for intent in sorted(dataset.intents, key=lambda x: x.id)
+        ]
 
         if augmenter is not None:
-            dataset = augmenter(dataset) # TODO
+            self.dataset = augmenter(self.dataset) # TODO
 
-        logger.debug("collecting tags from multiclass intent_records if present...")
-        self.tags = collect_tags(dataset) # TODO
+        self.tags = collect_tags(self.dataset) # TODO (class Tag)
 
-        logger.info("defining train and test splits...")
-        dataset = split(dataset, random_seed=random_seed)
-        self.utterances_train, self.labels_train = dataset["train"]["text"], dataset["train"]["label"]
-        self.utterances_test, self.labels_test = dataset["test"]["text"], dataset["test"]["label"]
-        self.utterances_oos = dataset["oos"]["text"]
+        if Split.TEST not in self.dataset:
+            logger.info("Spltting dataset into train and test splits")
+            self.dataset = split(self.dataset, random_seed=random_seed)
 
-        logger.debug("collection regexp patterns from multiclass intent records")
         self.regexp_patterns = [
             RegexPatterns(
                 id=intent.id,
@@ -94,61 +83,42 @@ class DataHandler:
                 regexp_partial_match=intent.regexp_partial_match,
             )
             for intent in dataset.intents
-        ] # TODO
+        ]
 
         self._logger = logger
 
+    @property
+    def multilabel(self) -> bool:
+        return self.dataset.multilabel
+
+    @property
+    def n_classes(self) -> int:
+        return self.dataset.n_classes
+
+    @property
+    def train_utterances(self) -> list[str]:
+        return self.dataset[Split.TRAIN][self.dataset.UTTERANCE_COLUMN]
+
+    @property
+    def train_labels(self) -> list[LabelType]:
+        return self.dataset[Split.TRAIN][self.dataset.LABEL_COLUMN]
+
+    @property
+    def test_utterances(self) -> list[str]:
+        return self.dataset[Split.TEST][self.dataset.UTTERANCE_COLUMN]
+
+    @property
+    def test_labels(self) -> list[LabelType]:
+        return self.dataset[Split.TEST][self.dataset.LABEL_COLUMN]
+
+    @property
+    def oos_utterances(self) -> list[str]:
+        if self.has_oos_samples():
+            return self.dataset[Split.OOS][self.dataset.UTTERANCE_COLUMN]
+        return []
+
     def has_oos_samples(self) -> bool:
-        return len(self.oos_utterances) > 0
+        return Split.OOS in self.dataset
 
-    def dump(
-        self,
-    ) -> tuple[list[dict[str, Any]], list[UtteranceRecord]]:
-        self._logger.debug("dumping train, test and oos data...")
-        train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
-        test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)
-        oos_data = _dump_oos(self.oos_utterances)
-        test_data = test_data + oos_data
-        return train_data, test_data  # type: ignore[return-value]
-
-
-def _dump_train(
-    utterances: list[str],
-    labels: list[LabelType],
-    n_classes: int,
-    multilabel: bool,
-) -> Sequence[dict[str, Any]]:
-    if multilabel and isinstance(labels[0], list):
-        res = []
-        for ut, labs in zip(utterances, labels, strict=True):
-            labs_converted = [i for i in range(n_classes) if labs[i]]  # type: ignore[index]
-            res.append({"utterance": ut, "labels": labs_converted})
-    elif not multilabel and isinstance(labels[0], int):
-        # TODO check if rec is used
-        res = [{"intent_id": i} for i in range(n_classes)]  # type: ignore[dict-item]
-        for ut, lab in zip(utterances, labels, strict=False):
-            rec = res[lab]  # type: ignore[index]
-            rec["sample_utterances"] = [*rec.get("sample_utterances", []), ut]
-    else:
-        message = "unexpected labels format"
-        raise ValueError(message)
-    return res
-
-
-def _dump_test(
-    utterances: list[str],
-    labels: list[LabelType],
-    n_classes: int,
-    multilabel: bool,
-) -> list[UtteranceRecord]:
-    res = []
-    for ut, labs in zip(utterances, labels, strict=True):
-        labs_converted = (
-            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]  # type: ignore[index,list-item]
-        )
-        res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
-    return res
-
-
-def _dump_oos(utterances: list[str]) -> list[UtteranceRecord]:
-    return [UtteranceRecord(utterance=ut, labels=[]) for ut in utterances]
+    def dump(self) -> dict[str, list[dict[str, Any]]]:
+        return self.dataset.dump()

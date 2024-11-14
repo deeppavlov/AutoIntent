@@ -1,14 +1,11 @@
 
-from datasets import Dataset
 from pydantic import BaseModel
 
 from autointent.custom_types import LabelType
 
-from .dataset import DatasetDict
 
-
-class Utterance(BaseModel):
-    text: str
+class Sample(BaseModel):
+    utterance: str
     label: LabelType | None = None
 
 
@@ -22,16 +19,7 @@ class Intent(BaseModel):
 
 
 class DatasetLoader(BaseModel):
-    train: list[Utterance]
-    validation: list[Utterance] = []
-    test: list[Utterance] = []
+    train: list[Sample]
+    validation: list[Sample] = []
+    test: list[Sample] = []
     intents: list[Intent] = []
-
-
-    def to_dataset(self) -> DatasetDict:
-        return DatasetDict(
-            {
-                split_name: Dataset.from_list(split)
-                for split_name, split in self.model_dump(exclude_defaults=True)
-            }
-        )

@@ -61,10 +61,10 @@ def test_data_handler_initialization(sample_multiclass_data):
 
     assert handler.multilabel is False
     assert handler.n_classes == 2
-    assert handler.utterances_train == ["hello", "hi", "goodbye", "bye"]
-    assert handler.utterances_test == ["greetings", "farewell"]
-    assert handler.labels_train == [0, 0, 1, 1]
-    assert handler.labels_test == [0, 1]
+    assert handler.train_utterances == ["hello", "hi", "goodbye", "bye"]
+    assert handler.test_utterances == ["greetings", "farewell"]
+    assert handler.train_labels == [0, 0, 1, 1]
+    assert handler.test_labels == [0, 1]
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
@@ -77,10 +77,10 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
 
     assert handler.multilabel is True
     assert handler.n_classes == 2
-    assert handler.utterances_train == ["hello and goodbye", "hi there"]
-    assert handler.utterances_test == ["greetings", "farewell"]
-    assert handler.labels_train == [[1, 1], [1, 0]]
-    assert handler.labels_test == [[1, 0], [0, 1]]
+    assert handler.train_utterances == ["hello and goodbye", "hi there"]
+    assert handler.test_utterances == ["greetings", "farewell"]
+    assert handler.train_labels == [[1, 1], [1, 0]]
+    assert handler.test_labels == [[1, 0], [0, 1]]
 
 
 def test_regex_sampling(sample_multiclass_data):

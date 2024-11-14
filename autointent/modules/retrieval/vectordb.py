@@ -67,10 +67,10 @@ class VectorDBModule(RetrievalModule):
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(
-            context.data_handler.utterances_test,
+            context.data_handler.test_utterances,
             self.k,
         )
-        return metric_fn(context.data_handler.labels_test, labels_pred)
+        return metric_fn(context.data_handler.test_labels, labels_pred)
 
     def get_assets(self) -> RetrieverArtifact:
         return RetrieverArtifact(embedder_name=self.model_name)

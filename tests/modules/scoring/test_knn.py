@@ -11,7 +11,7 @@ def test_base_knn(setup_environment, dataset):
 
     scorer = KNNScorer(k=3, weights="distance", model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir())
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     predictions = scorer.predict(
         [
             "why is there a hold on my american saving bank account",

@@ -1,17 +1,45 @@
-from typing import Any
+from functools import cached_property
+from typing import Any, TypedDict
 
-from datasets import Dataset, Sequence, concatenate_datasets
+from datasets import Dataset as HFDataset
 from datasets import DatasetDict as HFDatasetDict
+from datasets import Sequence, concatenate_datasets
 from typing_extensions import Self
 
+from autointent.custom_types import LabelType
 
-class DatasetDict(HFDatasetDict):
-    utterance_splits = ("train", "validation", "test")
+from .data_loader import DatasetLoader, Intent
+
+
+class Split:
+    TRAIN = "train"
+    VALIDATION = "validation"
+    TEST = "test"
+    OOS = "oos"
+
+
+class Sample(TypedDict):
+    utterance: str
+    label: LabelType | None
+
+
+class Dataset(HFDatasetDict):
+    LABEL_COLUMN = "label"
+    UTTERANCE_COLUMN = "utterance"
+
+    def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.intents = intents
+        self.create_oos_split()
 
     @property
+    def multilabel(self) -> bool:
+        return isinstance(self[Split.TRAIN].features[self.LABEL_COLUMN], Sequence)
+
+    @cached_property
     def n_classes(self) -> int:
         classes = set()
-        for label in self["train"]["label"]:
+        for label in self[Split.TRAIN][self.LABEL_COLUMN]:
             match label:
                 case int():
                     classes.add(label)
@@ -20,48 +48,56 @@ class DatasetDict(HFDatasetDict):
                         classes.add(label_)
         return len(classes)
 
-    @property
-    def multilabel(self) -> bool:
-        return isinstance(self["train"].features["label"], Sequence)
+    @classmethod
+    def from_dataset_loader(cls, data_loader: DatasetLoader) -> Self:
+        splits = data_loader.model_dump(exclude_defaults=True)
+        intents = splits.pop("intents", [])
+        return cls(
+            {
+                split_name: HFDataset.from_list(split)
+                for split_name, split in splits.items()
+            },
+            intents=intents,
+        )
 
-    def filter_oos(self) -> Self:
-        oos_splits = []
-        for split in self.utterance_splits:
-            if split in self:
-                is_split, oos_split = self._filter_oos(self[split])
-                self[split] = is_split
-                oos_splits.append(oos_split)
-        self["oos"] = concatenate_datasets(oos_splits)
-        return self
+    def dump(self) -> dict[str, list[dict[str, Any]]]:
+        return {split: self[split].to_list() for split in self}
 
-    def one_hot_labels(self) -> Self:
-        for split in self.utterance_splits:
-            if split in self:
-                self[split] = self[split].map(self._one_hot_label)
+
+    def create_oos_split(self) -> None:
+        oos_splits = self.filter(self._is_oos).values()
+        oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
+        if oos_splits:
+            splits = self.filter(lambda sample: not self._is_oos(sample))
+            for split_name, split in splits.items():
+                self[split_name] = split
+            self[Split.OOS] = concatenate_datasets(oos_splits)
+
+    def encode_labels(self) -> Self:
+        for split_name, split in self.map(self._encode_label).items():
+            self[split_name] = split
         return self
 
     def to_multilabel(self) -> Self:
-        for split in self.utterance_splits:
-            if split in self:
-                self[split] = self[split].map(self._sample_to_multilabel)
+        for split_name, split in self.map(self._to_multilabel).items():
+            self[split_name] = split
         return self
 
-    def _filter_oos(self, dataset: Dataset) -> tuple[Dataset, Dataset]:
-        is_indices, oos_indices = [], []
-        for idx, label in enumerate(dataset["label"]):
-            oos_indices.append(idx) if label is None else is_indices.append(idx)
-        return dataset.select(is_indices), dataset.select(oos_indices)
+    def _is_oos(self, sample: Sample) -> bool:
+        return sample["label"] is None
 
-    def _one_hot_label(self, sample: dict[str, Any]) -> dict[str, Any]:
-        one_hot_label = [0] * self.n_classes
-        if sample["label"] is not None:
-            label = [sample["label"]] if isinstance(sample["label"], int) else sample["label"]
-            for idx in label:
-                one_hot_label[idx] = 1
-        sample["label"] = one_hot_label
-        return sample
-
-    def _sample_to_multilabel(self, sample: dict[str, Any]) -> dict[str, Any]:
+    def _to_multilabel(self, sample: Sample) -> Sample:
         if isinstance(sample["label"], int):
             sample["label"] = [sample["label"]]
+        return sample
+
+    def _encode_label(self, sample: Sample) -> Sample:
+        one_hot_label = [0] * self.n_classes
+        match sample["label"]:
+            case int():
+                one_hot_label[sample["label"]] = 1
+            case list():
+                for idx in sample["label"]:
+                    one_hot_label[idx] = 1
+        sample["label"] = one_hot_label
         return sample
