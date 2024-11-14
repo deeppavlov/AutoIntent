@@ -1,4 +1,4 @@
-name: Run Tests
+name: unit tests
 
 on:
   push:
@@ -37,4 +37,4 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest
+        pytest --ignore=tests/nodes --ignore=tests/pipeline

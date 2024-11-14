@@ -31,7 +31,7 @@ class KNNScorer(ScoringModule):
 
     def __init__(
         self,
-        model_name: str,
+        embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES,
         db_dir: str | None = None,
@@ -49,15 +49,19 @@ class KNNScorer(ScoringModule):
             - closest: each sample has a non zero weight iff is the closest sample of some class
         - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
         """
-        if db_dir is None:
-            db_dir = str(get_db_dir())
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.k = k
         self.weights = weights
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -65,25 +69,28 @@ class KNNScorer(ScoringModule):
         context: Context,
         k: int,
         weights: WEIGHT_TYPES,
-        model_name: str | None = None,
+        embedder_name: str | None = None,
     ) -> Self:
-        if model_name is None:
-            model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
         else:
-            prebuilt_index = context.vector_index_client.exists(model_name)
+            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
-            model_name=model_name,
+            embedder_name=embedder_name,
             k=k,
             weights=weights,
-            db_dir=str(context.db_dir),
-            device=context.device,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            db_dir=str(context.get_db_dir()),
+            device=context.get_device(),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
+
+    def get_embedder_name(self) -> str:
+        return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if isinstance(labels[0], list):
@@ -96,19 +103,26 @@ class KNNScorer(ScoringModule):
 
         if self.prebuilt_index:
             # this happens only after RetrievalNode optimization
-            self._vector_index = vector_index_client.get_index(self.model_name)
+            self._vector_index = vector_index_client.get_index(self.embedder_name)
             if len(utterances) != len(self._vector_index.texts):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
         else:
-            self._vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+            self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        labels, distances, _ = self._vector_index.query(utterances, self.k)
-        return apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
+        return self._predict(utterances)[0]
+
+    def predict_with_metadata(
+        self,
+        utterances: list[str],
+    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        scores, neighbors = self._predict(utterances)
+        metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
+        return scores, metadata
 
     def clear_cache(self) -> None:
-        self._vector_index.delete()
+        self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = KNNScorerDumpMetadata(
@@ -141,4 +155,9 @@ class KNNScorer(ScoringModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self._vector_index = vector_index_client.get_index(self.model_name)
+        self._vector_index = vector_index_client.get_index(self.embedder_name)
+
+    def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
+        labels, distances, neigbors = self._vector_index.query(utterances, self.k)
+        scores = apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
+        return scores, neigbors

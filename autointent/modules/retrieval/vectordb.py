@@ -26,17 +26,15 @@ class VectorDBModule(RetrievalModule):
     def __init__(
         self,
         k: int,
-        model_name: str,
+        embedder_name: str,
         db_dir: str | None = None,
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.device = device
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
 
@@ -47,23 +45,29 @@ class VectorDBModule(RetrievalModule):
         cls,
         context: Context,
         k: int,
-        model_name: str,
+        embedder_name: str,
     ) -> Self:
         return cls(
             k=k,
-            model_name=model_name,
-            db_dir=str(context.db_dir),
-            device=context.device,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            embedder_name=embedder_name,
+            db_dir=str(context.get_db_dir()),
+            device=context.get_device(),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         vector_index_client = VectorIndexClient(
             self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length
         )
 
-        self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
     def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
         labels_pred, _, _ = self.vector_index.query(
@@ -73,10 +77,10 @@ class VectorDBModule(RetrievalModule):
         return metric_fn(context.data_handler.test_labels, labels_pred)
 
     def get_assets(self) -> RetrieverArtifact:
-        return RetrieverArtifact(embedder_name=self.model_name)
+        return RetrieverArtifact(embedder_name=self.embedder_name)
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = VectorDBMetadata(
@@ -101,7 +105,7 @@ class VectorDBModule(RetrievalModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self.vector_index = vector_index_client.get_index(self.model_name)
+        self.vector_index = vector_index_client.get_index(self.embedder_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
         """

@@ -6,7 +6,7 @@ from autointent import Context
 from autointent.configs.optimization_cli import OptimizationConfig
 
 from .pipeline_optimizer import PipelineOptimizer
-from .utils import load_config, load_data
+from .utils import load_config
 
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
@@ -18,24 +18,15 @@ def main(cfg: OptimizationConfig) -> None:
     logger.debug("Vector index path: %s", cfg.vector_index.db_dir)
 
     # create shared objects for a whole pipeline
-    context = Context(
-        load_data(cfg.data.train_path),
-        None if cfg.data.test_path is None else load_data(cfg.data.test_path),
-        cfg.vector_index.device,
-        cfg.augmentation.multilabel_generation_config,
-        cfg.augmentation.regex_sampling,
-        cfg.seed,
-        cfg.vector_index.db_dir,
-        cfg.logs.dump_dir,
-        cfg.data.force_multilabel,
-        cfg.embedder.batch_size,
-        cfg.embedder.max_length,
-    )
+    context = Context(cfg.seed)
+    context.configure_logging(cfg.logs)
+    context.configure_vector_index(cfg.vector_index, cfg.embedder)
+    context.configure_data(cfg.data, cfg.augmentation)
 
     # run optimization
-    search_space_config = load_config(cfg.task.search_space_path, context.multilabel, logger)
+    search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)
     pipeline = PipelineOptimizer.from_dict_config(search_space_config)
     pipeline.optimize(context)
 
     # save results
-    pipeline.dump(cfg.logs.dirpath)
+    context.dump()

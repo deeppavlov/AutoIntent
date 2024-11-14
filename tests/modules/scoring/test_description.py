@@ -3,6 +3,7 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DescriptionScorer
+from tests.conftest import setup_environment
 
 
 @pytest.mark.parametrize(
@@ -12,11 +13,11 @@ from autointent.modules import DescriptionScorer
         ([[0.2, 0.3, 0.2], [0.2, 0.3, 0.2]], False),
     ],
 )
-def test_description_scorer(setup_environment, dataset, expected_prediction, multilabel):
-    db_dir, dump_dir, logs_dir = setup_environment
+def test_description_scorer(dataset, expected_prediction, multilabel):
+    db_dir, dump_dir, logs_dir = setup_environment()
     data_handler = DataHandler(dataset, force_multilabel=multilabel)
 
-    scorer = DescriptionScorer(model_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir(), temperature=0.3)
+    scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, device="cpu")
 
     scorer.fit(data_handler.train_utterances, data_handler.train_labels, data_handler.label_description)
     assert scorer.description_vectors.shape[0] == len(data_handler.label_description)
@@ -34,5 +35,9 @@ def test_description_scorer(setup_environment, dataset, expected_prediction, mul
 
     assert predictions.shape == (len(test_utterances), len(data_handler.label_description))
     np.testing.assert_almost_equal(predictions, np.array(expected_prediction).reshape(predictions.shape), decimal=1)
+
+    predictions, metadata = scorer.predict_with_metadata(test_utterances)
+    assert len(predictions) == len(test_utterances)
+    assert metadata is None
 
     scorer.clear_cache()

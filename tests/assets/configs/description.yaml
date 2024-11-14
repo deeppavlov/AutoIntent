@@ -4,7 +4,7 @@ nodes:
     search_space:
       - module_type: vector_db
         k: [10]
-        model_name:
+        embedder_name:
           - sentence-transformers/all-MiniLM-L6-v2
   - node_type: scoring
     metric: scoring_roc_auc

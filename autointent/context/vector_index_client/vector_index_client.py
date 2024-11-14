@@ -1,6 +1,5 @@
 import json
 import logging
-import shutil
 from pathlib import Path
 
 from autointent.custom_types import LabelType
@@ -12,8 +11,6 @@ DIRNAMES_TYPE = dict[str, str]
 
 
 class VectorIndexClient:
-    model_name: str
-
     def __init__(
         self,
         device: str,
@@ -89,10 +86,10 @@ class VectorIndexClient:
         return self.db_dir / dir_name
 
     def delete_index(self, model_name: str) -> None:
-        dir_name = self._remove_index_dirname(model_name)
-        if dir_name is not None:
-            self._logger.debug("Deleting index for model: %s", model_name)
-            shutil.rmtree(self.db_dir / dir_name)
+        if not self.exists(model_name):
+            return
+        index = self.get_index(model_name)
+        index.delete()
 
     def get_index(self, model_name: str) -> VectorIndex:
         dirpath = self._get_index_dirpath(model_name)
@@ -107,6 +104,16 @@ class VectorIndexClient:
 
     def exists(self, model_name: str) -> bool:
         return self._get_index_dirpath(model_name) is not None
+
+    def delete_db(self) -> None:
+        path = self.db_dir / "indexes_dirnames.json"
+        if not path.exists():
+            return
+        with path.open() as file:
+            indexes_dirnames: DIRNAMES_TYPE = json.load(file)
+        for embedder_name in indexes_dirnames:
+            self.delete_index(embedder_name)
+        path.unlink()
 
 
 class NonExistingIndexError(Exception):
