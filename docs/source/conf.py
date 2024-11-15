@@ -1,4 +1,4 @@
-# Configuration file for the Sphinx documentation builder.  # noqa: INP001
+# Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "AutoIntent"
-copyright = "2024, voorhs, kudep"  # noqa: A001
-author = "voorhs, kudep"
+copyright = "2024, DeepPavlov"
+author = "DeepPavlov"
 release = "0.0.1"
 
 # -- General configuration ---------------------------------------------------

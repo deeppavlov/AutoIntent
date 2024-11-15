@@ -22,6 +22,14 @@ lint:
 	$(poetry) ruff format
 	$(poetry) ruff check --fix
 
+.PHONY: docs
+docs:
+	cd docs && make html
+
+.PHONY: serve-docs
+serve-docs:
+	cd docs/_build/html && $(poetry) python -m http.server
+
 .PHONY: all
 all: lint
 

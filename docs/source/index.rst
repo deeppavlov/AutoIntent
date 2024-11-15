@@ -22,3 +22,15 @@ Check out the :doc:`usage` section to begin with, including :ref:`installation <
 
    usage
 
+API
+===
+
+.. automodule:: autointent.generation.description_generation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: autointent
+    :members:
+    :undoc-members:
+    :show-inheritance:
