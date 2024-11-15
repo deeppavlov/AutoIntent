@@ -10,6 +10,8 @@ AutoIntent documentation
 
 `See us on GitHub! <https://github.com/deeppavlov/AutoIntent>`_
 
+Check out the :doc:`usage` section to begin with, including :ref:`installation <installation>` section.
+
 .. note::
 
    This project is under active development.

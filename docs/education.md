@@ -4,3 +4,4 @@
 - Официальный sphinx туториал: https://www.sphinx-doc.org/en/master/tutorial/index.html
 - Мысли умного и знаменитого дядьки: https://www.ericholscher.com/blog/2016/jul/1/sphinx-and-rtd-for-writers/
 - Проекты написанные на sphinx: https://www.sphinx-doc.org/en/master/examples.html
+- rst-директивы для докстрингов: https://www.sphinx-doc.org/en/master/usage/domains/python.html
