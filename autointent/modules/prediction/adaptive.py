@@ -79,7 +79,7 @@ class AdaptivePredictor(PredictionModule):
 
         self._r = metadata["r"]
         self.multilabel = metadata["multilabel"]
-        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type]
+        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
         self.metadata = metadata
 
 
