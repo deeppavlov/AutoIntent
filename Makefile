@@ -24,3 +24,11 @@ lint:
 
 .PHONY: all
 all: lint
+
+.PHONY: sync
+sync:
+	poetry install --sync --with dev,test,lint,typing,docs
+
+.PHONY: docs-serve
+docs-serve:
+	$(poetry) sphinx-autobuild docs/source docs/build/html
