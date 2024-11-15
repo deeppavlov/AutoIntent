@@ -1,8 +1,9 @@
 import json
+from abc import abstractmethod
 from pathlib import Path
+from typing import Any, Protocol
 
 from pydantic import BaseModel
-from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
@@ -27,13 +28,19 @@ class Dataset(BaseModel):
     test: list[Sample] = []
     intents: list[Intent] = []
 
-    @classmethod
-    def from_json(cls, filepath: str | Path) -> Self:
-        with Path.open(filepath) as file:
-            return cls.model_validate(json.load(file))
+
+class Reader(Protocol):
+    @abstractmethod
+    def read(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        raise NotImplementedError
+
+
+class DictReader:
+    def read(self, mapping: dict[str, Any]) -> dict[str, Any]:
+        return Dataset.model_validate(mapping).model_dump(exclude_defaults=True)
 
 
 class JsonReader:
-    def read(self, filepath: str | Path) -> Dataset:
+    def read(self, filepath: str | Path) -> dict[str, Any]:
         with Path.open(filepath) as file:
-            return Dataset.model_validate(json.load(file))
+            return Dataset.model_validate(json.load(file)).model_dump(exclude_defaults=True)

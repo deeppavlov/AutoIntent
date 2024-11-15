@@ -9,7 +9,7 @@ from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
-from .data_reader import Intent, JsonReader
+from .data_reader import DictReader, Intent, JsonReader, Reader
 
 
 class Split:
@@ -28,9 +28,9 @@ class Dataset(HFDatasetDict):
     LABEL_COLUMN = "label"
     UTTERANCE_COLUMN = "utterance"
 
-    def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:
+    def __init__(self, *args: Any, intents: list[dict[str, Any]], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.intents = intents
+        self.intents = [Intent.model_validate(intent) for intent in intents]
         self.create_oos_split()
 
     @property
@@ -50,13 +50,12 @@ class Dataset(HFDatasetDict):
         return len(classes)
 
     @classmethod
-    def load(cls, filepath: str | Path) -> Self:
-        reader = JsonReader().read(filepath)
-        splits = reader.model_dump(exclude={"intents"}, exclude_defaults=True)
-        return cls(
-            {split_name: HFDataset.from_list(split) for split_name, split in splits.items()},
-            intents=reader.intents,
-        )
+    def load_json(cls, filepath: str | Path) -> Self:
+        return cls._load(JsonReader(), filepath=filepath)
+
+    @classmethod
+    def load_dict(cls, mapping: dict[str, Any]) -> Self:
+        return cls._load(DictReader(), mapping=mapping)
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         return {split: self[split].to_list() for split in self}
@@ -79,6 +78,18 @@ class Dataset(HFDatasetDict):
         for split_name, split in self.map(self._to_multilabel).items():
             self[split_name] = split
         return self
+
+    @classmethod
+    def _load(cls, reader: Reader, **kwargs: Any) -> Self:
+        data = reader.read(**kwargs)
+        intents = data.pop("intents", [])
+        return cls(
+            {
+                split_name: HFDataset.from_list(split)
+                for split_name, split in data.items()
+            },
+            intents=intents,
+        )
 
     def _is_oos(self, sample: Sample) -> bool:
         return sample["label"] is None

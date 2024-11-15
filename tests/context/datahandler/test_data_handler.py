@@ -5,12 +5,16 @@ from autointent.context.data_handler import DataAugmenter, DataHandler, Dataset
 
 @pytest.fixture
 def sample_multiclass_data():
-    data = {
-        "utterances": [
-            {"text": "hello", "label": 0},
-            {"text": "hi", "label": 0},
-            {"text": "goodbye", "label": 1},
-            {"text": "bye", "label": 1},
+    return {
+        "train": [
+            {"utterance": "hello", "label": 0},
+            {"utterance": "hi", "label": 0},
+            {"utterance": "goodbye", "label": 1},
+            {"utterance": "bye", "label": 1},
+        ],
+        "test": [
+            {"utterance": "greetings", "label": 0},
+            {"utterance": "farewell", "label": 1},
         ],
         "intents": [
             {
@@ -25,39 +29,24 @@ def sample_multiclass_data():
             },
         ],
     }
-    test_data = {
-        "utterances": [
-            {"text": "greetings", "label": 0},
-            {"text": "farewell", "label": 1},
-        ],
-    }
-    return data, test_data
 
 
 @pytest.fixture
 def sample_multilabel_data():
-    data = {
-        "utterances": [
-            {"text": "hello and goodbye", "label": [0, 1]},
-            {"text": "hi there", "label": [0]},
+    return {
+        "train": [
+            {"utterance": "hello and goodbye", "label": [0, 1]},
+            {"utterance": "hi there", "label": [0]},
+        ],
+        "test": [
+            {"utterance": "greetings", "label": [0]},
+            {"utterance": "farewell", "label": [1]},
         ],
     }
-    test_data = {
-        "utterances": [
-            {"text": "greetings", "label": [0]},
-            {"text": "farewell", "label": [1]},
-        ],
-    }
-    return data, test_data
 
 
 def test_data_handler_initialization(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.load_dict(sample_multiclass_data), random_seed=42)
 
     assert handler.multilabel is False
     assert handler.n_classes == 2
@@ -68,12 +57,7 @@ def test_data_handler_initialization(sample_multiclass_data):
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
-    train_data, test_data = sample_multilabel_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.load_dict(sample_multilabel_data), random_seed=42)
 
     assert handler.multilabel is True
     assert handler.n_classes == 2
