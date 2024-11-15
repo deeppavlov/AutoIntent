@@ -20,7 +20,7 @@ default_search_space = np.linspace(0, 1, num=10)
 class AdaptivePredictorDumpMetadata(TypedDict):
     r: float
     multilabel: bool
-    tags: list[Tag]
+    tags: list[Tag] | None
 
 
 class AdaptivePredictor(PredictionModule):
@@ -79,7 +79,7 @@ class AdaptivePredictor(PredictionModule):
 
         self._r = metadata["r"]
         self.multilabel = metadata["multilabel"]
-        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
+        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type]
         self.metadata = metadata
 
 
@@ -95,7 +95,8 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     return res
 
 
-def multilabel_score(y_true: list[LabelType] | list[list[LabelType]], y_pred: list[LabelType] | list[list[LabelType]]) -> float:
+def multilabel_score(y_true: list[LabelType],
+                     y_pred: npt.NDArray[Any]) -> float:
 
     y_true_, y_pred_ = transform(y_true, y_pred)
 
