@@ -18,6 +18,7 @@ extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
+    "sphinx.ext.autosummary",
 ]
 
 templates_path = ["_templates"]

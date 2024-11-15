@@ -5,3 +5,4 @@
 - Мысли умного и знаменитого дядьки: https://www.ericholscher.com/blog/2016/jul/1/sphinx-and-rtd-for-writers/
 - Проекты написанные на sphinx: https://www.sphinx-doc.org/en/master/examples.html
 - rst-директивы для докстрингов: https://www.sphinx-doc.org/en/master/usage/domains/python.html
+- autodoc: https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
