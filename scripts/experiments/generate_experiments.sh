@@ -53,6 +53,8 @@ for METRIC in "${METRICS[@]}"; do
     fi
 
     rm -rf runs/
+    rm -rf outputs/
+    rm -rf vector_db_*
 
     echo "Processing dataset: $DATASET_NAME with metric: $METRIC"
     autointent data.train_path="$FILE" \
