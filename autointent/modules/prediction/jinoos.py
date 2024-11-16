@@ -42,9 +42,7 @@ class JinoosPredictor(PredictionModule):
         labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        TODO: use dev split instead of test split
-        """
+        """TODO: use dev split instead of test split."""
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []
@@ -89,8 +87,8 @@ def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: flo
 
 
 def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:
-    """
-    joint in and out of scope score
+    r"""
+    joint in and out of scope score.
 
     ```math
     \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}},

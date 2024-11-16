@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 
-from autointent.utils import funcs_to_dict
+from autointent.utils import _funcs_to_dict
 
 from .prediction import (
     PredictionMetricFn,
@@ -43,7 +43,7 @@ from .scoring import (
     scoring_roc_auc,
 )
 
-RETRIEVAL_METRICS_MULTICLASS: dict[str, RetrievalMetricFn] = funcs_to_dict(
+RETRIEVAL_METRICS_MULTICLASS: dict[str, RetrievalMetricFn] = _funcs_to_dict(
     retrieval_hit_rate,
     retrieval_map,
     retrieval_mrr,
@@ -51,7 +51,7 @@ RETRIEVAL_METRICS_MULTICLASS: dict[str, RetrievalMetricFn] = funcs_to_dict(
     retrieval_precision,
 )
 
-RETRIEVAL_METRICS_MULTILABEL: dict[str, RetrievalMetricFn] = funcs_to_dict(
+RETRIEVAL_METRICS_MULTILABEL: dict[str, RetrievalMetricFn] = _funcs_to_dict(
     retrieval_hit_rate_intersecting,
     retrieval_hit_rate_macro,
     retrieval_map_intersecting,
@@ -64,7 +64,7 @@ RETRIEVAL_METRICS_MULTILABEL: dict[str, RetrievalMetricFn] = funcs_to_dict(
     retrieval_precision_macro,
 )
 
-SCORING_METRICS_MULTICLASS: dict[str, ScoringMetricFn] = funcs_to_dict(
+SCORING_METRICS_MULTICLASS: dict[str, ScoringMetricFn] = _funcs_to_dict(
     scoring_accuracy,
     scoring_f1,
     scoring_log_likelihood,
@@ -73,14 +73,14 @@ SCORING_METRICS_MULTICLASS: dict[str, ScoringMetricFn] = funcs_to_dict(
     scoring_roc_auc,
 )
 
-SCORING_METRICS_MULTILABEL: dict[str, ScoringMetricFn] = SCORING_METRICS_MULTICLASS | funcs_to_dict(
+SCORING_METRICS_MULTILABEL: dict[str, ScoringMetricFn] = SCORING_METRICS_MULTICLASS | _funcs_to_dict(
     scoring_hit_rate,
     scoring_map,
     scoring_neg_coverage,
     scoring_neg_ranking_loss,
 )
 
-PREDICTION_METRICS_MULTICLASS: dict[str, PredictionMetricFn] = funcs_to_dict(
+PREDICTION_METRICS_MULTICLASS: dict[str, PredictionMetricFn] = _funcs_to_dict(
     prediction_accuracy,
     prediction_f1,
     prediction_precision,

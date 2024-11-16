@@ -103,7 +103,7 @@ class CrossEncoderWithLogreg:
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         """
-        Construct train samples for binary classifier over cross-encoder features
+        Construct train samples for binary classifier over cross-encoder features.
 
         Arguments
         ---
@@ -114,9 +114,7 @@ class CrossEncoderWithLogreg:
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
     def predict(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
-        """
-        Return probabilities of two utterances having the same intent label
-        """
+        """Return probabilities of two utterances having the same intent label."""
         features = self.get_features(pairs)
 
         return self._clf.predict_proba(features)[:, 1]  # type: ignore[no-any-return]

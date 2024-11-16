@@ -6,7 +6,7 @@ from .schemas import Dataset, Utterance
 
 
 def distribute_shots(n: int, k: int) -> list[int]:
-    """randomly distribute `k` samples among `n` bins"""
+    """Randomly distribute `k` samples among `n` bins."""
     samples_per_bin = [0] * n
     for _ in range(k):
         i_bin = random.randint(0, n - 1)
@@ -15,7 +15,7 @@ def distribute_shots(n: int, k: int) -> list[int]:
 
 
 def generate_from_template(template: str, n: int) -> list[str]:
-    """generate `n` samples from `template`, or fewer if it's impossible"""
+    """Generate `n` samples from `template`, or fewer if it's impossible."""
     return list(sre_yield.AllStrings(template))[:n]
 
 

@@ -16,11 +16,10 @@ def apply_weights(
     multilabel: bool,
 ) -> NDArray[Any]:
     """
-    Calculate probabilities
+    Calculate probabilities.
 
     Arguments
     ---
-
     `labels`:
     - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
     - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
@@ -79,7 +78,7 @@ def _closest_weighting(labels: NDArray[Any], distances: NDArray[Any]) -> NDArray
 
 
 def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
-    """convert nd array of ints to (n+1)d array of zeros and ones"""
+    """Convert nd array of ints to (n+1)d array of zeros and ones."""
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
     indices = (*tuple(np.indices(labels.shape)), labels)

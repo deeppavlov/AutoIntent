@@ -29,7 +29,7 @@ class ModulesList:
 
 
 class OptimizationInfo:
-    """TODO continous IO with file system (to be able to restore the state of optimization)"""
+    # TODO continous IO with file system (to be able to restore the state of optimization)
 
     # todo how to set trials
 
@@ -55,9 +55,8 @@ class OptimizationInfo:
         """
         Purposes:
         - save optimization results in a text form (hyperparameters and corresponding metrics)
-        - update best assets
+        - update best assets.
         """
-
         # save trial
         trial = Trial(
             module_type=module_type,

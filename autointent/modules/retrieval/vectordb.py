@@ -108,9 +108,7 @@ class VectorDBModule(RetrievalModule):
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
-        """
-        return labels, distances and texts of retrieved nearest neighbors
-        """
+        """Return labels, distances and texts of retrieved nearest neighbors."""
         return self.vector_index.query(
             utterances,
             self.k,

@@ -10,6 +10,23 @@ Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
+.. math::
+
+   (a + b)^2 = a^2 + 2ab + b^2
+
+   (a - b)^2 = a^2 - 2ab + b^2
+
+
+.. math::
+   :nowrap:
+
+   \begin{eqnarray}
+      y    & = & ax^2 + bx + c \\
+      f(x) & = & x^2 + 2xy + y^2
+   \end{eqnarray}
+
+
+
 
 .. toctree::
    :maxdepth: 2
@@ -23,7 +40,26 @@ API
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: autointent
+.. automodule:: autointent.generation.prompt_scheme
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: autointent.context.data_handler.schemas
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Configs
+=======
+.. automodule:: autointent.configs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Metrics
+=======
+.. automodule:: autointent.metrics
     :members:
     :undoc-members:
     :show-inheritance:

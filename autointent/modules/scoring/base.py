@@ -1,3 +1,5 @@
+"""Base class for scoring modules."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -39,7 +41,7 @@ class ScoringModule(Module, ABC):
 
 def get_topk(scores: npt.NDArray[Any], k: int) -> npt.NDArray[Any]:
     """
-    Argument
+    Argument.
     ---
     `scores`: np.ndarray of shape (n_samples, n_classes)
 

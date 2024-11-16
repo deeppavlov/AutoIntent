@@ -6,9 +6,7 @@ from .schemas import Dataset
 
 @dataclass
 class Tag:
-    """
-    If two intent classes have common tag they can't be both assigned to one sample
-    """
+    """If two intent classes have common tag they can't be both assigned to one sample."""
 
     tag_name: str
     intent_ids: list[int] = field(default_factory=list)  # classes with this tag

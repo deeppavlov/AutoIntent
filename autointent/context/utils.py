@@ -10,7 +10,7 @@ from .data_handler import Dataset
 
 
 class NumpyEncoder(json.JSONEncoder):
-    """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422"""
+    """Helper for dumping logs. Problem explained: https://stackoverflow.com/q/50916422."""
 
     def default(self, obj: Any) -> str | int | float | list[Any] | Any:  # noqa: ANN401
         if isinstance(obj, np.integer):
@@ -25,7 +25,7 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 def load_data(data_path: str | Path) -> Dataset:
-    """load data from the given path or load sample data which is distributed along with the autointent package"""
+    """Load data from the given path or load sample data which is distributed along with the autointent package."""
     if data_path == "default-multiclass":
         with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
             res = json.load(file)

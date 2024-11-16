@@ -1,3 +1,5 @@
+"""Threshold."""
+
 import json
 import logging
 from pathlib import Path
@@ -100,9 +102,11 @@ class ThresholdPredictor(PredictionModule):
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
     """
-    Return
-    ---
-    array of int labels, shape (n_samples,)
+    Make predictions for multiclass classification task.
+
+    :param scores: Scores from the model, shape (n_samples, n_classes)
+    :param thresh: Threshold for the scores, shape (n_classes,) or float
+    :return: Predicted classes, shape (n_samples,)
     """
     pred_classes: npt.NDArray[Any] = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
@@ -120,9 +124,12 @@ def multilabel_predict(
     scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any], tags: list[Tag] | None
 ) -> npt.NDArray[Any]:
     """
-    Return
-    ---
-    array of binary labels, shape (n_samples, n_classes)
+    Make predictions for multilabel classification task.
+
+    :param scores: Scores from the model, shape (n_samples, n_classes)
+    :param thresh: Threshold for the scores, shape (n_classes,) or float
+    :param tags: Tags for predictions
+    :return: Multilabel prediction
     """
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:

@@ -18,10 +18,12 @@ LabelType = int | list[int]
 
 
 class BaseMetadataDict(TypedDict):
-    pass
+    """Base metadata dictionary."""
 
 
 class NodeType(str, Enum):
+    """Node types."""
+
     retrieval = "retrieval"
     prediction = "prediction"
     scoring = "scoring"
@@ -29,3 +31,4 @@ class NodeType(str, Enum):
 
 
 NODE_TYPES = [NodeType.retrieval, NodeType.prediction, NodeType.scoring, NodeType.regexp]
+NodeTypeType = Literal["retrieval", "prediction", "scoring", "regexp"]

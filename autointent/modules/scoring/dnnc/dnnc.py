@@ -32,7 +32,7 @@ class DNNCScorer(ScoringModule):
     TODO:
     - think about other cross-encoder settings
     - implement training of cross-encoder with sentence_encoders utils
-    - inspect batch size of model.predict?
+    - inspect batch size of model.predict?.
     """
 
     name = "dnnc"

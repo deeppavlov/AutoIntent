@@ -3,19 +3,32 @@ from typing import Any
 
 from omegaconf import MISSING
 
+from autointent.custom_types import NodeType, NodeTypeType
+
 
 @dataclass
 class InferenceNodeConfig:
-    node_type: str = MISSING
-    module_type: str = MISSING
+    """Configuration for the inference node."""
+
+    node_type: NodeTypeType = MISSING
+    """Type of the node. Should be one of the NODE_TYPES"""
+    module_type: str = MISSING  # TODO: add custom type
+    """Type of the module. Should be one of the Module"""
     module_config: dict[str, Any] = MISSING
+    """Configuration of the module"""
     load_path: str | None = None
+    """Path to the module dump. If None, the module will be trained from scratch"""
     _target_: str = "autointent.nodes.InferenceNode"
 
 
 @dataclass
 class NodeOptimizerConfig:
-    node_type: str = MISSING
+    """Configuration for the node optimizer."""
+
+    node_type: NodeType = MISSING
+    """Type of the node. Should be one of the NODE_TYPES"""
     search_space: list[dict[str, Any]] = MISSING
-    metric: str = MISSING
+    """Search space for the optimization"""
+    metric: str = MISSING  # TODO: add custom type
+    """Metric to optimize"""
     _target_: str = "autointent.nodes.NodeOptimizer"

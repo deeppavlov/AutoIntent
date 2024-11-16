@@ -8,10 +8,27 @@ from .custom_types import LABELS_VALUE_TYPE
 
 
 class RegexpMetricFn(Protocol):
-    def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float: ...
+    """Protocol for regexp metrics."""
+
+    def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+        """
+        Calculate regexp metric.
+
+        :param y_true: True values of labels
+        :param y_pred: Predicted values of labels
+        :return: Score of the regexp metric
+        """
+        ...
 
 
 def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+    """
+    Calculate regexp partial accuracy.
+
+    :param y_true: True values of labels
+    :param y_pred: Predicted values of labels
+    :return: Score of the regexp metric
+    """
     y_true_, y_pred_ = transform(y_true, y_pred)
     correct = np.mean([true in pred for true, pred in zip(y_true_, y_pred_, strict=True)])
     total = y_true_.shape[0]
@@ -21,6 +38,13 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
 
 
 def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+    """
+    Calculate regexp partial precision.
+
+    :param y_true: True values of labels
+    :param y_pred: Predicted values of labels
+    :return: Score of the regexp metric
+    """
     y_true_, y_pred_ = transform(y_true, y_pred)
 
     correct = np.sum([true in pred for true, pred in zip(y_true_, y_pred_, strict=True)])

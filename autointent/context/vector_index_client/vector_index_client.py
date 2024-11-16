@@ -27,9 +27,7 @@ class VectorIndexClient:
     def create_index(
         self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None
     ) -> VectorIndex:
-        """
-        model_name should be a repo from hugging face, not a path to a local model
-        """
+        """model_name should be a repo from hugging face, not a path to a local model."""
         self._logger.info("Creating index for model: %s", model_name)
 
         index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
@@ -57,7 +55,7 @@ class VectorIndexClient:
             json.dump(indexes_dirnames, file, indent=4)
 
     def _remove_index_dirname(self, model_name: str) -> str | None:
-        """remove and return dirname if vector index exists, otherwise return None"""
+        """Remove and return dirname if vector index exists, otherwise return None."""
         path = self.db_dir / "indexes_dirnames.json"
         with path.open() as file:
             indexes_dirnames: DIRNAMES_TYPE = json.load(file)
@@ -67,7 +65,7 @@ class VectorIndexClient:
         return dir_name
 
     def _get_index_dirpath(self, model_name: str) -> Path | None:
-        """return dirname if vector index exists, otherwise return None"""
+        """Return dirname if vector index exists, otherwise return None."""
         path = self.db_dir / "indexes_dirnames.json"
         if not path.exists():
             return None

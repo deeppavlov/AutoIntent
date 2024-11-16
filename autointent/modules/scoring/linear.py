@@ -37,7 +37,7 @@ class LinearScorer(ScoringModule):
     To disable this warning, you can either:
         - Avoid using `tokenizers` before the fork if possible
         - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    ```
+    ```.
     """
 
     classifier_file_name: str = "classifier.joblib"

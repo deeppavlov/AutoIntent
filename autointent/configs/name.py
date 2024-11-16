@@ -340,12 +340,23 @@ nouns = [
 
 
 def generate_name() -> str:
+    """
+    Generate a random name for a run.
+
+    :return: Random name
+    """
     adjective = random.choice(adjectives)
     noun = random.choice(nouns)
     return f"{adjective}_{noun}"
 
 
 def get_run_name(run_name: str | None = None) -> str:
+    """
+    Get a run name.
+
+    :param run_name: Run name. If None, generate a random name
+    :return: Run name with a timestamp
+    """
     if run_name is None:
         run_name = generate_name()
     return f"{run_name}_{datetime.now().strftime('%m-%d-%Y_%H-%M-%S')}"  # noqa: DTZ005

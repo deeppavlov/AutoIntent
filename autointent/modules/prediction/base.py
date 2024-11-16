@@ -62,7 +62,7 @@ def get_prediction_evaluation_data(
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
     """
-    this function is intended to be used with multilabel predictor
+    this function is intended to be used with multilabel predictor.
 
     If some intent classes have common tag (i.e. they are mutually exclusive) \
     and were assigned to one sample, leave only that class that has the highest score.
@@ -77,7 +77,6 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
     ---
     np.ndarray of shape (n_samples, n_classes) with binary labels
     """
-
     n_samples, _ = labels.shape
     res = np.copy(labels)
 

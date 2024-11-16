@@ -14,7 +14,7 @@ from .schemas import Dataset, DatasetType
 
 
 def get_sample_utterances(intent_records: list[dict[str, Any]]) -> tuple[list[Any], list[Any]]:
-    """get plain list of all sample utterances and their intent labels"""
+    """Get plain list of all sample utterances and their intent labels."""
     utterances = [intent["sample_utterances"] for intent in intent_records]
     labels = [[intent["intent_id"]] * len(uts) for intent, uts in zip(intent_records, utterances, strict=False)]
 
@@ -53,9 +53,7 @@ def split_sample_utterances(
     list[LabelType],
     list[LabelType],
 ]:
-    """
-    Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test
-    """
+    """Return: n_classes, oos_utterances, utterances_train, utterances_test, labels_train, labels_test."""
     logger = logging.getLogger(__name__)
 
     utterances, labels = get_samples(dataset)
@@ -125,9 +123,7 @@ def multilabel_train_test_split(
 
 
 def validate_test_labels(test_labels: list[LabelType], multilabel: bool, n_classes: int) -> bool:
-    """
-    ensure that all classes are presented in the presented labels set
-    """
+    """Ensure that all classes are presented in the presented labels set."""
     if not multilabel and isinstance(test_labels[0], int):
         return is_multiclass_test_set_complete(test_labels, n_classes)  # type: ignore[arg-type]
     if multilabel and isinstance(test_labels[0], list):
@@ -147,7 +143,7 @@ def is_multiclass_test_set_complete(labels: list[int], n_classes: int) -> bool:
 
 
 def to_onehot(labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
-    """convert nd array of ints to (n+1)d array of zeros and ones"""
+    """Convert nd array of ints to (n+1)d array of zeros and ones."""
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
     indices = (*tuple(np.indices(labels.shape)), labels)

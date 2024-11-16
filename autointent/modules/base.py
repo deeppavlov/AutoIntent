@@ -22,31 +22,27 @@ class Module(ABC):
 
     @abstractmethod
     def score(self, context: Context, metric_fn: METRIC_FN) -> float:
-        """
-        calculates metric on test set and returns metric value
-        """
+        """Calculates metric on test set and returns metric value."""
 
     @abstractmethod
     def get_assets(self) -> Artifact:
-        """
-        return useful assets that represent intermediate data into context
-        """
+        """Return useful assets that represent intermediate data into context."""
 
     @abstractmethod
     def clear_cache(self) -> None:
-        """clear GPU/CPU memory"""
+        """Clear GPU/CPU memory."""
 
     @abstractmethod
     def dump(self, path: str) -> None:
-        """dump all data needed for inference"""
+        """Dump all data needed for inference."""
 
     @abstractmethod
     def load(self, path: str) -> None:
-        """load all data needed for inference"""
+        """Load all data needed for inference."""
 
     @abstractmethod
     def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
-        """inference"""
+        """Inference."""
 
     def predict_with_metadata(
         self,
@@ -61,5 +57,5 @@ class Module(ABC):
         pass
 
     def get_embedder_name(self) -> str | None:
-        """experimental method"""
+        """Experimental method."""
         return None
