@@ -11,9 +11,9 @@ MULTILABEL="$2"
 
 # Determine the correct configuration file based on the multilabel argument
 if [ "$MULTILABEL" == "true" ]; then
-  CONFIG_PATH="../../autointent/datafiles/default-multilabel-config.yaml"
+  CONFIG_PATH="autointent/datafiles/default-multilabel-config.yaml"
 elif [ "$MULTILABEL" == "false" ]; then
-  CONFIG_PATH="../../autointent/datafiles/default-multiclass-config.yaml"
+  CONFIG_PATH="autointent/datafiles/default-multiclass-config.yaml"
 else
   echo "Invalid value for <multilabel>. Use 'true' or 'false'."
   exit 1
