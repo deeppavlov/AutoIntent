@@ -22,22 +22,16 @@ lint:
 	$(poetry) ruff format
 	$(poetry) ruff check --fix
 
-.PHONY: docs
-docs:
-	cd docs && make html
-
-.PHONY: serve-docs
-serve-docs:
-	cd docs/_build/html && $(poetry) python -m http.server
-
-.PHONY: all
-all: lint
-
 .PHONY: sync
 sync:
 	poetry install --sync --with dev,test,lint,typing,docs
 
-.PHONY: docs-serve
-docs-serve:
+.PHONY: docs
+docs:
 	$(poetry) sphinx-apidoc -e -E -f --remove-old -o docs/source/apiref autointent
-	$(poetry) sphinx-autobuild docs/source docs/build/html --port 8333
+	$(poetry) python -m sphinx build docs/source docs/build/html
+
+.PHONY: serve-docs
+serve-docs:
+	make docs
+	$(poetry) python -m http.server -d docs/build/html 8333
