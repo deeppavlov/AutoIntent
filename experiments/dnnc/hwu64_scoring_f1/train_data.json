@@ -1,0 +1,562 @@
+[
+    {
+        "intent_id": 0,
+        "sample_utterances": [
+            "do i have an alarm set for morning flight",
+            "show my alarms",
+            "list all set alarms",
+            "please list active alarms"
+        ]
+    },
+    {
+        "intent_id": 1,
+        "sample_utterances": [
+            "can you please remove the alarm",
+            "turn off the alarm",
+            "olly cancel alarms",
+            "do not wake me up tomorrow"
+        ]
+    },
+    {
+        "intent_id": 2,
+        "sample_utterances": [
+            "please set my alarm clock for eight am",
+            "make an alarm to help me remember",
+            "turn on my alarm",
+            "wake me up at time"
+        ]
+    },
+    {
+        "intent_id": 3,
+        "sample_utterances": [
+            "turn off the bass from the audio",
+            "too loud",
+            "low the volume",
+            "lower the volume"
+        ]
+    },
+    {
+        "intent_id": 4,
+        "sample_utterances": [
+            "it's quiet time",
+            "turn the vibrate off from speaker",
+            "mute the speaker please",
+            "mute yourself until five pm"
+        ]
+    },
+    {
+        "intent_id": 5,
+        "sample_utterances": [
+            "increase the volume to seventy percent",
+            "could you speak up",
+            "louder volume please",
+            "can you speak louder"
+        ]
+    },
+    {
+        "intent_id": 6,
+        "sample_utterances": [
+            "what is on the agenda for today",
+            "what are my plans for today",
+            "what on my calendar",
+            "can you pull up the latest time so i won't be late for my appointment"
+        ]
+    },
+    {
+        "intent_id": 7,
+        "sample_utterances": [
+            "find dinner with mom on my calendar and delete it",
+            "cancel future event from place i worked",
+            "please delete my lunch date from the march twenty third schedule"
+        ]
+    },
+    {
+        "intent_id": 8,
+        "sample_utterances": [
+            "remind me to pick up john from the airport tonight at eight",
+            "set a meeting with hongbin",
+            "on january twenty five set meeting for twelve",
+            "remind me at the start of each month"
+        ]
+    },
+    {
+        "intent_id": 9,
+        "sample_utterances": [
+            "get recipe for apple pie",
+            "how to cook spaghetti squash",
+            "i want to know the procedure of making thanksgiving turkey in five sentences",
+            "find easy recipe for corn bread"
+        ]
+    },
+    {
+        "intent_id": 10,
+        "sample_utterances": [
+            "please convert the time of here at nine pm to brasil time zone",
+            "convert eastern time to western time",
+            "if it's five am in berlin what time is it here"
+        ]
+    },
+    {
+        "intent_id": 11,
+        "sample_utterances": [
+            "twenty ninth march comes on what day",
+            "what will be the time now in washington",
+            "what's today date",
+            "what day of the week is the first of march"
+        ]
+    },
+    {
+        "intent_id": 12,
+        "sample_utterances": [
+            "add apahelp@yahoo dot com to my contacts",
+            "add a new email address which is",
+            "remember this email",
+            "send an email and save the contact information for samuelwaters@hotmail dot com"
+        ]
+    },
+    {
+        "intent_id": 13,
+        "sample_utterances": [
+            "what were the first number of email subjects i got today",
+            "tell me about new emails",
+            "what is the email sent by this contact read",
+            "check inbox for mail from sarah"
+        ]
+    },
+    {
+        "intent_id": 14,
+        "sample_utterances": [
+            "is bills pager number in my contacts",
+            "tell me the email address for aunt ruth",
+            "tell me the office address of my brother"
+        ]
+    },
+    {
+        "intent_id": 15,
+        "sample_utterances": [
+            "reach by mail to my family",
+            "send email to david davis email address",
+            "email my mom",
+            "send email to cat that i will accept job offer"
+        ]
+    },
+    {
+        "intent_id": 16,
+        "sample_utterances": [
+            "yeap.",
+            "yeap that's right.",
+            "yes it's excellent.",
+            "yeah fantastic response to the command."
+        ]
+    },
+    {
+        "intent_id": 17,
+        "sample_utterances": [
+            "that is all, just stop.",
+            "i would like you stop.",
+            "olly that is enough, cancel.",
+            "olly please would you shut off."
+        ]
+    },
+    {
+        "intent_id": 18,
+        "sample_utterances": [
+            "did you get it correctly?",
+            "check and confirm the details please.",
+            "please confirm details."
+        ]
+    },
+    {
+        "intent_id": 19,
+        "sample_utterances": [
+            "any one, olly.",
+            "don't bother, olly.",
+            "do not mind.",
+            "really would not mind."
+        ]
+    },
+    {
+        "intent_id": 20,
+        "sample_utterances": [
+            "will you please again elaborate.",
+            "can you please clarify once again.",
+            "clarify further on that to me please."
+        ]
+    },
+    {
+        "intent_id": 21,
+        "sample_utterances": [
+            "tell me a joke about dogs",
+            "hey do you know any jokes",
+            "i need a good joke",
+            "can you tell me a nice joke"
+        ]
+    },
+    {
+        "intent_id": 22,
+        "sample_utterances": [
+            "i think this is not correct command.",
+            "no, i think that's not the right response.",
+            "you don't understand it right."
+        ]
+    },
+    {
+        "intent_id": 23,
+        "sample_utterances": [
+            "you are so smart.",
+            "thanks, that's fantastic job, olly.",
+            "that's amazing work, i appreciate it."
+        ]
+    },
+    {
+        "intent_id": 24,
+        "sample_utterances": [
+            "i want to know more about this person",
+            "opinion about latest gadgets",
+            "how often do you complete updates",
+            "i would like to crack jokes"
+        ]
+    },
+    {
+        "intent_id": 25,
+        "sample_utterances": [
+            "could you speak the last utterance said once more.",
+            "please would you reset.",
+            "would you try the last one spoken one more time again please.",
+            "tell me once again."
+        ]
+    },
+    {
+        "intent_id": 26,
+        "sample_utterances": [
+            "start roomba",
+            "run the robot vacuum cleaner",
+            "hey go from off to on my vacuum in five minutes",
+            "hoover the carpets around"
+        ]
+    },
+    {
+        "intent_id": 27,
+        "sample_utterances": [
+            "please get the coffee machine to make me some coffee",
+            "can you start the coffee machine for me",
+            "i'd like a cappuccino please",
+            "please make me some coffee"
+        ]
+    },
+    {
+        "intent_id": 28,
+        "sample_utterances": [
+            "change the color of my porch lights to green",
+            "change the media room lights from purple to green",
+            "make light color red"
+        ]
+    },
+    {
+        "intent_id": 29,
+        "sample_utterances": [
+            "dim the lights",
+            "please dim the lights in the bedroom",
+            "dim the lights in the living room",
+            "minimize the lights"
+        ]
+    },
+    {
+        "intent_id": 30,
+        "sample_utterances": [
+            "make the lights off",
+            "i want the light to be switched off",
+            "turn off the room lights",
+            "light off living room"
+        ]
+    },
+    {
+        "intent_id": 31,
+        "sample_utterances": [
+            "i want to turn on the blue lights",
+            "please turn the lights on",
+            "put the disco lights on",
+            "it's too dark here"
+        ]
+    },
+    {
+        "intent_id": 32,
+        "sample_utterances": [
+            "i need more light",
+            "do more light",
+            "turn up the brightness",
+            "brighten the lights please"
+        ]
+    },
+    {
+        "intent_id": 33,
+        "sample_utterances": [
+            "turn off the fan in the master bedroom",
+            "the wemo plug should be turned off on",
+            "turn off the wemo socket in the kitchen",
+            "turn off the smart socket"
+        ]
+    },
+    {
+        "intent_id": 34,
+        "sample_utterances": [
+            "please turn on wemo socket",
+            "outlet on",
+            "please turn on my smart plug socket",
+            "please switch on my wemo plug socket"
+        ]
+    },
+    {
+        "intent_id": 35,
+        "sample_utterances": [
+            "add grocery shopping to today's to do list",
+            "add a tab to the shopping list",
+            "create list"
+        ]
+    },
+    {
+        "intent_id": 36,
+        "sample_utterances": [
+            "give me all my lists",
+            "can you tell me whats on my shopping list",
+            "what are the items on my list",
+            "send me the last list uploaded"
+        ]
+    },
+    {
+        "intent_id": 37,
+        "sample_utterances": [
+            "remove milk from my grocery list",
+            "please delete list titled kickball",
+            "eliminate the list kickball but make sure the contacts remain",
+            "remove this list from the others"
+        ]
+    },
+    {
+        "intent_id": 38,
+        "sample_utterances": [
+            "this song is my favourite",
+            "save opinion on song",
+            "isn't keith urban wonderful"
+        ]
+    },
+    {
+        "intent_id": 39,
+        "sample_utterances": [
+            "what is the name of the lead singer in this band",
+            "what's the name of this song",
+            "what song do i listen to the most"
+        ]
+    },
+    {
+        "intent_id": 40,
+        "sample_utterances": [
+            "turn on shuffle",
+            "make a laundry setting for the volume at twenty",
+            "open music player settings",
+            "please add this song to work out playlist"
+        ]
+    },
+    {
+        "intent_id": 41,
+        "sample_utterances": [
+            "what's happening in world news today",
+            "which teams are playing today in the premier league",
+            "let me know the latest weather news",
+            "how about the latest news"
+        ]
+    },
+    {
+        "intent_id": 42,
+        "sample_utterances": [
+            "play it after five minutes",
+            "base on my audiobook collection get me recommendation related audio book i should listen get and play me the resume",
+            "continue pride and prejudice"
+        ]
+    },
+    {
+        "intent_id": 43,
+        "sample_utterances": [
+            "let's play fmod",
+            "i need to play sims",
+            "play keno",
+            "play papa pear saga"
+        ]
+    },
+    {
+        "intent_id": 44,
+        "sample_utterances": [
+            "i want to hear play that funky music",
+            "play music from good playlist",
+            "run indian folk song",
+            "play be warned by tech n9ne"
+        ]
+    },
+    {
+        "intent_id": 45,
+        "sample_utterances": [
+            "show me the newest podcasts",
+            "show me the previous episode",
+            "please go to next date",
+            "move to next section"
+        ]
+    },
+    {
+        "intent_id": 46,
+        "sample_utterances": [
+            "turn it to frequency nine hundred and ninety seven",
+            "play the kansas city hip hop station",
+            "please play the local latin music channel on the radio",
+            "play the urban radio station"
+        ]
+    },
+    {
+        "intent_id": 47,
+        "sample_utterances": [
+            "what would be the exchange rate of currency in japan",
+            "what is the exchange rate of euro and dollar",
+            "what is the current exchange rate from u. s. d. to rupies",
+            "given me the exchange rates between u. s. d. and cad"
+        ]
+    },
+    {
+        "intent_id": 48,
+        "sample_utterances": [
+            "blanket definition",
+            "tell me about rock",
+            "what is laptop",
+            "define a phrase blue sky research"
+        ]
+    },
+    {
+        "intent_id": 49,
+        "sample_utterances": [
+            "when was born abraham lincoln",
+            "what is the temperature in indianapolis indiana",
+            "how far is parana river",
+            "how many sides are on a pentagon"
+        ]
+    },
+    {
+        "intent_id": 50,
+        "sample_utterances": [
+            "do you know math",
+            "how many pounds do sixty kg make",
+            "calculate two plus 29",
+            "what is fifty five minus two"
+        ]
+    },
+    {
+        "intent_id": 51,
+        "sample_utterances": [
+            "stock details",
+            "give me the opening stock price of apple",
+            "what's the stock of apple"
+        ]
+    },
+    {
+        "intent_id": 52,
+        "sample_utterances": [
+            "any activity in the area",
+            "what is happening now",
+            "what baseball games are scheduled for this week in tulsa",
+            "what is going on in me area today"
+        ]
+    },
+    {
+        "intent_id": 53,
+        "sample_utterances": [
+            "give me all ice cream shops within two miles",
+            "recommend pub in eighth and monte diablo",
+            "i need a good shop"
+        ]
+    },
+    {
+        "intent_id": 54,
+        "sample_utterances": [
+            "what is the best movie to watch with a glass of wine",
+            "is logan a good movie to watch",
+            "what are the current movies playing in me area",
+            "do you have any suggestion action movies"
+        ]
+    },
+    {
+        "intent_id": 55,
+        "sample_utterances": [
+            "please post happy birthday usa on my newsfeed",
+            "tweet bad day at starbucks",
+            "send a tweet to esurance to say i hate you",
+            "tweet complaint to consumer service"
+        ]
+    },
+    {
+        "intent_id": 56,
+        "sample_utterances": [
+            "social media updates",
+            "in every three hours give me my facebook update",
+            "new updates",
+            "find me new comments from my facebook"
+        ]
+    },
+    {
+        "intent_id": 57,
+        "sample_utterances": [
+            "find food and order",
+            "hey order me some take out from jason's deli",
+            "open grubhub",
+            "order a ham and cheese sandwich from subway"
+        ]
+    },
+    {
+        "intent_id": 58,
+        "sample_utterances": [
+            "remember i've ordered a cake for tonight's birthday party let me know the status please",
+            "does that restaurant allow call in orders",
+            "does dominos deliver",
+            "is my order ready"
+        ]
+    },
+    {
+        "intent_id": 59,
+        "sample_utterances": [
+            "i need the arrival time for new york train",
+            "how do i get from my house to the target along i forty",
+            "when does the next train to work leave",
+            "is the train time to a location long"
+        ]
+    },
+    {
+        "intent_id": 60,
+        "sample_utterances": [
+            "where is the closest uber",
+            "please book a taxi for me",
+            "book uber from my home",
+            "get me a taxi"
+        ]
+    },
+    {
+        "intent_id": 61,
+        "sample_utterances": [
+            "buy a train ticket from lakeland florida to new york",
+            "schedule a journey to las vegas by train",
+            "book a rajdhani train ticket from mumbai to ahmedabad",
+            "i need the current dart rail schedule from west irving station to north lake college"
+        ]
+    },
+    {
+        "intent_id": 62,
+        "sample_utterances": [
+            "what is traffic like right now",
+            "tell me the traffic condition from here to home",
+            "can i make back home without a traffic jam"
+        ]
+    },
+    {
+        "intent_id": 63,
+        "sample_utterances": [
+            "do i need to carry umbrella for evening",
+            "what is the current weather conditions in chicago illinois",
+            "what will be the temperature today for miami florida"
+        ]
+    }
+]

@@ -1,0 +1,63 @@
+[
+    {
+        "intent_id": 0,
+        "sample_utterances": [
+            "Add the name Not Fade Away to the playlist the midnight hour",
+            "Add the Beatles tune Yesterday to my playlist, The Southern Highway Chronicles",
+            "Add tune to this is trey songz",
+            "Add arthur russell to my Women of Disco playlist."
+        ]
+    },
+    {
+        "intent_id": 1,
+        "sample_utterances": [
+            "Make reservations for me at a taverna in Hong Kong",
+            "I want to take my mom and I to the tea house",
+            "book a spot at Rimsky-Korsakoffee House in Mackville",
+            "Book me a reservation for Ad Hoc in Brazil for a party of 7"
+        ]
+    },
+    {
+        "intent_id": 2,
+        "sample_utterances": [
+            "what is the weather forecast for Moffett",
+            "What will the humidity be in Beroun on aug. 26",
+            "at 0 AM what will the weather be here",
+            "What will the humidity be in AR in 49 weeks and a half from now"
+        ]
+    },
+    {
+        "intent_id": 3,
+        "sample_utterances": [
+            "Play the track Goodbye Alexander, Goodbye Honey Boy from Ehsaan Noorani",
+            "Play some seventies music on Netflix .",
+            "Lets hear some 2009 music"
+        ]
+    },
+    {
+        "intent_id": 4,
+        "sample_utterances": [
+            "Rate this album a 3",
+            "Rate this album zero of 6",
+            "Rate Timeline of science fiction 4 out of 6",
+            "I give Benson-Meditation 1 out of 6 stars ."
+        ]
+    },
+    {
+        "intent_id": 5,
+        "sample_utterances": [
+            "Find a TV show called The God Boy .",
+            "play the song S.F. sound furniture",
+            "Where to buy painting Target Practice",
+            "I'd like to see Apartment Hunting ."
+        ]
+    },
+    {
+        "intent_id": 6,
+        "sample_utterances": [
+            "I'd like to watch Heartbreak at Pacific Theatres at two pm",
+            "are there any movies playing around here",
+            "What time is My Son Shall Be Armenian playing at Plitt Theatres"
+        ]
+    }
+]

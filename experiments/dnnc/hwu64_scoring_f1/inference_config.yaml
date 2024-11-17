@@ -1,0 +1,17 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 64
+  seed: 42
+nodes_configs:
+- load_path: null
+  module_config:
+    embedder_name: avsolatorio/GIST-small-Embedding-v0
+    k: 10
+  module_type: vector_db
+  node_type: retrieval
+- load_path: null
+  module_config:
+    embedder_name: avsolatorio/GIST-small-Embedding-v0
+  module_type: linear
+  node_type: scoring

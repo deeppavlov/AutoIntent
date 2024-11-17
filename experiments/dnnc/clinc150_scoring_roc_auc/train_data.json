@@ -1,0 +1,1314 @@
+[
+    {
+        "intent_id": 0,
+        "sample_utterances": [
+            "does acero in maplewood allow reservations",
+            "is there evening reservations available in the eve",
+            "does ruby tuesday accept reservations",
+            "do they take reservations at bar tartine"
+        ]
+    },
+    {
+        "intent_id": 1,
+        "sample_utterances": [
+            "for what reason is my account blocked",
+            "what would cause me to be locked out of my bank account",
+            "can you tell me why there's a hold on my mutualone account"
+        ]
+    },
+    {
+        "intent_id": 2,
+        "sample_utterances": [
+            "please set up an alarm to go off tomorrow at daybreak",
+            "make an alarm for tomorrow at twilight",
+            "can you play an alarm at 5pm",
+            "set an alarm to go to sleep and another to wake up"
+        ]
+    },
+    {
+        "intent_id": 3,
+        "sample_utterances": [
+            "tell me a little more about the status of my credit card application",
+            "have i gotten confirmation for my credit card app",
+            "has the discover card approved my app",
+            "is the processing done on my new credit card"
+        ]
+    },
+    {
+        "intent_id": 4,
+        "sample_utterances": [
+            "how good is the apr on my mastercard compared to others",
+            "what apr does this credit card have",
+            "what is the apr for my credit card",
+            "is the apr rate on my amex pretty good"
+        ]
+    },
+    {
+        "intent_id": 5,
+        "sample_utterances": [
+            "are you a real person or a bot",
+            "do you know whether you are a human or whether you're a computer",
+            "are you ai or a real person please",
+            "so are you a real person"
+        ]
+    },
+    {
+        "intent_id": 6,
+        "sample_utterances": [
+            "what is my bank balance for all accounts",
+            "can you tell me how much cash i have",
+            "what is the balance of my bank account",
+            "what is the value of my bank accounts"
+        ]
+    },
+    {
+        "intent_id": 7,
+        "sample_utterances": [
+            "find out the cost of my bill payments",
+            "how much is my cable bill",
+            "how much is my current water bill for",
+            "how much is my xfinity bill this month"
+        ]
+    },
+    {
+        "intent_id": 8,
+        "sample_utterances": [
+            "i would like to know when the bill is due",
+            "when is my next car payment",
+            "when is my bill due",
+            "when is my car insurance due"
+        ]
+    },
+    {
+        "intent_id": 9,
+        "sample_utterances": [
+            "book a flight from pensacola, fl to houston, tx on 17 february 2019 and returning on 7 march 2019",
+            "book a flight from key west, fl to san antonio, tx on 18 february 2019 and returning on 5 march 2019",
+            "please get me a flight booked from miami to dallas on american airlines",
+            "book a flight from chicago to dc on monday and returning on wednesday"
+        ]
+    },
+    {
+        "intent_id": 10,
+        "sample_utterances": [
+            "find and book a hotel in md, baltimore starting on the 7th to the 9th",
+            "is it possible to have a room booked in omaha near the convention hall for may 01, 2019 to may 05, 2019",
+            "can i get a hotel room that can accommodate 50 people in bangor from january 01, 2021 to january 30, 2021",
+            "could you reserve me a hotel room in philadelphia near chinatown from 3/19 through 3/22"
+        ]
+    },
+    {
+        "intent_id": 11,
+        "sample_utterances": [
+            "could you tell me what 30% off 235 is, please",
+            "can you help me do math",
+            "what is the sum of 3 plus 5",
+            "how much is 50 plus 756"
+        ]
+    },
+    {
+        "intent_id": 12,
+        "sample_utterances": [
+            "what events are on my calendar for april 1st",
+            "what time is my haircut on wednesday",
+            "what's on my calendar for tuesday",
+            "what do i have planned for tomorrow"
+        ]
+    },
+    {
+        "intent_id": 13,
+        "sample_utterances": [
+            "take my lunch plans off the calendar for march 13th",
+            "i want to add farm trip to my calendar for friday",
+            "i wanna remove fishing from my calendar for soccer",
+            "put \"get tires checked\" on my calendar"
+        ]
+    },
+    {
+        "intent_id": 14,
+        "sample_utterances": [
+            "how many calories does a scoop of chocolate ice cream have",
+            "tell me the amount of calories in muffins",
+            "how many calories would i consume if i ate a loaded hotdog"
+        ]
+    },
+    {
+        "intent_id": 15,
+        "sample_utterances": [
+            "undo",
+            "i want you to cancel the current action",
+            "how do i make you stop talking",
+            "do not complete the task that i gave you"
+        ]
+    },
+    {
+        "intent_id": 16,
+        "sample_utterances": [
+            "i would like to cancel my reservations",
+            "cancel the reservation at olive garden for tommy",
+            "cancel my reservation for 6 pm at sidetracks",
+            "call the restaurant and cancel my reservation"
+        ]
+    },
+    {
+        "intent_id": 17,
+        "sample_utterances": [
+            "can i rent a car in belgium from march 01 to march 02 and have it be a porsche",
+            "will you help me reserve a rental car for my trip to dallas",
+            "find out if i can rent a car in los angeles from march 2-9",
+            "book me a rental car in aiken on may 12 to may 16"
+        ]
+    },
+    {
+        "intent_id": 18,
+        "sample_utterances": [
+            "at walmart my card got declined when i was buyng qtips",
+            "find out why my card was declined",
+            "i was at costco trying to buy groceries and my card got declined",
+            "tell me why my card didn't work yesterday"
+        ]
+    },
+    {
+        "intent_id": 19,
+        "sample_utterances": [
+            "how many carry ons can i take on a flight with united to lax",
+            "can you tell me jet blue airlines' carry on policy",
+            "can i carry on a garment bag, a small travel bag, and a back pack on my trip with american airlines",
+            "what are the rules for carry on luggage"
+        ]
+    },
+    {
+        "intent_id": 20,
+        "sample_utterances": [
+            "switch over to the male voice mode",
+            "could you change the accent you're using",
+            "change to a male voice"
+        ]
+    },
+    {
+        "intent_id": 21,
+        "sample_utterances": [
+            "from now on i'm going to call you ishmael",
+            "please respond to me when i reference skynet",
+            "i hereby rename you felix"
+        ]
+    },
+    {
+        "intent_id": 22,
+        "sample_utterances": [
+            "talk to me in italian from now on",
+            "i need to change language to spanish",
+            "how can i adjust the spoken language",
+            "can you speak to me in chinese"
+        ]
+    },
+    {
+        "intent_id": 23,
+        "sample_utterances": [
+            "slow the speech down",
+            "i can't understand you because of how rapidly you're speaking",
+            "could you not talk so slowly",
+            "i would like you to increase the speed of your speech please"
+        ]
+    },
+    {
+        "intent_id": 24,
+        "sample_utterances": [
+            "the name you should call me is janet",
+            "i'm called tim",
+            "call me stevie",
+            "people call me gary"
+        ]
+    },
+    {
+        "intent_id": 25,
+        "sample_utterances": [
+            "please your volume",
+            "set the volume to 4 please",
+            "volume needs to be at 4",
+            "turn your voice box down"
+        ]
+    },
+    {
+        "intent_id": 26,
+        "sample_utterances": [
+            "do you know if my reservation for dono is confirmed at 8 pm",
+            "will you make sure robert has a reservation at ruth's steakhouse",
+            "i'd like for you to make sure my reservation is there for charlie's under jack",
+            "please confirm i have a reservation for 2 pm on february 21st"
+        ]
+    },
+    {
+        "intent_id": 27,
+        "sample_utterances": [
+            "how long does it take to prepare pot roast",
+            "how long will it take me to make baked chicken",
+            "how long will the turkey take to cook",
+            "how long do the brownies need to be in the oven"
+        ]
+    },
+    {
+        "intent_id": 28,
+        "sample_utterances": [
+            "how high is my credit limit for my childrens place card",
+            "credit limit info",
+            "how high is my credit limit for my navy federal card",
+            "tell me my visa's credit limit"
+        ]
+    },
+    {
+        "intent_id": 29,
+        "sample_utterances": [
+            "can i increase my credit limit to 1100 dollars",
+            "i need a credit raise by 1000 dollars",
+            "can my limit be increased for my visa",
+            "is the limit on my visa card able to be increased"
+        ]
+    },
+    {
+        "intent_id": 30,
+        "sample_utterances": [
+            "what is the number of my credit score",
+            "verify with me my credit score",
+            "i gotta know my credit score",
+            "where can i check my credit score"
+        ]
+    },
+    {
+        "intent_id": 31,
+        "sample_utterances": [
+            "could you find my location on the map, please",
+            "look my location up on the map",
+            "how can i find my current location",
+            "place a marker for me where i am on the map"
+        ]
+    },
+    {
+        "intent_id": 32,
+        "sample_utterances": [
+            "report the card has been damaged",
+            "my card split in half, how do i report it",
+            "the chip on my card is damaged and i need a new one",
+            "my card is damaged so i can not use it"
+        ]
+    },
+    {
+        "intent_id": 33,
+        "sample_utterances": [
+            "what day is it gonna be in twenty-one days",
+            "i need the full date for today",
+            "tell me what day today is",
+            "what would tomorrow's date be"
+        ]
+    },
+    {
+        "intent_id": 34,
+        "sample_utterances": [
+            "use the word ataraxy in a sentence",
+            "tell me the definition of the word redemption",
+            "what is the meaning of flange",
+            "what is the definition of succumb"
+        ]
+    },
+    {
+        "intent_id": 35,
+        "sample_utterances": [
+            "what steps do i need to do to set up direct deposit",
+            "set up a direct deposit",
+            "i'd like to set up a direct deposit for my paycheck",
+            "i'd like to have my paycheck direct deposited to my chase account"
+        ]
+    },
+    {
+        "intent_id": 36,
+        "sample_utterances": [
+            "assist me to know how to get to target by bus",
+            "how do i get to the statue of liberty on foot",
+            "can you tell me the nearest restaurant to me and give me directions",
+            "i'm at home, so where is the closest starbucks"
+        ]
+    },
+    {
+        "intent_id": 37,
+        "sample_utterances": [
+            "what is the length of time it takes to get to phoenix",
+            "it takes how long to get to mcdonald's in pomona",
+            "how much time does it take to get to levi stadium from san jose airport"
+        ]
+    },
+    {
+        "intent_id": 38,
+        "sample_utterances": [
+            "i am curious about whether you have pets",
+            "do you like cat or dogs",
+            "do you have any pet animals",
+            "what species of pets do you own"
+        ]
+    },
+    {
+        "intent_id": 39,
+        "sample_utterances": [
+            "i gotta know the exchange rate between yen and rubles",
+            "us dollars to uk",
+            "whats rupees dollars in 30",
+            "what is the current exchange rate of yen to lira"
+        ]
+    },
+    {
+        "intent_id": 40,
+        "sample_utterances": [
+            "during which month will my card expire",
+            "on what date does my visa card expires",
+            "how many more days before my credit card expires",
+            "i need to know the date of expiration for my credit card"
+        ]
+    },
+    {
+        "intent_id": 41,
+        "sample_utterances": [
+            "have you seen my cellphone",
+            "help, i cannot find my phone",
+            "ai, i lost my phone, help me find it please"
+        ]
+    },
+    {
+        "intent_id": 42,
+        "sample_utterances": [
+            "do you mind informing me the status of my southwest flight",
+            "when will i get to my destination",
+            "when will my flight land",
+            "what landing time is scheduled for my flight"
+        ]
+    },
+    {
+        "intent_id": 43,
+        "sample_utterances": [
+            "i ned you to flip a coin",
+            "let's settle it with a coin flip",
+            "can you flip a coin, i will take tails",
+            "flip a coin for me"
+        ]
+    },
+    {
+        "intent_id": 44,
+        "sample_utterances": [
+            "how long will eggs last in the fridge",
+            "will the chicken have gone bad if it's been in the fridge since monday",
+            "how long can i keep a ham in the freezer",
+            "the milk will expire when"
+        ]
+    },
+    {
+        "intent_id": 45,
+        "sample_utterances": [
+            "can you please freeze my bank account",
+            "please make my account a frozen one",
+            "place a block on my capital one account right now",
+            "freeze my account immediately"
+        ]
+    },
+    {
+        "intent_id": 46,
+        "sample_utterances": [
+            "can you tell me fun facts about lighthouses",
+            "what's a fun fact about mythology",
+            "give me a fun fact about otters"
+        ]
+    },
+    {
+        "intent_id": 47,
+        "sample_utterances": [
+            "can you read my gas level",
+            "how much gas is in my tank",
+            "do i have enough fuel to get to orlando",
+            "tell me the amount of gas i have"
+        ]
+    },
+    {
+        "intent_id": 48,
+        "sample_utterances": [
+            "is there a certain type of gas i need to use",
+            "what kind of gas is needed for this car",
+            "what type of gas does this car take"
+        ]
+    },
+    {
+        "intent_id": 49,
+        "sample_utterances": [
+            "i have to go ai goodbye",
+            "goodbye, ai assistant",
+            "thanks for talking to me",
+            "bye-bye"
+        ]
+    },
+    {
+        "intent_id": 50,
+        "sample_utterances": [
+            "how are you doing, ai",
+            "hello how's it going",
+            "how do you feel"
+        ]
+    },
+    {
+        "intent_id": 51,
+        "sample_utterances": [
+            "if i go to tgifridays at eight, will they be crowded",
+            "how long will it take to be seated at macaroni grill",
+            "how long will i have to wait before being seated at the cheese cake factory",
+            "is there a wait time to get into tgifridays"
+        ]
+    },
+    {
+        "intent_id": 52,
+        "sample_utterances": [
+            "what age were you on your last birthday, ai",
+            "how old are you exactly at the moment",
+            "how old is the ai"
+        ]
+    },
+    {
+        "intent_id": 53,
+        "sample_utterances": [
+            "how can i go about improving my credit score",
+            "what factors can ruin a credit score",
+            "tell me how to improve my credit score",
+            "what are ways to improve my credit"
+        ]
+    },
+    {
+        "intent_id": 54,
+        "sample_utterances": [
+            "what do you make in a year",
+            "advise me of my income",
+            "how much am i getting paid",
+            "what do i usually earn in a day"
+        ]
+    },
+    {
+        "intent_id": 55,
+        "sample_utterances": [
+            "can i use something else if i don't have eggs",
+            "i need to swap salt for baking soda",
+            "can yogurt be used for sour cream",
+            "can i use milk instead of cream"
+        ]
+    },
+    {
+        "intent_id": 56,
+        "sample_utterances": [
+            "what ingredients go in spaghetti",
+            "i want to cook a quick breakfast what ingredients do i need",
+            "how do you make chicken noodle casserole",
+            "what ingredients are in sugar cookies"
+        ]
+    },
+    {
+        "intent_id": 57,
+        "sample_utterances": [
+            "what insurance benefits am i getting",
+            "are my health benefits good",
+            "what insurance benefits do i have"
+        ]
+    },
+    {
+        "intent_id": 58,
+        "sample_utterances": [
+            "aaa insurance start new plan",
+            "what rental insurance policy do you recommend",
+            "help me find a new auto insurance policy"
+        ]
+    },
+    {
+        "intent_id": 59,
+        "sample_utterances": [
+            "how can i find my interest rate for my alliance account",
+            "how do i figure out my intetest rate",
+            "could you tell me my interest rate"
+        ]
+    },
+    {
+        "intent_id": 60,
+        "sample_utterances": [
+            "will i be charged if i use the card in germany",
+            "what are the fees for using my card in toronto",
+            "what fees are charged if i use something in paris",
+            "do i need to pay any fee if i use my card in japan"
+        ]
+    },
+    {
+        "intent_id": 61,
+        "sample_utterances": [
+            "do i need an international visa to go to mexico",
+            "do i need a visa for germany",
+            "does international travel always require a visa"
+        ]
+    },
+    {
+        "intent_id": 62,
+        "sample_utterances": [
+            "show me the way to jump start a battery",
+            "pull up instructions on how to jump start a car",
+            "explain how to jump a car",
+            "i would appreciate it if you could show me how to jump start a car battery"
+        ]
+    },
+    {
+        "intent_id": 63,
+        "sample_utterances": [
+            "when was the last time my car was in the shop",
+            "check my calendar for the date that my care was last serviced",
+            "i need to know when i last carried my car to the shop",
+            "do you know when i last took my car in to the shop"
+        ]
+    },
+    {
+        "intent_id": 64,
+        "sample_utterances": [
+            "what to do if luggage lost",
+            "who do i go to to find lost luggage",
+            "i lost my luggage coming from chicago on delta flight ab123",
+            "my luggage was lost on the flight"
+        ]
+    },
+    {
+        "intent_id": 65,
+        "sample_utterances": [
+            "call christie",
+            "x is who i need to call",
+            "call home",
+            "can you make a phone call to randy"
+        ]
+    },
+    {
+        "intent_id": 66,
+        "sample_utterances": [
+            "i haven't the foggiest",
+            "i'm unsure of the answer",
+            "not a clue",
+            "i'm unsure"
+        ]
+    },
+    {
+        "intent_id": 67,
+        "sample_utterances": [
+            "do you have any suggestions as to what i should cook for dinner",
+            "can you give me a burmese dinner suggestion",
+            "what do you think i should make for dinner",
+            "suggest a meal from laos to me, please"
+        ]
+    },
+    {
+        "intent_id": 68,
+        "sample_utterances": [
+            "what is your take on the meaning of life",
+            "what is the point of life",
+            "i wanna know the meaning of life",
+            "meaning of life is"
+        ]
+    },
+    {
+        "intent_id": 69,
+        "sample_utterances": [
+            "what is the conversion between tablespoons and cups",
+            "how do i convert four inches into centimeters",
+            "what's 12 feet in meters",
+            "how many meters are in 50 feet"
+        ]
+    },
+    {
+        "intent_id": 70,
+        "sample_utterances": [
+            "have i got any meetings today with sara",
+            "do i have any meetings today between 2 and 3",
+            "when am i gonna be meeting roger",
+            "what is on my schedule between 10:00 am and 11:00 am"
+        ]
+    },
+    {
+        "intent_id": 71,
+        "sample_utterances": [
+            "please give me the minimum payment total for my sprint phone bill",
+            "how much is the minimum payment on my chase card",
+            "i need to know the bill's minimum payment"
+        ]
+    },
+    {
+        "intent_id": 72,
+        "sample_utterances": [
+            "what is the amount of miles per gallon this car gets on the highway",
+            "what is the highway mpg on this car",
+            "retrieve my current mpg on my car",
+            "what are the estimates for the car's highway mpg"
+        ]
+    },
+    {
+        "intent_id": 73,
+        "sample_utterances": [
+            "i would like to apply for a bank of america travel rewards credit card",
+            "is it possible to apply for a new credit card",
+            "direct me to the application for a new credit card",
+            "am i eligible for a new credit card application"
+        ]
+    },
+    {
+        "intent_id": 74,
+        "sample_utterances": [
+            "what day is our next free day",
+            "i need to know when my next day off is",
+            "what day is our next free day on the calendar, please"
+        ]
+    },
+    {
+        "intent_id": 75,
+        "sample_utterances": [
+            "please jump to the song that follows this one",
+            "the next song should be played",
+            "i need you to play the next song on this playlist",
+            "i want to hear the next song"
+        ]
+    },
+    {
+        "intent_id": 76,
+        "sample_utterances": [
+            "that isn't the right answer",
+            "not that",
+            "not true",
+            "no, don't do that"
+        ]
+    },
+    {
+        "intent_id": 77,
+        "sample_utterances": [
+            "can you give me nutritional info on oranges",
+            "i want to know how nutritious an avocado typically is",
+            "what are the nutritional facts of waffles",
+            "what's the nutritional info for a loaf of bread"
+        ]
+    },
+    {
+        "intent_id": 78,
+        "sample_utterances": [
+            "what oil do i need and how is it changed",
+            "how do i change the oil in my car",
+            "can you show me how to change the oil in my car",
+            "can you tell me how to change my car's oil"
+        ]
+    },
+    {
+        "intent_id": 79,
+        "sample_utterances": [
+            "when's the next time i should go for an oil change",
+            "how often should the oil get changed",
+            "is there a way to tell when i need my oil changed"
+        ]
+    },
+    {
+        "intent_id": 80,
+        "sample_utterances": [
+            "i just used up my toothpaste and need you to order more",
+            "i'm making a purchase and need the help of ai",
+            "please order everything you see on my shopping list",
+            "please order me everything that is on my shopping list"
+        ]
+    },
+    {
+        "intent_id": 81,
+        "sample_utterances": [
+            "i would like to order additional checkbooks to me mailed to my home address",
+            "ai, where do i go to order checks for my usbank account",
+            "since we're out of checks i want help purchasing new ones",
+            "can i get some more of those new checkbooks mailed to me"
+        ]
+    },
+    {
+        "intent_id": 82,
+        "sample_utterances": [
+            "what's going on with my order",
+            "can you find my package in transit",
+            "is my order here yet",
+            "can you please check on the status of my online order"
+        ]
+    },
+    {
+        "intent_id": 83,
+        "sample_utterances": [
+            "i would like to pay my cell phone bill",
+            "i want to pay my car payment",
+            "make a payment on the electric bill",
+            "i want to pay my gas bill"
+        ]
+    },
+    {
+        "intent_id": 84,
+        "sample_utterances": [
+            "day that i get paid",
+            "when's my next paycheck",
+            "what is the date of my last paycheck",
+            "can you tell me what day my next paycheck will come"
+        ]
+    },
+    {
+        "intent_id": 85,
+        "sample_utterances": [
+            "what is the procedure for getting a new pin number",
+            "so it turns out i can't remember what my pin is for my bank of america checking account",
+            "i'd like to change my pin number for my wells fargo account",
+            "how can i switch the pin on my wells fargo account to 9982"
+        ]
+    },
+    {
+        "intent_id": 86,
+        "sample_utterances": [
+            "please play 1979 by the smashing pumpkins",
+            "please play the new lady gaga song",
+            "i wanna play the song that goes like hey jude don't make it bad",
+            "music please"
+        ]
+    },
+    {
+        "intent_id": 87,
+        "sample_utterances": [
+            "what type of plug does the country use",
+            "should i bring my socket converter while traveling to england",
+            "what plug type does spain use"
+        ]
+    },
+    {
+        "intent_id": 88,
+        "sample_utterances": [
+            "check days of pto",
+            "i've saved what number of days of vacation",
+            "how many pto days do i have for the year"
+        ]
+    },
+    {
+        "intent_id": 89,
+        "sample_utterances": [
+            "i'd like to schedule some pto from 2/22 to 2/25",
+            "let's do a personal pto request for the dates may 12th to may 15th",
+            "how do i request vacation time",
+            "i need help making a pto request for march 3-10"
+        ]
+    },
+    {
+        "intent_id": 90,
+        "sample_utterances": [
+            "could you tell me what the status of my day off request is",
+            "has may supervisor approved the vacation days i asked for",
+            "my vacation, has it been approved yet"
+        ]
+    },
+    {
+        "intent_id": 91,
+        "sample_utterances": [
+            "have i used half of my days off yet",
+            "how many times have i taken off from work this year",
+            "how many personal days have i taken this month"
+        ]
+    },
+    {
+        "intent_id": 92,
+        "sample_utterances": [
+            "can you find a hearty lasagna recipe",
+            "how do i make lemon merengue pie",
+            "can you give me a recipe for german chocolate cake"
+        ]
+    },
+    {
+        "intent_id": 93,
+        "sample_utterances": [
+            "walk me through the best ways to use my credit card points",
+            "let's use my credit card points",
+            "i want to cash my credit card points",
+            "i want to use my credit card points"
+        ]
+    },
+    {
+        "intent_id": 94,
+        "sample_utterances": [
+            "confirm that buy a light bulb is on my list of reminders",
+            "what are in my reminders list",
+            "i want to hear what is on my reminders list",
+            "what do i want to remember"
+        ]
+    },
+    {
+        "intent_id": 95,
+        "sample_utterances": [
+            "make me a reminder about booking it",
+            "set a reminder to go dress shopping",
+            "remind me to take out the garbage in the morning",
+            "remind me to call the vet tomorrow"
+        ]
+    },
+    {
+        "intent_id": 96,
+        "sample_utterances": [
+            "i would like that repeated",
+            "i would like you to repeat yourself",
+            "what was that last thing you said",
+            "will you please repeat what you said"
+        ]
+    },
+    {
+        "intent_id": 97,
+        "sample_utterances": [
+            "when will me new card arrive",
+            "when will my new visa get here",
+            "when will my new card come in the mail",
+            "how many days does it take to receive a new card"
+        ]
+    },
+    {
+        "intent_id": 98,
+        "sample_utterances": [
+            "there are some questionable charges on my card",
+            "i'm reporting fraudelent activity on my card",
+            "how do i let visa know about a charge i didn't make",
+            "so i made a fraudulent transaction"
+        ]
+    },
+    {
+        "intent_id": 99,
+        "sample_utterances": [
+            "what do i do if i lost my card",
+            "i can't find my visa card and i want to report it as lost",
+            "i misplaced my visa and need it marked as lost"
+        ]
+    },
+    {
+        "intent_id": 100,
+        "sample_utterances": [
+            "please revert all settings to factory default",
+            "restore my factory settings immediately please",
+            "can you restore factory settings now",
+            "reset the factory settings please"
+        ]
+    },
+    {
+        "intent_id": 101,
+        "sample_utterances": [
+            "book a reservation for 5 at lawry's under the name chris",
+            "would you please make a reservation for 2 at olive garden for 5 pm today",
+            "can you get me a table for two for 8:00 pm at parc",
+            "can i make a reservation for 2 at state bird for 7:30, please"
+        ]
+    },
+    {
+        "intent_id": 102,
+        "sample_utterances": [
+            "how good are the ratings for peter luger steakhouse",
+            "how good are the ratings for red robin",
+            "are the reviews good or bad for burger king"
+        ]
+    },
+    {
+        "intent_id": 103,
+        "sample_utterances": [
+            "can you tell me the best place for cajun shrimp in tampa",
+            "are there any decent places to get seafood in seattle",
+            "can you suggest some quality chinese restaurants in oklahoma city"
+        ]
+    },
+    {
+        "intent_id": 104,
+        "sample_utterances": [
+            "i wonder how many points i have earned with my bank of america card",
+            "how many points did i get on my visa card",
+            "what's my total point number on my mastercard",
+            "how many points have i already accrued on my chase mastercard"
+        ]
+    },
+    {
+        "intent_id": 105,
+        "sample_utterances": [
+            "when you roll a six sided dice what is the results",
+            "what do you get if you roll a six sided dice",
+            "roll the dice for me",
+            "shoot the dice!"
+        ]
+    },
+    {
+        "intent_id": 106,
+        "sample_utterances": [
+            "i have a new job, help me with my 401k rollover",
+            "ways to transfer my 401k",
+            "i switched companies and need to rollover my 401k"
+        ]
+    },
+    {
+        "intent_id": 107,
+        "sample_utterances": [
+            "how can i find my routing number from bank of america",
+            "what's bank of america's routing number",
+            "show me the routing number for chase"
+        ]
+    },
+    {
+        "intent_id": 108,
+        "sample_utterances": [
+            "i have to schedule some car maintenance",
+            "can someone look at my car cause the check engine light is on",
+            "i need to schedule a car repair",
+            "can i schedule a check up for my tires somewhere"
+        ]
+    },
+    {
+        "intent_id": 109,
+        "sample_utterances": [
+            "tell me how i can schedule a meeting",
+            "are there rooms available between 5 and 530",
+            "set up a meeting with frank at 2pm",
+            "tell me how do i schedule a meeting"
+        ]
+    },
+    {
+        "intent_id": 110,
+        "sample_utterances": [
+            "how do i share my location with noel",
+            "please show my current location to andre",
+            "give boss my current location",
+            "i need to share my location with trey"
+        ]
+    },
+    {
+        "intent_id": 111,
+        "sample_utterances": [
+            "what are the contents of my shopping list",
+            "can you tell me my shopping list items, please",
+            "do i have a big shopping list",
+            "i need to know the things on my shopping list"
+        ]
+    },
+    {
+        "intent_id": 112,
+        "sample_utterances": [
+            "are bananas on my shopping list can you add them if they aren't",
+            "i need soda added to my list and carrots removed",
+            "add groceries to my shopping list as i am out",
+            "can you put detergent on my shopping list cause i'm all out"
+        ]
+    },
+    {
+        "intent_id": 113,
+        "sample_utterances": [
+            "lock all the doors",
+            "can you please help me start the car",
+            "set temperature to 75",
+            "can you get the fan going in here"
+        ]
+    },
+    {
+        "intent_id": 114,
+        "sample_utterances": [
+            "can you tell me how to spell elephant",
+            "i can't figure out how to spell superficial",
+            "i forget how to spell xylophone",
+            "how do you spell syzygy"
+        ]
+    },
+    {
+        "intent_id": 115,
+        "sample_utterances": [
+            "i need to know what i have spent on food recently",
+            "how much have i lately spent on eating out",
+            "how much money have i dropped recently"
+        ]
+    },
+    {
+        "intent_id": 116,
+        "sample_utterances": [
+            "remove the sync from my phone",
+            "disconnect from my phone please",
+            "will you please end the connection to my phone"
+        ]
+    },
+    {
+        "intent_id": 117,
+        "sample_utterances": [
+            "what do you think will be the result of my federal tax return",
+            "how much tax do i pay",
+            "what kind of tax do i pay",
+            "what do i currently pay in taxes"
+        ]
+    },
+    {
+        "intent_id": 118,
+        "sample_utterances": [
+            "do you know any good jokes about zebras",
+            "what's the funniest thing you know about peanuts",
+            "tell me a joke about jobs",
+            "do you know any good jokes"
+        ]
+    },
+    {
+        "intent_id": 119,
+        "sample_utterances": [
+            "i need sal to be texted and say i'll be there",
+            "text my coworker for me and tell them the due date",
+            "let sal know by text i will be attending",
+            "text christy and ask her what she wants for dinner"
+        ]
+    },
+    {
+        "intent_id": 120,
+        "sample_utterances": [
+            "thanks so much!",
+            "i appreciate that",
+            "awesome, thanks",
+            "your answer is appreciated"
+        ]
+    },
+    {
+        "intent_id": 121,
+        "sample_utterances": [
+            "what is the time in the utc timezone",
+            "what's the time set to in florida right now",
+            "what is the time, please"
+        ]
+    },
+    {
+        "intent_id": 122,
+        "sample_utterances": [
+            "please set a timer for 40 minutes",
+            "set a five minute timer please",
+            "set a one minute timer",
+            "please, can you set the timer for me"
+        ]
+    },
+    {
+        "intent_id": 123,
+        "sample_utterances": [
+            "what timezone is china in",
+            "time zone in france",
+            "italy's timezone is what",
+            "do you know the timezone for dublin"
+        ]
+    },
+    {
+        "intent_id": 124,
+        "sample_utterances": [
+            "how much longer until i have to change my tires",
+            "is it time for new tires",
+            "when do you think i should replace my tires because i replaced them on 12/21/17"
+        ]
+    },
+    {
+        "intent_id": 125,
+        "sample_utterances": [
+            "are my tires low",
+            "would you let me know how low the air in my tires are",
+            "tell me my car's tire pressure level",
+            "are my tires properly inflated with air"
+        ]
+    },
+    {
+        "intent_id": 126,
+        "sample_utterances": [
+            "i need to know everything on my to do list currently",
+            "read back to me my to do list",
+            "can you tell me my to do list",
+            "i need to hear my todo list"
+        ]
+    },
+    {
+        "intent_id": 127,
+        "sample_utterances": [
+            "to my domestic task list please add paint kitchen",
+            "add to my task list get carpet cleaned",
+            "i want you to add cleaning the toilet to my to do list",
+            "please include feeding the fish on my to do list"
+        ]
+    },
+    {
+        "intent_id": 128,
+        "sample_utterances": [
+            "how is the traffic at the nearest wal-mart pharmacy",
+            "traffic looking alright going towards burger king",
+            "how is the traffic at jfk at 5 pm on weekdays",
+            "is traffic bad on the way to chicago"
+        ]
+    },
+    {
+        "intent_id": 129,
+        "sample_utterances": [
+            "let me check my transaction on my citi card",
+            "show me the transaction on my car",
+            "what are my recent transaction"
+        ]
+    },
+    {
+        "intent_id": 130,
+        "sample_utterances": [
+            "can you transfer money from a to b",
+            "transfer 100 dollars between checking and savings",
+            "i would like to make a transfer"
+        ]
+    },
+    {
+        "intent_id": 131,
+        "sample_utterances": [
+            "can you translate cat into russian for me",
+            "in england how do they say subway",
+            "could you translate atm machine into english",
+            "please tell me how to ask for a taxi in french"
+        ]
+    },
+    {
+        "intent_id": 132,
+        "sample_utterances": [
+            "any alerts for travelers to canada",
+            "if i got to indonesia is it safe",
+            "do i need to read any travel alerts for kenya",
+            "i'd like to see if there's a travel alert for the country"
+        ]
+    },
+    {
+        "intent_id": 133,
+        "sample_utterances": [
+            "i'm travelling to boston soon and want to inform my bank",
+            "alert the bank that i am traveling to tokyo on the 7th until the 21st",
+            "tell my bank i will be traveling in brazil from june 1st to july 1st",
+            "the bank should know i am going to asia soon"
+        ]
+    },
+    {
+        "intent_id": 134,
+        "sample_utterances": [
+            "when visiting chicago, what things can i do there",
+            "what does kentucky have to offer for things to do",
+            "what are the big tourist sites in sweden",
+            "give me a list of things to do in orlando"
+        ]
+    },
+    {
+        "intent_id": 135,
+        "sample_utterances": [
+            "schedule me an uber to the mall",
+            "i need an uber to take me to the mall",
+            "call an uber to mark's house",
+            "book an uber to school"
+        ]
+    },
+    {
+        "intent_id": 136,
+        "sample_utterances": [
+            "please put this song on my moody monday playlist",
+            "what did you add to my playlist - broken by evanescence",
+            "can you please add hero by skillet to my playlist",
+            "add one by metallica to my playlist"
+        ]
+    },
+    {
+        "intent_id": 137,
+        "sample_utterances": [
+            "what do you know me as",
+            "can you tell me my name",
+            "what am i known as to you",
+            "what name do you have saved for me"
+        ]
+    },
+    {
+        "intent_id": 138,
+        "sample_utterances": [
+            "do i need any vaccinations before going to indonesia",
+            "what shots are recommended before traveling to kenya",
+            "do i need a vaccination to go to europe",
+            "do i need a vaccination to go to greece"
+        ]
+    },
+    {
+        "intent_id": 139,
+        "sample_utterances": [
+            "how do i get a w2 form and from where",
+            "how and where are my w2 forms given",
+            "can i get my w2 online"
+        ]
+    },
+    {
+        "intent_id": 140,
+        "sample_utterances": [
+            "is it snowing right now in richmond, va",
+            "what's the highest chance of rain for today",
+            "what is today's high temperature predicted to be"
+        ]
+    },
+    {
+        "intent_id": 141,
+        "sample_utterances": [
+            "i'd like to know your hobbies",
+            "what sorts of activities do you enjoy",
+            "what's your favorite hobby",
+            "what do you like to do when you have spare time"
+        ]
+    },
+    {
+        "intent_id": 142,
+        "sample_utterances": [
+            "ai can you tell me what things i may ask",
+            "what can i ask you all about",
+            "what are the subject areas you are knowledgable in",
+            "tell me the subject areas you are familiar with"
+        ]
+    },
+    {
+        "intent_id": 143,
+        "sample_utterances": [
+            "ai, what do people call you",
+            "tell me your name",
+            "how are you named",
+            "what name do you answer to"
+        ]
+    },
+    {
+        "intent_id": 144,
+        "sample_utterances": [
+            "what's playing right now",
+            "i'd like to know this song's name",
+            "do you know what song this is"
+        ]
+    },
+    {
+        "intent_id": 145,
+        "sample_utterances": [
+            "your birth occurred where",
+            "where were your born",
+            "where did your parents have you",
+            "where do you trace your roots"
+        ]
+    },
+    {
+        "intent_id": 146,
+        "sample_utterances": [
+            "can you whisper",
+            "i need you to switch to whisper mode",
+            "could you please get out of whisper mode",
+            "i can't be loud and need you to speak more quietly"
+        ]
+    },
+    {
+        "intent_id": 147,
+        "sample_utterances": [
+            "do you have an employer",
+            "i need to know who is your boss",
+            "you work for who"
+        ]
+    },
+    {
+        "intent_id": 148,
+        "sample_utterances": [
+            "i'd like to know who made you",
+            "what company coded you",
+            "could you let me know who made you",
+            "provide me the name of who made you"
+        ]
+    },
+    {
+        "intent_id": 149,
+        "sample_utterances": [
+            "i agree with the truth of what you just said",
+            "that would be yes",
+            "agreed, that's valid"
+        ]
+    }
+]

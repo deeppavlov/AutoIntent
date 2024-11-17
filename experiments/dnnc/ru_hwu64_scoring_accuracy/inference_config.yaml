@@ -1,0 +1,19 @@
+metadata:
+  device: cuda
+  multilabel: false
+  n_classes: 54
+  seed: 42
+nodes_configs:
+- load_path: null
+  module_config:
+    embedder_name: avsolatorio/GIST-small-Embedding-v0
+    k: 10
+  module_type: vector_db
+  node_type: retrieval
+- load_path: null
+  module_config:
+    cross_encoder_name: BAAI/bge-reranker-base
+    k: 10
+    train_head: false
+  module_type: dnnc
+  node_type: scoring
