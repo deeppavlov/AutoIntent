@@ -13,6 +13,8 @@ from autointent.modules.base import Module
 
 
 class PredictionModule(Module, ABC):
+    """Base class for prediction modules."""
+
     @abstractmethod
     def fit(
         self,
@@ -20,27 +22,56 @@ class PredictionModule(Module, ABC):
         labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
-        pass
+        """
+        Fit the model.
+
+        :param scores: Scores to fit
+        :param labels: Labels to fit
+        :param tags: Tags to fit
+        :return:
+        """
 
     @abstractmethod
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        pass
+        """
+        Predict the best score.
+
+        :param scores: Scores to predict
+        :return:
+        """
 
     def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
+        """
+        Calculate metric on test set and return metric value.
+
+        :param context: Context to score
+        :param metric_fn: Metric function
+        :return: Score
+        """
         labels, scores = get_prediction_evaluation_data(context)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
 
     def get_assets(self) -> PredictorArtifact:
+        """
+        Return useful assets that represent intermediate data into context.
+
+        :return:
+        """
         return PredictorArtifact(labels=self._predictions)
 
     def clear_cache(self) -> None:
-        pass
+        """Clear cache."""
 
 
 def get_prediction_evaluation_data(
     context: Context,
 ) -> tuple[list[LabelType], npt.NDArray[Any]]:
+    """
+    Get prediction evaluation data.
+    :param context: Context
+    :return:
+    """
     labels = np.array(context.data_handler.labels_test)
     scores = context.optimization_info.get_best_test_scores()
 
@@ -64,18 +95,13 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
     """
     this function is intended to be used with multilabel predictor.
 
-    If some intent classes have common tag (i.e. they are mutually exclusive) \
+    If some intent classes have common tag (i.e. they are mutually exclusive)
     and were assigned to one sample, leave only that class that has the highest score.
 
-    Arguments
-    ---
-    - `labels`: np.ndarray of shape (n_samples, n_classes) with binary labels
-    - `scores`: np.ndarray of shape (n_samples, n_classes) with float values from 0..1
-    - `tags`: list of Tags
-
-    Return
-    ---
-    np.ndarray of shape (n_samples, n_classes) with binary labels
+    :param labels: Binary labels of shape (n_samples, n_classes)
+    :param scores: (n_samples, n_classes) with float values from 0..1
+    :param tags: list of Tags
+    :return: np.ndarray of shape (n_samples, n_classes) with binary labels
     """
     n_samples, _ = labels.shape
     res = np.copy(labels)

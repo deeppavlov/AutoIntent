@@ -1,3 +1,5 @@
+"""Custom types for AutoIntent."""
+
 from enum import Enum
 from typing import Literal, TypedDict
 
@@ -5,6 +7,8 @@ TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
 
 
 class LogLevel(Enum):
+    """Logging levels."""
+
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"

@@ -1,3 +1,5 @@
+"""Configuration for the optimization process."""
+
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any

@@ -1,3 +1,5 @@
+"""Regexp node info."""
+
 from collections.abc import Mapping
 from typing import ClassVar
 
@@ -11,6 +13,8 @@ from .base import NodeInfo
 
 
 class RegExpNodeInfo(NodeInfo):
+    """Regexp node info."""
+
     metrics_available: ClassVar[Mapping[str, RegexpMetricFn]] = _funcs_to_dict(
         regexp_partial_accuracy,
         regexp_partial_precision,

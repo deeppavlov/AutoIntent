@@ -63,3 +63,11 @@ Metrics
     :members:
     :undoc-members:
     :show-inheritance:
+
+Modules
+=======
+
+.. automodule:: autointent.modules
+    :members:
+    :undoc-members:
+    :show-inheritance:

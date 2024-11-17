@@ -1,3 +1,5 @@
+"""Inference CLI configuration module."""
+
 from dataclasses import dataclass
 
 from hydra.core.config_store import ConfigStore

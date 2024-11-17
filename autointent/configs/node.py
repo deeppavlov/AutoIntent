@@ -1,3 +1,5 @@
+"""Configuration for the nodes."""
+
 from dataclasses import dataclass
 from typing import Any
 

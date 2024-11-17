@@ -1,3 +1,5 @@
+"""Configuration for the inference pipeline."""
+
 from dataclasses import dataclass
 
 from omegaconf import MISSING

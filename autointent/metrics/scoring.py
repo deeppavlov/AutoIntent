@@ -36,7 +36,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 
     .. math::
 
-        \\frac{1}{\\ell}\\sum_{i=1}^{\\ell} \\log(s[y[i]])
+        \\frac{1}{\\ell}\\sum_{i=1}^{\\ell}\\log(s[y[i]])
 
     where ``s[y[i]]`` is a predicted score of ``i``\\ th utterance having ground truth label
 
@@ -45,7 +45,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 
     .. math::
 
-        \\frac{1}{\\ell}\\sum_{i=1}^{\\ell}\\sum_{c=1}^C [y[i,c]\\cdot\\log(s[i,c])+(1-y[i,c])\\cdot\\log(1-s[i,c])]
+        \\frac{1}{\\ell}\\sum_{i=1}^\\ell\\sum_{c=1}^C\\Big[y[i,c]\\cdot\\log(s[i,c])+(1-y[i,c])\\cdot\\log(1-s[i,c])\\Big]
 
     where ``s[i,c]`` is a predicted score of ``i``\\ th utterance having ground truth label ``c``
 

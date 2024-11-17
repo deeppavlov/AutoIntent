@@ -1,3 +1,5 @@
+"""Retrieval node info."""
+
 from collections.abc import Mapping
 from typing import ClassVar
 
@@ -13,6 +15,8 @@ from .base import NodeInfo
 
 
 class RetrievalNodeInfo(NodeInfo):
+    """Retrieval node info."""
+
     metrics_available: ClassVar[Mapping[str, RetrievalMetricFn]] = (
         RETRIEVAL_METRICS_MULTICLASS | RETRIEVAL_METRICS_MULTILABEL
     )

@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 class ThresholdPredictorDumpMetadata(BaseMetadataDict):
+    """Threshold predictor metadata."""
+
     multilabel: bool
     tags: list[Tag] | None
     thresh: float | npt.NDArray[Any]
@@ -26,6 +28,8 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
 
 
 class ThresholdPredictor(PredictionModule):
+    """Threshold predictor module."""
+
     metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
     tags: list[Tag] | None
@@ -38,6 +42,14 @@ class ThresholdPredictor(PredictionModule):
         n_classes: int | None = None,
         tags: list[Tag] | None = None,
     ) -> None:
+        """
+        Initialize threshold predictor.
+
+        :param thresh: Threshold for the scores, shape (n_classes,) or float
+        :param multilabel: If multilabel classification, default False
+        :param n_classes: Number of classes, default None
+        :param tags: Tags for predictions, default None
+        """
         self.thresh = thresh
         self.multilabel = multilabel
         self.n_classes = n_classes
@@ -45,6 +57,13 @@ class ThresholdPredictor(PredictionModule):
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
+        """
+        Initialize from context.
+
+        :param context: Context
+        :param thresh: Threshold
+        :return:
+        """
         return cls(
             thresh=thresh,
             multilabel=context.is_multilabel(),
@@ -57,6 +76,14 @@ class ThresholdPredictor(PredictionModule):
         labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
+        """
+        Fit the model.
+
+        :param scores: Scores to fit
+        :param labels: Labels to fit
+        :param tags: Tags to fit
+        :return:
+        """
         self.tags = tags
 
         if not isinstance(self.thresh, float):
@@ -70,11 +97,23 @@ class ThresholdPredictor(PredictionModule):
             self.thresh = np.array(self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """
+        Predict the best score.
+
+        :param scores: Scores to predict
+        :return:
+        """
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        """
+        Dump the metadata.
+
+        :param path: Path to dump
+        :return:
+        """
         self.metadata = ThresholdPredictorDumpMetadata(
             multilabel=self.multilabel,
             tags=self.tags,
@@ -88,6 +127,12 @@ class ThresholdPredictor(PredictionModule):
             json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
+        """
+        Load the metadata.
+
+        :param path: Path to load
+        :return:
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:

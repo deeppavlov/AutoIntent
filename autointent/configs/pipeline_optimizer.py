@@ -1,3 +1,5 @@
+"""Pipeline configuration."""
+
 from dataclasses import dataclass
 
 from omegaconf import MISSING

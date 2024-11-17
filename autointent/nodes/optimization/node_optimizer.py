@@ -1,3 +1,5 @@
+"""Node optimizer."""
+
 import gc
 import itertools as it
 import logging
@@ -11,13 +13,22 @@ from typing_extensions import Self
 
 from autointent.configs.node import NodeOptimizerConfig
 from autointent.context import Context
+from autointent.custom_types import NodeTypeType
 from autointent.modules import Module
 from autointent.modules.prediction.base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
 
 
 class NodeOptimizer:
-    def __init__(self, node_type: str, search_space: list[dict[str, Any]], metric: str) -> None:
+    """Node optimizer class."""
+
+    def __init__(self, node_type: NodeTypeType, search_space: list[dict[str, Any]], metric: str) -> None:
+        """
+        Initialize the node optimizer.
+        :param node_type: Node type
+        :param search_space: Search space for the optimization
+        :param metric: Metric to optimize.
+        """
         self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
         self.modules_search_spaces = search_space  # TODO search space validation
@@ -25,9 +36,21 @@ class NodeOptimizer:
 
     @classmethod
     def from_dict_config(cls, config: dict[str, Any]) -> Self:
+        """
+        Initialize from dictionary config.
+
+        :param config: Config
+        :return:
+        """
         return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def fit(self, context: Context) -> None:
+        """
+        Fit the node optimizer.
+
+        :param context: Context
+        :return:
+        """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
@@ -78,11 +101,26 @@ class NodeOptimizer:
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def get_module_dump_dir(self, dump_dir: Path, module_type: str, j_combination: int) -> str:
+        """
+        Get module dump directory.
+
+        :param dump_dir: The base directory where the module dump directories will be created.
+        :param module_type: The type of the module being optimized.
+        :param j_combination: The index of the parameter combination being used.
+        :return: The path to the module dump directory as a string.        :return:
+        """
         dump_dir_ = dump_dir / self.node_info.node_type / module_type / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
     def module_fit(self, module: Module, context: Context) -> None:
+        """
+        Fit the module.
+
+        :param module: Module to fit
+        :param context: Context to use
+        :return:
+        """
         if self.node_info.node_type in ["retrieval", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":
                 args = (

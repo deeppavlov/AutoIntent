@@ -1,3 +1,5 @@
+"""Base module for all modules."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -18,43 +20,88 @@ class Module(ABC):
 
     @abstractmethod
     def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
-        pass
+        """
+        Fit the model.
+
+        :param args: Args to fit
+        :param kwargs: Kwargs to fit
+        :return:
+        """
 
     @abstractmethod
     def score(self, context: Context, metric_fn: METRIC_FN) -> float:
-        """Calculates metric on test set and returns metric value."""
+        """
+        Calculates metric on test set and returns metric value.
+
+        :param context: Context to score
+        :param metric_fn: Metric function
+        :return:
+        """
 
     @abstractmethod
     def get_assets(self) -> Artifact:
-        """Return useful assets that represent intermediate data into context."""
+        """
+        Return useful assets that represent intermediate data into context.
+
+        :return:
+        """
 
     @abstractmethod
     def clear_cache(self) -> None:
-        """Clear GPU/CPU memory."""
+        """Clear cache."""
 
     @abstractmethod
     def dump(self, path: str) -> None:
-        """Dump all data needed for inference."""
+        """
+        Dump all data needed for inference.
+
+        :param path: Path to dump
+        :return:
+        """
 
     @abstractmethod
     def load(self, path: str) -> None:
-        """Load all data needed for inference."""
+        """
+        Load data from dump.
+
+        :param path: Path to load
+        :return:
+        """
 
     @abstractmethod
     def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
-        """Inference."""
+        """
+        Predict on the input.
+
+        :param args: args to predict.
+        :param kwargs: kwargs to predict.
+        :return:
+        """
 
     def predict_with_metadata(
         self,
         *args: list[str] | npt.NDArray[Any],
         **kwargs: dict[str, Any],
     ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        """
+        Predict on the input with metadata.
+
+        :param args: args to predict.
+        :param kwargs: kwargs to predict.
+        :return:
+        """
         return self.predict(*args, **kwargs), None
 
     @classmethod
     @abstractmethod
     def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
-        pass
+        """
+        Initialize self from context.
+
+        :param context: Context to init from.
+        :param kwargs: Additional kwargs.
+        :return:
+        """
 
     def get_embedder_name(self) -> str | None:
         """Experimental method."""

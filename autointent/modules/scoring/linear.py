@@ -24,22 +24,6 @@ class LinearScorerDumpDict(BaseMetadataDict):
 
 
 class LinearScorer(ScoringModule):
-    """
-    TODO:
-    - implement different modes (incremental learning with SGD and simple learning with LogisticRegression)
-    - control n_jobs
-    - adjust cv
-    - separate the sklearn fit() process and transformers tokenizers process (from vector_index embedding function)
-        to avoid the warnings:
-    ```
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling \
-        parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-        - Avoid using `tokenizers` before the fork if possible
-        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    ```.
-    """
-
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
     precomputed_embeddings: bool = False

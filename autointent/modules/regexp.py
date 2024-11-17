@@ -1,3 +1,5 @@
+"""Module for regular expressions based intent detection."""
+
 import json
 import re
 from pathlib import Path
@@ -16,17 +18,31 @@ from .base import Module
 
 
 class RegexPatternsCompiled(TypedDict):
+    """Compiled regex patterns."""
+
     id: int
+    """Intent ID."""
     regexp_full_match: list[re.Pattern[str]]
+    """Compiled regex patterns for full match."""
     regexp_partial_match: list[re.Pattern[str]]
+    """Compiled regex patterns for partial match."""
 
 
 class RegExp(Module):
+    """Regular expressions based intent detection module."""
+
     @classmethod
     def from_context(cls, context: Context) -> Self:
+        """Initialize from context."""
         return cls()
 
     def fit(self, intents: list[dict[str, Any]]) -> None:
+        """
+        Fit the model.
+
+        :param intents: Intents to fit
+        :return:
+        """
         intents_parsed = [Intent(**dct) for dct in intents]
         self.regexp_patterns = [
             RegexPatterns(
@@ -39,12 +55,24 @@ class RegExp(Module):
         self._compile_regex_patterns()
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
+        """
+        Predict intents for utterances.
+
+        :param utterances: Utterances to predict
+        :return:
+        """
         return [self._predict_single(utterance)[0] for utterance in utterances]
 
     def predict_with_metadata(
         self,
         utterances: list[str],
     ) -> tuple[list[LabelType], list[dict[str, Any]] | None]:
+        """
+        Predict intents for utterances with metadata.
+
+        :param utterances: Utterances to predict
+        :return:
+        """
         predictions, metadata = [], []
         for utterance in utterances:
             prediction, matches = self._predict_single(utterance)
@@ -53,6 +81,13 @@ class RegExp(Module):
         return predictions, metadata
 
     def _match(self, utterance: str, intent_record: RegexPatternsCompiled) -> dict[str, list[str]]:
+        """
+        Match utterance with intent record.
+
+        :param utterance: Utterance to match
+        :param intent_record: Intent record to match
+        :return:
+        """
         full_matches = [
             pattern.pattern
             for pattern in intent_record["regexp_full_match"]
@@ -66,6 +101,12 @@ class RegExp(Module):
         return {"full_matches": full_matches, "partial_matches": partial_matches}
 
     def _predict_single(self, utterance: str) -> tuple[LabelType, dict[str, list[str]]]:
+        """
+        Predict intent for a single utterance.
+
+        :param utterance: Utterance to predict
+        :return:
+        """
         # todo test this
         prediction = set()
         matches: dict[str, list[str]] = {"full_matches": [], "partial_matches": []}
@@ -78,6 +119,13 @@ class RegExp(Module):
         return list(prediction), matches
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
+        """
+        Calculates metric on test set and returns metric value.
+
+        :param context: Context to score
+        :param metric_fn: Metric function
+        :return:
+        """
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
         assets = {
@@ -92,12 +140,20 @@ class RegExp(Module):
         return metric_fn(context.data_handler.labels_test, assets["test_matches"])
 
     def clear_cache(self) -> None:
+        """Clear cache."""
         del self.regexp_patterns
 
     def get_assets(self) -> Artifact:
+        """Get assets."""
         return Artifact()
 
     def load(self, path: str) -> None:
+        """
+        Load data from dump.
+
+        :param path: Path to load
+        :return:
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
@@ -106,12 +162,19 @@ class RegExp(Module):
         self._compile_regex_patterns()
 
     def dump(self, path: str) -> None:
+        """
+        Dump all data needed for inference.
+
+        :param path: Path to dump
+        :return:
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(self.regexp_patterns, file, indent=4)
 
     def _compile_regex_patterns(self) -> None:
+        """Compile regex patterns."""
         self.regexp_patterns_compiled = [
             RegexPatternsCompiled(
                 id=regexp_patterns["id"],

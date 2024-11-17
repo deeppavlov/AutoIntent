@@ -1,3 +1,5 @@
+"""Argmax prediction module."""
+
 from typing import Any
 
 import numpy as np
@@ -12,14 +14,22 @@ from .base import PredictionModule
 
 
 class ArgmaxPredictor(PredictionModule):
+    """Argmax prediction module."""
+
     metadata = {}  # noqa: RUF012
     name = "argmax"
 
     def __init__(self) -> None:
-        pass
+        """Init."""
 
     @classmethod
     def from_context(cls, context: Context) -> Self:
+        """
+        Initialize form context.
+
+        :param context: Context
+        :return:
+        """
         return cls()
 
     def fit(
@@ -28,13 +38,26 @@ class ArgmaxPredictor(PredictionModule):
         labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
-        pass
+        """
+        Argmax not fitting anything.
+
+        :param scores: Scores to fit
+        :param labels: Labels to fit
+        :param tags: Tags to fit
+        :return:
+        """
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """
+        Predict the argmax.
+
+        :param scores: Scores to predict
+        :return:
+        """
         return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
 
     def load(self, path: str) -> None:
-        pass
+        """Load."""
 
     def dump(self, path: str) -> None:
-        pass
+        """Dump."""
