@@ -90,6 +90,7 @@ ignore = [
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001"]
+"tutorials/*" = ["INP001"]
 
 [tool.ruff.lint.pylint]
 max-args = 10
