@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from autointent.docs_utils.regenerate_apiref import regenerate_apiref
+
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
 author = "DeepPavlov"
@@ -30,3 +32,17 @@ exclude_patterns = []
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
+
+
+def setup(_) -> None:  # noqa: ANN001
+    regenerate_apiref(
+        [
+            ("autointent.configs", "Configs"),
+            ("autointent.context", "Context"),
+            ("autointent.generation", "Generation"),
+            ("autointent.metrics", "Metrics"),
+            ("autointent.modules", "Modules"),
+            ("autointent.nodes", "Nodes"),
+            ("autointent.pipeline", "Pipeline"),
+        ]
+    )

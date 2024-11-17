@@ -1,8 +1,9 @@
-API
-===
+API reference
+-------------
 
-.. autosummary::
-   :toctree: generated
-   :recursive:
+.. toctree::
+   :name: reference
+   :glob:
+   :maxdepth: 1
 
-   autointent.generation.description_generation
+   apiref/index_*

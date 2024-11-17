@@ -39,4 +39,5 @@ sync:
 
 .PHONY: docs-serve
 docs-serve:
-	$(poetry) sphinx-autobuild docs/source docs/build/html
+	$(poetry) sphinx-apidoc -e -E -f --remove-old -o docs/source/apiref autointent
+	$(poetry) sphinx-autobuild docs/source docs/build/html --port 8333

@@ -24,14 +24,3 @@ Check out the :doc:`usage` section to begin with, including :ref:`installation <
    api
 
 Try out our :py:func:`autointent.generation.description_generation.get_utterances_by_id` function.
-
-API
-===
-
-.. .. automodule:: autointent.generation.description_generation
-..    :members:
-..    :show-inheritance:
-
-.. .. automodule:: autointent
-..     :members:
-..     :undoc-members:
