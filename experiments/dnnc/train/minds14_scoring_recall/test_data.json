@@ -1,0 +1,110 @@
+[
+    {
+        "utterance": "what to pay sms-code",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "Hello, I would like to deposit money into my account How can I put it transfer And what methods are possible in your bank",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "I lost my card and want to freeze my account",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "Show me information about all my payments for the last week",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "Hello, I would like to know where the nearest branch is where I could deposit cash",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "get the balance in the current account",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "if Minecraft withdrawing the amount santa maria How can I withdraw door cards Olga how much can I take a referral and how much can I withdraw within 3",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "the application does not load the balance of my new account how can i check the account",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "Hello How much money can I withdraw at one time",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "how can i create a joint account can i have an account with my partner business application where application has options",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "I am trying to make a payment, but some text messages come with confirmation of payment and it is not clear what to do with them Do I need to somehow answer them or something",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "and I received an invoice that I need to pay",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "Your bank's miss card Can I pay her when I travel abroad",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "Good afternoon, registration address",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "How direct debit works",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "Why is my card not working",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "Hello, I am calling about problems with my credit card. And I'm trying to pay at the store on my birthday, my payment didn't go through. Could you check why my card is not working?",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "who can I talk to about a business loan",
+        "labels": [
+            5
+        ]
+    }
+]

@@ -1,0 +1,584 @@
+[
+    {
+        "utterance": "can I top up an apple pay?",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "Will I see fees from adding money with an international card?",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "How would I use a bank transfer for topping my account?",
+        "labels": [
+            65
+        ]
+    },
+    {
+        "utterance": "It's been over a month and i still haven't received my goods! I ordered a pencil for crying out loud, it's not that hard to deliver that! I'm done with these people, give me a refund immediately! I'll search for my Japanese exclusive pencil elsewhere!",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "When I'm traveling is it possible to add money automatically at certain time points?",
+        "labels": [
+            4
+        ]
+    },
+    {
+        "utterance": "How much does it cost to top up by transfer?",
+        "labels": [
+            56
+        ]
+    },
+    {
+        "utterance": "I got my card a few days ago but am unable to top up. I'm thinking about closing my account because of this. What is going on?",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "Is there a reason why top-up needs verifying?",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "When will the transaction be done?",
+        "labels": [
+            66
+        ]
+    },
+    {
+        "utterance": "How long does transfer from the US take?",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "The refund doesn't show in my account",
+        "labels": [
+            51
+        ]
+    },
+    {
+        "utterance": "Is currency exchange possible?",
+        "labels": [
+            33
+        ]
+    },
+    {
+        "utterance": "How long is the wait for a money transfer to show up?",
+        "labels": [
+            48
+        ]
+    },
+    {
+        "utterance": "Where can I go to find out how to verify my identity?",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "What are all of the different steps for identity checks?",
+        "labels": [
+            69
+        ]
+    },
+    {
+        "utterance": "I can't enter my passcode.",
+        "labels": [
+            44
+        ]
+    },
+    {
+        "utterance": "Please help me!  A payment I made had an error on the account number and I can't cancel on my side.  Can you cancel it?",
+        "labels": [
+            8
+        ]
+    },
+    {
+        "utterance": "Which fiat currencies do you currently support? Will this change in this future?",
+        "labels": [
+            36
+        ]
+    },
+    {
+        "utterance": "Can you find out why my credit card didn't process payment? It was declined for top up so what's the deal?",
+        "labels": [
+            59
+        ]
+    },
+    {
+        "utterance": "would I need to pay extra for exchanging currencies?",
+        "labels": [
+            31
+        ]
+    },
+    {
+        "utterance": "When I tried to access my cash, I wasn't allowed!",
+        "labels": [
+            26
+        ]
+    },
+    {
+        "utterance": "I have been overcharged. I just changed over Russian Ruble to UK pounds and it was too much. It seems something was wrong with my exchange.",
+        "labels": [
+            17
+        ]
+    },
+    {
+        "utterance": "What is the charge for using a Top up card in the US?",
+        "labels": [
+            57
+        ]
+    },
+    {
+        "utterance": "How do you top-up using cash?",
+        "labels": [
+            58
+        ]
+    },
+    {
+        "utterance": "How can I get my card out of the ATM?",
+        "labels": [
+            18
+        ]
+    },
+    {
+        "utterance": "I exchanged cash when traveling and the rate was incorrect.",
+        "labels": [
+            76
+        ]
+    },
+    {
+        "utterance": "Where do I go to update details?",
+        "labels": [
+            30
+        ]
+    },
+    {
+        "utterance": "Do you limit my top-offs?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "can i get a virtual card online",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "The terminal I paid at wouldn't take my card. Is something wrong?",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "I have trouble proving my identity.",
+        "labels": [
+            68
+        ]
+    },
+    {
+        "utterance": "Why won't you let me name X as a beneficiary?",
+        "labels": [
+            7
+        ]
+    },
+    {
+        "utterance": "What is the appropriate age for my child to be able to open an account?",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "I only got some of the cash I requested from the ATM",
+        "labels": [
+            75
+        ]
+    },
+    {
+        "utterance": "Can I use my Apple watch to fill my gas tank?",
+        "labels": [
+            2
+        ]
+    },
+    {
+        "utterance": "My top up was rejected. Why?",
+        "labels": [
+            61
+        ]
+    },
+    {
+        "utterance": "virtual card won't work for me",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "Please check and let me know why my transfers are getting declined.",
+        "labels": [
+            27
+        ]
+    },
+    {
+        "utterance": "from where are coming your exchange rates?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "I just got an email in confirming my purchase with my card. I login to the mobile app on the card and found out there are several purchase were made without me aware of it. Evidently someone had stole my card information and made these fraudulent purchase. I need the transaction to be reverse and have my card suspended.",
+        "labels": [
+            22
+        ]
+    },
+    {
+        "utterance": "I have yet to receive my virtual card",
+        "labels": [
+            40
+        ]
+    },
+    {
+        "utterance": "Where can I use my Mastercard?",
+        "labels": [
+            10
+        ]
+    },
+    {
+        "utterance": "I noticed that my card was charged more than once for one thing.",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "I'm happy with Mastercard and want to stick with just that credit card.",
+        "labels": [
+            73
+        ]
+    },
+    {
+        "utterance": "I placed a cash deposit in my account but I can't see it yet.",
+        "labels": [
+            6
+        ]
+    },
+    {
+        "utterance": "Okay, I found my card, can I put it back in the app?",
+        "labels": [
+            13
+        ]
+    },
+    {
+        "utterance": "I think someone saw my PIN and I am on vacation in Spain, can I change it locally at an ATM?",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "Why is there an identify check?",
+        "labels": [
+            74
+        ]
+    },
+    {
+        "utterance": "Where do you get those exchange rates?",
+        "labels": [
+            32
+        ]
+    },
+    {
+        "utterance": "How many transactions can I make on my disposable card?",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "What do I do if my card was stolen.",
+        "labels": [
+            41
+        ]
+    },
+    {
+        "utterance": "I wish to use my American Express to put funds into my account.",
+        "labels": [
+            54
+        ]
+    },
+    {
+        "utterance": "How can I get another card?",
+        "labels": [
+            39
+        ]
+    },
+    {
+        "utterance": "Why do you ask for top-up verification?",
+        "labels": [
+            71
+        ]
+    },
+    {
+        "utterance": "My app says I withdraw funds from my account through an ATM.",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "I transferred money from one account to another account and I charged a fee for it. Why is that?",
+        "labels": [
+            64
+        ]
+    },
+    {
+        "utterance": "Guide me on how to unblock my PIN",
+        "labels": [
+            49
+        ]
+    },
+    {
+        "utterance": "If I bought something I didn't like, can I get a refund?",
+        "labels": [
+            52
+        ]
+    },
+    {
+        "utterance": "How can I access my account when I have lost my phone?",
+        "labels": [
+            42
+        ]
+    },
+    {
+        "utterance": "I really need to know how to change my pin.",
+        "labels": [
+            21
+        ]
+    },
+    {
+        "utterance": "Do cash withdrawals cost anything?",
+        "labels": [
+            19
+        ]
+    },
+    {
+        "utterance": "I received a returned payment that I made.",
+        "labels": [
+            53
+        ]
+    },
+    {
+        "utterance": "I cannot get my virtual card to function.",
+        "labels": [
+            72
+        ]
+    },
+    {
+        "utterance": "I can still see money in my account after making a payment",
+        "labels": [
+            5
+        ]
+    },
+    {
+        "utterance": "How do I close my account?",
+        "labels": [
+            55
+        ]
+    },
+    {
+        "utterance": "Do I need to re-apply to order a new card when my old one's about to expire?",
+        "labels": [
+            9
+        ]
+    },
+    {
+        "utterance": "My wallet is empty even though I topped it up an hour ago.",
+        "labels": [
+            62
+        ]
+    },
+    {
+        "utterance": "To deliver to the US, how long will it take?",
+        "labels": [
+            12
+        ]
+    },
+    {
+        "utterance": "What is the age limit?",
+        "labels": [
+            1
+        ]
+    },
+    {
+        "utterance": "Will you charge for a physical card?",
+        "labels": [
+            43
+        ]
+    },
+    {
+        "utterance": "What is the process for activating my new card?",
+        "labels": [
+            0
+        ]
+    },
+    {
+        "utterance": "How do I troubleshoot my contactless?",
+        "labels": [
+            23
+        ]
+    },
+    {
+        "utterance": "Where is the tracking number for the card?",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "I'm still waiting for my new card.",
+        "labels": [
+            11
+        ]
+    },
+    {
+        "utterance": "how do i get a pin for my card",
+        "labels": [
+            38
+        ]
+    },
+    {
+        "utterance": "Does a US transfer take long",
+        "labels": [
+            67
+        ]
+    },
+    {
+        "utterance": "I can't seem to use my card. Can you help?",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "Why is my cash withdrawal still showing as pending?",
+        "labels": [
+            46
+        ]
+    },
+    {
+        "utterance": "why is there a fee for a payment on my card?",
+        "labels": [
+            15
+        ]
+    },
+    {
+        "utterance": "Can you tell me what the problem with my card is? It was declined at a restaurant today.",
+        "labels": [
+            14
+        ]
+    },
+    {
+        "utterance": "I don't recognize the direct debit payment from the app.",
+        "labels": [
+            28
+        ]
+    },
+    {
+        "utterance": "Is there a limit to how much I can top up?",
+        "labels": [
+            60
+        ]
+    },
+    {
+        "utterance": "There are duplicate transactions on my account",
+        "labels": [
+            63
+        ]
+    },
+    {
+        "utterance": "I've never been to that store.  That's a fraudulent charge.",
+        "labels": [
+            16
+        ]
+    },
+    {
+        "utterance": "I need to deposit my virtual card, how do i do that.",
+        "labels": [
+            37
+        ]
+    },
+    {
+        "utterance": "If my salary is in GBP, do I need to do something?",
+        "labels": [
+            50
+        ]
+    },
+    {
+        "utterance": "How can I tell the source for my available funds?",
+        "labels": [
+            70
+        ]
+    },
+    {
+        "utterance": "Can I use this all over the world?",
+        "labels": [
+            24
+        ]
+    },
+    {
+        "utterance": "I couldn't make a transfer",
+        "labels": [
+            35
+        ]
+    },
+    {
+        "utterance": "I was charged an extra dollar on my account and would like to know the reason.",
+        "labels": [
+            34
+        ]
+    },
+    {
+        "utterance": "My money hasn't been deposited yet. When will it be?",
+        "labels": [
+            47
+        ]
+    },
+    {
+        "utterance": "Where is an ATM?",
+        "labels": [
+            3
+        ]
+    },
+    {
+        "utterance": "I need several disposable cards made per day.",
+        "labels": [
+            29
+        ]
+    },
+    {
+        "utterance": "Why do you keep declining my payment? I tried several times already with this card and it is just not working.",
+        "labels": [
+            25
+        ]
+    },
+    {
+        "utterance": "I am waiting for a payment to be processed",
+        "labels": [
+            45
+        ]
+    },
+    {
+        "utterance": "help, I see money missing I didn't take out.",
+        "labels": [
+            20
+        ]
+    },
+    {
+        "utterance": "I was supposed to get a refund but it is not showing up on my card",
+        "labels": [
+            51
+        ]
+    }
+]

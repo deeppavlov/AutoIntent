@@ -1,0 +1,124 @@
+[
+    {
+        "intent_id": 0,
+        "sample_utterances": [
+            "Hello hello I am a client of your bank I have your credit card I would like to know if it can be used abroad and Do I need to do anything at all in order to use it abroad If there are some extra there is some nasty fee for it",
+            "Good morning next week I am leaving abroad what is the commission for withdrawing funds in Ugra",
+            "I would like to know if I can pay with my card abroad",
+            "I am going abroad Can I pay with my card abroad"
+        ]
+    },
+    {
+        "intent_id": 1,
+        "sample_utterances": [
+            "I want to change my address I'm calling to change my address",
+            "detailed directions download my Just like me MP3 320",
+            "Hello, I have moved here to another apartment and in this regard, I would like to tell you a new address so that everything will be aptudey",
+            "I need to change my address"
+        ]
+    },
+    {
+        "intent_id": 2,
+        "sample_utterances": [
+            "when entering the application, it throws me out of it",
+            "I can't log into my account and see the balance of my account",
+            "I cannot open the application I click on the icon and nothing happens I see the start screen and nothing is loaded",
+            "Hello, the application does not load, now I cannot look at my bank account"
+        ]
+    },
+    {
+        "intent_id": 3,
+        "sample_utterances": [
+            "I want to know the maximum amount that I can withdraw from my account",
+            "What is the maximum amount I can withdraw from an ATM And how can I increase the amount of the maximum amount of money",
+            "Hello, I would like to know what is the maximum withdrawal limit on my bank account"
+        ]
+    },
+    {
+        "intent_id": 4,
+        "sample_utterances": [
+            "Good morning I would like to know how much is left on my current account Thank you very much",
+            "Good afternoon I would like to check my balance How much money do I have left in my account?",
+            "Hello, can you please see the balance on my account",
+            "Hello, I would like to know how much money I have left in my account"
+        ]
+    },
+    {
+        "intent_id": 5,
+        "sample_utterances": [
+            "Hello, I'm calling about a new business loan. I wanted to ask a few questions and understand how your system works",
+            "everything happening to me new business loans",
+            "Good afternoon, I would like to consult about the loan I want to take a loan, respectively, this first loan is a certain amount with whom I could talk about this topic Thank you",
+            "Hello, hello. I called you about business loans. The fact is that I have a new company and I need some new equipment, so to speak, and so on, so I would like to know now. Can I get a new business loan from you and what is generally needed for this"
+        ]
+    },
+    {
+        "intent_id": 6,
+        "sample_utterances": [
+            "my card is not working my payment was declined What do I need to do",
+            "Hello, I have your bank card, but unfortunately it doesn’t work now. Could you help me",
+            "picture does not work i can use Why didn’t pay"
+        ]
+    },
+    {
+        "intent_id": 7,
+        "sample_utterances": [
+            "Where can I put money into my account",
+            "Please tell me how can I deposit money into my current account together thanks",
+            "How can I deposit money into my account"
+        ]
+    },
+    {
+        "intent_id": 8,
+        "sample_utterances": [
+            "Tell me about direct debiting from my account what operations were carried out today",
+            "I do not need credit cards I just would like to Pay directly the balance every time you buy, you can tell me what are the conditions for direct exchange on my account",
+            "Tell us about direct write-off",
+            "want to know more details about direct debit"
+        ]
+    },
+    {
+        "intent_id": 9,
+        "sample_utterances": [
+            "please freeze my card urgently",
+            "Good afternoon I would like to block my card",
+            "please block my card",
+            "set all transactions on my card freeze my card please block my card"
+        ]
+    },
+    {
+        "intent_id": 10,
+        "sample_utterances": [
+            "I want to make a large payment and I am waiting for confirmation via SMS, it does not reach me Could you send me a confirmation code by SMS Thanks again",
+            "Hello I want to make one purchase through the online bank And I have not received confirmation yet When can I receive it",
+            "I want to pay for a purchase on the Internet But I do not receive an SMS with a confirmation code"
+        ]
+    },
+    {
+        "intent_id": 11,
+        "sample_utterances": [
+            "Congratulations, my partner and I would like to have a joint account How can I create a joint account and what documents need to be completed for this Thank you",
+            "What data is needed to create a joint account",
+            "Hello, I would like to open a joint account with my wife. Could you help me with this?",
+            "Good afternoon, and I have to open an account in your bank But I would also like to open a joint account How it works"
+        ]
+    },
+    {
+        "intent_id": 12,
+        "sample_utterances": [
+            "I would like to know about my recent transactions Could you please give me a complete list",
+            "I would like to see my last transactions there is a payment I do not know",
+            "Where can I see a list of my transactions",
+            "Hello. Can you provide me with a list of my last transactions. It seems to me from the payments that I have not made and I do not know"
+        ]
+    },
+    {
+        "intent_id": 13,
+        "sample_utterances": [
+            "bill payment",
+            "I need to pay the invoice, tell me how to do it, how can I pay And the term of payment by my credit card And what other data do you need so that I can pay for this invoice And you need an address or just credit card information",
+            "and I want to pay my bill by card",
+            "I would like to pay the bill"
+        ]
+    }
+]

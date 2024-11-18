@@ -1,0 +1,675 @@
+[
+    {
+        "intent_id": 0,
+        "sample_utterances": [
+            "How do i activate my card",
+            "I want to start using my card.",
+            "What would II do if I wanted to activate my new card",
+            "i cannot seem to activate card"
+        ]
+    },
+    {
+        "intent_id": 1,
+        "sample_utterances": [
+            "Do you have a limit for someone's age?",
+            "What about my children?",
+            "Can my children open an account?"
+        ]
+    },
+    {
+        "intent_id": 2,
+        "sample_utterances": [
+            "Can I pay for my gas using my Apple watch?",
+            "Am I able to Top Up with Apply Pay?",
+            "Why can't I get my top up to work in Apple Pay?"
+        ]
+    },
+    {
+        "intent_id": 3,
+        "sample_utterances": [
+            "I need to withdraw money. Where can I do that?",
+            "How can I find an ATM that accepts this card?",
+            "Can this card be used at all ATMs?",
+            "What ATMs can I use my card?"
+        ]
+    },
+    {
+        "intent_id": 4,
+        "sample_utterances": [
+            "Will the system automatically top up itself?",
+            "Can I get an auto Top-up?",
+            "Does the app top up automatically?",
+            "Do you have an auto-top function and how do I use it if so?"
+        ]
+    },
+    {
+        "intent_id": 5,
+        "sample_utterances": [
+            "How can I fix my bank transfer to show up on my bank account?",
+            "Please check to see if the band transfer I made a while ago from my UK account has safely arrived.",
+            "Can you check if my money has reached my account since it is not showing up yet?",
+            "Why wasn't my bank balance updated?"
+        ]
+    },
+    {
+        "intent_id": 6,
+        "sample_utterances": [
+            "Where is the cash deposit I made?",
+            "I attempted to deposit a cheque yesterday but the balance isn't showing today. Is it still pending?",
+            "How do I see my updated balance after I make a cheque or cash deposit?",
+            "I haven't seen the cash yet from the cheque I deposited."
+        ]
+    },
+    {
+        "intent_id": 7,
+        "sample_utterances": [
+            "I was trying to purchase some crypto and the app won't allow me to do it. What's the deal with this? I really wanted to complete the exchange.",
+            "Why is my beneficiary not being allowed to get payment services?",
+            "Am I allowed to transfer money to a beneficiary?",
+            "Why cant I transfer to my account?"
+        ]
+    },
+    {
+        "intent_id": 8,
+        "sample_utterances": [
+            "I recently made a transfer but I need to cancel it as soon as possible.  Please let me know when this happens.",
+            "Please help me, there is a transaction in the incorrect account.",
+            "Am I able to cancel a transfer I just made",
+            "I wanna revert a transaction i did this morning."
+        ]
+    },
+    {
+        "intent_id": 9,
+        "sample_utterances": [
+            "I need a new card, my old card is expiring.",
+            "My card is due to expire",
+            "What happens if my card expires?",
+            "My card has an expiration date, will you send a new one automatically?"
+        ]
+    },
+    {
+        "intent_id": 10,
+        "sample_utterances": [
+            "What places accept my card?",
+            "What businesses can I use this card with?",
+            "What are the limits to where my card will be accepted?",
+            "Who accepts the card?"
+        ]
+    },
+    {
+        "intent_id": 11,
+        "sample_utterances": [
+            "My card hasn't arrived yet. What do I do?",
+            "What can I do to track the card you sent me?",
+            "I was issued a card about a week ago. why hasn't it come in yet?"
+        ]
+    },
+    {
+        "intent_id": 12,
+        "sample_utterances": [
+            "I need to get my card quickly",
+            "How long will it take to get to the US?",
+            "I need my card to be delivered fast",
+            "How will I get my card?"
+        ]
+    },
+    {
+        "intent_id": 13,
+        "sample_utterances": [
+            "I want to link to my card card with you, how?",
+            "I found my card, am I able to put it back into the app?",
+            "I want to reactivate my card, I thought I had lost it but found it again in my jacket this morning.",
+            "I want my card I just received to show up in the app. How do I do that?"
+        ]
+    },
+    {
+        "intent_id": 14,
+        "sample_utterances": [
+            "I cannot seem to use my card.",
+            "Can you help me with my card, I think it's broke.",
+            "How do I re-order a damaged card?"
+        ]
+    },
+    {
+        "intent_id": 15,
+        "sample_utterances": [
+            "I was charged a fee for using my card. Can I check that in any way? It seems like there are occasions that I am charge for fees. Can you elaborate this?",
+            "I saw a fee on my app from one of my payments and I wasn't sure where it came from. Is there a way you can tell me when there's an additional fee for my payments?",
+            "I see a fee that I think was charged because I paid by card.",
+            "Let me know when you charge for payments. I just checked the app and saw a fee that I wasn't warned about."
+        ]
+    },
+    {
+        "intent_id": 16,
+        "sample_utterances": [
+            "There is a strange payment on my card.",
+            "I didn't do a payment and I have it now.",
+            "Why is this payment on my app",
+            "There are a few payments in the app that I didn't make! Does someone else have my card?  What should I do?"
+        ]
+    },
+    {
+        "intent_id": 17,
+        "sample_utterances": [
+            "I question today's exchange rate for rubles into pounds. I was hoping for a better return.",
+            "Hello, I believe there has been a mistake made on the exchange rate for my card. Could you please check the official interbank exchange rate for me?",
+            "There's an error with the rate that is charged.",
+            "The fee charged when I changed rubles into British pounds was too much."
+        ]
+    },
+    {
+        "intent_id": 18,
+        "sample_utterances": [
+            "What are the steps I should take to recover my swallowed card?",
+            "Why did the ATM eat my card?",
+            "My card is stuck in an ATM machine, how do I get it back quickly?",
+            "My card got stuck in an ATM."
+        ]
+    },
+    {
+        "intent_id": 19,
+        "sample_utterances": [
+            "I have a fee for cash withdrawal",
+            "that fee should not be there, you charged my cash for an unnecessary thing.",
+            "I just took some cash out of a cash machine in Heathrow airport because I wanted to buy some new sunglasses for my holiday but you've added a fee to the withdrawal, what is this?",
+            "What was the extra charge for withdrawing money?"
+        ]
+    },
+    {
+        "intent_id": 20,
+        "sample_utterances": [
+            "I saw there is a cash withdrawal from my account via the app which I did not complete.",
+            "In the app, I see a withdrawal I didn't make.",
+            "I don't recognize this withdrawal on my statement"
+        ]
+    },
+    {
+        "intent_id": 21,
+        "sample_utterances": [
+            "I think my pin has been compromised, what do I do?",
+            "I want to replace my current PIN.",
+            "What is the process to change my PIN?"
+        ]
+    },
+    {
+        "intent_id": 22,
+        "sample_utterances": [
+            "What steps can I take if someone else is using my card?",
+            "Someone has been using my card. There are unfamiliar transactions on there. Can you freeze the card to keep this from happening?",
+            "I sees some suspicious spending on my credit card that I don't recall I had made. What should I do?",
+            "How do I report possible fraudulent activity on my account?"
+        ]
+    },
+    {
+        "intent_id": 23,
+        "sample_utterances": [
+            "I have a contactless that's broken.",
+            "Help me to set up contactless payments.",
+            "I am having issues using contactless payments, could my card be damaged?"
+        ]
+    },
+    {
+        "intent_id": 24,
+        "sample_utterances": [
+            "Can I get a card? I live in the US.",
+            "In which countries does your app work",
+            "I live in the EU, can I get one of your cards?",
+            "I'm not in the UK, but can I still get a card?"
+        ]
+    },
+    {
+        "intent_id": 25,
+        "sample_utterances": [
+            "I had a problem with my card payment, can you help?",
+            "My card payment didn't go through.",
+            "My card was refused",
+            "Why won't you accept my payment? I keep trying with this card and it's not working."
+        ]
+    },
+    {
+        "intent_id": 26,
+        "sample_utterances": [
+            "i needed money for a night out with the girls but i was declined, why?",
+            "I tried to get money out of an ATM in Notting Hill earlier, but it didn't work. Is my card actually working? It's the first time I tried using it",
+            "I tried to get funds in hard cash but it was rejected!",
+            "The ATM would not give me cash,why?"
+        ]
+    },
+    {
+        "intent_id": 27,
+        "sample_utterances": [
+            "Why did you decline my transfer?",
+            "I wanted to buy something online yesterday, but I could not because the card got declined on the day of and the following day. What is wrong with the card?",
+            "Why has my transfer been declined?",
+            "Why does my card continually get declined? I thought I had enough money in there but I've tried several times now and it still isn't working."
+        ]
+    },
+    {
+        "intent_id": 28,
+        "sample_utterances": [
+            "Why is there a direct debit to my account? I didn't do that.",
+            "Am I able to look back at a transaction to see who with drawled some money from my account? I don't remember authorizing this a few weeks ago, but wanted to double check who took the money.",
+            "I see a direct debit charge that I did not approve",
+            "How can I dispute a debit transaction?"
+        ]
+    },
+    {
+        "intent_id": 29,
+        "sample_utterances": [
+            "What is the maximum transactions for one disposable card?",
+            "What is the most amount of disposable cards allowable?",
+            "I must make several disposable cards per day."
+        ]
+    },
+    {
+        "intent_id": 30,
+        "sample_utterances": [
+            "after i got married i need to change my name",
+            "How do I edit the personal details on my account?",
+            "How can I change to my married name?",
+            "How can I update my details since I moved?"
+        ]
+    },
+    {
+        "intent_id": 31,
+        "sample_utterances": [
+            "Do I have to pay more for exchanges?",
+            "What's the cost for exchanges?",
+            "Will there be a charge for exchanging foreign currency?",
+            "Does it cost extra to exchange foreign currencies?"
+        ]
+    },
+    {
+        "intent_id": 32,
+        "sample_utterances": [
+            "I would like to know what your exchange rates are.",
+            "Do you know what your exchange rates are?",
+            "where do you find your exchange rates?"
+        ]
+    },
+    {
+        "intent_id": 33,
+        "sample_utterances": [
+            "How do I go about exchanging currencies with this app?",
+            "Does this app exchange currencies?",
+            "Do you support changing the currency I use?",
+            "Can I use this app to change money?"
+        ]
+    },
+    {
+        "intent_id": 34,
+        "sample_utterances": [
+            "There is a charge for an additional pound.",
+            "I was overcharged one extra pound!",
+            "A pending charge of 1L appears on my statement.  Please explain as I have not made a purchase for that amount",
+            "Why did you guys charge me an extra €1?"
+        ]
+    },
+    {
+        "intent_id": 35,
+        "sample_utterances": [
+            "My transfer failed, why?",
+            "I needed to send my friends some money urgently.  I tried multiple times to transfer the money this morning, but the transfer keeps failing.  Can you tell me why the transfer is getting rejected?",
+            "What are the reasons that my mortgage payment won't go through? I'm getting an error and don't know how to correct to get this transfer to go through.",
+            "Errors keep showing up every time I try to make this transfer and I am on a time crunch,  could you please help."
+        ]
+    },
+    {
+        "intent_id": 36,
+        "sample_utterances": [
+            "I'm interested in holding and exchange for flat currencies, what do you support?",
+            "What kind of fiat currencies are supported for holding and exchange?",
+            "Which flat currencies do you support for holding and exchange?",
+            "I need a list of currencies you accept for exchange."
+        ]
+    },
+    {
+        "intent_id": 37,
+        "sample_utterances": [
+            "What are the uses for disposable cards?",
+            "I want to make an online purchase but I don't want to use my credit card. Can you tell me how a disposable virtual card works and where I can apply for one?",
+            "Am I able to order a disposable virtual card?"
+        ]
+    },
+    {
+        "intent_id": 38,
+        "sample_utterances": [
+            "Where's my card PIN?",
+            "I need my PIN, where is it?",
+            "Where is my pin? I don't have it yet",
+            "Will the PIN come separately?"
+        ]
+    },
+    {
+        "intent_id": 39,
+        "sample_utterances": [
+            "Can I get a few more physical cards?",
+            "If I need an additional card, is there a fee for that?",
+            "I would like an extra card.",
+            "I would like some more physical cards, what is my limit?"
+        ]
+    },
+    {
+        "intent_id": 40,
+        "sample_utterances": [
+            "How to order a virtual card",
+            "Is there an alternative to a physical card?",
+            "Where do I get a virtual card?",
+            "When will my virtual card arrive?"
+        ]
+    },
+    {
+        "intent_id": 41,
+        "sample_utterances": [
+            "How do I report my card as lost or stolen?",
+            "Help! I lost my card!",
+            "My card is lost!  Please help me!",
+            "Help!  My card is stolen."
+        ]
+    },
+    {
+        "intent_id": 42,
+        "sample_utterances": [
+            "I don't know where my phone is.",
+            "I left my phone at the hotel.",
+            "I can't use the app because I got mugged yesterday and they took everything. I need some help.",
+            "Someone has taken my phone from my hotel room!"
+        ]
+    },
+    {
+        "intent_id": 43,
+        "sample_utterances": [
+            "I need an actual card that I can hold in my hand, how do I do that?",
+            "Will there be a fee to receive a physical card?",
+            "tell me how I can order my card.",
+            "How do I order a card?"
+        ]
+    },
+    {
+        "intent_id": 44,
+        "sample_utterances": [
+            "Help! I've forgot my app passcode!",
+            "passcode retrieval",
+            "I thought I knew my password but I guess I was wrong, what can I do now?",
+            "I used to know my password, but not anymore."
+        ]
+    },
+    {
+        "intent_id": 45,
+        "sample_utterances": [
+            "How long does it take for a new purchase to stop being considered pending?",
+            "Why is the payment showing as pending from things I bought this morning?",
+            "I don't know what pending transaction means.",
+            "I have made a payment by my card, and its still pending since a long time. Could you please tell me when it will process."
+        ]
+    },
+    {
+        "intent_id": 46,
+        "sample_utterances": [
+            "I went to an ATM to get cash, but the app says the withdrawal is still pending. How is that possible when I already have the cash with me?",
+            "Why does it still charge me even though I was unable to withdraw money from the ATM?",
+            "I made a cash withdrawal earlier and it's showing as pending.  What does that mean?",
+            "Hello, I tried to take out some money out of the ATM, but it's still showing that it's pending? I really don't want to be charged for this."
+        ]
+    },
+    {
+        "intent_id": 47,
+        "sample_utterances": [
+            "I tried to top up, but it didn't finish.",
+            "It appears my top-up is still pending.",
+            "I have a new card and I can't add money to it.  I tried about 30 minutes ago and it is still pending.  What do I do?",
+            "Where to check top ups pending?"
+        ]
+    },
+    {
+        "intent_id": 48,
+        "sample_utterances": [
+            "As I double checked that I have the correct account details that i submitted , they're right for sure. Transfer is still pending so far.",
+            "there is a transfer pending.",
+            "Hello. How long does it usually take to transfer money to another country? I've made sure all the information is correct, but the transfer still says that it's \"pending.\"",
+            "When will my transfer move from pending to confirmed?"
+        ]
+    },
+    {
+        "intent_id": 49,
+        "sample_utterances": [
+            "What do I do if my PIN was blocked?",
+            "What if I type in the wrong PIN too many times?",
+            "My PIN got blocked, help.",
+            "Can you unblock my blocked pin?"
+        ]
+    },
+    {
+        "intent_id": 50,
+        "sample_utterances": [
+            "My salary is in GBP - what should I do?",
+            "what currencies can I receive my salary in with this?",
+            "How to receive transfers from my employer when I get paid in GBP?",
+            "My friend wants to send me money, can she?"
+        ]
+    },
+    {
+        "intent_id": 51,
+        "sample_utterances": [
+            "I requested a refund from a merchant but don't see the money in my account.  Are you able to check with the merchant or process the refund manually?",
+            "There is not a refund in my statement.",
+            "I'm supposed to be getting a refund but it hasn't shown up, now what?"
+        ]
+    },
+    {
+        "intent_id": 52,
+        "sample_utterances": [
+            "I would like to report an issue with my product and want to get it refunded",
+            "I just bought an item and would like to stop payment can you tell me if the item has been sent yet?",
+            "I need a refund and cancel a transaction on an item I purchased and i need it as soon as possible, please!"
+        ]
+    },
+    {
+        "intent_id": 53,
+        "sample_utterances": [
+            "I tried to use my debit card, but the payment did not work.",
+            "Why did the funds for one of my purchase come back to my account?",
+            "The card payment didn't work",
+            "A seller is stating that they haven't received money yet when the money has already deducted from my account."
+        ]
+    },
+    {
+        "intent_id": 54,
+        "sample_utterances": [
+            "Do you have a list of the cards and currencies supported?",
+            "Please let me know what currency I can use to top up my account?",
+            "What currency can I use to pay for a top up?",
+            "do you accept from usa credit card?"
+        ]
+    },
+    {
+        "intent_id": 55,
+        "sample_utterances": [
+            "I would like to invalidate my account.  I am very disappointed with your services.",
+            "Please delete my account immediately.",
+            "I want to stop my account",
+            "How can I delete my account?"
+        ]
+    },
+    {
+        "intent_id": 56,
+        "sample_utterances": [
+            "Do you take SWIFT transfers?",
+            "If I top up by transfer, am I going to be charged?",
+            "What are the fees for using transfer to top off my account?",
+            "Will I be fined for topping up by transfer?"
+        ]
+    },
+    {
+        "intent_id": 57,
+        "sample_utterances": [
+            "Are there still fees for european top-ups?",
+            "how should i add money to my card",
+            "Are there charges for using a bank card to top up"
+        ]
+    },
+    {
+        "intent_id": 58,
+        "sample_utterances": [
+            "I want to top up my account with a cheque",
+            "Can I mail in a check to top up?",
+            "Do you accept cheques for top ups?",
+            "how do i get top up with cash deposit"
+        ]
+    },
+    {
+        "intent_id": 59,
+        "sample_utterances": [
+            "I desperately need to top-up my card, so why is it being declined? Can you solve this for me? I need to use my card immediately!",
+            "Why did my top-up not work?",
+            "My top up is not working"
+        ]
+    },
+    {
+        "intent_id": 60,
+        "sample_utterances": [
+            "Is there a limit to my top-up?",
+            "What is the most I can top-up?",
+            "what is the most money i can top up?"
+        ]
+    },
+    {
+        "intent_id": 61,
+        "sample_utterances": [
+            "My money disappeared! Please help??",
+            "What's the problem? I thought you offered crypto top up. This doesn't appear to be working at all. My money has now vanished from my account.",
+            "Did you lose my money? I had added funds through top-up not long ago and I know they were in my account, but they seem to have disappeared. What happened?",
+            "I think you reverted my top up."
+        ]
+    },
+    {
+        "intent_id": 62,
+        "sample_utterances": [
+            "I want to know how to transfer money with my credit card",
+            "How can I use my credit card to transfer money?",
+            "Is it possible for friends to top up my account?",
+            "I have a new card. How do i top it up?"
+        ]
+    },
+    {
+        "intent_id": 63,
+        "sample_utterances": [
+            "Good day, in reviewing my credit card activity over the last several days, I see a repeated charge for a restaurant that I went to. The charge was put through twice, so I would like one of the charges corrected and the amount that was withdrawn to be reinstated please.",
+            "I have been charged twice on my statement.",
+            "Hi, I was just checking over my card transactions and notice I was charged twice for a restaurant visit this week. Can you please remove one of these false charges from my account?"
+        ]
+    },
+    {
+        "intent_id": 64,
+        "sample_utterances": [
+            "I got an unexpected charge on my transfers. How can I correct this?",
+            "I tried to transfer money to a receiver and they didn't get the right amount. What is going on and who do I contact to help me?",
+            "I was charged a fee for a transfer.",
+            "Why was I charged a fee for transferring money"
+        ]
+    },
+    {
+        "intent_id": 65,
+        "sample_utterances": [
+            "I want to transfer money. How do I do that for my account?",
+            "How can I top up my account by bank transfer?",
+            "What do you do to transfer money to my account?",
+            "I'd like to know how transferring my money into my account works."
+        ]
+    },
+    {
+        "intent_id": 66,
+        "sample_utterances": [
+            "I haven't received money from a transfer?",
+            "My transfer didn't arrive to the recipient",
+            "I sent a payment but it isn't showing up in the app",
+            "How long do transfers typically take? Is there a way of speeding the process up? My friend needs the money I sent her desperately."
+        ]
+    },
+    {
+        "intent_id": 67,
+        "sample_utterances": [
+            "what is the time frame for transfers",
+            "How long will I have to wait for my money to be in my account?",
+            "What is the timeframe for a transfer in Europe?"
+        ]
+    },
+    {
+        "intent_id": 68,
+        "sample_utterances": [
+            "You will hear back from us about your verification results in 10 minutes to a one hour timeframe.  If these verification results do fail, please double-check to make sure your images are clear and have no glare or blur; your photos need to be fully readable.  You need to be 18 years of age or older and a resident of Switzerland or the European Economic Area to create an account.",
+            "Why am I unable to verify my id?",
+            "I don't have the means to prove my identity.",
+            "Help me verify my identify?"
+        ]
+    },
+    {
+        "intent_id": 69,
+        "sample_utterances": [
+            "What documents do you need to verify my identity?",
+            "Can you tell me what i need for the identity check?",
+            "What forms of ID work for verification?"
+        ]
+    },
+    {
+        "intent_id": 70,
+        "sample_utterances": [
+            "Show me how to look at the source of my current funds?",
+            "I would like to know where the funds are at.",
+            "Can you tell me how to tell where my funds come from?",
+            "What source do my fund come from?"
+        ]
+    },
+    {
+        "intent_id": 71,
+        "sample_utterances": [
+            "why do i need to verify the top up?",
+            "What is the verification process used for?",
+            "Tell me how to verify a top up."
+        ]
+    },
+    {
+        "intent_id": 72,
+        "sample_utterances": [
+            "I tried paying with my disposable virtual card earlier but it was rejected. What can I do to fix this?",
+            "I tried to use my disposable virtual card to pay a subscription to the gym and it got rejected. Any ideas why?",
+            "What is the reason I got rejected for using my disposable virtual card to pay a subscription to the gym?"
+        ]
+    },
+    {
+        "intent_id": 73,
+        "sample_utterances": [
+            "Please give me a Mastercard instead.",
+            "Do I have a choice for a Mastercard?",
+            "Could I get a mastercard if that's reasonable?",
+            "What card types can I choose from?"
+        ]
+    },
+    {
+        "intent_id": 74,
+        "sample_utterances": [
+            "DO you know the reason for the identity check?",
+            "Why check my identity?",
+            "I still want to use my account but haven't verified is that OK?",
+            "Why are you asking so many questions about who I am"
+        ]
+    },
+    {
+        "intent_id": 75,
+        "sample_utterances": [
+            "The machine only paid me a hundred when I wanted 20",
+            "I was only given $20 after trying to withdraw $100",
+            "I could not get the cash I wanted",
+            "Can you explain why the ATM is giving me less money than what I asked for?"
+        ]
+    },
+    {
+        "intent_id": 76,
+        "sample_utterances": [
+            "I had trouble with an incorrect rate being applied when using the ATM with foreign currency.",
+            "Whats wrong with my currency exchange?",
+            "what are weekend rates for getting cash",
+            "Is it possible to use an ATM when I am not in the country and make a withdraw with out extra fees?"
+        ]
+    }
+]
