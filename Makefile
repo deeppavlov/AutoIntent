@@ -32,6 +32,5 @@ docs:
 	$(poetry) python -m sphinx build docs/source docs/build/html
 
 .PHONY: serve-docs
-serve-docs:
-	make docs
+serve-docs: docs
 	$(poetry) python -m http.server -d docs/build/html 8333
