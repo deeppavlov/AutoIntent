@@ -1,3 +1,8 @@
+# %% [markdown]
+"""
+# Optimization demo
+"""
+
 # %%
 import importlib.resources as ires
 from pathlib import Path
