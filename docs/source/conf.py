@@ -6,11 +6,15 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+import sys
 
-from autointent.docs_utils import (
-    generate_tutorial_links_for_notebook_creation,
-    regenerate_apiref,
-)
+conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
+
+sys.path.insert(0, conf_dir)
+
+from docs_utils.apiref import regenerate_apiref  # noqa: E402
+from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
 
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
@@ -29,7 +33,7 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["conf.py"]
+exclude_patterns = ["conf.py", "docs_utils/*"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -49,7 +53,7 @@ autodoc_default_options = {
 }
 
 # Finding tutorials directories
-nbsphinx_custom_formats = {".py": "autointent.docs_utils.py_percent_to_notebook"}
+nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """

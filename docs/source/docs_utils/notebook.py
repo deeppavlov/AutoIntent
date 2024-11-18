@@ -215,8 +215,8 @@ def py_percent_to_notebook(text: str) -> nbformat.NotebookNode:
     Convert `.py`-file to jupyter notebook.
 
     This function takes string in `py:percent` format, applies replacement patterns
-    :py:class:`autointent.docs_utils.InstallationCell`, :py:function:`autointent.docs_utils.DocumentationLink`,
-    :py:function:`autointent.docs_utils.MarkdownDocumentationLink` and converts result to standard
+    :py:class:`docs_utils.InstallationCell`, :py:function:`docs_utils.DocumentationLink`,
+    :py:function:`docs_utils.MarkdownDocumentationLink` and converts result to standard
     JSON representation of jupyter notebook. See example:
 
     .. code-block:: python
