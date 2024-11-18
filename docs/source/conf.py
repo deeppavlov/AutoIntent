@@ -64,7 +64,7 @@ def setup(_) -> None:  # noqa: ANN001
         [
             ("tutorials.pipeline_optimization", "Pipeline Optimization"),
             ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
-            ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")])
+            ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
         ]
     )
     regenerate_apiref(
