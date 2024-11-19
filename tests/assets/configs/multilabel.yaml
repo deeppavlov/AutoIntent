@@ -22,3 +22,4 @@ nodes:
       - module_type: threshold
         thresh: [0.5, [0.5, 0.5, 0.5]]
       - module_type: tunable
+      - module_type: adaptive

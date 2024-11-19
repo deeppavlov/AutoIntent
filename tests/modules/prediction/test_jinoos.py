@@ -1,22 +1,44 @@
+from typing import Any
+
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from autointent.modules import JinoosPredictor
+from autointent.modules.prediction.utils import InvalidNumClassesError, WrongClassificationError
 
 
-@pytest.mark.xfail
-def test_predict_returns_correct_indices(context):
+def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float):
+    """
+    `labels`: labels without oos detection
+    """
+    mask = np.max(scores, axis=1) < thresh
+    labels[mask] = -1
+
+    return labels
+
+
+def test_predict_returns_correct_indices(multiclass_fit_data):
     predictor = JinoosPredictor()
-    predictor.fit(context("multiclass"))
+    predictor.fit(*multiclass_fit_data)
+    scores = np.array([[0.1, 0.9, 0], [0.8, 0, 0.2], [0, 0.3, 0.7]])
+
+    # inference
+    predictions = predictor.predict(scores)
+    desired = detect_oos(scores, np.array([1, 0, 2]), predictor.thresh)
+
+    np.testing.assert_array_equal(predictions, desired)
+
+
+def test_fails_on_wrong_n_classes(multiclass_fit_data):
+    predictor = JinoosPredictor()
+    predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    predictions = predictor.predict(scores)
-    np.testing.assert_array_equal(predictions, np.array([1, 0, 1]))
+    with pytest.raises(InvalidNumClassesError):
+        predictor.predict(scores)
 
 
-@pytest.mark.xfail
-def test_predict_handles_single_class(context):
+def test_fails_on_wrong_clf_problem(multilabel_fit_data):
     predictor = JinoosPredictor()
-    predictor.fit(context("multiclass"))
-    scores = np.array([[0.5], [0.5], [0.5]])
-    predictions = predictor.predict(scores)
-    np.testing.assert_array_equal(predictions, np.array([0, 0, 0]))
+    with pytest.raises(WrongClassificationError):
+        predictor.fit(*multilabel_fit_data)
