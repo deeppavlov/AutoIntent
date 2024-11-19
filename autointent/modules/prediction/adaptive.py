@@ -12,7 +12,8 @@ from autointent.context.data_handler import Tag
 from autointent.custom_types import LabelType
 from autointent.metrics.converter import transform
 
-from .base import PredictionModule, apply_tags
+from .base import PredictionModule
+from .utils import InvalidNumClassesError, WrongClassificationError, apply_tags
 
 default_search_space = np.linspace(0, 1, num=10)
 
@@ -25,9 +26,11 @@ class AdaptivePredictorDumpMetadata(TypedDict):
 
 class AdaptivePredictor(PredictionModule):
     metadata_dict_name = "metadata.json"
-    multilabel: bool
+    n_classes: int
+    _r: float
     tags: list[Tag] | None
     name = "adapt"
+    tags: list[Tag]
 
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else default_search_space
@@ -45,6 +48,14 @@ class AdaptivePredictor(PredictionModule):
         tags: list[Tag] | None = None,
     ) -> None:
         self.tags = tags
+        multilabel = isinstance(labels[0], list)
+        if not multilabel:
+            msg = """AdaptivePredictor is not designed to perform multiclass classification,
+            consider using other predictor algorithms"""
+            raise WrongClassificationError(msg)
+        self.n_classes = (
+            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+        )
 
         metrics_list = []
         for r in self.search_space:
@@ -52,14 +63,13 @@ class AdaptivePredictor(PredictionModule):
             metric_value = multilabel_score(labels, y_pred)
             metrics_list.append(metric_value)
 
-        self._r = self.search_space[np.argmax(metrics_list)]
+        self._r = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        if self.multilabel:
-            return multilabel_predict(scores, self._r, self.tags)
-        msg = """AdaptivePredictor is not designed to perform multiclass
-        classification, consider using other predictor algorithms"""
-        raise NotImplementedError(msg)
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
+        return multilabel_predict(scores, self._r, self.tags)
 
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
@@ -87,7 +97,7 @@ def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
 
 def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
     thresh = _find_threshes(r, scores)
-    res = (scores >= thresh[None, :]).astype(int)
+    res = (scores >= thresh[None, :]).astype(int)  # suspicious
     if tags:
         res = apply_tags(res, scores, tags)
     return res
