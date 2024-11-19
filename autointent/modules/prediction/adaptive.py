@@ -32,7 +32,6 @@ class AdaptivePredictor(PredictionModule):
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else default_search_space
 
-
     @classmethod
     def from_context(cls, context: Context, search_space: list[float] | None = None) -> Self:
         return cls(
@@ -45,8 +44,7 @@ class AdaptivePredictor(PredictionModule):
         labels: list[LabelType],
         tags: list[Tag] | None = None,
     ) -> None:
-
-        self.tags=tags
+        self.tags = tags
 
         metrics_list = []
         for r in self.search_space:
@@ -95,9 +93,7 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     return res
 
 
-def multilabel_score(y_true: list[LabelType],
-                     y_pred: npt.NDArray[Any]) -> float:
-
+def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float:
     y_true_, y_pred_ = transform(y_true, y_pred)
 
     return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]
