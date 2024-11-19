@@ -42,7 +42,7 @@ class MLKnnScorer(ScoringModule):
     def __init__(
         self,
         k: int,
-        model_name: str,
+        embedder_name: str,
         db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
@@ -50,16 +50,20 @@ class MLKnnScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
-        if db_dir is None:
-            db_dir = str(get_db_dir())
         self.k = k
-        self.model_name = model_name
+        self.embedder_name = embedder_name
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
-        self.db_dir = db_dir
+        self._db_dir = db_dir
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+
+    @property
+    def db_dir(self) -> str:
+        if self._db_dir is None:
+            self._db_dir = str(get_db_dir())
+        return self._db_dir
 
     @classmethod
     def from_context(
@@ -68,26 +72,29 @@ class MLKnnScorer(ScoringModule):
         k: int,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        model_name: str | None = None,
+        embedder_name: str | None = None,
     ) -> Self:
-        if model_name is None:
-            model_name = context.optimization_info.get_best_embedder()
+        if embedder_name is None:
+            embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
         else:
-            prebuilt_index = context.vector_index_client.exists(model_name)
+            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
         instance = cls(
             k=k,
-            model_name=model_name,
+            embedder_name=embedder_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            db_dir=str(context.db_dir),
-            device=context.device,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            db_dir=str(context.get_db_dir()),
+            device=context.get_device(),
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
+
+    def get_embedder_name(self) -> str:
+        return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         if not isinstance(labels[0], list):
@@ -100,12 +107,12 @@ class MLKnnScorer(ScoringModule):
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.model_name)
+            self.vector_index = vector_index_client.get_index(self.embedder_name)
             if len(utterances) != len(self.vector_index.texts):
                 msg = "Vector index mismatches provided utterances"
                 raise ValueError(msg)
         else:
-            self.vector_index = vector_index_client.create_index(self.model_name, utterances, labels)
+            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         self.features = (
             self.vector_index.embedder.embed(utterances)
@@ -125,7 +132,7 @@ class MLKnnScorer(ScoringModule):
         c = np.zeros((self.n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self.n_classes, self.k + 1), dtype=int)
 
-        neighbors_labels = self._get_neighbors(self.features)
+        neighbors_labels, _ = self._get_neighbors(self.features)
 
         for i in range(self.labels.shape[0]):
             deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
@@ -142,40 +149,36 @@ class MLKnnScorer(ScoringModule):
 
         return cond_prob_true, cond_prob_false
 
-    def _get_neighbors(self, queries: list[str] | NDArray[Any]) -> NDArray[np.int64]:
-        """
-        retrieve nearest neighbors and return their labels in binary format
-
-        Return
-        ---
-        array of shape (n_queries, n_candidates, n_classes)
-        """
-        labels, _, _ = self.vector_index.query(
+    def _get_neighbors(
+        self,
+        queries: list[str] | NDArray[Any],
+    ) -> tuple[NDArray[np.int64], list[list[str]]]:
+        labels, _, neighbors = self.vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
         )
-        return np.array([candidates[self.ignore_first_neighbours :] for candidates in labels])
+        return (
+            np.array([candidates[self.ignore_first_neighbours :] for candidates in labels]),
+            neighbors,
+        )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
         probas = self.predict(utterances)
         return (probas > thresh).astype(int)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        result = np.zeros((len(utterances), self.n_classes), dtype=float)
-        neighbors_labels = self._get_neighbors(utterances)
+        return self._predict(utterances)[0]
 
-        for instance in range(neighbors_labels.shape[0]):
-            deltas = np.sum(neighbors_labels[instance], axis=0).astype(int)
-
-            for label in range(self.n_classes):
-                p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
-                p_false = self._prior_prob_false[label] * self._cond_prob_false[label, deltas[label]]
-                result[instance, label] = p_true / (p_true + p_false)
-
-        return result
+    def predict_with_metadata(
+        self,
+        utterances: list[str],
+    ) -> tuple[NDArray[Any], list[dict[str, Any]] | None]:
+        scores, neighbors = self._predict(utterances)
+        metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
+        return scores, metadata
 
     def clear_cache(self) -> None:
-        self.vector_index.delete()
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         self.metadata = MLKnnScorerDumpMetadata(
@@ -218,4 +221,21 @@ class MLKnnScorer(ScoringModule):
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
         )
-        self.vector_index = vector_index_client.get_index(self.model_name)
+        self.vector_index = vector_index_client.get_index(self.embedder_name)
+
+    def _predict(
+        self,
+        utterances: list[str],
+    ) -> tuple[NDArray[np.float64], list[list[str]]]:
+        result = np.zeros((len(utterances), self.n_classes), dtype=float)
+        neighbors_labels, neighbors = self._get_neighbors(utterances)
+
+        for instance in range(neighbors_labels.shape[0]):
+            deltas = np.sum(neighbors_labels[instance], axis=0).astype(int)
+
+            for label in range(self.n_classes):
+                p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
+                p_false = self._prior_prob_false[label] * self._cond_prob_false[label, deltas[label]]
+                result[instance, label] = p_true / (p_true + p_false)
+
+        return result, neighbors

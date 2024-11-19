@@ -21,6 +21,7 @@ import numpy.typing as npt
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
+from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
@@ -133,7 +134,7 @@ class CrossEncoderWithLogreg:
         self._clf = clf
 
     @classmethod
-    def load(cls, path: str) -> "CrossEncoderWithLogreg":
+    def load(cls, path: str) -> Self:
         dump_dir = Path(path)
 
         # load sklearn model
@@ -144,7 +145,7 @@ class CrossEncoderWithLogreg:
         crossencoder_dir = str(dump_dir / "crossencoder")
         model = CrossEncoder(crossencoder_dir)  # TODO control device
 
-        res = CrossEncoderWithLogreg(model)
+        res = cls(model)
         res.set_classifier(clf)
 
         return res

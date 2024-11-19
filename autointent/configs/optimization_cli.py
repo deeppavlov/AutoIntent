@@ -6,7 +6,7 @@ from typing import Any
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
-from autointent.pipeline.optimization.utils import generate_name
+from .name import generate_name
 
 
 @dataclass
@@ -28,6 +28,8 @@ class LoggingConfig:
     run_name: str | None = None
     dirpath: Path | None = None
     dump_dir: Path | None = None
+    dump_modules: bool = False
+    clear_ram: bool = True
 
     def __post_init__(self) -> None:
         self.define_run_name()
@@ -44,7 +46,6 @@ class LoggingConfig:
         if self.run_name is None:
             raise ValueError
         self.dirpath = dirpath / self.run_name
-        self.dirpath.mkdir(parents=True)
 
     def define_dump_dir(self) -> None:
         if self.dump_dir is None:
@@ -57,6 +58,7 @@ class LoggingConfig:
 class VectorIndexConfig:
     db_dir: Path | None = None
     device: str = "cpu"
+    save_db: bool = False
 
 
 @dataclass
