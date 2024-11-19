@@ -19,6 +19,7 @@ default_search_space = np.linspace(0, 1, num=100)
 
 class JinoosPredictorDumpMetadata(BaseMetadataDict):
     thresh: float
+    n_classes: int
 
 
 class JinoosPredictor(PredictionModule):
@@ -71,7 +72,7 @@ class JinoosPredictor(PredictionModule):
         return _detect_oos(pred_classes, best_scores, self.thresh)
 
     def dump(self, path: str) -> None:
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
 
         dump_dir = Path(path)
 
@@ -86,6 +87,7 @@ class JinoosPredictor(PredictionModule):
 
         self.thresh = metadata["thresh"]
         self.metadata = metadata
+        self.n_classes = metadata["n_classes"]
 
 
 def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
