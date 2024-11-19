@@ -68,17 +68,22 @@ class CrossEncoderWithLogreg:
     def get_features(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
         logits_list: list[npt.NDArray[Any]] = []
 
+        feature_level = 2  # (batch_size, hidden_size)
+        sequence_level = 3  # (batch_size, seq_len, hidden_size)
+
         def hook_function(module, input_tensor, output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ARG001, ANN001
-            logits_list.append(input_tensor[0].cpu().numpy())
+            if len(input_tensor[0].shape) == feature_level:
+                x = input_tensor[0]
+            elif len(input_tensor[0].shape) == sequence_level:
+                x = input_tensor[0][:, 0, :]  # take <s> token (equiv. to [CLS])
+            else:
+                text_error = f"Unexpected input_tensor[0] shape: {input_tensor[0].shape}"
+                raise ValueError(text_error)
+            logits_list.append(x.cpu().numpy())
 
         handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
-
-        for i in range(0, len(pairs), self.batch_size):
-            batch = pairs[i : i + self.batch_size]
-            self.cross_encoder.predict(batch)
-
+        self.cross_encoder.predict(pairs, batch_size=self.batch_size)
         handler.remove()
-
         return np.concatenate(logits_list, axis=0)
 
     def _fit(self, pairs: list[list[str]], labels: list[LabelType]) -> None:
