@@ -21,7 +21,7 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     tags: list[Tag] | None
     thresh: float | npt.NDArray[Any]
-    n_classes: int | None
+    n_classes: int
 
 
 class ThresholdPredictor(PredictionModule):
@@ -41,8 +41,6 @@ class ThresholdPredictor(PredictionModule):
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
         return cls(
             thresh=thresh,
-            multilabel=context.is_multilabel(),
-            n_classes=context.get_n_classes(),
         )
 
     def fit(

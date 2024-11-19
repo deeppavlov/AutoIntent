@@ -51,9 +51,7 @@ class JinoosPredictor(PredictionModule):
         if multilabel:
             msg = "JinoosPredictor is compatible with single-label classification only"
             raise WrongClassificationError(msg)
-        self.n_classes = (
-            len(labels[0]) if multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
-        )
+        self.n_classes = len(set(labels).difference([-1]))
 
         pred_classes, best_scores = _predict(scores)
 

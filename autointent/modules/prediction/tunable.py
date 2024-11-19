@@ -29,7 +29,7 @@ class TunablePredictor(PredictionModule):
     name = "tunable"
     multilabel: bool
     n_classes: int
-    tags: list[Tag]
+    tags: list[Tag] | None
 
     def __init__(
         self,
@@ -81,7 +81,7 @@ class TunablePredictor(PredictionModule):
 
     def dump(self, path: str) -> None:
         self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_classes=self.n_classes
         )
 
         dump_dir = Path(path)

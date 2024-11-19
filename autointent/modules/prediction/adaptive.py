@@ -30,7 +30,6 @@ class AdaptivePredictor(PredictionModule):
     _r: float
     tags: list[Tag] | None
     name = "adapt"
-    tags: list[Tag]
 
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else default_search_space
