@@ -7,10 +7,10 @@ from datasets import ClassLabel, Sequence, concatenate_datasets
 from datasets import Dataset as HFDataset
 from typing_extensions import Self
 
-from autointent.context.data_handler.schemas import Tag
 from autointent.custom_types import LabelType
 
-from .data_reader import DictReader, Intent, JsonReader, Reader
+from .schemas import Tag
+from .validation import Intent
 
 
 class Split:
@@ -34,7 +34,7 @@ class Dataset(dict[str, HFDataset]):
 
         self.intents = intents
 
-        oos_split = self.create_oos_split()
+        oos_split = self._create_oos_split()
         if oos_split is not None:
             self[Split.OOS] = oos_split
 
@@ -58,24 +58,16 @@ class Dataset(dict[str, HFDataset]):
 
     @classmethod
     def from_json(cls, filepath: str | Path) -> Self:
-        return cls._load(JsonReader(), filepath=filepath)
+        from .reader import JsonReader
+        return JsonReader().read(filepath)
 
     @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> Self:
-        return cls._load(DictReader(), mapping=mapping)
+        from .reader import DictReader
+        return DictReader().read(mapping)
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         return {split_name: split.to_list() for split_name, split in self.items()}
-
-    def create_oos_split(self) -> HFDataset | None:
-        oos_splits = [split.filter(self._is_oos) for split in self.values()]
-        oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
-        if oos_splits:
-            splits = self.filter(lambda sample: not self._is_oos(sample))
-            for split_name, split in splits.items():
-                self[split_name] = split
-            return concatenate_datasets(oos_splits)
-        return None
 
     def encode_labels(self) -> Self:
         for split_name, split in self.items():
@@ -99,18 +91,6 @@ class Dataset(dict[str, HFDataset]):
             for tag, intent_ids in tag_mapping.items()
         ]
 
-    @classmethod
-    def _load(cls, reader: Reader, **kwargs: Any) -> Self:
-        data = reader.read(**kwargs)
-        intents = [Intent.model_validate(intent) for intent in data.pop("intents", [])]
-        return cls(
-            {
-                split_name: HFDataset.from_list(split)
-                for split_name, split in data.items()
-            },
-            intents=intents,
-        )
-
     def _is_oos(self, sample: Sample) -> bool:
         return sample["label"] is None
 
@@ -129,6 +109,16 @@ class Dataset(dict[str, HFDataset]):
                     one_hot_label[idx] = 1
         sample["label"] = one_hot_label
         return sample
+
+    def _create_oos_split(self) -> HFDataset | None:
+        oos_splits = [split.filter(self._is_oos) for split in self.values()]
+        oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
+        if oos_splits:
+            splits = self.filter(lambda sample: not self._is_oos(sample))
+            for split_name, split in splits.items():
+                self[split_name] = split
+            return concatenate_datasets(oos_splits)
+        return None
 
     def _cast_label_feature(self) -> None:
         for split_name, split in self.items():
