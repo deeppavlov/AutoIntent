@@ -7,21 +7,37 @@
         "prediction": [],
         "scoring": [
             0.6953125,
-            0.7265625,
+            0.703125,
+            0.6640625,
             0.65625,
-            0.65625,
+            0.6953125,
+            0.6640625,
+            0.625,
+            0.53125,
             0.6953125,
             0.6875,
-            0.625,
-            0.546875,
-            0.6953125,
-            0.6953125,
             0.609375,
             0.5703125,
             0.6953125,
-            0.6484375,
-            0.5390625,
-            0.40625,
+            0.6875,
+            0.65625,
+            0.5625,
+            0.6953125,
+            0.6796875,
+            0.640625,
+            0.609375,
+            0.6953125,
+            0.6640625,
+            0.640625,
+            0.65625,
+            0.6953125,
+            0.59375,
+            0.6328125,
+            0.5703125,
+            0.6953125,
+            0.7421875,
+            0.7109375,
+            0.65625,
             0.6953125,
             0.6953125,
             0.6953125,
@@ -82,7 +98,7 @@
                     "k": 3
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.7265625,
+                "metric_value": 0.703125,
                 "module_dump_dir": null
             },
             {
@@ -93,7 +109,7 @@
                     "k": 5
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.65625,
+                "metric_value": 0.6640625,
                 "module_dump_dir": null
             },
             {
@@ -126,7 +142,7 @@
                     "k": 3
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.6875,
+                "metric_value": 0.6640625,
                 "module_dump_dir": null
             },
             {
@@ -148,7 +164,7 @@
                     "k": 10
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.546875,
+                "metric_value": 0.53125,
                 "module_dump_dir": null
             },
             {
@@ -170,7 +186,7 @@
                     "k": 3
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.6953125,
+                "metric_value": 0.6875,
                 "module_dump_dir": null
             },
             {
@@ -198,7 +214,7 @@
             {
                 "module_type": "dnnc",
                 "module_params": {
-                    "cross_encoder_name": "pingkeest/learning2_model",
+                    "cross_encoder_name": "intfloat/multilingual-e5-large-instruct",
                     "train_head": true,
                     "k": 1
                 },
@@ -209,34 +225,210 @@
             {
                 "module_type": "dnnc",
                 "module_params": {
-                    "cross_encoder_name": "pingkeest/learning2_model",
+                    "cross_encoder_name": "intfloat/multilingual-e5-large-instruct",
                     "train_head": true,
                     "k": 3
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.6484375,
+                "metric_value": 0.6875,
                 "module_dump_dir": null
             },
             {
                 "module_type": "dnnc",
                 "module_params": {
-                    "cross_encoder_name": "pingkeest/learning2_model",
+                    "cross_encoder_name": "intfloat/multilingual-e5-large-instruct",
                     "train_head": true,
                     "k": 5
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.5390625,
+                "metric_value": 0.65625,
                 "module_dump_dir": null
             },
             {
                 "module_type": "dnnc",
                 "module_params": {
-                    "cross_encoder_name": "pingkeest/learning2_model",
+                    "cross_encoder_name": "intfloat/multilingual-e5-large-instruct",
                     "train_head": true,
                     "k": 10
                 },
                 "metric_name": "scoring_recall",
-                "metric_value": 0.40625,
+                "metric_value": 0.5625,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "deepvk/USER-bge-m3",
+                    "train_head": true,
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6953125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "deepvk/USER-bge-m3",
+                    "train_head": true,
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6796875,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "deepvk/USER-bge-m3",
+                    "train_head": true,
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.640625,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "deepvk/USER-bge-m3",
+                    "train_head": true,
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.609375,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-m3",
+                    "train_head": true,
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6953125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-m3",
+                    "train_head": true,
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6640625,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-m3",
+                    "train_head": true,
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.640625,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-m3",
+                    "train_head": true,
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.65625,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "ai-forever/ru-en-RoSBERTa",
+                    "train_head": true,
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6953125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "ai-forever/ru-en-RoSBERTa",
+                    "train_head": true,
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.59375,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "ai-forever/ru-en-RoSBERTa",
+                    "train_head": true,
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6328125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "ai-forever/ru-en-RoSBERTa",
+                    "train_head": true,
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.5703125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-reranker-base",
+                    "train_head": true,
+                    "k": 1
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.6953125,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-reranker-base",
+                    "train_head": true,
+                    "k": 3
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7421875,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-reranker-base",
+                    "train_head": true,
+                    "k": 5
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.7109375,
+                "module_dump_dir": null
+            },
+            {
+                "module_type": "dnnc",
+                "module_params": {
+                    "cross_encoder_name": "BAAI/bge-reranker-base",
+                    "train_head": true,
+                    "k": 10
+                },
+                "metric_name": "scoring_recall",
+                "metric_value": 0.65625,
                 "module_dump_dir": null
             },
             {

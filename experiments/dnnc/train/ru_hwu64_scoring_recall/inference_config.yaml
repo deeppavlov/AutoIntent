@@ -12,6 +12,8 @@ nodes_configs:
   node_type: retrieval
 - load_path: null
   module_config:
-    embedder_name: avsolatorio/GIST-small-Embedding-v0
-  module_type: linear
+    cross_encoder_name: deepvk/USER-bge-m3
+    k: 10
+    train_head: true
+  module_type: dnnc
   node_type: scoring
