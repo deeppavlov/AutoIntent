@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.context.data_handler import DataAugmenter, DataHandler, Dataset
+from autointent.context.data_handler import DataHandler, Dataset
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def sample_multilabel_data():
 
 
 def test_data_handler_initialization(sample_multiclass_data):
-    handler = DataHandler(dataset=Dataset.load_dict(sample_multiclass_data), random_seed=42)
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
     assert handler.multilabel is False
     assert handler.n_classes == 2
@@ -57,7 +57,7 @@ def test_data_handler_initialization(sample_multiclass_data):
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
-    handler = DataHandler(dataset=Dataset.load_dict(sample_multilabel_data), random_seed=42)
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multilabel_data), random_seed=42)
 
     assert handler.multilabel is True
     assert handler.n_classes == 2
@@ -67,30 +67,21 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.test_labels == [[1, 0], [0, 1]]
 
 
-def test_regex_sampling(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    augmenter = DataAugmenter(regex_sampling=5, random_seed=42)
-    dataset = Dataset.model_validate(train_data)
-    augmented_dataset = augmenter(dataset)
-    utterances_train = [ut.text for ut in augmented_dataset.utterances]
-    assert utterances_train == ["hello", "hi", "goodbye", "bye", "hello", "hi", "goodbye", "bye"]
-
-
 def test_dump_method(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
-    train_data, test_data = handler.dump()
+    dump = handler.dump()
 
-    assert train_data == [
-        {"intent_id": 0, "sample_utterances": ["hello", "hi"]},
-        {"intent_id": 1, "sample_utterances": ["goodbye", "bye"]},
+    assert dump["train"] == [
+        {"utterance": "hello", "label": 0},
+        {"utterance": "hi", "label": 0},
+        {"utterance": "goodbye", "label": 1},
+        {"utterance": "bye", "label": 1},
     ]
-    assert test_data == [{"labels": [0], "utterance": "greetings"}, {"labels": [1], "utterance": "farewell"}]
+    assert dump["test"] == [
+        {"utterance": "greetings", "label": 0},
+        {"utterance": "farewell", "label": 1},
+    ]
 
 
 @pytest.mark.skip("All data validations will be refactored later")

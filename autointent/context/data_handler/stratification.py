@@ -20,7 +20,7 @@ class StratifiedSplitter:
             test_size=self.test_size,
             random_state=self.random_seed,
             shuffle=True,
-            stratify=dataset[dataset.LABEL_COLUMN],
+            stratify=dataset[dataset.label_column],
         )
 
     def _split_multilabel(self, dataset: Dataset) -> ...:
@@ -29,7 +29,7 @@ class StratifiedSplitter:
             order=2,
             sample_distribution_per_fold=[self.test_size, 1.0 - self.test_size],
         )
-        return next(splitter.split(np.arange(len(dataset)), np.array(dataset[dataset.LABEL_COLUMN])))
+        return next(splitter.split(np.arange(len(dataset)), np.array(dataset[dataset.label_column])))
 
 
 def split(dataset: Dataset, random_seed: int) -> Dataset:

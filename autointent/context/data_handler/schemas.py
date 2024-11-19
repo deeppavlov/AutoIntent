@@ -9,6 +9,11 @@ from typing_extensions import Self
 from autointent.custom_types import LabelType
 
 
+class Tag(BaseModel):
+    name: str
+    intent_ids: list[int]
+
+
 class UtteranceType(str, Enum):
     oos = "oos"
     multilabel = "multilabel"

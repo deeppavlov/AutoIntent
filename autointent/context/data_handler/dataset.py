@@ -1,12 +1,13 @@
+from collections import defaultdict
 from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
+from datasets import ClassLabel, Sequence, concatenate_datasets
 from datasets import Dataset as HFDataset
-from datasets import DatasetDict as HFDatasetDict
-from datasets import Sequence, concatenate_datasets
 from typing_extensions import Self
 
+from autointent.context.data_handler.schemas import Tag
 from autointent.custom_types import LabelType
 
 from .data_reader import DictReader, Intent, JsonReader, Reader
@@ -24,23 +25,29 @@ class Sample(TypedDict):
     label: LabelType | None
 
 
-class Dataset(HFDatasetDict):
-    LABEL_COLUMN = "label"
-    UTTERANCE_COLUMN = "utterance"
+class Dataset(dict[str, HFDataset]):
+    label_feature = "label"
+    utterance_feature = "utterance"
 
-    def __init__(self, *args: Any, intents: list[dict[str, Any]], **kwargs: Any) -> None:
+    def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.intents = [Intent.model_validate(intent) for intent in intents]
-        self.create_oos_split()
+
+        self.intents = intents
+
+        oos_split = self.create_oos_split()
+        if oos_split is not None:
+            self[Split.OOS] = oos_split
+
+        self._cast_label_feature()
 
     @property
     def multilabel(self) -> bool:
-        return isinstance(self[Split.TRAIN].features[self.LABEL_COLUMN], Sequence)
+        return isinstance(self[Split.TRAIN].features[self.label_feature], Sequence)
 
     @cached_property
     def n_classes(self) -> int:
         classes = set()
-        for label in self[Split.TRAIN][self.LABEL_COLUMN]:
+        for label in self[Split.TRAIN][self.label_feature]:
             match label:
                 case int():
                     classes.add(label)
@@ -50,39 +57,52 @@ class Dataset(HFDatasetDict):
         return len(classes)
 
     @classmethod
-    def load_json(cls, filepath: str | Path) -> Self:
+    def from_json(cls, filepath: str | Path) -> Self:
         return cls._load(JsonReader(), filepath=filepath)
 
     @classmethod
-    def load_dict(cls, mapping: dict[str, Any]) -> Self:
+    def from_dict(cls, mapping: dict[str, Any]) -> Self:
         return cls._load(DictReader(), mapping=mapping)
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
-        return {split: self[split].to_list() for split in self}
+        return {split_name: split.to_list() for split_name, split in self.items()}
 
-    def create_oos_split(self) -> None:
-        oos_splits = self.filter(self._is_oos).values()
+    def create_oos_split(self) -> HFDataset | None:
+        oos_splits = [split.filter(self._is_oos) for split in self.values()]
         oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
         if oos_splits:
             splits = self.filter(lambda sample: not self._is_oos(sample))
             for split_name, split in splits.items():
                 self[split_name] = split
-            self[Split.OOS] = concatenate_datasets(oos_splits)
+            return concatenate_datasets(oos_splits)
+        return None
 
     def encode_labels(self) -> Self:
-        for split_name, split in self.map(self._encode_label).items():
-            self[split_name] = split
+        for split_name, split in self.items():
+            self[split_name] = split.map(self._encode_label)
         return self
 
     def to_multilabel(self) -> Self:
-        for split_name, split in self.map(self._to_multilabel).items():
-            self[split_name] = split
+        for split_name, split in self.items():
+            self[split_name] = split.map(self._to_multilabel)
+        self._cast_label_column()
         return self
+
+    def get_tags(self) -> list[Tag]:
+        tag_mapping = defaultdict(list)
+        for intent in self.intents:
+            for tag in intent.tags:
+                tag_mapping[tag].append(intent.id)
+
+        return [
+            Tag(name=tag, intent_ids=intent_ids)
+            for tag, intent_ids in tag_mapping.items()
+        ]
 
     @classmethod
     def _load(cls, reader: Reader, **kwargs: Any) -> Self:
         data = reader.read(**kwargs)
-        intents = data.pop("intents", [])
+        intents = [Intent.model_validate(intent) for intent in data.pop("intents", [])]
         return cls(
             {
                 split_name: HFDataset.from_list(split)
@@ -109,3 +129,16 @@ class Dataset(HFDatasetDict):
                     one_hot_label[idx] = 1
         sample["label"] = one_hot_label
         return sample
+
+    def _cast_label_feature(self) -> None:
+        for split_name, split in self.items():
+            new_features = split.features.copy()
+            if self.multilabel:
+                new_features[self.label_feature] = Sequence(
+                    ClassLabel(num_classes=self.n_classes),
+                )
+            else:
+                new_features[self.label_feature] = ClassLabel(
+                    num_classes=self.n_classes,
+                )
+            self[split_name] = split.cast(new_features)

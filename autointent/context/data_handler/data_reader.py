@@ -3,7 +3,8 @@ from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Protocol
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
@@ -27,6 +28,11 @@ class Dataset(BaseModel):
     validation: list[Sample] = []
     test: list[Sample] = []
     intents: list[Intent] = []
+
+    @model_validator(mode="after")
+    def sort_intents_by_id(self) -> Self:
+        self.intents = sorted(self.intents, key=lambda intent: intent.id)
+        return self
 
 
 class Reader(Protocol):

@@ -7,14 +7,13 @@ from typing import Any
 import yaml
 
 from autointent.configs.optimization_cli import (
-    AugmentationConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
 
-from .data_handler import DataAugmenter, DataHandler, Dataset
+from .data_handler import DataHandler, Dataset
 from .optimization_info import OptimizationInfo
 from .utils import NumpyEncoder, load_data
 from .vector_index_client import VectorIndex, VectorIndexClient
@@ -49,23 +48,12 @@ class Context:
             self.embedder_config.max_length,
         )
 
-    def configure_data(self, config: DataConfig, augmentation_config: AugmentationConfig | None = None) -> None:
-        if augmentation_config is not None:
-            self.augmentation_config = AugmentationConfig()
-            augmenter = DataAugmenter(
-                self.augmentation_config.multilabel_generation_config,
-                self.augmentation_config.regex_sampling,
-                self.seed,
-            )
-        else:
-            augmenter = None
-
+    def configure_data(self, config: DataConfig) -> None:
         self.data_handler = DataHandler(
             dataset=load_data(config.train_path),
             test_dataset=None if config.test_path is None else load_data(config.test_path),
             random_seed=self.seed,
             force_multilabel=config.force_multilabel,
-            augmenter=augmenter,
         )
 
     def set_datasets(

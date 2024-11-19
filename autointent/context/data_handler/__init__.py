@@ -1,5 +1,5 @@
-from .data_handler import DataAugmenter, DataHandler
+from .data_handler import DataHandler
 from .dataset import Dataset
-from .tags import Tag
+from .schemas import Tag
 
-__all__ = ["DataAugmenter", "DataHandler", "Tag", "Dataset"]
+__all__ = ["DataHandler", "Dataset", "Tag"]
