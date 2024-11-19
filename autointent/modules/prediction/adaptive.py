@@ -20,8 +20,8 @@ default_search_space = np.linspace(0, 1, num=10)
 
 class AdaptivePredictorDumpMetadata(TypedDict):
     r: float
-    multilabel: bool
     tags: list[Tag] | None
+    n_classes: int
 
 
 class AdaptivePredictor(PredictionModule):
@@ -29,7 +29,7 @@ class AdaptivePredictor(PredictionModule):
     n_classes: int
     _r: float
     tags: list[Tag] | None
-    name = "adapt"
+    name = "adaptive"
 
     def __init__(self, search_space: list[float] | None = None) -> None:
         self.search_space = search_space if search_space is not None else default_search_space
@@ -53,7 +53,7 @@ class AdaptivePredictor(PredictionModule):
             consider using other predictor algorithms"""
             raise WrongClassificationError(msg)
         self.n_classes = (
-            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+            len(labels[0]) if multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
         )
 
         metrics_list = []
@@ -73,7 +73,7 @@ class AdaptivePredictor(PredictionModule):
     def dump(self, path: str) -> None:
         dump_dir = Path(path)
 
-        metadata = AdaptivePredictorDumpMetadata(r=self._r, multilabel=self.multilabel, tags=self.tags)
+        metadata = AdaptivePredictorDumpMetadata(r=self._r, tags=self.tags, n_classes=self.n_classes)
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
@@ -85,18 +85,18 @@ class AdaptivePredictor(PredictionModule):
             metadata: AdaptivePredictorDumpMetadata = json.load(file)
 
         self._r = metadata["r"]
-        self.multilabel = metadata["multilabel"]
+        self.n_classes = metadata["n_classes"]
         self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
         self.metadata = metadata
 
 
-def _find_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
     return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
 def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
-    thresh = _find_threshes(r, scores)
-    res = (scores >= thresh[None, :]).astype(int)  # suspicious
+    thresh = get_adapted_threshes(r, scores)
+    res = (scores >= thresh[:, None]).astype(int)  # suspicious
     if tags:
         res = apply_tags(res, scores, tags)
     return res
@@ -105,4 +105,4 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
 def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float:
     y_true_, y_pred_ = transform(y_true, y_pred)
 
-    return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]
+    return f1_score(y_pred_, y_true_, average="weighted")  # type: ignore[no-any-return]
