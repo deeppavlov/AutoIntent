@@ -13,6 +13,8 @@ from autointent.metrics import METRIC_FN
 
 
 class Module(ABC):
+    """Base module."""
+
     name: str
 
     metadata_dict_name: str = "metadata.json"
@@ -31,7 +33,7 @@ class Module(ABC):
     @abstractmethod
     def score(self, context: Context, metric_fn: METRIC_FN) -> float:
         """
-        Calculates metric on test set and returns metric value.
+        Calculate metric on test set and return metric value.
 
         :param context: Context to score
         :param metric_fn: Metric function

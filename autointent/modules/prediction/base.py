@@ -1,3 +1,4 @@
+"""Predictior module."""
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -69,6 +70,7 @@ def get_prediction_evaluation_data(
 ) -> tuple[list[LabelType], npt.NDArray[Any]]:
     """
     Get prediction evaluation data.
+
     :param context: Context
     :return:
     """
@@ -93,10 +95,10 @@ def get_prediction_evaluation_data(
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
     """
-    this function is intended to be used with multilabel predictor.
+    Use this function with a multilabel predictor.
 
-    If some intent classes have common tag (i.e. they are mutually exclusive)
-    and were assigned to one sample, leave only that class that has the highest score.
+    If some intent classes have a common tag (i.e., they are mutually exclusive)
+    and are assigned to one sample, leave only the class with the highest score.
 
     :param labels: Binary labels of shape (n_samples, n_classes)
     :param scores: (n_samples, n_classes) with float values from 0..1

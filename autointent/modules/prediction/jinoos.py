@@ -25,6 +25,8 @@ class JinoosPredictorDumpMetadata(BaseMetadataDict):
 
 
 class JinoosPredictor(PredictionModule):
+    """Jinoos predictor module."""
+
     thresh: float
     name = "jinoos"
 

@@ -1,3 +1,5 @@
+"""Utility functions for calculating probabilities and weighting nearest neighbors."""
+
 from typing import Any
 
 import numpy as np
@@ -16,19 +18,16 @@ def apply_weights(
     multilabel: bool,
 ) -> NDArray[Any]:
     """
-    Calculate probabilities.
+    Calculate probabilities based on labels, distances, and weighting strategy.
 
-    Arguments
-    ---
-    `labels`:
-    - multiclass case: np.ndarray of shape (n_samples, n_neighbors) with integer labels from [0,n_classes-1]
-    - multilabel case: np.ndarray of shape (n_samples, n_neighbors, n_classes) with binary labels
-
-    `distances`: np.ndarray of shape (n_samples, n_neighbors) with float values
-
-    Return
-    ---
-    np.ndarray of shape (n_samples, n_classes)
+    :param labels:
+        - For multiclass: Array of shape (n_samples, n_neighbors) with integer labels in [0, n_classes - 1].
+        - For multilabel: Array of shape (n_samples, n_neighbors, n_classes) with binary labels.
+    :param distances: Array of shape (n_samples, n_neighbors) with float distances.
+    :param weights: Weighting strategy to apply. Options are "closest", "uniform", or "distance".
+    :param n_classes: Number of classes in the dataset.
+    :param multilabel: Whether the task is multilabel classification.
+    :return: Array of shape (n_samples, n_classes) with calculated probabilities.
     """
     n_samples, n_candidates = distances.shape
 
@@ -52,6 +51,17 @@ def apply_weights(
 
 
 def closest_weighting(labels: NDArray[Any], distances: NDArray[Any], multilabel: bool, n_classes: int) -> NDArray[Any]:
+    """
+    Apply closest weighting strategy.
+
+    :param labels:
+        - For multiclass: Array of shape (n_samples, n_neighbors) with integer labels in [0, n_classes - 1].
+        - For multilabel: Array of shape (n_samples, n_neighbors, n_classes) with binary labels.
+    :param distances: Array of shape (n_samples, n_neighbors) with cosine distances.
+    :param multilabel: Whether the task is multilabel classification.
+    :param n_classes: Number of classes in the dataset.
+    :return: Array of shape (n_samples, n_classes) with calculated probabilities.
+    """
     if not multilabel:
         labels = to_onehot(labels, n_classes)
     return _closest_weighting(labels, distances)
@@ -59,26 +69,29 @@ def closest_weighting(labels: NDArray[Any], distances: NDArray[Any], multilabel:
 
 def _closest_weighting(labels: NDArray[Any], distances: NDArray[Any]) -> NDArray[Any]:
     """
-    Arguments
-    ---
-    `labels`: array of shape (n_samples, n_candidates, n_classes) with binary labels
-    `distances`: array of shape (n_samples, n_candidates) with cosine distances
+    Apply closest weighting strategy for multilabel classification.
 
-    Return
-    ---
-    array of shape (n_samples, n_classes) with probabilities
+    :param labels: Array of shape (n_samples, n_candidates, n_classes) with binary labels.
+    :param distances: Array of shape (n_samples, n_candidates) with cosine distances.
+    :return: Array of shape (n_samples, n_classes) with calculated probabilities.
     """
-    # broadcast to (n_samples, n_candidates, n_classes)
+    # Broadcast to (n_samples, n_candidates, n_classes)
     broadcasted_similarities = np.broadcast_to(1 - distances[..., None], shape=labels.shape)
     expanded_distances_view = np.where(labels != 0, broadcasted_similarities, -1)
 
-    # select closest candidate for each query-class pair
+    # Select closest candidate for each query-class pair
     similarities = np.max(expanded_distances_view, axis=1)
-    return (similarities + 1) / 2  # type: ignore[no-any-return] # cosine [-1,+1] -> prob [0,1]
+    return (similarities + 1) / 2  # type: ignore[no-any-return]  # cosine [-1,+1] -> prob [0,1]
 
 
 def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
-    """Convert nd array of ints to (n+1)d array of zeros and ones."""
+    """
+    Convert an array of integer labels to a one-hot encoded array.
+
+    :param labels: Array of shape (n_samples, n_neighbors) with integer labels.
+    :param n_classes: Number of classes in the dataset.
+    :return: One-hot encoded array of shape (n_samples, n_neighbors, n_classes).
+    """
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
     indices = (*tuple(np.indices(labels.shape)), labels)

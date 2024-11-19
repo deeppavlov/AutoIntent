@@ -96,8 +96,10 @@ class AugmentationConfig:
 @dataclass
 class EmbedderConfig:
     """
-    Configuration for the embedder. The embedder is used to embed the data before training the model.
-    These parameters will be applied to the embedder used in the optimization process in vector db.
+    Configuration for the embedder.
+
+    The embedder is used to embed the data before training the model. These parameters
+    will be applied to the embedder used in the optimization process in vector db.
     Only one model can be used globally.
     """
 

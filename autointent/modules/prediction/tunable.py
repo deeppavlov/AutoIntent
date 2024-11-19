@@ -1,4 +1,5 @@
 """Tunable predictor module."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -66,9 +67,10 @@ class TunablePredictor(PredictionModule):
         tags: list[Tag] | None = None,
     ) -> None:
         """
-        Fit module
-        When data doesn't contain out-of-scope utterances, using
-        TunablePredictor imposes unnecessary computational overhead.
+        Fit module.
+
+        When data doesn't contain out-of-scope utterances, using TunablePredictor imposes unnecessary
+         computational overhead.
 
         :param scores: Scores to fit
         :param labels: Labels to fit

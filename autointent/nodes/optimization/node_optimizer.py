@@ -25,6 +25,7 @@ class NodeOptimizer:
     def __init__(self, node_type: NodeTypeType, search_space: list[dict[str, Any]], metric: str) -> None:
         """
         Initialize the node optimizer.
+
         :param node_type: Node type
         :param search_space: Search space for the optimization
         :param metric: Metric to optimize.
@@ -107,7 +108,7 @@ class NodeOptimizer:
         :param dump_dir: The base directory where the module dump directories will be created.
         :param module_type: The type of the module being optimized.
         :param j_combination: The index of the parameter combination being used.
-        :return: The path to the module dump directory as a string.        :return:
+        :return: The path to the module dump directory as a string.
         """
         dump_dir_ = dump_dir / self.node_info.node_type / module_type / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)

@@ -120,7 +120,7 @@ class RegExp(Module):
 
     def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
         """
-        Calculates metric on test set and returns metric value.
+        Calculate metric on test set and return metric value.
 
         :param context: Context to score
         :param metric_fn: Metric function

@@ -1,3 +1,4 @@
+"""Description generation for intents using OpenAI models."""
 import asyncio
 import random
 from collections import defaultdict
@@ -10,7 +11,7 @@ from autointent.generation.prompt_scheme import PromptDescription
 
 def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     """
-    Groups utterances by their labels.
+    Group utterances by their labels.
 
     :param utterances: List of utterances with `label` and `text` attributes.
 
@@ -41,7 +42,7 @@ async def create_intent_description(
     model_name: str,
 ) -> str:
     """
-    Generates a description for a specific intent using an OpenAI model.
+    Generate a description for a specific intent using an OpenAI model.
 
     :param client: The OpenAI client instance used to communicate with the model.
     :param intent_name: The name of the intent to describe. If None, an empty string will be used.
@@ -82,7 +83,7 @@ async def generate_intent_descriptions(
     model_name: str,
 ) -> list[Intent]:
     """
-    Generates descriptions for a list of intents using an OpenAI model.
+    Generate descriptions for a list of intents using an OpenAI model.
 
     :param client: The OpenAI client used to generate the descriptions.
     :param intent_utterances: A dictionary mapping intent IDs to their corresponding utterances.

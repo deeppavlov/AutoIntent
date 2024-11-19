@@ -1,3 +1,4 @@
+"""Prediction metrics for multiclass and multilabel classification tasks."""
 import logging
 from typing import Protocol
 

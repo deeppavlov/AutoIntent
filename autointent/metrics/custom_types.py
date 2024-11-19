@@ -1,3 +1,4 @@
+"""Type definitions for metrics module."""
 import numpy as np
 import numpy.typing as npt
 
