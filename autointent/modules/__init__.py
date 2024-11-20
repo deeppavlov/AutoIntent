@@ -37,7 +37,7 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
-    [AdaptivePredictor, ThresholdPredictor, TunablePredictor]
+    [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 
 __all__ = [
