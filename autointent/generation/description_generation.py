@@ -1,4 +1,5 @@
 """Description generation for intents using OpenAI models."""
+
 import asyncio
 import random
 from collections import defaultdict

@@ -1,4 +1,5 @@
 """Util functions for counting neighbors in kNN-based models."""
+
 import numpy as np
 from numpy.typing import NDArray
 

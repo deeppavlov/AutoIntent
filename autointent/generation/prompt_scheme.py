@@ -1,4 +1,5 @@
 """Prompt description configuration."""
+
 from pydantic import BaseModel, field_validator
 
 from autointent.generation.prompts import PROMPT_DESCRIPTION

@@ -1,4 +1,5 @@
 """Predictior module."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -63,7 +64,6 @@ class PredictionModule(Module, ABC):
 
     def clear_cache(self) -> None:
         """Clear cache."""
-        pass
 
 
 def get_prediction_evaluation_data(

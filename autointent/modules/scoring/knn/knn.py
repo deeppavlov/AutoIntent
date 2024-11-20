@@ -173,9 +173,7 @@ class KNNScorer(ScoringModule):
         """
         return self._predict(utterances)[0]
 
-    def predict_with_metadata(
-        self, utterances: list[str]
-    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+    def predict_with_metadata(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
         """
         Predict class probabilities along with metadata for the given utterances.
 

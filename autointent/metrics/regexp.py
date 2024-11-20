@@ -1,4 +1,5 @@
 """Regexp metrics for intent recognition."""
+
 from typing import Protocol
 
 import numpy as np

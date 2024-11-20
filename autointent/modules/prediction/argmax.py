@@ -1,10 +1,8 @@
-import json
-from pathlib import Path
 """Argmax prediction module."""
 
-from typing import Any
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -19,17 +17,19 @@ from .utils import InvalidNumClassesError, WrongClassificationError
 
 
 class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
+    """Argmax predictor metadata."""
+
     n_classes: int
 
 
 class ArgmaxPredictor(PredictionModule):
     """Argmax prediction module."""
+
     name = "argmax"
     n_classes: int
 
     def __init__(self) -> None:
         """Init."""
-        pass
 
     @classmethod
     def from_context(cls, context: Context) -> Self:
@@ -61,7 +61,6 @@ class ArgmaxPredictor(PredictionModule):
             raise WrongClassificationError(msg)
         self.n_classes = len(set(labels).difference([-1]))
 
-
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """
         Predict the argmax.
@@ -77,6 +76,7 @@ class ArgmaxPredictor(PredictionModule):
     def dump(self, path: str) -> None:
         """
         Dump.
+
         :param path: Dump path.
         :return:
         """

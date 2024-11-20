@@ -49,7 +49,6 @@ class BaseMetadataDict(TypedDict):
     """Base metadata dictionary for storing additional information."""
 
 
-
 class NodeType(str, Enum):
     """Enumeration of node types in the AutoIntent pipeline."""
 

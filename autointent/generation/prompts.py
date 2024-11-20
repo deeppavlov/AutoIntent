@@ -1,4 +1,5 @@
 """Prompt description."""
+
 PROMPT_DESCRIPTION = """
 Your task is to write a description of the intent.
 

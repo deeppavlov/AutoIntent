@@ -163,9 +163,7 @@ class DNNCScorer(ScoringModule):
         """
         return self._predict(utterances)[0]
 
-    def predict_with_metadata(
-        self, utterances: list[str]
-    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+    def predict_with_metadata(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
         """
         Predict class scores along with metadata for the given utterances.
 
@@ -272,9 +270,7 @@ class DNNCScorer(ScoringModule):
         else:
             self.model = CrossEncoder(crossencoder_dir, device=self.device)
 
-    def _predict(
-        self, utterances: list[str]
-    ) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
+    def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         """
         Predict class scores for the given utterances using the vector index and cross-encoder.
 
