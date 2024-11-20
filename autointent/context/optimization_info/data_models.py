@@ -82,7 +82,7 @@ class Artifacts(BaseModel):
         :param node_type: Node type as a string.
         :return: A list of artifacts for the node type.
         """
-        return getattr(self, validate_node_name(node_type))
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
 
     def get_best_artifact(self, node_type: str, idx: int) -> Artifact:
         """
@@ -135,7 +135,7 @@ class Trials(BaseModel):
         :param node_type: Node type as a string.
         :return: A list of trials for the node type.
         """
-        return getattr(self, validate_node_name(node_type))
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
 
     def add_trial(self, node_type: str, trial: Trial) -> None:
         """
@@ -166,7 +166,7 @@ class TrialsIds(BaseModel):
         :param node_type: Node type as a string.
         :return: The index of the best trial, or None if not set.
         """
-        return getattr(self, validate_node_name(node_type))
+        return getattr(self, validate_node_name(node_type))  # type: ignore[no-any-return]
 
     def set_best_trial_idx(self, node_type: str, idx: int) -> None:
         """

@@ -11,7 +11,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs.node import InferenceNodeConfig
-from autointent.custom_types import NODE_TYPES, NodeType
+from autointent.custom_types import NODE_TYPES, NodeType, NodeTypeType
 
 from .data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from .logger import get_logger
@@ -36,7 +36,7 @@ class ModulesList:
         :param node_type: The type of node (e.g., "regexp", "retrieval").
         :return: List of modules for the specified node type.
         """
-        return getattr(self, node_type)
+        return getattr(self, node_type)  # type: ignore[no-any-return]
 
     def add_module(self, node_type: str, module: "Module") -> None:
         """
@@ -171,7 +171,7 @@ class OptimizationInfo:
 
         :return: Dictionary containing metrics and configurations for all nodes.
         """
-        node_wise_metrics = {node_type.value: self._get_metrics_values(node_type) for node_type in NODE_TYPES}
+        node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NODE_TYPES}
         return {
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
@@ -191,7 +191,7 @@ class OptimizationInfo:
             trial = self.trials.get_trial(node_type, idx)
             res.append(
                 InferenceNodeConfig(
-                    node_type=node_type.value,
+                    node_type=node_type,  # type: ignore[arg-type]
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
@@ -211,11 +211,11 @@ class OptimizationInfo:
             return self.modules.get(node_type)[idx]
         return None
 
-    def get_best_modules(self) -> dict[str, "Module"]:
+    def get_best_modules(self) -> dict[NodeTypeType, "Module"]:
         """
         Retrieve the best modules for all node types.
 
         :return: Dictionary of the best modules for each node type.
         """
         res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
-        return {nt: m for nt, m in res.items() if m is not None}
+        return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]

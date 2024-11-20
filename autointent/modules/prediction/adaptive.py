@@ -98,7 +98,7 @@ class AdaptivePredictor(PredictionModule):
                 "Consider using other predictor algorithms."
             )
             raise WrongClassificationError(msg)
-        self.n_classes = len(labels[0]) if multilabel else len(set(labels).difference([-1]))
+        self.n_classes = len(labels[0]) if multilabel else len(set(labels).difference([-1]))  # type: ignore[arg-type]
 
         metrics_list = []
         for r in self.search_space:

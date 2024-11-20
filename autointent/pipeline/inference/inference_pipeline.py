@@ -71,8 +71,8 @@ class InferencePipeline:
         :param utterances: list of utterances
         :return: list of predicted labels
         """
-        scores = self.nodes[NodeType.scoring].module.predict(utterances)
-        return self.nodes[NodeType.prediction].module.predict(scores)  # type: ignore[return-value]
+        scores = self.nodes[NodeType.scoring.value].module.predict(utterances)
+        return self.nodes[NodeType.prediction.value].module.predict(scores)  # type: ignore[return-value]
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """

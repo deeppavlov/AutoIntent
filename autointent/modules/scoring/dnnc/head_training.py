@@ -30,7 +30,7 @@ def construct_samples(
     :param balancing_factor: Factor for balancing the positive and negative samples. If None, no balancing is applied.
     :return: Tuple containing lists of text pairs and their corresponding binary labels.
     """
-    samples = [[], []]
+    samples = [[], []]  # type: ignore[var-annotated]
 
     for (i, text1), (j, text2) in it.combinations(enumerate(texts), 2):
         pair = [text1, text2]
@@ -48,8 +48,8 @@ def construct_samples(
     else:
         samples = samples[0] + samples[1]
 
-    pairs = [dct["texts"] for dct in samples]
-    labels = [dct["label"] for dct in samples]
+    pairs = [dct["texts"] for dct in samples]  # type: ignore[call-overload]
+    labels = [dct["label"] for dct in samples]  # type: ignore[call-overload]
     return pairs, labels
 
 
@@ -126,7 +126,7 @@ class CrossEncoderWithLogreg:
         :param labels: Intent class labels corresponding to the utterances.
         """
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
-        self._fit(pairs, labels_)
+        self._fit(pairs, labels_)  # type: ignore[arg-type]
 
     def predict(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
         """
@@ -136,7 +136,7 @@ class CrossEncoderWithLogreg:
         :return: Numpy array of probabilities.
         """
         features = self.get_features(pairs)
-        return self._clf.predict_proba(features)[:, 1]
+        return self._clf.predict_proba(features)[:, 1]  # type: ignore[no-any-return]
 
     def save(self, path: str) -> None:
         """

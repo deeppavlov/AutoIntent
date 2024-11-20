@@ -58,5 +58,5 @@ class NodeType(str, Enum):
     regexp = "regexp"
 
 
-NODE_TYPES = [NodeType.retrieval, NodeType.prediction, NodeType.scoring, NodeType.regexp]
+NODE_TYPES = [NodeType.retrieval.value, NodeType.prediction.value, NodeType.scoring.value, NodeType.regexp.value]
 NodeTypeType = Literal["retrieval", "prediction", "scoring", "regexp"]
