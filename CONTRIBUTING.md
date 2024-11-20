@@ -84,3 +84,15 @@ embedder_batch_size: 32
 ```bash
 autointent --config-path FULL_PATH/test_config --config-name config
 ```
+
+## Построение документации
+
+Построить html версию в папке `docs/build`:
+```bash
+make docs
+```
+
+Построить html версию и захостить локально:
+```bash
+make serve-docs
+```
