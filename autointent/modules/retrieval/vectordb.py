@@ -64,7 +64,7 @@ class VectorDBModule(RetrievalModule):
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         vector_index_client = VectorIndexClient(
-            self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length
+            self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length,
         )
 
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)

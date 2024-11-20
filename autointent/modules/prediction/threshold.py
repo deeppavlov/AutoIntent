@@ -8,7 +8,7 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.data_handler.tags import Tag
+from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import PredictionModule, apply_tags
@@ -117,7 +117,7 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
 
 
 def multilabel_predict(
-    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any], tags: list[Tag] | None
+    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any], tags: list[Tag] | None,
 ) -> npt.NDArray[Any]:
     """
     Return

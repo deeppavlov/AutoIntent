@@ -127,7 +127,7 @@ class OptimizationInfo:
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
-                )
+                ),
             )
         return res
 

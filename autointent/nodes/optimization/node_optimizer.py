@@ -88,7 +88,7 @@ class NodeOptimizer:
                 args = (
                     context.data_handler.train_utterances,
                     context.data_handler.train_labels,
-                    context.data_handler.label_description,
+                    context.data_handler.intent_descriptions,
                 )
             else:
                 args = (context.data_handler.train_utterances, context.data_handler.train_labels)  # type: ignore[assignment]

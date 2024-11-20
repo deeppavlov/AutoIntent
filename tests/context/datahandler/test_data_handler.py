@@ -86,7 +86,7 @@ def test_dump_method(sample_multiclass_data):
 
 @pytest.mark.skip("All data validations will be refactored later")
 def test_error_handling(
-    sample_multiclass_intent_records, sample_multilabel_utterance_records, sample_test_utterance_records
+    sample_multiclass_intent_records, sample_multilabel_utterance_records, sample_test_utterance_records,
 ):
     with pytest.raises(ValueError, match="unexpected classification mode value"):
         DataHandler(

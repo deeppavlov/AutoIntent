@@ -80,7 +80,6 @@ class OptimizationConfig:
     task: TaskConfig = field(default_factory=TaskConfig)
     logs: LoggingConfig = field(default_factory=LoggingConfig)
     vector_index: VectorIndexConfig = field(default_factory=VectorIndexConfig)
-    augmentation: AugmentationConfig = field(default_factory=AugmentationConfig)
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
 
     defaults: list[Any] = field(
@@ -88,7 +87,7 @@ class OptimizationConfig:
             "_self_",
             {"override hydra/job_logging": "autointent_standard_job_logger"},
             {"override hydra/help": "autointent_help"},
-        ]
+        ],
     )
 
 

@@ -72,7 +72,7 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 
 
 def average_precision_intersecting(
-    query_label: LABELS_VALUE_TYPE, candidate_labels: CANDIDATE_TYPE, k: int | None = None
+    query_label: LABELS_VALUE_TYPE, candidate_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     """
     helper function for `retrieval_map_intersecting`
@@ -123,7 +123,7 @@ def retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CAND
 
 
 def retrieval_hit_rate(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
@@ -139,7 +139,7 @@ def retrieval_hit_rate(
 
 
 def retrieval_hit_rate_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     """all the labels are binarized"""
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
@@ -173,7 +173,7 @@ def retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels:
 
 
 def retrieval_precision(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
@@ -191,7 +191,7 @@ def retrieval_precision(
 
 
 def retrieval_precision_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
@@ -219,7 +219,7 @@ def retrieval_precision_macro(
 
 
 def retrieval_precision_numpy(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     top_k_candidates = candidates_labels_[:, :k]
@@ -279,7 +279,7 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
 
 
 def retrieval_ndcg_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     ndcg_scores: list[float] = []
@@ -295,7 +295,7 @@ def retrieval_ndcg_intersecting(
 
 
 def retrieval_ndcg_macro(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     return macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
@@ -317,7 +317,7 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 
 
 def retrieval_mrr_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
@@ -334,6 +334,6 @@ def retrieval_mrr_intersecting(
 
 
 def retrieval_mrr_macro(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None,
 ) -> float:
     return macrofy(retrieval_mrr, query_labels, candidates_labels, k)

@@ -30,5 +30,5 @@ class DictReader(BaseReader):
 
 class JsonReader(BaseReader):
     def _read(self, filepath: str | Path) -> DatasetReader:
-        with Path.open(filepath) as file:
+        with Path(filepath).open() as file:
             return DatasetReader.model_validate(json.load(file))

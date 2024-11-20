@@ -81,7 +81,7 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
 
 
 def calculate_prediction_metric(
-    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
+    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 ) -> float:
     labels_, scores_ = transform(labels, scores)
 

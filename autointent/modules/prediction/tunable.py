@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score
 from typing_extensions import Self
 
 from autointent.context import Context
-from autointent.context.data_handler.tags import Tag
+from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import PredictionModule
@@ -73,7 +73,7 @@ class TunablePredictor(PredictionModule):
 
     def dump(self, path: str) -> None:
         self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags,
         )
 
         dump_dir = Path(path)

@@ -25,7 +25,7 @@ class VectorIndexClient:
         self.embedder_max_length = embedder_max_length
 
     def create_index(
-        self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None
+        self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None,
     ) -> VectorIndex:
         """
         model_name should be a repo from hugging face, not a path to a local model

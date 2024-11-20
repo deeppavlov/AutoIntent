@@ -9,8 +9,7 @@ from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
-from .schemas import Tag
-from .validation import Intent
+from .schemas import Intent, Tag
 
 
 class Split:
@@ -38,7 +37,7 @@ class Dataset(dict[str, HFDataset]):
         if oos_split is not None:
             self[Split.OOS] = oos_split
 
-        self._cast_label_feature()
+        self._encoded_labels = False
 
     @property
     def multilabel(self) -> bool:
@@ -46,23 +45,15 @@ class Dataset(dict[str, HFDataset]):
 
     @cached_property
     def n_classes(self) -> int:
-        classes = set()
-        for label in self[Split.TRAIN][self.label_feature]:
-            match label:
-                case int():
-                    classes.add(label)
-                case list():
-                    for label_ in label:
-                        classes.add(label_)
-        return len(classes)
+        return self.get_n_classes(Split.TRAIN)
 
     @classmethod
-    def from_json(cls, filepath: str | Path) -> Self:
+    def from_json(cls, filepath: str | Path) -> "Dataset":
         from .reader import JsonReader
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_dict(cls, mapping: dict[str, Any]) -> Self:
+    def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
         from .reader import DictReader
         return DictReader().read(mapping)
 
@@ -72,12 +63,12 @@ class Dataset(dict[str, HFDataset]):
     def encode_labels(self) -> Self:
         for split_name, split in self.items():
             self[split_name] = split.map(self._encode_label)
+        self._encoded_labels = True
         return self
 
     def to_multilabel(self) -> Self:
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
-        self._cast_label_column()
         return self
 
     def get_tags(self) -> list[Tag]:
@@ -85,11 +76,25 @@ class Dataset(dict[str, HFDataset]):
         for intent in self.intents:
             for tag in intent.tags:
                 tag_mapping[tag].append(intent.id)
-
         return [
             Tag(name=tag, intent_ids=intent_ids)
             for tag, intent_ids in tag_mapping.items()
         ]
+
+    def get_n_classes(self, split: str) -> int:
+        classes = set()
+        for label in self[split][self.label_feature]:
+            match (label, self._encoded_labels):
+                case (int(), _):
+                    classes.add(label)
+                case (list(), False):
+                    for label_ in label:
+                        classes.add(label_)
+                case (list(), True):
+                    for idx, label_ in enumerate(label):
+                        if label_:
+                            classes.add(idx)
+        return len(classes)
 
     def _is_oos(self, sample: Sample) -> bool:
         return sample["label"] is None
@@ -114,9 +119,8 @@ class Dataset(dict[str, HFDataset]):
         oos_splits = [split.filter(self._is_oos) for split in self.values()]
         oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
         if oos_splits:
-            splits = self.filter(lambda sample: not self._is_oos(sample))
-            for split_name, split in splits.items():
-                self[split_name] = split
+            for split_name, split in self.items():
+                self[split_name] = split.filter(lambda sample: not self._is_oos(sample))
             return concatenate_datasets(oos_splits)
         return None
 

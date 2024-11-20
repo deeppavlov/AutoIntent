@@ -73,7 +73,6 @@ ignore = [
     "TD",      # todos
     "FIX",     # fixmes
     "S311",    # random usage
-    "COM812",  # trailing commas
     "ISC001",  # implicit string concatenation
     "ERA001",  # commented code
     "FBT",     # boolean trap
@@ -86,6 +85,9 @@ ignore = [
 
 [tool.ruff.lint.pylint]
 max-args = 10
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
 
 [build-system]
 requires = ["poetry-core"]

@@ -51,16 +51,13 @@ class Context:
     def configure_data(self, config: DataConfig) -> None:
         self.data_handler = DataHandler(
             dataset=load_data(config.train_path),
-            test_dataset=None if config.test_path is None else load_data(config.test_path),
             random_seed=self.seed,
             force_multilabel=config.force_multilabel,
         )
 
-    def set_datasets(
-        self, train_data: Dataset, val_data: Dataset | None = None, force_multilabel: bool = False
-    ) -> None:
+    def set_dataset(self, dataset: Dataset, force_multilabel: bool = False) -> None:
         self.data_handler = DataHandler(
-            dataset=train_data, test_dataset=val_data, random_seed=self.seed, force_multilabel=force_multilabel
+            dataset=dataset, force_multilabel=force_multilabel, random_seed=self.seed,
         )
 
     def get_best_index(self) -> VectorIndex:
@@ -104,13 +101,9 @@ class Context:
         # self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
-        train_data, test_data = self.data_handler.dump()
-        train_path = logs_dir / "train_data.json"
-        test_path = logs_dir / "test_data.json"
-        with train_path.open("w") as file:
-            json.dump(train_data, file, indent=4, ensure_ascii=False)
-        with test_path.open("w") as file:
-            json.dump(test_data, file, indent=4, ensure_ascii=False)
+        dataset_path = logs_dir / "dataset.json"
+        with dataset_path.open("w") as file:
+            json.dump(self.data_handler.dump(), file, indent=4, ensure_ascii=False)
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 

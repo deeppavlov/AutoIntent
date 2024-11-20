@@ -1,6 +1,8 @@
 import numpy as np
+from datasets import Dataset as HFDataset
 
-from autointent.context.data_handler import DataHandler, Dataset
+from autointent.context.data_handler import DataHandler
+from autointent.context.data_handler.dataset import Split
 from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
 from tests.conftest import setup_environment
 
@@ -8,21 +10,20 @@ from tests.conftest import setup_environment
 def test_base_mlknn(dataset):
     db_dir, dump_dir, logs_dir = setup_environment()
 
-    test_dataset = Dataset.model_validate(
-        {
-            "utterances": [
-                {
-                    "text": "why is there a hold on my american saving bank account",
-                    "label": [0, 1, 2],
-                },
-                {
-                    "text": "i am nost sure why my account is blocked",
-                    "label": [0, 2],
-                },
-            ],
-        },
+    dataset[Split.TEST] = HFDataset.from_list(
+        [
+            {
+                "utterance": "why is there a hold on my american saving bank account",
+                "label": [0, 1, 2],
+            },
+            {
+                "utterance": "i am nost sure why my account is blocked",
+                "label": [0, 2],
+            },
+        ],
     )
-    data_handler = DataHandler(dataset, test_dataset, force_multilabel=True)
+
+    data_handler = DataHandler(dataset, force_multilabel=True)
 
     scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, db_dir=db_dir, device="cpu")
     scorer.fit(data_handler.train_utterances, data_handler.train_labels)

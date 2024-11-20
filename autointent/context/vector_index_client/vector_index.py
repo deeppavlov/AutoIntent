@@ -16,7 +16,7 @@ class VectorIndex:
     embedder: Embedder
 
     def __init__(
-        self, model_name: str, device: str, embedder_batch_size: int = 32, embedder_max_length: int | None = None
+        self, model_name: str, device: str, embedder_batch_size: int = 32, embedder_max_length: int | None = None,
     ) -> None:
         self.model_name = model_name
         self.embedder = Embedder(
@@ -90,7 +90,7 @@ class VectorIndex:
         return self.labels
 
     def query(
-        self, queries: list[str] | npt.NDArray[np.float32], k: int
+        self, queries: list[str] | npt.NDArray[np.float32], k: int,
     ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
         """
         Arguments

@@ -37,7 +37,7 @@ def test_base_linear(dataset):
                     0.63123131,
                     0.1896569,
                 ],
-            ]
+            ],
         ),
         predictions,
         decimal=2,
