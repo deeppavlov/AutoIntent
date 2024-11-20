@@ -11,7 +11,8 @@ from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
 
-from .base import PredictionModule, apply_tags
+from .base import PredictionModule
+from .utils import InvalidNumClassesError, apply_tags
 
 logger = logging.getLogger(__name__)
 
@@ -20,33 +21,26 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     tags: list[Tag] | None
     thresh: float | npt.NDArray[Any]
-    n_classes: int | None
+    n_classes: int
 
 
 class ThresholdPredictor(PredictionModule):
     metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
+    n_classes: int
     tags: list[Tag] | None
     name = "threshold"
 
     def __init__(
         self,
         thresh: float | npt.NDArray[Any],
-        multilabel: bool = False,
-        n_classes: int | None = None,
-        tags: list[Tag] | None = None,
     ) -> None:
         self.thresh = thresh
-        self.multilabel = multilabel
-        self.n_classes = n_classes
-        self.tags = tags
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
         return cls(
             thresh=thresh,
-            multilabel=context.is_multilabel(),
-            n_classes=context.get_n_classes(),
         )
 
     def fit(
@@ -56,20 +50,27 @@ class ThresholdPredictor(PredictionModule):
         tags: list[Tag] | None = None,
     ) -> None:
         self.tags = tags
+        self.multilabel = isinstance(labels[0], list)
+        self.n_classes = (
+            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+        )
 
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self.n_classes:
                 msg = (
-                    f"Wrong number of thresholds provided doesn't match with number of classes."
+                    f"Number of thresholds provided doesn't match with number of classes."
                     f" {len(self.thresh)} != {self.n_classes}"
                 )
                 logger.error(msg)
-                raise ValueError(msg)
+                raise InvalidNumClassesError(msg)
             self.thresh = np.array(self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
         return multiclass_predict(scores, self.thresh)
 
     def dump(self, path: str) -> None:
