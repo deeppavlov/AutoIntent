@@ -17,6 +17,7 @@ from autointent.custom_types import BaseMetadataDict, LabelType
 
 from .base import PredictionModule
 from .threshold import multiclass_predict, multilabel_predict
+from .utils import InvalidNumClassesError
 
 
 class TunablePredictorDumpMetadata(BaseMetadataDict):
@@ -25,12 +26,16 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
     multilabel: bool
     thresh: list[float]
     tags: list[Tag] | None
+    n_classes: int
 
 
 class TunablePredictor(PredictionModule):
     """Tunable predictor module."""
 
     name = "tunable"
+    multilabel: bool
+    n_classes: int
+    tags: list[Tag] | None
 
     def __init__(
         self,
@@ -79,11 +84,11 @@ class TunablePredictor(PredictionModule):
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
-        n_classes = (
+        self.n_classes = (
             len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
         )
 
-        thresh_optimizer = ThreshOptimizer(n_classes=n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
+        thresh_optimizer = ThreshOptimizer(n_classes=self.n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
 
         thresh_optimizer.fit(
             probas=scores,
@@ -100,6 +105,9 @@ class TunablePredictor(PredictionModule):
         :param scores: Scores to predict
         :return:
         """
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
@@ -112,7 +120,7 @@ class TunablePredictor(PredictionModule):
         :return:
         """
         self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags
+            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_classes=self.n_classes
         )
 
         dump_dir = Path(path)
@@ -136,6 +144,7 @@ class TunablePredictor(PredictionModule):
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]
+        self.n_classes = metadata["n_classes"]
 
 
 class ThreshOptimizer:

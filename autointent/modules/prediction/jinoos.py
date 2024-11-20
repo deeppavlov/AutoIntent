@@ -14,6 +14,7 @@ from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule
+from .utils import InvalidNumClassesError, WrongClassificationError
 
 default_search_space = np.linspace(0, 1, num=100)
 
@@ -22,6 +23,7 @@ class JinoosPredictorDumpMetadata(BaseMetadataDict):
     """Metadata for Jinoos predictor dump."""
 
     thresh: float
+    n_classes: int
 
 
 class JinoosPredictor(PredictionModule):
@@ -29,6 +31,7 @@ class JinoosPredictor(PredictionModule):
 
     thresh: float
     name = "jinoos"
+    n_classes: int
 
     def __init__(
         self,
@@ -69,6 +72,13 @@ class JinoosPredictor(PredictionModule):
         :return:
         """
         # TODO: use dev split instead of test split.
+
+        multilabel = isinstance(labels[0], list)
+        if multilabel:
+            msg = "JinoosPredictor is compatible with single-label classification only"
+            raise WrongClassificationError(msg)
+        self.n_classes = len(set(labels).difference([-1]))
+
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []
@@ -86,6 +96,9 @@ class JinoosPredictor(PredictionModule):
         :param scores: Scores to predict
         :return:
         """
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self.thresh)
 
@@ -96,7 +109,7 @@ class JinoosPredictor(PredictionModule):
         :param path: Path to dump
         :return:
         """
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
 
         dump_dir = Path(path)
 
@@ -117,6 +130,7 @@ class JinoosPredictor(PredictionModule):
 
         self.thresh = metadata["thresh"]
         self.metadata = metadata
+        self.n_classes = metadata["n_classes"]
 
     @staticmethod
     def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:

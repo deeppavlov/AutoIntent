@@ -5,7 +5,7 @@ nodes:
     search_space:
       - module_type: vector_db
         k: [10]
-        model_name:
+        embedder_name:
           - deepvk/USER-bge-m3
   - node_type: scoring
     metric: scoring_roc_auc
@@ -19,3 +19,4 @@ nodes:
     search_space:
       - module_type: threshold
         thresh: [0.5]
+      - module_type: adaptive
