@@ -58,7 +58,6 @@ class ThresholdPredictor(PredictionModule):
 
         :param context: Context
         :param thresh: Threshold
-        :return:
         """
         return cls(
             thresh=thresh,
@@ -76,7 +75,6 @@ class ThresholdPredictor(PredictionModule):
         :param scores: Scores to fit
         :param labels: Labels to fit
         :param tags: Tags to fit
-        :return:
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
@@ -99,7 +97,6 @@ class ThresholdPredictor(PredictionModule):
         Predict the best score.
 
         :param scores: Scores to predict
-        :return:
         """
         if self.multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
@@ -113,7 +110,6 @@ class ThresholdPredictor(PredictionModule):
         Dump the metadata.
 
         :param path: Path to dump
-        :return:
         """
         self.metadata = ThresholdPredictorDumpMetadata(
             multilabel=self.multilabel,
@@ -132,7 +128,6 @@ class ThresholdPredictor(PredictionModule):
         Load the metadata.
 
         :param path: Path to load
-        :return:
         """
         dump_dir = Path(path)
 

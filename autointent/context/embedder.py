@@ -18,14 +18,12 @@ from sentence_transformers import SentenceTransformer
 class EmbedderDumpMetadata(TypedDict):
     """
     Metadata for saving and loading an Embedder instance.
-
-    Attributes:
-        batch_size (int): Batch size used for embedding calculations.
-        max_length (int | None): Maximum sequence length for the embedding model.
     """
 
     batch_size: int
+    """Batch size used for embedding calculations."""
     max_length: int | None
+    """Maximum sequence length for the embedding model."""
 
 
 class Embedder:
@@ -34,11 +32,6 @@ class Embedder:
 
     This class handles initialization, saving, loading, and clearing of
     embedding models, as well as calculating embeddings for input texts.
-
-    Attributes:
-        embedding_model (SentenceTransformer): The Sentence Transformer model instance.
-        embedder_subdir (str): Subdirectory name for storing the embedding model.
-        metadata_dict_name (str): Name of the metadata file for storing model settings.
     """
 
     embedder_subdir: str = "sentence_transformers"

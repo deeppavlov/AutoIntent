@@ -33,10 +33,23 @@ class DNNCScorerDumpMetadata(BaseMetadataDict):
 
 class DNNCScorer(ScoringModule):
     """
-    Scoring module for intent classification using a deep neural network classifier.
+    Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
 
     This module uses a CrossEncoder for scoring candidate intents and can optionally
     train a logistic regression head on top of cross-encoder features.
+
+    .. code-block:: bibtex
+
+        @misc{zhang2020discriminativenearestneighborfewshot,
+          title={Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference},
+          author={Jian-Guo Zhang and Kazuma Hashimoto and Wenhao Liu and Chien-Sheng Wu and Yao Wan and
+          Philip S. Yu and Richard Socher and Caiming Xiong},
+          year={2020},
+          eprint={2010.13009},
+          archivePrefix={arXiv},
+          primaryClass={cs.CL},
+          url={https://arxiv.org/abs/2010.13009},
+    }
     """
 
     name = "dnnc"

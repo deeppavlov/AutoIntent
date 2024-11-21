@@ -27,7 +27,6 @@ class Module(ABC):
 
         :param args: Args to fit
         :param kwargs: Kwargs to fit
-        :return:
         """
 
     @abstractmethod
@@ -37,7 +36,6 @@ class Module(ABC):
 
         :param context: Context to score
         :param metric_fn: Metric function
-        :return:
         """
 
     @abstractmethod
@@ -45,7 +43,6 @@ class Module(ABC):
         """
         Return useful assets that represent intermediate data into context.
 
-        :return:
         """
 
     @abstractmethod
@@ -58,7 +55,6 @@ class Module(ABC):
         Dump all data needed for inference.
 
         :param path: Path to dump
-        :return:
         """
 
     @abstractmethod
@@ -67,7 +63,6 @@ class Module(ABC):
         Load data from dump.
 
         :param path: Path to load
-        :return:
         """
 
     @abstractmethod
@@ -77,7 +72,6 @@ class Module(ABC):
 
         :param args: args to predict.
         :param kwargs: kwargs to predict.
-        :return:
         """
 
     def predict_with_metadata(
@@ -90,7 +84,6 @@ class Module(ABC):
 
         :param args: args to predict.
         :param kwargs: kwargs to predict.
-        :return:
         """
         return self.predict(*args, **kwargs), None
 
@@ -102,7 +95,6 @@ class Module(ABC):
 
         :param context: Context to init from.
         :param kwargs: Additional kwargs.
-        :return:
         """
 
     def get_embedder_name(self) -> str | None:

@@ -279,7 +279,6 @@ class MLKnnScorer(ScoringModule):
         Save the MLKnnScorer's metadata and probabilities to disk.
 
         :param path: Path to the directory where assets will be dumped.
-        :return:
         """
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
@@ -306,7 +305,6 @@ class MLKnnScorer(ScoringModule):
         Load the MLKnnScorer's metadata and probabilities from disk.
 
         :param path: Path to the directory containing the dumped assets.
-        :return:
         """
         dump_dir = Path(path)
 

@@ -41,7 +41,6 @@ class RegExp(Module):
         Fit the model.
 
         :param intents: Intents to fit
-        :return:
         """
         intents_parsed = [Intent(**dct) for dct in intents]
         self.regexp_patterns = [
@@ -59,7 +58,6 @@ class RegExp(Module):
         Predict intents for utterances.
 
         :param utterances: Utterances to predict
-        :return:
         """
         return [self._predict_single(utterance)[0] for utterance in utterances]
 
@@ -71,7 +69,6 @@ class RegExp(Module):
         Predict intents for utterances with metadata.
 
         :param utterances: Utterances to predict
-        :return:
         """
         predictions, metadata = [], []
         for utterance in utterances:
@@ -86,7 +83,6 @@ class RegExp(Module):
 
         :param utterance: Utterance to match
         :param intent_record: Intent record to match
-        :return:
         """
         full_matches = [
             pattern.pattern
@@ -105,7 +101,6 @@ class RegExp(Module):
         Predict intent for a single utterance.
 
         :param utterance: Utterance to predict
-        :return:
         """
         # todo test this
         prediction = set()
@@ -124,7 +119,6 @@ class RegExp(Module):
 
         :param context: Context to score
         :param metric_fn: Metric function
-        :return:
         """
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
@@ -152,7 +146,6 @@ class RegExp(Module):
         Load data from dump.
 
         :param path: Path to load
-        :return:
         """
         dump_dir = Path(path)
 
@@ -166,7 +159,6 @@ class RegExp(Module):
         Dump all data needed for inference.
 
         :param path: Path to dump
-        :return:
         """
         dump_dir = Path(path)
 

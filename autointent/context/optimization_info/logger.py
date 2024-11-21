@@ -32,7 +32,6 @@ class PPrintFormatter(logging.Formatter):
         Format the log record.
 
         :param record: The log record.
-        :return:
         """
         if isinstance(record.msg, dict):
             format_msg = "module scoring results:\n"

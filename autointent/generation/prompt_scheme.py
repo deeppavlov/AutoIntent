@@ -24,7 +24,6 @@ class PromptDescription(BaseModel):
         Validate the prompt description template.
 
         :param value: Check the prompt description template.
-        :return:
         """
         if value.find("{intent_name}") == -1 or value.find("{user_utterances}") == -1:
             text_error = (

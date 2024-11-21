@@ -61,7 +61,6 @@ class TunablePredictor(PredictionModule):
 
         :param context: Context
         :param n_trials: Number of trials
-        :return:
         """
         return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
 
@@ -80,7 +79,6 @@ class TunablePredictor(PredictionModule):
         :param scores: Scores to fit
         :param labels: Labels to fit
         :param tags: Tags to fit
-        :return:
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
@@ -103,7 +101,6 @@ class TunablePredictor(PredictionModule):
         Predict the best score.
 
         :param scores: Scores to predict
-        :return:
         """
         if scores.shape[1] != self.n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
@@ -117,7 +114,6 @@ class TunablePredictor(PredictionModule):
         Dump all data needed for inference.
 
         :param path: Path to dump
-        :return:
         """
         self.metadata = TunablePredictorDumpMetadata(
             multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_classes=self.n_classes
@@ -133,7 +129,6 @@ class TunablePredictor(PredictionModule):
         Load data from dump.
 
         :param path: Path to load
-        :return:
         """
         dump_dir = Path(path)
 
@@ -167,7 +162,6 @@ class ThreshOptimizer:
         Objective function to optimize.
 
         :param trial: Trial
-        :return:
         """
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
         if self.multilabel:
@@ -190,7 +184,6 @@ class ThreshOptimizer:
         :param labels: Labels
         :param seed: Seed
         :param tags: Tags
-        :return:
         """
         self.probas = probas
         self.labels = labels

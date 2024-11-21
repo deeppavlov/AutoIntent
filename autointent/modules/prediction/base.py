@@ -30,7 +30,6 @@ class PredictionModule(Module, ABC):
         :param scores: Scores to fit
         :param labels: Labels to fit
         :param tags: Tags to fit
-        :return:
         """
 
     @abstractmethod
@@ -39,7 +38,6 @@ class PredictionModule(Module, ABC):
         Predict the best score.
 
         :param scores: Scores to predict
-        :return:
         """
 
     def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
@@ -58,7 +56,6 @@ class PredictionModule(Module, ABC):
         """
         Return useful assets that represent intermediate data into context.
 
-        :return:
         """
         return PredictorArtifact(labels=self._predictions)
 

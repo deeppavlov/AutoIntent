@@ -41,7 +41,6 @@ class NodeOptimizer:
         Initialize from dictionary config.
 
         :param config: Config
-        :return:
         """
         return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
@@ -50,7 +49,6 @@ class NodeOptimizer:
         Fit the node optimizer.
 
         :param context: Context
-        :return:
         """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
@@ -120,7 +118,6 @@ class NodeOptimizer:
 
         :param module: Module to fit
         :param context: Context to use
-        :return:
         """
         if self.node_info.node_type in ["retrieval", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":

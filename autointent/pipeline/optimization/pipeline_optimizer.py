@@ -40,7 +40,6 @@ class PipelineOptimizer:
         Set configuration for the optimizer.
 
         :param config: Configuration
-        :return:
         """
         if isinstance(config, LoggingConfig):
             self.logging_config = config
@@ -58,7 +57,6 @@ class PipelineOptimizer:
         Create pipeline optimizer from dictionary config.
 
         :param config: Dictionary config
-        :return:
         """
         return instantiate(PipelineOptimizerConfig, **config)  # type: ignore[no-any-return]
 
@@ -67,7 +65,6 @@ class PipelineOptimizer:
         Optimize the pipeline.
 
         :param context: Context
-        :return:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")

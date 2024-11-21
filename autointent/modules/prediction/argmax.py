@@ -37,7 +37,6 @@ class ArgmaxPredictor(PredictionModule):
         Initialize form context.
 
         :param context: Context
-        :return:
         """
         return cls()
 
@@ -53,7 +52,7 @@ class ArgmaxPredictor(PredictionModule):
         :param scores: Scores to fit
         :param labels: Labels to fit
         :param tags: Tags to fit
-        :return:
+        :raises WrongClassificationError: If the classification is wrong.
         """
         multilabel = isinstance(labels[0], list)
         if multilabel:
@@ -66,7 +65,7 @@ class ArgmaxPredictor(PredictionModule):
         Predict the argmax.
 
         :param scores: Scores to predict
-        :return:
+        :raises InvalidNumClassesError: If the number of classes is invalid.
         """
         if scores.shape[1] != self.n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
@@ -78,7 +77,6 @@ class ArgmaxPredictor(PredictionModule):
         Dump.
 
         :param path: Dump path.
-        :return:
         """
         self.metadata = ArgmaxPredictorDumpMetadata(n_classes=self.n_classes)
 

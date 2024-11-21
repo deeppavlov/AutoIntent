@@ -51,7 +51,6 @@ class JinoosPredictor(PredictionModule):
 
         :param context: Context
         :param search_space: Search space
-        :return:
         """
         return cls(
             search_space=search_space,
@@ -69,7 +68,6 @@ class JinoosPredictor(PredictionModule):
         :param scores: Scores to fit
         :param labels: Labels to fit
         :param tags: Tags to fit
-        :return:
         """
         # TODO: use dev split instead of test split.
 
@@ -94,7 +92,6 @@ class JinoosPredictor(PredictionModule):
         Predict the best score.
 
         :param scores: Scores to predict
-        :return:
         """
         if scores.shape[1] != self.n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
@@ -107,7 +104,6 @@ class JinoosPredictor(PredictionModule):
         Dump all data needed for inference.
 
         :param path: Path to dump
-        :return:
         """
         self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
 
@@ -121,7 +117,6 @@ class JinoosPredictor(PredictionModule):
         Load data from dump.
 
         :param path: Path to load
-        :return:
         """
         dump_dir = Path(path)
 
@@ -146,7 +141,6 @@ class JinoosPredictor(PredictionModule):
 
         :param y_true: True labels
         :param y_pred: Predicted labels
-        :return:
         """
         y_true_, y_pred_ = transform(y_true, y_pred)
 

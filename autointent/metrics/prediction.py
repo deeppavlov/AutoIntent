@@ -30,7 +30,7 @@ class PredictionMetricFn(Protocol):
 
 def prediction_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     """
-    Calculate prediction accuracy.
+    Calculate prediction accuracy. Supports both multiclass and multilabel.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
@@ -91,7 +91,7 @@ def prediction_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
 
 def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     """
-    Calculate prediction precision.
+    Calculate prediction precision. Supports both multiclass and multilabel.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
@@ -102,7 +102,7 @@ def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -
 
 def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     """
-    Calculate prediction recall.
+    Calculate prediction recall. Supports both multiclass and multilabel.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
@@ -113,7 +113,7 @@ def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
 
 def prediction_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     """
-    Calculate prediction f1 score.
+    Calculate prediction f1 score. Supports both multiclass and multilabel.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels

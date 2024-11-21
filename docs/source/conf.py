@@ -27,13 +27,23 @@ release = "0.0.1"
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
     "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.doctest",
+    "sphinx.ext.viewcode",
+    "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
     "nbsphinx",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["conf.py", "docs_utils/*"]
+exclude_patterns = ["conf.py", "docs_utils/*", "_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -49,7 +59,7 @@ autodoc_default_options = {
     "private-members": True,
     # "special-members": "__call__",
     "member-order": "bysource",
-    # "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
+    "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
 }
 
 # Finding tutorials directories
@@ -57,6 +67,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 
 def setup(_) -> None:  # noqa: ANN001

@@ -59,7 +59,6 @@ class InferencePipeline:
         Create pipeline from config.
 
         :param nodes_configs: list of config for nodes
-        :return:
         """
         nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         return cls(nodes)
@@ -115,7 +114,6 @@ class InferencePipeline:
 
         :param utterances: utterances
         :param labels: labels
-        :return:
         """
 
     @classmethod
@@ -124,7 +122,6 @@ class InferencePipeline:
         Create pipeline from context.
 
         :param context: context
-        :return:
         """
         if not context.has_saved_modules():
             config = context.optimization_info.get_inference_nodes_config()

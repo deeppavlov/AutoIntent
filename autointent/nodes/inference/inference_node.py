@@ -30,7 +30,6 @@ class InferenceNode:
         Initialize from config.
 
         :param config: Configuration for the node.
-        :return:
         """
         node_info = NODES_INFO[config.node_type]
         module = node_info.modules_available[config.module_type](**config.module_config)
