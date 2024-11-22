@@ -1,3 +1,5 @@
+"""Data Handler file."""
+
 import logging
 from collections.abc import Sequence
 from typing import Any, TypedDict
@@ -17,20 +19,40 @@ logger = logging.getLogger(__name__)
 
 
 class RegexPatterns(TypedDict):
+    """Regex patterns for each intent class."""
+
     id: int
+    """Intent class id."""
     regexp_full_match: list[str]
+    """Full match regex patterns."""
     regexp_partial_match: list[str]
+    """Partial match regex patterns."""
 
 
 class DataAugmenter:
+    """Data augmenter."""
+
     def __init__(
         self, multilabel_generation_config: str | None = None, regex_sampling: int = 0, random_seed: int = 0
     ) -> None:
+        """
+        Initialize the data augmenter.
+
+        :param multilabel_generation_config: Configuration string for multilabel generation.
+        :param regex_sampling: How many samples to take from regular expressions for each intent class.
+        :param random_seed: Seed for random number generation.
+        """
         self.multilabel_generation_config = multilabel_generation_config
         self.regex_sampling = regex_sampling
         self.random_seed = random_seed
 
     def __call__(self, dataset: Dataset) -> Dataset:
+        """
+        Augment the dataset.
+
+        :param dataset: Dataset to augment.
+        :return: Augmented dataset.
+        """
         if self.regex_sampling > 0:
             logger.debug(
                 "sampling %s utterances from regular expressions for each intent class...", self.regex_sampling
@@ -49,6 +71,8 @@ class DataAugmenter:
 
 
 class DataHandler:
+    """Data handler class."""
+
     def __init__(
         self,
         dataset: Dataset,
@@ -57,6 +81,15 @@ class DataHandler:
         random_seed: int = 0,
         augmenter: DataAugmenter | None = None,
     ) -> None:
+        """
+        Initialize the data handler.
+
+        :param dataset: Training dataset.
+        :param test_dataset: Test dataset.
+        :param force_multilabel: If True, force the dataset to be multilabel.
+        :param random_seed: Seed for random number generation.
+        :param augmenter: Augmenter to use.
+        """
         set_seed(random_seed)
 
         if force_multilabel:
@@ -100,11 +133,21 @@ class DataHandler:
         self._logger = logger
 
     def has_oos_samples(self) -> bool:
+        """
+        Check if there are out-of-scope samples.
+
+        :return: True if there are out-of-scope samples.
+        """
         return len(self.oos_utterances) > 0
 
     def dump(
         self,
     ) -> tuple[list[dict[str, Any]], list[UtteranceRecord]]:
+        """
+        Dump the train, test and out-of-scope data.
+
+        :return: Train and test data.
+        """
         self._logger.debug("dumping train, test and oos data...")
         train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
         test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)

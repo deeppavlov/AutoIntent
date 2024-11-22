@@ -53,7 +53,7 @@ def test_validate_test_labels():
     assert validate_test_labels([0, 1, 2], False, 3)
     assert validate_test_labels([[1, 0, 0], [0, 1, 0], [0, 0, 1]], True, 3)
 
-    with pytest.raises(ValueError, match="unexpected labels format"):
+    with pytest.raises(ValueError, match="Unexpected labels format"):
         validate_test_labels([0, 1], True, 3)
 
 

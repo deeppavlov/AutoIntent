@@ -1,3 +1,5 @@
+"""DescriptionScorer class for scoring utterances based on intent descriptions."""
+
 import json
 from pathlib import Path
 from typing import TypedDict
@@ -16,6 +18,8 @@ from autointent.modules.scoring.base import ScoringModule
 
 
 class DescriptionScorerDumpMetadata(TypedDict):
+    """Metadata for dumping the state of a DescriptionScorer."""
+
     db_dir: str
     n_classes: int
     multilabel: bool
@@ -24,6 +28,8 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
 
 class DescriptionScorer(ScoringModule):
+    """Scoring module that scores utterances based on similarity to intent descriptions."""
+
     weights_file_name: str = "description_vectors.npy"
     embedder: Embedder
     precomputed_embeddings: bool = False
@@ -40,6 +46,15 @@ class DescriptionScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
+        """
+        Initialize the DescriptionScorer.
+
+        :param embedder_name: Name of the embedder model.
+        :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
+        :param device: Device to run the embedder on, e.g., "cpu" or "cuda".
+        :param batch_size: Batch size for embedding generation, defaults to 32.
+        :param max_length: Maximum sequence length for embedding, defaults to None.
+        """
         self.temperature = temperature
         self.device = device
         self.embedder_name = embedder_name
@@ -53,6 +68,14 @@ class DescriptionScorer(ScoringModule):
         temperature: float,
         embedder_name: str | None = None,
     ) -> Self:
+        """
+        Create a DescriptionScorer instance using a Context object.
+
+        :param context: Context containing configurations and utilities.
+        :param temperature: Temperature parameter for scaling logits.
+        :param embedder_name: Name of the embedder model. If None, the best embedder is used.
+        :return: Initialized DescriptionScorer instance.
+        """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
             precomputed_embeddings = True
@@ -69,6 +92,11 @@ class DescriptionScorer(ScoringModule):
         return instance
 
     def get_embedder_name(self) -> str:
+        """
+        Get the name of the embedder.
+
+        :return: Embedder name.
+        """
         return self.embedder_name
 
     def fit(
@@ -77,6 +105,14 @@ class DescriptionScorer(ScoringModule):
         labels: list[LabelType],
         descriptions: list[str],
     ) -> None:
+        """
+        Fit the scorer by embedding utterances and descriptions.
+
+        :param utterances: List of utterances to embed.
+        :param labels: List of labels corresponding to the utterances.
+        :param descriptions: List of intent descriptions.
+        :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
+        """
         if isinstance(labels[0], list):
             self.n_classes = len(labels[0])
             self.multilabel = True
@@ -113,6 +149,12 @@ class DescriptionScorer(ScoringModule):
         self.embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
+        """
+        Predict scores for utterances based on similarity to intent descriptions.
+
+        :param utterances: List of utterances to score.
+        :return: Array of probabilities for each utterance.
+        """
         utterance_vectors = self.embedder.embed(utterances)
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self.description_vectors)
 
@@ -123,9 +165,15 @@ class DescriptionScorer(ScoringModule):
         return probabilites  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
+        """Clear cached data in memory used by the embedder."""
         self.embedder.clear_ram()
 
     def dump(self, path: str) -> None:
+        """
+        Save the scorer's metadata, description vectors, and embedder state.
+
+        :param path: Path to the directory where assets will be dumped.
+        """
         self.metadata = DescriptionScorerDumpMetadata(
             db_dir=str(self.db_dir),
             n_classes=self.n_classes,
@@ -139,10 +187,14 @@ class DescriptionScorer(ScoringModule):
             json.dump(self.metadata, file, indent=4)
 
         np.save(dump_dir / self.weights_file_name, self.description_vectors)
-
         self.embedder.dump(dump_dir / self.embedding_model_subdir)
 
     def load(self, path: str) -> None:
+        """
+        Load the scorer's metadata, description vectors, and embedder state.
+
+        :param path: Path to the directory containing the dumped assets.
+        """
         dump_dir = Path(path)
 
         self.description_vectors = np.load(dump_dir / self.weights_file_name)

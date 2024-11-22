@@ -1,3 +1,5 @@
+"""Cli endpoint."""
+
 import logging
 
 import hydra
@@ -11,6 +13,12 @@ from .utils import load_config
 
 @hydra.main(config_name="optimization_config", config_path=".", version_base=None)
 def main(cfg: OptimizationConfig) -> None:
+    """
+    Run the optimization pipeline.
+
+    :param cfg: Configuration for the optimization pipeline
+    :return:
+    """
     logger = logging.getLogger(__name__)
 
     logger.debug("Run Name: %s", cfg.logs.run_name)

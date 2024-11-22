@@ -1,17 +1,27 @@
 import numpy as np
+import pytest
 
 from autointent.modules.prediction.argmax import ArgmaxPredictor
+from autointent.modules.prediction.utils import InvalidNumClassesError, WrongClassificationError
 
 
-def test_predict_returns_correct_indices():
+def test_multiclass(multiclass_fit_data):
     predictor = ArgmaxPredictor()
+    predictor.fit(*multiclass_fit_data)
+    scores = np.array([[0.1, 0.9, 0], [0.8, 0, 0.2], [0, 0.3, 0.7]])
+    predictions = predictor.predict(scores)
+    np.testing.assert_array_equal(predictions, np.array([1, 0, 2]))
+
+
+def test_fails_on_wrong_n_classes(multiclass_fit_data):
+    predictor = ArgmaxPredictor()
+    predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    predictions = predictor.predict(scores)
-    np.testing.assert_array_equal(predictions, np.array([1, 0, 1]))
+    with pytest.raises(InvalidNumClassesError):
+        predictor.predict(scores)
 
 
-def test_predict_handles_single_class():
+def test_fails_on_wrong_clf_problem(multilabel_fit_data):
     predictor = ArgmaxPredictor()
-    scores = np.array([[0.5], [0.5], [0.5]])
-    predictions = predictor.predict(scores)
-    np.testing.assert_array_equal(predictions, np.array([0, 0, 0]))
+    with pytest.raises(WrongClassificationError):
+        predictor.fit(*multilabel_fit_data)

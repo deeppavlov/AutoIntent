@@ -58,6 +58,7 @@ def test_prediction_multilabel(scoring_optimizer_multilabel):
         "search_space": [
             {"module_type": "threshold", "thresh": [0.5]},
             {"module_type": "tunable", "n_trials": [None, 3]},
+            {"module_type": "adaptive"},
         ],
     }
 

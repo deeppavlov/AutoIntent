@@ -34,3 +34,6 @@ docs:
 .PHONY: serve-docs
 serve-docs: docs
 	$(poetry) python -m http.server -d docs/build/html 8333
+
+.PHONY: all
+all: lint

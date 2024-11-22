@@ -2,6 +2,7 @@ from typing import TypeVar
 
 from .base import Module
 from .prediction import (
+    AdaptivePredictor,
     ArgmaxPredictor,
     JinoosPredictor,
     PredictionModule,
@@ -35,28 +36,31 @@ PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
     [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
 )
 
-PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict([ThresholdPredictor, TunablePredictor])
+PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
+    [AdaptivePredictor, ThresholdPredictor, TunablePredictor]
+)
 
 __all__ = [
-    "Module",
-    "ArgmaxPredictor",
-    "JinoosPredictor",
-    "PredictionModule",
-    "ThresholdPredictor",
-    "TunablePredictor",
-    "RegExp",
-    "RetrievalModule",
-    "VectorDBModule",
-    "DNNCScorer",
-    "KNNScorer",
-    "LinearScorer",
-    "MLKnnScorer",
-    "DescriptionScorer",
-    "ScoringModule",
+    "PREDICTION_MODULES_MULTICLASS",
+    "PREDICTION_MODULES_MULTILABEL",
     "RETRIEVAL_MODULES_MULTICLASS",
     "RETRIEVAL_MODULES_MULTILABEL",
     "SCORING_MODULES_MULTICLASS",
     "SCORING_MODULES_MULTILABEL",
-    "PREDICTION_MODULES_MULTICLASS",
-    "PREDICTION_MODULES_MULTILABEL",
+    "AdaptivePredictor",
+    "ArgmaxPredictor",
+    "DNNCScorer",
+    "DescriptionScorer",
+    "JinoosPredictor",
+    "KNNScorer",
+    "LinearScorer",
+    "MLKnnScorer",
+    "Module",
+    "PredictionModule",
+    "RegExp",
+    "RetrievalModule",
+    "ScoringModule",
+    "ThresholdPredictor",
+    "TunablePredictor",
+    "VectorDBModule",
 ]

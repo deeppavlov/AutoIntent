@@ -1,3 +1,5 @@
+"""LinearScorer class for linear classification."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -18,6 +20,14 @@ from .base import ScoringModule
 
 
 class LinearScorerDumpDict(BaseMetadataDict):
+    """
+    Metadata for dumping the state of a LinearScorer.
+
+    :ivar multilabel: Whether the task is multilabel classification.
+    :ivar batch_size: Batch size used for embedding.
+    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
+    """
+
     multilabel: bool
     batch_size: int
     max_length: int | None
@@ -25,20 +35,31 @@ class LinearScorerDumpDict(BaseMetadataDict):
 
 class LinearScorer(ScoringModule):
     """
-    TODO:
-    - implement different modes (incremental learning with SGD and simple learning with LogisticRegression)
-    - control n_jobs
-    - adjust cv
-    - separate the sklearn fit() process and transformers tokenizers process (from vector_index embedding function)
-        to avoid the warnings:
-    ```
-    huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling \
-        parallelism to avoid deadlocks...
-    To disable this warning, you can either:
-        - Avoid using `tokenizers` before the fork if possible
-        - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    ```
+    Scoring module for linear classification using logistic regression.
+
+    This module uses embeddings generated from a transformer model to train a
+    logistic regression classifier for intent classification.
+
+    :ivar classifier_file_name: Filename for saving the classifier to disk.
+    :ivar embedding_model_subdir: Directory for saving the embedding model.
+    :ivar precomputed_embeddings: Flag indicating if embeddings are precomputed.
+    :ivar db_dir: Path to the database directory.
+    :ivar name: Name of the scorer, defaults to "linear".
     """
+
+    # TODO:
+    # - implement different modes (incremental learning with SGD and simple learning with LogisticRegression)
+    # - control n_jobs
+    # - adjust cv
+    # - separate the sklearn fit() process and transformers tokenizers process (from vector_index embedding function)
+    #     to avoid the warnings:
+    # ```
+    # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling \
+    #     parallelism to avoid deadlocks...
+    # To disable this warning, you can either:
+    #     - Avoid using `tokenizers` before the fork if possible
+    #     - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+    # ```
 
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
@@ -56,6 +77,17 @@ class LinearScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
+        """
+        Initialize the LinearScorer.
+
+        :param embedder_name: Name of the embedder model.
+        :param cv: Number of cross-validation folds, defaults to 3.
+        :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
+        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param seed: Random seed for reproducibility, defaults to 0.
+        :param batch_size: Batch size for embedding generation, defaults to 32.
+        :param max_length: Maximum sequence length for embedding, or None for default.
+        """
         self.cv = cv
         self.n_jobs = n_jobs
         self.device = device
@@ -70,6 +102,13 @@ class LinearScorer(ScoringModule):
         context: Context,
         embedder_name: str | None = None,
     ) -> Self:
+        """
+        Create a LinearScorer instance using a Context object.
+
+        :param context: Context containing configurations and utilities.
+        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :return: Initialized LinearScorer instance.
+        """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
             precomputed_embeddings = True
@@ -88,6 +127,11 @@ class LinearScorer(ScoringModule):
         return instance
 
     def get_embedder_name(self) -> str:
+        """
+        Get the name of the embedder.
+
+        :return: Embedder name.
+        """
         return self.embedder_name
 
     def fit(
@@ -95,6 +139,13 @@ class LinearScorer(ScoringModule):
         utterances: list[str],
         labels: list[LabelType],
     ) -> None:
+        """
+        Train the logistic regression classifier.
+
+        :param utterances: List of training utterances.
+        :param labels: List of labels corresponding to the utterances.
+        :raises ValueError: If the vector index mismatches the provided utterances.
+        """
         self._multilabel = isinstance(labels[0], list)
 
         if self.precomputed_embeddings:
@@ -127,6 +178,12 @@ class LinearScorer(ScoringModule):
         self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+        """
+        Predict probabilities for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Array of predicted probabilities for each class.
+        """
         features = self._embedder.embed(utterances)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
@@ -134,9 +191,15 @@ class LinearScorer(ScoringModule):
         return probas  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
+        """Clear cached data in memory used by the embedder."""
         self._embedder.clear_ram()
 
     def dump(self, path: str) -> None:
+        """
+        Save the LinearScorer's metadata, classifier, and embedder to disk.
+
+        :param path: Path to the directory where assets will be dumped.
+        """
         self.metadata = LinearScorerDumpDict(
             multilabel=self._multilabel,
             batch_size=self.batch_size,
@@ -149,14 +212,19 @@ class LinearScorer(ScoringModule):
         with metadata_path.open("w") as file:
             json.dump(self.metadata, file, indent=4)
 
-        # dump sklearn model
+        # Dump sklearn model
         clf_path = dump_dir / self.classifier_file_name
         joblib.dump(self._clf, clf_path)
 
-        # dump sentence transformer model
+        # Dump sentence transformer model
         self._embedder.dump(dump_dir / self.embedding_model_subdir)
 
     def load(self, path: str) -> None:
+        """
+        Load the LinearScorer's metadata, classifier, and embedder from disk.
+
+        :param path: Path to the directory containing the dumped assets.
+        """
         dump_dir = Path(path)
 
         metadata_path = dump_dir / self.metadata_dict_name
@@ -164,11 +232,11 @@ class LinearScorer(ScoringModule):
             metadata: LinearScorerDumpDict = json.load(file)
         self._multilabel = metadata["multilabel"]
 
-        # load sklearn model
+        # Load sklearn model
         clf_path = dump_dir / self.classifier_file_name
         self._clf = joblib.load(clf_path)
 
-        # load sentence transformer model
+        # Load sentence transformer model
         embedder_dir = dump_dir / self.embedding_model_subdir
         self._embedder = Embedder(
             device=self.device,
