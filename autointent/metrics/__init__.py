@@ -93,7 +93,11 @@ PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
 METRIC_FN = PredictionMetricFn | RegexpMetricFn | RetrievalMetricFn | ScoringMetricFn
 
 __all__ = [
+    "METRIC_FN",
     "PredictionMetricFn",
+    "RegexpMetricFn",
+    "RetrievalMetricFn",
+    "ScoringMetricFn",
     "prediction_accuracy",
     "prediction_f1",
     "prediction_precision",
@@ -101,7 +105,6 @@ __all__ = [
     "prediction_roc_auc",
     "regexp_partial_accuracy",
     "regexp_partial_precision",
-    "RetrievalMetricFn",
     "retrieval_hit_rate",
     "retrieval_hit_rate_intersecting",
     "retrieval_hit_rate_macro",
@@ -117,7 +120,6 @@ __all__ = [
     "retrieval_precision",
     "retrieval_precision_intersecting",
     "retrieval_precision_macro",
-    "ScoringMetricFn",
     "scoring_accuracy",
     "scoring_f1",
     "scoring_hit_rate",
@@ -128,6 +130,4 @@ __all__ = [
     "scoring_precision",
     "scoring_recall",
     "scoring_roc_auc",
-    "RegexpMetricFn",
-    "METRIC_FN",
 ]

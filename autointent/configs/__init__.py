@@ -13,16 +13,16 @@ from .optimization_cli import (
 from .pipeline_optimizer import PipelineOptimizerConfig
 
 __all__ = [
-    "InferenceConfig",
-    "InferencePipelineConfig",
-    "NodeOptimizerConfig",
-    "InferenceNodeConfig",
-    "PipelineOptimizerConfig",
-    "DataConfig",
-    "TaskConfig",
-    "LoggingConfig",
-    "VectorIndexConfig",
     "AugmentationConfig",
+    "DataConfig",
     "EmbedderConfig",
+    "InferenceConfig",
+    "InferenceNodeConfig",
+    "InferencePipelineConfig",
+    "LoggingConfig",
+    "NodeOptimizerConfig",
     "OptimizationConfig",
+    "PipelineOptimizerConfig",
+    "TaskConfig",
+    "VectorIndexConfig",
 ]

@@ -14,10 +14,10 @@ NODES_INFO: dict[str, NodeInfo] = {
 }
 
 __all__ = [
+    "NODES_INFO",
     "NodeInfo",
     "PredictionNodeInfo",
     "RegExpNodeInfo",
     "RetrievalNodeInfo",
     "ScoringNodeInfo",
-    "NODES_INFO",
 ]
