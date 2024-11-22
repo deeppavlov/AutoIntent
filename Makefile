@@ -22,10 +22,6 @@ lint:
 	$(poetry) ruff format
 	$(poetry) ruff check --fix
 
-.PHONY: docs-html
-docs-html:
-	cd docs && make html
-
 .PHONY: sync
 sync:
 	poetry install --sync --with dev,test,lint,typing,docs
