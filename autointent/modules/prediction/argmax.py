@@ -18,11 +18,13 @@ from .utils import InvalidNumClassesError, WrongClassificationError
 
 class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
     """Argmax predictor metadata."""
+
     n_classes: int
 
 
 class ArgmaxPredictor(PredictionModule):
     """Argmax prediction module."""
+
     name = "argmax"
     n_classes: int
 
