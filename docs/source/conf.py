@@ -30,6 +30,7 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.autosummary",
     "nbsphinx",
+    "sphinx.ext.todo",
 ]
 
 templates_path = ["_templates"]
@@ -42,6 +43,7 @@ exclude_patterns = ["conf.py", "docs_utils/*"]
 html_theme = "alabaster"
 html_static_path = ["_static"]
 
+todo_include_todos = True
 
 autodoc_default_options = {
     "members": True,
