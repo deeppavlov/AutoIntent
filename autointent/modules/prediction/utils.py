@@ -1,5 +1,4 @@
 """Utility functions and custom exceptions for handling multilabel predictions and errors."""
-
 from typing import Any
 
 import numpy as np

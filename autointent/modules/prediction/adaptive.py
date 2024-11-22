@@ -28,7 +28,6 @@ class AdaptivePredictorDumpMetadata(TypedDict):
     :ivar tags: List of Tag objects for mutually exclusive classes.
     :ivar n_classes: Number of classes used during training.
     """
-
     r: float
     tags: list[Tag] | None
     n_classes: int
@@ -47,7 +46,6 @@ class AdaptivePredictor(PredictionModule):
     :ivar tags: List of Tag objects for mutually exclusive classes.
     :ivar name: Name of the predictor, defaults to "adaptive".
     """
-
     metadata_dict_name = "metadata.json"
     n_classes: int
     _r: float

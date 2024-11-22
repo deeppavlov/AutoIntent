@@ -70,7 +70,6 @@ class JinoosPredictor(PredictionModule):
         :param tags: Tags to fit
         """
         # TODO: use dev split instead of test split.
-
         multilabel = isinstance(labels[0], list)
         if multilabel:
             msg = "JinoosPredictor is compatible with single-label classification only"

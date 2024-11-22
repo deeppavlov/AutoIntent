@@ -47,6 +47,7 @@ __all__ = [
     "RETRIEVAL_MODULES_MULTILABEL",
     "SCORING_MODULES_MULTICLASS",
     "SCORING_MODULES_MULTILABEL",
+    "Module",
     "AdaptivePredictor",
     "ArgmaxPredictor",
     "DNNCScorer",
