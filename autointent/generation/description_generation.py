@@ -1,3 +1,5 @@
+"""Description generation for intents using OpenAI models."""
+
 import asyncio
 import random
 from collections import defaultdict
@@ -10,13 +12,11 @@ from autointent.generation.prompt_scheme import PromptDescription
 
 def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
     """
-    Groups utterances by their labels.
+    Group utterances by their labels.
 
-    Args:
-        utterances (list[Utterance]): List of utterances with `label` and `text` attributes.
+    :param utterances: List of utterances with `label` and `text` attributes.
 
-    Returns:
-        dict[int, list[str]]: A dictionary where labels map to lists of utterance texts.
+    :returns: A dictionary where labels map to lists of utterance texts.
     """
     intent_utterances = defaultdict(list)
 
@@ -43,22 +43,18 @@ async def create_intent_description(
     model_name: str,
 ) -> str:
     """
-    Generates a description for a specific intent using an OpenAI model.
+    Generate a description for a specific intent using an OpenAI model.
 
-    Args:
-        client (AsyncOpenAI): The OpenAI client instance used to communicate with the model.
-        intent_name (str | None): The name of the intent to describe. If None, an empty string will be used.
-        utterances (list[str]): A list of example utterances related to the intent.
-        regexp_patterns (list[str]): A list of regular expression patterns associated with the intent.
-        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
-                                  and {user_utterances} to format the content sent to the model.
-        model_name (str): The identifier of the OpenAI model to use for generating the description.
+    :param client: The OpenAI client instance used to communicate with the model.
+    :param intent_name: The name of the intent to describe. If None, an empty string will be used.
+    :param utterances: A list of example utterances related to the intent.
+    :param regexp_patterns: A list of regular expression patterns associated with the intent.
 
-    Returns:
-        str: The generated description of the intent.
+    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
+                                    and {user_utterances} to format the content sent to the model.
+    :param model_name: The identifier of the OpenAI model to use for generating the description.
 
-    Raises:
-        ValueError: If the response from the model is not a string or is in an unexpected format.
+    :returns: The generated description of the intent.
     """
     intent_name = intent_name if intent_name is not None else ""
     utterances = random.sample(utterances, min(5, len(utterances)))
@@ -88,18 +84,16 @@ async def generate_intent_descriptions(
     model_name: str,
 ) -> list[Intent]:
     """
-    Generates descriptions for a list of intents using an OpenAI model.
+    Generate descriptions for a list of intents using an OpenAI model.
 
-    Args:
-        client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
-        intent_utterances (dict[int, list[str]]): A dictionary mapping intent IDs to their corresponding utterances.
-        intents (list[Intent]): A list of intents to generate descriptions for.
-        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
-                                  and {user_utterances} to format the content sent to the model.
-        model_name (str): The name of the OpenAI model to use for generating descriptions.
+    :param client: The OpenAI client used to generate the descriptions.
+    :param intent_utterances: A dictionary mapping intent IDs to their corresponding utterances.
+    :param intents: A list of intents to generate descriptions for.
+    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
+                                      and {user_utterances} to format the content sent to the model.
+    :param model_name: The name of the OpenAI model to use for generating descriptions.
 
-    Returns:
-        list[Intent]: The list of intents with updated descriptions.
+    :returns: The list of intents with updated descriptions.
     """
     tasks = []
     for intent in intents:
@@ -134,15 +128,13 @@ def enhance_dataset_with_descriptions(
     """
     Enhances a dataset by generating descriptions for intents using an OpenAI model.
 
-    Args:
-        dataset (Dataset): The dataset containing utterances and intents that require descriptions.
-        client (AsyncOpenAI): The OpenAI client used to generate the descriptions.
-        prompt (PromptDescription): A string template for the prompt, which must include placeholders for {intent_name}
-                                  and {user_utterances} to format the content sent to the model.
-        model_name (str, optional): The OpenAI model to use for generating descriptions. Defaults to "gpt-3.5-turbo".
+    :param dataset: The dataset containing utterances and intents that require descriptions.
+    :param client: The OpenAI client used to generate the descriptions.
+    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
+                                      and {user_utterances} to format the content sent to the model.
+    :param model_name: The OpenAI model to use for generating descriptions.
 
-    Returns:
-        Dataset: The dataset with intents enhanced by generated descriptions.
+    :returns: The dataset with intents enhanced by generated descriptions.
     """
     intent_utterances = get_utterances_by_id(utterances=dataset.utterances)
     dataset.intents = asyncio.run(

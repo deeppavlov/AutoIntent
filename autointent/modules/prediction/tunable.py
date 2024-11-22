@@ -1,3 +1,5 @@
+"""Tunable predictor module."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -19,6 +21,8 @@ from .utils import InvalidNumClassesError
 
 
 class TunablePredictorDumpMetadata(BaseMetadataDict):
+    """Tunable predictor metadata."""
+
     multilabel: bool
     thresh: list[float]
     tags: list[Tag] | None
@@ -26,6 +30,8 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 
 
 class TunablePredictor(PredictionModule):
+    """Tunable predictor module."""
+
     name = "tunable"
     multilabel: bool
     n_classes: int
@@ -37,12 +43,25 @@ class TunablePredictor(PredictionModule):
         seed: int = 0,
         tags: list[Tag] | None = None,
     ) -> None:
+        """
+        Initialize tunable predictor.
+
+        :param n_trials: Number of trials
+        :param seed: Seed
+        :param tags: Tags
+        """
         self.n_trials = n_trials
         self.seed = seed
         self.tags = tags
 
     @classmethod
     def from_context(cls, context: Context, n_trials: int = 320) -> Self:
+        """
+        Initialize from context.
+
+        :param context: Context
+        :param n_trials: Number of trials
+        """
         return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
 
     def fit(
@@ -52,8 +71,14 @@ class TunablePredictor(PredictionModule):
         tags: list[Tag] | None = None,
     ) -> None:
         """
-        When data doesn't contain out-of-scope utterances, using
-        TunablePredictor imposes unnecessary computational overhead.
+        Fit module.
+
+        When data doesn't contain out-of-scope utterances, using TunablePredictor imposes unnecessary
+         computational overhead.
+
+        :param scores: Scores to fit
+        :param labels: Labels to fit
+        :param tags: Tags to fit
         """
         self.tags = tags
         self.multilabel = isinstance(labels[0], list)
@@ -72,6 +97,11 @@ class TunablePredictor(PredictionModule):
         self.thresh = thresh_optimizer.best_thresholds
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """
+        Predict the best score.
+
+        :param scores: Scores to predict
+        """
         if scores.shape[1] != self.n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
@@ -80,6 +110,11 @@ class TunablePredictor(PredictionModule):
         return multiclass_predict(scores, self.thresh)
 
     def dump(self, path: str) -> None:
+        """
+        Dump all data needed for inference.
+
+        :param path: Path to dump
+        """
         self.metadata = TunablePredictorDumpMetadata(
             multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_classes=self.n_classes
         )
@@ -90,6 +125,11 @@ class TunablePredictor(PredictionModule):
             json.dump(self.metadata, file, indent=4)
 
     def load(self, path: str) -> None:
+        """
+        Load data from dump.
+
+        :param path: Path to load
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
@@ -103,12 +143,26 @@ class TunablePredictor(PredictionModule):
 
 
 class ThreshOptimizer:
+    """Threshold optimizer."""
+
     def __init__(self, n_classes: int, multilabel: bool, n_trials: int | None = None) -> None:
+        """
+        Initialize threshold optimizer.
+
+        :param n_classes: Number of classes
+        :param multilabel: Is multilabel
+        :param n_trials: Number of trials
+        """
         self.n_classes = n_classes
         self.multilabel = multilabel
         self.n_trials = n_trials if n_trials is not None else n_classes * 10
 
     def objective(self, trial: Trial) -> float:
+        """
+        Objective function to optimize.
+
+        :param trial: Trial
+        """
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
         if self.multilabel:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
@@ -123,6 +177,14 @@ class ThreshOptimizer:
         seed: int,
         tags: list[Tag] | None = None,
     ) -> None:
+        """
+        Fit the optimizer.
+
+        :param probas: Probabilities
+        :param labels: Labels
+        :param seed: Seed
+        :param tags: Tags
+        """
         self.probas = probas
         self.labels = labels
         self.tags = tags

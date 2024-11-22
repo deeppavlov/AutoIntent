@@ -5,4 +5,4 @@ from .knn import KNNScorer
 from .linear import LinearScorer
 from .mlknn import MLKnnScorer
 
-__all__ = ["ScoringModule", "DNNCScorer", "KNNScorer", "LinearScorer", "MLKnnScorer", "DescriptionScorer"]
+__all__ = ["DNNCScorer", "DescriptionScorer", "KNNScorer", "LinearScorer", "MLKnnScorer", "ScoringModule"]

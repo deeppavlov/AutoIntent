@@ -1,3 +1,5 @@
+"""MLKnnScorer class for multi-label k-nearest neighbors classification."""
+
 import json
 from pathlib import Path
 from typing import Any, TypedDict
@@ -14,6 +16,15 @@ from autointent.modules.scoring.base import ScoringModule
 
 
 class MLKnnScorerDumpMetadata(BaseMetadataDict):
+    """
+    Metadata for dumping the state of an MLKnnScorer.
+
+    :ivar db_dir: Path to the database directory.
+    :ivar n_classes: Number of classes in the dataset.
+    :ivar batch_size: Batch size used for embedding.
+    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
+    """
+
     db_dir: str
     n_classes: int
     batch_size: int
@@ -21,6 +32,15 @@ class MLKnnScorerDumpMetadata(BaseMetadataDict):
 
 
 class ArrayToSave(TypedDict):
+    """
+    Data structure for saving prior and conditional probabilities.
+
+    :ivar prior_prob_true: Prior probabilities of each class being true.
+    :ivar prior_prob_false: Prior probabilities of each class being false.
+    :ivar cond_prob_true: Conditional probabilities given true labels.
+    :ivar cond_prob_false: Conditional probabilities given false labels.
+    """
+
     prior_prob_true: NDArray[np.float64]
     prior_prob_false: NDArray[np.float64]
     cond_prob_true: NDArray[np.float64]
@@ -28,12 +48,18 @@ class ArrayToSave(TypedDict):
 
 
 class MLKnnScorer(ScoringModule):
-    _multilabel: bool
-    n_classes: int
-    _prior_prob_true: NDArray[np.float64]
-    _prior_prob_false: NDArray[np.float64]
-    _cond_prob_true: NDArray[np.float64]
-    _cond_prob_false: NDArray[np.float64]
+    """
+    Multi-label k-nearest neighbors (ML-KNN) scorer.
+
+    This module implements ML-KNN, a multi-label classifier that computes probabilities
+    based on the k-nearest neighbors of a query instance.
+
+    :ivar arrays_filename: Filename for saving probabilities to disk.
+    :ivar metadata: Metadata about the scorer's configuration.
+    :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
+    :ivar name: Name of the scorer, defaults to "mlknn".
+    """
+
     arrays_filename: str = "probs.npz"
     metadata: MLKnnScorerDumpMetadata
     prebuilt_index: bool = False
@@ -50,6 +76,18 @@ class MLKnnScorer(ScoringModule):
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
+        """
+        Initialize the MLKnnScorer.
+
+        :param k: Number of nearest neighbors to consider.
+        :param embedder_name: Name of the embedder used for vectorization.
+        :param db_dir: Path to the database directory, or None to use default.
+        :param s: Smoothing parameter for probability calculations, defaults to 1.0.
+        :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
+        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param batch_size: Batch size for embedding generation, defaults to 32.
+        :param max_length: Maximum sequence length for embedding, or None for default.
+        """
         self.k = k
         self.embedder_name = embedder_name
         self.s = s
@@ -61,6 +99,11 @@ class MLKnnScorer(ScoringModule):
 
     @property
     def db_dir(self) -> str:
+        """
+        Get the database directory for the vector index.
+
+        :return: Path to the database directory.
+        """
         if self._db_dir is None:
             self._db_dir = str(get_db_dir())
         return self._db_dir
@@ -74,6 +117,16 @@ class MLKnnScorer(ScoringModule):
         ignore_first_neighbours: int = 0,
         embedder_name: str | None = None,
     ) -> Self:
+        """
+        Create an MLKnnScorer instance using a Context object.
+
+        :param context: Context containing configurations and utilities.
+        :param k: Number of nearest neighbors to consider.
+        :param s: Smoothing parameter for probability calculations, defaults to 1.0.
+        :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
+        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :return: Initialized MLKnnScorer instance.
+        """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
@@ -94,9 +147,22 @@ class MLKnnScorer(ScoringModule):
         return instance
 
     def get_embedder_name(self) -> str:
+        """
+        Get the name of the embedder.
+
+        :return: Embedder name.
+        """
         return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+        """
+        Fit the scorer by training or loading the vector index and calculating probabilities.
+
+        :param utterances: List of training utterances.
+        :param labels: List of multi-label targets for each utterance.
+        :raises TypeError: If the labels are not multi-label.
+        :raises ValueError: If the vector index mismatches the provided utterances.
+        """
         if not isinstance(labels[0], list):
             msg = "mlknn scorer support only multilabel input"
             raise TypeError(msg)
@@ -124,11 +190,22 @@ class MLKnnScorer(ScoringModule):
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 
     def _compute_prior(self, y: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """
+        Compute prior probabilities for each class.
+
+        :param y: Array of labels (multi-label format).
+        :return: Tuple of prior probabilities for true and false labels.
+        """
         prior_prob_true = (self.s + y.sum(axis=0)) / (self.s * 2 + y.shape[0])
         prior_prob_false = 1 - prior_prob_true
         return prior_prob_true, prior_prob_false
 
     def _compute_cond(self) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """
+        Compute conditional probabilities for neighbors.
+
+        :return: Tuple of conditional probabilities for true and false labels.
+        """
         c = np.zeros((self.n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self.n_classes, self.k + 1), dtype=int)
 
@@ -163,24 +240,46 @@ class MLKnnScorer(ScoringModule):
         )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
+        """
+        Predict labels for the given utterances.
+
+        :param utterances: List of query utterances.
+        :param thresh: Threshold for binary classification, defaults to 0.5.
+        :return: Predicted labels as a binary array.
+        """
         probas = self.predict(utterances)
         return (probas > thresh).astype(int)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
+        """
+        Predict probabilities for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Array of predicted probabilities for each class.
+        """
         return self._predict(utterances)[0]
 
-    def predict_with_metadata(
-        self,
-        utterances: list[str],
-    ) -> tuple[NDArray[Any], list[dict[str, Any]] | None]:
+    def predict_with_metadata(self, utterances: list[str]) -> tuple[NDArray[Any], list[dict[str, Any]] | None]:
+        """
+        Predict probabilities along with metadata for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Tuple of probabilities and metadata with neighbor information.
+        """
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
         return scores, metadata
 
     def clear_cache(self) -> None:
+        """Clear cached data in memory used by the vector index."""
         self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
+        """
+        Save the MLKnnScorer's metadata and probabilities to disk.
+
+        :param path: Path to the directory where assets will be dumped.
+        """
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
             n_classes=self.n_classes,
@@ -202,6 +301,11 @@ class MLKnnScorer(ScoringModule):
         np.savez(dump_dir / self.arrays_filename, **arrays_to_save)
 
     def load(self, path: str) -> None:
+        """
+        Load the MLKnnScorer's metadata and probabilities from disk.
+
+        :param path: Path to the directory containing the dumped assets.
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:

@@ -1,3 +1,5 @@
+"""Cli utilities for optimization."""
+
 import importlib.resources as ires
 from logging import Logger
 from pathlib import Path
@@ -7,7 +9,14 @@ import yaml
 
 
 def load_config(config_path: str | Path | None, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
-    """load config from the given path or load default config which is distributed along with the autointent package"""
+    """
+    Load configuration from the given path or load default configuration.
+
+    :param config_path: Path to the configuration file
+    :param multilabel: Whether to use multilabel or not
+    :param logger: Logger
+    :return:
+    """
     if config_path is not None:
         if logger is not None:
             logger.debug("loading optimization search space config from %s...)", config_path)
