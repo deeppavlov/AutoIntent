@@ -9,6 +9,8 @@
 import os
 import sys
 
+from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
+
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
@@ -73,13 +75,13 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 
 def setup(_) -> None:  # noqa: ANN001
-    # generate_tutorial_links_for_notebook_creation(
-    #     [
-    #         ("tutorials.pipeline_optimization", "Pipeline Optimization"),
-    #         ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
-    #         ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
-    #     ]
-    # )
+    generate_tutorial_links_for_notebook_creation(
+        [
+            ("tutorials.pipeline_optimization", "Pipeline Optimization"),
+            ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
+            ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
+        ]
+    )
     regenerate_apiref(
         [
             ("autointent.configs", "Configs"),
