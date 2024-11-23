@@ -3,9 +3,8 @@ import re
 from typing import ClassVar, Literal
 
 import nbformat
-from pydantic import BaseModel
-
 from jupytext import jupytext
+from pydantic import BaseModel
 
 
 class ReplacePattern(BaseModel, abc.ABC):

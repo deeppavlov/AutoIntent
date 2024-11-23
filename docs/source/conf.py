@@ -14,7 +14,6 @@ conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 sys.path.insert(0, conf_dir)
 
 from docs_utils.apiref import regenerate_apiref  # noqa: E402
-from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
 
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
