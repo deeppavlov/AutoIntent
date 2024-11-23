@@ -196,18 +196,19 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
 
     The result is equivalent to executing the following code:
 
-    .. code-block:: python
-
-        scores = np.array(scores)
-        labels = np.array(labels)
-
-        n_classes = scores.shape[1]
-        from scipy.stats import rankdata
-        int_ranks = rankdata(scores, axis=1)  # int ranks are from [1, n_classes]
-        filtered_ranks = int_ranks * labels  # guarantee that 0 labels wont have max rank
-        max_ranks = np.max(filtered_ranks, axis=1)
-        float_ranks = (max_ranks - 1) / (n_classes - 1)  # float ranks are from [0,1]
-        res = 1 - np.mean(float_ranks)
+    >>> def compute_rank_metric():
+    ...     import numpy as np
+    ...     scores = np.array([[1, 2, 3]])
+    ...     labels = np.array([1, 0, 0])
+    ...     n_classes = scores.shape[1]
+    ...     from scipy.stats import rankdata
+    ...     int_ranks = rankdata(scores, axis=1)
+    ...     filtered_ranks = int_ranks * labels
+    ...     max_ranks = np.max(filtered_ranks, axis=1)
+    ...     float_ranks = (max_ranks - 1) / (n_classes - 1)
+    ...     return float(1 - np.mean(float_ranks))
+    >>> print(f"{compute_rank_metric():.1f}")
+    1.0
 
     :param labels: ground truth labels for each utterance
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
