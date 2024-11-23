@@ -55,4 +55,4 @@ def optimize(task_type: TaskType) -> None:
 
 
 # %%
-optimize("multiclass")
+# optimize("multiclass")

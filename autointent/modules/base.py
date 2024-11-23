@@ -40,10 +40,7 @@ class Module(ABC):
 
     @abstractmethod
     def get_assets(self) -> Artifact:
-        """
-        Return useful assets that represent intermediate data into context.
-
-        """
+        """Return useful assets that represent intermediate data into context."""
 
     @abstractmethod
     def clear_cache(self) -> None:
