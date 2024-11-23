@@ -17,7 +17,6 @@ from autointent.configs.optimization_cli import (
 )
 from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
 from autointent.pipeline.optimization.utils import load_config
-from tests.conftest import setup_environment
 
 # %%
 TaskType = Literal["multiclass", "multilabel", "description"]
