@@ -5,8 +5,12 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches:
-      - "dev"
-      - "feat/docs_ci"
+      - dev
+      - feat/docs_ci
+  pull_request:
+    branches:
+      - dev
+      - feat/docs_ci
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
