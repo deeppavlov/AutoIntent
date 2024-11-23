@@ -5,10 +5,7 @@ from typing import ClassVar, Literal
 import nbformat
 from pydantic import BaseModel
 
-try:
-    from jupytext import jupytext
-except ImportError:
-    jupytext = None
+from jupytext import jupytext
 
 
 class ReplacePattern(BaseModel, abc.ABC):
@@ -78,7 +75,7 @@ class DocumentationLink(ReplacePattern):
     USAGE EXAMPLES
     --------------
 
-    %doclink(api,index_pipeline)) -> ../apiref/index_pipeline.rst
+    %doclink(api,index_pipeline) -> ../apiref/index_pipeline.rst
 
     %doclink(api,script.core.script) -> ../apiref/chatsky.script.core.script.rst
 
@@ -243,7 +240,4 @@ def py_percent_to_notebook(text: str) -> nbformat.NotebookNode:
         # %% [raw]
         # This is a raw cell
     """
-    if jupytext is None:
-        msg = "`doc` dependencies are not installed."
-        raise ModuleNotFoundError(msg)
     return jupytext.reads(apply_replace_patterns(text), "py:percent")

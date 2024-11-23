@@ -27,10 +27,19 @@ release = "0.0.1"
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
     "sphinx.ext.autosummary",
-    "nbsphinx",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.doctest",
+    "sphinx.ext.viewcode",
+    "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
+    "nbsphinx",
 ]
 
 templates_path = ["_templates"]
@@ -51,7 +60,7 @@ autodoc_default_options = {
     "private-members": True,
     # "special-members": "__call__",
     "member-order": "bysource",
-    # "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
+    "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
 }
 
 # Finding tutorials directories
@@ -60,15 +69,17 @@ nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
 
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+
 
 def setup(_) -> None:  # noqa: ANN001
-    generate_tutorial_links_for_notebook_creation(
-        [
-            ("tutorials.pipeline_optimization", "Pipeline Optimization"),
-            ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
-            ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
-        ]
-    )
+    # generate_tutorial_links_for_notebook_creation(
+    #     [
+    #         ("tutorials.pipeline_optimization", "Pipeline Optimization"),
+    #         ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
+    #         ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
+    #     ]
+    # )
     regenerate_apiref(
         [
             ("autointent.configs", "Configs"),
