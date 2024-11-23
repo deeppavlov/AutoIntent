@@ -1,66 +1,61 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: build_and_publish_docs
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches:
-      - dev
-      - feat/docs_ci
-  pull_request:
-    branches:
-      - dev
-      - feat/docs_ci
-
-  # Allows you to run this workflow manually from the Actions tab
+    - dev
+    - feat/docs_ci
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/dev' }}
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
+    name: build and publish docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python 3.10
+      - name: set up python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
-          cache: "pip"
+          python-version: 3.10
 
-      - name: Install dependencies
+      - name: setup poetry
         run: |
-          pip install .[docs]
+          curl -sSL https://install.python-poetry.org | python -
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: install dependencies
+        run: |
+          poetry install --with docs
 
-      - name: Build docs
+      - name: build documentation
         run: |
           make docs
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: 'docs/_build/html'
+      - name: save branch name without slashes
+        # if: ${{ github.ref != 'refs/heads/dev' }}
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          BRANCH_NAME=${{ env.BRANCH_NAME }}
+          BRANCH_NAME=${BRANCH_NAME////_}
+          echo BRANCH_NAME=${BRANCH_NAME} >> $GITHUB_ENV
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: save artifact
+        # if: ${{ github.ref != 'refs/heads/dev' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('github-pages-for-branch-{0}', env.BRANCH_NAME) }}
+          path: docs/build/
+          retention-days: 3
+
+      - name: deploy website
+        # if: ${{ github.ref == 'refs/heads/dev' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          branch: gh-pages
+          folder: docs/build/
+          single-commit: True
