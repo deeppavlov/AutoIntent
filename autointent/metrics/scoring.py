@@ -33,28 +33,28 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
     r"""
     Supports multiclass and multilabel cases.
 
-    Multiclass case
+    Multiclass case:
     Mean negative cross-entropy for each utterance classification result:
 
     .. math::
 
         \frac{1}{\ell}\sum_{i=1}^{\ell}\log(s[y[i]])
 
-    where ``s[y[i]]`` is a predicted score of ``i``th utterance having ground truth label
+    where ``s[y[i]]`` is the predicted score of the ``i``-th utterance having the ground truth label.
 
-    Multilabel case
+    Multilabel case:
     Mean negative binary cross-entropy:
 
     .. math::
 
         \frac{1}{\ell}\sum_{i=1}^\ell\sum_{c=1}^C\Big[y[i,c]\cdot\log(s[i,c])+(1-y[i,c])\cdot\log(1-s[i,c])\Big]
 
-    where ``s[i,c]`` is a predicted score of ``i``'th utterance having ground truth label ``c``
+    where ``s[i,c]`` is the predicted score of the ``i``-th utterance having the ground truth label ``c``.
 
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :param eps: small value to avoid division by zero
-    :return: Score of the scoring metric
+    :param labels: Ground truth labels for each utterance.
+    :param scores: For each utterance, a list containing scores for each of `n_classes` classes.
+    :param eps: A small value to avoid division by zero.
+    :return: Score of the scoring metric.
     """
     labels_array, scores_array = transform(labels, scores)
     scores_array[scores_array == 0] = eps

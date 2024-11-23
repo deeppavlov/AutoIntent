@@ -7,6 +7,7 @@
 import importlib.resources as ires
 from pathlib import Path
 from typing import Literal
+from uuid import uuid4
 
 from autointent.configs.optimization_cli import (
     DataConfig,
@@ -20,6 +21,13 @@ from autointent.pipeline.optimization.utils import load_config
 
 # %%
 TaskType = Literal["multiclass", "multilabel", "description"]
+
+
+def setup_environment() -> tuple[str, str, str]:
+    logs_dir = ires.files("tests").joinpath("logs") / str(uuid4())
+    db_dir = logs_dir / "db"
+    dump_dir = logs_dir / "modules_dump"
+    return db_dir, dump_dir, logs_dir
 
 
 def get_search_space_path(task_type: TaskType) -> None:
