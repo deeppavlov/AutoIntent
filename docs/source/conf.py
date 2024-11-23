@@ -36,6 +36,7 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx.ext.doctest",
     "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "nbsphinx",
