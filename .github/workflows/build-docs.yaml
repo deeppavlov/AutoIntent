@@ -4,7 +4,6 @@ on:
   push:
     branches:
     - dev
-    - feat/docs_ci
   workflow_dispatch:
 
 concurrency:
