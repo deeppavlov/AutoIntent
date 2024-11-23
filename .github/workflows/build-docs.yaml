@@ -30,6 +30,10 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python -
 
+      - name: Install pandoc
+        run: |
+          sudo apt install pandoc
+
       - name: install dependencies
         run: |
           poetry install --with docs
