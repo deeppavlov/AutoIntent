@@ -8,6 +8,7 @@
 
 import os
 import sys
+from pathlib import Path
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
@@ -31,11 +32,23 @@ extensions = [
     "sphinx.ext.autosummary",
     "nbsphinx",
     "sphinx.ext.todo",
+    "autoapi.extension",
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = ["conf.py", "docs_utils/*"]
 
+autoapi_dirs = [Path.cwd().parent.parent / "autointent"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    # "private-members",
+    "show-inheritance",
+    "show-module-summary",
+    "special-members",
+    "imported-members",
+]
+autodoc_typehints = "description"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
