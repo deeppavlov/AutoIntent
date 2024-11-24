@@ -3,7 +3,7 @@ import re
 import pytest
 
 from autointent.context.data_handler import Dataset
-from autointent.context.data_handler.sampling import (
+from autointent.context.data_handler._sampling import (
     distribute_shots,
     generate_from_template,
     generate_from_templates,

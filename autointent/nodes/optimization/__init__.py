@@ -1,3 +1,3 @@
-from .node_optimizer import NodeOptimizer
+from ._node_optimizer import NodeOptimizer
 
 __all__ = ["NodeOptimizer"]

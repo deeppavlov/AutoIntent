@@ -1,10 +1,10 @@
 from autointent.custom_types import NodeType
 
-from .base import NodeInfo
-from .prediction import PredictionNodeInfo
-from .regexp import RegExpNodeInfo
-from .retrieval import RetrievalNodeInfo
-from .scoring import ScoringNodeInfo
+from ._base import NodeInfo
+from ._prediction import PredictionNodeInfo
+from ._regexp import RegExpNodeInfo
+from ._retrieval import RetrievalNodeInfo
+from ._scoring import ScoringNodeInfo
 
 NODES_INFO: dict[str, NodeInfo] = {
     NodeType.retrieval: RetrievalNodeInfo(),

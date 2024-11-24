@@ -1,3 +1,3 @@
-from .inference_node import InferenceNode
+from ._inference_node import InferenceNode
 
 __all__ = ["InferenceNode"]

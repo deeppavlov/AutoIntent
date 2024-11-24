@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from autointent.context.data_handler.schemas import Dataset, Intent, Utterance
+from autointent.context.data_handler._schemas import Dataset, Intent, Utterance
 from autointent.generation.description_generation import (
     create_intent_description,
     enhance_dataset_with_descriptions,

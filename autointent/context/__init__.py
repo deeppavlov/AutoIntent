@@ -1,3 +1,3 @@
-from .context import Context
+from ._context import Context
 
 __all__ = ["Context"]

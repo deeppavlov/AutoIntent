@@ -1,1 +1,1 @@
-from .pipeline_optimizer import PipelineOptimizer
+from ._pipeline_optimizer import PipelineOptimizer

@@ -8,7 +8,7 @@ One can use simple argmax predictor for multiclass classification problem.
 # %%
 import numpy as np
 
-from autointent.modules.prediction.argmax import ArgmaxPredictor
+from autointent.modules.prediction import ArgmaxPredictor
 
 # %% [markdown]
 """

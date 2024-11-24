@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from autointent.modules import AdaptivePredictor
-from autointent.modules.prediction.utils import InvalidNumClassesError, WrongClassificationError
+from autointent.modules.prediction._utils import InvalidNumClassesError, WrongClassificationError
 
 
 def test_multilabel(multilabel_fit_data):

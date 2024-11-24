@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from autointent.context.data_handler.stratification import (
+from autointent.context.data_handler._stratification import (
     get_sample_utterances,
     is_multiclass_test_set_complete,
     is_multilabel_test_set_complete,

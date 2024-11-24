@@ -1,7 +1,7 @@
 import numpy as np
 
 from autointent.context.data_handler import DataHandler, Dataset
-from autointent.modules.scoring.mlknn.mlknn import MLKnnScorer
+from autointent.modules.scoring._mlknn.mlknn import MLKnnScorer
 from tests.conftest import setup_environment
 
 

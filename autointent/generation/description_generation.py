@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-from autointent.context.data_handler.schemas import Dataset, Intent, Utterance, UtteranceType
+from autointent.context.data_handler._schemas import Dataset, Intent, Utterance, UtteranceType
 from autointent.generation.prompt_scheme import PromptDescription
 
 

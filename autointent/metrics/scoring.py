@@ -6,8 +6,8 @@ from typing import Protocol
 import numpy as np
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
-from .converter import transform
-from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+from ._converter import transform
+from ._custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 logger = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
     return roc_auc_score(labels_, scores_, average="macro")  # type: ignore[no-any-return]
 
 
-def calculate_prediction_metric(
+def _calculate_prediction_metric(
     func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
 ) -> float:
     """
@@ -130,7 +130,7 @@ def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    return calculate_prediction_metric(prediction_accuracy, labels, scores)
+    return _calculate_prediction_metric(prediction_accuracy, labels, scores)
 
 
 def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
@@ -141,7 +141,7 @@ def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    return calculate_prediction_metric(prediction_f1, labels, scores)
+    return _calculate_prediction_metric(prediction_f1, labels, scores)
 
 
 def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
@@ -152,7 +152,7 @@ def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> f
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    return calculate_prediction_metric(prediction_precision, labels, scores)
+    return _calculate_prediction_metric(prediction_precision, labels, scores)
 
 
 def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
@@ -163,7 +163,7 @@ def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> floa
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    return calculate_prediction_metric(prediction_recall, labels, scores)
+    return _calculate_prediction_metric(prediction_recall, labels, scores)
 
 
 def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:

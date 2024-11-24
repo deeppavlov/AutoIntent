@@ -4,9 +4,9 @@ from typing import Protocol
 
 import numpy as np
 
-from autointent.metrics.converter import transform
+from autointent.metrics._converter import transform
 
-from .custom_types import LABELS_VALUE_TYPE
+from ._custom_types import LABELS_VALUE_TYPE
 
 
 class RegexpMetricFn(Protocol):
