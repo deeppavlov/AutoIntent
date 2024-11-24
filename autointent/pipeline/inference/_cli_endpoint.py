@@ -7,7 +7,7 @@ from pathlib import Path
 import hydra
 import yaml
 
-from autointent.configs._inference_cli import InferenceConfig
+from autointent.configs import InferenceConfig
 from autointent.context._utils import NumpyEncoder
 
 from ._inference_pipeline import InferencePipeline

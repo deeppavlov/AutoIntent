@@ -4,8 +4,7 @@ from typing import Protocol
 
 import numpy as np
 
-from autointent.metrics._converter import transform
-
+from ._converter import transform
 from ._custom_types import LABELS_VALUE_TYPE
 
 

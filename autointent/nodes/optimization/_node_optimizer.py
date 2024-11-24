@@ -11,7 +11,7 @@ import torch
 from hydra.utils import instantiate
 from typing_extensions import Self
 
-from autointent.configs._node import NodeOptimizerConfig
+from autointent.configs import NodeOptimizerConfig
 from autointent.context import Context
 from autointent.custom_types import NodeTypeType
 from autointent.modules import Module

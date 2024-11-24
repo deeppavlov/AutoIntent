@@ -7,8 +7,7 @@ from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
-from autointent.context.vector_index_client._cache import get_db_dir
+from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RetrievalMetricFn
 

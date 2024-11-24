@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import NDArray
 
-from autointent.configs._node import InferenceNodeConfig
+from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NODE_TYPES, NodeType, NodeTypeType
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds

@@ -10,11 +10,10 @@ from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
 from typing_extensions import Self
 
-from autointent.context import Context
-from autointent.context._embedder import Embedder
+from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LabelType
-from autointent.modules.scoring._base import ScoringModule
+from autointent.modules.scoring import ScoringModule
 
 
 class DescriptionScorerDumpMetadata(TypedDict):

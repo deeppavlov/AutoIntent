@@ -5,7 +5,7 @@ from typing import Any
 from pydantic import BaseModel
 from typing_extensions import Self
 
-from autointent.configs._node import InferenceNodeConfig
+from autointent.configs import InferenceNodeConfig
 from autointent.context import Context
 from autointent.custom_types import LabelType, NodeType
 from autointent.nodes.inference import InferenceNode

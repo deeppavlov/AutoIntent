@@ -7,7 +7,7 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent.context import Context
-from autointent.context.optimization_info._data_models import Artifact
+from autointent.context.optimization_info import Artifact
 from autointent.custom_types import BaseMetadataDict
 from autointent.metrics import METRIC_FN
 

@@ -10,7 +10,7 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.data_handler._tags import Tag
+from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
 
 from ._base import PredictionModule

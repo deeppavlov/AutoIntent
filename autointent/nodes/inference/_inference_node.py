@@ -5,9 +5,9 @@ import gc
 import torch
 from typing_extensions import Self
 
-from autointent.configs._node import InferenceNodeConfig
+from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeTypeType
-from autointent.modules._base import Module
+from autointent.modules import Module
 from autointent.nodes.nodes_info import NODES_INFO
 
 

@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from autointent.configs._optimization_cli import (
+from autointent.configs import (
     AugmentationConfig,
     DataConfig,
     EmbedderConfig,

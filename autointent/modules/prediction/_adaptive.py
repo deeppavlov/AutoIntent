@@ -12,7 +12,6 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.custom_types import LabelType
-from autointent.metrics._converter import transform
 
 from ._base import PredictionModule
 from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
@@ -186,5 +185,4 @@ def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float
     :param y_pred: Array of shape (n_samples, n_classes) with predicted labels.
     :return: Weighted F1 score.
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
-    return f1_score(y_pred_, y_true_, average="weighted")  # type: ignore[no-any-return]
+    return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]

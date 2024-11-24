@@ -11,7 +11,6 @@ from typing_extensions import Self
 from autointent import Context
 from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.metrics._converter import transform
 
 from ._base import PredictionModule
 from ._utils import InvalidNumClassesError, WrongClassificationError
@@ -141,7 +140,7 @@ class JinoosPredictor(PredictionModule):
         :param y_true: True labels
         :param y_pred: Predicted labels
         """
-        y_true_, y_pred_ = transform(y_true, y_pred)
+        y_true_, y_pred_ = np.array(y_true), np.array(y_pred)
 
         in_domain_mask = y_true_ != -1
         correct_mask = y_true_ == y_pred_

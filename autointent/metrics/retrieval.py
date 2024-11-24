@@ -6,8 +6,7 @@ from typing import Any, Protocol
 import numpy as np
 import numpy.typing as npt
 
-from autointent.metrics._converter import transform
-
+from ._converter import transform
 from ._custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
 
 

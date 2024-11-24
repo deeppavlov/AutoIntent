@@ -12,10 +12,9 @@ from sentence_transformers import CrossEncoder
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.vector_index_client import VectorIndexClient
-from autointent.context.vector_index_client._cache import get_db_dir
+from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.scoring._base import ScoringModule
+from autointent.modules.scoring import ScoringModule
 
 from .head_training import CrossEncoderWithLogreg
 

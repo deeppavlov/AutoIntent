@@ -11,8 +11,7 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from typing_extensions import Self
 
-from autointent.context import Context
-from autointent.context._embedder import Embedder
+from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
 
