@@ -58,7 +58,7 @@ class ArgmaxPredictor(PredictionModule):
         if multilabel:
             msg = "ArgmaxPredictor is compatible with single-label classifiction only"
             raise WrongClassificationError(msg)
-        self.n_classes = len(set(labels).difference([-1]))
+        self.n_classes = scores.shape[1]
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """
