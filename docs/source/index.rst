@@ -31,4 +31,4 @@ AutoIntent documentation
    tutorials
    guides/index
    learn/index
-   api
+   api-reference/index
