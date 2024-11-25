@@ -49,7 +49,8 @@ class DNNCScorer(ScoringModule):
           archivePrefix={arXiv},
           primaryClass={cs.CL},
           url={https://arxiv.org/abs/2010.13009},
-    }
+        }
+
     """
 
     name = "dnnc"

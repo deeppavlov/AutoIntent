@@ -20,7 +20,6 @@ hydra-core = "^1.3.2"
 faiss-cpu = "^1.9.0"
 openai = "^1.52.1"
 datasets = "2.20.0"
-ruff = "^0.8.0"
 
 
 [tool.poetry.group.dev]
@@ -30,6 +29,7 @@ optional = true
 tach = "^0.11.3"
 ipykernel = "^6.29.5"
 ipywidgets = "^8.1.5"
+ruff = "^0.8.0"
 
 [tool.poetry.group.test]
 optional = true
@@ -58,6 +58,7 @@ jupytext = "^1.16.4"
 nbsphinx = "^0.9.5"
 sphinx-autodoc-typehints = "^2.5.0"
 sphinx-copybutton = "^0.5.2"
+jupyter = "^1.1.1"
 
 [tool.poetry.group.docs]
 optional = true
@@ -76,7 +77,6 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "D",       # pydocstyle
     "TD",      # todos
     "FIX",     # fixmes
     "S311",    # random usage
@@ -92,7 +92,7 @@ ignore = [
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
 "*/utils.py" = ["D104", "D100"]
-"tutorials/*" = ["INP001", "T"]
+"tutorials/*" = ["INP001", "T", "D"]
 
 [tool.ruff.lint.pylint]
 max-args = 10
