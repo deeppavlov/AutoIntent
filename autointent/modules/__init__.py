@@ -1,6 +1,7 @@
 from typing import TypeVar
 
-from .base import Module
+from ._base import Module
+from ._regexp import RegExp
 from .prediction import (
     AdaptivePredictor,
     ArgmaxPredictor,
@@ -9,7 +10,6 @@ from .prediction import (
     ThresholdPredictor,
     TunablePredictor,
 )
-from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
 

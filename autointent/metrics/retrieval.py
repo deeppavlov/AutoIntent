@@ -6,9 +6,8 @@ from typing import Any, Protocol
 import numpy as np
 import numpy.typing as npt
 
-from autointent.metrics.converter import transform
-
-from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
+from ._converter import transform
+from ._custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
 
 
 class RetrievalMetricFn(Protocol):
@@ -36,7 +35,7 @@ class RetrievalMetricFn(Protocol):
         ...
 
 
-def macrofy(
+def _macrofy(
     metric_fn: Callable[[npt.NDArray[Any], npt.NDArray[Any], int | None], float],
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -64,7 +63,7 @@ def macrofy(
     return np.mean(classwise_values)  # type: ignore[return-value]
 
 
-def average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64], k: int | None = None) -> float:
+def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64], k: int | None = None) -> float:
     """
     Calculate the average precision at position k.
 
@@ -93,14 +92,12 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    ap_list = [average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
+    ap_list = [_average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
     return sum(ap_list) / len(ap_list)
 
 
-def average_precision_intersecting(
-    query_label: LABELS_VALUE_TYPE,
-    candidate_labels: CANDIDATE_TYPE,
-    k: int | None = None,
+def _average_precision_intersecting(
+    query_label: LABELS_VALUE_TYPE, candidate_labels: CANDIDATE_TYPE, k: int | None = None
 ) -> float:
     """
     Calculate the average precision at position k for the intersecting labels.
@@ -136,7 +133,7 @@ def retrieval_map_intersecting(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    ap_list = [average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
+    ap_list = [_average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
     return sum(ap_list) / len(ap_list)
 
 
@@ -154,10 +151,10 @@ def retrieval_map_macro(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    return macrofy(retrieval_map, query_labels, candidates_labels, k)
+    return _macrofy(retrieval_map, query_labels, candidates_labels, k)
 
 
-def retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
+def _retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
     """
     Calculate mean average precision at position k.
 
@@ -253,10 +250,10 @@ def retrieval_hit_rate_macro(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    return macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
+    return _macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
 
 
-def retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
+def _retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
     """
     Calculate the hit rate at position k.
 
@@ -346,13 +343,11 @@ def retrieval_precision_macro(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    return macrofy(retrieval_precision, query_labels, candidates_labels, k)
+    return _macrofy(retrieval_precision, query_labels, candidates_labels, k)
 
 
-def retrieval_precision_numpy(
-    query_labels: LABELS_VALUE_TYPE,
-    candidates_labels: CANDIDATE_TYPE,
-    k: int | None = None,
+def _retrieval_precision_numpy(
+    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
 ) -> float:
     """
     Calculate the precision at position k.
@@ -371,7 +366,7 @@ def retrieval_precision_numpy(
     return np.mean(precision_at_k)  # type: ignore[no-any-return]
 
 
-def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
+def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     Calculate the Discounted Cumulative Gain (DCG) at position k.
 
@@ -384,7 +379,7 @@ def dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     return np.sum(relevance_scores / discounts)  # type: ignore[no-any-return]
 
 
-def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
+def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     Calculate the Ideal Discounted Cumulative Gain (IDCG) at position k.
 
@@ -393,7 +388,7 @@ def idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     :return: IDCG value at position k
     """
     ideal_scores = np.sort(relevance_scores)[::-1]
-    return dcg(ideal_scores, k)
+    return _dcg(ideal_scores, k)
 
 
 def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
@@ -412,8 +407,8 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
     relevance_scores: npt.NDArray[np.bool] = query_label_[:, None] == candidates_labels_
 
     for rel_scores in relevance_scores:
-        cur_dcg = dcg(rel_scores, k)
-        cur_idcg = idcg(rel_scores, k)
+        cur_dcg = _dcg(rel_scores, k)
+        cur_idcg = _idcg(rel_scores, k)
         ndcg_scores.append(0.0 if cur_idcg == 0 else cur_dcg / cur_idcg)
 
     return np.mean(ndcg_scores)  # type: ignore[return-value]
@@ -439,8 +434,8 @@ def retrieval_ndcg_intersecting(
     relevance_scores = (expanded_relevance_scores.sum(axis=-1) != 0).astype(int)
 
     for rel_scores in relevance_scores:
-        cur_dcg = dcg(rel_scores, k)
-        cur_idcg = idcg(rel_scores, k)
+        cur_dcg = _dcg(rel_scores, k)
+        cur_idcg = _idcg(rel_scores, k)
         ndcg_scores.append(0.0 if cur_idcg == 0 else cur_dcg / cur_idcg)
 
     return np.mean(ndcg_scores)  # type: ignore[return-value]
@@ -460,7 +455,7 @@ def retrieval_ndcg_macro(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    return macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
+    return _macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
 def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
@@ -530,4 +525,4 @@ def retrieval_mrr_macro(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    return macrofy(retrieval_mrr, query_labels, candidates_labels, k)
+    return _macrofy(retrieval_mrr, query_labels, candidates_labels, k)

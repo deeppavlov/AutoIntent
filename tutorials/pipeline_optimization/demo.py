@@ -9,15 +9,15 @@ from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
-from autointent.configs.optimization_cli import (
+from autointent.configs import (
     DataConfig,
     LoggingConfig,
     OptimizationConfig,
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline.optimization.cli_endpoint import main as optimize_pipeline
-from autointent.pipeline.optimization.utils import load_config
+from autointent.pipeline.optimization._cli_endpoint import main as optimize_pipeline
+from autointent.pipeline.optimization._utils import load_config
 
 # %%
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -62,4 +62,4 @@ def optimize(task_type: TaskType) -> None:
 
 
 # %%
-# optimize("multiclass")
+optimize("multiclass")

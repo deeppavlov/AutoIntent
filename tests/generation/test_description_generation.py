@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from autointent.context.data_handler import Dataset, Intent
+from autointent.context.data_handler import Dataset, Intent, Sample
 from autointent.generation.description_generation import (
     create_intent_description,
     enhance_dataset_with_descriptions,
@@ -20,43 +20,43 @@ def test_get_utterances_by_id_empty_input():
 
 
 def test_get_utterances_by_id_single_multiclass_utterance():
-    samples = [{"utterance": "Hello", "label": 1}]
+    samples = [Sample(utterance="Hello", label=1)]
     result = group_utterances_by_label(samples)
     assert result == {1: ["Hello"]}
 
 
 def test_get_utterances_by_id_multiple_multiclass_same_label():
-    samples = [{"utterance": "Hello", "label": 1}, {"utterance": "Hi", "label": 1}]
+    samples = [Sample(utterance="Hello", label=1), Sample(utterance="Hi", label=1)]
     result = group_utterances_by_label(samples)
     assert result == {1: ["Hello", "Hi"]}
 
 
 def test_get_utterances_by_id_single_multilabel_utterance():
-    samples = [{"utterance": "Good morning", "label": [1, 2]}]
+    samples = [Sample(utterance="Good morning", label=[1, 2])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning"], 2: ["Good morning"]}
     assert result == expected_result
 
 
 def test_get_utterances_by_id_multiple_multilabel_utterances():
-    samples = [{"utterance": "Good morning", "label": [1, 2]}, {"utterance": "Good night", "label": [1, 3]}]
+    samples = [Sample(utterance="Good morning", label=[1, 2]), Sample(utterance="Good night", label=[1, 3])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning", "Good night"], 2: ["Good morning"], 3: ["Good night"]}
     assert result == expected_result
 
 
 def test_get_utterances_by_id_oos_utterances():
-    samples = [{"utterance": "Unknown command", "label": None}, {"utterance": "Hello", "label": [2]}]
+    samples = [Sample(utterance="Unknown command", label=None), Sample(utterance="Hello", label=[2])]
     result = group_utterances_by_label(samples)
     assert result == {2: ["Hello"]}
 
 
 def test_get_utterances_by_id_mixed_types():
     samples = [
-        {"utterance": "Hello", "label": 1},
-        {"utterance": "Good morning", "label": [1, 3]},
-        {"utterance": "Random text", "label": None},
-        {"utterance": "Hi", "label": 3},
+        Sample(utterance="Hello", label=1),
+        Sample(utterance="Good morning", label=[1, 3]),
+        Sample(utterance="Random text", label=None),
+        Sample(utterance="Hi", label=3),
     ]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Hello", "Good morning"], 3: ["Good morning", "Hi"]}
@@ -64,7 +64,7 @@ def test_get_utterances_by_id_mixed_types():
 
 
 def test_get_utterances_by_id_duplicate_texts_different_labels():
-    samples = [{"utterance": "Duplicate", "label": 1}, {"utterance": "Duplicate", "label": 2}]
+    samples = [Sample(utterance="Duplicate", label=1), Sample(utterance="Duplicate", label=2)]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Duplicate"], 2: ["Duplicate"]}
     assert result == expected_result

@@ -1,3 +1,5 @@
-from .context import Context
+from autointent._embedder import Embedder
 
-__all__ = ["Context"]
+from ._context import Context
+
+__all__ = ["Context", "Embedder"]

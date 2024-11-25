@@ -1,7 +1,7 @@
-from .inference_cli import InferenceConfig
-from .inference_pipeline import InferencePipelineConfig
-from .node import InferenceNodeConfig, NodeOptimizerConfig
-from .optimization_cli import (
+from ._inference_cli import InferenceConfig
+from ._inference_pipeline import InferencePipelineConfig
+from ._node import InferenceNodeConfig, NodeOptimizerConfig
+from ._optimization_cli import (
     AugmentationConfig,
     DataConfig,
     EmbedderConfig,
@@ -10,7 +10,7 @@ from .optimization_cli import (
     TaskConfig,
     VectorIndexConfig,
 )
-from .pipeline_optimizer import PipelineOptimizerConfig
+from ._pipeline_optimizer import PipelineOptimizerConfig
 
 __all__ = [
     "AugmentationConfig",

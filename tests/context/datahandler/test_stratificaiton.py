@@ -1,5 +1,5 @@
-from autointent.context.data_handler.dataset import Split
-from autointent.context.data_handler.stratification import split_dataset
+from autointent.context.data_handler._dataset import Split
+from autointent.context.data_handler._stratification import split_dataset
 
 
 def test_train_test_split(dataset):

@@ -28,7 +28,6 @@ sync:
 
 .PHONY: docs
 docs:
-	$(poetry) sphinx-apidoc -e -E -f --remove-old -o docs/source/apiref autointent
 	$(poetry) python -m sphinx build -b html docs/source docs/build/html
 
 .PHONY: test-docs

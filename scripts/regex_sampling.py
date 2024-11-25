@@ -1,4 +1,4 @@
-from autointent.context.data_handler.sampling import sample_from_regex
+from autointent.context.data_handler._sampling import sample_from_regex
 
 if __name__ == "__main__":
     import json
