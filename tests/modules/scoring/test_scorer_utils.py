@@ -186,5 +186,6 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
 )
 def test_closest_weighting(labels, distances, multilabel, n_classes, ground_truth):
     np.testing.assert_array_equal(
-        actual=closest_weighting(labels, distances, multilabel, n_classes), desired=ground_truth,
+        actual=closest_weighting(labels, distances, multilabel, n_classes),
+        desired=ground_truth,
     )

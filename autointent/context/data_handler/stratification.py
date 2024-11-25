@@ -25,7 +25,11 @@ class StratifiedSplitter:
     """
 
     def __init__(
-        self, test_size: float, label_feature: str, random_seed: int, shuffle: bool = True,
+        self,
+        test_size: float,
+        label_feature: str,
+        random_seed: int,
+        shuffle: bool = True,
     ) -> None:
         """
         Initialize the StratifiedSplitter.
@@ -52,7 +56,7 @@ class StratifiedSplitter:
         return dataset.select(splits[0]), dataset.select(splits[1])
 
     def _split(self, dataset: HFDataset) -> Sequence[npt.NDArray[np.int_]]:
-        return train_test_split( # type: ignore[no-any-return]
+        return train_test_split(  # type: ignore[no-any-return]
             np.arange(len(dataset)),
             test_size=self.test_size,
             random_state=self.random_seed,
@@ -81,7 +85,9 @@ def split_dataset(dataset: Dataset, random_seed: int) -> Dataset:
     :return: The input dataset with training and testing splits.
     """
     splitter = StratifiedSplitter(
-        test_size=0.25, label_feature=dataset.label_feature, random_seed=random_seed,
+        test_size=0.25,
+        label_feature=dataset.label_feature,
+        random_seed=random_seed,
     )
     dataset[Split.TRAIN], dataset[Split.TEST] = splitter(dataset[Split.TRAIN], dataset.multilabel)
     return dataset

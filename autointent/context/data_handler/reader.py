@@ -10,7 +10,7 @@ from .validation import DatasetReader, DatasetValidator
 
 
 class BaseReader(ABC):
-    def read(self, *args: Any, **kwargs: Any) -> Dataset:
+    def read(self, *args: Any, **kwargs: Any) -> Dataset:  # noqa: ANN401
         dataset_reader = DatasetValidator.validate(self._read(*args, **kwargs))
         splits = dataset_reader.model_dump(exclude={"intents"}, exclude_defaults=True)
         return Dataset(
@@ -19,8 +19,7 @@ class BaseReader(ABC):
         )
 
     @abstractmethod
-    def _read(self, *args: Any, **kwargs: Any) -> DatasetReader:
-        ...
+    def _read(self, *args: Any, **kwargs: Any) -> DatasetReader: ...  # noqa: ANN401
 
 
 class DictReader(BaseReader):

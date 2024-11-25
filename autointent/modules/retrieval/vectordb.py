@@ -104,7 +104,10 @@ class VectorDBModule(RetrievalModule):
         :param labels: List of corresponding labels for the utterances.
         """
         vector_index_client = VectorIndexClient(
-            self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length,
+            self.device,
+            self.db_dir,
+            embedder_batch_size=self.batch_size,
+            embedder_max_length=self.max_length,
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 

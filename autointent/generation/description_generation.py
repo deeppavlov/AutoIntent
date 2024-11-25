@@ -59,7 +59,9 @@ async def create_intent_description(
     regexp_patterns = random.sample(regexp_patterns, min(3, len(regexp_patterns)))
 
     content = prompt.text.format(
-        intent_name=intent_name, user_utterances="\n".join(utterances), regexp_patterns="\n".join(regexp_patterns),
+        intent_name=intent_name,
+        user_utterances="\n".join(utterances),
+        regexp_patterns="\n".join(regexp_patterns),
     )
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],

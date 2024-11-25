@@ -90,7 +90,9 @@ class Context:
         :param force_multilabel: Whether to force multilabel classification.
         """
         self.data_handler = DataHandler(
-            dataset=dataset, force_multilabel=force_multilabel, random_seed=self.seed,
+            dataset=dataset,
+            force_multilabel=force_multilabel,
+            random_seed=self.seed,
         )
 
     def get_best_index(self) -> VectorIndex:

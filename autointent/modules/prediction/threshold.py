@@ -162,7 +162,9 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
 
 
 def multilabel_predict(
-    scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any], tags: list[Tag] | None,
+    scores: npt.NDArray[Any],
+    thresh: float | npt.NDArray[Any],
+    tags: list[Tag] | None,
 ) -> npt.NDArray[Any]:
     """
     Make predictions for multilabel classification task.

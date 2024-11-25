@@ -17,7 +17,8 @@ def get_counts(labels: NDArray[np.int_], n_classes: int, weights: NDArray[np.flo
     n_queries = labels.shape[0]
     labels += n_classes * np.arange(n_queries)[:, None]
     return np.bincount(labels.ravel(), minlength=n_classes * n_queries, weights=weights.ravel()).reshape(
-        n_queries, n_classes,
+        n_queries,
+        n_classes,
     )
 
 

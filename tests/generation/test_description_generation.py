@@ -208,7 +208,11 @@ async def test_generate_intent_descriptions_skip_existing_descriptions():
     intent_utterances = {1: ["Hello", "Hi"], 2: ["Goodbye", "See you"]}
     intents = [
         Intent(
-            id=1, name="Greeting", description="Existing description", regexp_full_match=[], regexp_partial_match=[],
+            id=1,
+            name="Greeting",
+            description="Existing description",
+            regexp_full_match=[],
+            regexp_partial_match=[],
         ),
         Intent(id=2, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
     ]

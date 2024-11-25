@@ -36,8 +36,7 @@ class DatasetReader(BaseModel):
         intent_ids = {intent.id for intent in self.intents}
         for sample in split:
             message = (
-                f"Sample with label {sample.label} references a non-existent intent ID. "
-                f"Valid IDs are {intent_ids}."
+                f"Sample with label {sample.label} references a non-existent intent ID. " f"Valid IDs are {intent_ids}."
             )
             if isinstance(sample.label, int) and sample.label not in intent_ids:
                 raise ValueError(message)

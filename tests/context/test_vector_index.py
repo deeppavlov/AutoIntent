@@ -23,6 +23,8 @@ def test_create_collection(data_handler):
     db_dir, dump_dir, logs_dir = setup_environment()
     vector_index_client = VectorIndexClient("cpu", db_dir)
     vector_index = vector_index_client.create_index(
-        "bert-base-uncased", data_handler.utterances_train, data_handler.labels_train,
+        "bert-base-uncased",
+        data_handler.utterances_train,
+        data_handler.labels_train,
     )
     assert vector_index.model_name == "bert-base-uncased"

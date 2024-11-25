@@ -29,7 +29,7 @@ class Dataset(dict[str, HFDataset]):
     label_feature = "label"
     utterance_feature = "utterance"
 
-    def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:
+    def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
         super().__init__(*args, **kwargs)
 
         self.intents = intents
@@ -51,11 +51,13 @@ class Dataset(dict[str, HFDataset]):
     @classmethod
     def from_json(cls, filepath: str | Path) -> "Dataset":
         from .reader import JsonReader
+
         return JsonReader().read(filepath)
 
     @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
         from .reader import DictReader
+
         return DictReader().read(mapping)
 
     @classmethod
@@ -82,7 +84,7 @@ class Dataset(dict[str, HFDataset]):
             self[split_name] = split.map(self._to_multilabel)
         return self
 
-    def push_to_hub(self, repo_id: str)-> None:
+    def push_to_hub(self, repo_id: str) -> None:
         for split_name, split in self.items():
             split.push_to_hub(repo_id, split=split_name)
 
@@ -95,10 +97,7 @@ class Dataset(dict[str, HFDataset]):
         for intent in self.intents:
             for tag in intent.tags:
                 tag_mapping[tag].append(intent.id)
-        return [
-            Tag(name=tag, intent_ids=intent_ids)
-            for tag, intent_ids in tag_mapping.items()
-        ]
+        return [Tag(name=tag, intent_ids=intent_ids) for tag, intent_ids in tag_mapping.items()]
 
     def get_n_classes(self, split: str) -> int:
         classes = set()

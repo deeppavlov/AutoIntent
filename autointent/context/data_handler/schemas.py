@@ -37,8 +37,7 @@ class Sample(BaseModel):
         label = [self.label] if isinstance(self.label, int) else self.label
         if not label:
             message = (
-                "The `label` field cannot be empty for a multilabel sample. "
-                "Please provide at least one valid label."
+                "The `label` field cannot be empty for a multilabel sample. " "Please provide at least one valid label."
             )
             raise ValueError(message)
         if any(label_ < 0 for label_ in label):
