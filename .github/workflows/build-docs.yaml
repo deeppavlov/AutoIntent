@@ -59,6 +59,7 @@ jobs:
 
       - name: deploy website
         uses: JamesIves/github-pages-deploy-action@v4.6.4
+        if: ${{ github.ref != 'refs/heads/dev' }}
         with:
           branch: gh-pages
           folder: docs/build/html/
