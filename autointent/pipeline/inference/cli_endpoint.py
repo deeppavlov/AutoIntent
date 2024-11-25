@@ -1,3 +1,5 @@
+"""CLI endpoint for inference pipeline."""
+
 import json
 import logging
 from pathlib import Path
@@ -13,6 +15,12 @@ from .inference_pipeline import InferencePipeline
 
 @hydra.main(config_name="inference_config", config_path=".", version_base=None)
 def main(cfg: InferenceConfig) -> None:
+    """
+    Construct the inference pipeline and predict the data.
+
+    :param cfg: Configuration for the inference pipeline
+    :return:
+    """
     # load data for prediction
     with Path(cfg.data_path).open() as file:
         data: list[str] = json.load(file)

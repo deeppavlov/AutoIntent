@@ -6,11 +6,11 @@ from .linear import LinearScorer
 from .mlknn import MLKnnScorer
 
 __all__ = [
-    "ScoringModule",
-    "DNNCScorer",
-    "KNNScorer",
-    "LinearScorer",
-    "MLKnnScorer",
-    "DescriptionScorer",
-    "RerankScorer",
+           "DNNCScorer",
+           "DescriptionScorer",
+           "KNNScorer",
+           "LinearScorer",
+           "MLKnnScorer",
+           "RerankScorer",
+           "ScoringModule",
 ]

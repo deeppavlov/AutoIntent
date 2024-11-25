@@ -1,3 +1,5 @@
+"""Prediction node info."""
+
 from collections.abc import Mapping
 from typing import ClassVar
 
@@ -9,6 +11,8 @@ from .base import NodeInfo
 
 
 class PredictionNodeInfo(NodeInfo):
+    """Prediction node info."""
+
     metrics_available: ClassVar[Mapping[str, PredictionMetricFn]] = (
         PREDICTION_METRICS_MULTICLASS | PREDICTION_METRICS_MULTILABEL
     )

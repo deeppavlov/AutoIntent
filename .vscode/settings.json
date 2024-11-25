@@ -1,3 +1,6 @@
 {
-    "ruff.configuration": "pyproject.toml"
+    "ruff.configuration": "pyproject.toml",
+    "python.analysis.extraPaths": [
+        "./docs/source"
+    ]
 }
