@@ -69,7 +69,7 @@ def get_prediction_evaluation_data(
     :param context: Context
     :return:
     """
-    labels = np.array(context.data_handler.labels_test)
+    labels = np.array(context.data_handler.test_labels)
     scores = context.optimization_info.get_best_test_scores()
 
     if scores is None:

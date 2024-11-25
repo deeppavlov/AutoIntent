@@ -116,7 +116,10 @@ class TunablePredictor(PredictionModule):
         :param path: Path to dump
         """
         self.metadata = TunablePredictorDumpMetadata(
-            multilabel=self.multilabel, thresh=self.thresh.tolist(), tags=self.tags, n_classes=self.n_classes
+            multilabel=self.multilabel,
+            thresh=self.thresh.tolist(),
+            tags=self.tags,
+            n_classes=self.n_classes,
         )
 
         dump_dir = Path(path)

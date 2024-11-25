@@ -28,6 +28,10 @@ sync:
 
 .PHONY: docs
 docs:
+	$(poetry) python -m sphinx build -b html docs/source docs/build/html
+
+.PHONY: test-docs
+test-docs: docs
 	$(poetry) python -m sphinx build -b doctest docs/source docs/build/html
 
 .PHONY: serve-docs

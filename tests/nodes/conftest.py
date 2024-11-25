@@ -30,7 +30,7 @@ def get_retrieval_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
                 "module_type": "vector_db",
-            }
+            },
         ],
     }
 

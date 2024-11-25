@@ -16,7 +16,7 @@ from autointent.modules.scoring._knn.weighting import closest_weighting
                     [1, 2, 1, 1, 2],
                     [1, 2, 1, 2, 2],
                     [0, 2, 1, 2, 2],
-                ]
+                ],
             ),
             3,
             np.array(
@@ -24,20 +24,20 @@ from autointent.modules.scoring._knn.weighting import closest_weighting
                     [0, 3, 2],
                     [0, 2, 3],
                     [1, 1, 3],
-                ]
+                ],
             ),
         ),
         (
             np.array(
                 [
                     [1, 2, 1, 1, 2],
-                ]
+                ],
             ),
             3,
             np.array(
                 [
                     [0, 3, 2],
-                ]
+                ],
             ),
         ),
         (
@@ -46,7 +46,7 @@ from autointent.modules.scoring._knn.weighting import closest_weighting
                     [0, 0, 0, 0, 0],
                     [2, 2, 2, 2, 2],
                     [1, 1, 1, 1, 1],
-                ]
+                ],
             ),
             3,
             np.array(
@@ -54,7 +54,7 @@ from autointent.modules.scoring._knn.weighting import closest_weighting
                     [5, 0, 0],
                     [0, 0, 5],
                     [0, 5, 0],
-                ]
+                ],
             ),
         ),
     ],
@@ -73,7 +73,7 @@ def test_knn_get_counts(labels, n_classes, ground_truth):
                     [0, 1, 2, 3, 4, 5],
                     [0, 1, 2, 3, 4, 5],
                     [0, 1, 2, 3, 4, 5],
-                ]
+                ],
             ),
             1,
             np.array([[5], [5], [5]]),
@@ -84,7 +84,7 @@ def test_knn_get_counts(labels, n_classes, ground_truth):
                     [0, 1, 2, 3, 4, 5],
                     [0, 1, 2, 3, 4, 5],
                     [0, 1, 2, 3, 4, 5],
-                ]
+                ],
             ),
             3,
             np.array([[5, 4, 3], [5, 4, 3], [5, 4, 3]]),
@@ -106,14 +106,14 @@ def test_scoring_get_topk(scores, k, ground_truth):
                     [0.0, 0.0, 0.2],
                     [0.0, 0.3, 0.2],
                     [0.3, 0.0, 0.2],
-                ]
+                ],
             ),
             np.array(
                 [
                     [4, 9, 3],
                     [2, 5, 6],
                     [7, 1, 0],
-                ]
+                ],
             ),
             10,
             np.array(
@@ -121,9 +121,9 @@ def test_scoring_get_topk(scores, k, ground_truth):
                     [0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0],
                     [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.0, 0.0],
-                ]
+                ],
             ),
-        )
+        ),
     ],
 )
 def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
@@ -140,13 +140,13 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
                 [
                     [0, 2, 0, 2],
                     [0, 2, 0, 2],
-                ]
+                ],
             ),
             np.array(
                 [
                     [0.5, 0.3, 0.1, 0.5],
                     [0.5, 0.3, 0.1, 0.1],
-                ]
+                ],
             ),
             False,
             3,
@@ -186,5 +186,6 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
 )
 def test_closest_weighting(labels, distances, multilabel, n_classes, ground_truth):
     np.testing.assert_array_equal(
-        actual=closest_weighting(labels, distances, multilabel, n_classes), desired=ground_truth
+        actual=closest_weighting(labels, distances, multilabel, n_classes),
+        desired=ground_truth,
     )

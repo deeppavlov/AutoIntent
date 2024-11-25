@@ -1,465 +1,439 @@
 {
-    "utterances": [
+    "train": [
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "can you give me a moderately priced restaurant",
+            "utterance": "can you give me a moderately priced restaurant",
             "label": [
                 6
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "vegetarian",
+            "utterance": "vegetarian",
             "label": [
                 6
             ]
         },
         {
-            "text": "what is the eagles address",
+            "utterance": "what is the eagles address",
             "label": [
                 6,
                 10
             ]
         },
         {
-            "text": "telephone",
+            "utterance": "telephone",
             "label": [
                 10
             ]
         },
         {
-            "text": "what area is it in",
+            "utterance": "what area is it in",
             "label": [
                 10
             ]
         },
         {
-            "text": "post code",
+            "utterance": "post code",
             "label": [
                 10
             ]
         },
         {
-            "text": "thank you and good bye",
+            "utterance": "thank you and good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "yes im looking for a traditional restaurant in the expensive price range",
+            "utterance": "yes im looking for a traditional restaurant in the expensive price range",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "im trying to find a vegetarian restaurant and i dont care regarding the price range",
+            "utterance": "im trying to find a vegetarian restaurant and i dont care regarding the price range",
             "label": [
                 6
             ]
         },
         {
-            "text": "i dont care",
+            "utterance": "i dont care",
             "label": [
                 6
             ]
         },
         {
-            "text": "chesterton",
+            "utterance": "chesterton",
             "label": [
                 6
             ]
         },
         {
-            "text": "does it have a television",
+            "utterance": "does it have a television",
             "label": [
                 10
             ]
         },
         {
-            "text": "hi im looking for a pub",
+            "utterance": "hi im looking for a pub",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "what is the address phone number and postcode",
+            "utterance": "what is the address phone number and postcode",
             "label": [
                 10
             ]
         },
         {
-            "text": "and what is the address and phone number",
+            "utterance": "and what is the address and phone number",
             "label": [
                 10
             ]
         },
         {
-            "text": "may i have the address and prices",
+            "utterance": "may i have the address and prices",
             "label": [
                 10
             ]
         },
         {
-            "text": "thank you goodbye",
+            "utterance": "thank you goodbye",
             "label": [
                 2
             ]
         },
         {
-            "text": "number",
+            "utterance": "number",
             "label": [
                 10
             ]
         },
         {
-            "text": "im looking for a pub with and internet connection",
+            "utterance": "im looking for a pub with and internet connection",
             "label": [
                 6
             ]
         },
         {
-            "text": "price",
+            "utterance": "price",
             "label": [
                 10
             ]
         },
         {
-            "text": "price",
+            "utterance": "price",
             "label": [
                 10
             ]
         },
         {
-            "text": "restaurant",
+            "utterance": "restaurant",
             "label": [
                 6
             ]
         },
         {
-            "text": "and whats the post code",
+            "utterance": "and whats the post code",
             "label": [
                 10
             ]
         },
         {
-            "text": "i want to find a restaurant in kings hedges",
+            "utterance": "i want to find a restaurant in kings hedges",
             "label": [
                 6
             ]
         },
         {
-            "text": "i would like japanese food",
+            "utterance": "i would like japanese food",
             "label": [
                 6
             ]
         },
         {
-            "text": "yes i would like to know about a restaurant",
+            "utterance": "yes i would like to know about a restaurant",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "any price range",
+            "utterance": "any price range",
             "label": [
                 6
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "a restaurant in kings hedges",
+            "utterance": "a restaurant in kings hedges",
             "label": [
                 6
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "no no",
+            "utterance": "no no",
             "label": [
                 7
             ]
         },
         {
-            "text": "uh what are some other eareas",
+            "utterance": "uh what are some other eareas",
             "label": [
                 9
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "i dont care",
+            "utterance": "i dont care",
             "label": [
                 6
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "castle hill area",
+            "utterance": "castle hill area",
             "label": [
                 6
             ]
         },
         {
-            "text": "moderate",
+            "utterance": "moderate",
             "label": [
                 6
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "ya any part of the avenue is fine",
+            "utterance": "ya any part of the avenue is fine",
             "label": [
                 6
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "im looking for a japanese restaurant",
+            "utterance": "im looking for a japanese restaurant",
             "label": [
                 6
             ]
         },
         {
-            "text": "and what is the price of the venue",
+            "utterance": "and what is the price of the venue",
             "label": [
                 10
             ]
         },
         {
-            "text": "what is the type of food",
+            "utterance": "what is the type of food",
             "label": [
                 10
             ]
         },
         {
-            "text": "ok what does it have a television",
+            "utterance": "ok what does it have a television",
             "label": [
                 10
             ]
         },
         {
-            "text": "whats the phone number",
+            "utterance": "whats the phone number",
             "label": [
                 10
             ]
         },
         {
-            "text": "uhm address",
+            "utterance": "uhm address",
             "label": [
                 10
             ]
         },
         {
-            "text": "does it have internet connection",
+            "utterance": "does it have internet connection",
             "label": [
                 10
             ]
         },
         {
-            "text": "does it have a television",
+            "utterance": "does it have a television",
             "label": [
                 10
             ]
         },
         {
-            "text": "and the phone number",
+            "utterance": "and the phone number",
             "label": [
                 10
             ]
         },
         {
-            "text": "end of system audio no im looking for a seafood restaurant",
+            "utterance": "end of system audio no im looking for a seafood restaurant",
             "label": [
                 6,
                 7
             ]
         },
         {
-            "text": "ok what is the address phone number and price",
+            "utterance": "ok what is the address phone number and price",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "yes please",
+            "utterance": "yes please",
             "label": [
                 1
             ]
         },
         {
-            "text": "yeah lets have you got anything in the mediterranean food in the area",
+            "utterance": "yeah lets have you got anything in the mediterranean food in the area",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "what about any other area",
+            "utterance": "what about any other area",
             "label": [
                 9
             ]
         },
         {
-            "text": "no particular venue",
+            "utterance": "no particular venue",
             "label": [
                 6,
                 7
             ]
         },
         {
-            "text": "whats the uh thank you and goodbye",
+            "utterance": "whats the uh thank you and goodbye",
             "label": [
                 2,
                 12
             ]
         },
         {
-            "text": "goodbye",
+            "utterance": "goodbye",
             "label": [
                 2
             ]
         },
         {
-            "text": "next type of food cherry hinton area",
+            "utterance": "next type of food cherry hinton area",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "yeah hi uh i want to find an internet connection and must have a tv",
+            "utterance": "yeah hi uh i want to find an internet connection and must have a tv",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "breathing ok thank you goodbye",
+            "utterance": "breathing ok thank you goodbye",
             "label": [
                 2,
                 12
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "thank you goodbye",
+            "utterance": "thank you goodbye",
             "label": [
                 2
             ]
         },
         {
-            "text": "can you select me another venue",
+            "utterance": "can you select me another venue",
             "label": [
                 9
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "next choice",
+            "utterance": "next choice",
             "label": [
                 9
             ]
         },
         {
-            "text": "ok thank you good bye",
-            "label": [
-                2,
-                0,
-                12
-            ]
-        },
-        {
-            "text": "thank you good bye",
-            "label": [
-                2
-            ]
-        },
-        {
-            "text": "no",
-            "label": [
-                7
-            ]
-        },
-        {
-            "text": "yes",
-            "label": [
-                1
-            ]
-        },
-        {
-            "text": "ok thank you goodbye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -467,70 +441,96 @@
             ]
         },
         {
-            "text": "thank you good bye",
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "thank you goodbye",
+            "utterance": "no",
+            "label": [
+                7
+            ]
+        },
+        {
+            "utterance": "yes",
+            "label": [
+                1
+            ]
+        },
+        {
+            "utterance": "ok thank you goodbye",
+            "label": [
+                2,
+                0,
+                12
+            ]
+        },
+        {
+            "utterance": "thank you good bye",
             "label": [
                 2
             ]
         },
         {
-            "text": "yes",
+            "utterance": "thank you goodbye",
+            "label": [
+                2
+            ]
+        },
+        {
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "how about indian",
+            "utterance": "how about indian",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "yes im looking for a moderately priced restaurant and it should be in the addenbrookes area",
+            "utterance": "yes im looking for a moderately priced restaurant and it should be in the addenbrookes area",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "noise ah hi i am looking for an",
+            "utterance": "noise ah hi i am looking for an",
             "label": [
                 5
             ]
         },
         {
-            "text": "no any part cheap food",
+            "utterance": "no any part cheap food",
             "label": [
                 6,
                 7
             ]
         },
         {
-            "text": "okay and uh",
+            "utterance": "okay and uh",
             "label": [
                 0
             ]
         },
         {
-            "text": "okay thank you goodbye",
+            "utterance": "okay thank you goodbye",
             "label": [
                 2,
                 0,
@@ -538,25 +538,25 @@
             ]
         },
         {
-            "text": "thank you",
+            "utterance": "thank you",
             "label": [
                 12
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "no thank you goodbye",
+            "utterance": "no thank you goodbye",
             "label": [
                 2,
                 12,
@@ -564,59 +564,59 @@
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "hi im looking for a pub having internet connection and have a tv",
+            "utterance": "hi im looking for a pub having internet connection and have a tv",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "ah hi ah i am looking for a thia restaurant",
+            "utterance": "ah hi ah i am looking for a thia restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "ok thank you",
+            "utterance": "ok thank you",
             "label": [
                 0,
                 12
             ]
         },
         {
-            "text": "thank you",
+            "utterance": "thank you",
             "label": [
                 12
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "yes i am",
+            "utterance": "yes i am",
             "label": [
                 1
             ]
         },
         {
-            "text": "what about mediterranean",
+            "utterance": "what about mediterranean",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -624,20 +624,20 @@
             ]
         },
         {
-            "text": "okay what is the",
+            "utterance": "okay what is the",
             "label": [
                 0
             ]
         },
         {
-            "text": "hi im looking for a mediterranean restaurant in the rosemary area",
+            "utterance": "hi im looking for a mediterranean restaurant in the rosemary area",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "ok thank you what is the phone number and post code",
+            "utterance": "ok thank you what is the phone number and post code",
             "label": [
                 0,
                 12,
@@ -645,78 +645,78 @@
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "alright thank you good bye",
+            "utterance": "alright thank you good bye",
             "label": [
                 2,
                 12
             ]
         },
         {
-            "text": "ok i need the phone number and the area",
+            "utterance": "ok i need the phone number and the area",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "ok unintelligible",
+            "utterance": "ok unintelligible",
             "label": [
                 0
             ]
         },
         {
-            "text": "ok can i get an address phone number and post code please",
+            "utterance": "ok can i get an address phone number and post code please",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "ok and a",
+            "utterance": "ok and a",
             "label": [
                 0
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "yes i am looking for a restaurant",
+            "utterance": "yes i am looking for a restaurant",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "no i want the postcode",
+            "utterance": "no i want the postcode",
             "label": [
                 7,
                 10
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -724,76 +724,76 @@
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "ok whats the address phone number and post code",
+            "utterance": "ok whats the address phone number and post code",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "breathing thank you good bye",
+            "utterance": "breathing thank you good bye",
             "label": [
                 2,
                 12
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "yes i would like to know about a restaurant",
+            "utterance": "yes i would like to know about a restaurant",
             "label": [
                 6,
                 1
             ]
         },
         {
-            "text": "yes",
+            "utterance": "yes",
             "label": [
                 1
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "what else do you have",
+            "utterance": "what else do you have",
             "label": [
                 9
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "ok thank you goodbye",
+            "utterance": "ok thank you goodbye",
             "label": [
                 2,
                 0,
@@ -801,39 +801,39 @@
             ]
         },
         {
-            "text": "is it in the cheap price range",
+            "utterance": "is it in the cheap price range",
             "label": [
                 3
             ]
         },
         {
-            "text": "no",
+            "utterance": "no",
             "label": [
                 7
             ]
         },
         {
-            "text": "ok can you get me the phone number and the what type of food unintelligible",
+            "utterance": "ok can you get me the phone number and the what type of food unintelligible",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "is it in the kings hedge area",
+            "utterance": "is it in the kings hedge area",
             "label": [
                 3
             ]
         },
         {
-            "text": "any other pubs",
+            "utterance": "any other pubs",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -841,14 +841,14 @@
             ]
         },
         {
-            "text": "clicking thank you good bye",
+            "utterance": "clicking thank you good bye",
             "label": [
                 2,
                 12
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -856,39 +856,39 @@
             ]
         },
         {
-            "text": "what about contemporary restaurant",
+            "utterance": "what about contemporary restaurant",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "hi im looking for a contemporary restaurant and is it should be free",
+            "utterance": "hi im looking for a contemporary restaurant and is it should be free",
             "label": [
                 3
             ]
         },
         {
-            "text": "ok and whats the phone number",
+            "utterance": "ok and whats the phone number",
             "label": [
                 0,
                 10
             ]
         },
         {
-            "text": "hi i am looking for an ex",
+            "utterance": "hi i am looking for an ex",
             "label": [
                 5
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -896,7 +896,7 @@
             ]
         },
         {
-            "text": "ok thank you good bye",
+            "utterance": "ok thank you good bye",
             "label": [
                 2,
                 0,
@@ -904,510 +904,510 @@
             ]
         },
         {
-            "text": "is it located in addenbrookes area",
+            "utterance": "is it located in addenbrookes area",
             "label": [
                 3
             ]
         },
         {
-            "text": "is it in the city center jesus christ this is ridiculous",
+            "utterance": "is it in the city center jesus christ this is ridiculous",
             "label": [
                 3
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "is it a chinese takeaway restaurant",
+            "utterance": "is it a chinese takeaway restaurant",
             "label": [
                 3
             ]
         },
         {
-            "text": "is it burger gourmet",
+            "utterance": "is it burger gourmet",
             "label": [
                 3
             ]
         },
         {
-            "text": "say again",
+            "utterance": "say again",
             "label": [
                 8
             ]
         },
         {
-            "text": "is it cheap price range",
+            "utterance": "is it cheap price range",
             "label": [
                 3
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "um is it free",
+            "utterance": "um is it free",
             "label": [
                 3
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "hello i am looking for cheap restaurant in addenbrookes area",
+            "utterance": "hello i am looking for cheap restaurant in addenbrookes area",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "ya hi ah i want to find a fusion restaurant",
+            "utterance": "ya hi ah i want to find a fusion restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "does the bakers have a television",
+            "utterance": "does the bakers have a television",
             "label": [
                 3,
                 10
             ]
         },
         {
-            "text": "are there any other pubs",
+            "utterance": "are there any other pubs",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "can we start again",
+            "utterance": "can we start again",
             "label": [
                 11
             ]
         },
         {
-            "text": "hi im looking for cafe",
+            "utterance": "hi im looking for cafe",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "ah does it have a moderate price range",
+            "utterance": "ah does it have a moderate price range",
             "label": [
                 3
             ]
         },
         {
-            "text": "pick a different area",
+            "utterance": "pick a different area",
             "label": [
                 9
             ]
         },
         {
-            "text": "breathing do you have anything in newnham area",
+            "utterance": "breathing do you have anything in newnham area",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "is it located in the castlehill area",
+            "utterance": "is it located in the castlehill area",
             "label": [
                 3
             ]
         },
         {
-            "text": "start over",
+            "utterance": "start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "is it a thia restaurant",
+            "utterance": "is it a thia restaurant",
             "label": [
                 3
             ]
         },
         {
-            "text": "not spanish food not spanish food fast",
+            "utterance": "not spanish food not spanish food fast",
             "label": [
                 4
             ]
         },
         {
-            "text": "are there any other options",
+            "utterance": "are there any other options",
             "label": [
                 9
             ]
         },
         {
-            "text": "is it in the addenbrookes area",
+            "utterance": "is it in the addenbrookes area",
             "label": [
                 3
             ]
         },
         {
-            "text": "how about castle hill",
+            "utterance": "how about castle hill",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "hi im looking for a fusion restaurant",
+            "utterance": "hi im looking for a fusion restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "is it in the city center",
+            "utterance": "is it in the city center",
             "label": [
                 3
             ]
         },
         {
-            "text": "no is it in fenditton",
+            "utterance": "no is it in fenditton",
             "label": [
                 3,
                 7
             ]
         },
         {
-            "text": "does it serve vegetarian food",
+            "utterance": "does it serve vegetarian food",
             "label": [
                 3
             ]
         },
         {
-            "text": "ah what about asian food",
+            "utterance": "ah what about asian food",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "is it in the cheap price range",
+            "utterance": "is it in the cheap price range",
             "label": [
                 3
             ]
         },
         {
-            "text": "what else do you have",
+            "utterance": "what else do you have",
             "label": [
                 9
             ]
         },
         {
-            "text": "do you have any others",
+            "utterance": "do you have any others",
             "label": [
                 9
             ]
         },
         {
-            "text": "is it in the trumington area",
+            "utterance": "is it in the trumington area",
             "label": [
                 3
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "noise is it in the moderate price range",
+            "utterance": "noise is it in the moderate price range",
             "label": [
                 3
             ]
         },
         {
-            "text": "hi im looking for a fusion restaurant",
+            "utterance": "hi im looking for a fusion restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "how about the fenditton area",
+            "utterance": "how about the fenditton area",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "say again",
+            "utterance": "say again",
             "label": [
                 8
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "hi im looking for a cheap restaurant in the fenditton area",
+            "utterance": "hi im looking for a cheap restaurant in the fenditton area",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "hi im looking for a restaurant in fenditton",
+            "utterance": "hi im looking for a restaurant in fenditton",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "hi im looking for a cheap restaurant in the girton area",
+            "utterance": "hi im looking for a cheap restaurant in the girton area",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "hello",
+            "utterance": "hello",
             "label": [
                 5
             ]
         },
         {
-            "text": "any kind of food what about any kind of food",
+            "utterance": "any kind of food what about any kind of food",
             "label": [
                 6,
                 9
             ]
         },
         {
-            "text": "hi im looking for an english restaurant",
+            "utterance": "hi im looking for an english restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "hello",
+            "utterance": "hello",
             "label": [
                 5
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "could you repeat",
+            "utterance": "could you repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "hi im looking for a restaurant in fen ditton",
+            "utterance": "hi im looking for a restaurant in fen ditton",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "hi im looking for a fusion restaurant",
+            "utterance": "hi im looking for a fusion restaurant",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "start over",
+            "utterance": "start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "hi im looking for a restaurnt in the barnwell area",
+            "utterance": "hi im looking for a restaurnt in the barnwell area",
             "label": [
                 5,
                 6
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "im sorry could you repeat that",
+            "utterance": "im sorry could you repeat that",
             "label": [
                 8
             ]
         },
         {
-            "text": "could you repeat that please",
+            "utterance": "could you repeat that please",
             "label": [
                 8
             ]
         },
         {
-            "text": "uh cheap or moderate",
+            "utterance": "uh cheap or moderate",
             "label": [
                 4
             ]
         },
         {
-            "text": "start over",
+            "utterance": "start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "search again",
+            "utterance": "search again",
             "label": [
                 8
             ]
         },
         {
-            "text": "id like to start over please",
+            "utterance": "id like to start over please",
             "label": [
                 11
             ]
         },
         {
-            "text": "i need a pub not bakers",
+            "utterance": "i need a pub not bakers",
             "label": [
                 6,
                 4
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "repeat",
+            "utterance": "repeat",
             "label": [
                 8
             ]
         },
         {
-            "text": "i didnt ask for a moderate price range i need a pub with internet and tv",
+            "utterance": "i didnt ask for a moderate price range i need a pub with internet and tv",
             "label": [
                 6,
                 4
             ]
         },
         {
-            "text": "may i restart",
+            "utterance": "may i restart",
             "label": [
                 11
             ]
         },
         {
-            "text": "start over",
+            "utterance": "start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "lets start over please",
+            "utterance": "lets start over please",
             "label": [
                 11
             ]
         },
         {
-            "text": "not so expensive price range",
+            "utterance": "not so expensive price range",
             "label": [
                 4
             ]
         },
         {
-            "text": "less expensive",
+            "utterance": "less expensive",
             "label": [
                 4
             ]
         },
         {
-            "text": "um cheap cheap venue not indian",
+            "utterance": "um cheap cheap venue not indian",
             "label": [
                 6,
                 4
             ]
         },
         {
-            "text": "can i start over",
+            "utterance": "can i start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "lets start over",
+            "utterance": "lets start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "lets not go to japan",
+            "utterance": "lets not go to japan",
             "label": [
                 4
             ]
         },
         {
-            "text": "start over",
+            "utterance": "start over",
             "label": [
                 11
             ]
         },
         {
-            "text": "less expensive",
+            "utterance": "less expensive",
             "label": [
                 4
             ]
         },
         {
-            "text": "not free moderate",
+            "utterance": "not free moderate",
             "label": [
                 6,
                 4

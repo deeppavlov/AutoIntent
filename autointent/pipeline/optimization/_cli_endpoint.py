@@ -29,7 +29,7 @@ def main(cfg: OptimizationConfig) -> None:
     context = Context(cfg.seed)
     context.configure_logging(cfg.logs)
     context.configure_vector_index(cfg.vector_index, cfg.embedder)
-    context.configure_data(cfg.data, cfg.augmentation)
+    context.configure_data(cfg.data)
 
     # run optimization
     search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)

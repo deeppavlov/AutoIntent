@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - dev
+  pull_request:
+    branches:
+      - dev
   workflow_dispatch:
 
 concurrency:
@@ -37,6 +40,10 @@ jobs:
         run: |
           poetry install --with docs
 
+      - name: Test documentation
+        run: |
+          make test-docs
+
       - name: build documentation
         run: |
           make docs
@@ -49,15 +56,16 @@ jobs:
           BRANCH_NAME=${BRANCH_NAME////_}
           echo BRANCH_NAME=${BRANCH_NAME} >> $GITHUB_ENV
 
-      - name: save artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ format('github-pages-for-branch-{0}', env.BRANCH_NAME) }}
           path: docs/build/
           retention-days: 3
 
-      - name: deploy website
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.4
+        if: ${{ github.ref == 'refs/heads/dev' }}
         with:
           branch: gh-pages
           folder: docs/build/html/

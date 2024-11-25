@@ -93,6 +93,6 @@ def setup(app) -> None:  # noqa: ANN001
             ("tutorials.pipeline_optimization", "Pipeline Optimization"),
             ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
             ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
-        ]
+        ],
     )
     app.connect("autodoc-skip-member", skip_member)

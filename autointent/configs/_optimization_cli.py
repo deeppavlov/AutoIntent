@@ -123,8 +123,6 @@ class OptimizationConfig:
     """Configuration for the logging"""
     vector_index: VectorIndexConfig = field(default_factory=VectorIndexConfig)
     """Configuration for the vector index"""
-    augmentation: AugmentationConfig = field(default_factory=AugmentationConfig)
-    """Configuration for the augmentation"""
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
     """Configuration for the embedder"""
 
@@ -133,7 +131,7 @@ class OptimizationConfig:
             "_self_",
             {"override hydra/job_logging": "autointent_standard_job_logger"},
             {"override hydra/help": "autointent_help"},
-        ]
+        ],
     )
 
 

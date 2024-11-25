@@ -102,7 +102,7 @@ def test_inference_pipeline_cli(dataset, task_type):
     pipeline_optimizer = PipelineOptimizer.from_dict_config(search_space)
 
     pipeline_optimizer.set_config(
-        logging_config := LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True)
+        logging_config := LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True),
     )
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
