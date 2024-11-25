@@ -5,9 +5,9 @@ from .optimization import NodeOptimizer
 __all__ = [
     "InferenceNode",
     "NodeInfo",
+    "NodeOptimizer",
     "PredictionNodeInfo",
     "RegExpNodeInfo",
     "RetrievalNodeInfo",
     "ScoringNodeInfo",
-    "NodeOptimizer",
 ]

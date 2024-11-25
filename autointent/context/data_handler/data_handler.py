@@ -1,3 +1,5 @@
+"""Data Handler file."""
+
 import logging
 from typing import Any, TypedDict, cast
 
@@ -12,18 +14,32 @@ logger = logging.getLogger(__name__)
 
 
 class RegexPatterns(TypedDict):
+    """Regex patterns for each intent class."""
+
     id: int
+    """Intent class id."""
     regexp_full_match: list[str]
+    """Full match regex patterns."""
     regexp_partial_match: list[str]
+    """Partial match regex patterns."""
 
 
 class DataHandler:
+    """Data handler class."""
+
     def __init__(
         self,
         dataset: Dataset,
         force_multilabel: bool = False,
         random_seed: int = 0,
     ) -> None:
+        """
+        Initialize the data handler.
+
+        :param dataset: Training dataset.
+        :param force_multilabel: If True, force the dataset to be multilabel.
+        :param random_seed: Seed for random number generation.
+        """
         set_seed(random_seed)
 
         self.dataset = dataset
@@ -92,7 +108,17 @@ class DataHandler:
         return []
 
     def has_oos_samples(self) -> bool:
+        """
+        Check if there are out-of-scope samples.
+
+        :return: True if there are out-of-scope samples.
+        """
         return Split.OOS in self.dataset
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
+        """
+        Dump the dataset splits.
+
+        :return: Dataset dump.
+        """
         return self.dataset.dump()

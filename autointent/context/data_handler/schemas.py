@@ -1,3 +1,8 @@
+"""Module for defining schemas for tags, intents, and utterances.
+
+This module provides data models for utterances, intents, and tags.
+"""
+
 from pydantic import BaseModel, model_validator
 from typing_extensions import Self
 
@@ -5,11 +10,20 @@ from autointent.custom_types import LabelType
 
 
 class Tag(BaseModel):
+    """
+    Represents a tag associated with intent classes.
+
+    Tags are used to define constraints such that if two intent classes share
+    a common tag, they cannot both be assigned to the same sample.
+    """
+
     name: str
     intent_ids: list[int]
 
 
 class Sample(BaseModel):
+    """Represents a sample with utterance and an optional label."""
+
     utterance: str
     label: LabelType | None = None
 
@@ -37,6 +51,8 @@ class Sample(BaseModel):
 
 
 class Intent(BaseModel):
+    """Represents an intent with its metadata and regular expressions."""
+
     id: int
     name: str | None = None
     tags: list[str] = []

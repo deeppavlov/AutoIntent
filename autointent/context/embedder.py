@@ -1,3 +1,9 @@
+"""Module for managing embedding models using Sentence Transformers.
+
+This module provides the `Embedder` class for managing, persisting, and loading
+embedding models and calculating embeddings for input texts.
+"""
+
 import json
 import logging
 import shutil
@@ -10,12 +16,24 @@ from sentence_transformers import SentenceTransformer
 
 
 class EmbedderDumpMetadata(TypedDict):
+    """
+    Metadata for saving and loading an Embedder instance.
+    """
+
     batch_size: int
+    """Batch size used for embedding calculations."""
     max_length: int | None
+    """Maximum sequence length for the embedding model."""
 
 
 class Embedder:
-    embedding_model: SentenceTransformer
+    """
+    A wrapper for managing embedding models using Sentence Transformers.
+
+    This class handles initialization, saving, loading, and clearing of
+    embedding models, as well as calculating embeddings for input texts.
+    """
+
     embedder_subdir: str = "sentence_transformers"
     metadata_dict_name: str = "metadata.json"
 
@@ -26,6 +44,14 @@ class Embedder:
         batch_size: int = 32,
         max_length: int | None = None,
     ) -> None:
+        """
+        Initialize the Embedder.
+
+        :param model_name: Path to a local model directory or a Hugging Face model name.
+        :param device: Device to run the model on (e.g., "cpu", "cuda").
+        :param batch_size: Batch size for embedding calculations.
+        :param max_length: Maximum sequence length for the embedding model.
+        """
         self.model_name = model_name
         self.device = device
         self.batch_size = batch_size
@@ -39,17 +65,24 @@ class Embedder:
         self.logger = logging.getLogger(__name__)
 
     def clear_ram(self) -> None:
-        self.logger.debug("deleting embedder %s", self.model_name)
+        """Move the embedding model to CPU and delete it from memory."""
+        self.logger.debug("Clearing embedder %s from memory", self.model_name)
         self.embedding_model.cpu()
         del self.embedding_model
 
     def delete(self) -> None:
+        """Delete the embedding model and its associated directory."""
         self.clear_ram()
         shutil.rmtree(
             self.dump_dir, ignore_errors=True,
         )  # TODO: `ignore_errors=True` is workaround for PermissionError: [WinError 5] Access is denied
 
     def dump(self, path: Path) -> None:
+        """
+        Save the embedding model and metadata to disk.
+
+        :param path: Path to the directory where the model will be saved.
+        """
         self.dump_dir = path
         metadata = EmbedderDumpMetadata(
             batch_size=self.batch_size,
@@ -61,6 +94,11 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     def load(self, path: Path | str) -> None:
+        """
+        Load the embedding model and metadata from disk.
+
+        :param path: Path to the directory where the model is stored.
+        """
         self.dump_dir = Path(path)
         path = Path(path)
         with (path / self.metadata_dict_name).open() as file:
@@ -71,8 +109,14 @@ class Embedder:
         self.embedding_model = SentenceTransformer(str(path / self.embedder_subdir), device=self.device)
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
+        """
+        Calculate embeddings for a list of utterances.
+
+        :param utterances: List of input texts to calculate embeddings for.
+        :return: A numpy array of embeddings.
+        """
         self.logger.debug(
-            "calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
+            "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
             self.model_name,
             self.batch_size,
             str(self.max_length),

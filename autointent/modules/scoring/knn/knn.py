@@ -1,3 +1,5 @@
+"""KNNScorer class for k-nearest neighbors scoring."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -16,6 +18,16 @@ from .weighting import apply_weights
 
 
 class KNNScorerDumpMetadata(BaseMetadataDict):
+    """
+    Metadata for dumping the state of a KNNScorer.
+
+    :ivar n_classes: Number of classes in the dataset.
+    :ivar multilabel: Whether the task is multilabel classification.
+    :ivar db_dir: Path to the database directory.
+    :ivar batch_size: Batch size used for embedding.
+    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
+    """
+
     n_classes: int
     multilabel: bool
     db_dir: str
@@ -24,6 +36,18 @@ class KNNScorerDumpMetadata(BaseMetadataDict):
 
 
 class KNNScorer(ScoringModule):
+    """
+    K-nearest neighbors (KNN) scorer for intent classification.
+
+    This module uses a vector index to retrieve nearest neighbors for query utterances
+    and applies a weighting strategy to compute class probabilities.
+
+    :ivar weights: Weighting strategy used for scoring.
+    :ivar _vector_index: VectorIndex instance for neighbor retrieval.
+    :ivar name: Name of the scorer, defaults to "knn".
+    :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
+    """
+
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
     name = "knn"
@@ -40,14 +64,18 @@ class KNNScorer(ScoringModule):
         max_length: int | None = None,
     ) -> None:
         """
-        Arguments
-        ---
-        - `k`: int, number of closest neighbors to consider during inference;
-        - `weights`: bool or str from "uniform", "distance", "closest"
-            - uniform (equivalent to False): a unit weight for each sample
-            - distance (equivalent to True): weight is calculated as 1 / (distance_to_neighbor + 1e-5),
-            - closest: each sample has a non zero weight iff is the closest sample of some class
-        - `device`: str, something like "cuda:0" or "cuda:0,1,2", a device to store embedding function
+        Initialize the KNNScorer.
+
+        :param embedder_name: Name of the embedder used for vectorization.
+        :param k: Number of closest neighbors to consider during inference.
+        :param weights: Weighting strategy:
+            - "uniform" (or False): Equal weight for all neighbors.
+            - "distance" (or True): Weight inversely proportional to distance.
+            - "closest": Only the closest neighbor of each class is weighted.
+        :param db_dir: Path to the database directory, or None to use default.
+        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param batch_size: Batch size for embedding generation, defaults to 32.
+        :param max_length: Maximum sequence length for embedding, or None for default.
         """
         self.embedder_name = embedder_name
         self.k = k
@@ -59,6 +87,11 @@ class KNNScorer(ScoringModule):
 
     @property
     def db_dir(self) -> str:
+        """
+        Get the database directory for the vector index.
+
+        :return: Path to the database directory.
+        """
         if self._db_dir is None:
             self._db_dir = str(get_db_dir())
         return self._db_dir
@@ -71,6 +104,15 @@ class KNNScorer(ScoringModule):
         weights: WEIGHT_TYPES,
         embedder_name: str | None = None,
     ) -> Self:
+        """
+        Create a KNNScorer instance using a Context object.
+
+        :param context: Context containing configurations and utilities.
+        :param k: Number of closest neighbors to consider during inference.
+        :param weights: Weighting strategy for scoring.
+        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :return: Initialized KNNScorer instance.
+        """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
             prebuilt_index = True
@@ -90,9 +132,21 @@ class KNNScorer(ScoringModule):
         return instance
 
     def get_embedder_name(self) -> str:
+        """
+        Get the name of the embedder.
+
+        :return: Embedder name.
+        """
         return self.embedder_name
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+        """
+        Fit the scorer by training or loading the vector index.
+
+        :param utterances: List of training utterances.
+        :param labels: List of labels corresponding to the utterances.
+        :raises ValueError: If the vector index mismatches the provided utterances.
+        """
         if isinstance(labels[0], list):
             self.n_classes = len(labels[0])
             self.multilabel = True
@@ -111,20 +165,35 @@ class KNNScorer(ScoringModule):
             self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+        """
+        Predict class probabilities for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Array of predicted probabilities for each class.
+        """
         return self._predict(utterances)[0]
 
-    def predict_with_metadata(
-        self,
-        utterances: list[str],
-    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+    def predict_with_metadata(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+        """
+        Predict class probabilities along with metadata for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Tuple of predicted probabilities and metadata with neighbor information.
+        """
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
         return scores, metadata
 
     def clear_cache(self) -> None:
+        """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
+        """
+        Save the KNNScorer's metadata and vector index to disk.
+
+        :param path: Path to the directory where assets will be dumped.
+        """
         self.metadata = KNNScorerDumpMetadata(
             db_dir=self.db_dir,
             n_classes=self.n_classes,
@@ -141,6 +210,11 @@ class KNNScorer(ScoringModule):
         self._vector_index.dump(dump_dir)
 
     def load(self, path: str) -> None:
+        """
+        Load the KNNScorer's metadata and vector index from disk.
+
+        :param path: Path to the directory containing the dumped assets.
+        """
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
@@ -158,6 +232,12 @@ class KNNScorer(ScoringModule):
         self._vector_index = vector_index_client.get_index(self.embedder_name)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
-        labels, distances, neigbors = self._vector_index.query(utterances, self.k)
+        """
+        Predict class probabilities and retrieve neighbors for the given utterances.
+
+        :param utterances: List of query utterances.
+        :return: Tuple containing class probabilities and neighbor utterances.
+        """
+        labels, distances, neighbors = self._vector_index.query(utterances, self.k)
         scores = apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
-        return scores, neigbors
+        return scores, neighbors
