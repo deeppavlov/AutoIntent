@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - dev
+    - test_docs_civ2
   workflow_dispatch:
 
 concurrency:
