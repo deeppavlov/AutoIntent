@@ -49,7 +49,7 @@ class DataHandler:
             self.dataset = self.dataset.encode_labels()
 
         if Split.TEST not in self.dataset:
-            logger.info("Spltting dataset into train and test splits")
+            logger.info("Splitting dataset into train and test splits")
             self.dataset = split_dataset(self.dataset, random_seed=random_seed)
 
         for split in self.dataset:
@@ -79,30 +79,65 @@ class DataHandler:
 
     @property
     def multilabel(self) -> bool:
+        """
+        Check if the dataset is multilabel.
+
+        :return: True if the dataset is multilabel, False otherwise.
+        """
         return self.dataset.multilabel
 
     @property
     def n_classes(self) -> int:
+        """
+        Get the number of classes in the dataset.
+
+        :return: Number of classes.
+        """
         return self.dataset.n_classes
 
     @property
     def train_utterances(self) -> list[str]:
+        """
+        Get the training utterances.
+
+        :return: List of training utterances.
+        """
         return cast(list[str], self.dataset[Split.TRAIN][self.dataset.utterance_feature])
 
     @property
     def train_labels(self) -> list[LabelType]:
+        """
+        Get the training labels.
+
+        :return: List of training labels.
+        """
         return cast(list[LabelType], self.dataset[Split.TRAIN][self.dataset.label_feature])
 
     @property
     def test_utterances(self) -> list[str]:
+        """
+        Get the test utterances.
+
+        :return: List of test utterances.
+        """
         return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
 
     @property
     def test_labels(self) -> list[LabelType]:
+        """
+        Get the test labels.
+
+        :return: List of test labels.
+        """
         return cast(list[LabelType], self.dataset[Split.TEST][self.dataset.label_feature])
 
     @property
     def oos_utterances(self) -> list[str]:
+        """
+        Get the out-of-scope utterances.
+
+        :return: List of out-of-scope utterances if available, otherwise an empty list.
+        """
         if self.has_oos_samples():
             return cast(list[str], self.dataset[Split.OOS][self.dataset.utterance_feature])
         return []
