@@ -28,6 +28,7 @@ class KNNScorer(ScoringModule):
     _vector_index: VectorIndex
     name = "knn"
     prebuilt_index: bool = False
+    max_length: int | None
 
     def __init__(
         self,
@@ -125,13 +126,7 @@ class KNNScorer(ScoringModule):
         self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
-        self.metadata = KNNScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
+        self.metadata = self._store_state_to_metadata()
 
         dump_dir = Path(path)
 
@@ -140,24 +135,44 @@ class KNNScorer(ScoringModule):
 
         self._vector_index.dump(dump_dir)
 
+    def _store_state_to_metadata(self) -> KNNScorerDumpMetadata:
+        return KNNScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            multilabel=self.multilabel,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+
     def load(self, path: str) -> None:
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata: KNNScorerDumpMetadata = json.load(file)
 
-        self.n_classes = self.metadata["n_classes"]
-        self.multilabel = self.metadata["multilabel"]
+        self._restore_state_from_metadata(self.metadata)
+
+    def _restore_state_from_metadata(self, metadata: KNNScorerDumpMetadata) -> None:
+        self.n_classes = metadata["n_classes"]
+        self.multilabel = metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(
             device=self.device,
-            db_dir=self.metadata["db_dir"],
-            embedder_batch_size=self.metadata["batch_size"],
-            embedder_max_length=self.metadata["max_length"],
+            db_dir=metadata["db_dir"],
+            embedder_batch_size=metadata["batch_size"],
+            embedder_max_length=metadata["max_length"],
         )
         self._vector_index = vector_index_client.get_index(self.embedder_name)
 
+    def _get_neighbours(
+        self, utterances: list[str]
+    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
+        return self._vector_index.query(utterances, self.k)
+
+    def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        return apply_weights(labels, distances, self.weights, self.n_classes, self.multilabel)
+
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
-        labels, distances, neigbors = self._vector_index.query(utterances, self.k)
-        scores = apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
-        return scores, neigbors
+        labels, distances, neighbors = self._get_neighbours(utterances)
+        scores = self._count_scores(np.array(labels), np.array(distances))
+        return scores, neighbors

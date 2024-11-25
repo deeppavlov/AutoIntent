@@ -10,7 +10,7 @@ from .prediction import (
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
+from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, ScoringModule
 
 T = TypeVar("T", bound=Module)
 
@@ -24,7 +24,7 @@ RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict([Vec
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
 
 SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict(
-    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer]
+    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer, RerankScorer]
 )
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
@@ -49,6 +49,7 @@ __all__ = [
     "VectorDBModule",
     "DNNCScorer",
     "KNNScorer",
+    "RerankScorer",
     "LinearScorer",
     "MLKnnScorer",
     "DescriptionScorer",
