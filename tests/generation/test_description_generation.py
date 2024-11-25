@@ -277,12 +277,12 @@ def test_enhance_dataset_with_descriptions_basic():
         dataset = Dataset.from_dict(
             {
                 "train": [
-                    {"utterance": "Hello", "label": 1},
-                    {"utterance": "Goodbye", "label": 2},
+                    {"utterance": "Hello", "label": 0},
+                    {"utterance": "Goodbye", "label": 1},
                 ],
                 "intents": [
-                    {"id": 1, "name": "Greeting"},
-                    {"id": 2, "name": "Farewell"},
+                    {"id": 0, "name": "Greeting"},
+                    {"id": 1, "name": "Farewell"},
                 ],
             },
         )
@@ -295,7 +295,7 @@ def test_enhance_dataset_with_descriptions_basic():
             prompt=prompt,
             model_name="gpt4o-mini",
         )
-        expected_intent_utterances = defaultdict(list, {1: ["Hello"], 2: ["Goodbye"]})
+        expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
 
         assert enhanced_dataset.intents[0].description == "Generated description"
         assert enhanced_dataset.intents[1].description == "Generated description"
@@ -303,8 +303,8 @@ def test_enhance_dataset_with_descriptions_basic():
             client,
             expected_intent_utterances,
             [
-                Intent(id=1, name="Greeting", description=None, regexp_full_match=[], regexp_partial_match=[]),
-                Intent(id=2, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
+                Intent(id=0, name="Greeting", description=None, regexp_full_match=[], regexp_partial_match=[]),
+                Intent(id=1, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
             ],
             prompt,
             "gpt4o-mini",
@@ -317,20 +317,20 @@ def test_enhance_dataset_with_existing_descriptions():
         "autointent.generation.description_generation.generate_intent_descriptions",
         new=AsyncMock(
             return_value=[
-                Intent(id=1, name="Greeting", description="Existing description"),
-                Intent(id=2, name="Farewell", description="Generated description"),
+                Intent(id=0, name="Greeting", description="Existing description"),
+                Intent(id=1, name="Farewell", description="Generated description"),
             ],
         ),
     ) as mock_generate_intent_descriptions:
         dataset = Dataset.from_dict(
             {
                 "train": [
-                    {"utterance": "Hello", "label": 1},
-                    {"utterance": "Goodbye", "label": 2},
+                    {"utterance": "Hello", "label": 0},
+                    {"utterance": "Goodbye", "label": 1},
                 ],
                 "intents": [
-                    {"id": 1, "name": "Greeting", "description": "Existing description"},
-                    {"id": 2, "name": "Farewell"},
+                    {"id": 0, "name": "Greeting", "description": "Existing description"},
+                    {"id": 1, "name": "Farewell"},
                 ],
             },
         )
@@ -343,7 +343,7 @@ def test_enhance_dataset_with_existing_descriptions():
             prompt=prompt,
             model_name="gpt4o-mini",
         )
-        expected_intent_utterances = defaultdict(list, {1: ["Hello"], 2: ["Goodbye"]})
+        expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
 
         assert enhanced_dataset.intents[0].description == "Existing description"
         assert enhanced_dataset.intents[1].description == "Generated description"
@@ -352,13 +352,13 @@ def test_enhance_dataset_with_existing_descriptions():
             expected_intent_utterances,
             [
                 Intent(
-                    id=1,
+                    id=0,
                     name="Greeting",
                     description="Existing description",
                     regexp_full_match=[],
                     regexp_partial_match=[],
                 ),
-                Intent(id=2, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
+                Intent(id=1, name="Farewell", description=None, regexp_full_match=[], regexp_partial_match=[]),
             ],
             prompt,
             "gpt4o-mini",

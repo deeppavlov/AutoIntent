@@ -3,7 +3,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
-from datasets import ClassLabel, Sequence, concatenate_datasets
+from datasets import ClassLabel, Sequence, concatenate_datasets, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
 from typing_extensions import Self
 
@@ -17,6 +17,7 @@ class Split:
     VALIDATION = "validation"
     TEST = "test"
     OOS = "oos"
+    INTENTS = "intents"
 
 
 class Sample(TypedDict):
@@ -57,6 +58,16 @@ class Dataset(dict[str, HFDataset]):
         from .reader import DictReader
         return DictReader().read(mapping)
 
+    @classmethod
+    def from_datasets(cls, repo_id: str) -> "Dataset":
+        splits, intents = load_dataset(repo_id), []
+        if Split.INTENTS in get_dataset_config_names(repo_id):
+            intents = load_dataset(repo_id, Split.INTENTS)[Split.INTENTS].to_list()
+        return cls(
+            splits.items(),
+            intents=[Intent.model_validate(intent) for intent in intents],
+        )
+
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         return {split_name: split.to_list() for split_name, split in self.items()}
 
@@ -70,6 +81,14 @@ class Dataset(dict[str, HFDataset]):
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
         return self
+
+    def push_to_hub(self, repo_id: str)-> None:
+        for split_name, split in self.items():
+            split.push_to_hub(repo_id, split=split_name)
+
+        if self.intents:
+            intents = HFDataset.from_list([intent.model_dump() for intent in self.intents])
+            intents.push_to_hub(repo_id, config_name=Split.INTENTS, split=Split.INTENTS)
 
     def get_tags(self) -> list[Tag]:
         tag_mapping = defaultdict(list)
