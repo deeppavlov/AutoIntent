@@ -9,12 +9,13 @@
 import os
 import sys
 
+from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
+
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
 
 from docs_utils.apiref import regenerate_apiref  # noqa: E402
-from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
 
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
@@ -27,10 +28,20 @@ release = "0.0.1"
 extensions = [
     "sphinx.ext.duration",
     "sphinx.ext.autodoc",
-    "sphinx.ext.doctest",
     "sphinx.ext.autosummary",
-    "nbsphinx",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.doctest",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
+    "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
+    "nbsphinx",
 ]
 
 templates_path = ["_templates"]
@@ -51,7 +62,7 @@ autodoc_default_options = {
     "private-members": True,
     # "special-members": "__call__",
     "member-order": "bysource",
-    # "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
+    "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
 }
 
 # Finding tutorials directories
@@ -59,6 +70,8 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
+
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 
 def setup(_) -> None:  # noqa: ANN001
