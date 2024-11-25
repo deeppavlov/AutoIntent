@@ -44,7 +44,7 @@ Train model:
 
 # %%
 
-scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+scorer.fit(data_handler.train_utterances, data_handler.train_labels)
 
 # %% [markdown]
 """
