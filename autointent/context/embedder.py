@@ -72,7 +72,8 @@ class Embedder:
         """Delete the embedding model and its associated directory."""
         self.clear_ram()
         shutil.rmtree(
-            self.dump_dir, ignore_errors=True
+            self.dump_dir,
+            ignore_errors=True,
         )  # TODO: `ignore_errors=True` is workaround for PermissionError: [WinError 5] Access is denied
 
     def dump(self, path: Path) -> None:

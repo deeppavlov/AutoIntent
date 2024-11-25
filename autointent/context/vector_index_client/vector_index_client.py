@@ -48,7 +48,10 @@ class VectorIndexClient:
         self.embedder_max_length = embedder_max_length
 
     def create_index(
-        self, model_name: str, utterances: list[str] | None = None, labels: list[LabelType] | None = None
+        self,
+        model_name: str,
+        utterances: list[str] | None = None,
+        labels: list[LabelType] | None = None,
     ) -> VectorIndex:
         """
         Create a new vector index for the specified model.

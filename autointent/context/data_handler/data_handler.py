@@ -1,19 +1,14 @@
 """Data Handler file."""
 
 import logging
-from collections.abc import Sequence
-from typing import Any, TypedDict
+from typing import Any, TypedDict, cast
 
 from transformers import set_seed
 
 from autointent.custom_types import LabelType
 
-from .multilabel_generation import generate_multilabel_version
-from .sampling import sample_from_regex
-from .schemas import Dataset, DatasetType
-from .scheme import UtteranceRecord
-from .stratification import split_sample_utterances
-from .tags import collect_tags
+from .dataset import Dataset, Split
+from .stratification import split_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -29,108 +24,123 @@ class RegexPatterns(TypedDict):
     """Partial match regex patterns."""
 
 
-class DataAugmenter:
-    """Data augmenter."""
-
-    def __init__(
-        self, multilabel_generation_config: str | None = None, regex_sampling: int = 0, random_seed: int = 0
-    ) -> None:
-        """
-        Initialize the data augmenter.
-
-        :param multilabel_generation_config: Configuration string for multilabel generation.
-        :param regex_sampling: How many samples to take from regular expressions for each intent class.
-        :param random_seed: Seed for random number generation.
-        """
-        self.multilabel_generation_config = multilabel_generation_config
-        self.regex_sampling = regex_sampling
-        self.random_seed = random_seed
-
-    def __call__(self, dataset: Dataset) -> Dataset:
-        """
-        Augment the dataset.
-
-        :param dataset: Dataset to augment.
-        :return: Augmented dataset.
-        """
-        if self.regex_sampling > 0:
-            logger.debug(
-                "sampling %s utterances from regular expressions for each intent class...", self.regex_sampling
-            )
-            dataset = sample_from_regex(dataset=dataset, n_shots=self.regex_sampling)
-
-        if self.multilabel_generation_config is not None and self.multilabel_generation_config != "":
-            logger.debug("generating multilabel utterances from multiclass ones...")
-            dataset = generate_multilabel_version(
-                dataset=dataset,
-                config_string=self.multilabel_generation_config,
-                random_seed=self.random_seed,
-            )
-
-        return dataset
-
-
 class DataHandler:
     """Data handler class."""
 
     def __init__(
         self,
         dataset: Dataset,
-        test_dataset: Dataset | None = None,
         force_multilabel: bool = False,
         random_seed: int = 0,
-        augmenter: DataAugmenter | None = None,
     ) -> None:
         """
         Initialize the data handler.
 
         :param dataset: Training dataset.
-        :param test_dataset: Test dataset.
         :param force_multilabel: If True, force the dataset to be multilabel.
         :param random_seed: Seed for random number generation.
-        :param augmenter: Augmenter to use.
         """
         set_seed(random_seed)
 
+        self.dataset = dataset
         if force_multilabel:
-            dataset = dataset.to_multilabel()
+            self.dataset = self.dataset.to_multilabel()
+        if self.dataset.multilabel:
+            self.dataset = self.dataset.encode_labels()
 
-        self.multilabel = dataset.type == DatasetType.multilabel
-        self.label_description: list[str | None] = [
-            intent.description for intent in sorted(dataset.intents, key=lambda x: x.id)
-        ]
+        if Split.TEST not in self.dataset:
+            logger.info("Splitting dataset into train and test splits")
+            self.dataset = split_dataset(self.dataset, random_seed=random_seed)
 
-        if augmenter is not None:
-            dataset = augmenter(dataset)
+        for split in self.dataset:
+            if split == Split.OOS:
+                continue
+            n_classes_split = self.dataset.get_n_classes(split)
+            if n_classes_split != self.n_classes:
+                message = (
+                    f"Number of classes in split '{split}' doesn't match initial number of classes "
+                    f"({n_classes_split} != {self.n_classes})"
+                )
+                raise ValueError(message)
 
-        logger.debug("collecting tags from multiclass intent_records if present...")
-        self.tags = collect_tags(dataset)
-
-        logger.info("defining train and test splits...")
-        (
-            self.n_classes,
-            self.oos_utterances,
-            self.utterances_train,
-            self.utterances_test,
-            self.labels_train,
-            self.labels_test,
-        ) = split_sample_utterances(
-            dataset=dataset,
-            test_dataset=test_dataset,
-            random_seed=random_seed,
-        )
-
-        logger.debug("collection regexp patterns from multiclass intent records")
         self.regexp_patterns = [
             RegexPatterns(
                 id=intent.id,
                 regexp_full_match=intent.regexp_full_match,
                 regexp_partial_match=intent.regexp_partial_match,
             )
-            for intent in dataset.intents
+            for intent in self.dataset.intents
         ]
 
+        self.intent_descriptions = [intent.name for intent in self.dataset.intents]
+        self.tags = self.dataset.get_tags()
+
         self._logger = logger
+
+    @property
+    def multilabel(self) -> bool:
+        """
+        Check if the dataset is multilabel.
+
+        :return: True if the dataset is multilabel, False otherwise.
+        """
+        return self.dataset.multilabel
+
+    @property
+    def n_classes(self) -> int:
+        """
+        Get the number of classes in the dataset.
+
+        :return: Number of classes.
+        """
+        return self.dataset.n_classes
+
+    @property
+    def train_utterances(self) -> list[str]:
+        """
+        Get the training utterances.
+
+        :return: List of training utterances.
+        """
+        return cast(list[str], self.dataset[Split.TRAIN][self.dataset.utterance_feature])
+
+    @property
+    def train_labels(self) -> list[LabelType]:
+        """
+        Get the training labels.
+
+        :return: List of training labels.
+        """
+        return cast(list[LabelType], self.dataset[Split.TRAIN][self.dataset.label_feature])
+
+    @property
+    def test_utterances(self) -> list[str]:
+        """
+        Get the test utterances.
+
+        :return: List of test utterances.
+        """
+        return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
+
+    @property
+    def test_labels(self) -> list[LabelType]:
+        """
+        Get the test labels.
+
+        :return: List of test labels.
+        """
+        return cast(list[LabelType], self.dataset[Split.TEST][self.dataset.label_feature])
+
+    @property
+    def oos_utterances(self) -> list[str]:
+        """
+        Get the out-of-scope utterances.
+
+        :return: List of out-of-scope utterances if available, otherwise an empty list.
+        """
+        if self.has_oos_samples():
+            return cast(list[str], self.dataset[Split.OOS][self.dataset.utterance_feature])
+        return []
 
     def has_oos_samples(self) -> bool:
         """
@@ -138,61 +148,12 @@ class DataHandler:
 
         :return: True if there are out-of-scope samples.
         """
-        return len(self.oos_utterances) > 0
+        return Split.OOS in self.dataset
 
-    def dump(
-        self,
-    ) -> tuple[list[dict[str, Any]], list[UtteranceRecord]]:
+    def dump(self) -> dict[str, list[dict[str, Any]]]:
         """
-        Dump the train, test and out-of-scope data.
+        Dump the dataset splits.
 
-        :return: Train and test data.
+        :return: Dataset dump.
         """
-        self._logger.debug("dumping train, test and oos data...")
-        train_data = _dump_train(self.utterances_train, self.labels_train, self.n_classes, self.multilabel)
-        test_data = _dump_test(self.utterances_test, self.labels_test, self.n_classes, self.multilabel)
-        oos_data = _dump_oos(self.oos_utterances)
-        test_data = test_data + oos_data
-        return train_data, test_data  # type: ignore[return-value]
-
-
-def _dump_train(
-    utterances: list[str],
-    labels: list[LabelType],
-    n_classes: int,
-    multilabel: bool,
-) -> Sequence[dict[str, Any]]:
-    if multilabel and isinstance(labels[0], list):
-        res = []
-        for ut, labs in zip(utterances, labels, strict=True):
-            labs_converted = [i for i in range(n_classes) if labs[i]]  # type: ignore[index]
-            res.append({"utterance": ut, "labels": labs_converted})
-    elif not multilabel and isinstance(labels[0], int):
-        # TODO check if rec is used
-        res = [{"intent_id": i} for i in range(n_classes)]  # type: ignore[dict-item]
-        for ut, lab in zip(utterances, labels, strict=False):
-            rec = res[lab]  # type: ignore[index]
-            rec["sample_utterances"] = [*rec.get("sample_utterances", []), ut]
-    else:
-        message = "unexpected labels format"
-        raise ValueError(message)
-    return res
-
-
-def _dump_test(
-    utterances: list[str],
-    labels: list[LabelType],
-    n_classes: int,
-    multilabel: bool,
-) -> list[UtteranceRecord]:
-    res = []
-    for ut, labs in zip(utterances, labels, strict=True):
-        labs_converted = (
-            [i for i in range(n_classes) if labs[i]] if multilabel and isinstance(labels[0], list) else [labs]  # type: ignore[index,list-item]
-        )
-        res.append(UtteranceRecord(utterance=ut, labels=labs_converted))
-    return res
-
-
-def _dump_oos(utterances: list[str]) -> list[UtteranceRecord]:
-    return [UtteranceRecord(utterance=ut, labels=[]) for ut in utterances]
+        return self.dataset.dump()

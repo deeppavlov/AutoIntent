@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 def construct_samples(
-    texts: list[str], labels: list[Any], balancing_factor: int | None = None
+    texts: list[str],
+    labels: list[Any],
+    balancing_factor: int | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """
     Construct balanced samples of text pairs for training.

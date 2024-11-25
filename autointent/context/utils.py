@@ -41,7 +41,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def load_data(data_path: str | Path) -> Dataset:
+def load_data(filepath: str | Path) -> Dataset:
     """
     Load data from a specified path or use default sample data.
 
@@ -54,14 +54,12 @@ def load_data(data_path: str | Path) -> Dataset:
                       - "default-multilabel": Loads sample multilabel dataset.
     :return: A `Dataset` object containing the loaded data.
     """
-    if data_path == "default-multiclass":
-        with ires.files("autointent.datafiles").joinpath("banking77.json").open() as file:
-            res = json.load(file)
-    elif data_path == "default-multilabel":
-        with ires.files("autointent.datafiles").joinpath("dstc3-20shot.json").open() as file:
-            res = json.load(file)
-    else:
-        with Path(data_path).open() as file:
-            res = json.load(file)
-
-    return Dataset.model_validate(res)
+    if filepath == "default-multiclass":
+        return Dataset.from_json(
+            ires.files("autointent.datafiles").joinpath("banking77.json"),  # type: ignore[arg-type]
+        )
+    if filepath == "default-multilabel":
+        return Dataset.from_json(
+            ires.files("autointent.datafiles").joinpath("dstc3-20shot.json"),  # type: ignore[arg-type]
+        )
+    return Dataset.from_json(filepath)

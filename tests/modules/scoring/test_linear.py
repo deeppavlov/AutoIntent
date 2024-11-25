@@ -12,7 +12,7 @@ def test_base_linear(dataset):
 
     scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu")
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -37,7 +37,7 @@ def test_base_linear(dataset):
                     0.63123131,
                     0.1896569,
                 ],
-            ]
+            ],
         ),
         predictions,
         decimal=2,

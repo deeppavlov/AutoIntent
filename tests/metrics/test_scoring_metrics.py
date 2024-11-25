@@ -17,7 +17,7 @@ from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood,
                     np.log(0.3),
                     np.log(0.5),
                     np.log(0.1),
-                ]
+                ],
             ),
         ),
         (

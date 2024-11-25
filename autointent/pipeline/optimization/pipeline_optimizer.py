@@ -74,19 +74,16 @@ class PipelineOptimizer:
             self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
 
-    def optimize_from_dataset(
-        self, train_data: Dataset, val_data: Dataset | None = None, force_multilabel: bool = False
-    ) -> Context:
+    def optimize_from_dataset(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
 
-        :param train_data: Training data
-        :param val_data: Validation data
+        :param dataset: Dataset for optimization
         :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
         context = Context()
-        context.set_datasets(train_data, val_data, force_multilabel)
+        context.set_dataset(dataset, force_multilabel)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
 

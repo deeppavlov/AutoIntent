@@ -1,5 +1,5 @@
-from .data_handler import DataAugmenter, DataHandler
-from .schemas import Dataset
-from .tags import Tag
+from .data_handler import DataHandler
+from .dataset import Dataset
+from .schemas import Intent, Sample, Tag
 
-__all__ = ["DataAugmenter", "DataHandler", "Dataset", "Tag"]
+__all__ = ["DataHandler", "Dataset", "Intent", "Sample", "Tag"]

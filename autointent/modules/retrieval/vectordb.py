@@ -104,7 +104,10 @@ class VectorDBModule(RetrievalModule):
         :param labels: List of corresponding labels for the utterances.
         """
         vector_index_client = VectorIndexClient(
-            self.device, self.db_dir, embedder_batch_size=self.batch_size, embedder_max_length=self.max_length
+            self.device,
+            self.db_dir,
+            embedder_batch_size=self.batch_size,
+            embedder_max_length=self.max_length,
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
@@ -117,10 +120,10 @@ class VectorDBModule(RetrievalModule):
         :return: Computed metric score.
         """
         labels_pred, _, _ = self.vector_index.query(
-            context.data_handler.utterances_test,
+            context.data_handler.test_utterances,
             self.k,
         )
-        return metric_fn(context.data_handler.labels_test, labels_pred)
+        return metric_fn(context.data_handler.test_labels, labels_pred)
 
     def get_assets(self) -> RetrieverArtifact:
         """

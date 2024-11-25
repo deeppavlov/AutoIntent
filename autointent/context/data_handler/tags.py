@@ -7,7 +7,7 @@ intent classes in a dataset.
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-from .schemas import Dataset
+from .dataset import Dataset
 
 
 @dataclass

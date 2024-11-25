@@ -21,7 +21,7 @@ def test_base_dnnc(dataset, train_head, pred_score):
         device="cpu",
     )
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

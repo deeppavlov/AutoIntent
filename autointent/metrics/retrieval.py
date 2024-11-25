@@ -98,7 +98,9 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 
 
 def average_precision_intersecting(
-    query_label: LABELS_VALUE_TYPE, candidate_labels: CANDIDATE_TYPE, k: int | None = None
+    query_label: LABELS_VALUE_TYPE,
+    candidate_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the average precision at position k for the intersecting labels.
@@ -182,7 +184,9 @@ def retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CAND
 
 
 def retrieval_hit_rate(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the hit rate at position k.
@@ -207,7 +211,9 @@ def retrieval_hit_rate(
 
 
 def retrieval_hit_rate_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the hit rate at position k for the intersecting labels.
@@ -267,7 +273,9 @@ def retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels:
 
 
 def retrieval_precision(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the precision at position k.
@@ -294,7 +302,9 @@ def retrieval_precision(
 
 
 def retrieval_precision_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the precision at position k for the intersecting labels.
@@ -340,7 +350,9 @@ def retrieval_precision_macro(
 
 
 def retrieval_precision_numpy(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the precision at position k.
@@ -408,7 +420,9 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
 
 
 def retrieval_ndcg_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
@@ -433,7 +447,9 @@ def retrieval_ndcg_intersecting(
 
 
 def retrieval_ndcg_macro(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
@@ -473,7 +489,9 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 
 
 def retrieval_mrr_intersecting(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
@@ -499,7 +517,9 @@ def retrieval_mrr_intersecting(
 
 
 def retrieval_mrr_macro(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
+    query_labels: LABELS_VALUE_TYPE,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None = None,
 ) -> float:
     """
     Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.

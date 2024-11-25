@@ -28,8 +28,8 @@ class ScoringModule(Module, ABC):
         :param metric_fn: Function to compute the scoring metric.
         :return: Computed metric value for the test set.
         """
-        self._test_scores = self.predict(context.data_handler.utterances_test)
-        res = metric_fn(context.data_handler.labels_test, self._test_scores)
+        self._test_scores = self.predict(context.data_handler.test_utterances)
+        res = metric_fn(context.data_handler.test_labels, self._test_scores)
         self._oos_scores = None
         if context.data_handler.has_oos_samples():
             self._oos_scores = self.predict(context.data_handler.oos_utterances)

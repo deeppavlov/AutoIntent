@@ -64,7 +64,7 @@ def get_retrieval_optimizer(multilabel: bool):
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
                 "module_type": "vector_db",
-            }
+            },
         ],
     }
 

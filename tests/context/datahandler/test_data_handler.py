@@ -1,16 +1,20 @@
 import pytest
 
-from autointent.context.data_handler import DataAugmenter, DataHandler, Dataset
+from autointent.context.data_handler import DataHandler, Dataset
 
 
 @pytest.fixture
 def sample_multiclass_data():
-    data = {
-        "utterances": [
-            {"text": "hello", "label": 0},
-            {"text": "hi", "label": 0},
-            {"text": "goodbye", "label": 1},
-            {"text": "bye", "label": 1},
+    return {
+        "train": [
+            {"utterance": "hello", "label": 0},
+            {"utterance": "hi", "label": 0},
+            {"utterance": "goodbye", "label": 1},
+            {"utterance": "bye", "label": 1},
+        ],
+        "test": [
+            {"utterance": "greetings", "label": 0},
+            {"utterance": "farewell", "label": 1},
         ],
         "intents": [
             {
@@ -25,93 +29,66 @@ def sample_multiclass_data():
             },
         ],
     }
-    test_data = {
-        "utterances": [
-            {"text": "greetings", "label": 0},
-            {"text": "farewell", "label": 1},
-        ],
-    }
-    return data, test_data
 
 
 @pytest.fixture
 def sample_multilabel_data():
-    data = {
-        "utterances": [
-            {"text": "hello and goodbye", "label": [0, 1]},
-            {"text": "hi there", "label": [0]},
+    return {
+        "train": [
+            {"utterance": "hello and goodbye", "label": [0, 1]},
+            {"utterance": "hi there", "label": [0]},
+        ],
+        "test": [
+            {"utterance": "greetings", "label": [0]},
+            {"utterance": "farewell", "label": [1]},
         ],
     }
-    test_data = {
-        "utterances": [
-            {"text": "greetings", "label": [0]},
-            {"text": "farewell", "label": [1]},
-        ],
-    }
-    return data, test_data
 
 
 def test_data_handler_initialization(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
     assert handler.multilabel is False
     assert handler.n_classes == 2
-    assert handler.utterances_train == ["hello", "hi", "goodbye", "bye"]
-    assert handler.utterances_test == ["greetings", "farewell"]
-    assert handler.labels_train == [0, 0, 1, 1]
-    assert handler.labels_test == [0, 1]
+    assert handler.train_utterances == ["hello", "hi", "goodbye", "bye"]
+    assert handler.test_utterances == ["greetings", "farewell"]
+    assert handler.train_labels == [0, 0, 1, 1]
+    assert handler.test_labels == [0, 1]
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
-    train_data, test_data = sample_multilabel_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multilabel_data), random_seed=42)
 
     assert handler.multilabel is True
     assert handler.n_classes == 2
-    assert handler.utterances_train == ["hello and goodbye", "hi there"]
-    assert handler.utterances_test == ["greetings", "farewell"]
-    assert handler.labels_train == [[1, 1], [1, 0]]
-    assert handler.labels_test == [[1, 0], [0, 1]]
-
-
-def test_regex_sampling(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    augmenter = DataAugmenter(regex_sampling=5, random_seed=42)
-    dataset = Dataset.model_validate(train_data)
-    augmented_dataset = augmenter(dataset)
-    utterances_train = [ut.text for ut in augmented_dataset.utterances]
-    assert utterances_train == ["hello", "hi", "goodbye", "bye", "hello", "hi", "goodbye", "bye"]
+    assert handler.train_utterances == ["hello and goodbye", "hi there"]
+    assert handler.test_utterances == ["greetings", "farewell"]
+    assert handler.train_labels == [[1, 1], [1, 0]]
+    assert handler.test_labels == [[1, 0], [0, 1]]
 
 
 def test_dump_method(sample_multiclass_data):
-    train_data, test_data = sample_multiclass_data
-    handler = DataHandler(
-        dataset=Dataset.model_validate(train_data),
-        test_dataset=Dataset.model_validate(test_data),
-        random_seed=42,
-    )
+    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
-    train_data, test_data = handler.dump()
+    dump = handler.dump()
 
-    assert train_data == [
-        {"intent_id": 0, "sample_utterances": ["hello", "hi"]},
-        {"intent_id": 1, "sample_utterances": ["goodbye", "bye"]},
+    assert dump["train"] == [
+        {"utterance": "hello", "label": 0},
+        {"utterance": "hi", "label": 0},
+        {"utterance": "goodbye", "label": 1},
+        {"utterance": "bye", "label": 1},
     ]
-    assert test_data == [{"labels": [0], "utterance": "greetings"}, {"labels": [1], "utterance": "farewell"}]
+    assert dump["test"] == [
+        {"utterance": "greetings", "label": 0},
+        {"utterance": "farewell", "label": 1},
+    ]
 
 
 @pytest.mark.skip("All data validations will be refactored later")
 def test_error_handling(
-    sample_multiclass_intent_records, sample_multilabel_utterance_records, sample_test_utterance_records
+    sample_multiclass_intent_records,
+    sample_multilabel_utterance_records,
+    sample_test_utterance_records,
 ):
     with pytest.raises(ValueError, match="unexpected classification mode value"):
         DataHandler(

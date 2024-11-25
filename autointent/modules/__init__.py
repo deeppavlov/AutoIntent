@@ -25,19 +25,19 @@ RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict([Vec
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
 
 SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict(
-    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer]
+    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer],
 )
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
-    [MLKnnScorer, LinearScorer, DescriptionScorer]
+    [MLKnnScorer, LinearScorer, DescriptionScorer],
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
-    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
+    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor],
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
-    [AdaptivePredictor, ThresholdPredictor, TunablePredictor]
+    [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 
 __all__ = [
