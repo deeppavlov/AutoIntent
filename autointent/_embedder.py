@@ -16,9 +16,7 @@ from sentence_transformers import SentenceTransformer
 
 
 class EmbedderDumpMetadata(TypedDict):
-    """
-    Metadata for saving and loading an Embedder instance.
-    """
+    """Metadata for saving and loading an Embedder instance."""
 
     batch_size: int
     """Batch size used for embedding calculations."""

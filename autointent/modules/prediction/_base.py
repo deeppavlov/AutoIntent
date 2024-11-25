@@ -53,10 +53,7 @@ class PredictionModule(Module, ABC):
         return metric_fn(labels, self._predictions)
 
     def get_assets(self) -> PredictorArtifact:
-        """
-        Return useful assets that represent intermediate data into context.
-
-        """
+        """Return useful assets that represent intermediate data into context."""
         return PredictorArtifact(labels=self._predictions)
 
     def clear_cache(self) -> None:
