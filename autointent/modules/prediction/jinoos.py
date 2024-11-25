@@ -12,17 +12,20 @@ from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics.converter import transform
 
 from .base import PredictionModule
+from .utils import InvalidNumClassesError, WrongClassificationError
 
 default_search_space = np.linspace(0, 1, num=100)
 
 
 class JinoosPredictorDumpMetadata(BaseMetadataDict):
     thresh: float
+    n_classes: int
 
 
 class JinoosPredictor(PredictionModule):
     thresh: float
     name = "jinoos"
+    n_classes: int
 
     def __init__(
         self,
@@ -45,6 +48,12 @@ class JinoosPredictor(PredictionModule):
         """
         TODO: use dev split instead of test split
         """
+        multilabel = isinstance(labels[0], list)
+        if multilabel:
+            msg = "JinoosPredictor is compatible with single-label classification only"
+            raise WrongClassificationError(msg)
+        self.n_classes = len(set(labels).difference([-1]))
+
         pred_classes, best_scores = _predict(scores)
 
         metrics_list: list[float] = []
@@ -56,11 +65,14 @@ class JinoosPredictor(PredictionModule):
         self.thresh = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
         pred_classes, best_scores = _predict(scores)
         return _detect_oos(pred_classes, best_scores, self.thresh)
 
     def dump(self, path: str) -> None:
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh)
+        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
 
         dump_dir = Path(path)
 
@@ -75,6 +87,7 @@ class JinoosPredictor(PredictionModule):
 
         self.thresh = metadata["thresh"]
         self.metadata = metadata
+        self.n_classes = metadata["n_classes"]
 
 
 def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
