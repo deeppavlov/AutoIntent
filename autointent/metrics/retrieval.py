@@ -717,7 +717,7 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 
     .. math::
 
-        \text{MRR@k} = \frac{1}{N} \\sum_{i=1}^N \frac{1}{\text{rank}_i}
+        \text{MRR@k} = \frac{1}{N} \sum_{i=1}^N \frac{1}{\text{rank}_i}
 
     where:
     - :math:`\text{rank}_i` is the rank position of the first relevant item in the top-k results for query :math:`i`,
@@ -762,6 +762,8 @@ def retrieval_mrr_intersecting(
     - :math:`\text{rank}_i` is the rank position of the first relevant (intersecting) item in the top-k
     results for query :math:`i`,
     - :math:`N` is the total number of queries.
+
+    Intersecting relevance is determined by checking whether the query label intersects with the candidate labels.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
