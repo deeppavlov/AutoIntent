@@ -266,16 +266,16 @@ def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYP
 
 
 def scoring_map(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    Supports multilabel.
+    r"""
+    Calculate the mean average precision (MAP) score for multilabel classification.
 
-    mean average precision score
+    The MAP score measures the precision at different levels of ranking,
+    averaged across all queries. The ideal value is 1, indicating perfect ranking, while the worst value is 0.
 
-    the ideal value is 1, the worst is 0
+    This function utilizes :func:`sklearn.metrics.label_ranking_average_precision_score` for computation.
 
-
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    :param labels: ground truth labels for each sample
+    :param scores: for each sample, this list contains scores for each of `n_classes` classes
+    :return: mean average precision score
     """
     return label_ranking_average_precision_score(labels, scores)  # type: ignore[no-any-return]
