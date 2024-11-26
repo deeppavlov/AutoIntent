@@ -78,7 +78,7 @@ def _macrofy(
 
 
 def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64], k: int | None = None) -> float:
-    """
+    r"""
     Calculate the average precision at position k.
 
     The average precision is calculated as:
@@ -97,11 +97,10 @@ def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64]
     - :math:`\frac{\text{num_relevant}}{i+1}` is the precision at rank :math:`i`.
 
     :param query_label: For each query, this list contains its class labels
-    :param candidate_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidate_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     num_relevant = 0
     sum_precision = 0.0
     for i, label in enumerate(candidate_labels[:k]):
@@ -240,7 +239,7 @@ def retrieval_map_macro(
 
 
 def _retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
-    """
+    r"""
     Calculate mean average precision at position k.
 
     The mean average precision (MAP) at position :math:`k` is calculated as follows:
@@ -260,11 +259,10 @@ def _retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CAN
     - :math:`|Q|` is the total number of queries.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
     relevance_mask = candidates_labels_ == query_label_[:, None]
@@ -303,11 +301,10 @@ def retrieval_hit_rate(
     is true and 0 otherwise.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
 
@@ -387,7 +384,7 @@ def retrieval_hit_rate_macro(
 
 
 def _retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
-    """
+    r"""
     Calculate the hit rate at position k.
 
     The hit rate is calculated as:
@@ -404,11 +401,10 @@ def _retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels
     is true and 0 otherwise.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
     truncated_candidates = candidates_labels_[:, :k]
     hit_mask = np.isin(query_label_[:, None], truncated_candidates).any(axis=1)
@@ -559,7 +555,7 @@ def _retrieval_precision_numpy(
 
 
 def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
-    """
+    r"""
     Calculate the Discounted Cumulative Gain (DCG) at position k.
 
     DCG is calculated as:
@@ -582,7 +578,7 @@ def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
 
 
 def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
-    """
+    r"""
     Calculate the Ideal Discounted Cumulative Gain (IDCG) at position k.
 
     IDCG is the maximum possible DCG that can be achieved if the relevance
@@ -655,22 +651,19 @@ def retrieval_ndcg_intersecting(
         {\text{IDCG@k}_{\text{intersecting}}}
 
     where:
-    - :math:`\text{DCG@k}_{\text{intersecting}}` is the Discounted Cumulative Gain for the
-    intersecting labels at position :math:`k`,
-    - :math:`\text{IDCG@k}_{\text{intersecting}}` is the Ideal Discounted Cumulative Gain
-    for the intersecting labels at position :math:`k`.
+
+    - :math:`\text{DCG@k}_{\text{intersecting}}` is the Discounted Cumulative Gain for the intersecting labels at position :math:`k`,
+    - :math:`\text{IDCG@k}_{\text{intersecting}}` is the Ideal Discounted Cumulative Gain for the intersecting labels at position :math:`k`.
 
     Intersecting relevance is determined by checking whether the query labels overlap with
     the candidate labels.
     NDCG values are normalized between 0 and 1, where 1 indicates the ideal ranking.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked
-    by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     ndcg_scores: list[float] = []
     expanded_relevance_scores: npt.NDArray[np.bool] = query_labels_[:, None, :] == candidates_labels_
@@ -696,11 +689,10 @@ def retrieval_ndcg_macro(
     query using :func:`macrofy` to compute the macro-averaged score.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     return _macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
@@ -719,11 +711,10 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
     - :math:`N` is the total number of queries.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
 
@@ -761,11 +752,10 @@ def retrieval_mrr_intersecting(
     Intersecting relevance is determined by checking whether the query label intersects with the candidate labels.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     query_labels_, candidates_labels_ = transform(query_labels, candidates_labels)
     candidates_labels_ = candidates_labels_[:, :k]
     mrr_sum = 0.0
@@ -792,9 +782,8 @@ def retrieval_mrr_macro(
     query using :func:`macrofy` to compute the macro-averaged score.
 
     :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
+    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
-    """
+    """  # noqa: E501
     return _macrofy(retrieval_mrr, query_labels, candidates_labels, k)

@@ -91,7 +91,7 @@ def _prediction_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VAL
     Calculate roc_auc for multilabel.
 
     This function internally uses :func:`sklearn.metrics.roc_auc_score` with `average=macro`. Refer to the
-    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html>`_
+    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html>`__
     for more details.
 
     :param y_true: True values of labels
@@ -127,7 +127,7 @@ def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -
     Calculate prediction precision. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.precision_score` with `average=macro`. Refer to the
-    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html>`_
+    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html>`__
     for more details.
 
     :param y_true: True values of labels
@@ -142,7 +142,7 @@ def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
     Calculate prediction recall. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.recall_score` with `average=macro`. Refer to the
-    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html>`_
+    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html>`__
     for more details.
 
     :param y_true: True values of labels
@@ -157,7 +157,7 @@ def prediction_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float
     Calculate prediction f1 score. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.f1_score` with `average=macro`. Refer to the
-    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`_
+    `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`__
     for more details.
 
     :param y_true: True values of labels
