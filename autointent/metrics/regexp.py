@@ -38,7 +38,7 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
     - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
     - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
     - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
-      is true and 0 otherwise.
+    is true and 0 otherwise.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
@@ -68,8 +68,8 @@ def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYP
     - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
     - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
     - :math:`|y_{\text{pred},i}|` is the number of predicted labels for the :math:`i`-th sample,
-    - :math:`\\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
-      is true and 0 otherwise.
+    - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
+    is true and 0 otherwise.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
