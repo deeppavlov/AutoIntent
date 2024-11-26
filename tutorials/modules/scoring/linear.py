@@ -6,8 +6,8 @@
 # %%
 import importlib.resources as ires
 
+from autointent.context._utils import load_data
 from autointent.context.data_handler import DataHandler
-from autointent.context.utils import load_data
 from autointent.modules import LinearScorer
 
 # %% [markdown]

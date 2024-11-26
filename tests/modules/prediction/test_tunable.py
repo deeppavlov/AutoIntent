@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from autointent.modules import TunablePredictor
-from autointent.modules.prediction.utils import InvalidNumClassesError
+from autointent.modules.prediction._utils import InvalidNumClassesError
 
 
 def test_multiclass(multiclass_fit_data):

@@ -4,16 +4,16 @@ from typing import Literal
 
 import pytest
 
-from autointent.configs.inference_cli import InferenceConfig
-from autointent.configs.optimization_cli import (
+from autointent.configs._inference_cli import InferenceConfig
+from autointent.configs._optimization_cli import (
     EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
 from autointent.pipeline.inference import InferencePipeline
-from autointent.pipeline.inference.cli_endpoint import main as inference_pipeline
+from autointent.pipeline.inference._cli_endpoint import main as inference_pipeline
 from autointent.pipeline.optimization import PipelineOptimizer
-from autointent.pipeline.optimization.utils import load_config
+from autointent.pipeline.optimization._utils import load_config
 from tests.conftest import setup_environment
 
 TaskType = Literal["multiclass", "multilabel", "description"]

@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from autointent.context.utils import load_data
+from autointent.context._utils import load_data
 
 
 def setup_environment() -> tuple[str, str]:

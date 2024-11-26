@@ -6,8 +6,7 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-from autointent.context.data_handler import Dataset, Intent
-from autointent.context.data_handler.dataset import Sample
+from autointent.context.data_handler import Dataset, Intent, Sample
 from autointent.generation.prompt_scheme import PromptDescription
 
 
@@ -22,12 +21,12 @@ def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:
     label_mapping = defaultdict(list)
 
     for sample in samples:
-        match sample["label"]:
+        match sample.label:
             case list():
-                for label in sample["label"]:
-                    label_mapping[label].append(sample["utterance"])
+                for label in sample.label:
+                    label_mapping[label].append(sample.utterance)
             case int():
-                label_mapping[sample["label"]].append(sample["utterance"])
+                label_mapping[sample.label].append(sample.utterance)
 
     return label_mapping
 
@@ -138,7 +137,7 @@ def enhance_dataset_with_descriptions(
     """
     samples = []
     for split in dataset.values():
-        samples.extend(split.to_list())
+        samples.extend([Sample(**sample) for sample in split.to_list()])
     intent_utterances = group_utterances_by_label(samples)
     dataset.intents = asyncio.run(
         generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name),
