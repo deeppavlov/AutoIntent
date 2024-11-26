@@ -34,13 +34,13 @@ AutoML goes brrr...
 
     autointent data.train_path="path/to/your/data.json"
 
-Эта команда запустит поиск гиперпараметров в дефолтном пространстве поиска. Больше про пространство поиска и как выбирать его кастомным смотрите в :doc:`search_space`. 
+Эта команда запустит поиск гиперпараметров в дефолтном пространстве поиска. Больше про пространство поиска и как выбирать его кастомным смотрите в гайде :doc:`guides/search_space_configuration`. 
 
-По итогу в текущей рабочей директории создастся папка ``runs``, в которой будет сохранен подобранный классификатор, готовый к инференсу. Больше про папку рана и что в нем сохраняется смотрите в :doc:`optimization_results`.
+По итогу в текущей рабочей директории создастся папка ``runs``, в которой будет сохранен подобранный классификатор, готовый к инференсу. Больше про папку рана и что в нем сохраняется смотрите в гайде :doc:`guides/optimization_results`.
 
 .. seealso::
 
-    Построить классификатор из данных можно и с помощью Python API. Больше об этом смотрите в нашем туториале :doc:`tutorials/index_pipeline_optimization`. 
+    Построить классификатор из данных можно и с помощью Python API. Больше об этом смотрите в наших туториалах про оптимизацию :doc:`tutorials/index_pipeline_optimization`. 
 
 Inference
 ---------
@@ -55,3 +55,33 @@ Inference
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
 
+.. seealso::
+
+    Больше про возможные варианты инференса смотрите в нашем туториале :doc:`tutorials/index_pipeline_inference`
+
+Modular Approach
+----------------
+
+Если нет необходимости в переборе пайплайнов и гиперпараметров, можно импортировать методы классификации напрямую.
+
+.. code-block:: python
+
+    from autointent.modules import KNNScorer
+
+    scorer = KNNScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=1)
+    train_utterances = [
+        "why is there a hold on my american saving bank account",
+        "i am nost sure why my account is blocked",
+        "why is there a hold on my capital one checking account",
+    ]
+    train_labels = [0, 2, 1]
+    scorer.fit(train_utterances, train_labels)
+    test_utterances = [
+        "i think my account is blocked but i do not know the reason",
+        "can you tell me why is my bank account frozen",
+    ]
+    scorer.predict(test_utterances)
+
+.. seealso::
+
+    Больше про использование методов классификации напрямую, смотрите в наших туториалах :doc:`tutorials/index_scoring_modules`, :doc:`tutorials/index_prediction_modules`.
