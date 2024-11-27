@@ -36,12 +36,6 @@ class JinoosPredictor(PredictionModule):
     :ivar name: Name of the predictor, defaults to "adaptive".
     :ivar n_classes: Number of classes determined during fitting.
 
-    Parameters
-    ----------
-    search_space : list[float], optional
-        List of threshold scaling factors to search for optimal performance.
-        Defaults to a range between 0 and 1.
-
     Examples
     --------
     >>> from autointent.modules import JinoosPredictor

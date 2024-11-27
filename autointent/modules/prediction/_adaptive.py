@@ -46,12 +46,6 @@ class AdaptivePredictor(PredictionModule):
     :ivar tags: List of Tag objects for mutually exclusive classes.
     :ivar name: Name of the predictor, defaults to "adaptive".
 
-    Parameters
-    ----------
-    search_space : list[float], optional
-        List of threshold scaling factors to search for optimal performance.
-        Defaults to a range between 0 and 1.
-
     Examples
     --------
     >>> from autointent.modules import AdaptivePredictor

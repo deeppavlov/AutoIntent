@@ -29,7 +29,50 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
 
 
 class ThresholdPredictor(PredictionModule):
-    """Threshold predictor module."""
+    """
+    Threshold predictor module.
+
+    ThresholdPredictor uses a predefined threshold (or array of thresholds) to predict
+    labels for single-label or multi-label classification tasks.
+
+    :ivar metadata_dict_name: Filename for saving metadata to disk.
+    :ivar multilabel: If True, the model supports multi-label classification.
+    :ivar n_classes: Number of classes in the dataset.
+    :ivar tags: Tags for predictions (if any).
+    :ivar name: Name of the predictor, defaults to "adaptive".
+
+    Examples
+    --------
+    Single-label classification example:
+    >>> from autointent.modules import ThresholdPredictor
+    >>> import numpy as np
+    >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+    >>> labels = [1, 0, 1]
+    >>> threshold = 0.5
+
+    >>> predictor = ThresholdPredictor(thresh=threshold)
+    >>> predictor.fit(scores, labels)
+    >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [1, 0]
+
+    Multi-label classification example:
+    >>> labels = [[1, 0], [0, 1], [1, 1]]
+    >>> predictor = ThresholdPredictor(thresh=[0.5, 0.5])
+    >>> predictor.fit(scores, labels)
+    >>> test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [[0 1], [1 0]]
+
+    Save and load the model:
+    >>> predictor.dump("model_dir")
+    >>> loaded_predictor = ThresholdPredictor(thresh=0.5)
+    >>> loaded_predictor.load("model_dir")
+    >>> print(loaded_predictor.thresh)
+    0.5
+    """
 
     metadata: ThresholdPredictorDumpMetadata
     multilabel: bool
@@ -45,9 +88,6 @@ class ThresholdPredictor(PredictionModule):
         Initialize threshold predictor.
 
         :param thresh: Threshold for the scores, shape (n_classes,) or float
-        :param multilabel: If multilabel classification, default False
-        :param n_classes: Number of classes, default None
-        :param tags: Tags for predictions, default None
         """
         self.thresh = thresh
 
