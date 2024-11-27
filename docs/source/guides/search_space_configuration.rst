@@ -3,9 +3,12 @@ Search Space Configuration
 
 В этом гайде вы узнаете как настраивать кастомное пространство поиска гипепараметров.
 
+Python API
+##########
+
 .. note::
 
-    Перед чтением данного гайда советуем ознамомиться с разделом :doc:`../concepts`.
+    Перед чтением данного гайда советуем ознамомиться с разделами :doc:`../concepts` и :doc:`../learn/greedy_optimization`.
 
 Optimization Module
 -------------------
@@ -118,6 +121,9 @@ Start Auto Configuration
     pipeline_optimizer = PipelineOptimizer.from_dict(search_space)
     pipeline_optimizer.fit(dataset)
 
+CLI
+###
+
 Yaml Format
 -----------
 
@@ -160,3 +166,8 @@ Explanation:
 - ``counts`` is a list (python ``[10, 20, 30]``)
 - ``literal_counts`` is a list too
 - ``users`` is a list of dictionaries
+
+Start Auto Configuration
+------------------------
+
+Чтобы задать серч спейс для оптимизации из командной строки, достаточно...
