@@ -1,19 +1,19 @@
 Search Space Configuration
 ==========================
 
-В этом гайде вы узнаете как настраивать кастомное пространство поиска гипепараметров.
+In this guide, you will learn how to configure a custom hyperparameter search space.
 
 Python API
 ##########
 
 .. note::
 
-    Перед чтением данного гайда советуем ознамомиться с разделами :doc:`../concepts` и :doc:`../learn/optimization`.
+    Before reading this guide, we recommend familiarizing yourself with the sections :doc:`../concepts` and :doc:`../learn/optimization`.
 
 Optimization Module
 -------------------
 
-Чтобы задать модуль оптимизации, достаточно создать следующий словарик:
+To set up the optimization module, you need to create the following dictionary:
 
 .. code-block:: python
 
@@ -26,10 +26,9 @@ Optimization Module
         ]
     }
 
-В поле ``module_type`` указано название модуля. Названия можете посмотреть например в :py:data:`autointent.modules.SCORING_MODULES_MULTICLASS`.
+The ``module_type`` field specifies the name of the module. You can find the names, for example, in :py:data:`autointent.modules.SCORING_MODULES_MULTICLASS`.
 
-Все поля, кроме ``module_type`` являются списками, задающими пространство поиска по каждому гиперпарметру. Если опустить их, то во время автоконфигурации будет использован дефолтный набор гиперпараметров:
-
+All fields except ``module_type`` are lists that define the search space for each hyperparameter. If you omit them, the default set of hyperparameters will be used during auto-configuration:
 
 .. code-block:: python
 
@@ -38,7 +37,7 @@ Optimization Module
 Optimization Node
 -----------------
 
-Чтобы задать узел оптимизации, нужно создать список модулей и задать метрику для оптимизации:
+To set up the optimization node, you need to create a list of modules and specify the metric for optimization:
 
 .. code-block:: python
 
@@ -51,11 +50,10 @@ Optimization Node
         ]
     }
 
-
 Search Space
 ------------
 
-Серч спейс всего пайплайна выглядит примерно следующим образом:
+The search space for the entire pipeline looks approximately like this:
 
 .. code-block:: python
 
@@ -127,9 +125,9 @@ CLI
 Yaml Format
 -----------
 
-YAML (YAML Ain't Markup Language) is a human-readable data serialization standard that is often used for configuration files and data exchange between languages with different data structures. It serves for similar purposes as JSON but much easier to read.
+YAML (YAML Ain't Markup Language) is a human-readable data serialization standard that is often used for configuration files and data exchange between languages with different data structures. It serves similar purposes as JSON but is much easier to read.
 
-Here's example yaml file:
+Here's an example YAML file:
 
 .. code-block:: yaml
 
@@ -161,13 +159,13 @@ Here's example yaml file:
 
 Explanation:
 
-- the whole file represents dictionary with keys ``database``, ``counts``, ``users``, ``settings``, ``debug``, ``timeout``
-- ``database`` itself is a dictionary with keys ``host``, ``port`` and so on
-- ``counts`` is a list (python ``[10, 20, 30]``)
+- the whole file represents a dictionary with keys ``database``, ``counts``, ``users``, ``settings``, ``debug``, ``timeout``
+- ``database`` itself is a dictionary with keys ``host``, ``port``, and so on
+- ``counts`` is a list (Python ``[10, 20, 30]``)
 - ``literal_counts`` is a list too
 - ``users`` is a list of dictionaries
 
 Start Auto Configuration
 ------------------------
 
-Чтобы задать серч спейс для оптимизации из командной строки, достаточно...
+To set up the search space for optimization from the command line, you need to...
