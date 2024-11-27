@@ -145,7 +145,7 @@ class AdaptivePredictor(PredictionModule):
             metadata: AdaptivePredictorDumpMetadata = json.load(file)
 
         if metadata["tags"] is not None and isinstance(metadata["tags"], list):
-            self.tags = [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type, union-attr]
+            self.tags = [Tag(**tag) for tag in metadata["tags"]]
         else:
             self.tags = None
 
