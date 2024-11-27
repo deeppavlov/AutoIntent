@@ -23,7 +23,33 @@ class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
 
 
 class ArgmaxPredictor(PredictionModule):
-    """Argmax prediction module."""
+    """
+    Argmax prediction module.
+    
+    The ArgmaxPredictor is a simple predictor that selects the class with the highest
+    score (argmax) for single-label classification tasks.
+
+    Examples
+    --------
+    >>> from autointent.modules import ArgmaxPredictor
+    >>> import numpy as np
+    >>> predictor = ArgmaxPredictor()
+    >>> train_scores = np.array([[0.2, 0.8, 0.0], [0.7, 0.1, 0.2]])
+    >>> labels = [1, 0]  # Single-label targets
+    >>> predictor.fit(train_scores, labels)
+    >>> test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [1 0]
+
+    >>> # Save the predictor's state
+    >>> predictor.dump("outputs/")
+    >>> loaded_predictor = ArgmaxPredictor()
+    >>> loaded_predictor.load("outputs/")
+    >>> loaded_predictions = loaded_predictor.predict(test_scores)
+    >>> print(loaded_predictions)
+    [1 0]
+    """
 
     name = "argmax"
     n_classes: int
