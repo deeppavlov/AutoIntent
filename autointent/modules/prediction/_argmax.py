@@ -25,7 +25,9 @@ class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
 class ArgmaxPredictor(PredictionModule):
     """
     Argmax prediction module.
-    
+
+    :ivar n_classes: Number of classes in the dataset.
+
     The ArgmaxPredictor is a simple predictor that selects the class with the highest
     score (argmax) for single-label classification tasks.
 
