@@ -45,6 +45,35 @@ class AdaptivePredictor(PredictionModule):
     :ivar _r: Scaling factor for thresholds.
     :ivar tags: List of Tag objects for mutually exclusive classes.
     :ivar name: Name of the predictor, defaults to "adaptive".
+
+    Parameters
+    ----------
+    search_space : list[float], optional
+        List of threshold scaling factors to search for optimal performance.
+        Defaults to a range between 0 and 1.
+
+    Examples
+    --------
+    >>> from autointent.modules import AdaptivePredictor
+    >>> import numpy as np
+    >>> scores = np.array([[0.8, 0.1, 0.4], [0.2, 0.9, 0.5]])
+    >>> labels = [[1, 0, 0], [0, 1, 0]]
+    >>> search_space = [0.1, 0.2, 0.3, 0.5, 0.7]
+    >>> predictor = AdaptivePredictor(search_space=search_space)
+    >>> predictor.fit(scores, labels)
+    >>> predictions = predictor.predict(scores)
+    >>> print(predictions)
+    [[1 0 0]
+     [0 1 0]]
+
+    >>> # Save and load the predictor
+    >>> predictor.dump("path/to/save")
+    >>> predictor_loaded = AdaptivePredictor()
+    >>> predictor_loaded.load("path/to/save")
+    >>> predictions = predictor_loaded.predict(scores)
+    >>> print(predictions)
+    [[1 0 0]
+     [0 1 0]]
     """
 
     metadata_dict_name = "metadata.json"
