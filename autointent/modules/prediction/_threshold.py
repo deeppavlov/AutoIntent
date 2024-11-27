@@ -54,7 +54,7 @@ class ThresholdPredictor(PredictionModule):
     >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
     >>> predictions = predictor.predict(test_scores)
     >>> print(predictions)
-    [1, 0]
+    [1 0]
 
     Multi-label classification example:
     >>> labels = [[1, 0], [0, 1], [1, 1]]
@@ -63,12 +63,12 @@ class ThresholdPredictor(PredictionModule):
     >>> test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
     >>> predictions = predictor.predict(test_scores)
     >>> print(predictions)
-    [[0 1], [1 0]]
+    [[0 1] [1 0]]
 
     Save and load the model:
-    >>> predictor.dump("model_dir")
+    >>> predictor.dump("outputs/")
     >>> loaded_predictor = ThresholdPredictor(thresh=0.5)
-    >>> loaded_predictor.load("model_dir")
+    >>> loaded_predictor.load("outputs/")
     >>> print(loaded_predictor.thresh)
     0.5
     """
