@@ -6,7 +6,12 @@
 # %%
 import importlib.resources as ires
 
+import datasets
+
 from autointent.context.data_handler import Dataset
+
+# %%
+datasets.logging.disable_progress_bar() # disable tqdm outputs
 
 # %% [markdown]
 """
@@ -173,9 +178,7 @@ For example, you can load the `autointent/datafiles/dstc3-20shot.json` file like
 
 # %%
 dataset = Dataset.from_json(
-    ires.files("autointent.datafiles").joinpath(
-        "autointent/datafiles/dstc3-20shot.json",
-    ),
+    ires.files("autointent.datafiles").joinpath("dstc3-20shot.json"),
 )
 
 # %% [markdown]
@@ -186,7 +189,7 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 """
 
 # %%
-dataset = Dataset.from_datasets("<repo_id>")
+# dataset = Dataset.from_datasets("<repo_id>")
 
 # %% [markdown]
 """
@@ -217,8 +220,7 @@ so you can work with them accordingly.
 """
 
 # %%
-dataset["train"]["label"]  # getting all train labels
-dataset["train"]["utterance"]  # getting all train utterances
+dataset["train"][:5]  # get first 5 train samples
 
 # %% [markdown]
 """
@@ -228,7 +230,7 @@ Metadata that you added to intents in your dataset is stored in `intents: list[I
 """
 
 # %%
-dataset.intents
+dataset.intents[0] # get intent (id=0)
 
 # %% [markdown]
 """
@@ -239,4 +241,4 @@ Ensure that you are logged in using the `huggingface-cli` tool:
 """
 
 # %%
-dataset.push_to_hub("<repo_id>")
+# dataset.push_to_hub("<repo_id>")
