@@ -22,7 +22,7 @@ class RetrievalNodeInfo(NodeInfo):
     )
 
     modules_available: ClassVar[Mapping[str, type[Module]]] = (
-        RETRIEVAL_MODULES_MULTICLASS | RETRIEVAL_MODULES_MULTILABEL
+        RETRIEVAL_MODULES_MULTICLASS | RETRIEVAL_MODULES_MULTILABEL  # type: ignore[has-type]
     )
 
     node_type = NodeType.retrieval
