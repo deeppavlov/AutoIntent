@@ -115,7 +115,7 @@ Start Auto Configuration
 
     from autointent.pipeline import PipelineOptimizer
 
-    pipeline_optimizer = PipelineOptimizer.from_search_space(search_space)
+    pipeline_optimizer = PipelineOptimizer.from_dict(search_space)
     pipeline_optimizer.fit(dataset)
 
 Yaml Format
