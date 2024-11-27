@@ -144,9 +144,13 @@ class AdaptivePredictor(PredictionModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             metadata: AdaptivePredictorDumpMetadata = json.load(file)
 
+        if metadata["tags"] is not None and isinstance(metadata["tags"], list):
+            self.tags = [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type, union-attr]
+        else:
+            self.tags = None
+
         self._r = metadata["r"]
         self.n_classes = metadata["n_classes"]
-        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
         self.metadata = metadata
 
 
