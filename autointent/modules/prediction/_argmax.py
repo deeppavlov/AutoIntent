@@ -44,7 +44,7 @@ class ArgmaxPredictor(PredictionModule):
     >>> print(predictions)
     [1 0]
 
-    >>> # Save the predictor's state
+    Save the predictor's state:
     >>> predictor.dump("outputs/")
     >>> loaded_predictor = ArgmaxPredictor()
     >>> loaded_predictor.load("outputs/")

@@ -66,7 +66,7 @@ class AdaptivePredictor(PredictionModule):
     [[1 0 0]
      [0 1 0]]
 
-    >>> # Save and load the predictor
+    Save and load the predictor:
     >>> predictor.dump("outputs/")
     >>> predictor_loaded = AdaptivePredictor()
     >>> predictor_loaded.load("outputs/")

@@ -56,7 +56,7 @@ class JinoosPredictor(PredictionModule):
     >>> print(predictions)
     [1, -1]  # Example output: -1 indicates OOS samples
 
-    >>> # Save and load the predictor state:
+    Save and load the predictor state:
     >>> predictor.dump("outputs/")
     >>> loaded_predictor = JinoosPredictor()
     >>> loaded_predictor.load("outputs/")
