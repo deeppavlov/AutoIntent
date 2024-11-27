@@ -14,6 +14,7 @@ from autointent.configs._pipeline_optimizer import PipelineOptimizerConfig
 from autointent.context.data_handler import Dataset
 from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
+from autointent.utils import load_default_search_space
 
 
 class PipelineOptimizer:
@@ -59,6 +60,15 @@ class PipelineOptimizer:
         :param config: Dictionary config
         """
         return instantiate(PipelineOptimizerConfig, **search_space)  # type: ignore[no-any-return]
+
+    @classmethod
+    def default(cls, multilabel: bool) -> Self:
+        """
+        Create pipeline optimizer with default search space for given classification task.
+
+        :param multilabel: Wether the task multi-label, or single-label.
+        """
+        return cls.from_dict(load_default_search_space(multilabel))
 
     def _fit(self, context: Context) -> None:
         """

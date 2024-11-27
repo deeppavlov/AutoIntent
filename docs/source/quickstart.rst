@@ -17,30 +17,56 @@ AutoIntent можно установить с помощью менеджера 
 Data Format
 -----------
 
-Для работы с AutoIntent нужно привести обучающие данные в специальный формат.
+Для работы с AutoIntent нужно привести обучающие данные в специальный формат. You need to provide a training split containing samples with utterances and labels, as shown below:
 
-.. todo::
+.. code-block:: json
 
-    Написать когда закончится рефакторинг датасетов
+    {
+        "train": [
+            {
+                "utterance": "Hello!",
+                "label": 0
+            }
+        ]
+    }
+
+For a multilabel dataset, the ``label`` field should be a list of integers representing the corresponding class labels.
+
+To use it with our Python API, you can yse our :class:`autointent.Dataset` object. 
+
+.. code-block:: python
+
+    from autointent import Dataset
+
+    dataset = Dataset.from_dict({"train": [...]})
+
+To load dataset from file system into python, :meth:`autointent.Dataset.from_json` method exists:
+
+.. code-block:: python
+
+    dataset = Dataset.from_json("/path/to/json")
 
 AutoML goes brrr...
 -------------------
 
-Когда данные готовы, можно запускать построение оптимального классификатора.
-
-Из командной строки:
+Когда данные готовы, можно запускать построение оптимального классификатора из командной строки:
 
 .. code-block:: bash
 
     autointent data.train_path="path/to/your/data.json"
 
-Эта команда запустит поиск гиперпараметров в дефолтном пространстве поиска. Больше про пространство поиска и как выбирать его кастомным смотрите в гайде :doc:`guides/search_space_configuration`. 
+Эта команда запустит поиск гиперпараметров в дефолтном пространстве поиска.
 
 По итогу в текущей рабочей директории создастся папка ``runs``, в которой будет сохранен подобранный классификатор, готовый к инференсу. Больше про папку рана и что в нем сохраняется смотрите в гайде :doc:`guides/optimization_results`.
 
-.. seealso::
+Аналогичные действия но в ограниченном режиме можно запустить с помощью Python API:
 
-    Построить классификатор из данных можно и с помощью Python API. Больше об этом смотрите в наших туториалах про оптимизацию :doc:`tutorials/index_pipeline_optimization`. 
+.. code-block:: python
+
+    from autointent import PipelineOptimizer
+
+    pipeline_optimizer = PipelineOptimizer.default(multilabel=False)
+    pipeline_optimizer.fit(dataset)
 
 Inference
 ---------
@@ -54,10 +80,6 @@ Inference
     inference_pipeline = InferencePipeline.load("path/to/run/directory")
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
-
-.. seealso::
-
-    Больше про возможные варианты инференса смотрите в нашем туториале :doc:`tutorials/index_pipeline_inference`
 
 Modular Approach
 ----------------
@@ -82,6 +104,12 @@ Modular Approach
     ]
     scorer.predict(test_utterances)
 
-.. seealso::
+Futher Reading
+--------------
 
-    Больше про использование методов классификации напрямую, смотрите в наших туториалах :doc:`tutorials/index_scoring_modules`, :doc:`tutorials/index_prediction_modules`.
+- Больше про работу с данными в AutoIntent читайте в нашем туториале :doc:`tutorials/index_data.`
+- Про то, как устроена автоконфигурация в нашей библиотеке, смотрите в разделе :doc:`learn/optimization`.
+- Больше про пространство поиска и как выбирать его кастомным смотрите в гайде :doc:`guides/search_space_configuration`. 
+- Построить классификатор из данных можно и с помощью Python API. Больше об этом смотрите в наших туториалах про оптимизацию :doc:`tutorials/index_pipeline_optimization`. 
+- Больше про возможные варианты инференса смотрите в нашем туториале :doc:`tutorials/index_pipeline_inference`
+- Больше про использование методов классификации напрямую, смотрите в наших туториалах :doc:`tutorials/index_scoring_modules`, :doc:`tutorials/index_prediction_modules`.

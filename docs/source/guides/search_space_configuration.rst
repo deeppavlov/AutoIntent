@@ -8,7 +8,7 @@ Python API
 
 .. note::
 
-    Перед чтением данного гайда советуем ознамомиться с разделами :doc:`../concepts` и :doc:`../learn/greedy_optimization`.
+    Перед чтением данного гайда советуем ознамомиться с разделами :doc:`../concepts` и :doc:`../learn/optimization`.
 
 Optimization Module
 -------------------
