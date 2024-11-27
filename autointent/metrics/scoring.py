@@ -102,8 +102,13 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
 def _calculate_prediction_metric(
     func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
 ) -> float:
-    """
+    r"""
     Calculate prediction metric.
+
+    This function applies the given prediction metric function :func:`func` to evaluate the predictions.
+    It transforms the inputs and computes predictions based on the input scores:
+    - For multiclass classification, predictions are generated using :func:`np.argmax`.
+    - For multilabel classification, predictions are generated using a threshold of 0.5.
 
     :param func: prediction metric function
     :param labels: ground truth labels for each utterance
@@ -123,8 +128,11 @@ def _calculate_prediction_metric(
 
 
 def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multiclass and multilabel.
+    r"""
+    Calculate accuracy for multiclass and multilabel classification.
+
+    This function computes accuracy by using :func:`prediction_accuracy` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
 
     :param labels: ground truth labels for each utterance
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
@@ -134,47 +142,66 @@ def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
 
 
 def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multiclass and multilabel.
+    r"""
+    Calculate the F1 score for multiclass and multilabel classification.
 
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    This function computes the F1 score by using :func:`prediction_f1` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: F1 score
     """
     return _calculate_prediction_metric(prediction_f1, labels, scores)
 
 
 def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multiclass and multilabel.
+    r"""
+    Calculate precision for multiclass and multilabel classification.
 
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    This function computes precision by using :func:`prediction_precision` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Precision score
     """
     return _calculate_prediction_metric(prediction_precision, labels, scores)
 
 
 def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multiclass and multilabel.
+    r"""
+    Calculate recall for multiclass and multilabel classification.
 
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    This function computes recall by using :func:`prediction_recall` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Recall score
     """
     return _calculate_prediction_metric(prediction_recall, labels, scores)
 
 
 def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multilabel.
+    r"""
+    Calculate the hit rate for multilabel classification.
 
-    calculates fraction of cases when the top-ranked label is in the set of proper labels of the instance
+    The hit rate measures the fraction of cases where the top-ranked label is in the set
+    of true labels for the instance.
 
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    .. math::
+
+        \text{Hit Rate} = \frac{1}{N} \sum_{i=1}^N \mathbb{1}(y_{\text{top},i} \in y_{\text{true},i})
+
+    where:
+    - :math:`N` is the total number of instances,
+    - :math:`y_{\text{top},i}` is the top-ranked predicted label for instance :math:`i`,
+    - :math:`y_{\text{true},i}` is the set of ground truth labels for instance :math:`i`.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Hit rate score
     """
     labels_, scores_ = transform(labels, scores)
 
@@ -237,16 +264,16 @@ def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYP
 
 
 def scoring_map(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    Supports multilabel.
+    r"""
+    Calculate the mean average precision (MAP) score for multilabel classification.
 
-    mean average precision score
+    The MAP score measures the precision at different levels of ranking,
+    averaged across all queries. The ideal value is 1, indicating perfect ranking, while the worst value is 0.
 
-    the ideal value is 1, the worst is 0
+    This function utilizes :func:`sklearn.metrics.label_ranking_average_precision_score` for computation.
 
-
-    :param labels: ground truth labels for each utterance
-    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
-    :return: Score of the scoring metric
+    :param labels: ground truth labels for each sample
+    :param scores: for each sample, this list contains scores for each of `n_classes` classes
+    :return: mean average precision score
     """
     return label_ranking_average_precision_score(labels, scores)  # type: ignore[no-any-return]

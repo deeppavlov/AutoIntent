@@ -48,6 +48,7 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = ["conf.py", "docs_utils/*"]
 
+autoapi_keep_files = True
 autoapi_dirs = [Path.cwd().parent.parent / "autointent"]
 autoapi_options = [
     "members",
