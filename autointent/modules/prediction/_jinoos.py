@@ -48,7 +48,7 @@ class JinoosPredictor(PredictionModule):
     >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
     >>> predictions = predictor.predict(test_scores)
     >>> print(predictions)
-    [1, -1]  # Example output: -1 indicates OOS samples
+    [1 0]
 
     Save and load the predictor state:
     >>> predictor.dump("outputs/")

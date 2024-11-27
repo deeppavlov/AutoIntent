@@ -49,7 +49,6 @@ class ThresholdPredictor(PredictionModule):
     >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
     >>> labels = [1, 0, 1]
     >>> threshold = 0.5
-
     >>> predictor = ThresholdPredictor(thresh=threshold)
     >>> predictor.fit(scores, labels)
     >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
