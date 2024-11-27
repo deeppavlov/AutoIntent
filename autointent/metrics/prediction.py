@@ -105,8 +105,9 @@ def prediction_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
     r"""
     Calculate ROC AUC for multiclass and multilabel classification.
 
-    This function serves as a wrapper that delegates to either :func:`_prediction_roc_auc_multiclass`
-    or :func:`_prediction_roc_auc_multilabel` based on the dimensions of the input data.
+    The ROC AUC measures the ability of a model to distinguish between classes.
+    It is calculated as the area under the curve of the true positive rate (TPR)
+    against the false positive rate (FPR) at various threshold settings.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
