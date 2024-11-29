@@ -4,6 +4,10 @@ version = "0.2.1-alpha1"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
 authors = ["voorhs <ilya_alekseev_2016@list.ru>"]
 readme = "README.md"
+homepage = "https://deeppavlov.github.io/AutoIntent/"
+repository = "https://github.com/deeppavlov/AutoIntent"
+documentation = "https://deeppavlov.github.io/AutoIntent/"
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
