@@ -11,7 +11,7 @@ from .prediction import (
 )
 from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule
+from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule, SklearnScorer
 
 T = TypeVar("T", bound=Module)
 
@@ -25,11 +25,11 @@ RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict([Vec
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
 
 SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict(
-    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer]
+    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer, SklearnScorer]
 )
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
-    [MLKnnScorer, LinearScorer, DescriptionScorer]
+    [MLKnnScorer, LinearScorer, DescriptionScorer, SklearnScorer]
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
@@ -42,8 +42,7 @@ PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
 
 __all__ = [
     "Module",
-    "AdaptivePredictor"
-    "ArgmaxPredictor",
+    "AdaptivePredictor" "ArgmaxPredictor",
     "JinoosPredictor",
     "PredictionModule",
     "ThresholdPredictor",
@@ -57,6 +56,7 @@ __all__ = [
     "MLKnnScorer",
     "DescriptionScorer",
     "ScoringModule",
+    "SklearnScorer",
     "RETRIEVAL_MODULES_MULTICLASS",
     "RETRIEVAL_MODULES_MULTILABEL",
     "SCORING_MODULES_MULTICLASS",
