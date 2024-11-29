@@ -98,8 +98,8 @@ class DocumentationLink(ReplacePattern):
     @staticmethod
     def link_to_doc_page(
         page_type: Literal["api", "tutorial", "guide"],
-        page: str,
-        anchor: str | None = None,
+        dotpath: str,
+        obj: str | None = None,
     ) -> str:
         """
         Create a link to a documentation page.
@@ -111,10 +111,10 @@ class DocumentationLink(ReplacePattern):
                 - "tutorial" -- Tutorials
                 - "guide" -- User guides
 
-        :param page:
-            Name of the page without the common prefix.
+        :param dotpath:
+            Path to the index page in unix style.
 
-            So, to link to keywords, pass "script.core.keywords" as page (omitting the "chatsky" prefix).
+            So, to link Dataset, pass "context" as page (omitting the "autointent" prefix).
 
             To link to the basic script tutorial, pass "script.core.1_basics" (without the "tutorials" prefix).
 
@@ -122,7 +122,7 @@ class DocumentationLink(ReplacePattern):
 
             API index pages are also supported.
             Passing "index_pipeline" will link to the "apiref/index_pipeline.html" page.
-        :param anchor:
+        :param obj:
             An anchor on the page. (optional)
 
             For the "api" type, use only the last part of the linked object.
@@ -134,12 +134,14 @@ class DocumentationLink(ReplacePattern):
             A link to the corresponding documentation part.
         """
         if page_type == "api":
-            prefix = "" if page.startswith("index") else "chatsky."
-            return f"../apiref/{prefix}{page}.rst" + (f"#{prefix}{page}.{anchor}" if anchor is not None else "")
-        if page_type == "tutorial":
-            return f"../tutorials/tutorials.{page}.py" + (f"#{anchor}" if anchor is not None else "")
-        if page_type == "guide":
-            return f"../user_guides/{page}.rst" + (f"#{anchor}" if anchor is not None else "")
+            path = "/".join(dotpath.split("."))
+            return f"../autoapi/autointent/{path}/index.rst" + (
+                f"#autointent.{dotpath}.{obj}" if obj is not None else ""
+            )
+        # if page_type == "tutorial":
+        #     return f"../tutorials/tutorials.{page}.py" + (f"#{anchor}" if anchor is not None else "")
+        # if page_type == "guide":
+        #     return f"../guides/{page}.rst" + (f"#{anchor}" if anchor is not None else "")
         msg = "Unexpected page type"
         raise ValueError(msg)
 
