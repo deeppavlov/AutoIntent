@@ -55,7 +55,7 @@ Once the data is ready, you can start building the optimal classifier from the c
 
     autointent data.train_path="path/to/your/data.json"
 
-This command will start the hyperparameter search in the default search space.
+This command will start the hyperparameter search in the default :ref:`search space <key-search-space>`.
 
 As a result, a ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference. More about the run folder and what is saved in it can be found in the guide :doc:`guides/optimization_results`.
 
@@ -107,6 +107,7 @@ If there is no need to iterate over pipelines and hyperparameters, you can impor
 Further Reading
 ---------------
 
+- Get familiar with :doc:`concepts`.
 - Learn more about working with data in AutoIntent in our tutorial :doc:`tutorials/index_data`.
 - Learn about how auto-configuration works in our library in the section :doc:`learn/optimization`.
 - Learn more about the search space and how to customize it in the guide :doc:`guides/search_space_configuration`.
