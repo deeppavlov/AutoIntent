@@ -27,7 +27,39 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
 
 class DescriptionScorer(ScoringModule):
-    """Scoring module that scores utterances based on similarity to intent descriptions."""
+    r"""
+    Scoring module that scores utterances based on similarity to intent descriptions.
+
+    DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
+    between the two, using either cosine similarity and softmax.
+
+    :ivar weights_file_name: Filename for saving the description vectors (`description_vectors.npy`).
+    :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
+    :ivar precomputed_embeddings: Flag indicating whether precomputed embeddings are used.
+    :ivar embedding_model_subdir: Directory for storing the embedder's model files.
+    :ivar _vector_index: Internal vector index used when embeddings are precomputed.
+    :ivar db_dir: Directory path where the vector database is stored.
+    :ivar name: Name of the scorer, defaults to "description".
+
+    Examples
+    --------
+    Creating and fitting the DescriptionScorer
+    >>> from autointent.modules import DescriptionScorer
+    >>> utterances = ["what is your name?", "how old are you?"]
+    >>> labels = [0, 1]
+    >>> descriptions = ["greeting", "age-related question"]
+    >>> scorer = DescriptionScorer(embedder_name="your_embedder", temperature=1.0)
+    >>> scorer.fit(utterances, labels, descriptions)
+
+    Predicting scores:
+    >>> scores = scorer.predict(["tell me about your age?"])
+    >>> print(scores)  # Outputs similarity scores for the utterance against all descriptions
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = DescriptionScorer(embedder_name="your_embedder")
+    >>> loaded_scorer.load("outputs/")
+    """
 
     weights_file_name: str = "description_vectors.npy"
     embedder: Embedder

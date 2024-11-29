@@ -40,13 +40,10 @@ class VectorDBModule(RetrievalModule):
     >>> labels = [1, 2, 3]
     >>> vector_db = VectorDBModule(k=2, embedder_name="some_embedder", db_dir="./db", device="cpu")
     >>> vector_db.fit(utterances, labels)
-
-    Evaluating the retrieval model:
     >>> def retrieval_metric_fn(true_labels, predicted_labels):
     >>>     # Custom metric function (e.g., accuracy or F1 score)
     >>>     return sum([1 if true == pred else 0 for true, pred \\
     >>>         in zip(true_labels, predicted_labels)]) / len(true_labels)
-
     >>> score = vector_db.score(context, retrieval_metric_fn)
     >>> print(score)
 
