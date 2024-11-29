@@ -1,7 +1,9 @@
 """Inference pipeline for prediction."""
 
+from pathlib import Path
 from typing import Any
 
+import yaml
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -62,6 +64,12 @@ class InferencePipeline:
         """
         nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         return cls(nodes)
+
+    @classmethod
+    def load(cls, path: str | Path) -> Self:
+        with (Path(path) / "inference_config.yaml").open() as file:
+            inference_dict_config = yaml.safe_load(file)
+        return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
         """

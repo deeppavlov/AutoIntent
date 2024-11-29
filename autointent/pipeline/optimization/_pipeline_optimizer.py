@@ -14,6 +14,7 @@ from autointent.configs._pipeline_optimizer import PipelineOptimizerConfig
 from autointent.context.data_handler import Dataset
 from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
+from autointent.utils import load_default_search_space
 
 
 class PipelineOptimizer:
@@ -52,15 +53,24 @@ class PipelineOptimizer:
             raise TypeError(msg)
 
     @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> Self:
+    def from_dict(cls, search_space: dict[str, Any]) -> Self:
         """
-        Create pipeline optimizer from dictionary config.
+        Create pipeline optimizer from dictionary search space.
 
         :param config: Dictionary config
         """
-        return instantiate(PipelineOptimizerConfig, **config)  # type: ignore[no-any-return]
+        return instantiate(PipelineOptimizerConfig, **search_space)  # type: ignore[no-any-return]
 
-    def optimize(self, context: Context) -> None:
+    @classmethod
+    def default(cls, multilabel: bool) -> Self:
+        """
+        Create pipeline optimizer with default search space for given classification task.
+
+        :param multilabel: Wether the task multi-label, or single-label.
+        """
+        return cls.from_dict(load_default_search_space(multilabel))
+
+    def _fit(self, context: Context) -> None:
         """
         Optimize the pipeline.
 
@@ -74,7 +84,7 @@ class PipelineOptimizer:
             self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
 
-    def optimize_from_dataset(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
+    def fit(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -87,7 +97,7 @@ class PipelineOptimizer:
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
 
-        self.optimize(context)
+        self._fit(context)
         self.inference_config = context.optimization_info.get_inference_nodes_config()
         return context
 

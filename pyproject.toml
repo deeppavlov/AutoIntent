@@ -69,7 +69,7 @@ sphinx-copybutton = "^0.5.2"
 sphinx-autoapi = "^3.3.3"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
+"autointent" = "autointent.pipeline.optimization._cli_endpoint:main"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 

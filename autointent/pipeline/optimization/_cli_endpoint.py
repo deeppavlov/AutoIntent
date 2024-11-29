@@ -33,8 +33,8 @@ def main(cfg: OptimizationConfig) -> None:
 
     # run optimization
     search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)
-    pipeline = PipelineOptimizer.from_dict_config(search_space_config)
-    pipeline.optimize(context)
+    pipeline = PipelineOptimizer.from_dict(search_space_config)
+    pipeline._fit(context)  # noqa: SLF001
 
     # save results
     context.dump()
