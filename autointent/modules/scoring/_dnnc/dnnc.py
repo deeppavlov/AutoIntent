@@ -31,7 +31,7 @@ class DNNCScorerDumpMetadata(BaseMetadataDict):
 
 
 class DNNCScorer(ScoringModule):
-    """
+    r"""
     Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
 
     This module uses a CrossEncoder for scoring candidate intents and can optionally
@@ -50,6 +50,45 @@ class DNNCScorer(ScoringModule):
           url={https://arxiv.org/abs/2010.13009},
         }
 
+    :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`crossencoder`).
+    :ivar model: The model used for scoring, which could be a `CrossEncoder` or a `CrossEncoderWithLogreg`.
+    :ivar prebuilt_index: Flag indicating whether a prebuilt vector index is used.
+    :ivar _db_dir: Path to the database directory where the vector index is stored.
+    :ivar name: Name of the scorer, defaults to "dnnc".
+
+    Examples
+    --------
+    Creating and fitting the DNNCScorer:
+    >>> from autointent.modules import DNNCScorer
+    >>> utterances = ["what is your name?", "how are you?"]
+    >>> labels = ["greeting", "greeting"]
+    >>> scorer = DNNCScorer(
+    >>>     cross_encoder_name="cross_encoder_model",
+    >>>     embedder_name="embedder_model",
+    >>>     k=5,
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda",
+    >>>     train_head=True,
+    >>>     batch_size=32,
+    >>>     max_length=128
+    >>> )
+    >>> scorer.fit(utterances, labels)
+
+    Predicting scores:
+    >>> test_utterances = ["Hello!", "What's up?"]
+    >>> scores = scorer.predict(test_utterances)
+    >>> print(scores)  # Outputs similarity scores for the utterances
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = DNNCScorer(
+    >>>     cross_encoder_name="cross_encoder_model",
+    >>>     embedder_name="embedder_model",
+    >>>     k=5,
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda"
+    >>> )
+    >>> loaded_scorer.load("outputs/")
     """
 
     name = "dnnc"
