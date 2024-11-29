@@ -244,3 +244,11 @@ Ensure that you are logged in using the `huggingface-cli` tool:
 
 # %%
 # dataset.push_to_hub("<repo_id>")
+
+# %% [markdown]
+"""
+## See Also
+
+- Training on your data: %mddoclink(tutorial,pipeline_optimization.demo)
+- [Key Concepts](../concepts.html)
+"""

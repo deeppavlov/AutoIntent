@@ -138,10 +138,10 @@ class DocumentationLink(ReplacePattern):
             return f"../autoapi/autointent/{path}/index.rst" + (
                 f"#autointent.{dotpath}.{obj}" if obj is not None else ""
             )
-        # if page_type == "tutorial":
-        #     return f"../tutorials/tutorials.{page}.py" + (f"#{anchor}" if anchor is not None else "")
-        # if page_type == "guide":
-        #     return f"../guides/{page}.rst" + (f"#{anchor}" if anchor is not None else "")
+        if page_type == "tutorial":
+            return f"../tutorials/tutorials.{dotpath}.py"
+        if page_type == "guide":
+            return f"../guides/{dotpath}.rst" + (f"#{obj}" if obj is not None else "")
         msg = "Unexpected page type"
         raise ValueError(msg)
 
