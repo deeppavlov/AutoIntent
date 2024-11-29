@@ -1,48 +1,60 @@
+"""Scoring metrics for multiclass and multilabel classification tasks."""
+
 import logging
 from typing import Protocol
 
 import numpy as np
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
-from .converter import transform
-from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+from ._converter import transform
+from ._custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 logger = logging.getLogger(__name__)
 
 
 class ScoringMetricFn(Protocol):
+    """Protocol for scoring metrics."""
+
     def __call__(self, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
         """
-        Arguments
-        ---
-        - `labels`: ground truth labels for each utterance
+        Calculate scoring metric.
+
+        :param labels: ground truth labels for each utterance
             - multiclass case: list representing an array of shape `(n_samples,)` with integer values
             - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with integer values
-        - `scores`: for each utterance, this list contains scores for each of `n_classes` classes
+        :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+        :return: Score of the scoring metric
         """
         ...
 
 
 def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE, eps: float = 1e-10) -> float:
-    """
-    supports multiclass and multilabel
+    r"""
+    Supports multiclass and multilabel cases.
 
-    Multiclass case
-    ---
-    mean negative cross-entropy for each utterance classification result, i.e.
-    ```math
-    {1\\over\\ell}\\sum_{i=1}^\\ell log(s[y[i]]),
-    ```
-    where `s[y[i]]` is a predicted score of `i`th utterance having ground truth label
+    Multiclass case:
+    Mean negative cross-entropy for each utterance classification result:
 
-    Multilabel case
-    ---
-    mean negative binary cross-entropy, i.e.
-    ```math
-    {1\\over\\ell}\\sum_{i=1}^\\ell\\sum_{c=1}^C [y[i,c]\\cdot\\log(s[i,c])+(1-y[i,c])\\cdot\\log(1-s[i,c])]
-    ```
-    where `s[i,c]` is a predicted score of `i`th utterance having ground truth label `c`
+    .. math::
+
+        \frac{1}{\ell}\sum_{i=1}^{\ell}\log(s[y[i]])
+
+    where ``s[y[i]]`` is the predicted score of the ``i``-th utterance having the ground truth label.
+
+    Multilabel case:
+    Mean negative binary cross-entropy:
+
+    .. math::
+
+        \frac{1}{\ell}\sum_{i=1}^\ell\sum_{c=1}^C\Big[y[i,c]\cdot\log(s[i,c])+(1-y[i,c])\cdot\log(1-s[i,c])\Big]
+
+    where ``s[i,c]`` is the predicted score of the ``i``-th utterance having the ground truth label ``c``.
+
+    :param labels: Ground truth labels for each utterance.
+    :param scores: For each utterance, a list containing scores for each of `n_classes` classes.
+    :param eps: A small value to avoid division by zero.
+    :return: Score of the scoring metric.
     """
     labels_array, scores_array = transform(labels, scores)
     scores_array[scores_array == 0] = eps
@@ -63,13 +75,20 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 
 
 def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multiclass and multilabel
+    r"""
+    Supports multiclass and multilabel cases.
 
-    macro averaged roc-auc for utterance classification task, i.e.
-    ```math
-    {1\\over C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
-    ```
+    Macro averaged roc-auc for utterance classification task, i.e.
+
+    .. math::
+
+        \frac{1}{C}\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
+
+    where ``C`` is the number of classes
+
+    :param labels: ground truth labels for each utterance
+    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+    :return: Score of the scoring metric
     """
     labels_, scores_ = transform(labels, scores)
 
@@ -80,9 +99,22 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
     return roc_auc_score(labels_, scores_, average="macro")  # type: ignore[no-any-return]
 
 
-def calculate_prediction_metric(
+def _calculate_prediction_metric(
     func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
 ) -> float:
+    r"""
+    Calculate prediction metric.
+
+    This function applies the given prediction metric function :func:`func` to evaluate the predictions.
+    It transforms the inputs and computes predictions based on the input scores:
+    - For multiclass classification, predictions are generated using :func:`np.argmax`.
+    - For multilabel classification, predictions are generated using a threshold of 0.5.
+
+    :param func: prediction metric function
+    :param labels: ground truth labels for each utterance
+    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+    :return: Score of the scoring metric
+    """
     labels_, scores_ = transform(labels, scores)
 
     if labels_.ndim == 1:
@@ -96,38 +128,80 @@ def calculate_prediction_metric(
 
 
 def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+    r"""
+    Calculate accuracy for multiclass and multilabel classification.
+
+    This function computes accuracy by using :func:`prediction_accuracy` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: ground truth labels for each utterance
+    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+    :return: Score of the scoring metric
     """
-    supports multiclass and multilabel
-    """
-    return calculate_prediction_metric(prediction_accuracy, labels, scores)
+    return _calculate_prediction_metric(prediction_accuracy, labels, scores)
 
 
 def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+    r"""
+    Calculate the F1 score for multiclass and multilabel classification.
+
+    This function computes the F1 score by using :func:`prediction_f1` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: F1 score
     """
-    supports multiclass and multilabel
-    """
-    return calculate_prediction_metric(prediction_f1, labels, scores)
+    return _calculate_prediction_metric(prediction_f1, labels, scores)
 
 
 def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+    r"""
+    Calculate precision for multiclass and multilabel classification.
+
+    This function computes precision by using :func:`prediction_precision` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Precision score
     """
-    supports multiclass and multilabel
-    """
-    return calculate_prediction_metric(prediction_precision, labels, scores)
+    return _calculate_prediction_metric(prediction_precision, labels, scores)
 
 
 def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+    r"""
+    Calculate recall for multiclass and multilabel classification.
+
+    This function computes recall by using :func:`prediction_recall` to evaluate predictions and
+    :func:`calculate_prediction_metric` to handle the computation.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Recall score
     """
-    supports multiclass and multilabel
-    """
-    return calculate_prediction_metric(prediction_recall, labels, scores)
+    return _calculate_prediction_metric(prediction_recall, labels, scores)
 
 
 def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multilabel
+    r"""
+    Calculate the hit rate for multilabel classification.
 
-    calculates fraction of cases when the top-ranked label is in the set of proper labels of the instance
+    The hit rate measures the fraction of cases where the top-ranked label is in the set
+    of true labels for the instance.
+
+    .. math::
+
+        \text{Hit Rate} = \frac{1}{N} \sum_{i=1}^N \mathbb{1}(y_{\text{top},i} \in y_{\text{true},i})
+
+    where:
+    - :math:`N` is the total number of instances,
+    - :math:`y_{\text{top},i}` is the top-ranked predicted label for instance :math:`i`,
+    - :math:`y_{\text{true},i}` is the set of ground truth labels for instance :math:`i`.
+
+    :param labels: Ground truth labels for each sample
+    :param scores: For each sample, this list contains scores for each of `n_classes` classes
+    :return: Hit rate score
     """
     labels_, scores_ = transform(labels, scores)
 
@@ -139,26 +213,33 @@ def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
 
 def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
-    supports multilabel
+    Supports multilabel classification.
 
-    evaluates how far we need, on the average, to go down the list of labels
-    in order to cover all the proper labels of the instance
+    Evaluates how far we need, on average, to go down the list of labels in order to cover
+    all the proper labels of the instance.
 
-    the ideal value is 1, the worst is 0
+    - The ideal value is 1
+    - The worst value is 0
 
-    the result is the same as after executing the following code:
-    ```
-    scores = np.array(scores)
-    labels = np.array(labels)
+    The result is equivalent to executing the following code:
 
-    n_classes = scores.shape[1]
-    from scipy.stats import rankdata
-    int_ranks = rankdata(scores, axis=1)  # int ranks are from [1, n_classes]
-    filtered_ranks = int_ranks * labels  # guarantee that 0 labels wont have max rank
-    max_ranks = np.max(filtered_ranks, axis=1)
-    float_ranks = (max_ranks - 1) / (n_classes - 1)  # float ranks are from [0,1]
-    res = 1 - np.mean(float_ranks)
-    ```
+    >>> def compute_rank_metric():
+    ...     import numpy as np
+    ...     scores = np.array([[1, 2, 3]])
+    ...     labels = np.array([1, 0, 0])
+    ...     n_classes = scores.shape[1]
+    ...     from scipy.stats import rankdata
+    ...     int_ranks = rankdata(scores, axis=1)
+    ...     filtered_ranks = int_ranks * labels
+    ...     max_ranks = np.max(filtered_ranks, axis=1)
+    ...     float_ranks = (max_ranks - 1) / (n_classes - 1)
+    ...     return float(1 - np.mean(float_ranks))
+    >>> print(f"{compute_rank_metric():.1f}")
+    1.0
+
+    :param labels: ground truth labels for each utterance
+    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+    :return: Score of the scoring metric
     """
     labels_, scores_ = transform(labels, scores)
 
@@ -168,22 +249,31 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
 
 def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
-    supports multilabel
+    supports multilabel.
 
     Compute the average number of label pairs that are incorrectly ordered given y_score
     weighted by the size of the label set and the number of labels not in the label set.
 
     the ideal value is 0
+
+    :param labels: ground truth labels for each utterance
+    :param scores: for each utterance, this list contains scores for each of `n_classes` classes
+    :return: Score of the scoring metric
     """
     return -label_ranking_loss(labels, scores)  # type: ignore[no-any-return]
 
 
 def scoring_map(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
-    """
-    supports multilabel
+    r"""
+    Calculate the mean average precision (MAP) score for multilabel classification.
 
-    mean average precision score
+    The MAP score measures the precision at different levels of ranking,
+    averaged across all queries. The ideal value is 1, indicating perfect ranking, while the worst value is 0.
 
-    the ideal value is 1, the worst is 0
+    This function utilizes :func:`sklearn.metrics.label_ranking_average_precision_score` for computation.
+
+    :param labels: ground truth labels for each sample
+    :param scores: for each sample, this list contains scores for each of `n_classes` classes
+    :return: mean average precision score
     """
     return label_ranking_average_precision_score(labels, scores)  # type: ignore[no-any-return]

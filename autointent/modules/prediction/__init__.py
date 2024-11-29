@@ -1,9 +1,9 @@
-from .adaptive import AdaptivePredictor
-from .argmax import ArgmaxPredictor
-from .base import PredictionModule
-from .jinoos import JinoosPredictor
-from .threshold import ThresholdPredictor
-from .tunable import TunablePredictor
+from ._adaptive import AdaptivePredictor
+from ._argmax import ArgmaxPredictor
+from ._base import PredictionModule
+from ._jinoos import JinoosPredictor
+from ._threshold import ThresholdPredictor
+from ._tunable import TunablePredictor
 
 __all__ = [
     "AdaptivePredictor",

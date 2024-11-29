@@ -5,7 +5,7 @@ nodes:
     search_space:
       - module_type: vector_db
         k: [10]
-        model_name:
+        embedder_name:
           - avsolatorio/GIST-small-Embedding-v0
           - infgrad/stella-base-en-v2
   - node_type: scoring

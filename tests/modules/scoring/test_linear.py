@@ -2,16 +2,17 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
+from tests.conftest import setup_environment
 
 
-def test_base_linear(setup_environment, dataset):
-    get_db_dir, dump_dir, logs_dir = setup_environment
+def test_base_linear(dataset):
+    get_db_dir, dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer("sergeyzh/rubert-tiny-turbo")
+    scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu")
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -36,8 +37,12 @@ def test_base_linear(setup_environment, dataset):
                     0.63123131,
                     0.1896569,
                 ],
-            ]
+            ],
         ),
         predictions,
         decimal=2,
     )
+
+    predictions, metadata = scorer.predict_with_metadata(test_data)
+    assert len(predictions) == len(test_data)
+    assert metadata is None

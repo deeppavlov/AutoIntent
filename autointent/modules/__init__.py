@@ -1,6 +1,7 @@
 from typing import TypeVar
 
-from .base import Module
+from ._base import Module
+from ._regexp import RegExp
 from .prediction import (
     AdaptivePredictor,
     ArgmaxPredictor,
@@ -9,7 +10,6 @@ from .prediction import (
     ThresholdPredictor,
     TunablePredictor,
 )
-from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, ScoringModule, SklearnScorer
 
@@ -33,34 +33,35 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
-    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
+    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor],
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
-    [AdaptivePredictor, ThresholdPredictor, TunablePredictor]
+    [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 
 __all__ = [
-    "Module",
-    "AdaptivePredictor" "ArgmaxPredictor",
-    "JinoosPredictor",
-    "PredictionModule",
-    "ThresholdPredictor",
-    "TunablePredictor",
-    "RegExp",
-    "RetrievalModule",
-    "VectorDBModule",
-    "DNNCScorer",
-    "KNNScorer",
-    "LinearScorer",
-    "MLKnnScorer",
-    "DescriptionScorer",
-    "ScoringModule",
-    "SklearnScorer",
+    "PREDICTION_MODULES_MULTICLASS",
+    "PREDICTION_MODULES_MULTILABEL",
     "RETRIEVAL_MODULES_MULTICLASS",
     "RETRIEVAL_MODULES_MULTILABEL",
     "SCORING_MODULES_MULTICLASS",
     "SCORING_MODULES_MULTILABEL",
-    "PREDICTION_MODULES_MULTICLASS",
-    "PREDICTION_MODULES_MULTILABEL",
+    "AdaptivePredictor",
+    "ArgmaxPredictor",
+    "DNNCScorer",
+    "DescriptionScorer",
+    "JinoosPredictor",
+    "KNNScorer",
+    "LinearScorer",
+    "MLKnnScorer",
+    "Module",
+    "PredictionModule",
+    "RegExp",
+    "RetrievalModule",
+    "ScoringModule",
+    "SklearnScorer",
+    "ThresholdPredictor",
+    "TunablePredictor",
+    "VectorDBModule",
 ]

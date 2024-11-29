@@ -377,10 +377,3 @@ Prediction:
     - `prediction_recall`
     - `prediction_roc_auc`
 
-## Roadmap
-
-| Version | Description                                               |
-| ------- | --------------------------------------------------------- |
-| v0.0.x  | Python API, CLI API, Greedy optimization                  |
-| v0.1.x  | Web UI for logging, Bayes optimization, data augmentation |
-| v0.2.x  | Optimization presets, improved efficiency                 |
