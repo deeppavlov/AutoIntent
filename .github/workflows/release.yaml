@@ -18,7 +18,7 @@ jobs:
     - name: Install pypa/build
       run: pip install build
     - name: Build a binary wheel and a source tarball
-      run: python3 -m build
+      run: python -m build
     - name: Store the distribution packages
       uses: actions/upload-artifact@v4
       with:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/autointent  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/test_ci_release
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
@@ -44,7 +44,6 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
-
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
@@ -73,12 +72,16 @@ jobs:
         inputs: >-
           ./dist/*.tar.gz
           ./dist/*.whl
-        release-signing-artifacts: false  # Prevent the action from uploading artifacts, because, by default it will uplpoad artifacts with tag name too
+        # Prevent the action from uploading artifacts, because, by default it will uplpoad artifacts with tag name, too
+        release-signing-artifacts: false
 
-    - name: Upload artifacts to release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          ./dist/*
+    - name: Upload artifact signatures to GitHub Release
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      # Upload to GitHub Release using the `gh` CLI.
+      # `dist/` contains the built packages, and the
+      # sigstore-produced signatures and certificates.
+      run: >-
+        gh release upload
+        '${{ github.ref_name }}' dist/**
+        --repo '${{ github.repository }}'
