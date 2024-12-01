@@ -161,14 +161,14 @@ class Dataset(dict[str, HFDataset]):
             self[split_name] = split.map(self._to_multilabel)
         return self
 
-    def push_to_hub(self, repo_id: str) -> None:
+    def push_to_hub(self, repo_id: str, private: bool = False) -> None:
         """
         Push dataset splits to a Hugging Face repository.
 
         :param repo_id: ID of the Hugging Face repository.
         """
         for split_name, split in self.items():
-            split.push_to_hub(repo_id, split=split_name)
+            split.push_to_hub(repo_id, split=split_name, private=private)
 
         if self.intents:
             intents = HFDataset.from_list([intent.model_dump() for intent in self.intents])
