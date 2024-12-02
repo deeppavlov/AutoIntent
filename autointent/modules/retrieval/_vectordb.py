@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Literal
 
 from typing_extensions import Self
 
@@ -110,7 +111,12 @@ class VectorDBModule(RetrievalModule):
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: RetrievalMetricFn,
+    ) -> float:
         """
         Evaluate the retrieval model using a specified metric function.
 
@@ -118,11 +124,14 @@ class VectorDBModule(RetrievalModule):
         :param metric_fn: Function to compute the retrieval metric.
         :return: Computed metric score.
         """
-        labels_pred, _, _ = self.vector_index.query(
-            context.data_handler.test_utterances,
-            self.k,
-        )
-        return metric_fn(context.data_handler.test_labels, labels_pred)
+        if split == "validation":
+            utterances = context.data_handler.validation_utterances(0)
+            labels = context.data_handler.validation_labels(0)
+        else:
+            utterances = context.data_handler.test_utterances()
+            labels = context.data_handler.test_labels()
+        predictions, _, _ = self.vector_index.query(utterances, self.k)
+        return metric_fn(labels, predictions)
 
     def get_assets(self) -> RetrieverArtifact:
         """

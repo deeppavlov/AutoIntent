@@ -81,7 +81,8 @@ class Dataset(dict[str, HFDataset]):
 
         :return: True if the dataset is multilabel, False otherwise.
         """
-        return isinstance(self[Split.TRAIN].features[self.label_feature], Sequence)
+        split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
+        return isinstance(self[split].features[self.label_feature], Sequence)
 
     @cached_property
     def n_classes(self) -> int:

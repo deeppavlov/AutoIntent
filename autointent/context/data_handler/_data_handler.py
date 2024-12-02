@@ -48,9 +48,31 @@ class DataHandler:
         if self.dataset.multilabel:
             self.dataset = self.dataset.encode_labels()
 
+        self.n_classes = self.dataset.n_classes
+
         if Split.TEST not in self.dataset:
-            logger.info("Splitting dataset into train and test splits")
-            self.dataset = split_dataset(self.dataset, random_seed=random_seed)
+            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
+                self.dataset,
+                split=Split.TRAIN,
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
+            self.dataset,
+            split=Split.TRAIN,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+        self.dataset.pop(Split.TRAIN)
+
+        for idx in range(2):
+            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+                self.dataset,
+                split=f"{Split.TRAIN}_{idx}",
+                test_size=0.2,
+                random_seed=random_seed,
+            )
 
         for split in self.dataset:
             if split == Split.OOS:
@@ -86,52 +108,60 @@ class DataHandler:
         """
         return self.dataset.multilabel
 
-    @property
-    def n_classes(self) -> int:
-        """
-        Get the number of classes in the dataset.
-
-        :return: Number of classes.
-        """
-        return self.dataset.n_classes
-
-    @property
-    def train_utterances(self) -> list[str]:
+    def train_utterances(self, idx: int | None = None) -> list[str]:
         """
         Get the training utterances.
 
         :return: List of training utterances.
         """
-        return cast(list[str], self.dataset[Split.TRAIN][self.dataset.utterance_feature])
+        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    @property
-    def train_labels(self) -> list[LabelType]:
+    def train_labels(self, idx: int | None = None) -> list[LabelType]:
         """
         Get the training labels.
 
         :return: List of training labels.
         """
-        return cast(list[LabelType], self.dataset[Split.TRAIN][self.dataset.label_feature])
+        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    @property
-    def test_utterances(self) -> list[str]:
+    def validation_utterances(self, idx: int | None = None) -> list[str]:
+        """
+        Get the validation utterances.
+
+        :return: List of validation utterances.
+        """
+        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
+
+    def validation_labels(self, idx: int | None = None) -> list[LabelType]:
+        """
+        Get the validatio labels.
+
+        :return: List of validatio labels.
+        """
+        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+
+    def test_utterances(self, idx: int | None = None) -> list[str]:
         """
         Get the test utterances.
 
         :return: List of test utterances.
         """
-        return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
+        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    @property
-    def test_labels(self) -> list[LabelType]:
+    def test_labels(self, idx: int | None = None) -> list[LabelType]:
         """
         Get the test labels.
 
         :return: List of test labels.
         """
-        return cast(list[LabelType], self.dataset[Split.TEST][self.dataset.label_feature])
+        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    @property
     def oos_utterances(self) -> list[str]:
         """
         Get the out-of-scope utterances.

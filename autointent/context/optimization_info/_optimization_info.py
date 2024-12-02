@@ -147,6 +147,24 @@ class OptimizationInfo:
         best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
+    def get_best_train_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the train scores from the best scorer node.
+
+        :return: Train scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.train_scores
+
+    def get_best_validation_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the validation scores from the best scorer node.
+
+        :return: Validation scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.validation_scores
+
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
         """
         Retrieve the test scores from the best scorer node.
@@ -199,7 +217,7 @@ class OptimizationInfo:
             )
         return res
 
-    def _get_best_module(self, node_type: str) -> "Module | None":
+    def get_best_module(self, node_type: str) -> "Module | None":
         """
         Retrieve the best module for a specific node type.
 
@@ -217,5 +235,5 @@ class OptimizationInfo:
 
         :return: Dictionary of the best modules for each node type.
         """
-        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
+        res = {nt: self.get_best_module(nt) for nt in NODE_TYPES}
         return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]

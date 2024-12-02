@@ -11,7 +11,7 @@ def test_multiclass(multiclass_fit_data):
     scores = np.array([[0.1, 0.9, 0], [0.8, 0, 0.2], [0, 0.3, 0.7]])
 
     predictions = predictor.predict(scores)
-    desired = np.array([1, 0, -1])
+    desired = np.array([1, 0, 2])
 
     np.testing.assert_array_equal(predictions, desired)
 
@@ -21,7 +21,7 @@ def test_multilabel(multilabel_fit_data):
     predictor.fit(*multilabel_fit_data)
     scores = np.array([[0.2, 0.9, 0], [0.8, 0, 0.6], [0, 0.4, 0.7]])
     predictions = predictor.predict(scores)
-    desired = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 0]])
+    desired = np.array([[0, 1, 0], [1, 0, 1], [0, 0, 1]])
 
     np.testing.assert_array_equal(predictions, desired)
 

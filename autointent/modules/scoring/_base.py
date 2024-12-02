@@ -1,7 +1,7 @@
 """Base class for scoring modules."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -20,7 +20,12 @@ class ScoringModule(Module, ABC):
     using a scoring metric.
     """
 
-    def score(self, context: Context, metric_fn: ScoringMetricFn) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: ScoringMetricFn,
+    ) -> float:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 
@@ -28,12 +33,24 @@ class ScoringModule(Module, ABC):
         :param metric_fn: Function to compute the scoring metric.
         :return: Computed metric value for the test set.
         """
-        self._test_scores = self.predict(context.data_handler.test_utterances)
-        res = metric_fn(context.data_handler.test_labels, self._test_scores)
+        if split == "validation":
+            utterances = context.data_handler.validation_utterances(0)
+            labels = context.data_handler.validation_labels(0)
+        else:
+            utterances = context.data_handler.test_utterances()
+            labels = context.data_handler.test_labels()
+
+        scores = self.predict(utterances)
+
         self._oos_scores = None
         if context.data_handler.has_oos_samples():
-            self._oos_scores = self.predict(context.data_handler.oos_utterances)
-        return res
+            self._oos_scores = self.predict(context.data_handler.oos_utterances())
+
+        self._train_scores = self.predict(context.data_handler.train_utterances(1))
+        self._validation_scores = self.predict(context.data_handler.validation_utterances(1))
+        self._test_scores = self.predict(context.data_handler.test_utterances())
+
+        return metric_fn(labels, scores)
 
     def get_assets(self) -> ScorerArtifact:
         """
@@ -41,7 +58,12 @@ class ScoringModule(Module, ABC):
 
         :return: ScorerArtifact containing test scores and out-of-scope (OOS) scores.
         """
-        return ScorerArtifact(test_scores=self._test_scores, oos_scores=self._oos_scores)
+        return ScorerArtifact(
+            train_scores=self._train_scores,
+            validation_scores=self._validation_scores,
+            test_scores=self._test_scores,
+            oos_scores=self._oos_scores,
+        )
 
     @abstractmethod
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
