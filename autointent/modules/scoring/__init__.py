@@ -7,12 +7,12 @@ from ._mlknn import MLKnnScorer
 from ._sklearn import SklearnScorer
 
 __all__ = [
-    "ScoringModule",
     "DescriptionScorer",
     "DNNCScorer",
     "KNNScorer",
     "LinearScorer",
     "MLKnnScorer",
+    "ScoringModule",
     "SklearnScorer",
 ]
 
