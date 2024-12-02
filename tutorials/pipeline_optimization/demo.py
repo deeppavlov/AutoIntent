@@ -16,7 +16,7 @@ from autointent.configs import (
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline.optimization._cli_endpoint import main as optimize_pipeline
+from autointent.pipeline._cli_endpoint import optimize
 from autointent.pipeline.optimization._utils import load_config
 
 # %%
@@ -40,26 +40,23 @@ def get_search_space(task_type: TaskType) -> None:
 
 
 # %%
-def optimize(task_type: TaskType) -> None:
-    db_dir, dump_dir, logs_dir = setup_environment()
-    config = OptimizationConfig(
-        data=DataConfig(
-            train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
-            force_multilabel=(task_type == "multilabel"),
-        ),
-        task=TaskConfig(
-            search_space_path=get_search_space_path(task_type),
-        ),
-        vector_index=VectorIndexConfig(
-            db_dir=db_dir,
-            device="cpu",
-        ),
-        logs=LoggingConfig(
-            dirpath=Path(logs_dir),
-        ),
-    )
-    optimize_pipeline(config)
-
+db_dir, dump_dir, logs_dir = setup_environment()
+config = OptimizationConfig(
+    data=DataConfig(
+        train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
+    ),
+    task=TaskConfig(
+        search_space_path=get_search_space_path("multiclass"),
+    ),
+    vector_index=VectorIndexConfig(
+        db_dir=db_dir,
+        device="cpu",
+    ),
+    logs=LoggingConfig(
+        dirpath=Path(logs_dir),
+    ),
+)
+optimize(config)
 
 # %%
 optimize("multiclass")

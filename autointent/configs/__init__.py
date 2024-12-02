@@ -10,7 +10,6 @@ from ._optimization_cli import (
     TaskConfig,
     VectorIndexConfig,
 )
-from ._pipeline_optimizer import PipelineOptimizerConfig
 
 __all__ = [
     "AugmentationConfig",
@@ -22,7 +21,6 @@ __all__ = [
     "LoggingConfig",
     "NodeOptimizerConfig",
     "OptimizationConfig",
-    "PipelineOptimizerConfig",
     "TaskConfig",
     "VectorIndexConfig",
 ]

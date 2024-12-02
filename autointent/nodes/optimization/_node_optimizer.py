@@ -30,6 +30,7 @@ class NodeOptimizer:
         :param search_space: Search space for the optimization
         :param metric: Metric to optimize.
         """
+        self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
         self.modules_search_spaces = search_space  # TODO search space validation

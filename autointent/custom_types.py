@@ -52,10 +52,10 @@ class BaseMetadataDict(TypedDict):
 class NodeType(str, Enum):
     """Enumeration of node types in the AutoIntent pipeline."""
 
-    retrieval = "retrieval"
-    prediction = "prediction"
-    scoring = "scoring"
     regexp = "regexp"
+    retrieval = "retrieval"
+    scoring = "scoring"
+    prediction = "prediction"
 
 
 NODE_TYPES = [NodeType.retrieval.value, NodeType.prediction.value, NodeType.scoring.value, NodeType.regexp.value]

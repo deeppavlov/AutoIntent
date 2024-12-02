@@ -13,9 +13,8 @@ from autointent.configs._optimization_cli import (
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline.optimization import PipelineOptimizer
-from autointent.pipeline.optimization._cli_endpoint import main as optimize_pipeline
-from autointent.pipeline.optimization._utils import load_config
+from autointent.pipeline import Pipeline
+from autointent.pipeline._cli_endpoint import load_config, optimize
 from tests.conftest import setup_environment
 
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -38,7 +37,7 @@ def test_no_context_optimization(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
-    pipeline_optimizer = PipelineOptimizer.from_dict(search_space)
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
@@ -56,7 +55,7 @@ def test_save_db(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
-    pipeline_optimizer = PipelineOptimizer.from_dict(search_space)
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
@@ -76,7 +75,7 @@ def test_dump_modules(dataset, task_type):
     db_dir, dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
-    pipeline_optimizer = PipelineOptimizer.from_dict(search_space)
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
@@ -110,4 +109,4 @@ def test_optimization_pipeline_cli(task_type):
             dirpath=Path(logs_dir),
         ),
     )
-    optimize_pipeline(config)
+    optimize(config)
