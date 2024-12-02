@@ -9,7 +9,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
 
-from autointent.context import Context, Embedder
+from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.scoring._base import ScoringModule
