@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import yaml
 from typing_extensions import Self
 
@@ -13,7 +14,7 @@ from autointent import Context
 from autointent.configs import InferenceNodeConfig
 from autointent.configs._optimization_cli import EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.context.data_handler import Dataset
-from autointent.custom_types import LabelType, NodeType
+from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 from autointent.nodes.inference import InferenceNode
 from autointent.utils import load_default_search_space, load_search_space
@@ -98,6 +99,9 @@ class Pipeline:
             self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
 
+    def is_inference(self) -> bool:
+        return isinstance(self.nodes[NodeType.scoring], InferenceNode)
+
     def fit(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -106,6 +110,10 @@ class Pipeline:
         :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
+        if self.is_inference():
+            msg = "Pipeline in inference mode cannot be fitted"
+            raise RuntimeError(msg)
+
         context = Context()
         context.set_dataset(dataset, force_multilabel)
         context.configure_logging(self.logging_config)
@@ -115,7 +123,8 @@ class Pipeline:
 
         # initialize inference nodes
         if context.is_ram_to_clear():
-            nodes_list = context.optimization_info.get_inference_nodes_config()
+            nodes_configs = context.optimization_info.get_inference_nodes_config()
+            nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         else:
             modules_dict = context.optimization_info.get_best_modules()
             nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
@@ -150,15 +159,19 @@ class Pipeline:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
-    def predict(self, utterances: list[str]) -> list[LabelType]:
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
         Predict the labels for the utterances.
 
         :param utterances: list of utterances
         :return: list of predicted labels
         """
-        scores = self.nodes[NodeType.scoring.value].module.predict(utterances)
-        return self.nodes[NodeType.prediction.value].module.predict(scores)  # type: ignore[return-value]
+        if not self.is_inference():
+            msg = "Pipeline in optimization mode cannot perform inference"
+            raise RuntimeError(msg)
+
+        scores = self.nodes[NodeType.scoring].module.predict(utterances)
+        return self.nodes[NodeType.prediction].module.predict(scores)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """
@@ -167,11 +180,15 @@ class Pipeline:
         :param utterances: list of utterances
         :return: prediction output
         """
-        scores, scores_metadata = self.nodes["scoring"].module.predict_with_metadata(utterances)
-        predictions = self.nodes["prediction"].module.predict(scores)
+        if not self.is_inference():
+            msg = "Pipeline in optimization mode cannot perform inference"
+            raise RuntimeError(msg)
+
+        scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)
+        predictions = self.nodes[NodeType.prediction].module.predict(scores)
         regexp_predictions, regexp_predictions_metadata = None, None
-        if "regexp" in self.nodes:
-            regexp_predictions, regexp_predictions_metadata = self.nodes["regexp"].module.predict_with_metadata(
+        if NodeType.regexp in self.nodes:
+            regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(
                 utterances,
             )
 

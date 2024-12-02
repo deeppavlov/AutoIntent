@@ -165,7 +165,7 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.oos_scores
 
-    def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
+    def dump_evaluation_results(self) -> dict[str, Any]:
         """
         Dump evaluation results for all nodes.
 
@@ -191,7 +191,7 @@ class OptimizationInfo:
             trial = self.trials.get_trial(node_type, idx)
             res.append(
                 InferenceNodeConfig(
-                    node_type=node_type,  # type: ignore[arg-type]
+                    node_type=node_type,
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
@@ -218,4 +218,4 @@ class OptimizationInfo:
         :return: Dictionary of the best modules for each node type.
         """
         res = {nt: self._get_best_module(nt) for nt in NodeType}
-        return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]
+        return {nt: m for nt, m in res.items() if m is not None}

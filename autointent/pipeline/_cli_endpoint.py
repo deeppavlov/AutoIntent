@@ -44,7 +44,7 @@ def optimize(cfg: OptimizationConfig) -> None:
     context.dump()
 
 
-def load_config(config_path: str | Path | None, multilabel: bool, logger: Logger | None = None) -> dict[str, Any]:
+def load_config(config_path: str | Path | None, multilabel: bool, logger: Logger | None = None) -> list[dict[str, Any]]:
     """
     Load configuration from the given path or load default configuration.
 
