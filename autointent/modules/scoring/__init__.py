@@ -8,11 +8,11 @@ from ._sklearn import SklearnScorer
 
 __all__ = [
     "ScoringModule",
+    "DescriptionScorer",
     "DNNCScorer",
     "KNNScorer",
     "LinearScorer",
     "MLKnnScorer",
-    "DescriptionScorer",
     "SklearnScorer",
 ]
 
