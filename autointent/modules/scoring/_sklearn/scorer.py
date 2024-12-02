@@ -153,7 +153,11 @@ class SklearnScorer(ScoringModule):
             )
             features = embedder.embed(utterances)
 
-        base_clf = AVAILIABLE_CLASSIFIERS.get(self.clf_name, self._missing_class)(**self.clf_args)
+        if AVAILIABLE_CLASSIFIERS.get(self.clf_name)
+            base_clf = AVAILIABLE_CLASSIFIERS.get(self.clf_name, self._missing_class)(**self.clf_args)
+        else:
+            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
+            raise ValueError(msg)
 
         clf = MultiOutputClassifier(base_clf) if self._multilabel else base_clf
 
@@ -161,10 +165,6 @@ class SklearnScorer(ScoringModule):
 
         self._clf = clf
         self._embedder = embedder
-
-    def _missing_class(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN002, ANN003
-            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
-            raise ValueError(msg)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
