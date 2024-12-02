@@ -162,10 +162,10 @@ class SklearnScorer(ScoringModule):
         self._clf = clf
         self._embedder = embedder
 
-    def _missing_class(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def _missing_class(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN002, ANN003
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
             raise ValueError(msg)
-    
+
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
         Predict probabilities for the given utterances.
