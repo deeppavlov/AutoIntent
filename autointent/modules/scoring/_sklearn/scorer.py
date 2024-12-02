@@ -154,7 +154,7 @@ class SklearnScorer(ScoringModule):
             features = embedder.embed(utterances)
 
         if AVAILIABLE_CLASSIFIERS.get(self.clf_name)
-            base_clf = AVAILIABLE_CLASSIFIERS.get(self.clf_name, self._missing_class)(**self.clf_args)
+            base_clf = AVAILIABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
             raise ValueError(msg)
