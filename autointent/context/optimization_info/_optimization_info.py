@@ -11,7 +11,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs import InferenceNodeConfig
-from autointent.custom_types import NODE_TYPES, NodeType, NodeTypeType
+from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from ._logger import get_logger
@@ -171,7 +171,7 @@ class OptimizationInfo:
 
         :return: Dictionary containing metrics and configurations for all nodes.
         """
-        node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NODE_TYPES}
+        node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NodeType}
         return {
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
@@ -183,9 +183,9 @@ class OptimizationInfo:
 
         :return: List of `InferenceNodeConfig` objects for inference nodes.
         """
-        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NODE_TYPES]
+        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NodeType]
         res = []
-        for idx, node_type in zip(trial_ids, NODE_TYPES, strict=True):
+        for idx, node_type in zip(trial_ids, NodeType, strict=True):
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)
@@ -211,11 +211,11 @@ class OptimizationInfo:
             return self.modules.get(node_type)[idx]
         return None
 
-    def get_best_modules(self) -> dict[NodeTypeType, "Module"]:
+    def get_best_modules(self) -> dict[NodeType, "Module"]:
         """
         Retrieve the best modules for all node types.
 
         :return: Dictionary of the best modules for each node type.
         """
-        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
+        res = {nt: self._get_best_module(nt) for nt in NodeType}
         return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]

@@ -1,4 +1,5 @@
 """Cli endpoint."""
+
 import importlib.resources as ires
 import logging
 from logging import Logger

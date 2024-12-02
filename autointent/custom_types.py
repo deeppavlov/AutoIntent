@@ -56,7 +56,3 @@ class NodeType(str, Enum):
     retrieval = "retrieval"
     scoring = "scoring"
     prediction = "prediction"
-
-
-NODE_TYPES = [NodeType.retrieval.value, NodeType.prediction.value, NodeType.scoring.value, NodeType.regexp.value]
-NodeTypeType = Literal["retrieval", "prediction", "scoring", "regexp"]

@@ -13,7 +13,7 @@ from typing_extensions import Self
 
 from autointent.configs import NodeOptimizerConfig
 from autointent.context import Context
-from autointent.custom_types import NodeTypeType
+from autointent.custom_types import NodeType
 from autointent.modules import Module
 from autointent.modules.prediction._base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
@@ -22,7 +22,7 @@ from autointent.nodes.nodes_info import NODES_INFO
 class NodeOptimizer:
     """Node optimizer class."""
 
-    def __init__(self, node_type: NodeTypeType, search_space: list[dict[str, Any]], metric: str) -> None:
+    def __init__(self, node_type: NodeType, search_space: list[dict[str, Any]], metric: str) -> None:
         """
         Initialize the node optimizer.
 

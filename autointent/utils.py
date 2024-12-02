@@ -7,7 +7,7 @@ from typing import Any
 import yaml
 
 
-def load_default_search_space(multilabel: bool) -> dict[str, Any]:
+def load_default_search_space(multilabel: bool) -> list[dict[str, Any]]:
     """
     Load configuration from the given path or load default configuration.
 
@@ -16,10 +16,10 @@ def load_default_search_space(multilabel: bool) -> dict[str, Any]:
     """
     config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
     path = ires.files("autointent.datafiles").joinpath(config_name)
-    return load_search_space(path)
+    return load_search_space(path)  # type: ignore[arg-type]
 
 
-def load_search_space(path: Path | str) -> dict[str, Any]:
+def load_search_space(path: Path | str) -> list[dict[str, Any]]:
     """
     Load hyperparameters search space from file.
 
@@ -27,4 +27,4 @@ def load_search_space(path: Path | str) -> dict[str, Any]:
     :return:
     """
     with Path(path).open() as file:
-        return yaml.safe_load(file)
+        return yaml.safe_load(file)  # type: ignore[no-any-return]
