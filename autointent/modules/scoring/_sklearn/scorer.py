@@ -9,8 +9,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
 
-from autointent.context import Context
-from autointent.context.embedder import Embedder
+from autointent.context import Context, Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.scoring._base import ScoringModule
@@ -109,21 +108,17 @@ class SklearnScorer(ScoringModule):
             precomputed_embeddings = True
         else:
             precomputed_embeddings = context.vector_index_client.exists(embedder_name)
-        context.device = context.get_device()
-        context.embedder_batch_size = context.get_batch_size()
-        context.embedder_max_length = context.get_max_length()
-        context.db_dir = context.get_db_dir()
         instance = cls(
-            model_name=embedder_name,
-            device=context.device,
+            embedder_name=embedder_name,
+            device=context.get_device(),
             seed=context.seed,
-            batch_size=context.embedder_batch_size,
-            max_length=context.embedder_max_length,
+            batch_size=context.get_batch_size(),
+            max_length=context.get_max_length(),
             clf_name=clf_name,
             clf_args=clf_args,
         )
         instance.precomputed_embeddings = precomputed_embeddings
-        instance.db_dir = str(context.db_dir)
+        instance.db_dir = str(context.get_db_dir())
         return instance
 
     def fit(
