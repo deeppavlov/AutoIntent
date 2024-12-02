@@ -1,9 +1,35 @@
 [tool.poetry]
 name = "autointent"
-version = "0.2.1-alpha1"
+version = "0.0.1"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
-authors = ["voorhs <ilya_alekseev_2016@list.ru>"]
+authors = ["Alexeev Ilya <ilya_alekseev_2016@list.ru>", "Kuznetsov Denis <kuznetsov.den.p@gmail.com>"]
+maintainers = [
+    "Alexeev Ilya <ilya_alekseev_2016@list.ru>",
+    "Solomatin Roman <risolomatin@gmail.com>",
+    "Sergeenko Egor <es.egor.sergeenko@gmail.com>",
+]
 readme = "README.md"
+homepage = "https://deeppavlov.github.io/AutoIntent/"
+repository = "https://github.com/deeppavlov/AutoIntent"
+documentation = "https://deeppavlov.github.io/AutoIntent/"
+keywords = ["nlp", "dialog-systems", "transformers", "auto-ml"]
+classifiers=[
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Natural Language :: English',
+    'Natural Language :: Russian',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: Microsoft :: Windows',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Text Processing :: Linguistic',
+    'Topic :: Utilities',
+    'Framework :: Pytest',
+    'Framework :: Sphinx',
+    'Typing :: Typed',
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
