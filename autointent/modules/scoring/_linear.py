@@ -44,21 +44,37 @@ class LinearScorer(ScoringModule):
     :ivar precomputed_embeddings: Flag indicating if embeddings are precomputed.
     :ivar db_dir: Path to the database directory.
     :ivar name: Name of the scorer, defaults to "linear".
-    """
 
-    # TODO:
-    # - implement different modes (incremental learning with SGD and simple learning with LogisticRegression)
-    # - control n_jobs
-    # - adjust cv
-    # - separate the sklearn fit() process and transformers tokenizers process (from vector_index embedding function)
-    #     to avoid the warnings:
-    # ```
-    # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling \
-    #     parallelism to avoid deadlocks...
-    # To disable this warning, you can either:
-    #     - Avoid using `tokenizers` before the fork if possible
-    #     - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    # ```
+    Example
+    --------
+    Creating and fitting the LinearScorer:
+    >>> from autointent.modules import LinearScorer
+    >>> utterances = ["what is your name?", "how are you?"]
+    >>> labels = ["greeting", "greeting"]
+    >>> scorer = LinearScorer(
+    >>>     embedder_name="bert-base",
+    >>>     cv=3,
+    >>>     n_jobs=-1,
+    >>>     device="cuda",
+    >>>     seed=42,
+    >>>     batch_size=32,
+    >>>     max_length=128
+    >>> )
+    >>> scorer.fit(utterances, labels)
+
+    Predicting probabilities:
+    >>> test_utterances = ["Hello!", "What's up?"]
+    >>> probabilities = scorer.predict(test_utterances)
+    >>> print(probabilities)  # Outputs predicted probabilities for each class
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = LinearScorer(
+    >>>     embedder_name="bert-base",
+    >>>     device="cuda"
+    >>> )
+    >>> loaded_scorer.load("outputs/")
+    """
 
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
