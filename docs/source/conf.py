@@ -66,7 +66,8 @@ autodoc_typehints = "description"
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
-nbsphinx_execute = "never"
+# nbsphinx_execute = "never"
+nbsphinx_kernel_name = "python"
 
 todo_include_todos = True
 
