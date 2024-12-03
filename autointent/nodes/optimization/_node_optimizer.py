@@ -8,10 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from hydra.utils import instantiate
-from typing_extensions import Self
 
-from autointent.configs import NodeOptimizerConfig
 from autointent.context import Context
 from autointent.custom_types import NodeType
 from autointent.modules import Module
@@ -35,15 +32,6 @@ class NodeOptimizer:
         self.metric_name = metric
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
-
-    @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> Self:
-        """
-        Initialize from dictionary config.
-
-        :param config: Config
-        """
-        return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def fit(self, context: Context) -> None:
         """

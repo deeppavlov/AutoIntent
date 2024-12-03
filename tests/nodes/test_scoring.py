@@ -45,7 +45,7 @@ def test_scoring_multiclass(retrieval_optimizer_multiclass):
         ],
     }
 
-    scoring_optimizer = NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    scoring_optimizer = NodeOptimizer(**scoring_optimizer_config)
 
     scoring_optimizer.fit(context)
 
@@ -85,7 +85,7 @@ def test_scoring_multilabel(retrieval_optimizer_multilabel):
         ],
     }
 
-    scoring_optimizer = NodeOptimizer.from_dict_config(scoring_optimizer_config)
+    scoring_optimizer = NodeOptimizer(**scoring_optimizer_config)
 
     scoring_optimizer.fit(context)
 
