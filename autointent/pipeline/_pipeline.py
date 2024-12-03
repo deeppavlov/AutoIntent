@@ -102,7 +102,7 @@ class Pipeline:
     def is_inference(self) -> bool:
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
+    def fit(self, dataset: Dataset, force_multilabel: bool = False, init_for_inference: bool = True) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -121,15 +121,15 @@ class Pipeline:
 
         self._fit(context)
 
-        # initialize inference nodes
-        if context.is_ram_to_clear():
-            nodes_configs = context.optimization_info.get_inference_nodes_config()
-            nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
-        else:
-            modules_dict = context.optimization_info.get_best_modules()
-            nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
+        if init_for_inference:
+            if context.is_ram_to_clear():
+                nodes_configs = context.optimization_info.get_inference_nodes_config()
+                nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
+            else:
+                modules_dict = context.optimization_info.get_best_modules()
+                nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
 
-        self.nodes = {node.node_type: node for node in nodes_list}
+            self.nodes = {node.node_type: node for node in nodes_list}
 
         return context
 

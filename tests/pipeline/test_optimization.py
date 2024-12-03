@@ -43,7 +43,7 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
 
 
@@ -61,7 +61,7 @@ def test_save_db(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
 
     assert os.listdir(db_dir)
@@ -81,7 +81,7 @@ def test_dump_modules(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
 
     assert os.listdir(dump_dir)
