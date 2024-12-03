@@ -15,7 +15,7 @@ def test_base_rerank_scorer(dataset):
         weights="distance",
         embedder_name="sergeyzh/rubert-tiny-turbo",
         m=2,
-        scorer_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
+        cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
         db_dir=db_dir,
         device="cpu",
     )
@@ -28,7 +28,7 @@ def test_base_rerank_scorer(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
     predictions = scorer.predict(test_data)
     assert (
         predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])

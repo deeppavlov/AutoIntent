@@ -15,7 +15,7 @@ from .knn import KNNScorer, KNNScorerDumpMetadata
 
 
 class RerankScorerDumpMetadata(KNNScorerDumpMetadata):
-    scorer_name: str
+    cross_encoder_name: str
     m: int | None
     rank_threshold_cutoff: int | None
 
@@ -29,7 +29,7 @@ class RerankScorer(KNNScorer):
         embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES,
-        scorer_name: str,
+        cross_encoder_name: str,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
         db_dir: str | None = None,
@@ -47,10 +47,9 @@ class RerankScorer(KNNScorer):
             max_length=max_length,
         )
 
-        self.scorer_name = scorer_name
+        self.cross_encoder_name = cross_encoder_name
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff
-        self._scorer = CrossEncoder(self.scorer_name, device=self.device, max_length=self.max_length)  # type: ignore[arg-type]
 
     @classmethod
     def from_context(
@@ -58,7 +57,7 @@ class RerankScorer(KNNScorer):
         context: Context,
         k: int,
         weights: WEIGHT_TYPES,
-        scorer_name: str,
+        cross_encoder_name: str,
         embedder_name: str | None = None,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
@@ -73,7 +72,7 @@ class RerankScorer(KNNScorer):
             embedder_name=embedder_name,
             k=k,
             weights=weights,
-            scorer_name=scorer_name,
+            cross_encoder_name=cross_encoder_name,
             m=m,
             rank_threshold_cutoff=rank_threshold_cutoff,
             db_dir=str(context.get_db_dir()),
@@ -85,11 +84,16 @@ class RerankScorer(KNNScorer):
         instance.prebuilt_index = prebuilt_index
         return instance
 
+    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.device, max_length=self.max_length)  # type: ignore[arg-type]
+
+        super().fit(utterances, labels)
+
     def _store_state_to_metadata(self) -> RerankScorerDumpMetadata:
         return RerankScorerDumpMetadata(
             **super()._store_state_to_metadata(),
             m=self.m,
-            scorer_name=self.scorer_name,
+            cross_encoder_name=self.cross_encoder_name,
             rank_threshold_cutoff=self.rank_threshold_cutoff,
         )
 
@@ -105,8 +109,9 @@ class RerankScorer(KNNScorer):
         super()._restore_state_from_metadata(metadata)
 
         self.m = metadata["m"] if metadata["m"] else self.k
-        self.scorer_name = metadata["scorer_name"]
+        self.cross_encoder_name = metadata["cross_encoder_name"]
         self.rank_threshold_cutoff = metadata["rank_threshold_cutoff"]
+        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.device, max_length=self.max_length)  # type: ignore[arg-type]
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         knn_labels, knn_distances, knn_neighbors = self._get_neighbours(utterances)
@@ -129,8 +134,9 @@ class RerankScorer(KNNScorer):
             #         cur_ranks.pop()
 
             # keep only relevant data for the utterance
-            for dst, src in zip([labels, distances, neighbours], [query_labels, query_distances, query_docs],
-                                strict=True):
+            for dst, src in zip(
+                [labels, distances, neighbours], [query_labels, query_distances, query_docs], strict=True
+            ):
                 dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined, index]
 
         scores = self._count_scores(np.array(labels), np.array(distances))
