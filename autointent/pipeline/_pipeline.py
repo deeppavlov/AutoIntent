@@ -99,7 +99,12 @@ class Pipeline:
             self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
 
-    def is_inference(self) -> bool:
+    def _is_inference(self) -> bool:
+        """
+        Check the mode in which pipeline is.
+
+        :return: True if pipeline is in inference mode, False if in optimization mode.
+        """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
     def fit(self, dataset: Dataset, force_multilabel: bool = False, init_for_inference: bool = True) -> Context:
@@ -110,7 +115,7 @@ class Pipeline:
         :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
-        if self.is_inference():
+        if self._is_inference():
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
 
@@ -139,7 +144,7 @@ class Pipeline:
         Create inference pipeline from dictionary config.
 
         :param nodes_configs: list of dictionary config for nodes
-        :return: InferencePipeline
+        :return: pipeline ready for inference
         """
         return cls.from_config([InferenceNodeConfig(**cfg) for cfg in nodes_configs])
 
@@ -155,6 +160,13 @@ class Pipeline:
 
     @classmethod
     def load(cls, path: str | Path) -> Self:
+        """
+        Load pipeline in inference mode.
+
+        This method loads fitted modules and tuned hyperparameters.
+        :path: path to optimization run directory
+        :return: initialized pipeline, ready for inference
+        """
         with (Path(path) / "inference_config.yaml").open() as file:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
@@ -166,7 +178,7 @@ class Pipeline:
         :param utterances: list of utterances
         :return: list of predicted labels
         """
-        if not self.is_inference():
+        if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
@@ -180,7 +192,7 @@ class Pipeline:
         :param utterances: list of utterances
         :return: prediction output
         """
-        if not self.is_inference():
+        if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 

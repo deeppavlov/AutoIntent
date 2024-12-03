@@ -16,8 +16,7 @@ from autointent.configs import (
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline._cli_endpoint import optimize
-from autointent.pipeline.optimization._utils import load_config
+from autointent.pipeline._cli_endpoint import load_config, optimize
 
 # %%
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -57,6 +56,3 @@ config = OptimizationConfig(
     ),
 )
 optimize(config)
-
-# %%
-optimize("multiclass")
