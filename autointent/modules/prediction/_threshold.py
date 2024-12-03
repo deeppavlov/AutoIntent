@@ -45,9 +45,6 @@ class ThresholdPredictor(PredictionModule):
         Initialize threshold predictor.
 
         :param thresh: Threshold for the scores, shape (n_classes,) or float
-        :param multilabel: If multilabel classification, default False
-        :param n_classes: Number of classes, default None
-        :param tags: Tags for predictions, default None
         """
         self.thresh = thresh
 
@@ -119,9 +116,11 @@ class ThresholdPredictor(PredictionModule):
         )
 
         dump_dir = Path(path)
+        metadata_json = self.metadata
+        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
+            json.dump(metadata_json, file, indent=4)
 
     def load(self, path: str) -> None:
         """
