@@ -1,9 +1,35 @@
 [tool.poetry]
 name = "autointent"
-version = "0.2.1-alpha1"
+version = "0.0.1"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
-authors = ["voorhs <ilya_alekseev_2016@list.ru>"]
+authors = ["Alexeev Ilya <ilya_alekseev_2016@list.ru>", "Kuznetsov Denis <kuznetsov.den.p@gmail.com>"]
+maintainers = [
+    "Alexeev Ilya <ilya_alekseev_2016@list.ru>",
+    "Solomatin Roman <risolomatin@gmail.com>",
+    "Sergeenko Egor <es.egor.sergeenko@gmail.com>",
+]
 readme = "README.md"
+homepage = "https://deeppavlov.github.io/AutoIntent/"
+repository = "https://github.com/deeppavlov/AutoIntent"
+documentation = "https://deeppavlov.github.io/AutoIntent/"
+keywords = ["nlp", "dialog-systems", "transformers", "auto-ml"]
+classifiers=[
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Natural Language :: English',
+    'Natural Language :: Russian',
+    'Operating System :: POSIX :: Linux',
+    'Operating System :: Microsoft :: Windows',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Topic :: Text Processing :: Linguistic',
+    'Topic :: Utilities',
+    'Framework :: Pytest',
+    'Framework :: Sphinx',
+    'Typing :: Typed',
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -19,9 +45,8 @@ pydantic = "^2.9.2"
 hydra-core = "^1.3.2"
 faiss-cpu = "^1.9.0"
 openai = "^1.52.1"
-datasets = "2.20.0"
+datasets = "^3.1.0"
 ruff = "^0.8.0"
-
 
 [tool.poetry.group.dev]
 optional = true
@@ -30,6 +55,7 @@ optional = true
 tach = "^0.11.3"
 ipykernel = "^6.29.5"
 ipywidgets = "^8.1.5"
+ruff = "^0.8.0"
 
 [tool.poetry.group.test]
 optional = true
@@ -39,6 +65,12 @@ pytest = "8.3.2"
 pytest-cov = "^5.0.0"
 coverage = "^7.6.1"
 pytest-asyncio = "^0.24.0"
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+ruff = "^0.8.0"
 
 [tool.poetry.group.typing]
 optional = true
@@ -50,6 +82,8 @@ types-pygments = "^2.18.0.20240506"
 types-setuptools = "^75.2.0.20241019"
 joblib-stubs = "^1.4.2.5.20240918"
 
+[tool.poetry.group.docs]
+optional = true
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^8.1.3"
@@ -58,12 +92,10 @@ jupytext = "^1.16.4"
 nbsphinx = "^0.9.5"
 sphinx-autodoc-typehints = "^2.5.0"
 sphinx-copybutton = "^0.5.2"
-
-[tool.poetry.group.docs]
-optional = true
+sphinx-autoapi = "^3.3.3"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization.cli_endpoint:main"
+"autointent" = "autointent.pipeline.optimization._cli_endpoint:main"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 
@@ -76,7 +108,6 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "D",       # pydocstyle
     "TD",      # todos
     "FIX",     # fixmes
     "S311",    # random usage
@@ -92,7 +123,7 @@ ignore = [
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
 "*/utils.py" = ["D104", "D100"]
-"tutorials/*" = ["INP001", "T"]
+"tutorials/*" = ["B018", "E501", "INP001", "T", "D"]
 
 [tool.ruff.lint.pylint]
 max-args = 10

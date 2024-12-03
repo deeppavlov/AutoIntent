@@ -6,8 +6,8 @@
 # %%
 import importlib.resources as ires
 
+from autointent.context._utils import load_data
 from autointent.context.data_handler import DataHandler
-from autointent.context.utils import load_data
 from autointent.modules import LinearScorer
 
 # %% [markdown]
@@ -44,7 +44,7 @@ Train model:
 
 # %%
 
-scorer.fit(data_handler.utterances_train, data_handler.labels_train)
+scorer.fit(data_handler.train_utterances, data_handler.train_labels)
 
 # %% [markdown]
 """

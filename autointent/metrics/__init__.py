@@ -1,6 +1,4 @@
-from collections.abc import Callable, Mapping
-
-from autointent.utils import _funcs_to_dict
+from autointent._utils import _funcs_to_dict
 
 from .prediction import (
     PredictionMetricFn,
@@ -89,6 +87,8 @@ PREDICTION_METRICS_MULTICLASS: dict[str, PredictionMetricFn] = _funcs_to_dict(
 )
 
 PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
+
+REGEXP_METRICS = _funcs_to_dict(regexp_partial_accuracy, regexp_partial_precision)
 
 METRIC_FN = PredictionMetricFn | RegexpMetricFn | RetrievalMetricFn | ScoringMetricFn
 

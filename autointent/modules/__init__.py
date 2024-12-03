@@ -1,6 +1,7 @@
 from typing import TypeVar
 
-from .base import Module
+from ._base import Module
+from ._regexp import RegExp
 from .prediction import (
     AdaptivePredictor,
     ArgmaxPredictor,
@@ -9,7 +10,6 @@ from .prediction import (
     ThresholdPredictor,
     TunablePredictor,
 )
-from .regexp import RegExp
 from .retrieval import RetrievalModule, VectorDBModule
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, ScoringModule
 
@@ -29,15 +29,15 @@ SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict
 )
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
-    [MLKnnScorer, LinearScorer, DescriptionScorer]
+    [MLKnnScorer, LinearScorer, DescriptionScorer],
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
-    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor]
+    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor],
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = create_modules_dict(
-    [AdaptivePredictor, ThresholdPredictor, TunablePredictor]
+    [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 
 __all__ = [

@@ -6,32 +6,29 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-from autointent.context.data_handler.schemas import Dataset, Intent, Utterance, UtteranceType
+from autointent.context.data_handler import Dataset, Intent, Sample
 from autointent.generation.prompt_scheme import PromptDescription
 
 
-def get_utterances_by_id(utterances: list[Utterance]) -> dict[int, list[str]]:
+def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:
     """
-    Group utterances by their labels.
+    Group samples by their labels.
 
-    :param utterances: List of utterances with `label` and `text` attributes.
+    :param samples: List of samples with `label` and `utterance` attributes.
 
-    :returns: A dictionary where labels map to lists of utterance texts.
+    :returns: A dictionary where labels map to lists of utterances.
     """
-    intent_utterances = defaultdict(list)
+    label_mapping = defaultdict(list)
 
-    for utterance in utterances:
-        if utterance.type == UtteranceType.oos:
-            continue
+    for sample in samples:
+        match sample.label:
+            case list():
+                for label in sample.label:
+                    label_mapping[label].append(sample.utterance)
+            case int():
+                label_mapping[sample.label].append(sample.utterance)
 
-        text = utterance.text
-        if utterance.type == UtteranceType.multilabel:
-            for label in utterance.label:  # type: ignore[union-attr]
-                intent_utterances[label].append(text)
-        else:
-            intent_utterances[utterance.label].append(text)
-
-    return intent_utterances
+    return label_mapping
 
 
 async def create_intent_description(
@@ -61,7 +58,9 @@ async def create_intent_description(
     regexp_patterns = random.sample(regexp_patterns, min(3, len(regexp_patterns)))
 
     content = prompt.text.format(
-        intent_name=intent_name, user_utterances="\n".join(utterances), regexp_patterns="\n".join(regexp_patterns)
+        intent_name=intent_name,
+        user_utterances="\n".join(utterances),
+        regexp_patterns="\n".join(regexp_patterns),
     )
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
@@ -109,7 +108,7 @@ async def generate_intent_descriptions(
                 regexp_patterns=regexp_patterns,
                 prompt=prompt,
                 model_name=model_name,
-            )
+            ),
         )
         tasks.append((intent, task))
 
@@ -136,8 +135,11 @@ def enhance_dataset_with_descriptions(
 
     :returns: The dataset with intents enhanced by generated descriptions.
     """
-    intent_utterances = get_utterances_by_id(utterances=dataset.utterances)
+    samples = []
+    for split in dataset.values():
+        samples.extend([Sample(**sample) for sample in split.to_list()])
+    intent_utterances = group_utterances_by_label(samples)
     dataset.intents = asyncio.run(
-        generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name)
+        generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name),
     )
     return dataset

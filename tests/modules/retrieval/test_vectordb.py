@@ -1,4 +1,4 @@
-from autointent.modules.retrieval.vectordb import VectorDBModule
+from autointent.modules.retrieval._vectordb import VectorDBModule
 from tests.conftest import setup_environment
 
 

@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import Context
-from autointent.configs.optimization_cli import DataConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs._optimization_cli import DataConfig, LoggingConfig, VectorIndexConfig
 from autointent.nodes.optimization import NodeOptimizer
 from tests.conftest import get_dataset_path, setup_environment
 
@@ -30,7 +30,7 @@ def get_retrieval_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
                 "module_type": "vector_db",
-            }
+            },
         ],
     }
 

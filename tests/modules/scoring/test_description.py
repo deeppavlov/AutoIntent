@@ -19,8 +19,8 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
 
     scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, device="cpu")
 
-    scorer.fit(data_handler.utterances_train, data_handler.labels_train, data_handler.label_description)
-    assert scorer.description_vectors.shape[0] == len(data_handler.label_description)
+    scorer.fit(data_handler.train_utterances, data_handler.train_labels, data_handler.intent_descriptions)
+    assert scorer.description_vectors.shape[0] == len(data_handler.intent_descriptions)
 
     test_utterances = [
         "What is the balance on my account?",
@@ -33,7 +33,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     else:
         np.testing.assert_almost_equal(np.sum(predictions), len(test_utterances))
 
-    assert predictions.shape == (len(test_utterances), len(data_handler.label_description))
+    assert predictions.shape == (len(test_utterances), len(data_handler.intent_descriptions))
     np.testing.assert_almost_equal(predictions, np.array(expected_prediction).reshape(predictions.shape), decimal=1)
 
     predictions, metadata = scorer.predict_with_metadata(test_utterances)

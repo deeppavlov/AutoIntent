@@ -1,3 +1,3 @@
-from .inference_pipeline import InferencePipeline
+from ._inference_pipeline import InferencePipeline
 
 __all__ = ["InferencePipeline"]

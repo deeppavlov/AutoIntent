@@ -3,7 +3,7 @@ import logging
 
 import torch
 
-from autointent.configs.node import InferenceNodeConfig
+from autointent.configs._node import InferenceNodeConfig
 from autointent.nodes import InferenceNode, NodeOptimizer
 
 from .conftest import get_context
@@ -64,7 +64,7 @@ def get_retrieval_optimizer(multilabel: bool):
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
                 "module_type": "vector_db",
-            }
+            },
         ],
     }
 

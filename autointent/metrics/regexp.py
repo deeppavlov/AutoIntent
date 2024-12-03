@@ -4,9 +4,8 @@ from typing import Protocol
 
 import numpy as np
 
-from autointent.metrics.converter import transform
-
-from .custom_types import LABELS_VALUE_TYPE
+from ._converter import transform
+from ._custom_types import LABELS_VALUE_TYPE
 
 
 class RegexpMetricFn(Protocol):
@@ -24,8 +23,21 @@ class RegexpMetricFn(Protocol):
 
 
 def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
-    """
+    r"""
     Calculate regexp partial accuracy.
+
+    The regexp partial accuracy is calculated as:
+
+    .. math::
+
+        \text{Partial Accuracy} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{true},i} \in y_{\text{pred},i})}{N}
+
+    where:
+    - :math:`N` is the total number of samples,
+    - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
+    - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
+    - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
+    is true and 0 otherwise.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
@@ -40,8 +52,23 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
 
 
 def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
-    """
+    r"""
     Calculate regexp partial precision.
+
+    The regexp partial precision is calculated as:
+
+    .. math::
+
+        \text{Partial Precision} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{true},i}
+        \in y_{\text{pred},i})}{\sum_{i=1}^N \mathbb{1}(|y_{\text{pred},i}| > 0)}
+
+    where:
+    - :math:`N` is the total number of samples,
+    - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
+    - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
+    - :math:`|y_{\text{pred},i}|` is the number of predicted labels for the :math:`i`-th sample,
+    - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
+    is true and 0 otherwise.
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
