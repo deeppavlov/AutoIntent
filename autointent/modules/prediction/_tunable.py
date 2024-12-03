@@ -123,9 +123,11 @@ class TunablePredictor(PredictionModule):
         )
 
         dump_dir = Path(path)
+        metadata_json = self.metadata
+        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
+            json.dump(metadata_json, file, indent=4)
 
     def load(self, path: str) -> None:
         """

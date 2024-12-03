@@ -3,7 +3,7 @@
         {
             "id": 0,
             "name": "accept_reservations",
-            "tags": [],
+            "tags": ["reservation"],
             "regexp_full_match": [],
             "regexp_partial_match": [],
             "description": "User wants to know if Red Robin accepts reservations."
@@ -19,10 +19,18 @@
         {
             "id": 2,
             "name": "alarm",
-            "tags": [],
+            "tags": ["alarm"],
             "regexp_full_match": [],
             "regexp_partial_match": [],
             "description": "User wants to set or manage an alarm."
+        },
+        {
+            "id": 3,
+            "name": "alarm",
+            "tags": ["alarm"],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to set or manage an alarm second time."
         }
     ],
     "train": [
