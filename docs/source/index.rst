@@ -23,14 +23,35 @@ Example of building an intent classifier in a couple of lines of code:
    pipeline.fit(dataset)
    pipeline.predict(["Hello, World!"])
 
-We recommend you to begin your exploration of our library from the :doc:`quickstart` page.
+Documentation Contents
+----------------------
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+:doc:`quickstart`
+.................
 
-   quickstart
-   concepts
-   tutorials
-   guides/index
-   learn/index
+It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities.
+
+:doc:`concepts`
+...............
+
+This page contains basic information about the terms and concepts we use throughout our documentation.
+
+:doc:`tutorials`
+................
+
+Newbie-friendly information on how to perform different tasks using our library.
+
+:doc:`guides/index`
+...................
+
+Some advanced information
+
+:doc:`learn/index`
+..................
+
+Some theoretical background
+
+:doc:`API Reference <autoapi/autointent/index>`
+...............................................
+
+lotta stuff
