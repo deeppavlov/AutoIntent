@@ -30,7 +30,48 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
 
 
 class TunablePredictor(PredictionModule):
-    """Tunable predictor module."""
+    """
+    Tunable predictor module.
+
+    TunablePredictor uses an optimization process to find the best thresholds for predicting labels
+    in single-label or multi-label classification tasks. It is designed for datasets with varying
+    score distributions and supports out-of-scope (OOS) detection.
+
+    :ivar name: Name of the predictor, defaults to "tunable".
+    :ivar multilabel: Whether the task is multi-label classification.
+    :ivar n_classes: Number of classes determined during fitting.
+    :ivar tags: Tags for predictions, if any.
+
+    Examples
+    --------
+    Single-label classification:
+    >>> import numpy as np
+    >>> from autointent.modules import TunablePredictor
+    >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+    >>> labels = [1, 0, 1]
+    >>> predictor = TunablePredictor(n_trials=100, seed=42)
+    >>> predictor.fit(scores, labels)
+    >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [1 0]
+
+    Multi-label classification:
+    >>> labels = [[1, 0], [0, 1], [1, 1]]
+    >>> predictor = TunablePredictor(n_trials=100, seed=42)
+    >>> predictor.fit(scores, labels)
+    >>> test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [[0 1] [1 0]]
+
+    Saving and loading the model:
+    >>> predictor.dump("outputs/")
+    >>> loaded_predictor = TunablePredictor()
+    >>> loaded_predictor.load("outputs/")
+    >>> print(loaded_predictor.thresh)
+    [0.5, 0.7]
+    """
 
     name = "tunable"
     multilabel: bool

@@ -45,6 +45,39 @@ class KNNScorer(ScoringModule):
     :ivar _vector_index: VectorIndex instance for neighbor retrieval.
     :ivar name: Name of the scorer, defaults to "knn".
     :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
+
+    Examples
+    --------
+    Creating and fitting the KNNScorer:
+    >>> from autointent.modules import KNNScorer
+    >>> utterances = ["hello", "how are you?"]
+    >>> labels = ["greeting", "greeting"]
+    >>> scorer = KNNScorer(
+    >>>     embedder_name="bert-base",
+    >>>     k=5,
+    >>>     weights="distance",
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda",
+    >>>     batch_size=32,
+    >>>     max_length=128
+    >>> )
+    >>> scorer.fit(utterances, labels)
+
+    Predicting class probabilities:
+    >>> test_utterances = ["hi", "what's up?"]
+    >>> probabilities = scorer.predict(test_utterances)
+    >>> print(probabilities)  # Outputs predicted class probabilities for the utterances
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = KNNScorer(
+    >>>     embedder_name="bert-base",
+    >>>     k=5,
+    >>>     weights="distance",
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda"
+    >>> )
+    >>> loaded_scorer.load("outputs/")
     """
 
     weights: WEIGHT_TYPES

@@ -26,7 +26,37 @@ class JinoosPredictorDumpMetadata(BaseMetadataDict):
 
 
 class JinoosPredictor(PredictionModule):
-    """Jinoos predictor module."""
+    """
+    Jinoos predictor module.
+
+    JinoosPredictor predicts the best scores for single-label classification tasks
+    and detects out-of-scope (OOS) samples based on a threshold.
+
+    :ivar thresh: The optimized threshold value for OOS detection.
+    :ivar name: Name of the predictor, defaults to "adaptive".
+    :ivar n_classes: Number of classes determined during fitting.
+
+    Examples
+    --------
+    >>> from autointent.modules import JinoosPredictor
+    >>> import numpy as np
+    >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+    >>> labels = [1, 0, 1]
+    >>> search_space = [0.3, 0.5, 0.7]
+    >>> predictor = JinoosPredictor(search_space=search_space)
+    >>> predictor.fit(scores, labels)
+    >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+    >>> predictions = predictor.predict(test_scores)
+    >>> print(predictions)
+    [1 0]
+
+    Save and load the predictor state:
+    >>> predictor.dump("outputs/")
+    >>> loaded_predictor = JinoosPredictor()
+    >>> loaded_predictor.load("outputs/")
+    >>> print(loaded_predictor.thresh)
+    0.5  # Example threshold from the search space
+    """
 
     thresh: float
     name = "jinoos"

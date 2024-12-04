@@ -57,6 +57,43 @@ class MLKnnScorer(ScoringModule):
     :ivar metadata: Metadata about the scorer's configuration.
     :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
     :ivar name: Name of the scorer, defaults to "mlknn".
+
+    Example
+    --------
+    Creating and fitting the MLKnnScorer:
+    >>> from knn_scorer import MLKnnScorer
+    >>> utterances = ["what is your name?", "how are you?"]
+    >>> labels = [["greeting"], ["greeting"]]
+    >>> scorer = MLKnnScorer(
+    >>>     k=5,
+    >>>     embedder_name="bert-base",
+    >>>     db_dir="/path/to/database",
+    >>>     s=1.0,
+    >>>     ignore_first_neighbours=0,
+    >>>     device="cuda",
+    >>>     batch_size=32,
+    >>>     max_length=128
+    >>> )
+    >>> scorer.fit(utterances, labels)
+
+    Predicting probabilities:
+    >>> test_utterances = ["Hi!", "What's up?"]
+    >>> probabilities = scorer.predict(test_utterances)
+    >>> print(probabilities)  # Outputs predicted probabilities for each label
+
+    Predicting labels:
+    >>> predicted_labels = scorer.predict_labels(test_utterances, thresh=0.5)
+    >>> print(predicted_labels)  # Outputs binary array for each label prediction
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = MLKnnScorer(
+    >>>     k=5,
+    >>>     embedder_name="bert-base",
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda"
+    >>> )
+    >>> loaded_scorer.load("outputs/")
     """
 
     arrays_filename: str = "probs.npz"
