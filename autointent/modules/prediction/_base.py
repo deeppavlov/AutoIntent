@@ -82,15 +82,18 @@ def get_prediction_evaluation_data(
     elif split == "validation":
         labels = np.array(context.data_handler.validation_labels(1))
         scores = context.optimization_info.get_best_validation_scores()
-    else:
+    elif split == "test":
         labels = np.array(context.data_handler.test_labels())
         scores = context.optimization_info.get_best_test_scores()
+    else:
+        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation', or 'test'."
+        raise ValueError(message)
 
     if scores is None:
         message = f"No '{split}' scores found in the optimization info"
         raise ValueError(message)
 
-    oos_scores = context.optimization_info.get_best_oos_scores()
+    oos_scores = context.optimization_info.get_best_oos_scores(split)
     return_scores = scores
     if oos_scores is not None:
         oos_labels = (

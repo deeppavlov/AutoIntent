@@ -145,6 +145,15 @@
         },
         {
             "utterance": "what size wipers does this car take"
+        },
+        {
+            "utterance": "where is the dipstick"
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
         }
     ]
 }

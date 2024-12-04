@@ -130,8 +130,8 @@ class RegExp(Module):
         assets = {
             "test_matches": list(self.predict(context.data_handler.test_utterances())),
             "oos_matches": None
-            if context.data_handler.has_oos_samples()
-            else self.predict(context.data_handler.oos_utterances()),
+            if not context.data_handler.has_oos_samples()
+            else self.predict(context.data_handler.oos_utterances(2)),
         }
         if assets["test_matches"] is None:
             msg = "no matches found"

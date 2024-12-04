@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.context.data_handler import Split
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
 from autointent.modules import Module
@@ -36,15 +37,22 @@ class ScoringModule(Module, ABC):
         if split == "validation":
             utterances = context.data_handler.validation_utterances(0)
             labels = context.data_handler.validation_labels(0)
-        else:
+        elif split == "test":
             utterances = context.data_handler.test_utterances()
             labels = context.data_handler.test_labels()
+        else:
+            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
+            raise ValueError(message)
 
         scores = self.predict(utterances)
 
         self._oos_scores = None
         if context.data_handler.has_oos_samples():
-            self._oos_scores = self.predict(context.data_handler.oos_utterances())
+            self._oos_scores = {
+                Split.TRAIN: self.predict(context.data_handler.oos_utterances(0)),
+                Split.VALIDATION: self.predict(context.data_handler.oos_utterances(1)),
+                Split.TEST: self.predict(context.data_handler.oos_utterances(2)),
+            }
 
         self._train_scores = self.predict(context.data_handler.train_utterances(1))
         self._validation_scores = self.predict(context.data_handler.validation_utterances(1))

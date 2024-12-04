@@ -127,9 +127,12 @@ class VectorDBModule(RetrievalModule):
         if split == "validation":
             utterances = context.data_handler.validation_utterances(0)
             labels = context.data_handler.validation_labels(0)
-        else:
+        elif split == "test":
             utterances = context.data_handler.test_utterances()
             labels = context.data_handler.test_labels()
+        else:
+            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
+            raise ValueError(message)
         predictions, _, _ = self.vector_index.query(utterances, self.k)
         return metric_fn(labels, predictions)
 

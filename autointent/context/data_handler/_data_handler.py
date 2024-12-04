@@ -50,40 +50,7 @@ class DataHandler:
 
         self.n_classes = self.dataset.n_classes
 
-        if Split.TEST not in self.dataset:
-            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
-                self.dataset,
-                split=Split.TRAIN,
-                test_size=0.2,
-                random_seed=random_seed,
-            )
-
-        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
-            self.dataset,
-            split=Split.TRAIN,
-            test_size=0.5,
-            random_seed=random_seed,
-        )
-        self.dataset.pop(Split.TRAIN)
-
-        for idx in range(2):
-            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
-                self.dataset,
-                split=f"{Split.TRAIN}_{idx}",
-                test_size=0.2,
-                random_seed=random_seed,
-            )
-
-        for split in self.dataset:
-            if split == Split.OOS:
-                continue
-            n_classes_split = self.dataset.get_n_classes(split)
-            if n_classes_split != self.n_classes:
-                message = (
-                    f"Number of classes in split '{split}' doesn't match initial number of classes "
-                    f"({n_classes_split} != {self.n_classes})"
-                )
-                raise ValueError(message)
+        self._split(random_seed)
 
         self.regexp_patterns = [
             RegexPatterns(
@@ -162,14 +129,15 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    def oos_utterances(self) -> list[str]:
+    def oos_utterances(self, idx: int | None = None) -> list[str]:
         """
         Get the out-of-scope utterances.
 
         :return: List of out-of-scope utterances if available, otherwise an empty list.
         """
         if self.has_oos_samples():
-            return cast(list[str], self.dataset[Split.OOS][self.dataset.utterance_feature])
+            split = f"{Split.OOS}_{idx}" if idx is not None else Split.OOS
+            return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
         return []
 
     def has_oos_samples(self) -> bool:
@@ -178,7 +146,7 @@ class DataHandler:
 
         :return: True if there are out-of-scope samples.
         """
-        return Split.OOS in self.dataset
+        return any(split.startswith(Split.OOS) for split in self.dataset)
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         """
@@ -187,3 +155,60 @@ class DataHandler:
         :return: Dataset dump.
         """
         return self.dataset.dump()
+
+    def _split(self, random_seed: int) -> None:
+        if Split.TEST not in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
+                self.dataset,
+                split=Split.TRAIN,
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
+            self.dataset,
+            split=Split.TRAIN,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+        self.dataset.pop(Split.TRAIN)
+
+        for idx in range(2):
+            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+                self.dataset,
+                split=f"{Split.TRAIN}_{idx}",
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+        if self.has_oos_samples():
+            self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
+                self.dataset[Split.OOS]
+                .train_test_split(
+                    test_size=0.2,
+                    shuffle=True,
+                    seed=random_seed,
+                )
+                .values()
+            )
+            self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
+                self.dataset[f"{Split.OOS}_1"]
+                .train_test_split(
+                    test_size=0.5,
+                    shuffle=True,
+                    seed=random_seed,
+                )
+                .values()
+            )
+            self.dataset.pop(Split.OOS)
+
+        for split in self.dataset:
+            if split.startswith(Split.OOS):
+                continue
+            n_classes_split = self.dataset.get_n_classes(split)
+            if n_classes_split != self.n_classes:
+                message = (
+                    f"Number of classes in split '{split}' doesn't match initial number of classes "
+                    f"({n_classes_split} != {self.n_classes})"
+                )
+                raise ValueError(message)
