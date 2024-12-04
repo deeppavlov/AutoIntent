@@ -28,7 +28,7 @@ def test_base_rerank_scorer(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
+    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     predictions = scorer.predict(test_data)
     assert (
         predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])

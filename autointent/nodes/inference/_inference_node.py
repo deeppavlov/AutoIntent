@@ -6,7 +6,7 @@ import torch
 from typing_extensions import Self
 
 from autointent.configs import InferenceNodeConfig
-from autointent.custom_types import NodeTypeType
+from autointent.custom_types import NodeType
 from autointent.modules import Module
 from autointent.nodes.nodes_info import NODES_INFO
 
@@ -14,7 +14,7 @@ from autointent.nodes.nodes_info import NODES_INFO
 class InferenceNode:
     """Inference node class."""
 
-    def __init__(self, module: Module, node_type: NodeTypeType) -> None:
+    def __init__(self, module: Module, node_type: NodeType) -> None:
         """
         Initialize the inference node.
 

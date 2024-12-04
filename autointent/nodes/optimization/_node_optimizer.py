@@ -8,12 +8,9 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from hydra.utils import instantiate
-from typing_extensions import Self
 
-from autointent.configs import NodeOptimizerConfig
 from autointent.context import Context
-from autointent.custom_types import NodeTypeType
+from autointent.custom_types import NodeType
 from autointent.modules import Module
 from autointent.modules.prediction._base import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
@@ -22,7 +19,7 @@ from autointent.nodes.nodes_info import NODES_INFO
 class NodeOptimizer:
     """Node optimizer class."""
 
-    def __init__(self, node_type: NodeTypeType, search_space: list[dict[str, Any]], metric: str) -> None:
+    def __init__(self, node_type: NodeType, search_space: list[dict[str, Any]], metric: str) -> None:
         """
         Initialize the node optimizer.
 
@@ -30,19 +27,11 @@ class NodeOptimizer:
         :param search_space: Search space for the optimization
         :param metric: Metric to optimize.
         """
+        self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
-
-    @classmethod
-    def from_dict_config(cls, config: dict[str, Any]) -> Self:
-        """
-        Initialize from dictionary config.
-
-        :param config: Config
-        """
-        return instantiate(NodeOptimizerConfig, **config)  # type: ignore[no-any-return]
 
     def fit(self, context: Context) -> None:
         """

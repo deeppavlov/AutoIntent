@@ -16,15 +16,12 @@ Example of building an intent classifier in a couple of lines of code:
 
 .. code-block:: python
 
-   from autointent import PipelineOptimizer, InferencePipeline, Dataset
+   from autointent import Pipeline, Dataset
 
    dataset = Dataset.from_json("/path/to/json")
-   pipeline_optimizer = PipelineOptimizer.default(multilabel=False)
-   pipeline_optimizer.fit(dataset)
-   pipeline_optimizer.dump()
-
-   inference_pipeline = InferencePipeline.load("/path/to/run")
-   inference_pipeline.predict(["Hello, World!"])
+   optimizer = Pipeline.default_optimizer(multilabel=False)
+   pipeline.fit(dataset)
+   pipeline.predict(["Hello, World!"])
 
 We recommend you to begin your exploration of our library from the :doc:`quickstart` page.
 
