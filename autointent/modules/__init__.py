@@ -11,15 +11,17 @@ from .prediction import (
     TunablePredictor,
 )
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import (DescriptionScorer,
-                      DNNCScorer,
-                      KNNScorer,
-                      LinearScorer,
-                      MLKnnScorer,
-                      RerankScorer,
-                      ScoringModule,
-                      SklearnScorer
+from .scoring import (
+    DescriptionScorer,
+    DNNCScorer,
+    KNNScorer,
+    LinearScorer,
+    MLKnnScorer,
+    RerankScorer,
+    ScoringModule,
+    SklearnScorer,
 )
+
 T = TypeVar("T", bound=Module)
 
 
