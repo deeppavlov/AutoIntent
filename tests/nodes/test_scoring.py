@@ -42,6 +42,14 @@ def test_scoring_multiclass(retrieval_optimizer_multiclass):
                 "temperature": [1.0, 0.5, 0.1, 0.05],
                 "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
             },
+            {
+                "module_type": "rerank",
+                "weights": ["uniform", "distance", "closest"],
+                "k": [3],
+                "m": [2],
+                "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
         ],
     }
 
@@ -82,6 +90,14 @@ def test_scoring_multilabel(retrieval_optimizer_multilabel):
                 "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
             },
             {"module_type": "mlknn", "k": [5], "embedder_name": ["sergeyzh/rubert-tiny-turbo"]},
+            {
+                "module_type": "rerank",
+                "weights": ["uniform", "distance", "closest"],
+                "k": [3],
+                "m": [2],
+                "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+            },
         ],
     }
 
