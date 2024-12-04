@@ -178,7 +178,10 @@ class OptimizationInfo:
         """
         Retrieve the out-of-scope scores from the best scorer node.
 
-        :return: Out-of-scope scores as a numpy array.
+        :param split: The data split for which to retrieve the OOS scores.
+            Must be one of "train", "validation", or "test".
+        :return: A numpy array containing OOS scores for the specified split,
+            or `None` if no OOS scores are available.
         """
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         if best_scorer_artifact.oos_scores is not None:
@@ -219,7 +222,7 @@ class OptimizationInfo:
             )
         return res
 
-    def get_best_module(self, node_type: str) -> "Module | None":
+    def _get_best_module(self, node_type: str) -> "Module | None":
         """
         Retrieve the best module for a specific node type.
 
@@ -237,5 +240,5 @@ class OptimizationInfo:
 
         :return: Dictionary of the best modules for each node type.
         """
-        res = {nt: self.get_best_module(nt) for nt in NODE_TYPES}
+        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
         return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]

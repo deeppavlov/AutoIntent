@@ -121,6 +121,7 @@ class VectorDBModule(RetrievalModule):
         Evaluate the retrieval model using a specified metric function.
 
         :param context: The context containing test data and labels.
+        :param split: Target split
         :param metric_fn: Function to compute the retrieval metric.
         :return: Computed metric score.
         """

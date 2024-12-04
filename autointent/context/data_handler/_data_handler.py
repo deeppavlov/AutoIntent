@@ -77,8 +77,13 @@ class DataHandler:
 
     def train_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the training utterances.
+        Retrieve training utterances from the dataset.
 
+        If a specific training split index is provided, retrieves utterances
+        from the indexed training split. Otherwise, retrieves utterances from
+        the primary training split.
+
+        :param idx: Optional index for a specific training split.
         :return: List of training utterances.
         """
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
@@ -86,8 +91,13 @@ class DataHandler:
 
     def train_labels(self, idx: int | None = None) -> list[LabelType]:
         """
-        Get the training labels.
+        Retrieve training labels from the dataset.
 
+        If a specific training split index is provided, retrieves labels
+        from the indexed training split. Otherwise, retrieves labels from
+        the primary training split.
+
+        :param idx: Optional index for a specific training split.
         :return: List of training labels.
         """
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
@@ -95,8 +105,13 @@ class DataHandler:
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the validation utterances.
+        Retrieve validation utterances from the dataset.
 
+        If a specific validation split index is provided, retrieves utterances
+        from the indexed validation split. Otherwise, retrieves utterances from
+        the primary validation split.
+
+        :param idx: Optional index for a specific validation split.
         :return: List of validation utterances.
         """
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
@@ -104,17 +119,27 @@ class DataHandler:
 
     def validation_labels(self, idx: int | None = None) -> list[LabelType]:
         """
-        Get the validatio labels.
+        Retrieve validation labels from the dataset.
 
-        :return: List of validatio labels.
+        If a specific validation split index is provided, retrieves labels
+        from the indexed validation split. Otherwise, retrieves labels from
+        the primary validation split.
+
+        :param idx: Optional index for a specific validation split.
+        :return: List of validation labels.
         """
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
         return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the test utterances.
+        Retrieve test utterances from the dataset.
 
+        If a specific test split index is provided, retrieves utterances
+        from the indexed test split. Otherwise, retrieves utterances from
+        the primary test split.
+
+        :param idx: Optional index for a specific test split.
         :return: List of test utterances.
         """
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
@@ -122,8 +147,13 @@ class DataHandler:
 
     def test_labels(self, idx: int | None = None) -> list[LabelType]:
         """
-        Get the test labels.
+        Retrieve test labels from the dataset.
 
+        If a specific test split index is provided, retrieves labels
+        from the indexed test split. Otherwise, retrieves labels from
+        the primary test split.
+
+        :param idx: Optional index for a specific test split.
         :return: List of test labels.
         """
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
@@ -131,9 +161,14 @@ class DataHandler:
 
     def oos_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the out-of-scope utterances.
+        Retrieve out-of-scope (OOS) utterances from the dataset.
 
-        :return: List of out-of-scope utterances if available, otherwise an empty list.
+        If the dataset contains out-of-scope samples, retrieves the utterances
+        from the specified OOS split index (if provided) or the primary OOS split.
+        Returns an empty list if no OOS samples are available in the dataset.
+
+        :param idx: Optional index for a specific OOS split.
+        :return: List of out-of-scope utterances, or an empty list if unavailable.
         """
         if self.has_oos_samples():
             split = f"{Split.OOS}_{idx}" if idx is not None else Split.OOS

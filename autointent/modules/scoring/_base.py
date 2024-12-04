@@ -31,6 +31,7 @@ class ScoringModule(Module, ABC):
         Evaluate the scorer on a test set and compute the specified metric.
 
         :param context: Context containing test set and other data.
+        :param split: Target split
         :param metric_fn: Function to compute the scoring metric.
         :return: Computed metric value for the test set.
         """

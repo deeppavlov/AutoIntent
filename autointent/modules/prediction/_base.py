@@ -50,6 +50,7 @@ class PredictionModule(Module, ABC):
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
+        :param split: Target split
         :param metric_fn: Metric function
         :return: Score
         """
