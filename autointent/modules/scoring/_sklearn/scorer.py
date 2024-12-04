@@ -56,7 +56,7 @@ class SklearnScorer(ScoringModule):
         embedder_name: str,
         clf_name: str,
         cv: int = 3,
-        clf_args: dict[str, Any] = {},  # noqa: B006
+        clf_args: dict[str, Any] | None = None,
         n_jobs: int = -1,
         device: str = "cpu",
         seed: int = 0,
@@ -91,7 +91,7 @@ class SklearnScorer(ScoringModule):
         cls,
         context: Context,
         clf_name: str,
-        clf_args: dict[str, Any] = {},  # noqa: B006
+        clf_args: dict[str, Any] | None = None,
         embedder_name: str | None = None,
     ) -> Self:
         """
@@ -136,7 +136,7 @@ class SklearnScorer(ScoringModule):
         self._multilabel = isinstance(labels[0], list)
 
         if self.precomputed_embeddings:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
+            # this happens only when SklearnScorer is within Pipeline opimization after RetrievalNode optimization
             vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
             vector_index = vector_index_client.get_index(self.embedder_name)
             features = vector_index.get_all_embeddings()
@@ -152,7 +152,7 @@ class SklearnScorer(ScoringModule):
                 max_length=self.max_length,
             )
             features = embedder.embed(utterances)
-
+        self.clf_args = {} if self.clf_args is None else self.clf_args
         if AVAILIABLE_CLASSIFIERS.get(self.clf_name):
             base_clf = AVAILIABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
