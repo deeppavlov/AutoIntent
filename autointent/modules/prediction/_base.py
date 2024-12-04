@@ -1,7 +1,7 @@
 """Predictior module."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -40,15 +40,21 @@ class PredictionModule(Module, ABC):
         :param scores: Scores to predict
         """
 
-    def score(self, context: Context, metric_fn: PredictionMetricFn) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: PredictionMetricFn,
+    ) -> float:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
+        :param split: Target split
         :param metric_fn: Metric function
         :return: Score
         """
-        labels, scores = get_prediction_evaluation_data(context)
+        labels, scores = get_prediction_evaluation_data(context, split)
         self._predictions = self.predict(scores)
         return metric_fn(labels, self._predictions)
 
@@ -62,21 +68,33 @@ class PredictionModule(Module, ABC):
 
 def get_prediction_evaluation_data(
     context: Context,
+    split: Literal["train", "validation", "test"],
 ) -> tuple[list[LabelType], npt.NDArray[Any]]:
     """
     Get prediction evaluation data.
 
     :param context: Context
+    :param split: Target split
     :return:
     """
-    labels = np.array(context.data_handler.test_labels)
-    scores = context.optimization_info.get_best_test_scores()
+    if split == "train":
+        labels = np.array(context.data_handler.train_labels(1))
+        scores = context.optimization_info.get_best_train_scores()
+    elif split == "validation":
+        labels = np.array(context.data_handler.validation_labels(1))
+        scores = context.optimization_info.get_best_validation_scores()
+    elif split == "test":
+        labels = np.array(context.data_handler.test_labels())
+        scores = context.optimization_info.get_best_test_scores()
+    else:
+        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation', or 'test'."
+        raise ValueError(message)
 
     if scores is None:
-        msg = "No test scores found in the optimization info"
-        raise ValueError(msg)
+        message = f"No '{split}' scores found in the optimization info"
+        raise ValueError(message)
 
-    oos_scores = context.optimization_info.get_best_oos_scores()
+    oos_scores = context.optimization_info.get_best_oos_scores(split)
     return_scores = scores
     if oos_scores is not None:
         oos_labels = (
