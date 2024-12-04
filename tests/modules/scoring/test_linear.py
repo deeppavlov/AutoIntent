@@ -12,7 +12,7 @@ def test_base_linear(dataset):
 
     scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu")
 
-    scorer.fit(data_handler.train_utterances, data_handler.train_labels)
+    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -24,19 +24,11 @@ def test_base_linear(dataset):
     np.testing.assert_almost_equal(
         np.array(
             [
-                [0.17929172, 0.59130114, 0.22940714],
-                [0.15927979, 0.62363961, 0.2170806],
-                [
-                    0.20069508,
-                    0.53883687,
-                    0.26046804,
-                ],
-                [0.17557001, 0.61310582, 0.21132417],
-                [
-                    0.17911179,
-                    0.63123131,
-                    0.1896569,
-                ],
+                [0.33332719, 0.33334283, 0.33332997],
+                [0.33332507, 0.33334446, 0.33333046],
+                [0.33332806, 0.33334067, 0.33333127],
+                [0.33332788, 0.33334159, 0.33333053],
+                [0.33332806, 0.33334418, 0.33332775],
             ],
         ),
         predictions,

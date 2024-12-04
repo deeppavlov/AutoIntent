@@ -69,9 +69,7 @@ class NodeOptimizer:
                 self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_type)
-                metric_value = module.score(context, self.node_info.metrics_available[self.metric_name])
-
-                assets = module.get_assets()
+                metric_value = module.score(context, "validation", self.node_info.metrics_available[self.metric_name])
 
                 dump_dir = context.get_dump_dir()
 
@@ -87,7 +85,7 @@ class NodeOptimizer:
                     module_kwargs,
                     metric_value,
                     self.metric_name,
-                    assets,  # retriever name / scores / predictions
+                    module.get_assets(),  # retriever name / scores / predictions
                     module_dump_dir,
                     module=module if not context.is_ram_to_clear() else None,
                 )
@@ -122,14 +120,14 @@ class NodeOptimizer:
         if self.node_info.node_type in ["retrieval", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":
                 args = (
-                    context.data_handler.train_utterances,
-                    context.data_handler.train_labels,
+                    context.data_handler.train_utterances(0),
+                    context.data_handler.train_labels(0),
                     context.data_handler.intent_descriptions,
                 )
             else:
-                args = (context.data_handler.train_utterances, context.data_handler.train_labels)  # type: ignore[assignment]
+                args = (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[assignment]
         elif self.node_info.node_type == "prediction":
-            labels, scores = get_prediction_evaluation_data(context)
+            labels, scores = get_prediction_evaluation_data(context, "train")
             args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
         elif self.node_info.node_type == "regexp":
             args = ()  # type: ignore[assignment]

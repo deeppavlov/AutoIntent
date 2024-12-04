@@ -3,34 +3,17 @@
         {
             "id": 0,
             "name": "accept_reservations",
-            "tags": ["reservation"],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
             "description": "User wants to know if Red Robin accepts reservations."
         },
         {
             "id": 1,
             "name": "account_blocked",
-            "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
             "description": "User wants to know why their bank account is blocked or frozen."
         },
         {
             "id": 2,
             "name": "alarm",
-            "tags": ["alarm"],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
             "description": "User wants to set or manage an alarm."
-        },
-        {
-            "id": 3,
-            "name": "alarm",
-            "tags": ["alarm"],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "User wants to set or manage an alarm second time."
         }
     ],
     "train": [
@@ -53,6 +36,46 @@
         {
             "utterance": "does redrobin do reservations",
             "label": 0
+        },
+        {
+            "utterance": "does acero in maplewood allow reservations",
+            "label": 0
+        },
+        {
+            "utterance": "do they take reservations at bar tartine",
+            "label": 0
+        },
+        {
+            "utterance": "does cowgirl creamery in san francisco take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "can i get a reservation at melting pot tomorrow",
+            "label": 0
+        },
+        {
+            "utterance": "will they take reservations at torris",
+            "label": 0
+        },
+        {
+            "utterance": "i think my account is blocked",
+            "label": 1
+        },
+        {
+            "utterance": "why is my bank account stopping all transactions from going through",
+            "label": 1
+        },
+        {
+            "utterance": "what would cause me to be locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "find out the reason why am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "my account has a hold on it and i can't access my funds, why",
+            "label": 1
         },
         {
             "utterance": "why is there a hold on my american saving bank account",
@@ -95,6 +118,26 @@
             "label": 2
         },
         {
+            "utterance": "set an alarm for me for 10:00 and another one set for 4:00",
+            "label": 2
+        },
+        {
+            "utterance": "set an alarm to go to sleep and another to wake up",
+            "label": 2
+        },
+        {
+            "utterance": "set alarm",
+            "label": 2
+        },
+        {
+            "utterance": "i need an alarm set",
+            "label": 2
+        },
+        {
+            "utterance": "you need to set alarm for me",
+            "label": 2
+        },
+        {
             "utterance": "how much is an overdraft fee for bank"
         },
         {
@@ -102,6 +145,15 @@
         },
         {
             "utterance": "what size wipers does this car take"
+        },
+        {
+            "utterance": "where is the dipstick"
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
         }
     ]
 }

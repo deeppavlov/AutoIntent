@@ -9,8 +9,16 @@ def sample_multiclass_data():
         "train": [
             {"utterance": "hello", "label": 0},
             {"utterance": "hi", "label": 0},
+            {"utterance": "hey", "label": 0},
+            {"utterance": "greetings", "label": 0},
+            {"utterance": "what's up", "label": 0},
+            {"utterance": "howdy", "label": 0},
             {"utterance": "goodbye", "label": 1},
             {"utterance": "bye", "label": 1},
+            {"utterance": "see you later", "label": 1},
+            {"utterance": "take care", "label": 1},
+            {"utterance": "farewell", "label": 1},
+            {"utterance": "catch you later", "label": 1},
         ],
         "test": [
             {"utterance": "greetings", "label": 0},
@@ -37,6 +45,16 @@ def sample_multilabel_data():
         "train": [
             {"utterance": "hello and goodbye", "label": [0, 1]},
             {"utterance": "hi there", "label": [0]},
+            {"utterance": "farewell and see you later", "label": [1]},
+            {"utterance": "good morning", "label": [0]},
+            {"utterance": "goodbye for now", "label": [1]},
+            {"utterance": "hey, how's it going?", "label": [0]},
+            {"utterance": "so long and take care", "label": [1]},
+            {"utterance": "hello, nice to meet you", "label": [0]},
+            {"utterance": "bye, have a great day", "label": [1]},
+            {"utterance": "what's up?", "label": [0]},
+            {"utterance": "later, see you soon", "label": [1]},
+            {"utterance": "greetings and salutations", "label": [0]},
         ],
         "test": [
             {"utterance": "greetings", "label": [0]},
@@ -50,10 +68,10 @@ def test_data_handler_initialization(sample_multiclass_data):
 
     assert handler.multilabel is False
     assert handler.n_classes == 2
-    assert handler.train_utterances == ["hello", "hi", "goodbye", "bye"]
-    assert handler.test_utterances == ["greetings", "farewell"]
-    assert handler.train_labels == [0, 0, 1, 1]
-    assert handler.test_labels == [0, 1]
+    assert handler.train_utterances(0) == ["hello", "bye", "hi", "take care"]
+    assert handler.test_utterances() == ["greetings", "farewell"]
+    assert handler.train_labels(0) == [0, 1, 0, 1]
+    assert handler.test_labels() == [0, 1]
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
@@ -61,10 +79,15 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
 
     assert handler.multilabel is True
     assert handler.n_classes == 2
-    assert handler.train_utterances == ["hello and goodbye", "hi there"]
-    assert handler.test_utterances == ["greetings", "farewell"]
-    assert handler.train_labels == [[1, 1], [1, 0]]
-    assert handler.test_labels == [[1, 0], [0, 1]]
+    assert handler.train_utterances(0) == [
+        "so long and take care",
+        "what's up?",
+        "later, see you soon",
+        "greetings and salutations",
+    ]
+    assert handler.test_utterances() == ["greetings", "farewell"]
+    assert handler.train_labels(0) == [[0, 1], [1, 0], [0, 1], [1, 0]]
+    assert handler.test_labels() == [[1, 0], [0, 1]]
 
 
 def test_dump_method(sample_multiclass_data):
@@ -72,11 +95,14 @@ def test_dump_method(sample_multiclass_data):
 
     dump = handler.dump()
 
-    assert dump["train"] == [
+    for split in ["train_0", "validation_0", "train_1", "validation_1", "test"]:
+        assert split in dump
+
+    assert dump["train_0"] == [
         {"utterance": "hello", "label": 0},
-        {"utterance": "hi", "label": 0},
-        {"utterance": "goodbye", "label": 1},
         {"utterance": "bye", "label": 1},
+        {"utterance": "hi", "label": 0},
+        {"utterance": "take care", "label": 1},
     ]
     assert dump["test"] == [
         {"utterance": "greetings", "label": 0},
