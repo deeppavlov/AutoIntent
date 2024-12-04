@@ -60,11 +60,14 @@ autoapi_options = [
     "imported-members",
 ]
 autodoc_typehints = "description"
+autoapi_own_page_level = "function"
+suppress_warnings = ["autoapi.python_import_resolution"]
+autoapi_add_toctree_entry = False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "alabaster"
+html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 nbsphinx_execute = "never"
 
