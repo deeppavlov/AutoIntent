@@ -69,7 +69,7 @@ autoapi_add_toctree_entry = False
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
-nbsphinx_execute = "never"
+nbsphinx_execute = "always"
 
 todo_include_todos = True
 
