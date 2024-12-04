@@ -20,7 +20,7 @@ nodes:
           - avsolatorio/GIST-small-Embedding-v0
         k: [1, 3]
         train_head: [false, true]
-      - module_type: rerank_scorer
+      - module_type: rerank
         k: [ 5, 10 ]
         weights: [uniform, distance, closest]
         m: [ 2, 3 ]

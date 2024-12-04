@@ -16,7 +16,7 @@ nodes:
       - module_type: linear
       - module_type: mlknn
         k: [5]
-      - module_type: rerank_scorer
+      - module_type: rerank
         k: [ 5, 10 ]
         weights: [ uniform, distance, closest ]
         m: [ 2, 3 ]
