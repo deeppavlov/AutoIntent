@@ -48,20 +48,9 @@ class DataHandler:
         if self.dataset.multilabel:
             self.dataset = self.dataset.encode_labels()
 
-        if Split.TEST not in self.dataset:
-            logger.info("Splitting dataset into train and test splits")
-            self.dataset = split_dataset(self.dataset, random_seed=random_seed)
+        self.n_classes = self.dataset.n_classes
 
-        for split in self.dataset:
-            if split == Split.OOS:
-                continue
-            n_classes_split = self.dataset.get_n_classes(split)
-            if n_classes_split != self.n_classes:
-                message = (
-                    f"Number of classes in split '{split}' doesn't match initial number of classes "
-                    f"({n_classes_split} != {self.n_classes})"
-                )
-                raise ValueError(message)
+        self._split(random_seed)
 
         self.regexp_patterns = [
             RegexPatterns(
@@ -86,60 +75,104 @@ class DataHandler:
         """
         return self.dataset.multilabel
 
-    @property
-    def n_classes(self) -> int:
+    def train_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the number of classes in the dataset.
+        Retrieve training utterances from the dataset.
 
-        :return: Number of classes.
-        """
-        return self.dataset.n_classes
+        If a specific training split index is provided, retrieves utterances
+        from the indexed training split. Otherwise, retrieves utterances from
+        the primary training split.
 
-    @property
-    def train_utterances(self) -> list[str]:
-        """
-        Get the training utterances.
-
+        :param idx: Optional index for a specific training split.
         :return: List of training utterances.
         """
-        return cast(list[str], self.dataset[Split.TRAIN][self.dataset.utterance_feature])
+        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    @property
-    def train_labels(self) -> list[LabelType]:
+    def train_labels(self, idx: int | None = None) -> list[LabelType]:
         """
-        Get the training labels.
+        Retrieve training labels from the dataset.
 
+        If a specific training split index is provided, retrieves labels
+        from the indexed training split. Otherwise, retrieves labels from
+        the primary training split.
+
+        :param idx: Optional index for a specific training split.
         :return: List of training labels.
         """
-        return cast(list[LabelType], self.dataset[Split.TRAIN][self.dataset.label_feature])
+        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    @property
-    def test_utterances(self) -> list[str]:
+    def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the test utterances.
+        Retrieve validation utterances from the dataset.
 
+        If a specific validation split index is provided, retrieves utterances
+        from the indexed validation split. Otherwise, retrieves utterances from
+        the primary validation split.
+
+        :param idx: Optional index for a specific validation split.
+        :return: List of validation utterances.
+        """
+        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
+
+    def validation_labels(self, idx: int | None = None) -> list[LabelType]:
+        """
+        Retrieve validation labels from the dataset.
+
+        If a specific validation split index is provided, retrieves labels
+        from the indexed validation split. Otherwise, retrieves labels from
+        the primary validation split.
+
+        :param idx: Optional index for a specific validation split.
+        :return: List of validation labels.
+        """
+        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+
+    def test_utterances(self, idx: int | None = None) -> list[str]:
+        """
+        Retrieve test utterances from the dataset.
+
+        If a specific test split index is provided, retrieves utterances
+        from the indexed test split. Otherwise, retrieves utterances from
+        the primary test split.
+
+        :param idx: Optional index for a specific test split.
         :return: List of test utterances.
         """
-        return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
+        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
+        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    @property
-    def test_labels(self) -> list[LabelType]:
+    def test_labels(self, idx: int | None = None) -> list[LabelType]:
         """
-        Get the test labels.
+        Retrieve test labels from the dataset.
 
+        If a specific test split index is provided, retrieves labels
+        from the indexed test split. Otherwise, retrieves labels from
+        the primary test split.
+
+        :param idx: Optional index for a specific test split.
         :return: List of test labels.
         """
-        return cast(list[LabelType], self.dataset[Split.TEST][self.dataset.label_feature])
+        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
+        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    @property
-    def oos_utterances(self) -> list[str]:
+    def oos_utterances(self, idx: int | None = None) -> list[str]:
         """
-        Get the out-of-scope utterances.
+        Retrieve out-of-scope (OOS) utterances from the dataset.
 
-        :return: List of out-of-scope utterances if available, otherwise an empty list.
+        If the dataset contains out-of-scope samples, retrieves the utterances
+        from the specified OOS split index (if provided) or the primary OOS split.
+        Returns an empty list if no OOS samples are available in the dataset.
+
+        :param idx: Optional index for a specific OOS split.
+        :return: List of out-of-scope utterances, or an empty list if unavailable.
         """
         if self.has_oos_samples():
-            return cast(list[str], self.dataset[Split.OOS][self.dataset.utterance_feature])
+            split = f"{Split.OOS}_{idx}" if idx is not None else Split.OOS
+            return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
         return []
 
     def has_oos_samples(self) -> bool:
@@ -148,7 +181,7 @@ class DataHandler:
 
         :return: True if there are out-of-scope samples.
         """
-        return Split.OOS in self.dataset
+        return any(split.startswith(Split.OOS) for split in self.dataset)
 
     def dump(self) -> dict[str, list[dict[str, Any]]]:
         """
@@ -157,3 +190,60 @@ class DataHandler:
         :return: Dataset dump.
         """
         return self.dataset.dump()
+
+    def _split(self, random_seed: int) -> None:
+        if Split.TEST not in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
+                self.dataset,
+                split=Split.TRAIN,
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
+            self.dataset,
+            split=Split.TRAIN,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+        self.dataset.pop(Split.TRAIN)
+
+        for idx in range(2):
+            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+                self.dataset,
+                split=f"{Split.TRAIN}_{idx}",
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+        if self.has_oos_samples():
+            self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
+                self.dataset[Split.OOS]
+                .train_test_split(
+                    test_size=0.2,
+                    shuffle=True,
+                    seed=random_seed,
+                )
+                .values()
+            )
+            self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
+                self.dataset[f"{Split.OOS}_1"]
+                .train_test_split(
+                    test_size=0.5,
+                    shuffle=True,
+                    seed=random_seed,
+                )
+                .values()
+            )
+            self.dataset.pop(Split.OOS)
+
+        for split in self.dataset:
+            if split.startswith(Split.OOS):
+                continue
+            n_classes_split = self.dataset.get_n_classes(split)
+            if n_classes_split != self.n_classes:
+                message = (
+                    f"Number of classes in split '{split}' doesn't match initial number of classes "
+                    f"({n_classes_split} != {self.n_classes})"
+                )
+                raise ValueError(message)
