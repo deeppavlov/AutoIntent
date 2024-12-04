@@ -66,7 +66,6 @@ autodoc_typehints = "description"
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
-nbsphinx_execute = "never"
 
 todo_include_todos = True
 
