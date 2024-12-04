@@ -1,6 +1,6 @@
 from ._embedder import Embedder
 from .context import Context
 from .context.data_handler import Dataset
-from .pipeline import InferencePipeline, PipelineOptimizer
+from .pipeline import Pipeline
 
-__all__ = ["Context", "Dataset", "Embedder", "InferencePipeline", "PipelineOptimizer"]
+__all__ = ["Context", "Dataset", "Embedder", "Pipeline"]

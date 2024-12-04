@@ -68,4 +68,4 @@ def get_retrieval_optimizer(multilabel: bool):
         ],
     }
 
-    return NodeOptimizer.from_dict_config(retrieval_optimizer_config)
+    return NodeOptimizer(**retrieval_optimizer_config)

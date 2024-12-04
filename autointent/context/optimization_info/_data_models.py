@@ -39,8 +39,13 @@ class ScorerArtifact(Artifact):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+    train_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for train utterances")
+    validation_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for validation utterances")
     test_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for test utterances")
-    oos_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for out-of-scope utterances")
+    oos_scores: dict[str, NDArray[np.float64]] | None = Field(
+        None,
+        description="Scorer outputs for out-of-scope utterances",
+    )
 
 
 class PredictorArtifact(Artifact):

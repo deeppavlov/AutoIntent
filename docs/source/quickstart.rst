@@ -75,11 +75,11 @@ To apply the built classifier to new data, you can use our Python API:
 
 .. code-block:: python
 
-    from autointent import InferencePipeline
+    from autointent import Pipeline
 
-    inference_pipeline = InferencePipeline.load("path/to/run/directory")
+    pipeline = Pipeline.load("path/to/run/directory")
     utterances = ["123", "hello world"]
-    prediction = inference_pipeline.predict(utterances)
+    prediction = pipeline.predict(utterances)
 
 Modular Approach
 ----------------
