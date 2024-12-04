@@ -1,22 +1,21 @@
 # TODO: make up a better and more versatile config
-nodes:
-  - node_type: retrieval
-    metric: retrieval_hit_rate_intersecting
-    search_space:
-      - module_type: vector_db
-        k: [10]
-        embedder_name:
-          - deepvk/USER-bge-m3
-  - node_type: scoring
-    metric: scoring_roc_auc
-    search_space:
-      - module_type: knn
-        k: [3]
-        weights: ["uniform", "distance", "closest"]
-      - module_type: linear
-  - node_type: prediction
-    metric: prediction_accuracy
-    search_space:
-      - module_type: threshold
-        thresh: [0.5]
-      - module_type: adaptive
+- node_type: retrieval
+  metric: retrieval_hit_rate_intersecting
+  search_space:
+    - module_type: vector_db
+      k: [10]
+      embedder_name:
+        - deepvk/USER-bge-m3
+- node_type: scoring
+  metric: scoring_roc_auc
+  search_space:
+    - module_type: knn
+      k: [3]
+      weights: ["uniform", "distance", "closest"]
+    - module_type: linear
+- node_type: prediction
+  metric: prediction_accuracy
+  search_space:
+    - module_type: threshold
+      thresh: [0.5]
+    - module_type: adaptive

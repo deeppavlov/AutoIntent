@@ -30,7 +30,7 @@ def test_prediction_multiclass(scoring_optimizer_multiclass):
         ],
     }
 
-    prediction_optimizer = NodeOptimizer.from_dict_config(prediction_optimizer_config)
+    prediction_optimizer = NodeOptimizer(**prediction_optimizer_config)
 
     prediction_optimizer.fit(context)
 
@@ -62,7 +62,7 @@ def test_prediction_multilabel(scoring_optimizer_multilabel):
         ],
     }
 
-    prediction_optimizer = NodeOptimizer.from_dict_config(prediction_optimizer_config)
+    prediction_optimizer = NodeOptimizer(**prediction_optimizer_config)
 
     prediction_optimizer.fit(context)
 
