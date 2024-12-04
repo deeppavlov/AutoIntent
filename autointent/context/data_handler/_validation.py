@@ -17,7 +17,6 @@ class DatasetReader(BaseModel):
     """
 
     train: list[Sample]
-    validation: list[Sample] = []
     test: list[Sample] = []
     intents: list[Intent] = []
 
@@ -30,7 +29,7 @@ class DatasetReader(BaseModel):
         :return: The validated DatasetReader instance.
         """
         self._validate_intents()
-        for split in [self.train, self.validation, self.test]:
+        for split in [self.train, self.test]:
             self._validate_split(split)
         return self
 

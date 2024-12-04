@@ -12,7 +12,7 @@ from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
 
-from ._dataset import Dataset, Split
+from ._dataset import Dataset
 
 
 class StratifiedSplitter:
@@ -44,7 +44,7 @@ class StratifiedSplitter:
         self.random_seed = random_seed
         self.shuffle = shuffle
 
-    def __call__(self, dataset: HFDataset, multilabel: bool) -> tuple[Dataset, Dataset]:
+    def __call__(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
         """
         Split the dataset into training and testing subsets.
 
@@ -73,7 +73,12 @@ class StratifiedSplitter:
         return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
 
 
-def split_dataset(dataset: Dataset, random_seed: int) -> Dataset:
+def split_dataset(
+    dataset: Dataset,
+    split: str,
+    test_size: float,
+    random_seed: int,
+) -> tuple[HFDataset, HFDataset]:
     """
     Split a Dataset object into training and testing subsets.
 
@@ -81,13 +86,19 @@ def split_dataset(dataset: Dataset, random_seed: int) -> Dataset:
     while preserving the distribution of labels.
 
     :param dataset: The dataset to be split, which must include training data.
+    :param split: The specific data split to be divided, e.g., "train" or
+        another split within the dataset.
+    :param test_size: Proportion of the dataset to include in the test split.
+        Should be a float value between 0.0 and 1.0, where 0.0
+        means no data will be assigned to the test set, and 1.0
+        means all data will be assigned to the test set. For example,
+        a value of 0.2 indicates 20% of the data will be used for testing.
     :param random_seed: Seed for random number generation to ensure reproducibility.
-    :return: The input dataset with training and testing splits.
+    :return: A tuple containing two subsets of the selected split.
     """
     splitter = StratifiedSplitter(
-        test_size=0.25,
+        test_size=test_size,
         label_feature=dataset.label_feature,
         random_seed=random_seed,
     )
-    dataset[Split.TRAIN], dataset[Split.TEST] = splitter(dataset[Split.TRAIN], dataset.multilabel)
-    return dataset
+    return splitter(dataset[split], dataset.multilabel)

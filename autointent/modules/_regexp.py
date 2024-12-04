@@ -3,7 +3,7 @@
 import json
 import re
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 
 from typing_extensions import Self
 
@@ -113,7 +113,12 @@ class RegExp(Module):
             matches["partial_matches"].extend(intent_matches["partial_matches"])
         return list(prediction), matches
 
-    def score(self, context: Context, metric_fn: RegexpMetricFn) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: RegexpMetricFn,
+    ) -> float:
         """
         Calculate metric on test set and return metric value.
 
@@ -123,15 +128,15 @@ class RegExp(Module):
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
         assets = {
-            "test_matches": list(self.predict(context.data_handler.test_utterances)),
+            "test_matches": list(self.predict(context.data_handler.test_utterances())),
             "oos_matches": None
-            if len(context.data_handler.oos_utterances) == 0
-            else self.predict(context.data_handler.oos_utterances),
+            if not context.data_handler.has_oos_samples()
+            else self.predict(context.data_handler.oos_utterances(2)),
         }
         if assets["test_matches"] is None:
             msg = "no matches found"
             raise ValueError(msg)
-        return metric_fn(context.data_handler.test_labels, assets["test_matches"])
+        return metric_fn(context.data_handler.test_labels(), assets["test_matches"])
 
     def clear_cache(self) -> None:
         """Clear cache."""

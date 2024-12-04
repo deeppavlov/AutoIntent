@@ -5,7 +5,7 @@ trials, and modules during the pipeline's execution.
 """
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -147,6 +147,24 @@ class OptimizationInfo:
         best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
+    def get_best_train_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the train scores from the best scorer node.
+
+        :return: Train scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.train_scores
+
+    def get_best_validation_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the validation scores from the best scorer node.
+
+        :return: Validation scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.validation_scores
+
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
         """
         Retrieve the test scores from the best scorer node.
@@ -156,13 +174,18 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
 
-    def get_best_oos_scores(self) -> NDArray[np.float64] | None:
+    def get_best_oos_scores(self, split: Literal["train", "validation", "test"]) -> NDArray[np.float64] | None:
         """
         Retrieve the out-of-scope scores from the best scorer node.
 
-        :return: Out-of-scope scores as a numpy array.
+        :param split: The data split for which to retrieve the OOS scores.
+            Must be one of "train", "validation", or "test".
+        :return: A numpy array containing OOS scores for the specified split,
+            or `None` if no OOS scores are available.
         """
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        if best_scorer_artifact.oos_scores is not None:
+            return best_scorer_artifact.oos_scores[split]
         return best_scorer_artifact.oos_scores
 
     def dump_evaluation_results(self) -> dict[str, Any]:

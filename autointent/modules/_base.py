@@ -1,7 +1,7 @@
 """Base module for all modules."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Literal
 
 import numpy.typing as npt
 from typing_extensions import Self
@@ -30,7 +30,12 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def score(self, context: Context, metric_fn: METRIC_FN) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: METRIC_FN,
+    ) -> float:
         """
         Calculate metric on test set and return metric value.
 
