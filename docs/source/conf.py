@@ -83,6 +83,12 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         },
+        {
+            "name": "HuggingFace",
+            "url": "https://huggingface.co/AutoIntent",
+            "icon": "../_static/hf-logo.svg",
+            "type": "local",
+        },
     ],
     "show_toc_level": 3,
 }
