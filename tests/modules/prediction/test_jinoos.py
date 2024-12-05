@@ -21,7 +21,7 @@ def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float
 def test_predict_returns_correct_indices(multiclass_fit_data):
     predictor = JinoosPredictor()
     predictor.fit(*multiclass_fit_data)
-    scores = np.array([[0.1, 0.9, 0, 0.1], [0.8, 0, 0.2, 0.5], [0, 0.3, 0.7, 0.1]])
+    scores = np.array([[0.1, 0.9, 0, 0.1], [0.8, 0, 0.1, 0.1], [0, 0.2, 0.7, 0.1]])
 
     # inference
     predictions = predictor.predict(scores)
