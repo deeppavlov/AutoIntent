@@ -2,7 +2,7 @@
 
 from abc import ABC
 
-from autointent.modules import Module
+from autointent.modules.abc import Module
 
 
 class RetrievalModule(Module, ABC):

@@ -7,15 +7,6 @@ the AutoIntent framework for improved type safety and clarity.
 from enum import Enum
 from typing import Literal, TypedDict
 
-# Literal type for task types
-TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
-"""
-Represents the supported task types in AutoIntent:
-- "multiclass": Single-label classification.
-- "multilabel": Multi-label classification.
-- "multiclass_as_multilabel": Multi-class treated as multi-label.
-"""
-
 
 class LogLevel(Enum):
     """Logging levels for the AutoIntent framework."""

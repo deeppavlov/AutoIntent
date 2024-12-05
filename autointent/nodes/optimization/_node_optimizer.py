@@ -11,8 +11,8 @@ import torch
 
 from autointent.context import Context
 from autointent.custom_types import NodeType
-from autointent.modules import Module
-from autointent.modules.prediction._base import get_prediction_evaluation_data
+from autointent.modules.abc import Module
+from autointent.modules.abc._prediction import get_prediction_evaluation_data
 from autointent.nodes.nodes_info import NODES_INFO
 
 

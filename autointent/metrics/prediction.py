@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
 from ._converter import transform
-from ._custom_types import LABELS_VALUE_TYPE
+from .custom_types import LABELS_VALUE_TYPE
 
 logger = logging.getLogger(__name__)
 

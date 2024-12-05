@@ -14,8 +14,7 @@ from typing_extensions import Self
 from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
-
-from ._base import ScoringModule
+from autointent.modules.abc import ScoringModule
 
 
 class LinearScorerDumpDict(BaseMetadataDict):

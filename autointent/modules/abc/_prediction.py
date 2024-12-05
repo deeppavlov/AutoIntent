@@ -11,7 +11,7 @@ from autointent.context.data_handler import Tag
 from autointent.context.optimization_info import PredictorArtifact
 from autointent.custom_types import LabelType
 from autointent.metrics import PredictionMetricFn
-from autointent.modules import Module
+from autointent.modules.abc import Module
 
 
 class PredictionModule(Module, ABC):

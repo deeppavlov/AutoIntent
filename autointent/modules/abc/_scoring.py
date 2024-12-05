@@ -3,14 +3,13 @@
 from abc import ABC, abstractmethod
 from typing import Any, Literal
 
-import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.data_handler import Split
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
-from autointent.modules import Module
+from autointent.modules.abc import Module
 
 
 class ScoringModule(Module, ABC):
@@ -82,30 +81,3 @@ class ScoringModule(Module, ABC):
         :param utterances: List of utterances to score.
         :return: Array of predicted scores.
         """
-
-    def predict_topk(self, utterances: list[str], k: int = 3) -> npt.NDArray[Any]:
-        """
-        Predict the top-k most probable classes for each utterance.
-
-        :param utterances: List of utterances to score.
-        :param k: Number of top classes to return, defaults to 3.
-        :return: Array of shape (n_samples, k) with indices of the top-k classes.
-        """
-        scores = self.predict(utterances)
-        return get_topk(scores, k)
-
-
-def get_topk(scores: npt.NDArray[Any], k: int) -> npt.NDArray[Any]:
-    """
-    Get the indices of the top-k classes for each sample.
-
-    :param scores: Array of shape (n_samples, n_classes) with class scores.
-    :param k: Number of top classes to select.
-    :return: Array of shape (n_samples, k) containing indices of the top-k classes.
-    """
-    # Select top scores
-    top_indices = np.argpartition(scores, axis=1, kth=-k)[:, -k:]
-    top_scores = scores[np.arange(len(scores))[:, None], top_indices]
-    # Sort them
-    top_indices_sorted = np.argsort(top_scores, axis=1)[:, ::-1]
-    return top_indices[np.arange(len(scores))[:, None], top_indices_sorted]  # type: ignore[no-any-return]

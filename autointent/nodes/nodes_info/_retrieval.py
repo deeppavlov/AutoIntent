@@ -9,7 +9,8 @@ from autointent.metrics import (
     RETRIEVAL_METRICS_MULTILABEL,
     RetrievalMetricFn,
 )
-from autointent.modules import RETRIEVAL_MODULES_MULTICLASS, RETRIEVAL_MODULES_MULTILABEL, Module
+from autointent.modules import RETRIEVAL_MODULES_MULTICLASS, RETRIEVAL_MODULES_MULTILABEL
+from autointent.modules.abc import Module
 
 from ._base import NodeInfo
 

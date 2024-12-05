@@ -11,8 +11,7 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RetrievalMetricFn
-
-from ._base import RetrievalModule
+from autointent.modules.abc import RetrievalModule
 
 
 class VectorDBMetadata(BaseMetadataDict):

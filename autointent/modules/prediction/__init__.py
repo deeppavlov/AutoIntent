@@ -1,6 +1,5 @@
 from ._adaptive import AdaptivePredictor
 from ._argmax import ArgmaxPredictor
-from ._base import PredictionModule
 from ._jinoos import JinoosPredictor
 from ._threshold import ThresholdPredictor
 from ._tunable import TunablePredictor

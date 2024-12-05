@@ -13,8 +13,7 @@ from autointent.context.data_handler._schemas import Intent
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
 from autointent.metrics.regexp import RegexpMetricFn
-
-from ._base import Module
+from autointent.modules.abc import Module
 
 
 class RegexPatternsCompiled(TypedDict):

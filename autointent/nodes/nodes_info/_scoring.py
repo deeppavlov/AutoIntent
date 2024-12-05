@@ -5,7 +5,8 @@ from typing import ClassVar
 
 from autointent.custom_types import NodeType
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL, ScoringMetricFn
-from autointent.modules import SCORING_MODULES_MULTICLASS, SCORING_MODULES_MULTILABEL, ScoringModule
+from autointent.modules import SCORING_MODULES_MULTICLASS, SCORING_MODULES_MULTILABEL
+from autointent.modules.abc import ScoringModule
 
 from ._base import NodeInfo
 

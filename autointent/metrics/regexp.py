@@ -5,7 +5,7 @@ from typing import Protocol
 import numpy as np
 
 from ._converter import transform
-from ._custom_types import LABELS_VALUE_TYPE
+from .custom_types import LABELS_VALUE_TYPE
 
 
 class RegexpMetricFn(Protocol):
