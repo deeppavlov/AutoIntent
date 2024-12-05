@@ -20,6 +20,6 @@ def skip_member(app: Sphinx, what: str, name: str, obj: Any, skip: bool, options
         bool | None: True to skip the member, None to use the default behavior.
     """
     # Check if the member has a docstring
-    if hasattr(obj, "__doc__") and obj.__doc__ and "# exclude from docs" in obj.__doc__:
+    if hasattr(obj, "__doc__") and obj.__doc__ and "#private" in obj.__doc__:
         return True
     return skip

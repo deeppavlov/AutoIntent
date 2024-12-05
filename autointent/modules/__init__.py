@@ -38,4 +38,4 @@ PREDICTION_MODULES_MULTILABEL: dict[str, type[Module]] = _create_modules_dict(
     [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 
-__all__ = []
+__all__ = []  # type: ignore[var-annotated]

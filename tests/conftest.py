@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from autointent.context._utils import load_data
+from autointent import Dataset
 
 
 def setup_environment() -> tuple[str, str]:
@@ -19,4 +19,4 @@ def get_dataset_path():
 
 @pytest.fixture
 def dataset():
-    return load_data(get_dataset_path())
+    return Dataset.from_json(get_dataset_path())

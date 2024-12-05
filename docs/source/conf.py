@@ -99,7 +99,7 @@ autodoc_default_options = {
     "undoc-members": False,
     "private-members": False,
     # "special-members": "__call__",
-    "member-order": "bysource",
+    "member-order": "groupwise",
     "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
 }
 
@@ -122,4 +122,4 @@ def setup(app) -> None:  # noqa: ANN001
             ("tutorials.data", "Data"),
         ],
     )
-    app.connect("autodoc-skip-member", skip_member)
+    app.connect("autoapi-skip-member", skip_member)

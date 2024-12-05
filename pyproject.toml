@@ -120,6 +120,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "D104"]
+"autointent/__init__.py" = ["I001"]
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
