@@ -71,7 +71,7 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
 
 html_theme_options = {
-   "logo": {
+    "logo": {
         "text": "AutoIntent",
         "image_light": "../_static/logo-light.svg",
         "image_dark": "../_static/logo-dark.svg",
@@ -84,7 +84,7 @@ html_theme_options = {
             "type": "fontawesome",
         },
     ],
-    "show_toc_level": 3
+    "show_toc_level": 3,
 }
 
 html_favicon = "../_static/logo-white.svg"
