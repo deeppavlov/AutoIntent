@@ -1,3 +1,3 @@
-from ._dataset import Dataset, Split
+from ._dataset import Dataset
 
-__all__ = ["Dataset", "Split"]
+__all__ = ["Dataset"]

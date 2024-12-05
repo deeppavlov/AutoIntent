@@ -5,8 +5,8 @@ from typing import Any, TypedDict, cast
 
 from transformers import set_seed
 
-from autointent import Dataset, Split
-from autointent.custom_types import LabelType
+from autointent import Dataset
+from autointent.custom_types import LabelType, Split
 
 from ._stratification import split_dataset
 

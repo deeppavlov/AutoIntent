@@ -9,26 +9,8 @@ from datasets import ClassLabel, Sequence, concatenate_datasets, get_dataset_con
 from datasets import Dataset as HFDataset
 from typing_extensions import Self
 
-from autointent.custom_types import LabelType
+from autointent.custom_types import LabelType, Split
 from autointent.schemas import Intent, Tag
-
-
-class Split:
-    """
-    Constants representing dataset splits.
-
-    :cvar str TRAIN: Training split.
-    :cvar str VALIDATION: Validation split.
-    :cvar str TEST: Testing split.
-    :cvar str OOS: Out-of-scope split.
-    :cvar str INTENTS: Intents split.
-    """
-
-    TRAIN = "train"
-    VALIDATION = "validation"
-    TEST = "test"
-    OOS = "oos"
-    INTENTS = "intents"
 
 
 class Sample(TypedDict):

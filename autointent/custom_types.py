@@ -47,3 +47,21 @@ class NodeType(str, Enum):
     retrieval = "retrieval"
     scoring = "scoring"
     prediction = "prediction"
+
+
+class Split:
+    """
+    Constants representing dataset splits.
+
+    :cvar str TRAIN: Training split.
+    :cvar str VALIDATION: Validation split.
+    :cvar str TEST: Testing split.
+    :cvar str OOS: Out-of-scope split.
+    :cvar str INTENTS: Intents split.
+    """
+
+    TRAIN = "train"
+    VALIDATION = "validation"
+    TEST = "test"
+    OOS = "oos"
+    INTENTS = "intents"
