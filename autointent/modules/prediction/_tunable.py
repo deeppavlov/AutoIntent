@@ -124,7 +124,7 @@ class TunablePredictor(PredictionModule):
 
         dump_dir = Path(path)
         metadata_json = self.metadata
-        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None
+        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None  # type: ignore[misc]
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata_json, file, indent=4)
@@ -138,12 +138,14 @@ class TunablePredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: TunablePredictorDumpMetadata = json.load(file)
+            metadata = json.load(file)
 
-        self.metadata = metadata
+        metadata["tags"] = [Tag(**tag) for tag in metadata["tags"]] if metadata["tags"] else None
+
+        self.metadata: TunablePredictorDumpMetadata = metadata
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
-        self.tags = [Tag(**t) for t in metadata["tags"]] if metadata["tags"] else None
+        self.tags = metadata["tags"]
         self.n_classes = metadata["n_classes"]
 
 
