@@ -75,12 +75,19 @@ html_theme_options = {
         "text": "AutoIntent",
         "image_light": "../_static/logo-light.svg",
         "image_dark": "../_static/logo-dark.svg",
-    }
+    },
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/deeppavlov/AutoIntent",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        },
+    ],
 }
 
 html_favicon = "../_static/logo-white.svg"
-
-nbsphinx_execute = "never"
+html_show_sourcelink = False
 
 todo_include_todos = True
 
@@ -98,6 +105,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
+nbsphinx_execute = "never"
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
