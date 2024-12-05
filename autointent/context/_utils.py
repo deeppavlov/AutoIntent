@@ -56,10 +56,10 @@ def load_data(filepath: str | Path) -> Dataset:
     """
     if filepath == "default-multiclass":
         return Dataset.from_json(
-            ires.files("autointent.datafiles").joinpath("banking77.json"),  # type: ignore[arg-type]
+            ires.files("autointent._datafiles").joinpath("banking77.json"),  # type: ignore[arg-type]
         )
     if filepath == "default-multilabel":
         return Dataset.from_json(
-            ires.files("autointent.datafiles").joinpath("dstc3-20shot.json"),  # type: ignore[arg-type]
+            ires.files("autointent._datafiles").joinpath("dstc3-20shot.json"),  # type: ignore[arg-type]
         )
     return Dataset.from_json(filepath)
