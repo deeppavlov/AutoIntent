@@ -90,6 +90,8 @@ html_theme_options = {
 html_favicon = "../_static/logo-white.svg"
 html_show_sourcelink = False
 
+toc_object_entries_show_parents = "hide"
+
 todo_include_todos = True
 
 autodoc_default_options = {
