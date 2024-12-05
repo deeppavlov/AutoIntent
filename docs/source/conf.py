@@ -108,7 +108,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-nbsphinx_execute = "never"
+nbsphinx_execute = "always"
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
