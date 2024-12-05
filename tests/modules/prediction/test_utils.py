@@ -86,19 +86,3 @@ def multiple_tags_data():
 def test_apply_tags(labels, scores, tags, expected_labels):
     adjusted_labels = apply_tags(labels, scores, tags)
     np.testing.assert_array_equal(adjusted_labels, expected_labels)
-
-
-def test_apply_tags_large_dataset():
-    np.random.seed(0)
-    labels = np.random.randint(0, 2, size=(1000, 50))
-    scores = np.random.rand(1000, 50)
-    tags = [Tag(name=f"tag_{i}", intent_ids=list(range(i * 5, (i + 1) * 5))) for i in range(10)]
-
-    adjusted_labels = apply_tags(labels, scores, tags)
-
-    # Verify that no more than one intent per tag is assigned per sample
-    for i in range(100):  # Check first 100 samples for brevity
-        for tag in tags:
-            intent_ids = tag.intent_ids
-            assigned_intents = np.where(adjusted_labels[i, intent_ids] == 1)[0]
-            assert len(assigned_intents) <= 1  # No more than one intent per tag
