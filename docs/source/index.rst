@@ -26,27 +26,27 @@ Example of building an intent classifier in a couple of lines of code:
 Documentation Contents
 ----------------------
 
-:doc:`quickstart`
+:doc:`Quickstart <quickstart>`
 .................
 
 It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities.
 
-:doc:`concepts`
+:doc:`Key Concepts <concepts>`
 ...............
 
 This page contains basic information about the terms and concepts we use throughout our documentation.
 
-:doc:`tutorials`
+:doc:`Tutorials <tutorials>`
 ................
 
 Newbie-friendly information on how to perform different tasks using our library.
 
-:doc:`guides/index`
+:doc:`User Guides<guides/index>`
 ...................
 
 Some advanced information
 
-:doc:`learn/index`
+:doc:`Learn AutoIntent<learn/index>`
 ..................
 
 Some theoretical background
