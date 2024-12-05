@@ -68,8 +68,19 @@ autoapi_add_toctree_entry = False
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_static_path = ["_static"]
-nbsphinx_execute = "always"
+html_static_path = ["../_static"]
+
+html_theme_options = {
+   "logo": {
+        "text": "AutoIntent",
+        "image_light": "../_static/logo-light.svg",
+        "image_dark": "../_static/logo-dark.svg",
+    }
+}
+
+html_favicon = "../_static/logo-white.svg"
+
+nbsphinx_execute = "never"
 
 todo_include_todos = True
 
