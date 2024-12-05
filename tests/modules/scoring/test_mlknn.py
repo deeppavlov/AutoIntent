@@ -1,7 +1,8 @@
 import numpy as np
 from datasets import Dataset as HFDataset
 
-from autointent.context.data_handler import DataHandler, Split
+from autointent import Split
+from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import MLKnnScorer
 from tests.conftest import setup_environment
 

@@ -6,8 +6,9 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-from autointent.context.data_handler import Dataset, Intent, Sample
+from autointent import Dataset
 from autointent.generation.prompt_scheme import PromptDescription
+from autointent.schemas import Intent, Sample
 
 
 def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:

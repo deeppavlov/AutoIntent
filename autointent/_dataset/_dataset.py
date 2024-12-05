@@ -10,8 +10,7 @@ from datasets import Dataset as HFDataset
 from typing_extensions import Self
 
 from autointent.custom_types import LabelType
-
-from ._schemas import Intent, Tag
+from autointent.schemas import Intent, Tag
 
 
 class Split:

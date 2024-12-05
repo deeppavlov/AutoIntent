@@ -5,8 +5,7 @@ from typing import Any, Literal
 
 import numpy.typing as npt
 
-from autointent import Context
-from autointent.context.data_handler import Split
+from autointent import Context, Split
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.metrics import ScoringMetricFn
 from autointent.modules.abc import Module

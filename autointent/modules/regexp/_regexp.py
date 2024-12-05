@@ -9,11 +9,11 @@ from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
-from autointent.context.data_handler._schemas import Intent
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
 from autointent.metrics.regexp import RegexpMetricFn
 from autointent.modules.abc import Module
+from autointent.schemas import Intent
 
 
 class RegexPatternsCompiled(TypedDict):

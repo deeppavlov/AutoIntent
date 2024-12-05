@@ -10,9 +10,9 @@ import numpy.typing as npt
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import PredictionModule
+from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, apply_tags
 

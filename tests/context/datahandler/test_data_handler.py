@@ -1,6 +1,7 @@
 import pytest
 
-from autointent.context.data_handler import DataHandler, Dataset
+from autointent import Dataset
+from autointent.context.data_handler import DataHandler
 
 
 @pytest.fixture

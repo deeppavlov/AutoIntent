@@ -1,4 +1,4 @@
-from autointent.context.data_handler import Split
+from autointent import Split
 from autointent.context.data_handler._stratification import split_dataset
 
 

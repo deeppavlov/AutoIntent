@@ -3,7 +3,7 @@
 from pydantic import BaseModel, model_validator
 from typing_extensions import Self
 
-from ._schemas import Intent, Sample
+from autointent.schemas import Intent, Sample
 
 
 class DatasetReader(BaseModel):

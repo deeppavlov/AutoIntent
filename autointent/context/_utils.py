@@ -12,7 +12,7 @@ from typing import Any
 import numpy as np
 from omegaconf import ListConfig
 
-from .data_handler import Dataset
+from autointent import Dataset
 
 
 class NumpyEncoder(json.JSONEncoder):
