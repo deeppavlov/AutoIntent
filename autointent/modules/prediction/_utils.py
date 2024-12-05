@@ -21,23 +21,31 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
     :param tags: List of `Tag` objects, where each tag specifies mutually exclusive intent IDs.
     :return: Adjusted array of shape (n_samples, n_classes) with binary labels.
     """
-    n_samples, _ = labels.shape
-    res = np.copy(labels)
+    labels = labels.copy()
 
-    for i in range(n_samples):
-        sample_labels = labels[i].astype(bool)
-        sample_scores = scores[i]
+    for tag in tags:
+        intent_ids = tag.intent_ids
 
-        for tag in tags:
-            if any(sample_labels[idx] for idx in tag.intent_ids):
-                # Find the index of the class with the highest score among the tagged indices
-                max_score_index = max(tag.intent_ids, key=lambda idx: sample_scores[idx])
-                # Set all other tagged indices to 0 in the result
-                for idx in tag.intent_ids:
-                    if idx != max_score_index:
-                        res[i, idx] = 0
+        labels_sub = labels[:, intent_ids]
+        scores_sub = scores[:, intent_ids]
 
-    return res
+        assigned = labels_sub == 1
+        num_assigned = assigned.sum(axis=1)
+
+        assigned_scores = np.where(assigned, scores_sub, -np.inf)
+
+        samples_to_adjust = np.where(num_assigned > 1)[0]
+
+        if samples_to_adjust.size > 0:
+            assigned_scores_adjust = assigned_scores[samples_to_adjust, :]
+            idx_max_adjust = assigned_scores_adjust.argmax(axis=1)
+
+            labels_sub[samples_to_adjust, :] = 0
+            labels_sub[samples_to_adjust, idx_max_adjust] = 1
+
+        labels[:, intent_ids] = labels_sub
+
+    return labels
 
 
 class WrongClassificationError(Exception):

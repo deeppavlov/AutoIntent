@@ -143,7 +143,7 @@ class TunablePredictor(PredictionModule):
         self.metadata = metadata
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
-        self.tags = metadata["tags"]
+        self.tags = [Tag(**t) for t in metadata["tags"]] if metadata["tags"] else None
         self.n_classes = metadata["n_classes"]
 
 

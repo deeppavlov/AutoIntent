@@ -128,7 +128,9 @@ class AdaptivePredictor(PredictionModule):
         """
         dump_dir = Path(path)
 
-        metadata = AdaptivePredictorDumpMetadata(r=self._r, tags=self.tags, n_classes=self.n_classes)
+        metadata = AdaptivePredictorDumpMetadata(
+            r=self._r, tags=[t.model_dump() for t in self.tags] if self.tags else None, n_classes=self.n_classes
+        )
 
         with (dump_dir / self.metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
