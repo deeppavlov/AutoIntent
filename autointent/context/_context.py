@@ -111,8 +111,6 @@ class Context:
         :return: Dictionary containing inference configuration.
         """
         nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
-        for cfg in nodes_configs:
-            cfg.pop("_target_")
         return {
             "metadata": {
                 "device": self.get_device(),

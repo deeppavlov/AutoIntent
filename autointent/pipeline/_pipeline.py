@@ -11,8 +11,7 @@ import yaml
 from typing_extensions import Self
 
 from autointent import Context
-from autointent.configs import InferenceNodeConfig
-from autointent.configs._optimization_cli import EmbedderConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.context.data_handler import Dataset
 from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer

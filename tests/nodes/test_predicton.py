@@ -4,9 +4,8 @@ import logging
 import numpy as np
 import torch
 
-from autointent.configs._node import InferenceNodeConfig
-from autointent.nodes import InferenceNode
-from autointent.nodes.optimization import NodeOptimizer
+from autointent.configs import InferenceNodeConfig
+from autointent.nodes import InferenceNode, NodeOptimizer
 
 logger = logging.getLogger(__name__)
 
