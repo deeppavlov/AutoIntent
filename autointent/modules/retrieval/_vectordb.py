@@ -4,8 +4,6 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from typing_extensions import Self
-
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
@@ -95,7 +93,7 @@ class VectorDBModule(RetrievalModule):
         context: Context,
         k: int,
         embedder_name: str,
-    ) -> Self:
+    ) -> "VectorDBModule":
         """
         Create a VectorDBModule instance using a Context object.
 

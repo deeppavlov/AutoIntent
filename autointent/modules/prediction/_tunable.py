@@ -9,7 +9,6 @@ import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
 from sklearn.metrics import f1_score
-from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.data_handler import Tag
@@ -96,7 +95,7 @@ class TunablePredictor(PredictionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: int = 320) -> Self:
+    def from_context(cls, context: Context, n_trials: int = 320) -> "TunablePredictor":
         """
         Initialize from context.
 

@@ -6,7 +6,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler import Tag
@@ -60,7 +59,7 @@ class ArgmaxPredictor(PredictionModule):
         """Init."""
 
     @classmethod
-    def from_context(cls, context: Context) -> Self:
+    def from_context(cls, context: Context) -> "ArgmaxPredictor":
         """
         Initialize form context.
 

@@ -6,7 +6,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
@@ -136,7 +135,7 @@ class KNNScorer(ScoringModule):
         k: int,
         weights: WEIGHT_TYPES,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "KNNScorer":
         """
         Create a KNNScorer instance using a Context object.
 

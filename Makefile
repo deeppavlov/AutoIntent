@@ -38,5 +38,11 @@ test-docs: docs
 serve-docs: docs
 	$(poetry) python -m http.server -d docs/build/html 8333
 
+.PHONY: clean-docs
+clean-docs:
+	rm -rf docs/build
+	rm -rf docs/source/autoapi
+	rm -rf docs/source/tutorials
+
 .PHONY: all
 all: lint

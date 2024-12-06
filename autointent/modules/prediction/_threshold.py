@@ -7,7 +7,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.data_handler import Tag
@@ -91,7 +90,7 @@ class ThresholdPredictor(PredictionModule):
         self.thresh = thresh
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> Self:
+    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> "ThresholdPredictor":
         """
         Initialize from context.
 

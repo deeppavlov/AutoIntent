@@ -3,7 +3,6 @@
 import gc
 
 import torch
-from typing_extensions import Self
 
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
@@ -25,7 +24,7 @@ class InferenceNode:
         self.node_type = node_type
 
     @classmethod
-    def from_config(cls, config: InferenceNodeConfig) -> Self:
+    def from_config(cls, config: InferenceNodeConfig) -> "InferenceNode":
         """
         Initialize from config.
 

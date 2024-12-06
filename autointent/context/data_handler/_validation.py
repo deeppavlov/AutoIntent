@@ -1,7 +1,6 @@
 """File with definitions of DatasetReader and DatasetValidator."""
 
 from pydantic import BaseModel, model_validator
-from typing_extensions import Self
 
 from ._schemas import Intent, Sample
 
@@ -21,7 +20,7 @@ class DatasetReader(BaseModel):
     intents: list[Intent] = []
 
     @model_validator(mode="after")
-    def validate_dataset(self) -> Self:
+    def validate_dataset(self) -> "DatasetReader":
         """
         Validate the dataset by ensuring intents and data splits are consistent.
 
@@ -33,7 +32,7 @@ class DatasetReader(BaseModel):
             self._validate_split(split)
         return self
 
-    def _validate_intents(self) -> Self:
+    def _validate_intents(self) -> "DatasetReader":
         """
         Validate the intents by checking their IDs for sequential order.
 
@@ -52,7 +51,7 @@ class DatasetReader(BaseModel):
             raise ValueError(message)
         return self
 
-    def _validate_split(self, split: list[Sample]) -> Self:
+    def _validate_split(self, split: list[Sample]) -> "DatasetReader":
         """
         Validate a dataset split to ensure all sample labels reference valid intent IDs.
 

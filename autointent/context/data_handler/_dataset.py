@@ -7,7 +7,6 @@ from typing import Any, TypedDict
 
 from datasets import ClassLabel, Sequence, concatenate_datasets, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
-from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
@@ -141,7 +140,7 @@ class Dataset(dict[str, HFDataset]):
         """
         return {split_name: split.to_list() for split_name, split in self.items()}
 
-    def encode_labels(self) -> Self:
+    def encode_labels(self) -> "Dataset":
         """
         Encode dataset labels into one-hot or multilabel format.
 
@@ -152,7 +151,7 @@ class Dataset(dict[str, HFDataset]):
         self._encoded_labels = True
         return self
 
-    def to_multilabel(self) -> Self:
+    def to_multilabel(self) -> "Dataset":
         """
         Convert dataset labels to multilabel format.
 
