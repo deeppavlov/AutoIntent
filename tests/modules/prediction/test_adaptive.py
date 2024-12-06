@@ -5,11 +5,12 @@ from autointent.modules import AdaptivePredictor
 from autointent.modules.prediction._utils import InvalidNumClassesError, WrongClassificationError
 
 
-def test_multilabel(multilabel_fit_data, scores):
+def test_multilabel(multilabel_fit_data):
     predictor = AdaptivePredictor()
     predictor.fit(*multilabel_fit_data)
+    scores = np.array([[0.2, 0.9, 0, 0], [0.8, 0, 0.6, 0], [0, 0.4, 0.7, 0]])
     predictions = predictor.predict(scores)
-    desired = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0]])
+    desired = np.array([[0, 1, 0, 0], [1, 0, 1, 0], [0, 1, 1, 0]])
 
     np.testing.assert_array_equal(predictions, desired)
 
