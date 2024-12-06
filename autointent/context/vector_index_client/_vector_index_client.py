@@ -32,6 +32,7 @@ class VectorIndexClient:
         db_dir: str | Path | None,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the VectorIndexClient.
@@ -40,12 +41,14 @@ class VectorIndexClient:
         :param db_dir: Directory for storing vector indexes. Defaults to a cache directory.
         :param embedder_batch_size: Batch size for the embedding model.
         :param embedder_max_length: Maximum sequence length for the embedding model.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self._logger = logging.getLogger(__name__)
         self.device = device
         self.db_dir = get_db_dir(db_dir)
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
+        self.embedder_use_cache = embedder_use_cache
 
     def create_index(
         self,
@@ -64,7 +67,13 @@ class VectorIndexClient:
         """
         self._logger.info("Creating index for model: %s", model_name)
 
-        index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
+        index = VectorIndex(
+            model_name,
+            self.device,
+            self.embedder_batch_size,
+            self.embedder_max_length,
+            self.embedder_use_cache,
+        )
         if utterances is not None and labels is not None:
             index.add(utterances, labels)
             self.dump(index)
@@ -165,7 +174,13 @@ class VectorIndexClient:
         """
         dirpath = self._get_index_dirpath(model_name)
         if dirpath is not None:
-            index = VectorIndex(model_name, self.device, self.embedder_batch_size, self.embedder_max_length)
+            index = VectorIndex(
+                model_name,
+                self.device,
+                self.embedder_batch_size,
+                self.embedder_max_length,
+                self.embedder_use_cache,
+            )
             index.load(dirpath)
             return index
 

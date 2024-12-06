@@ -70,6 +70,7 @@ class VectorDBModule(RetrievalModule):
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the VectorDBModule.
@@ -80,12 +81,14 @@ class VectorDBModule(RetrievalModule):
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation.
         :param max_length: Maximum sequence length for embeddings. None if not set.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder_name = embedder_name
         self.device = device
         self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
         super().__init__(k=k)
 
@@ -111,6 +114,7 @@ class VectorDBModule(RetrievalModule):
             device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
         )
 
     @property
@@ -136,6 +140,7 @@ class VectorDBModule(RetrievalModule):
             self.db_dir,
             embedder_batch_size=self.batch_size,
             embedder_max_length=self.max_length,
+            embedder_use_cache=self.embedder_use_cache,
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
@@ -209,6 +214,7 @@ class VectorDBModule(RetrievalModule):
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
+            embedder_use_cache=self.embedder_use_cache,
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 
