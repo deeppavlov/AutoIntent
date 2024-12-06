@@ -60,6 +60,7 @@ class Embedder:
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
+        use_cache: bool = False,
     ) -> None:
         """
         Initialize the Embedder.
@@ -68,11 +69,13 @@ class Embedder:
         :param device: Device to run the model on (e.g., "cpu", "cuda").
         :param batch_size: Batch size for embedding calculations.
         :param max_length: Maximum sequence length for the embedding model.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.model_name = model_name
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+        self.use_cache = use_cache
 
         if Path(model_name).exists():
             self.load(model_name)
@@ -145,13 +148,14 @@ class Embedder:
         :param utterances: List of input texts to calculate embeddings for.
         :return: A numpy array of embeddings.
         """
-        hasher = Hasher()
-        hasher.update(self)
-        hasher.update(utterances)
+        if self.use_cache:
+            hasher = Hasher()
+            hasher.update(self)
+            hasher.update(utterances)
 
-        embeddings_path = get_embeddings_path(hasher.hexdigest())
-        if embeddings_path.exists():
-            return np.load(embeddings_path)  # type: ignore[no-any-return]
+            embeddings_path = get_embeddings_path(hasher.hexdigest())
+            if embeddings_path.exists():
+                return np.load(embeddings_path)  # type: ignore[no-any-return]
 
         self.logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
@@ -160,8 +164,10 @@ class Embedder:
             str(self.max_length),
             self.device,
         )
+
         if self.max_length is not None:
             self.embedding_model.max_seq_length = self.max_length
+
         embeddings = self.embedding_model.encode(
             utterances,
             convert_to_numpy=True,
@@ -169,7 +175,8 @@ class Embedder:
             normalize_embeddings=True,
         )
 
-        embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-        np.save(embeddings_path, embeddings)
+        if self.use_cache:
+            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
+            np.save(embeddings_path, embeddings)
 
         return embeddings  # type: ignore[return-value]

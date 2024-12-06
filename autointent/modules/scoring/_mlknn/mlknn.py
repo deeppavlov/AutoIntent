@@ -111,6 +111,7 @@ class MLKnnScorer(ScoringModule):
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the MLKnnScorer.
@@ -123,6 +124,7 @@ class MLKnnScorer(ScoringModule):
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.k = k
         self.embedder_name = embedder_name
@@ -132,6 +134,7 @@ class MLKnnScorer(ScoringModule):
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
     @property
     def db_dir(self) -> str:
@@ -178,6 +181,7 @@ class MLKnnScorer(ScoringModule):
             device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
@@ -205,7 +209,7 @@ class MLKnnScorer(ScoringModule):
 
         self.n_classes = len(labels[0])
 
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
@@ -360,6 +364,7 @@ class MLKnnScorer(ScoringModule):
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
+            embedder_use_cache=self.embedder_use_cache,
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 

@@ -91,6 +91,7 @@ class LinearScorer(ScoringModule):
         seed: int = 0,
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the LinearScorer.
@@ -102,6 +103,7 @@ class LinearScorer(ScoringModule):
         :param seed: Random seed for reproducibility, defaults to 0.
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.cv = cv
         self.n_jobs = n_jobs
@@ -110,6 +112,7 @@ class LinearScorer(ScoringModule):
         self.embedder_name = embedder_name
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -136,6 +139,7 @@ class LinearScorer(ScoringModule):
             seed=context.seed,
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
         )
         instance.precomputed_embeddings = precomputed_embeddings
         instance.db_dir = str(context.get_db_dir())
@@ -165,7 +169,13 @@ class LinearScorer(ScoringModule):
 
         if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
+            vector_index_client = VectorIndexClient(
+                self.device,
+                self.db_dir,
+                self.batch_size,
+                self.max_length,
+                self.embedder_use_cache,
+            )
             vector_index = vector_index_client.get_index(self.embedder_name)
             features = vector_index.get_all_embeddings()
             if len(features) != len(utterances):
@@ -178,6 +188,7 @@ class LinearScorer(ScoringModule):
                 model_name=self.embedder_name,
                 batch_size=self.batch_size,
                 max_length=self.max_length,
+                use_cache=self.embedder_use_cache,
             )
             features = embedder.embed(utterances)
 
@@ -258,4 +269,5 @@ class LinearScorer(ScoringModule):
             model_name=embedder_dir,
             batch_size=metadata["batch_size"],
             max_length=metadata["max_length"],
+            use_cache=self.embedder_use_cache,
         )
