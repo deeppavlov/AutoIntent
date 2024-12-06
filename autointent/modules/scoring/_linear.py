@@ -45,33 +45,18 @@ class LinearScorer(ScoringModule):
 
     Example
     --------
-    Creating and fitting the LinearScorer:
-    >>> from autointent.modules import LinearScorer
-    >>> utterances = ["what is your name?", "how are you?"]
-    >>> labels = ["greeting", "greeting"]
-    >>> scorer = LinearScorer(
-    >>>     embedder_name="bert-base",
-    >>>     cv=3,
-    >>>     n_jobs=-1,
-    >>>     device="cuda",
-    >>>     seed=42,
-    >>>     batch_size=32,
-    >>>     max_length=128
-    >>> )
-    >>> scorer.fit(utterances, labels)
+    .. testcode::
 
-    Predicting probabilities:
-    >>> test_utterances = ["Hello!", "What's up?"]
-    >>> probabilities = scorer.predict(test_utterances)
-    >>> print(probabilities)  # Outputs predicted probabilities for each class
+        from autointent.modules import LinearScorer
+        from autointent import Dataset
+        dataset = Dataset.from_datasets("AutoIntent/banking77_ru")
+        scorer = LinearScorer(
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+        )
+        scorer.fit(dataset["train"]["utterance"], dataset["train"]["label"])
+        test_utterances = ["Hello!", "What's up?"]
+        probabilities = scorer.predict(test_utterances)
 
-    Saving and loading the scorer:
-    >>> scorer.dump("outputs/")
-    >>> loaded_scorer = LinearScorer(
-    >>>     embedder_name="bert-base",
-    >>>     device="cuda"
-    >>> )
-    >>> loaded_scorer.load("outputs/")
     """
 
     classifier_file_name: str = "classifier.joblib"

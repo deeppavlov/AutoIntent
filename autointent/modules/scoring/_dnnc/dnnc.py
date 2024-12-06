@@ -57,37 +57,28 @@ class DNNCScorer(ScoringModule):
 
     Examples
     --------
-    Creating and fitting the DNNCScorer:
-    >>> from autointent.modules import DNNCScorer
-    >>> utterances = ["what is your name?", "how are you?"]
-    >>> labels = ["greeting", "greeting"]
-    >>> scorer = DNNCScorer(
-    >>>     cross_encoder_name="cross_encoder_model",
-    >>>     embedder_name="embedder_model",
-    >>>     k=5,
-    >>>     db_dir="/path/to/database",
-    >>>     device="cuda",
-    >>>     train_head=True,
-    >>>     batch_size=32,
-    >>>     max_length=128
-    >>> )
-    >>> scorer.fit(utterances, labels)
+    .. testcode::
 
-    Predicting scores:
-    >>> test_utterances = ["Hello!", "What's up?"]
-    >>> scores = scorer.predict(test_utterances)
-    >>> print(scores)  # Outputs similarity scores for the utterances
+        from autointent.modules.scoring import DNNCScorer
+        utterances = ["what is your name?", "how are you?"]
+        labels = [0, 1]
+        scorer = DNNCScorer(
+            cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+            k=5,
+        )
+        scorer.fit(utterances, labels)
 
-    Saving and loading the scorer:
-    >>> scorer.dump("outputs/")
-    >>> loaded_scorer = DNNCScorer(
-    >>>     cross_encoder_name="cross_encoder_model",
-    >>>     embedder_name="embedder_model",
-    >>>     k=5,
-    >>>     db_dir="/path/to/database",
-    >>>     device="cuda"
-    >>> )
-    >>> loaded_scorer.load("outputs/")
+        test_utterances = ["Hello!", "What's up?"]
+        scores = scorer.predict(test_utterances)
+        print(scores)  # Outputs similarity scores for the utterances
+
+
+    .. testoutput::
+
+        [[-8.90408421  0.        ]
+         [-8.10923195  0.        ]]
+
     """
 
     name = "dnnc"
