@@ -4,7 +4,6 @@ This module provides data models for utterances, intents, and tags.
 """
 
 from pydantic import BaseModel, model_validator
-from typing_extensions import Self
 
 from autointent.custom_types import LabelType
 
@@ -34,7 +33,7 @@ class Sample(BaseModel):
     label: LabelType | None = None
 
     @model_validator(mode="after")
-    def validate_sample(self) -> Self:
+    def validate_sample(self) -> "Sample":
         """
         Validate the sample after model instantiation.
 
@@ -48,7 +47,7 @@ class Sample(BaseModel):
         """
         return self._validate_label()
 
-    def _validate_label(self) -> Self:
+    def _validate_label(self) -> "Sample":
         """
         Validate the `label` field of the sample.
 

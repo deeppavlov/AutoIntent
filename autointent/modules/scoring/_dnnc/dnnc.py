@@ -9,7 +9,6 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
@@ -151,7 +150,7 @@ class DNNCScorer(ScoringModule):
         k: int,
         embedder_name: str | None = None,
         train_head: bool = False,
-    ) -> Self:
+    ) -> "DNNCScorer":
         """
         Create a DNNCScorer instance using a Context object.
 

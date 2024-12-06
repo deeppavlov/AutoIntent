@@ -9,7 +9,6 @@ import numpy as np
 import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
-from typing_extensions import Self
 
 from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndexClient
@@ -119,7 +118,7 @@ class LinearScorer(ScoringModule):
         cls,
         context: Context,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "LinearScorer":
         """
         Create a LinearScorer instance using a Context object.
 

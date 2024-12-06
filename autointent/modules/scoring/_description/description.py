@@ -8,7 +8,6 @@ import numpy as np
 import scipy
 from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
-from typing_extensions import Self
 
 from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
@@ -101,7 +100,7 @@ class DescriptionScorer(ScoringModule):
         context: Context,
         temperature: float,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "DescriptionScorer":
         """
         Create a DescriptionScorer instance using a Context object.
 

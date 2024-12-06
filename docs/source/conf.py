@@ -43,10 +43,21 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
     "nbsphinx",
+    "sphinx.ext.intersphinx",
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = ["conf.py", "docs_utils/*"]
+
+# API reference
+
+nitpicky = True  # warn about unknown links
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "pathlib": ("https://docs.python.org/3/library/pathlib.html", None),
+    # Add other mappings as needed
+}
 
 autoapi_keep_files = True
 autoapi_dirs = [Path.cwd().parent.parent / "autointent"]

@@ -6,7 +6,6 @@ from typing import Any, TypedDict
 
 import numpy as np
 from numpy.typing import NDArray
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
@@ -155,7 +154,7 @@ class MLKnnScorer(ScoringModule):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "MLKnnScorer":
         """
         Create an MLKnnScorer instance using a Context object.
 
