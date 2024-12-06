@@ -69,7 +69,7 @@ class LinearScorer(ScoringModule):
         self,
         embedder_name: str,
         cv: int = 3,
-        n_jobs: int = -1,
+        n_jobs: int | None = None,
         device: str = "cpu",
         seed: int = 0,
         batch_size: int = 32,

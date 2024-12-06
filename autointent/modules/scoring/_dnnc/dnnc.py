@@ -57,6 +57,10 @@ class DNNCScorer(ScoringModule):
 
     Examples
     --------
+    .. testsetup::
+
+        db_dir = "doctests-db"
+
     .. testcode::
 
         from autointent.modules.scoring import DNNCScorer
@@ -66,6 +70,7 @@ class DNNCScorer(ScoringModule):
             cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
             embedder_name="sergeyzh/rubert-tiny-turbo",
             k=5,
+            db_dir=db_dir,
         )
         scorer.fit(utterances, labels)
 
@@ -78,6 +83,11 @@ class DNNCScorer(ScoringModule):
 
         [[-8.90408421  0.        ]
          [-8.10923195  0.        ]]
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
 
     """
 

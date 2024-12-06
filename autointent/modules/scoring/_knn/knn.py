@@ -47,6 +47,10 @@ class KNNScorer(ScoringModule):
 
     Examples
     --------
+    .. testsetup::
+
+        db_dir = "doctests-db"
+
     .. testcode::
 
         from autointent.modules.scoring import KNNScorer
@@ -55,6 +59,7 @@ class KNNScorer(ScoringModule):
         scorer = KNNScorer(
             embedder_name="sergeyzh/rubert-tiny-turbo",
             k=5,
+            db_dir=db_dir,
         )
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "what's up?"]
@@ -65,6 +70,11 @@ class KNNScorer(ScoringModule):
 
         [[0.67297815 0.32702185]
          [0.44031678 0.55968322]]
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
 
     """
 

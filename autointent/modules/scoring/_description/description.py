@@ -42,13 +42,20 @@ class DescriptionScorer(ScoringModule):
 
     Examples
     --------
+    .. testsetup::
+
+        db_dir = "doctests-db"
+
     .. testcode::
 
         from autointent.modules import DescriptionScorer
         utterances = ["what is your name?", "how old are you?"]
         labels = [0, 1]
         descriptions = ["greeting", "age-related question"]
-        scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=1.0)
+        scorer = DescriptionScorer(
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+            db_dir=db_dir
+        )
         scorer.fit(utterances, labels, descriptions)
         scores = scorer.predict(["tell me about your age?"])
         print(scores)  # Outputs similarity scores for the utterance against all descriptions
@@ -56,6 +63,11 @@ class DescriptionScorer(ScoringModule):
     .. testoutput::
 
         [[0.47210786 0.5278922 ]]
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
 
     """
 
