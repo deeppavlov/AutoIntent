@@ -42,22 +42,21 @@ class DescriptionScorer(ScoringModule):
 
     Examples
     --------
-    Creating and fitting the DescriptionScorer
-    >>> from autointent.modules import DescriptionScorer
-    >>> utterances = ["what is your name?", "how old are you?"]
-    >>> labels = [0, 1]
-    >>> descriptions = ["greeting", "age-related question"]
-    >>> scorer = DescriptionScorer(embedder_name="your_embedder", temperature=1.0)
-    >>> scorer.fit(utterances, labels, descriptions)
+    .. testcode::
 
-    Predicting scores:
-    >>> scores = scorer.predict(["tell me about your age?"])
-    >>> print(scores)  # Outputs similarity scores for the utterance against all descriptions
+        from autointent.modules import DescriptionScorer
+        utterances = ["what is your name?", "how old are you?"]
+        labels = [0, 1]
+        descriptions = ["greeting", "age-related question"]
+        scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=1.0)
+        scorer.fit(utterances, labels, descriptions)
+        scores = scorer.predict(["tell me about your age?"])
+        print(scores)  # Outputs similarity scores for the utterance against all descriptions
 
-    Saving and loading the scorer:
-    >>> scorer.dump("outputs/")
-    >>> loaded_scorer = DescriptionScorer(embedder_name="your_embedder")
-    >>> loaded_scorer.load("outputs/")
+    .. testoutput::
+
+        [[0.47210786 0.5278922 ]]
+
     """
 
     weights_file_name: str = "description_vectors.npy"

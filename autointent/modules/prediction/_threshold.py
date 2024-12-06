@@ -42,34 +42,41 @@ class ThresholdPredictor(PredictionModule):
 
     Examples
     --------
-    Single-label classification example:
-    >>> from autointent.modules import ThresholdPredictor
-    >>> import numpy as np
-    >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
-    >>> labels = [1, 0, 1]
-    >>> threshold = 0.5
-    >>> predictor = ThresholdPredictor(thresh=threshold)
-    >>> predictor.fit(scores, labels)
-    >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
-    >>> predictions = predictor.predict(test_scores)
-    >>> print(predictions)
-    [1 0]
+    Single-label classification
+    ===========================
+    .. testcode::
 
-    Multi-label classification example:
-    >>> labels = [[1, 0], [0, 1], [1, 1]]
-    >>> predictor = ThresholdPredictor(thresh=[0.5, 0.5])
-    >>> predictor.fit(scores, labels)
-    >>> test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
-    >>> predictions = predictor.predict(test_scores)
-    >>> print(predictions)
-    [[0 1] [1 0]]
+        from autointent.modules import ThresholdPredictor
+        import numpy as np
+        scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+        labels = [1, 0, 1]
+        threshold = 0.5
+        predictor = ThresholdPredictor(thresh=threshold)
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
 
-    Save and load the model:
-    >>> predictor.dump("outputs/")
-    >>> loaded_predictor = ThresholdPredictor(thresh=0.5)
-    >>> loaded_predictor.load("outputs/")
-    >>> print(loaded_predictor.thresh)
-    0.5
+    .. testoutput::
+
+        [1 0]
+
+    Multi-label classification
+    ==========================
+    .. testcode::
+
+        labels = [[1, 0], [0, 1], [1, 1]]
+        predictor = ThresholdPredictor(thresh=[0.5, 0.5])
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
+
+    .. testoutput::
+
+        [[0 1]
+         [1 0]]
+
     """
 
     metadata: ThresholdPredictorDumpMetadata

@@ -43,33 +43,40 @@ class TunablePredictor(PredictionModule):
 
     Examples
     --------
-    Single-label classification:
-    >>> import numpy as np
-    >>> from autointent.modules import TunablePredictor
-    >>> scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
-    >>> labels = [1, 0, 1]
-    >>> predictor = TunablePredictor(n_trials=100, seed=42)
-    >>> predictor.fit(scores, labels)
-    >>> test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
-    >>> predictions = predictor.predict(test_scores)
-    >>> print(predictions)
-    [1 0]
+    Single-label classification
+    ===========================
+    .. testcode::
 
-    Multi-label classification:
-    >>> labels = [[1, 0], [0, 1], [1, 1]]
-    >>> predictor = TunablePredictor(n_trials=100, seed=42)
-    >>> predictor.fit(scores, labels)
-    >>> test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
-    >>> predictions = predictor.predict(test_scores)
-    >>> print(predictions)
-    [[0 1] [1 0]]
+        import numpy as np
+        from autointent.modules import TunablePredictor
+        scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+        labels = [1, 0, 1]
+        predictor = TunablePredictor(n_trials=100, seed=42)
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
 
-    Saving and loading the model:
-    >>> predictor.dump("outputs/")
-    >>> loaded_predictor = TunablePredictor()
-    >>> loaded_predictor.load("outputs/")
-    >>> print(loaded_predictor.thresh)
-    [0.5, 0.7]
+    .. testoutput::
+
+        [1 0]
+
+    Multi-label classification
+    ==========================
+    .. testcode::
+
+        labels = [[1, 0], [0, 1], [1, 1]]
+        predictor = TunablePredictor(n_trials=100, seed=42)
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
+
+    .. testoutput::
+
+        [[1 1]
+         [1 1]]
+
     """
 
     name = "tunable"

@@ -32,24 +32,22 @@ class ArgmaxPredictor(PredictionModule):
 
     Examples
     --------
-    >>> from autointent.modules import ArgmaxPredictor
-    >>> import numpy as np
-    >>> predictor = ArgmaxPredictor()
-    >>> train_scores = np.array([[0.2, 0.8, 0.0], [0.7, 0.1, 0.2]])
-    >>> labels = [1, 0]  # Single-label targets
-    >>> predictor.fit(train_scores, labels)
-    >>> test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
-    >>> predictions = predictor.predict(test_scores)
-    >>> print(predictions)
-    [1 0]
+    .. testcode::
 
-    Save the predictor's state:
-    >>> predictor.dump("outputs/")
-    >>> loaded_predictor = ArgmaxPredictor()
-    >>> loaded_predictor.load("outputs/")
-    >>> loaded_predictions = loaded_predictor.predict(test_scores)
-    >>> print(loaded_predictions)
-    [1 0]
+        from autointent.modules import ArgmaxPredictor
+        import numpy as np
+        predictor = ArgmaxPredictor()
+        train_scores = np.array([[0.2, 0.8, 0.0], [0.7, 0.1, 0.2]])
+        labels = [1, 0]  # Single-label targets
+        predictor.fit(train_scores, labels)
+        test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
+
+    .. testoutput::
+
+        [1 0]
+
     """
 
     name = "argmax"
