@@ -55,3 +55,14 @@ Some theoretical background
 ...............................................
 
 lotta stuff
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   quickstart
+   concepts
+   tutorials
+   guides/index
+   learn/index
+   autoapi/autointent/index
