@@ -48,14 +48,20 @@ class LinearScorer(ScoringModule):
     .. testcode::
 
         from autointent.modules import LinearScorer
-        from autointent import Dataset
-        dataset = Dataset.from_datasets("AutoIntent/banking77")
         scorer = LinearScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_name="sergeyzh/rubert-tiny-turbo", cv=2
         )
-        scorer.fit(dataset["train"]["utterance"], dataset["train"]["label"])
-        test_utterances = ["Hello!", "What's up?"]
+        utterances = ["hello", "goodbye", "allo", "sayonara"]
+        labels = [0, 1, 0, 1]
+        scorer.fit(utterances, labels)
+        test_utterances = ["hi", "bye"]
         probabilities = scorer.predict(test_utterances)
+        print(probabilities)
+
+    .. testoutput::
+
+        [[0.50000032 0.49999968]
+         [0.50000032 0.49999968]]
 
     """
 

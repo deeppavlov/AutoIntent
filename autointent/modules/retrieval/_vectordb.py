@@ -32,12 +32,20 @@ class VectorDBModule(RetrievalModule):
 
     Examples
     --------
+    .. testsetup::
+
+        db_dir = "doctests-db"
+
     .. testcode::
 
         from autointent.modules.retrieval import VectorDBModule
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
-        vector_db = VectorDBModule(k=2, embedder_name="sergeyzh/rubert-tiny-turbo")
+        vector_db = VectorDBModule(
+            k=2,
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+            db_dir=db_dir,
+        )
         vector_db.fit(utterances, labels)
         predictions = vector_db.predict(["how is the weather today?"])
         print(predictions)
@@ -45,6 +53,11 @@ class VectorDBModule(RetrievalModule):
     .. testoutput::
 
         ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
 
     """
 
