@@ -12,6 +12,7 @@ from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
+from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
 from ._hash import Hasher
@@ -30,7 +31,7 @@ def get_embeddings_path(filename: str) -> Path:
 
     :return: The full path to the embeddings file.
     """
-    return Path.home() / ".cache" / "autointent" / "embeddings" / f"{filename}.npy"
+    return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
 
 
 class EmbedderDumpMetadata(TypedDict):
