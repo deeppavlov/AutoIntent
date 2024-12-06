@@ -5,13 +5,13 @@ trials, and modules during the pipeline's execution.
 """
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent.configs import InferenceNodeConfig
-from autointent.custom_types import NODE_TYPES, NodeType, NodeTypeType
+from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 from ._logger import get_logger
@@ -147,6 +147,24 @@ class OptimizationInfo:
         best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
+    def get_best_train_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the train scores from the best scorer node.
+
+        :return: Train scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.train_scores
+
+    def get_best_validation_scores(self) -> NDArray[np.float64] | None:
+        """
+        Retrieve the validation scores from the best scorer node.
+
+        :return: Validation scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.validation_scores
+
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
         """
         Retrieve the test scores from the best scorer node.
@@ -156,22 +174,27 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
 
-    def get_best_oos_scores(self) -> NDArray[np.float64] | None:
+    def get_best_oos_scores(self, split: Literal["train", "validation", "test"]) -> NDArray[np.float64] | None:
         """
         Retrieve the out-of-scope scores from the best scorer node.
 
-        :return: Out-of-scope scores as a numpy array.
+        :param split: The data split for which to retrieve the OOS scores.
+            Must be one of "train", "validation", or "test".
+        :return: A numpy array containing OOS scores for the specified split,
+            or `None` if no OOS scores are available.
         """
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        if best_scorer_artifact.oos_scores is not None:
+            return best_scorer_artifact.oos_scores[split]
         return best_scorer_artifact.oos_scores
 
-    def dump_evaluation_results(self) -> dict[str, dict[str, list[float]]]:
+    def dump_evaluation_results(self) -> dict[str, Any]:
         """
         Dump evaluation results for all nodes.
 
         :return: Dictionary containing metrics and configurations for all nodes.
         """
-        node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NODE_TYPES}
+        node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NodeType}
         return {
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
@@ -183,15 +206,15 @@ class OptimizationInfo:
 
         :return: List of `InferenceNodeConfig` objects for inference nodes.
         """
-        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NODE_TYPES]
+        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NodeType]
         res = []
-        for idx, node_type in zip(trial_ids, NODE_TYPES, strict=True):
+        for idx, node_type in zip(trial_ids, NodeType, strict=True):
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)
             res.append(
                 InferenceNodeConfig(
-                    node_type=node_type,  # type: ignore[arg-type]
+                    node_type=node_type,
                     module_type=trial.module_type,
                     module_config=trial.module_params,
                     load_path=trial.module_dump_dir,
@@ -211,11 +234,11 @@ class OptimizationInfo:
             return self.modules.get(node_type)[idx]
         return None
 
-    def get_best_modules(self) -> dict[NodeTypeType, "Module"]:
+    def get_best_modules(self) -> dict[NodeType, "Module"]:
         """
         Retrieve the best modules for all node types.
 
         :return: Dictionary of the best modules for each node type.
         """
-        res = {nt: self._get_best_module(nt) for nt in NODE_TYPES}
-        return {nt: m for nt, m in res.items() if m is not None}  # type: ignore[misc]
+        res = {nt: self._get_best_module(nt) for nt in NodeType}
+        return {nt: m for nt, m in res.items() if m is not None}

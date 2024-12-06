@@ -59,11 +59,36 @@ CrossEncoderType = TypeVar("CrossEncoderType", bound="CrossEncoderWithLogreg")
 
 
 class CrossEncoderWithLogreg:
-    """
+    r"""
     Cross-encoder with logistic regression for binary classification.
 
     This class uses a SentenceTransformers CrossEncoder model to extract features
     and LogisticRegressionCV for classification.
+
+    :ivar cross_encoder: The CrossEncoder model used to extract features.
+    :ivar batch_size: Batch size for processing text pairs.
+    :ivar _clf: The trained LogisticRegressionCV classifier.
+    :ivar model_subdir: Directory for storing the cross-encoder model files.
+
+    Examples
+    --------
+    Creating and fitting the CrossEncoderWithLogreg:
+    >>> from autointent.modules import CrossEncoderWithLogreg
+    >>> from sentence_transformers import CrossEncoder
+    >>> model = CrossEncoder("cross-encoder-model")
+    >>> scorer = CrossEncoderWithLogreg(model)
+    >>> utterances = ["What is your name?", "How old are you?"]
+    >>> labels = [1, 0]
+    >>> scorer.fit(utterances, labels)
+
+    Predicting probabilities:
+    >>> test_pairs = [["What is your name?", "Hello!"], ["How old are you?", "What is your age?"]]
+    >>> probs = scorer.predict(test_pairs)
+    >>> print(probs)
+
+    Saving and loading the model:
+    >>> scorer.save("outputs/")
+    >>> loaded_scorer = CrossEncoderWithLogreg.load("outputs/")
     """
 
     def __init__(self, model: CrossEncoder, batch_size: int = 326) -> None:

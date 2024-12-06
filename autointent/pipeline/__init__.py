@@ -1,4 +1,3 @@
-from .inference import InferencePipeline
-from .optimization import PipelineOptimizer
+from ._pipeline import Pipeline
 
-__all__ = ["InferencePipeline", "PipelineOptimizer"]
+__all__ = ["Pipeline"]

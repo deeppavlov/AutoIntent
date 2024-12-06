@@ -5,14 +5,14 @@ from typing import Any
 
 from omegaconf import MISSING
 
-from autointent.custom_types import NodeType, NodeTypeType
+from autointent.custom_types import NodeType
 
 
 @dataclass
 class InferenceNodeConfig:
     """Configuration for the inference node."""
 
-    node_type: NodeTypeType = MISSING
+    node_type: NodeType = MISSING
     """Type of the node. Should be one of the NODE_TYPES"""
     module_type: str = MISSING  # TODO: add custom type
     """Type of the module. Should be one of the Module"""

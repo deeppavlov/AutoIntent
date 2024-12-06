@@ -6,7 +6,7 @@ In this section, you will learn how hyperparameter optimization works in our lib
 Pipeline
 --------
 
-The entire process of configuring a classifier in our library is divided into sequential steps:
+The entire process of configuring a classifier in our library is divided into sequential steps (:ref:`and that's why <key-stages>`):
 
 1. Selecting an embedder (EmbeddingNode)
 2. Selecting a classifier (ScoringNode)

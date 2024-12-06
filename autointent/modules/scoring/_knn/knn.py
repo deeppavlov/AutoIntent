@@ -45,12 +45,46 @@ class KNNScorer(ScoringModule):
     :ivar _vector_index: VectorIndex instance for neighbor retrieval.
     :ivar name: Name of the scorer, defaults to "knn".
     :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
+
+    Examples
+    --------
+    Creating and fitting the KNNScorer:
+    >>> from autointent.modules import KNNScorer
+    >>> utterances = ["hello", "how are you?"]
+    >>> labels = ["greeting", "greeting"]
+    >>> scorer = KNNScorer(
+    >>>     embedder_name="bert-base",
+    >>>     k=5,
+    >>>     weights="distance",
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda",
+    >>>     batch_size=32,
+    >>>     max_length=128
+    >>> )
+    >>> scorer.fit(utterances, labels)
+
+    Predicting class probabilities:
+    >>> test_utterances = ["hi", "what's up?"]
+    >>> probabilities = scorer.predict(test_utterances)
+    >>> print(probabilities)  # Outputs predicted class probabilities for the utterances
+
+    Saving and loading the scorer:
+    >>> scorer.dump("outputs/")
+    >>> loaded_scorer = KNNScorer(
+    >>>     embedder_name="bert-base",
+    >>>     k=5,
+    >>>     weights="distance",
+    >>>     db_dir="/path/to/database",
+    >>>     device="cuda"
+    >>> )
+    >>> loaded_scorer.load("outputs/")
     """
 
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
     name = "knn"
     prebuilt_index: bool = False
+    max_length: int | None
 
     def __init__(
         self,
@@ -193,13 +227,7 @@ class KNNScorer(ScoringModule):
 
         :param path: Path to the directory where assets will be dumped.
         """
-        self.metadata = KNNScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
+        self.metadata = self._store_state_to_metadata()
 
         dump_dir = Path(path)
 
@@ -207,6 +235,15 @@ class KNNScorer(ScoringModule):
             json.dump(self.metadata, file, indent=4)
 
         self._vector_index.dump(dump_dir)
+
+    def _store_state_to_metadata(self) -> KNNScorerDumpMetadata:
+        return KNNScorerDumpMetadata(
+            db_dir=self.db_dir,
+            n_classes=self.n_classes,
+            multilabel=self.multilabel,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
 
     def load(self, path: str) -> None:
         """
@@ -219,16 +256,27 @@ class KNNScorer(ScoringModule):
         with (dump_dir / self.metadata_dict_name).open() as file:
             self.metadata: KNNScorerDumpMetadata = json.load(file)
 
-        self.n_classes = self.metadata["n_classes"]
-        self.multilabel = self.metadata["multilabel"]
+        self._restore_state_from_metadata(self.metadata)
+
+    def _restore_state_from_metadata(self, metadata: KNNScorerDumpMetadata) -> None:
+        self.n_classes = metadata["n_classes"]
+        self.multilabel = metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(
             device=self.device,
-            db_dir=self.metadata["db_dir"],
-            embedder_batch_size=self.metadata["batch_size"],
-            embedder_max_length=self.metadata["max_length"],
+            db_dir=metadata["db_dir"],
+            embedder_batch_size=metadata["batch_size"],
+            embedder_max_length=metadata["max_length"],
         )
         self._vector_index = vector_index_client.get_index(self.embedder_name)
+
+    def _get_neighbours(
+        self, utterances: list[str]
+    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
+        return self._vector_index.query(utterances, self.k)
+
+    def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        return apply_weights(labels, distances, self.weights, self.n_classes, self.multilabel)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """
@@ -237,6 +285,6 @@ class KNNScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Tuple containing class probabilities and neighbor utterances.
         """
-        labels, distances, neighbors = self._vector_index.query(utterances, self.k)
-        scores = apply_weights(np.array(labels), np.array(distances), self.weights, self.n_classes, self.multilabel)
+        labels, distances, neighbors = self._get_neighbours(utterances)
+        scores = self._count_scores(np.array(labels), np.array(distances))
         return scores, neighbors

@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Literal
 
 from typing_extensions import Self
 
@@ -23,11 +24,39 @@ class VectorDBMetadata(BaseMetadataDict):
 
 
 class VectorDBModule(RetrievalModule):
-    """
+    r"""
     Module for managing retrieval operations using a vector database.
 
-    This class provides methods for indexing, querying, and managing a vector database for tasks
+    VectorDBModule provides methods for indexing, querying, and managing a vector database for tasks
     such as nearest neighbor retrieval.
+
+    :ivar vector_index: The vector index used for nearest neighbor retrieval.
+    :ivar name: Name of the module, defaults to "vector_db".
+
+    Examples
+    --------
+    Creating and fitting the VectorDBModule:
+    >>> from your_module import VectorDBModule
+    >>> utterances = ["hello world", "how are you?", "good morning"]
+    >>> labels = [1, 2, 3]
+    >>> vector_db = VectorDBModule(k=2, embedder_name="some_embedder", db_dir="./db", device="cpu")
+    >>> vector_db.fit(utterances, labels)
+    >>> def retrieval_metric_fn(true_labels, predicted_labels):
+    >>>     # Custom metric function (e.g., accuracy or F1 score)
+    >>>     return sum([1 if true == pred else 0 for true, pred \\
+    >>>         in zip(true_labels, predicted_labels)]) / len(true_labels)
+    >>> score = vector_db.score(context, retrieval_metric_fn)
+    >>> print(score)
+
+    Performing predictions:
+    >>> predictions = vector_db.predict(["how is the weather today?"])
+    >>> print(predictions)
+
+    Saving and loading the model:
+    >>> vector_db.dump("outputs/")
+    >>> loaded_vector_db = VectorDBModule(k=2, embedder_name="some_embedder", db_dir="./db", device="cpu")
+    >>> loaded_vector_db.load("outputs/")
+    >>> print(loaded_vector_db.vector_index)
     """
 
     vector_index: VectorIndex
@@ -110,19 +139,31 @@ class VectorDBModule(RetrievalModule):
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
-    def score(self, context: Context, metric_fn: RetrievalMetricFn) -> float:
+    def score(
+        self,
+        context: Context,
+        split: Literal["validation", "test"],
+        metric_fn: RetrievalMetricFn,
+    ) -> float:
         """
         Evaluate the retrieval model using a specified metric function.
 
         :param context: The context containing test data and labels.
+        :param split: Target split
         :param metric_fn: Function to compute the retrieval metric.
         :return: Computed metric score.
         """
-        labels_pred, _, _ = self.vector_index.query(
-            context.data_handler.test_utterances,
-            self.k,
-        )
-        return metric_fn(context.data_handler.test_labels, labels_pred)
+        if split == "validation":
+            utterances = context.data_handler.validation_utterances(0)
+            labels = context.data_handler.validation_labels(0)
+        elif split == "test":
+            utterances = context.data_handler.test_utterances()
+            labels = context.data_handler.test_labels()
+        else:
+            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
+            raise ValueError(message)
+        predictions, _, _ = self.vector_index.query(utterances, self.k)
+        return metric_fn(labels, predictions)
 
     def get_assets(self) -> RetrieverArtifact:
         """
