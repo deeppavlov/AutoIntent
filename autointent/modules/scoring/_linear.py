@@ -49,7 +49,7 @@ class LinearScorer(ScoringModule):
 
         from autointent.modules import LinearScorer
         from autointent import Dataset
-        dataset = Dataset.from_datasets("AutoIntent/banking77_ru")
+        dataset = Dataset.from_datasets("AutoIntent/banking77")
         scorer = LinearScorer(
             embedder_name="sergeyzh/rubert-tiny-turbo",
         )
