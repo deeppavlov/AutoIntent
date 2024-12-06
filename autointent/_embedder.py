@@ -8,11 +8,29 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import SentenceTransformer
+
+from ._hash import Hasher
+
+
+def get_embeddings_path(filename: str) -> Path:
+    """
+    Get the path to the embeddings file.
+
+    This function constructs the full path to an embeddings file stored
+    in a specific directory under the user's home directory. The embeddings
+    file is named based on the provided filename, with the `.npy` extension
+    added.
+
+    :param filename: The name of the embeddings file (without extension).
+
+    :return: The full path to the embeddings file.
+    """
+    return Path.home() / ".cache" / "autointent" / "embeddings" / f"{filename}.npy"
 
 
 class EmbedderDumpMetadata(TypedDict):
@@ -61,6 +79,14 @@ class Embedder:
             self.embedding_model = SentenceTransformer(str(model_name), device=device)
 
         self.logger = logging.getLogger(__name__)
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        """
+        Reduce the Embedder for serialization.
+
+        :return: A tuple containing the class and the necessary state for deserialization.
+        """
+        return (self.__class__, (self.model_name, self.device, self.batch_size, self.max_length))
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
@@ -114,6 +140,14 @@ class Embedder:
         :param utterances: List of input texts to calculate embeddings for.
         :return: A numpy array of embeddings.
         """
+        hasher = Hasher()
+        hasher.update(self)
+        hasher.update(utterances)
+
+        embeddings_path = get_embeddings_path(hasher.hexdigest())
+        if embeddings_path.exists():
+            return np.load(embeddings_path)  # type: ignore[no-any-return]
+
         self.logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
             self.model_name,
@@ -123,9 +157,14 @@ class Embedder:
         )
         if self.max_length is not None:
             self.embedding_model.max_seq_length = self.max_length
-        return self.embedding_model.encode(
+        embeddings = self.embedding_model.encode(
             utterances,
             convert_to_numpy=True,
             batch_size=self.batch_size,
             normalize_embeddings=True,
-        )  # type: ignore[return-value]
+        )
+
+        embeddings_path.parent.mkdir(parents=True, exist_ok=True)
+        np.save(embeddings_path, embeddings)
+
+        return embeddings  # type: ignore[return-value]
