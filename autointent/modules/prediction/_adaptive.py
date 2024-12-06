@@ -9,10 +9,10 @@ import numpy.typing as npt
 from sklearn.metrics import f1_score
 
 from autointent import Context
-from autointent.context.data_handler import Tag
 from autointent.custom_types import LabelType
+from autointent.modules.abc import PredictionModule
+from autointent.schemas import Tag
 
-from ._base import PredictionModule
 from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
 
 default_search_space = np.linspace(0, 1, num=10)

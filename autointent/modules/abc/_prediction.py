@@ -7,11 +7,11 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.context.data_handler import Tag
 from autointent.context.optimization_info import PredictorArtifact
 from autointent.custom_types import LabelType
 from autointent.metrics import PredictionMetricFn
-from autointent.modules import Module
+from autointent.modules.abc import Module
+from autointent.schemas import Tag
 
 
 class PredictionModule(Module, ABC):

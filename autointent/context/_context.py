@@ -8,6 +8,7 @@ from typing import Any
 
 import yaml
 
+from autointent import Dataset
 from autointent.configs import (
     DataConfig,
     EmbedderConfig,
@@ -16,7 +17,7 @@ from autointent.configs import (
 )
 
 from ._utils import NumpyEncoder, load_data
-from .data_handler import DataHandler, Dataset
+from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 from .vector_index_client import VectorIndex, VectorIndexClient
 
@@ -112,8 +113,6 @@ class Context:
         :return: Dictionary containing inference configuration.
         """
         nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
-        for cfg in nodes_configs:
-            cfg.pop("_target_")
         return {
             "metadata": {
                 "device": self.get_device(),

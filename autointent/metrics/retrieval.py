@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ._converter import transform
-from ._custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
+from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
 
 
 class RetrievalMetricFn(Protocol):

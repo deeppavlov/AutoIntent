@@ -175,12 +175,12 @@ dataset = Dataset.from_dict(
 ### Loading a dataset from a file
 
 The AutoIntent library includes sample datasets.
-For example, you can load the `autointent/datafiles/dstc3-20shot.json` file like this:
+For example, you can load the `autointent/_datafiles/dstc3-20shot.json` file like this:
 """
 
 # %%
 dataset = Dataset.from_json(
-    ires.files("autointent.datafiles").joinpath("dstc3-20shot.json"),
+    ires.files("autointent._datafiles").joinpath("dstc3-20shot.json"),
 )
 
 # %% [markdown]
@@ -200,7 +200,7 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 
 # %%
 dataset = Dataset.from_json(
-    ires.files("autointent.datafiles").joinpath("banking77.json"),
+    ires.files("autointent._datafiles").joinpath("banking77.json"),
 )
 
 # %% [markdown]

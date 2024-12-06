@@ -12,7 +12,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LabelType
-from autointent.modules.scoring import ScoringModule
+from autointent.modules.abc import ScoringModule
 
 
 class DescriptionScorerDumpMetadata(TypedDict):

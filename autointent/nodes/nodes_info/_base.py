@@ -5,7 +5,7 @@ from typing import ClassVar
 
 from autointent.custom_types import NodeType
 from autointent.metrics import METRIC_FN
-from autointent.modules import Module
+from autointent.modules.abc import Module
 
 
 class NodeInfo:

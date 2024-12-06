@@ -4,13 +4,13 @@ from typing import Literal
 
 import pytest
 
-from autointent.configs._optimization_cli import (
+from autointent import Pipeline
+from autointent.configs import (
     EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline import Pipeline
-from autointent.pipeline._cli_endpoint import load_config
+from autointent.utils import load_search_space
 from tests.conftest import setup_environment
 
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -22,7 +22,7 @@ def get_search_space_path(task_type: TaskType):
 
 def get_search_space(task_type: TaskType):
     path = get_search_space_path(task_type)
-    return load_config(str(path), multilabel=task_type == "multilabel")
+    return load_search_space(path)
 
 
 @pytest.mark.parametrize(

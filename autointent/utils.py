@@ -15,7 +15,7 @@ def load_default_search_space(multilabel: bool) -> list[dict[str, Any]]:
     :return:
     """
     config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
-    path = ires.files("autointent.datafiles").joinpath(config_name)
+    path = ires.files("autointent._datafiles").joinpath(config_name)
     return load_search_space(path)  # type: ignore[arg-type]
 
 

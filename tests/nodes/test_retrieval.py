@@ -3,7 +3,7 @@ import logging
 
 import torch
 
-from autointent.configs._node import InferenceNodeConfig
+from autointent.configs import InferenceNodeConfig
 from autointent.nodes import InferenceNode, NodeOptimizer
 
 from .conftest import get_context

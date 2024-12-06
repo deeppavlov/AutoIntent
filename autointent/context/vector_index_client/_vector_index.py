@@ -13,7 +13,7 @@ import faiss
 import numpy as np
 import numpy.typing as npt
 
-from autointent.context import Embedder
+from autointent import Embedder
 from autointent.custom_types import LabelType
 
 

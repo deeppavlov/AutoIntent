@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
+from autointent._pipeline._cli_endpoint import optimize
 from autointent.configs import (
     DataConfig,
     LoggingConfig,
@@ -16,7 +17,7 @@ from autointent.configs import (
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline._cli_endpoint import load_config, optimize
+from autointent.utils import load_search_space
 
 # %%
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -35,7 +36,7 @@ def get_search_space_path(task_type: TaskType) -> None:
 
 def get_search_space(task_type: TaskType) -> None:
     path = get_search_space_path(task_type)
-    return load_config(str(path), multilabel=task_type == "multilabel")
+    return load_search_space(path)
 
 
 # %%

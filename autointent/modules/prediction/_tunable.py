@@ -11,10 +11,10 @@ from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
 from autointent.context import Context
-from autointent.context.data_handler import Tag
 from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.modules.abc import PredictionModule
+from autointent.schemas import Tag
 
-from ._base import PredictionModule
 from ._threshold import multiclass_predict, multilabel_predict
 from ._utils import InvalidNumClassesError
 

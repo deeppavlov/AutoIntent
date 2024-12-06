@@ -94,6 +94,12 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
             "type": "fontawesome",
         },
+        {
+            "name": "HuggingFace",
+            "url": "https://huggingface.co/AutoIntent",
+            "icon": "../_static/hf-logo.svg",
+            "type": "local",
+        },
     ],
     "show_toc_level": 3,
 }
@@ -110,7 +116,7 @@ autodoc_default_options = {
     "undoc-members": False,
     "private-members": False,
     # "special-members": "__call__",
-    "member-order": "bysource",
+    "member-order": "groupwise",
     "exclude-members": "_abc_impl, model_fields, model_computed_fields, model_config",
 }
 
@@ -119,7 +125,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-nbsphinx_execute = "always"
+nbsphinx_execute = "never"
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
@@ -133,4 +139,4 @@ def setup(app) -> None:  # noqa: ANN001
             ("tutorials.data", "Data"),
         ],
     )
-    app.connect("autodoc-skip-member", skip_member)
+    app.connect("autoapi-skip-member", skip_member)

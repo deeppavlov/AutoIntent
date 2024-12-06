@@ -9,9 +9,8 @@ import numpy as np
 import numpy.typing as npt
 import yaml
 
-from autointent import Context
+from autointent import Context, Dataset
 from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.context.data_handler import Dataset
 from autointent.custom_types import NodeType
 from autointent.nodes import NodeOptimizer
 from autointent.nodes.inference import InferenceNode

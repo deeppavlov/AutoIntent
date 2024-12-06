@@ -10,7 +10,7 @@ import numpy.typing as npt
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import WEIGHT_TYPES, BaseMetadataDict, LabelType
-from autointent.modules.scoring import ScoringModule
+from autointent.modules.abc import ScoringModule
 
 from .weighting import apply_weights
 

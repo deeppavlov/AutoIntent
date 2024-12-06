@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
 from ._converter import transform
-from ._custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
 
 logger = logging.getLogger(__name__)

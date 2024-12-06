@@ -1,4 +1,4 @@
-from ._node import InferenceNodeConfig, NodeOptimizerConfig
+from ._inference_node import InferenceNodeConfig
 from ._optimization_cli import (
     AugmentationConfig,
     DataConfig,
@@ -14,8 +14,8 @@ __all__ = [
     "DataConfig",
     "EmbedderConfig",
     "InferenceNodeConfig",
+    "InferenceNodeConfig",
     "LoggingConfig",
-    "NodeOptimizerConfig",
     "OptimizationConfig",
     "TaskConfig",
     "VectorIndexConfig",

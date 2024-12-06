@@ -5,9 +5,9 @@ from typing import Any, TypedDict, cast
 
 from transformers import set_seed
 
-from autointent.custom_types import LabelType
+from autointent import Dataset
+from autointent.custom_types import LabelType, Split
 
-from ._dataset import Dataset, Split
 from ._stratification import split_dataset
 
 logger = logging.getLogger(__name__)

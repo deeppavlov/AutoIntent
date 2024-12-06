@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.scoring import ScoringModule
+from autointent.modules.abc import ScoringModule
 
 
 class MLKnnScorerDumpMetadata(BaseMetadataDict):

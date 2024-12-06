@@ -6,7 +6,7 @@ import torch
 
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
-from autointent.modules import Module
+from autointent.modules.abc import Module
 from autointent.nodes.nodes_info import NODES_INFO
 
 

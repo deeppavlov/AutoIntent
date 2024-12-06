@@ -17,7 +17,7 @@ from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact
 from ._logger import get_logger
 
 if TYPE_CHECKING:
-    from autointent.modules import Module
+    from autointent.modules.abc import Module
 
 
 @dataclass
