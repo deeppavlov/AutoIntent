@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install .[test]
+          pip install ".[test]"
 
     - name: Run tests
       run: |
