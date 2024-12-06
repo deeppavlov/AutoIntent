@@ -32,8 +32,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install .
-          pip install pytest pytest-asyncio
+          pip install .[test]
 
     - name: Run tests
       run: |
