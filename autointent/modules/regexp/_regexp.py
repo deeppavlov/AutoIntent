@@ -5,8 +5,6 @@ import re
 from pathlib import Path
 from typing import Any, Literal, TypedDict
 
-from typing_extensions import Self
-
 from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
@@ -31,7 +29,7 @@ class RegExp(Module):
     """Regular expressions based intent detection module."""
 
     @classmethod
-    def from_context(cls, context: Context) -> Self:
+    def from_context(cls, context: Context) -> "RegExp":
         """Initialize from context."""
         return cls()
 

@@ -115,8 +115,7 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
     Calculate the mean average precision at position k.
 
     The Mean Average Precision (MAP) is computed as the average of the average precision
-    (AP) scores for all queries. The average precision for a single query is calculated using
-    the :func:`average_precision` function, which computes the precision at each rank
+    (AP) scores for all queries. The average precision for a single query computes the precision at each rank
     position considering the top-k retrieved items.
 
     MAP is given by:
@@ -192,8 +191,7 @@ def retrieval_map_intersecting(
 
     The Mean Average Precision (MAP) for intersecting labels is computed as
     the average of the average precision (AP) scores for all queries. The average
-    precision for a single query is calculated using the :func:`average_precision_intersecting`
-    function, which considers the intersecting true and predicted labels for the
+    precision for a single query considers the intersecting true and predicted labels for the
     top-k retrieved items.
 
     MAP is given by:
@@ -226,8 +224,8 @@ def retrieval_map_macro(
     r"""
     Calculate the mean average precision at position k for the intersecting labels.
 
-    This function internally uses :func:`retrieval_map` to calculate the MAP for each query and then
-    applies :func:`macrofy` to perform macro-averaging across multiple queries.
+    This function internally uses :func:`retrieval_map` to calculate the MAP for each query and
+    performs macro-averaging across multiple queries.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
@@ -372,7 +370,7 @@ def retrieval_hit_rate_macro(
     Calculate the hit rate at position k for the intersecting labels.
 
     This function internally uses :func:`retrieval_hit_rate` to calculate the hit rate at position :math:`k`
-    for each query and applies :func:`macrofy` to perform macro-averaging across multiple queries.
+    for each query and performs macro-averaging across multiple queries.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
@@ -508,7 +506,7 @@ def retrieval_precision_macro(
     Calculate the precision at position k for the intersecting labels.
 
     This function internally uses :func:`retrieval_precision` to calculate the precision at position :math:`k`
-    for each query and applies :func:`macrofy` to perform macro-averaging across multiple queries.
+    for each query and performs macro-averaging across multiple queries.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
@@ -685,8 +683,7 @@ def retrieval_ndcg_macro(
     r"""
     Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
 
-    This function calculates NDCG using :func:`retrieval_ndcg` and applies it to each
-    query using :func:`macrofy` to compute the macro-averaged score.
+    This function calculates NDCG using :func:`retrieval_ndcg` and computes the macro-averaged score.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
@@ -778,8 +775,7 @@ def retrieval_mrr_macro(
     r"""
     Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
 
-    This function calculates MRR using :func:`retrieval_mrr` and applies it to each
-    query using :func:`macrofy` to compute the macro-averaged score.
+    This function calculates MRR using :func:`retrieval_mrr` and computes the macro-averaged score.
 
     :param query_labels: For each query, this list contains its class labels
     :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)

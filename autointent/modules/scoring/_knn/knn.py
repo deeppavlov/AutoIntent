@@ -6,7 +6,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
@@ -95,6 +94,7 @@ class KNNScorer(ScoringModule):
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the KNNScorer.
@@ -109,6 +109,7 @@ class KNNScorer(ScoringModule):
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder_name = embedder_name
         self.k = k
@@ -117,6 +118,7 @@ class KNNScorer(ScoringModule):
         self.device = device
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
     @property
     def db_dir(self) -> str:
@@ -136,7 +138,7 @@ class KNNScorer(ScoringModule):
         k: int,
         weights: WEIGHT_TYPES,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "KNNScorer":
         """
         Create a KNNScorer instance using a Context object.
 
@@ -160,6 +162,7 @@ class KNNScorer(ScoringModule):
             device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
@@ -186,7 +189,7 @@ class KNNScorer(ScoringModule):
         else:
             self.n_classes = len(set(labels))
             self.multilabel = False
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
 
         if self.prebuilt_index:
             # this happens only after RetrievalNode optimization
@@ -267,6 +270,7 @@ class KNNScorer(ScoringModule):
             db_dir=metadata["db_dir"],
             embedder_batch_size=metadata["batch_size"],
             embedder_max_length=metadata["max_length"],
+            embedder_use_cache=self.embedder_use_cache,
         )
         self._vector_index = vector_index_client.get_index(self.embedder_name)
 

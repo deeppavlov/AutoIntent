@@ -9,7 +9,6 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
@@ -107,6 +106,7 @@ class DNNCScorer(ScoringModule):
         train_head: bool = False,
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the DNNCScorer.
@@ -119,6 +119,7 @@ class DNNCScorer(ScoringModule):
         :param train_head: Whether to train a logistic regression head, defaults to False.
         :param batch_size: Batch size for processing text pairs, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.cross_encoder_name = cross_encoder_name
         self.embedder_name = embedder_name
@@ -128,6 +129,7 @@ class DNNCScorer(ScoringModule):
         self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
     @property
     def db_dir(self) -> str:
@@ -148,7 +150,7 @@ class DNNCScorer(ScoringModule):
         k: int,
         embedder_name: str | None = None,
         train_head: bool = False,
-    ) -> Self:
+    ) -> "DNNCScorer":
         """
         Create a DNNCScorer instance using a Context object.
 
@@ -174,6 +176,7 @@ class DNNCScorer(ScoringModule):
             db_dir=str(context.get_db_dir()),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
         )
         instance.prebuilt_index = prebuilt_index
         return instance
@@ -190,7 +193,7 @@ class DNNCScorer(ScoringModule):
 
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
-        vector_index_client = VectorIndexClient(self.device, self.db_dir)
+        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
@@ -313,6 +316,7 @@ class DNNCScorer(ScoringModule):
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],
+            embedder_use_cache=self.embedder_use_cache,
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 

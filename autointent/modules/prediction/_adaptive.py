@@ -7,7 +7,6 @@ from typing import Any, TypedDict
 import numpy as np
 import numpy.typing as npt
 from sklearn.metrics import f1_score
-from typing_extensions import Self
 
 from autointent import Context
 from autointent.custom_types import LabelType
@@ -86,7 +85,7 @@ class AdaptivePredictor(PredictionModule):
         self.search_space = search_space if search_space is not None else default_search_space
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None) -> Self:
+    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "AdaptivePredictor":
         """
         Create an AdaptivePredictor instance using a Context object.
 

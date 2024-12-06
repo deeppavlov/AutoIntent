@@ -8,7 +8,6 @@ import numpy as np
 import scipy
 from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
-from typing_extensions import Self
 
 from autointent import Context, Embedder
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
@@ -76,6 +75,7 @@ class DescriptionScorer(ScoringModule):
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the DescriptionScorer.
@@ -85,12 +85,14 @@ class DescriptionScorer(ScoringModule):
         :param device: Device to run the embedder on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, defaults to None.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.temperature = temperature
         self.device = device
         self.embedder_name = embedder_name
         self.batch_size = batch_size
         self.max_length = max_length
+        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -98,7 +100,7 @@ class DescriptionScorer(ScoringModule):
         context: Context,
         temperature: float,
         embedder_name: str | None = None,
-    ) -> Self:
+    ) -> "DescriptionScorer":
         """
         Create a DescriptionScorer instance using a Context object.
 
@@ -117,6 +119,7 @@ class DescriptionScorer(ScoringModule):
             temperature=temperature,
             device=context.get_device(),
             embedder_name=embedder_name,
+            embedder_use_cache=context.get_use_cache(),
         )
         instance.precomputed_embeddings = precomputed_embeddings
         instance.db_dir = str(context.get_db_dir())
@@ -153,7 +156,13 @@ class DescriptionScorer(ScoringModule):
 
         if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
+            vector_index_client = VectorIndexClient(
+                self.device,
+                self.db_dir,
+                self.batch_size,
+                self.max_length,
+                self.embedder_use_cache,
+            )
             vector_index = vector_index_client.get_index(self.embedder_name)
             features = vector_index.get_all_embeddings()
             if len(features) != len(utterances):
@@ -166,6 +175,7 @@ class DescriptionScorer(ScoringModule):
                 model_name=self.embedder_name,
                 batch_size=self.batch_size,
                 max_length=self.max_length,
+                use_cache=self.embedder_use_cache,
             )
             features = embedder.embed(utterances)
 
@@ -242,4 +252,5 @@ class DescriptionScorer(ScoringModule):
             model_name=embedder_dir,
             batch_size=self.metadata["batch_size"],
             max_length=self.metadata["max_length"],
+            use_cache=self.embedder_use_cache,
         )

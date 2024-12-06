@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Literal
 
 import numpy.typing as npt
-from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
@@ -91,7 +90,7 @@ class Module(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> Self:
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "Module":
         """
         Initialize self from context.
 

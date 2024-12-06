@@ -26,7 +26,7 @@ To create a dataset, you need to provide a training split containing samples wit
             "utterance": "Hello!",
             "label": 0
         },
-        ...
+        "...",
     ]
 }
 ```
@@ -43,7 +43,7 @@ To indicate that a sample is out-of-scope (OOS), omit the `label` field from the
         {
             "utterance": "OOS request"
         },
-        ...
+        "...",
     ]
 }
 ```
@@ -60,14 +60,14 @@ However, you can also specify a test split explicitly:
             "utterance": "Hello!",
             "label": 0
         },
-        ...
+        "...",
     ],
     "test": [
         {
             "utterance": "Hi!",
             "label": 0
         },
-        ...
+        "...",
     ]
 }
 ```
@@ -84,7 +84,7 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
             "utterance": "Hello!",
             "label": 0
         },
-        ...
+        "...",
     ],
     "intents": [
         {
@@ -94,8 +94,8 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
             "regexp_partial_match": ["\bhello\b"],
             "regexp_full_match": ["^hello$"],
             "description": "User wants to initiate a conversation with a greeting."
-        }
-        ...
+        },
+        "...",
     ]
 }
 ```
@@ -250,5 +250,4 @@ Ensure that you are logged in using the `huggingface-cli` tool:
 ## See Also
 
 - Training on your data: %mddoclink(tutorial,pipeline_optimization.demo)
-- [Key Concepts](../concepts.html)
 """

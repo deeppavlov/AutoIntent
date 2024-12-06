@@ -8,7 +8,6 @@ import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 from torch.nn import Sigmoid
-from typing_extensions import Self
 
 from autointent.context import Context
 from autointent.custom_types import WEIGHT_TYPES, LabelType
@@ -97,7 +96,7 @@ class RerankScorer(KNNScorer):
         embedder_name: str | None = None,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
-    ) -> Self:
+    ) -> "RerankScorer":
         """
         Create a RerankScorer instance from a given context.
 

@@ -31,6 +31,7 @@ class VectorIndex:
         device: str,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
+        embedder_use_cache: bool = False,
     ) -> None:
         """
         Initialize the vector index.
@@ -39,6 +40,7 @@ class VectorIndex:
         :param device: Device for running the embedding model (e.g., "cpu", "cuda").
         :param embedder_batch_size: Batch size for the embedder.
         :param embedder_max_length: Maximum sequence length for the embedder.
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.model_name = model_name
         self.embedder = Embedder(
@@ -46,6 +48,7 @@ class VectorIndex:
             batch_size=embedder_batch_size,
             device=device,
             max_length=embedder_max_length,
+            use_cache=embedder_use_cache,
         )
         self.device = device
 

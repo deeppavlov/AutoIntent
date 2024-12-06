@@ -8,7 +8,6 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 import yaml
-from typing_extensions import Self
 
 from autointent import Context, Dataset
 from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
@@ -60,7 +59,7 @@ class Pipeline:
             raise TypeError(msg)
 
     @classmethod
-    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str) -> Self:
+    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str) -> "Pipeline":
         """
         Create pipeline optimizer from dictionary search space.
 
@@ -73,7 +72,7 @@ class Pipeline:
         return cls(nodes)
 
     @classmethod
-    def default_optimizer(cls, multilabel: bool) -> Self:
+    def default_optimizer(cls, multilabel: bool) -> "Pipeline":
         """
         Create pipeline optimizer with default search space for given classification task.
 
@@ -137,7 +136,7 @@ class Pipeline:
         return context
 
     @classmethod
-    def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> Self:
+    def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":
         """
         Create inference pipeline from dictionary config.
 
@@ -147,7 +146,7 @@ class Pipeline:
         return cls.from_config([InferenceNodeConfig(**cfg) for cfg in nodes_configs])
 
     @classmethod
-    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> Self:
+    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> "Pipeline":
         """
         Create inference pipeline from config.
 
@@ -157,7 +156,7 @@ class Pipeline:
         return cls(nodes)
 
     @classmethod
-    def load(cls, path: str | Path) -> Self:
+    def load(cls, path: str | Path) -> "Pipeline":
         """
         Load pipeline in inference mode.
 

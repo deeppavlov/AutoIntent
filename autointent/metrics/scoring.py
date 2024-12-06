@@ -105,9 +105,9 @@ def _calculate_prediction_metric(
     r"""
     Calculate prediction metric.
 
-    This function applies the given prediction metric function :func:`func` to evaluate the predictions.
+    This function applies the given prediction metric function `func` to evaluate the predictions.
     It transforms the inputs and computes predictions based on the input scores:
-    - For multiclass classification, predictions are generated using :func:`np.argmax`.
+    - For multiclass classification, predictions are generated using `np.argmax`.
     - For multilabel classification, predictions are generated using a threshold of 0.5.
 
     :param func: prediction metric function
@@ -131,8 +131,8 @@ def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
     r"""
     Calculate accuracy for multiclass and multilabel classification.
 
-    This function computes accuracy by using :func:`prediction_accuracy` to evaluate predictions and
-    :func:`calculate_prediction_metric` to handle the computation.
+    This function computes accuracy by using :func:`autointent.metrics.prediction.prediction_accuracy`
+    to evaluate predictions.
 
     :param labels: ground truth labels for each utterance
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
@@ -145,8 +145,8 @@ def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate the F1 score for multiclass and multilabel classification.
 
-    This function computes the F1 score by using :func:`prediction_f1` to evaluate predictions and
-    :func:`calculate_prediction_metric` to handle the computation.
+    This function computes the F1 score by using :func:`autointent.metrics.prediction.prediction_f1`
+    to evaluate predictions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes
@@ -159,8 +159,8 @@ def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> f
     r"""
     Calculate precision for multiclass and multilabel classification.
 
-    This function computes precision by using :func:`prediction_precision` to evaluate predictions and
-    :func:`calculate_prediction_metric` to handle the computation.
+    This function computes precision by using :func:`autointent.metrics.prediction.prediction_precision`
+    to evaluate predictions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes
@@ -173,8 +173,8 @@ def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> floa
     r"""
     Calculate recall for multiclass and multilabel classification.
 
-    This function computes recall by using :func:`prediction_recall` to evaluate predictions and
-    :func:`calculate_prediction_metric` to handle the computation.
+    This function computes recall by using :func:`autointent.metrics.prediction.prediction_recall`
+    to evaluate predictions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes

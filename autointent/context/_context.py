@@ -69,6 +69,7 @@ class Context:
             self.vector_index_config.db_dir,
             self.embedder_config.batch_size,
             self.embedder_config.max_length,
+            self.embedder_config.use_cache,
         )
 
     def configure_data(self, config: DataConfig) -> None:
@@ -188,6 +189,14 @@ class Context:
         :return: Maximum length or None if not set.
         """
         return self.vector_index_client.embedder_max_length
+
+    def get_use_cache(self) -> bool:
+        """
+        Check if caching is enabled for the embedder.
+
+        :return: True if caching is enabled, False otherwise.
+        """
+        return self.vector_index_client.embedder_use_cache
 
     def get_dump_dir(self) -> Path | None:
         """
