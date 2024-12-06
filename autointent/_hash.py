@@ -25,7 +25,7 @@ class Hasher:
         self._state = xxhash.xxh64()
 
     @classmethod
-    def hash(cls, value: Any) -> str:  # noqa: ANN401
+    def hash(cls, value: Any) -> int:  # noqa: ANN401
         """
         Generate a hash for the given value using xxhash.
 
@@ -33,7 +33,9 @@ class Hasher:
 
         :return: The resulting hash digest as a hexadecimal string.
         """
-        return xxhash.xxh64(pickle.dumps(value)).hexdigest()
+        if hasattr(value, "__hash__") and value.__hash__ not in {None, object.__hash__}:
+            return hash(value)
+        return xxhash.xxh64(pickle.dumps(value)).intdigest()
 
     def update(self, value: Any) -> None:  # noqa: ANN401
         """
@@ -45,7 +47,7 @@ class Hasher:
         :param value: The value to update the hash state with.
         """
         self._state.update(str(type(value)).encode())
-        self._state.update(self.hash(value).encode())
+        self._state.update(str(self.hash(value)).encode())
 
     def hexdigest(self) -> str:
         """
@@ -57,3 +59,14 @@ class Hasher:
         :return: The resulting hash digest as a hexadecimal string.
         """
         return self._state.hexdigest()
+
+    def intdigest(self) -> int:
+        """
+        Return the current hash digest as an integer.
+
+        This method should be called after one or more `update` calls to get
+        the final hash result.
+
+        :return: The resulting hash digest as an integer.
+        """
+        return self._state.intdigest()

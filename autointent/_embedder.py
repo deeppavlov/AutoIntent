@@ -8,7 +8,7 @@ import json
 import logging
 import shutil
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
@@ -80,13 +80,17 @@ class Embedder:
 
         self.logger = logging.getLogger(__name__)
 
-    def __reduce__(self) -> tuple[Any, ...]:
+    def __hash__(self) -> int:
         """
-        Reduce the Embedder for serialization.
+        Compute a hash value for the Embedder.
 
-        :return: A tuple containing the class and the necessary state for deserialization.
+        :returns: The hash value of the Embedder.
         """
-        return (self.__class__, (self.model_name, self.device, self.batch_size, self.max_length))
+        hasher = Hasher()
+        for parameter in self.embedding_model.parameters():
+            hasher.update(parameter.detach().cpu().numpy())
+        hasher.update(self.max_length)
+        return hasher.intdigest()
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
