@@ -12,8 +12,7 @@ import yaml
 from autointent import Context, Dataset
 from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import NodeType
-from autointent.nodes import NodeOptimizer
-from autointent.nodes.inference import InferenceNode
+from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput

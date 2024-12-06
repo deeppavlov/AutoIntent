@@ -21,7 +21,8 @@ class LogLevel(Enum):
 # Literal type for weight types in specific operations
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
 """
-Represents weight calculation methods:
+Represents weight calculation methods
+
 - "uniform": Equal weight for all elements.
 - "distance": Weights based on distance.
 - "closest": Prioritizes closest elements.
@@ -30,7 +31,8 @@ Represents weight calculation methods:
 # Type alias for label representation
 LabelType = int | list[int]
 """
-Type alias for label representation:
+Type alias for label representation
+
 - `int`: For single-label classification.
 - `list[int]`: For multi-label classification.
 """

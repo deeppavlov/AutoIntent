@@ -26,7 +26,11 @@ To set up the optimization module, you need to create the following dictionary:
         ]
     }
 
-The ``module_type`` field specifies the name of the module. You can find the names, for example, in :py:data:`autointent.modules.SCORING_MODULES_MULTICLASS`.
+The ``module_type`` field specifies the name of the module. You can find the names, for example, in...
+
+.. todo::
+
+    Add docs for all available modules.
 
 All fields except ``module_type`` are lists that define the search space for each hyperparameter. If you omit them, the default set of hyperparameters will be used during auto-configuration:
 
