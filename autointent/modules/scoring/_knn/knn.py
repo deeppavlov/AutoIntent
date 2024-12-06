@@ -47,36 +47,35 @@ class KNNScorer(ScoringModule):
 
     Examples
     --------
-    Creating and fitting the KNNScorer:
-    >>> from autointent.modules import KNNScorer
-    >>> utterances = ["hello", "how are you?"]
-    >>> labels = ["greeting", "greeting"]
-    >>> scorer = KNNScorer(
-    >>>     embedder_name="bert-base",
-    >>>     k=5,
-    >>>     weights="distance",
-    >>>     db_dir="/path/to/database",
-    >>>     device="cuda",
-    >>>     batch_size=32,
-    >>>     max_length=128
-    >>> )
-    >>> scorer.fit(utterances, labels)
+    .. testsetup::
 
-    Predicting class probabilities:
-    >>> test_utterances = ["hi", "what's up?"]
-    >>> probabilities = scorer.predict(test_utterances)
-    >>> print(probabilities)  # Outputs predicted class probabilities for the utterances
+        db_dir = "doctests-db"
 
-    Saving and loading the scorer:
-    >>> scorer.dump("outputs/")
-    >>> loaded_scorer = KNNScorer(
-    >>>     embedder_name="bert-base",
-    >>>     k=5,
-    >>>     weights="distance",
-    >>>     db_dir="/path/to/database",
-    >>>     device="cuda"
-    >>> )
-    >>> loaded_scorer.load("outputs/")
+    .. testcode::
+
+        from autointent.modules.scoring import KNNScorer
+        utterances = ["hello", "how are you?"]
+        labels = [0, 1]
+        scorer = KNNScorer(
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+            k=5,
+            db_dir=db_dir,
+        )
+        scorer.fit(utterances, labels)
+        test_utterances = ["hi", "what's up?"]
+        probabilities = scorer.predict(test_utterances)
+        print(probabilities)  # Outputs predicted class probabilities for the utterances
+
+    .. testoutput::
+
+        [[0.67297815 0.32702185]
+         [0.44031678 0.55968322]]
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
+
     """
 
     weights: WEIGHT_TYPES
@@ -89,7 +88,7 @@ class KNNScorer(ScoringModule):
         self,
         embedder_name: str,
         k: int,
-        weights: WEIGHT_TYPES,
+        weights: WEIGHT_TYPES = "distance",
         db_dir: str | None = None,
         device: str = "cpu",
         batch_size: int = 32,

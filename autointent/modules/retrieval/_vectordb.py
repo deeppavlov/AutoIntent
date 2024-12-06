@@ -32,28 +32,33 @@ class VectorDBModule(RetrievalModule):
 
     Examples
     --------
-    Creating and fitting the VectorDBModule:
-    >>> from your_module import VectorDBModule
-    >>> utterances = ["hello world", "how are you?", "good morning"]
-    >>> labels = [1, 2, 3]
-    >>> vector_db = VectorDBModule(k=2, embedder_name="some_embedder", db_dir="./db", device="cpu")
-    >>> vector_db.fit(utterances, labels)
-    >>> def retrieval_metric_fn(true_labels, predicted_labels):
-    >>>     # Custom metric function (e.g., accuracy or F1 score)
-    >>>     return sum([1 if true == pred else 0 for true, pred \\
-    >>>         in zip(true_labels, predicted_labels)]) / len(true_labels)
-    >>> score = vector_db.score(context, retrieval_metric_fn)
-    >>> print(score)
+    .. testsetup::
 
-    Performing predictions:
-    >>> predictions = vector_db.predict(["how is the weather today?"])
-    >>> print(predictions)
+        db_dir = "doctests-db"
 
-    Saving and loading the model:
-    >>> vector_db.dump("outputs/")
-    >>> loaded_vector_db = VectorDBModule(k=2, embedder_name="some_embedder", db_dir="./db", device="cpu")
-    >>> loaded_vector_db.load("outputs/")
-    >>> print(loaded_vector_db.vector_index)
+    .. testcode::
+
+        from autointent.modules.retrieval import VectorDBModule
+        utterances = ["bye", "how are you?", "good morning"]
+        labels = [0, 1, 1]
+        vector_db = VectorDBModule(
+            k=2,
+            embedder_name="sergeyzh/rubert-tiny-turbo",
+            db_dir=db_dir,
+        )
+        vector_db.fit(utterances, labels)
+        predictions = vector_db.predict(["how is the weather today?"])
+        print(predictions)
+
+    .. testoutput::
+
+        ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
+
+    .. testcleanup::
+
+        import shutil
+        shutil.rmtree(db_dir)
+
     """
 
     vector_index: VectorIndex

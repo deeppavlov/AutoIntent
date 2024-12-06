@@ -172,7 +172,7 @@ class VectorIndex:
         all_results = func(queries, k)  # type: ignore[arg-type]
 
         all_labels = [[self.labels[result["id"]] for result in results] for results in all_results]
-        all_distances = [[result["distance"] for result in results] for results in all_results]
+        all_distances = [[float(result["distance"]) for result in results] for results in all_results]
         all_texts = [[self.texts[result["id"]] for result in results] for results in all_results]
 
         return all_labels, all_distances, all_texts

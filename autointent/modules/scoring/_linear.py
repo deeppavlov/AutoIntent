@@ -45,33 +45,24 @@ class LinearScorer(ScoringModule):
 
     Example
     --------
-    Creating and fitting the LinearScorer:
-    >>> from autointent.modules import LinearScorer
-    >>> utterances = ["what is your name?", "how are you?"]
-    >>> labels = ["greeting", "greeting"]
-    >>> scorer = LinearScorer(
-    >>>     embedder_name="bert-base",
-    >>>     cv=3,
-    >>>     n_jobs=-1,
-    >>>     device="cuda",
-    >>>     seed=42,
-    >>>     batch_size=32,
-    >>>     max_length=128
-    >>> )
-    >>> scorer.fit(utterances, labels)
+    .. testcode::
 
-    Predicting probabilities:
-    >>> test_utterances = ["Hello!", "What's up?"]
-    >>> probabilities = scorer.predict(test_utterances)
-    >>> print(probabilities)  # Outputs predicted probabilities for each class
+        from autointent.modules import LinearScorer
+        scorer = LinearScorer(
+            embedder_name="sergeyzh/rubert-tiny-turbo", cv=2
+        )
+        utterances = ["hello", "goodbye", "allo", "sayonara"]
+        labels = [0, 1, 0, 1]
+        scorer.fit(utterances, labels)
+        test_utterances = ["hi", "bye"]
+        probabilities = scorer.predict(test_utterances)
+        print(probabilities)
 
-    Saving and loading the scorer:
-    >>> scorer.dump("outputs/")
-    >>> loaded_scorer = LinearScorer(
-    >>>     embedder_name="bert-base",
-    >>>     device="cuda"
-    >>> )
-    >>> loaded_scorer.load("outputs/")
+    .. testoutput::
+
+        [[0.50000032 0.49999968]
+         [0.50000032 0.49999968]]
+
     """
 
     classifier_file_name: str = "classifier.joblib"
@@ -84,7 +75,7 @@ class LinearScorer(ScoringModule):
         self,
         embedder_name: str,
         cv: int = 3,
-        n_jobs: int = -1,
+        n_jobs: int | None = None,
         device: str = "cpu",
         seed: int = 0,
         batch_size: int = 32,

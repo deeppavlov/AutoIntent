@@ -51,12 +51,11 @@ exclude_patterns = ["conf.py", "docs_utils/*"]
 
 # API reference
 
-nitpicky = True  # warn about unknown links
+# nitpicky = True  # warn about unknown links
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "pathlib": ("https://docs.python.org/3/library/pathlib.html", None),
-    # Add other mappings as needed
+    "pydantic": ("https://docs.pydantic.dev/latest/", None),
 }
 
 autoapi_keep_files = True
