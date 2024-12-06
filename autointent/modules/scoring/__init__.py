@@ -4,6 +4,7 @@ from ._dnnc import DNNCScorer
 from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
 from ._mlknn import MLKnnScorer
+from ._sklearn import SklearnScorer
 
 __all__ = [
     "DNNCScorer",
@@ -13,4 +14,5 @@ __all__ = [
     "MLKnnScorer",
     "RerankScorer",
     "ScoringModule",
+    "SklearnScorer",
 ]

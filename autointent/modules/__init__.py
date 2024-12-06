@@ -11,7 +11,16 @@ from .prediction import (
     TunablePredictor,
 )
 from .retrieval import RetrievalModule, VectorDBModule
-from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, ScoringModule
+from .scoring import (
+    DescriptionScorer,
+    DNNCScorer,
+    KNNScorer,
+    LinearScorer,
+    MLKnnScorer,
+    RerankScorer,
+    ScoringModule,
+    SklearnScorer,
+)
 
 T = TypeVar("T", bound=Module)
 
@@ -25,11 +34,11 @@ RETRIEVAL_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict([Vec
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
 
 SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = create_modules_dict(
-    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer, RerankScorer]
+    [DNNCScorer, KNNScorer, LinearScorer, DescriptionScorer, RerankScorer, SklearnScorer]
 )
 
 SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = create_modules_dict(
-    [MLKnnScorer, LinearScorer, DescriptionScorer],
+    [MLKnnScorer, LinearScorer, DescriptionScorer, SklearnScorer]
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[Module]] = create_modules_dict(
@@ -61,6 +70,7 @@ __all__ = [
     "RerankScorer",
     "RetrievalModule",
     "ScoringModule",
+    "SklearnScorer",
     "ThresholdPredictor",
     "TunablePredictor",
     "VectorDBModule",
