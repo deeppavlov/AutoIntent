@@ -1,6 +1,8 @@
 # %% [markdown]
 """
 # Working with data
+
+In this tutorial you will learn how to manipulate intent classification data with AutoIntent.
 """
 
 # %%
@@ -238,7 +240,7 @@ dataset.intents[0]  # get intent (id=0)
 """
 ### Pushing a dataset to the Hugging Face Hub
 
-To share your dataset on the Hugging Face Hub, use the `push_to_hub` method.
+To share your dataset on the Hugging Face Hub, use method %mddoclink(method,Dataset,push_to_hub).
 Ensure that you are logged in using the `huggingface-cli` tool:
 """
 
