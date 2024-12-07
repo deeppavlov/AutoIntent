@@ -133,10 +133,16 @@ class DocumentationLink(ReplacePattern):
         :return:
             A link to the corresponding documentation part.
         """
-        if page_type == "api":
+        if page_type == "class":
             dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
             path = "/".join(dotpath.split("."))
             return f"../autoapi/{path}/{obj}.html" + (
+                f"#{dotpath}.{obj}" if obj is not None else ""
+            )
+        if page_type == "method":
+            dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
+            path = "/".join(dotpath.split("."))
+            return f"../autoapi/{path}.html" + (
                 f"#{dotpath}.{obj}" if obj is not None else ""
             )
         if page_type == "tutorial":

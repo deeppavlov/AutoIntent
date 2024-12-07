@@ -101,9 +101,9 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
 ```
 
 - `name`: A human-readable representation of the intent.
-- `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(api,schemas,Tag).
-- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(api,modules.regexp,RegExp) module to predict intents based on provided patterns.
-- `description`: Used by the %mddoclink(api,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
+- `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(class,schemas,Tag).
+- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(class,modules.regexp,RegExp) module to predict intents based on provided patterns.
+- `description`: Used by the %mddoclink(class,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
 
 All fields in the `intents` list are optional except for `id`.
 """
@@ -123,7 +123,7 @@ There are three main ways to load your dataset:
 """
 ### Creating a dataset from a Python dictionary
 
-One can load data into Python using our %mddoclink(api,,Dataset) object.
+One can load data into Python using our %mddoclink(class,,Dataset) object.
 """
 
 # %%
@@ -205,7 +205,7 @@ dataset = Dataset.from_json(
 
 # %% [markdown]
 """
-The %mddoclink(api,,Dataset) class organizes your data as a dictionary of [datasets.Dataset](https://huggingface.co/docs/datasets/v2.1.0/en/package_reference/main_classes#datasets.Dataset).
+The %mddoclink(class,,Dataset) class organizes your data as a dictionary of [datasets.Dataset](https://huggingface.co/docs/datasets/v2.1.0/en/package_reference/main_classes#datasets.Dataset).
 For example, after initialization, an `oos` key may be added if OOS samples are provided.
 In the case of the `banking77` dataset, only the `train` split is available, which you can access as shown below:
 """
@@ -217,7 +217,7 @@ dataset["train"]
 """
 ### Working with dataset splits
 
-Each split in the %mddoclink(api,,Dataset) class is an instance of [datasets.Dataset](https://huggingface.co/docs/datasets/en/package_reference/main_classes#datasets.Dataset),
+Each split in the %mddoclink(class,,Dataset) class is an instance of [datasets.Dataset](https://huggingface.co/docs/datasets/en/package_reference/main_classes#datasets.Dataset),
 so you can work with them accordingly.
 """
 

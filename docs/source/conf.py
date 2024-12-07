@@ -124,7 +124,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-nbsphinx_execute = "never"
+# nbsphinx_execute = "never"
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
@@ -132,7 +132,7 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 def setup(app) -> None:  # noqa: ANN001
     generate_tutorial_links_for_notebook_creation(
         [
-            ("tutorials.pipeline_optimization", "Pipeline Optimization"),
+            ("tutorials.auto_configuration", "AutoML Features"),
             ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
             ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
             ("tutorials.data", "Data"),

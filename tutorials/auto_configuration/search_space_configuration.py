@@ -36,7 +36,7 @@ The ``module_type`` field specifies the name of the module. You can find the nam
 
 TODO: _Add docs for all available modules._
 
-All fields except ``module_type`` are lists that define the search space for each hyperparameter (see %mddoclink(api,modules.scoring,KNNScorer)). If you omit them, the default set of hyperparameters will be used:
+All fields except ``module_type`` are lists that define the search space for each hyperparameter (see %mddoclink(class,modules.scoring,KNNScorer)). If you omit them, the default set of hyperparameters will be used:
 """
 
 # %%
@@ -45,7 +45,7 @@ linear_module = {"module_type": "linear"}
 
 # %% [markdown]
 """
-See docs %mddoclink(api,modules.scoring,LinearScorer).
+See docs %mddoclink(class,modules.scoring,LinearScorer).
 """
 
 # %% [markdown]
