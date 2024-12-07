@@ -43,7 +43,7 @@ class LoggingConfig:
     """Path to the directory where the modules will be dumped. If None, the modules will not be dumped"""
     dump_modules: bool = False
     """Whether to dump the modules or not"""
-    clear_ram: bool = True
+    clear_ram: bool = False
     """Whether to clear the RAM after dumping the modules"""
 
     def __post_init__(self) -> None:

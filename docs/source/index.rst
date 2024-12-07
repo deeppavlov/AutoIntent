@@ -14,14 +14,27 @@ The task of intent detection is one of the main subtasks in creating task-orient
 
 Example of building an intent classifier in a couple of lines of code:
 
-.. code-block:: python
+.. testsetup::
+
+   import importlib.resources as ires
+
+   path_to_json = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+
+.. testcode::
 
    from autointent import Pipeline, Dataset
 
-   dataset = Dataset.from_json("/path/to/json")
-   optimizer = Pipeline.default_optimizer(multilabel=False)
+   dataset = Dataset.from_json(path_to_json)
+   pipeline = Pipeline.default_optimizer(multilabel=False)
    pipeline.fit(dataset)
-   pipeline.predict(["Hello, World!"])
+   pipeline.predict(["show me my latest recent transactions"])
+
+.. testcleanup::
+
+   import shutil
+   from glob import glob
+   for match in glob("vector_db*"):
+      shutil.rmtree(match)
 
 Documentation Contents
 ----------------------
