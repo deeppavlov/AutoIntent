@@ -17,7 +17,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     db_dir, dump_dir, logs_dir = setup_environment()
     data_handler = DataHandler(dataset, force_multilabel=multilabel)
 
-    scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, device="cpu")
+    scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, embedder_device="cpu")
 
     scorer.fit(
         data_handler.train_utterances(0),

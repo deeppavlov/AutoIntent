@@ -102,7 +102,7 @@ class MLKnnScorer(ScoringModule):
         db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        device: str = "cpu",
+        embedder_device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
         embedder_use_cache: bool = False,
@@ -115,7 +115,7 @@ class MLKnnScorer(ScoringModule):
         :param db_dir: Path to the database directory, or None to use default.
         :param s: Smoothing parameter for probability calculations, defaults to 1.0.
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
@@ -125,7 +125,7 @@ class MLKnnScorer(ScoringModule):
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
         self._db_dir = db_dir
-        self.device = device
+        self.embedder_device = embedder_device
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
@@ -172,7 +172,7 @@ class MLKnnScorer(ScoringModule):
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
             db_dir=str(context.get_db_dir()),
-            device=context.get_device(),
+            embedder_device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
@@ -203,7 +203,9 @@ class MLKnnScorer(ScoringModule):
 
         self.n_classes = len(labels[0])
 
-        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
+        vector_index_client = VectorIndexClient(
+            self.embedder_device, self.db_dir, embedder_use_cache=self.embedder_use_cache
+        )
 
         if self.prebuilt_index:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
@@ -354,7 +356,7 @@ class MLKnnScorer(ScoringModule):
         self._cond_prob_false = arrays["cond_prob_false"]
 
         vector_index_client = VectorIndexClient(
-            device=self.device,
+            embedder_device=self.embedder_device,
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],

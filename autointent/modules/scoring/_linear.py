@@ -76,7 +76,7 @@ class LinearScorer(ScoringModule):
         embedder_name: str,
         cv: int = 3,
         n_jobs: int | None = None,
-        device: str = "cpu",
+        embedder_device: str = "cpu",
         seed: int = 0,
         batch_size: int = 32,
         max_length: int | None = None,
@@ -88,7 +88,7 @@ class LinearScorer(ScoringModule):
         :param embedder_name: Name of the embedder model.
         :param cv: Number of cross-validation folds, defaults to 3.
         :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param seed: Random seed for reproducibility, defaults to 0.
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
@@ -96,7 +96,7 @@ class LinearScorer(ScoringModule):
         """
         self.cv = cv
         self.n_jobs = n_jobs
-        self.device = device
+        self.embedder_device = embedder_device
         self.seed = seed
         self.embedder_name = embedder_name
         self.batch_size = batch_size
@@ -124,7 +124,7 @@ class LinearScorer(ScoringModule):
 
         instance = cls(
             embedder_name=embedder_name,
-            device=context.get_device(),
+            embedder_device=context.get_device(),
             seed=context.seed,
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
@@ -159,7 +159,7 @@ class LinearScorer(ScoringModule):
         if self.precomputed_embeddings:
             # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
             vector_index_client = VectorIndexClient(
-                self.device,
+                self.embedder_device,
                 self.db_dir,
                 self.batch_size,
                 self.max_length,
@@ -173,7 +173,7 @@ class LinearScorer(ScoringModule):
             embedder = vector_index.embedder
         else:
             embedder = Embedder(
-                device=self.device,
+                device=self.embedder_device,
                 model_name=self.embedder_name,
                 batch_size=self.batch_size,
                 max_length=self.max_length,
@@ -254,7 +254,7 @@ class LinearScorer(ScoringModule):
         # Load sentence transformer model
         embedder_dir = dump_dir / self.embedding_model_subdir
         self._embedder = Embedder(
-            device=self.device,
+            device=self.embedder_device,
             model_name=embedder_dir,
             batch_size=metadata["batch_size"],
             max_length=metadata["max_length"],

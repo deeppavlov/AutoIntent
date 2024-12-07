@@ -28,7 +28,7 @@ class VectorIndex:
     def __init__(
         self,
         model_name: str,
-        device: str,
+        embedder_device: str,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
         embedder_use_cache: bool = False,
@@ -37,7 +37,7 @@ class VectorIndex:
         Initialize the vector index.
 
         :param model_name: Name of the embedding model to use.
-        :param device: Device for running the embedding model (e.g., "cpu", "cuda").
+        :param embedder_device: Device for running the embedding model (e.g., "cpu", "cuda").
         :param embedder_batch_size: Batch size for the embedder.
         :param embedder_max_length: Maximum sequence length for the embedder.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
@@ -46,11 +46,11 @@ class VectorIndex:
         self.embedder = Embedder(
             model_name=model_name,
             batch_size=embedder_batch_size,
-            device=device,
+            device=embedder_device,
             max_length=embedder_max_length,
             use_cache=embedder_use_cache,
         )
-        self.device = device
+        self.embedder_device = embedder_device
 
         self.labels: list[LabelType] = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
@@ -200,7 +200,7 @@ class VectorIndex:
         """
         self.dump_dir = Path(dir_path)
         self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.device)
+        self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.embedder_device)
         with (dir_path / "texts.json").open() as file:
             self.texts = json.load(file)
         with (dir_path / "labels.json").open() as file:

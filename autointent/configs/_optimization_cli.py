@@ -77,8 +77,6 @@ class VectorIndexConfig:
 
     db_dir: Path | None = None
     """Path to the directory where the vector index database will be saved. If None, the database will not be saved"""
-    device: str = "cpu"
-    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
     save_db: bool = False
     """Whether to save the vector index database or not"""
 
@@ -109,6 +107,8 @@ class EmbedderConfig:
     """Max length for the embedder. If None, the max length will be taken from model config"""
     use_cache: bool = False
     """Flag indicating whether to cache embeddings for reuse, improving performance in repeated operations."""
+    device: str = "cpu"
+    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
 
 
 @dataclass

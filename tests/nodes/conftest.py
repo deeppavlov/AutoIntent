@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import Context
-from autointent.configs._optimization_cli import DataConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs._optimization_cli import DataConfig, EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.nodes.optimization import NodeOptimizer
 from tests.conftest import get_dataset_path, setup_environment
 
@@ -75,5 +75,5 @@ def get_context(multilabel):
     res = Context()
     res.configure_data(DataConfig(get_dataset_path(), force_multilabel=multilabel))
     res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
-    res.configure_vector_index(VectorIndexConfig(db_dir=db_dir, device="cpu"))
+    res.configure_vector_index(VectorIndexConfig(db_dir=db_dir), EmbedderConfig(device="cpu"))
     return res

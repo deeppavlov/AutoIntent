@@ -16,7 +16,7 @@ def data_handler():
 def test_vector_index_initialization():
     db_dir, dump_dir, logs_dir = setup_environment()
     vector_index_client = VectorIndexClient("cpu", db_dir)
-    assert vector_index_client.device == "cpu"
+    assert vector_index_client.embedder_device == "cpu"
 
 
 def test_create_collection(data_handler):

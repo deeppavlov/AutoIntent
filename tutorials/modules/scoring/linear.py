@@ -34,7 +34,7 @@ Initialize scoring module. It will take text and output probabilities for each c
 """
 
 # %%
-scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu", n_jobs=1)
+scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", n_jobs=1)
 
 
 # %% [markdown]

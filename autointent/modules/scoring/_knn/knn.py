@@ -90,7 +90,7 @@ class KNNScorer(ScoringModule):
         k: int,
         weights: WEIGHT_TYPES = "distance",
         db_dir: str | None = None,
-        device: str = "cpu",
+        embedder_device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
         embedder_use_cache: bool = False,
@@ -105,7 +105,7 @@ class KNNScorer(ScoringModule):
             - "distance" (or True): Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
         :param db_dir: Path to the database directory, or None to use default.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation, defaults to 32.
         :param max_length: Maximum sequence length for embedding, or None for default.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
@@ -114,7 +114,7 @@ class KNNScorer(ScoringModule):
         self.k = k
         self.weights = weights
         self._db_dir = db_dir
-        self.device = device
+        self.embedder_device = embedder_device
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
@@ -158,7 +158,7 @@ class KNNScorer(ScoringModule):
             k=k,
             weights=weights,
             db_dir=str(context.get_db_dir()),
-            device=context.get_device(),
+            embedder_device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
@@ -188,7 +188,9 @@ class KNNScorer(ScoringModule):
         else:
             self.n_classes = len(set(labels))
             self.multilabel = False
-        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
+        vector_index_client = VectorIndexClient(
+            self.embedder_device, self.db_dir, embedder_use_cache=self.embedder_use_cache
+        )
 
         if self.prebuilt_index:
             # this happens only after RetrievalNode optimization
@@ -265,7 +267,7 @@ class KNNScorer(ScoringModule):
         self.multilabel = metadata["multilabel"]
 
         vector_index_client = VectorIndexClient(
-            device=self.device,
+            embedder_device=self.embedder_device,
             db_dir=metadata["db_dir"],
             embedder_batch_size=metadata["batch_size"],
             embedder_max_length=metadata["max_length"],

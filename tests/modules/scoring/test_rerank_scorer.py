@@ -17,7 +17,7 @@ def test_base_rerank_scorer(dataset):
         m=2,
         cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
         db_dir=db_dir,
-        device="cpu",
+        embedder_device="cpu",
     )
 
     test_data = [
