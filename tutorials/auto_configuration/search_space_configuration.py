@@ -24,10 +24,7 @@ To set up the optimization module, you need to create the following dictionary:
 knn_module = {
     "module_type": "knn",
     "k": [1, 5, 10, 50],
-    "embedder_name": [
-        "avsolatorio/GIST-small-Embedding-v0",
-        "infgrad/stella-base-en-v2"
-    ]
+    "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
 }
 
 # %% [markdown]
@@ -62,7 +59,7 @@ scoring_node = {
     "search_space": [
         knn_module,
         linear_module,
-    ]
+    ],
 }
 
 # %% [markdown]
@@ -81,48 +78,28 @@ search_space = [
             {
                 "module_type": "vector_db",
                 "k": [10],
-                "embedder_name": [
-                    "avsolatorio/GIST-small-Embedding-v0",
-                    "infgrad/stella-base-en-v2"
-                ]
+                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
             }
-        ]
+        ],
     },
     {
         "node_type": "scoring",
         "metric": "scoring_roc_auc",
         "search_space": [
-            {
-                "module_type": "knn",
-                "k": [1, 3, 5, 10],
-                "weights": ["uniform", "distance", "closest"]
-            },
-            {
-                "module_type": "linear"
-            },
+            {"module_type": "knn", "k": [1, 3, 5, 10], "weights": ["uniform", "distance", "closest"]},
+            {"module_type": "linear"},
             {
                 "module_type": "dnnc",
-                "cross_encoder_name": [
-                    "BAAI/bge-reranker-base",
-                    "cross-encoder/ms-marco-MiniLM-L-6-v2"
-                ],
-                "k": [1, 3, 5, 10]
-            }
-        ]
+                "cross_encoder_name": ["BAAI/bge-reranker-base", "cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "k": [1, 3, 5, 10],
+            },
+        ],
     },
     {
         "node_type": "prediction",
         "metric": "prediction_accuracy",
-        "search_space": [
-            {
-                "module_type": "threshold",
-                "thresh": [0.5]
-            },
-            {
-                "module_type": "argmax"
-            }
-        ]
-    }
+        "search_space": [{"module_type": "threshold", "thresh": [0.5]}, {"module_type": "argmax"}],
+    },
 ]
 
 # %% [markdown]

@@ -136,15 +136,11 @@ class DocumentationLink(ReplacePattern):
         if page_type == "class":
             dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
             path = "/".join(dotpath.split("."))
-            return f"../autoapi/{path}/{obj}.html" + (
-                f"#{dotpath}.{obj}" if obj is not None else ""
-            )
+            return f"../autoapi/{path}/{obj}.html" + (f"#{dotpath}.{obj}" if obj is not None else "")
         if page_type == "method":
             dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
             path = "/".join(dotpath.split("."))
-            return f"../autoapi/{path}.html" + (
-                f"#{dotpath}.{obj}" if obj is not None else ""
-            )
+            return f"../autoapi/{path}.html" + (f"#{dotpath}.{obj}" if obj is not None else "")
         if page_type == "tutorial":
             return f"../tutorials/tutorials.{dotpath}.py"
         if page_type == "rst":
