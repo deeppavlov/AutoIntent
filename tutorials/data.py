@@ -102,7 +102,7 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
 
 - `name`: A human-readable representation of the intent.
 - `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(api,schemas,Tag).
-- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(api,modules,RegExp) module to predict intents based on provided patterns.
+- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(api,modules.regexp,RegExp) module to predict intents based on provided patterns.
 - `description`: Used by the %mddoclink(api,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
 
 All fields in the `intents` list are optional except for `id`.
