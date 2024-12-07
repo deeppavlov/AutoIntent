@@ -42,17 +42,17 @@ Documentation Contents
 :doc:`Quickstart <quickstart>`
 ..............................
 
-It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities.
+It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities and basic instructions for working with our library.
 
 :doc:`Key Concepts <concepts>`
 ..............................
 
-This page contains basic information about the terms and concepts we use throughout our documentation.
+Key terms and concepts we use throughout our documentation.
 
 :doc:`Tutorials <tutorials>`
 ............................
 
-Newbie-friendly information on how to perform different tasks using our library.
+A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
 
 :doc:`User Guides<guides/index>`
 ................................
