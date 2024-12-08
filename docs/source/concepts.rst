@@ -1,31 +1,30 @@
 Key Concepts
 ============
 
-
 .. _key-search-space:
 
 Optimization Search Space
 -------------------------
 
-Автоматический подбор классификатора происходит за счет перебора гиперпараметров в некотором *пространстве поиска*. Говоря на уровне идеи, это пространство поиска является словариком, в котором ключами являются имена гиперпараметров, а значениями --- списки. Гиперпараметры выступают в роли координатных "осей" пространства поиска, а значения в списках --- в роли точек на этой оси.
+The automatic selection of a classifier occurs through the iteration of hyperparameters within a certain *search space*. Conceptually, this search space is a dictionary where the keys are the names of the hyperparameters, and the values are lists. The hyperparameters act as the coordinate "axes" of the search space, and the values in the lists act as points on this axis.
 
 .. _key-stages:
 
 Classification Stages
 ---------------------
 
-Классификацию интента можно разделить на два этапа: скоринг и предсказание. Скоринг --- это предсказание вероятностей наличия каждого интента в данной реплике. Предсказание --- это формирование финального предсказания на основе предоставленных вероятностей.
+Intent classification can be divided into two stages: scoring and prediction. Scoring involves predicting the probabilities of the presence of each intent in a given utterance. Prediction involves forming the final prediction based on the provided probabilities.
 
 .. _key-oos:
 
 Out-of-domain utterances
 ------------------------
 
-Если мы хотим детектировать out-of-domain примеры, то на этапе предсказания необходимо подобрать порог вероятности, при котором можно утверждать о наличии какого-то известного интента. 
+If we want to detect out-of-domain examples, it is necessary to set a probability threshold during the prediction stage, at which the presence of some known intent can be asserted.
 
 .. _key-nodes-modules:
 
 Nodes and Modules
 -----------------
 
-Модель скоринга или предсказания вместе с её гиперпараметрами, которые нужно перебрать, мы называем *модулем оптимизации*. Набор модулей, относящихся к одному этапу оптимизации (скорингу или предсказанию), мы называем *узлом оптимизации*.
+The scoring or prediction model, along with its hyperparameters that need to be iterated, is called an *optimization module*. A set of modules related to one optimization stage (scoring or prediction) is called an *optimization node*.
