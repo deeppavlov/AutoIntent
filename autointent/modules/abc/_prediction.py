@@ -69,7 +69,7 @@ class PredictionModule(Module, ABC):
 def get_prediction_evaluation_data(
     context: Context,
     split: Literal["train", "validation", "test"],
-) -> tuple[list[LabelType], npt.NDArray[Any]]:
+) -> tuple[list[LabelType], npt.NDArray[np.float64]]:
     """
     Get prediction evaluation data.
 
@@ -103,4 +103,4 @@ def get_prediction_evaluation_data(
         labels = np.concatenate([labels, np.array(oos_labels)])
         return_scores = np.concatenate([scores, oos_scores])
 
-    return labels.tolist(), return_scores
+    return labels.tolist(), return_scores  # type: ignore[return-value]

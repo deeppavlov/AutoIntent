@@ -159,7 +159,7 @@ class ThresholdPredictor(PredictionModule):
         self.metadata = ThresholdPredictorDumpMetadata(
             multilabel=self.multilabel,
             tags=self.tags,
-            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),
+            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),  # type: ignore[typeddict-item]
             n_classes=self.n_classes,
         )
 

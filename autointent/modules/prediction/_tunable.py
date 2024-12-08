@@ -164,7 +164,7 @@ class TunablePredictor(PredictionModule):
         """
         self.metadata = TunablePredictorDumpMetadata(
             multilabel=self.multilabel,
-            thresh=self.thresh.tolist(),
+            thresh=self.thresh.tolist(),  # type: ignore[typeddict-item]
             tags=self.tags,
             n_classes=self.n_classes,
         )

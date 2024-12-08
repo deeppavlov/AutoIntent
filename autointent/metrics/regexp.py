@@ -48,7 +48,7 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
     total = y_true_.shape[0]
     if total == 0:
         return -1  # TODO think about it
-    return correct / total  # type: ignore[no-any-return]
+    return float(correct / total)
 
 
 def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:

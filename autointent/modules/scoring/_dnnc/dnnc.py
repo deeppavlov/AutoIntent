@@ -258,7 +258,7 @@ class DNNCScorer(ScoringModule):
 
         flattened_cross_encoder_scores: npt.NDArray[np.float64] = self.model.predict(flattened_text_pairs)  # type: ignore[assignment]
         return [
-            flattened_cross_encoder_scores[i : i + self.k].tolist()
+            flattened_cross_encoder_scores[i : i + self.k].tolist()  # type: ignore[misc]
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
