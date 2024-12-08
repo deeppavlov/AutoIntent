@@ -1,3 +1,5 @@
+"""This is AutoIntent API reference."""
+
 from ._embedder import Embedder
 from ._dataset import Dataset
 from ._hash import Hasher

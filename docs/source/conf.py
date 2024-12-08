@@ -142,10 +142,7 @@ def setup(app) -> None:  # noqa: ANN001
                 "user_guides.advanced",
                 "Advanced Usage",
             ),
-            (
-                "user_guides.cli",
-                "CLI Usage"
-            )
+            ("user_guides.cli", "CLI Usage"),
         ],
         source="user_guides",
         destination="docs/source/user_guides",
