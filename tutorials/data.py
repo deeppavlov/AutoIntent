@@ -35,9 +35,9 @@ To create a dataset, you need to provide a training split containing samples wit
 
 For a multilabel dataset, the `label` field should be a list of integers representing the corresponding class labels.
 
-### Handling out-of-scope (OOS) samples
+### Handling out-of-scope samples
 
-To indicate that a sample is out-of-scope (OOS), omit the `label` field from the sample dictionary. For example:
+To indicate that a sample is out-of-scope (see %mddoclink(rst,concepts)), omit the `label` field from the sample dictionary. For example:
 
 ```json
 {
@@ -181,9 +181,8 @@ For example, you can load the `autointent/_datafiles/dstc3-20shot.json` file lik
 """
 
 # %%
-dataset = Dataset.from_json(
-    ires.files("autointent._datafiles").joinpath("dstc3-20shot.json"),
-)
+path_to_dataset = ires.files("autointent._datafiles").joinpath("dstc3-20shot.json")
+dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
 """
@@ -193,23 +192,14 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 """
 
 # %%
-# dataset = Dataset.from_datasets("<repo_id>")
+dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
 
 # %% [markdown]
 """
 ### Accessing dataset splits
-"""
 
-# %%
-dataset = Dataset.from_json(
-    ires.files("autointent._datafiles").joinpath("banking77.json"),
-)
-
-# %% [markdown]
-"""
 The %mddoclink(class,,Dataset) class organizes your data as a dictionary of [datasets.Dataset](https://huggingface.co/docs/datasets/v2.1.0/en/package_reference/main_classes#datasets.Dataset).
 For example, after initialization, an `oos` key may be added if OOS samples are provided.
-In the case of the `banking77` dataset, only the `train` split is available, which you can access as shown below:
 """
 
 # %%
@@ -230,15 +220,15 @@ dataset["train"][:5]  # get first 5 train samples
 """
 ### Working with intents
 
-Metadata that you added to intents in your dataset is stored in `intents: list[Intent]` attribute.
+Metadata that you added to intents in your dataset is stored in %mddoclink(method,Dataset,intents) attribute.
 """
 
 # %%
-dataset.intents[0]  # get intent (id=0)
+dataset.intents[:3]
 
 # %% [markdown]
 """
-### Pushing a dataset to the Hugging Face Hub
+### Pushing dataset to the Hugging Face Hub
 
 To share your dataset on the Hugging Face Hub, use method %mddoclink(method,Dataset,push_to_hub).
 Ensure that you are logged in using the `huggingface-cli` tool:
@@ -251,5 +241,6 @@ Ensure that you are logged in using the `huggingface-cli` tool:
 """
 ## See Also
 
-- Training on your data: %mddoclink(tutorial,pipeline_optimization.demo)
+- Training on your data: %mddoclink(tutorial,auto_configuration.python_api)
+- [Modules API reference](../autoapi/autointent/modules/index.rst) to get familiar with modules to include into search space
 """
