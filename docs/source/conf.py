@@ -131,11 +131,28 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 def setup(app) -> None:  # noqa: ANN001
     generate_tutorial_links_for_notebook_creation(
-        [
-            ("tutorials.auto_configuration", "AutoML Features"),
-            ("tutorials.modules.scoring", "Scoring Modules", [("linear", "Linear Scorer")]),
-            ("tutorials.modules.prediction", "Prediction Modules", [("argmax", "Argmax Predictor")]),
-            ("tutorials.data", "Data"),
+        include=[
+            (
+                "user_guides.basic_usage",
+                "Basic Usage",
+                [
+                    ("01_data", "Data Manipulation"),
+                    ("02_modules", "Using Modules"),
+                    ("03_automl", "AutoML Features"),
+                    ("04_inference", "Inference"),
+                ],
+            ),
+            (
+                "user_guides.advanced",
+                "Advanced Usage",
+                [
+                    ("01_data", "Data Manipulation"),
+                    ("02_search_space", "Search Space Customization"),
+                    ("03_caching", "Caching in AutoIntent"),
+                ],
+            ),
         ],
+        source="user_guides",
+        destination="docs/source/user_guides",
     )
     app.connect("autoapi-skip-member", skip_member)

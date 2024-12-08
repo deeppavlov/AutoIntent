@@ -82,16 +82,6 @@ class VectorIndexConfig:
 
 
 @dataclass
-class AugmentationConfig:
-    """Configuration for the augmentation."""
-
-    regex_sampling: int = 0
-    """Number of regex samples to generate"""
-    multilabel_generation_config: str | None = None
-    """Path to the multilabel generation configuration file. If None, the default configuration will be used"""
-
-
-@dataclass
 class EmbedderConfig:
     """
     Configuration for the embedder.

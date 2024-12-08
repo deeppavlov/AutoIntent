@@ -49,15 +49,10 @@ It is recommended to begin with the :doc:`quickstart` page. It contains overview
 
 Key terms and concepts we use throughout our documentation.
 
-:doc:`Tutorials <tutorials>`
-............................
-
-A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
-
-:doc:`User Guides<guides/index>`
+:doc:`User Guides<user_guides>`
 ................................
 
-Some advanced information
+A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
 
 :doc:`Learn AutoIntent<learn/index>`
 ....................................
@@ -75,7 +70,6 @@ lotta stuff
 
    quickstart
    concepts
-   tutorials
-   guides/index
+   user_guides
    learn/index
    autoapi/autointent/index

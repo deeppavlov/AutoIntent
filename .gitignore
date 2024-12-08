@@ -71,7 +71,7 @@ instance/
 # Sphinx documentation
 docs/build/
 docs/source/autoapi
-docs/source/tutorials
+docs/source/user_guides
 
 # PyBuilder
 .pybuilder/

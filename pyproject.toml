@@ -97,7 +97,7 @@ sphinx-autoapi = "^3.3.3"
 ipykernel = "^6.29.5"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization._cli_endpoint:main"
+"autointent" = "autointent._pipeline._cli_endpoint:optimize"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 
@@ -126,7 +126,7 @@ ignore = [
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
 "*/utils.py" = ["D104", "D100"]
-"tutorials/*" = ["B018", "E501", "INP001", "T", "D", "E402"]
+"*user_guides/*" = ["B018", "E501", "INP001", "T", "D", "E402", "I001", "W292"]
 
 [tool.ruff.lint.pylint]
 max-args = 10

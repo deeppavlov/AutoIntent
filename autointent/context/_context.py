@@ -2,7 +2,6 @@
 
 import json
 import logging
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -112,7 +111,7 @@ class Context:
 
         :return: Dictionary containing inference configuration.
         """
-        nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
+        nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
         return {
             "metadata": {
                 "embedder_device": self.get_device(),

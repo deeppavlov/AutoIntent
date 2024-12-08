@@ -200,7 +200,7 @@ class OptimizationInfo:
             "configs": self.trials.model_dump(),
         }
 
-    def get_inference_nodes_config(self) -> list[InferenceNodeConfig]:
+    def get_inference_nodes_config(self, asdict: bool = False) -> list[InferenceNodeConfig]:
         """
         Generate configuration for inference nodes based on the best trials.
 
@@ -212,15 +212,14 @@ class OptimizationInfo:
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)
-            res.append(
-                InferenceNodeConfig(
-                    node_type=node_type,
-                    module_type=trial.module_type,
-                    module_config=trial.module_params,
-                    load_path=trial.module_dump_dir,
-                ),
-            )
-        return res
+            item = {
+                "node_type": node_type.value,
+                "module_type": trial.module_type,
+                "module_config": trial.module_params,
+                "load_path": trial.module_dump_dir,
+            }
+            res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
+        return res  # type: ignore[return-value]
 
     def _get_best_module(self, node_type: str) -> "Module | None":
         """

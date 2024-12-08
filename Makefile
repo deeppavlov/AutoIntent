@@ -42,7 +42,7 @@ serve-docs: docs
 clean-docs:
 	rm -rf docs/build
 	rm -rf docs/source/autoapi
-	rm -rf docs/source/tutorials
+	rm -rf docs/source/user_guides
 
 .PHONY: all
 all: lint

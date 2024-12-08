@@ -18,3 +18,7 @@ class InferenceNodeConfig:
     """Configuration of the module"""
     load_path: str | None = None
     """Path to the module dump. If None, the module will be trained from scratch"""
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.node_type, NodeType):
+            self.node_type = NodeType(self.node_type)
