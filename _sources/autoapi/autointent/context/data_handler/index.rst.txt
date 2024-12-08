@@ -1,0 +1,19 @@
+autointent.context.data_handler
+===============================
+
+.. py:module:: autointent.context.data_handler
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/context/data_handler/DataHandler
+
+.. autoapisummary::
+
+   autointent.context.data_handler.DataHandler
+
+

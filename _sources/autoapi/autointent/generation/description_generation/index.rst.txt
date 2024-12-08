@@ -1,0 +1,30 @@
+autointent.generation.description_generation
+============================================
+
+.. py:module:: autointent.generation.description_generation
+
+.. autoapi-nested-parse::
+
+   Description generation for intents using OpenAI models.
+
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/description_generation/group_utterances_by_label
+   /autoapi/autointent/generation/description_generation/create_intent_description
+   /autoapi/autointent/generation/description_generation/generate_intent_descriptions
+   /autoapi/autointent/generation/description_generation/enhance_dataset_with_descriptions
+
+.. autoapisummary::
+
+   autointent.generation.description_generation.group_utterances_by_label
+   autointent.generation.description_generation.create_intent_description
+   autointent.generation.description_generation.generate_intent_descriptions
+   autointent.generation.description_generation.enhance_dataset_with_descriptions
+
+

@@ -1,0 +1,19 @@
+autointent.modules.retrieval
+============================
+
+.. py:module:: autointent.modules.retrieval
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/retrieval/VectorDBModule
+
+.. autoapisummary::
+
+   autointent.modules.retrieval.VectorDBModule
+
+

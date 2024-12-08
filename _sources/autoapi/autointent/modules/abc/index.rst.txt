@@ -1,0 +1,25 @@
+autointent.modules.abc
+======================
+
+.. py:module:: autointent.modules.abc
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/abc/Module
+   /autoapi/autointent/modules/abc/PredictionModule
+   /autoapi/autointent/modules/abc/RetrievalModule
+   /autoapi/autointent/modules/abc/ScoringModule
+
+.. autoapisummary::
+
+   autointent.modules.abc.Module
+   autointent.modules.abc.PredictionModule
+   autointent.modules.abc.RetrievalModule
+   autointent.modules.abc.ScoringModule
+
+

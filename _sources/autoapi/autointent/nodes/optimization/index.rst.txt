@@ -1,0 +1,19 @@
+autointent.nodes.optimization
+=============================
+
+.. py:module:: autointent.nodes.optimization
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/nodes/optimization/NodeOptimizer
+
+.. autoapisummary::
+
+   autointent.nodes.optimization.NodeOptimizer
+
+

@@ -1,0 +1,27 @@
+autointent.modules.prediction
+=============================
+
+.. py:module:: autointent.modules.prediction
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/prediction/AdaptivePredictor
+   /autoapi/autointent/modules/prediction/ArgmaxPredictor
+   /autoapi/autointent/modules/prediction/JinoosPredictor
+   /autoapi/autointent/modules/prediction/ThresholdPredictor
+   /autoapi/autointent/modules/prediction/TunablePredictor
+
+.. autoapisummary::
+
+   autointent.modules.prediction.AdaptivePredictor
+   autointent.modules.prediction.ArgmaxPredictor
+   autointent.modules.prediction.JinoosPredictor
+   autointent.modules.prediction.ThresholdPredictor
+   autointent.modules.prediction.TunablePredictor
+
+

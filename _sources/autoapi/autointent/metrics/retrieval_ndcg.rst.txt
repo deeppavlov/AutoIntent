@@ -1,0 +1,25 @@
+autointent.metrics.retrieval_ndcg
+=================================
+
+.. py:function:: autointent.metrics.retrieval_ndcg(query_labels, candidates_labels, k = None)
+
+   Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k.
+
+   NDCG at position :math:`k` is calculated as:
+
+   .. math::
+
+       \text{NDCG@k} = \frac{\text{DCG@k}}{\text{IDCG@k}}
+
+   where:
+   - :math:`\text{DCG@k}` is the Discounted Cumulative Gain at position :math:`k`,
+   - :math:`\text{IDCG@k}` is the Ideal Discounted Cumulative Gain at position :math:`k`.
+
+   The NDCG value is normalized such that it is between 0 and 1, where 1 indicates the ideal ranking.
+
+   :param query_labels: For each query, this list contains its class labels
+   :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
+    (from most to least relevant)
+   :param k: Number of top items to consider for each query
+   :return: Score of the retrieval metric
+

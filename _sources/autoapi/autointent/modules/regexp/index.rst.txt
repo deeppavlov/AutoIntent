@@ -1,0 +1,19 @@
+autointent.modules.regexp
+=========================
+
+.. py:module:: autointent.modules.regexp
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/regexp/RegExp
+
+.. autoapisummary::
+
+   autointent.modules.regexp.RegExp
+
+

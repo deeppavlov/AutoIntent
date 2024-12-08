@@ -1,0 +1,20 @@
+autointent.generation.description_generation.create_intent_description
+======================================================================
+
+.. py:function:: autointent.generation.description_generation.create_intent_description(client, intent_name, utterances, regexp_patterns, prompt, model_name)
+   :async:
+
+
+   Generate a description for a specific intent using an OpenAI model.
+
+   :param client: The OpenAI client instance used to communicate with the model.
+   :param intent_name: The name of the intent to describe. If None, an empty string will be used.
+   :param utterances: A list of example utterances related to the intent.
+   :param regexp_patterns: A list of regular expression patterns associated with the intent.
+
+   :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
+                                   and {user_utterances} to format the content sent to the model.
+   :param model_name: The identifier of the OpenAI model to use for generating the description.
+
+   :returns: The generated description of the intent.
+

@@ -1,0 +1,41 @@
+autointent.nodes.nodes_info
+===========================
+
+.. py:module:: autointent.nodes.nodes_info
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.nodes.nodes_info.NODES_INFO
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/nodes/nodes_info/NodeInfo
+   /autoapi/autointent/nodes/nodes_info/PredictionNodeInfo
+   /autoapi/autointent/nodes/nodes_info/RegExpNodeInfo
+   /autoapi/autointent/nodes/nodes_info/RetrievalNodeInfo
+   /autoapi/autointent/nodes/nodes_info/ScoringNodeInfo
+
+.. autoapisummary::
+
+   autointent.nodes.nodes_info.NodeInfo
+   autointent.nodes.nodes_info.PredictionNodeInfo
+   autointent.nodes.nodes_info.RegExpNodeInfo
+   autointent.nodes.nodes_info.RetrievalNodeInfo
+   autointent.nodes.nodes_info.ScoringNodeInfo
+
+
+Package Contents
+----------------
+
+.. py:data:: NODES_INFO
+   :type:  dict[str, _base.NodeInfo]
+

@@ -1,0 +1,25 @@
+autointent.metrics.retrieval.retrieval_mrr_intersecting
+=======================================================
+
+.. py:function:: autointent.metrics.retrieval.retrieval_mrr_intersecting(query_labels, candidates_labels, k = None)
+
+   Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
+
+   MRR is calculated as:
+
+   .. math::
+
+       \text{MRR@k}_{\text{intersecting}} = \frac{1}{N} \sum_{i=1}^N \frac{1}{\text{rank}_i}
+
+   where:
+   - :math:`\text{rank}_i` is the rank position of the first relevant (intersecting) item in the top-k
+   results for query :math:`i`,
+   - :math:`N` is the total number of queries.
+
+   Intersecting relevance is determined by checking whether the query label intersects with the candidate labels.
+
+   :param query_labels: For each query, this list contains its class labels
+   :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
+   :param k: Number of top items to consider for each query
+   :return: Score of the retrieval metric
+

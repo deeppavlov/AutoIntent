@@ -1,0 +1,23 @@
+autointent.schemas
+==================
+
+.. py:module:: autointent.schemas
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/schemas/Intent
+   /autoapi/autointent/schemas/Sample
+   /autoapi/autointent/schemas/Tag
+
+.. autoapisummary::
+
+   autointent.schemas.Intent
+   autointent.schemas.Sample
+   autointent.schemas.Tag
+
+

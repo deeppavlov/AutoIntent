@@ -1,0 +1,17 @@
+autointent.generation
+=====================
+
+.. py:module:: autointent.generation
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/generation/description_generation/index
+   /autoapi/autointent/generation/prompt_scheme/index
+   /autoapi/autointent/generation/prompts/index
+
+

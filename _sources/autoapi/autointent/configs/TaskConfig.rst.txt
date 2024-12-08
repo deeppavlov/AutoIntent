@@ -1,0 +1,16 @@
+autointent.configs.TaskConfig
+=============================
+
+.. py:class:: autointent.configs.TaskConfig
+
+   Configuration for the task to optimize.
+
+
+   .. py:attribute:: search_space_path
+      :type:  pathlib.Path | None
+      :value: None
+
+
+      Path to the search space configuration file. If None, the default search space will be used
+
+

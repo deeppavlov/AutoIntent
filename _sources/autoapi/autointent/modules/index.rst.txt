@@ -1,0 +1,19 @@
+autointent.modules
+==================
+
+.. py:module:: autointent.modules
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/modules/abc/index
+   /autoapi/autointent/modules/prediction/index
+   /autoapi/autointent/modules/regexp/index
+   /autoapi/autointent/modules/retrieval/index
+   /autoapi/autointent/modules/scoring/index
+
+

@@ -1,0 +1,144 @@
+autointent.modules.scoring.DescriptionScorer
+============================================
+
+.. py:class:: autointent.modules.scoring.DescriptionScorer(embedder_name, temperature = 1.0, embedder_device = 'cpu', batch_size = 32, max_length = None, embedder_use_cache = False)
+
+   Bases: :py:obj:`autointent.modules.abc.ScoringModule`
+
+
+   Scoring module that scores utterances based on similarity to intent descriptions.
+
+   DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
+   between the two, using either cosine similarity and softmax.
+
+   :ivar weights_file_name: Filename for saving the description vectors (`description_vectors.npy`).
+   :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
+   :ivar precomputed_embeddings: Flag indicating whether precomputed embeddings are used.
+   :ivar embedding_model_subdir: Directory for storing the embedder's model files.
+   :ivar _vector_index: Internal vector index used when embeddings are precomputed.
+   :ivar db_dir: Directory path where the vector database is stored.
+   :ivar name: Name of the scorer, defaults to "description".
+
+
+
+   .. py:attribute:: weights_file_name
+      :type:  str
+      :value: 'description_vectors.npy'
+
+
+
+   .. py:attribute:: embedder
+      :type:  autointent.Embedder
+
+
+   .. py:attribute:: precomputed_embeddings
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: embedding_model_subdir
+      :type:  str
+      :value: 'embedding_model'
+
+
+
+   .. py:attribute:: db_dir
+      :type:  str
+
+
+   .. py:attribute:: name
+      :value: 'description'
+
+
+
+   .. py:attribute:: temperature
+      :value: 1.0
+
+
+
+   .. py:attribute:: embedder_device
+      :value: 'cpu'
+
+
+
+   .. py:attribute:: embedder_name
+
+
+   .. py:attribute:: batch_size
+      :value: 32
+
+
+
+   .. py:attribute:: max_length
+      :value: None
+
+
+
+   .. py:attribute:: embedder_use_cache
+      :value: False
+
+
+
+   .. py:method:: from_context(context, temperature, embedder_name = None)
+      :classmethod:
+
+
+      Create a DescriptionScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities.
+      :param temperature: Temperature parameter for scaling logits.
+      :param embedder_name: Name of the embedder model. If None, the best embedder is used.
+      :return: Initialized DescriptionScorer instance.
+
+
+
+   .. py:method:: get_embedder_name()
+
+      Get the name of the embedder.
+
+      :return: Embedder name.
+
+
+
+   .. py:method:: fit(utterances, labels, descriptions)
+
+      Fit the scorer by embedding utterances and descriptions.
+
+      :param utterances: List of utterances to embed.
+      :param labels: List of labels corresponding to the utterances.
+      :param descriptions: List of intent descriptions.
+      :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict scores for utterances based on similarity to intent descriptions.
+
+      :param utterances: List of utterances to score.
+      :return: Array of probabilities for each utterance.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the embedder.
+
+
+
+   .. py:method:: dump(path)
+
+      Save the scorer's metadata, description vectors, and embedder state.
+
+      :param path: Path to the directory where assets will be dumped.
+
+
+
+   .. py:method:: load(path)
+
+      Load the scorer's metadata, description vectors, and embedder state.
+
+      :param path: Path to the directory containing the dumped assets.
+
+

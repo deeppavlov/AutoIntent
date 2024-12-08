@@ -1,0 +1,13 @@
+autointent.modules.abc.RetrievalModule
+======================================
+
+.. py:class:: autointent.modules.abc.RetrievalModule(k)
+
+   Bases: :py:obj:`autointent.modules.abc.Module`, :py:obj:`abc.ABC`
+
+
+   Base class for retrieval modules.
+
+
+   .. py:attribute:: k
+

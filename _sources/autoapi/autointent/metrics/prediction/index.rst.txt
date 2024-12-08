@@ -1,0 +1,58 @@
+autointent.metrics.prediction
+=============================
+
+.. py:module:: autointent.metrics.prediction
+
+.. autoapi-nested-parse::
+
+   Prediction metrics for multiclass and multilabel classification tasks.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.metrics.prediction.logger
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/prediction/PredictionMetricFn
+
+.. autoapisummary::
+
+   autointent.metrics.prediction.PredictionMetricFn
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/prediction/prediction_accuracy
+   /autoapi/autointent/metrics/prediction/prediction_roc_auc
+   /autoapi/autointent/metrics/prediction/prediction_precision
+   /autoapi/autointent/metrics/prediction/prediction_recall
+   /autoapi/autointent/metrics/prediction/prediction_f1
+
+.. autoapisummary::
+
+   autointent.metrics.prediction.prediction_accuracy
+   autointent.metrics.prediction.prediction_roc_auc
+   autointent.metrics.prediction.prediction_precision
+   autointent.metrics.prediction.prediction_recall
+   autointent.metrics.prediction.prediction_f1
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+

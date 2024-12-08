@@ -1,0 +1,77 @@
+autointent.configs.LoggingConfig
+================================
+
+.. py:class:: autointent.configs.LoggingConfig
+
+   Configuration for the logging.
+
+
+   .. py:attribute:: run_name
+      :type:  str | None
+      :value: None
+
+
+      Name of the run. If None, a random name will be generated
+
+
+
+   .. py:attribute:: dirpath
+      :type:  pathlib.Path | None
+      :value: None
+
+
+      Path to the directory where the logs will be saved.
+      If None, the logs will be saved in the current working directory
+
+
+
+   .. py:attribute:: dump_dir
+      :type:  pathlib.Path | None
+      :value: None
+
+
+      Path to the directory where the modules will be dumped. If None, the modules will not be dumped
+
+
+
+   .. py:attribute:: dump_modules
+      :type:  bool
+      :value: False
+
+
+      Whether to dump the modules or not
+
+
+
+   .. py:attribute:: clear_ram
+      :type:  bool
+      :value: False
+
+
+      Whether to clear the RAM after dumping the modules
+
+
+
+   .. py:method:: __post_init__()
+
+      Define the run name, directory path and dump directory.
+
+
+
+   .. py:method:: define_run_name()
+
+      Define the run name. If None, a random name will be generated.
+
+
+
+   .. py:method:: define_dirpath()
+
+      Define the directory path. If None, the logs will be saved in the current working directory.
+
+
+
+   .. py:method:: define_dump_dir()
+
+      Define the dump directory. If None, the modules will not be dumped.
+
+
