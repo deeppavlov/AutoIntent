@@ -57,7 +57,7 @@ Once the data is ready, you can start building the optimal classifier from the c
 
 This command will start the hyperparameter search in the default :ref:`search space <key-search-space>`.
 
-As a result, a ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference. More about the run folder and what is saved in it can be found in the guide :doc:`guides/optimization_results`.
+As a result, a ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference.
 
 Similar actions but in a limited mode can be started using the Python API:
 
