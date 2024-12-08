@@ -1,6 +1,5 @@
 from ._inference_node import InferenceNodeConfig
 from ._optimization_cli import (
-    AugmentationConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -10,7 +9,6 @@ from ._optimization_cli import (
 )
 
 __all__ = [
-    "AugmentationConfig",
     "DataConfig",
     "EmbedderConfig",
     "InferenceNodeConfig",
