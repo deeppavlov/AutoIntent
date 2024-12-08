@@ -49,7 +49,7 @@ It is recommended to begin with the :doc:`quickstart` page. It contains overview
 
 Key terms and concepts we use throughout our documentation.
 
-:doc:`User Guides<user_guides/index>`
+:doc:`User Guides<user_guides>`
 ................................
 
 A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
@@ -70,7 +70,6 @@ lotta stuff
 
    quickstart
    concepts
-   tutorials
-   guides/index
+   user_guides
    learn/index
    autoapi/autointent/index

@@ -58,7 +58,7 @@ custom_pipeline = Pipeline.from_search_space(search_space)
 
 # %% [markdown]
 """
-See tutorial %mddoclink(tutorial,advanced.02_search_space_configuration) on how the search space is structured.
+See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
 """
 
 # %% [markdown]
@@ -67,7 +67,7 @@ See tutorial %mddoclink(tutorial,advanced.02_search_space_configuration) on how 
 
 %mddoclink(class,,Embedder) is one of the key components of AutoIntent. It affects both the quality of the resulting classifier and the efficiency of the auto configuration process.
 
-To select embedding models for your optimization, you need to customize search space (%mddoclink(tutorial,advanced.02_search_space_configuration)). Here, we will observe settings affecting efficiency.
+To select embedding models for your optimization, you need to customize search space (%mddoclink(notebook,advanced.02_search_space_configuration)). Here, we will observe settings affecting efficiency.
 
 Several options are customizable via %mddoclink(class,configs,EmbedderConfig). Defaults are the following:
 """

@@ -3,6 +3,7 @@
 # Inference Pipeline
 
 After you configured optimal pipeline with AutoIntent, you probably want to test its power on some new data! There are several options:
+
 - use it right after optimization
 - save to file system and then load
 
@@ -90,6 +91,11 @@ After that, you can load pipeline for inference:
 # %%
 loaded_pipeline = Pipeline.load(run_directory)
 loaded_pipeline.predict(["hello, world!"])
+
+# %% [markdown]
+"""
+## That's all!
+"""
 
 # %%
 # [you didn't see it]

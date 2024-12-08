@@ -9,6 +9,7 @@ Modules are the basic units in our library. They perform core operations such as
 ## Modules Types
 
 There are two main module types in AutoIntent:
+
 - **Scoring modules.** These modules perform probabilities prediction, i.e. they take an utterance as input and output a vector of probabilities.
 - **Prediction modules.** These modules take vector of probabilities and output set of labels. Prediction modules are important to support multi-label classification and out-of-domain utterances detection.
 
@@ -28,6 +29,7 @@ scorer = KNNScorer(
 # %% [markdown]
 """
 At this moment, you do two things:
+
 - **Set hyperparameters**. Refer to [Modules API Reference](../autoapi/autointent/modules/index.rst) to see all possible hyperparameters and their default values.
 - **Configure infrastructure**. You are allowed to
     - choose CUDA device (`embedder_device`)

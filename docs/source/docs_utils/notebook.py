@@ -97,7 +97,7 @@ class DocumentationLink(ReplacePattern):
 
     @staticmethod
     def link_to_doc_page(
-        page_type: Literal["api", "tutorial", "rst"],
+        page_type: Literal["api", "notebook", "rst"],
         dotpath: str,
         obj: str | None = None,
     ) -> str:
@@ -141,8 +141,8 @@ class DocumentationLink(ReplacePattern):
             dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
             path = "/".join(dotpath.split("."))
             return f"../autoapi/{path}.html" + (f"#{dotpath}.{obj}" if obj is not None else "")
-        if page_type == "tutorial":
-            return f"../tutorials/tutorials.{dotpath}.py"
+        if page_type == "notebook":
+            return f"../user_guides/user_guides.{dotpath}.py"
         if page_type == "rst":
             path = "/".join(dotpath.split("."))
             return f"../{path}.rst"

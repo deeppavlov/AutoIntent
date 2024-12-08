@@ -102,5 +102,5 @@ Note: ensure that you are logged in using `huggingface-cli`.
 """
 ## See Also
 
-- Next chapter of the user guide "Using modules": %mddoclink(tutorial,python_api.02_modules)
+- Next chapter of the user guide "Using modules": %mddoclink(notebook,python_api.02_modules)
 """
