@@ -31,7 +31,16 @@ def test_base_rerank_scorer(dataset):
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     predictions = scorer.predict(test_data)
     assert (
-        predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])
+        predictions
+        == np.array(
+            [
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+            ]
+        )
     ).all()
 
     predictions, metadata = scorer.predict_with_metadata(test_data)

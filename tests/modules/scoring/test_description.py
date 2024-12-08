@@ -9,8 +9,8 @@ from tests.conftest import setup_environment
 @pytest.mark.parametrize(
     ("expected_prediction", "multilabel"),
     [
-        ([[0.9, 0.9, 0.9], [0.9, 0.9, 0.9]], True),
-        ([[0.2, 0.3, 0.2], [0.2, 0.3, 0.2]], False),
+        ([[0.9, 0.9, 0.9, 0.9], [0.9, 0.9, 0.9, 0.9]], True),
+        ([[0.2, 0.3, 0.2, 0.2], [0.2, 0.3, 0.2, 0.2]], False),
     ],
 )
 def test_description_scorer(dataset, expected_prediction, multilabel):
