@@ -97,7 +97,7 @@ sphinx-autoapi = "^3.3.3"
 ipykernel = "^6.29.5"
 
 [tool.poetry.scripts]
-"autointent" = "autointent.pipeline.optimization._cli_endpoint:main"
+"autointent" = "autointent._pipeline._cli_endpoint:optimize"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 

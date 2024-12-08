@@ -31,6 +31,7 @@ def optimize(cfg: OptimizationConfig) -> None:
 
     # create shared objects for a whole pipeline
     context = Context(cfg.seed)
+    cfg.logs.clear_ram = True
     context.configure_logging(cfg.logs)
     context.configure_vector_index(cfg.vector_index, cfg.embedder)
     context.configure_data(cfg.data)
