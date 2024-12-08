@@ -95,5 +95,5 @@ loaded_pipeline.predict(["hello, world!"])
 import shutil
 shutil.rmtree(dump_dir)
 
-for file in Path.glob("./vector_db*"):
+for file in Path.cwd().glob("vector_db*"):
     shutil.rmtree(file)

@@ -108,5 +108,5 @@ loaded_scorer.predict_with_metadata(["hello world!"])
 import shutil
 shutil.rmtree(pathdir.parent)
 
-for file in Path.glob("./vector_db*"):
+for file in Path.cwd().glob("vector_db*"):
     shutil.rmtree(file)
