@@ -58,5 +58,5 @@ def load_data(filepath: str | Path) -> Dataset:
     if filepath == "default-multilabel":
         return Dataset.from_datasets("AutoIntent/clinc150_subset").to_multilabel().encode_labels()
     if not Path(filepath).exists():
-        return Dataset.from_datasets(filepath)
+        return Dataset.from_datasets(str(filepath))
     return Dataset.from_json(filepath)

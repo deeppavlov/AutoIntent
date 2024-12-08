@@ -53,7 +53,7 @@ After you converted your labeled data into JSON, you can load it into AutoIntent
 """
 
 # %%
-path_to_dataset = ires.files("autointent._datafiles").joinpath("dstc3-20shot.json")
+path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset.json")
 dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]

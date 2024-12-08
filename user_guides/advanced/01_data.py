@@ -177,11 +177,10 @@ dataset = Dataset.from_dict(
 ### Loading a dataset from a file
 
 The AutoIntent library includes sample datasets.
-For example, you can load the `autointent/_datafiles/dstc3-20shot.json` file like this:
 """
 
 # %%
-path_to_dataset = ires.files("autointent._datafiles").joinpath("dstc3-20shot.json")
+path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset.json")
 dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
