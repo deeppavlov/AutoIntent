@@ -41,8 +41,10 @@ One can explore its contents:
 
 # %%
 from autointent.utils import load_default_search_space
+from pprint import pprint
 
 search_space = load_default_search_space(multilabel=True)
+pprint(search_space)
 
 # %% [markdown]
 """
@@ -66,7 +68,7 @@ See tutorial %mddoclink(tutorial,auto_configuration.search_space_configuration) 
 
 To select embedding models for your optimization, you need to customize search (%mddoclink(tutorial,auto_configuration.search_space_configuration)). Here, we will observe settings affecting efficiency.
 
-Several options are customizable. Defaults are the following:
+Several options are customizable via %mddoclink(class,configs,EmbedderConfig). Defaults are the following:
 """
 
 # %%
@@ -90,7 +92,7 @@ custom_pipeline.set_config(embedder_config)
 """
 ## Vector Index Settings
 
-%mddoclink(class,context.vector_index_client,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying vector index settings you can select whether to save built vector index into file system and where to save it.
+%mddoclink(class,context.vector_index_client,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
 
 Default options are the following:
 """
@@ -115,4 +117,55 @@ These settings can be applied in a familiar way:
 custom_pipeline.set_config(vector_index_config)
 
 # %% [markdown]
+"""
+## Logging Settings
+
+The important thing is what assets you want to save during the pipeline auto-configuration process. You can control it with %mddoclink(class,configs,LoggingConfig). Default settings are the following:
+"""
+
+# %%
+from autointent.configs import LoggingConfig
+
+logging_config = LoggingConfig(
+    run_name=None,
+    dirpath=None,
+    dump_dir=None,
+    dump_modules=False,
+    clear_ram=False
+)
+custom_pipeline.set_config(logging_config)
+
+# %% [markdown]
+"""
+## Complete Example
+"""
+
+# %%
+from autointent import Pipeline, Dataset
+from autointent.utils import load_default_search_space
+from autointent.configs import LoggingConfig, VectorIndexConfig, EmbedderConfig
+
+# load data
+dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+
+# customize search space
+search_space = load_default_search_space(multilabel=False)
+
+# make pipeline
+custom_pipeline = Pipeline.from_search_space(search_space)
+
+# custom settings
+embedder_config = EmbedderConfig()
+vector_index_config = VectorIndexConfig()
+logging_config = LoggingConfig()
+
+custom_pipeline.set_config(embedder_config)
+custom_pipeline.set_config(vector_index_config)
+custom_pipeline.set_config(logging_config)
+
+# start auto-configuration
+custom_pipeline.fit(dataset)
+
+# inference
+custom_pipeline.predict(["hello world!"])
 

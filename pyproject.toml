@@ -126,7 +126,7 @@ ignore = [
 "autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
 "*/utils.py" = ["D104", "D100"]
-"tutorials/*" = ["B018", "E501", "INP001", "T", "D", "E402"]
+"tutorials/*" = ["B018", "E501", "INP001", "T", "D", "E402", "I001"]
 
 [tool.ruff.lint.pylint]
 max-args = 10
