@@ -1,8 +1,9 @@
 from ._inference_node import InferenceNode
-from .nodes_info import NodeInfo, PredictionNodeInfo, RegExpNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
-from .optimization import NodeOptimizer
+from ._nodes_info import NODES_INFO, NodeInfo, PredictionNodeInfo, RegExpNodeInfo, RetrievalNodeInfo, ScoringNodeInfo
+from ._optimization import NodeOptimizer
 
 __all__ = [
+    "NODES_INFO",
     "InferenceNode",
     "NodeInfo",
     "NodeOptimizer",

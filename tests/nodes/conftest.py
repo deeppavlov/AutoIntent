@@ -2,7 +2,7 @@ import pytest
 
 from autointent import Context
 from autointent.configs._optimization_cli import DataConfig, EmbedderConfig, LoggingConfig, VectorIndexConfig
-from autointent.nodes.optimization import NodeOptimizer
+from autointent.nodes import NodeOptimizer
 from tests.conftest import get_dataset_path, setup_environment
 
 
