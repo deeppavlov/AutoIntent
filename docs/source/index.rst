@@ -54,15 +54,16 @@ Key terms and concepts we use throughout our documentation.
 
 A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
 
-:doc:`Learn AutoIntent<learn/index>`
-....................................
-
-Some theoretical background
-
 :doc:`API Reference <autoapi/autointent/index>`
 ...............................................
 
-lotta stuff
+Pay special attention to the sections :doc:`autoapi/autointent/modules/index` and :doc:`autoapi/autointent/metrics/index`.
+
+:doc:`Learn AutoIntent<learn/index>`
+....................................
+
+Some theoretical background on dialogue systems and auto ML.
+
 
 .. toctree::
    :hidden:
