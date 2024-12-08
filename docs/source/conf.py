@@ -56,6 +56,8 @@ exclude_patterns = ["conf.py", "docs_utils/*"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
+    "datasets": ("https://huggingface.co/docs/datasets/master/en/", None),
+    "transformers": ("https://huggingface.co/docs/transformers/master/en/", None),
 }
 
 autoapi_keep_files = True
@@ -124,7 +126,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-# nbsphinx_execute = "never"
+nbsphinx_execute = "never"
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
@@ -135,22 +137,15 @@ def setup(app) -> None:  # noqa: ANN001
             (
                 "user_guides.basic_usage",
                 "Basic Usage",
-                [
-                    ("01_data", "Data Manipulation"),
-                    ("02_modules", "Using Modules"),
-                    ("03_automl", "AutoML Features"),
-                    ("04_inference", "Inference"),
-                ],
             ),
             (
                 "user_guides.advanced",
                 "Advanced Usage",
-                [
-                    ("01_data", "Data Manipulation"),
-                    ("02_search_space", "Search Space Customization"),
-                    ("03_caching", "Caching in AutoIntent"),
-                ],
             ),
+            (
+                "user_guides.cli",
+                "CLI Usage"
+            )
         ],
         source="user_guides",
         destination="docs/source/user_guides",
