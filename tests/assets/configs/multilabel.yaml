@@ -25,6 +25,6 @@
   metric: prediction_accuracy
   search_space:
     - module_type: threshold
-      thresh: [0.5, [0.5, 0.5, 0.5]]
+      thresh: [0.5, [0.5, 0.5, 0.5, 0.5]]
     - module_type: tunable
     - module_type: adaptive
