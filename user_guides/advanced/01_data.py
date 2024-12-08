@@ -2,7 +2,7 @@
 """
 # Working with data
 
-In this tutorial you will learn how to manipulate intent classification data with AutoIntent.
+This chapter is a more detailed version of data chapter from basic user guide about how to manipulate intent classification data with AutoIntent.
 """
 
 # %%
@@ -236,11 +236,3 @@ Ensure that you are logged in using the `huggingface-cli` tool:
 
 # %%
 # dataset.push_to_hub("<repo_id>")
-
-# %% [markdown]
-"""
-## See Also
-
-- Training on your data: %mddoclink(tutorial,auto_configuration.python_api)
-- [Modules API reference](../autoapi/autointent/modules/index.rst) to get familiar with modules to include into search space
-"""

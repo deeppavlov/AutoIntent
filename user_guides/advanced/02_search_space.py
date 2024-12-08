@@ -126,6 +126,13 @@ from autointent import Pipeline
 pipeline_optimizer = Pipeline.from_search_space(search_space)
 pipeline_optimizer.fit(dataset)
 
+# %% [markdown]
+"""
+## See Also
+
+- [Modules API reference](../autoapi/autointent/modules/index.rst) to get familiar with modules to include into search space
+"""
+
 # # %% [markdown]
 # CLI
 # ###
