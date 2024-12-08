@@ -69,7 +69,7 @@ class VectorDBModule(RetrievalModule):
         k: int,
         embedder_name: str,
         db_dir: str | None = None,
-        device: str = "cpu",
+        embedder_device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
         embedder_use_cache: bool = False,
@@ -80,13 +80,13 @@ class VectorDBModule(RetrievalModule):
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
         :param db_dir: Path to the database directory. If None, defaults will be used.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation.
         :param max_length: Maximum sequence length for embeddings. None if not set.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder_name = embedder_name
-        self.device = device
+        self.embedder_device = embedder_device
         self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
@@ -113,7 +113,7 @@ class VectorDBModule(RetrievalModule):
             k=k,
             embedder_name=embedder_name,
             db_dir=str(context.get_db_dir()),
-            device=context.get_device(),
+            embedder_device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
@@ -138,7 +138,7 @@ class VectorDBModule(RetrievalModule):
         :param labels: List of corresponding labels for the utterances.
         """
         vector_index_client = VectorIndexClient(
-            self.device,
+            self.embedder_device,
             self.db_dir,
             embedder_batch_size=self.batch_size,
             embedder_max_length=self.max_length,
@@ -212,7 +212,7 @@ class VectorDBModule(RetrievalModule):
             self.metadata: VectorDBMetadata = json.load(file)
 
         vector_index_client = VectorIndexClient(
-            device=self.device,
+            embedder_device=self.embedder_device,
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],

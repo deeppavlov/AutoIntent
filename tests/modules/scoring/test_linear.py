@@ -10,7 +10,7 @@ def test_base_linear(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", device="cpu")
+    scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", embedder_device="cpu")
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     test_data = [

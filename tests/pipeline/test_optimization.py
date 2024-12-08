@@ -41,8 +41,8 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve()))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
@@ -59,8 +59,8 @@ def test_save_db(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
@@ -79,8 +79,8 @@ def test_dump_modules(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve()))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
     context.dump()
@@ -104,10 +104,10 @@ def test_optimization_pipeline_cli(task_type):
         ),
         vector_index=VectorIndexConfig(
             db_dir=db_dir,
-            device="cpu",
         ),
         logs=LoggingConfig(
             dirpath=Path(logs_dir),
         ),
+        embedder=EmbedderConfig(device="cpu"),
     )
     optimize(config)

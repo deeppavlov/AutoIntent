@@ -158,7 +158,7 @@ class Embedder:
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
         self.logger.debug(
-            "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, device=%s",
+            "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
             self.model_name,
             self.batch_size,
             str(self.max_length),

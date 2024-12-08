@@ -65,7 +65,7 @@ class Context:
         self.embedder_config = embedder_config
 
         self.vector_index_client = VectorIndexClient(
-            self.vector_index_config.device,
+            self.embedder_config.device,
             self.vector_index_config.db_dir,
             self.embedder_config.batch_size,
             self.embedder_config.max_length,
@@ -115,7 +115,7 @@ class Context:
         nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
         return {
             "metadata": {
-                "device": self.get_device(),
+                "embedder_device": self.get_device(),
                 "multilabel": self.is_multilabel(),
                 "n_classes": self.get_n_classes(),
                 "seed": self.seed,
@@ -168,11 +168,11 @@ class Context:
 
     def get_device(self) -> str:
         """
-        Get the device used by the vector index client.
+        Get the embedder device used by the vector index client.
 
         :return: Device name.
         """
-        return self.vector_index_client.device
+        return self.vector_index_client.embedder_device
 
     def get_batch_size(self) -> int:
         """

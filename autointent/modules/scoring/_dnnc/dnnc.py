@@ -313,7 +313,7 @@ class DNNCScorer(ScoringModule):
         self.n_classes = self.metadata["n_classes"]
 
         vector_index_client = VectorIndexClient(
-            device=self.device,
+            embedder_device=self.device,
             db_dir=self.metadata["db_dir"],
             embedder_batch_size=self.metadata["batch_size"],
             embedder_max_length=self.metadata["max_length"],

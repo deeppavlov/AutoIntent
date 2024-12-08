@@ -10,7 +10,9 @@ def test_base_knn(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir, device="cpu")
+    scorer = KNNScorer(
+        k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir, embedder_device="cpu"
+    )
 
     test_data = [
         "why is there a hold on my american saving bank account",

@@ -28,7 +28,7 @@ class VectorIndexClient:
 
     def __init__(
         self,
-        device: str,
+        embedder_device: str,
         db_dir: str | Path | None,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
@@ -37,14 +37,14 @@ class VectorIndexClient:
         """
         Initialize the VectorIndexClient.
 
-        :param device: Device to run the embedding model on.
+        :param embedder_device: Device to run the embedding model on.
         :param db_dir: Directory for storing vector indexes. Defaults to a cache directory.
         :param embedder_batch_size: Batch size for the embedding model.
         :param embedder_max_length: Maximum sequence length for the embedding model.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self._logger = logging.getLogger(__name__)
-        self.device = device
+        self.embedder_device = embedder_device
         self.db_dir = get_db_dir(db_dir)
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
@@ -69,7 +69,7 @@ class VectorIndexClient:
 
         index = VectorIndex(
             model_name,
-            self.device,
+            self.embedder_device,
             self.embedder_batch_size,
             self.embedder_max_length,
             self.embedder_use_cache,
@@ -176,7 +176,7 @@ class VectorIndexClient:
         if dirpath is not None:
             index = VectorIndex(
                 model_name,
-                self.device,
+                self.embedder_device,
                 self.embedder_batch_size,
                 self.embedder_max_length,
                 self.embedder_use_cache,

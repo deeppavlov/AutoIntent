@@ -35,9 +35,9 @@ def test_inference_config(dataset, task_type):
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
     inference_config = context.optimization_info.get_inference_nodes_config()
@@ -68,8 +68,8 @@ def test_inference_context(dataset, task_type):
     pipeline = Pipeline.from_search_space(search_space)
 
     pipeline.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False, clear_ram=False))
-    pipeline.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu", save_db=True))
-    pipeline.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True))
+    pipeline.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     context = pipeline.fit(dataset, force_multilabel=(task_type == "multilabel"))
     utterances = ["123", "hello world"]

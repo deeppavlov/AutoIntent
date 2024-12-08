@@ -18,10 +18,10 @@ def mock_data_handler():
 @pytest.fixture
 def vector_index():
     db_dir, dump_dir, logs_dir = setup_environment()
-    return VectorIndexClient(device="cpu", multilabel=False, n_classes=2, db_dir=db_dir)
+    return VectorIndexClient(embedder_device="cpu", multilabel=False, n_classes=2, db_dir=db_dir)
 
 
 def test_vector_index_initialization():
     db_dir, dump_dir, logs_dir = setup_environment()
-    index = VectorIndexClient(device="cpu", db_dir=db_dir)
-    assert index.device == "cpu"
+    index = VectorIndexClient(embedder_device="cpu", db_dir=db_dir)
+    assert index.embedder_device == "cpu"

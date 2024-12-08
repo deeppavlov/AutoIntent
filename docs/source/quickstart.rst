@@ -108,9 +108,8 @@ Further Reading
 ---------------
 
 - Get familiar with :doc:`concepts`.
-- Learn more about working with data in AutoIntent in our tutorial :doc:`tutorials/index_data`.
+- Learn more about working with data in AutoIntent in our tutorials :doc:`tutorials/index_data`.
 - Learn about how auto-configuration works in our library in the section :doc:`learn/optimization`.
-- Learn more about the search space and how to customize it in the guide :doc:`guides/search_space_configuration`.
+- Learn more about the search space and how to customize it in the tutorials :doc:`tutorials/index_pipeline_optimization`.
 - You can also build a classifier from data using the Python API. Learn more about this in our optimization tutorials :doc:`tutorials/index_pipeline_optimization`.
-- Learn more about possible inference options in our tutorial :doc:`tutorials/index_pipeline_inference`.
 - Learn more about using classification methods directly in our tutorials :doc:`tutorials/index_scoring_modules`, :doc:`tutorials/index_prediction_modules`.

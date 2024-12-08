@@ -25,7 +25,7 @@ def test_base_mlknn(dataset):
 
     data_handler = DataHandler(dataset, force_multilabel=True)
 
-    scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, db_dir=db_dir, device="cpu")
+    scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, db_dir=db_dir, embedder_device="cpu")
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [

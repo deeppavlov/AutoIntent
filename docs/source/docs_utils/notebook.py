@@ -97,7 +97,7 @@ class DocumentationLink(ReplacePattern):
 
     @staticmethod
     def link_to_doc_page(
-        page_type: Literal["api", "tutorial", "guide"],
+        page_type: Literal["api", "tutorial", "rst"],
         dotpath: str,
         obj: str | None = None,
     ) -> str:
@@ -109,7 +109,7 @@ class DocumentationLink(ReplacePattern):
 
                 - "api" -- API reference
                 - "tutorial" -- Tutorials
-                - "guide" -- User guides
+                - "rst" -- User guides
 
         :param dotpath:
             Path to the index page in unix style.
@@ -133,15 +133,19 @@ class DocumentationLink(ReplacePattern):
         :return:
             A link to the corresponding documentation part.
         """
-        if page_type == "api":
+        if page_type == "class":
+            dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
             path = "/".join(dotpath.split("."))
-            return f"../autoapi/autointent/{path}/index.rst" + (
-                f"#autointent.{dotpath}.{obj}" if obj is not None else ""
-            )
+            return f"../autoapi/{path}/{obj}.html" + (f"#{dotpath}.{obj}" if obj is not None else "")
+        if page_type == "method":
+            dotpath = "autointent" + (("." + dotpath) if dotpath != "" else "")
+            path = "/".join(dotpath.split("."))
+            return f"../autoapi/{path}.html" + (f"#{dotpath}.{obj}" if obj is not None else "")
         if page_type == "tutorial":
             return f"../tutorials/tutorials.{dotpath}.py"
-        if page_type == "guide":
-            return f"../guides/{dotpath}.rst" + (f"#{obj}" if obj is not None else "")
+        if page_type == "rst":
+            path = "/".join(dotpath.split("."))
+            return f"../{path}.rst"
         msg = "Unexpected page type"
         raise ValueError(msg)
 

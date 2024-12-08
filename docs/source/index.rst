@@ -14,14 +14,27 @@ The task of intent detection is one of the main subtasks in creating task-orient
 
 Example of building an intent classifier in a couple of lines of code:
 
-.. code-block:: python
+.. testsetup::
+
+   import importlib.resources as ires
+
+   path_to_json = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+
+.. testcode::
 
    from autointent import Pipeline, Dataset
 
-   dataset = Dataset.from_json("/path/to/json")
-   optimizer = Pipeline.default_optimizer(multilabel=False)
+   dataset = Dataset.from_json(path_to_json)
+   pipeline = Pipeline.default_optimizer(multilabel=False)
    pipeline.fit(dataset)
-   pipeline.predict(["Hello, World!"])
+   pipeline.predict(["show me my latest recent transactions"])
+
+.. testcleanup::
+
+   import shutil
+   from glob import glob
+   for match in glob("vector_db*"):
+      shutil.rmtree(match)
 
 Documentation Contents
 ----------------------
@@ -29,17 +42,17 @@ Documentation Contents
 :doc:`Quickstart <quickstart>`
 ..............................
 
-It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities.
+It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities and basic instructions for working with our library.
 
 :doc:`Key Concepts <concepts>`
 ..............................
 
-This page contains basic information about the terms and concepts we use throughout our documentation.
+Key terms and concepts we use throughout our documentation.
 
 :doc:`Tutorials <tutorials>`
 ............................
 
-Newbie-friendly information on how to perform different tasks using our library.
+A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
 
 :doc:`User Guides<guides/index>`
 ................................
