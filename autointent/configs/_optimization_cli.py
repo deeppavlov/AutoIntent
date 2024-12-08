@@ -80,6 +80,7 @@ class VectorIndexConfig:
     save_db: bool = False
     """Whether to save the vector index database or not"""
 
+
 @dataclass
 class EmbedderConfig:
     """

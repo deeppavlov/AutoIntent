@@ -142,13 +142,17 @@ def setup(app) -> None:  # noqa: ANN001
                     ("04_inference", "Inference"),
                 ],
             ),
-            ("user_guides.advanced", "Advanced Usage", [
-                ("01_data", "Data Manipulation"),
-                ("02_search_space", "Search Space Customization"),
-                ("03_caching", "Caching in AutoIntent"),
-            ]),
+            (
+                "user_guides.advanced",
+                "Advanced Usage",
+                [
+                    ("01_data", "Data Manipulation"),
+                    ("02_search_space", "Search Space Customization"),
+                    ("03_caching", "Caching in AutoIntent"),
+                ],
+            ),
         ],
         source="user_guides",
-        destination="docs/source/user_guides"
+        destination="docs/source/user_guides",
     )
     app.connect("autoapi-skip-member", skip_member)

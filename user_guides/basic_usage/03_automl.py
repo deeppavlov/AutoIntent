@@ -40,8 +40,9 @@ One can explore its contents:
 """
 
 # %%
-from autointent.utils import load_default_search_space
 from pprint import pprint
+
+from autointent.utils import load_default_search_space
 
 search_space = load_default_search_space(multilabel=True)
 pprint(search_space)
@@ -100,10 +101,7 @@ Default options are the following:
 # %%
 from autointent.configs import VectorIndexConfig
 
-vector_index_config = VectorIndexConfig(
-    db_dir=None,
-    save_db=False
-)
+vector_index_config = VectorIndexConfig(db_dir=None, save_db=False)
 
 # %% [markdown]
 """
@@ -126,13 +124,7 @@ The important thing is what assets you want to save during the pipeline auto-con
 # %%
 from autointent.configs import LoggingConfig
 
-logging_config = LoggingConfig(
-    run_name=None,
-    dirpath=None,
-    dump_dir=None,
-    dump_modules=False,
-    clear_ram=False
-)
+logging_config = LoggingConfig(run_name=None, dirpath=None, dump_dir=None, dump_modules=False, clear_ram=False)
 custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
@@ -141,9 +133,9 @@ custom_pipeline.set_config(logging_config)
 """
 
 # %%
-from autointent import Pipeline, Dataset
+from autointent import Dataset, Pipeline
+from autointent.configs import EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.utils import load_default_search_space
-from autointent.configs import LoggingConfig, VectorIndexConfig, EmbedderConfig
 
 # load data
 dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")

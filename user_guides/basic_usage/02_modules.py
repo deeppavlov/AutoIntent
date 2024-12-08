@@ -71,6 +71,7 @@ We provide functionality to save and restore module. To save, just provide a pat
 
 # %%
 from pathlib import Path
+
 pathdir = Path("my_dumps/knnscorer_clinc150")
 pathdir.mkdir(parents=True)
 scorer.dump(pathdir)
@@ -106,6 +107,7 @@ loaded_scorer.predict_with_metadata(["hello world!"])
 # %%
 # [you didn't see it]
 import shutil
+
 shutil.rmtree(pathdir.parent)
 
 for file in Path.cwd().glob("vector_db*"):

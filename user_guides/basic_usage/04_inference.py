@@ -12,7 +12,7 @@ Here's the basic example:
 """
 
 # %%
-from autointent import Pipeline, Dataset
+from autointent import Dataset, Pipeline
 
 dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
 pipeline = Pipeline.default_optimizer(multilabel=False)
@@ -53,9 +53,10 @@ Firstly, your auto-configuration run should dump modules into file system:
 """
 
 # %%
-from autointent import Pipeline, Dataset
-from autointent.configs import LoggingConfig, VectorIndexConfig
 from pathlib import Path
+
+from autointent import Dataset, Pipeline
+from autointent.configs import LoggingConfig, VectorIndexConfig
 
 dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
 pipeline = Pipeline.default_optimizer(multilabel=False)
@@ -93,6 +94,7 @@ loaded_pipeline.predict(["hello, world!"])
 # %%
 # [you didn't see it]
 import shutil
+
 shutil.rmtree(dump_dir)
 
 for file in Path.cwd().glob("vector_db*"):

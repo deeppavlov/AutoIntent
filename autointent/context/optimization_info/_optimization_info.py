@@ -218,8 +218,8 @@ class OptimizationInfo:
                 "module_config": trial.module_params,
                 "load_path": trial.module_dump_dir,
             }
-            res.append(item if asdict else InferenceNodeConfig(**item))
-        return res
+            res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
+        return res  # type: ignore[return-value]
 
     def _get_best_module(self, node_type: str) -> "Module | None":
         """
