@@ -18,7 +18,7 @@ def test_base_mlknn(dataset):
             },
             {
                 "utterance": "i am nost sure why my account is blocked",
-                "label": [0, 2],
+                "label": [0, 3],
             },
         ],
     )
@@ -37,7 +37,23 @@ def test_base_mlknn(dataset):
     ]
 
     predictions = scorer.predict_labels(test_data)
-    assert (predictions == np.array([[0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 0]])).all()
+    assert (
+        predictions
+        == np.array(
+            [
+                [
+                    0,
+                    1,
+                    0,
+                    0,
+                ],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+            ]
+        )
+    ).all()
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)

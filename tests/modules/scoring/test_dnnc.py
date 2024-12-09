@@ -30,7 +30,7 @@ def test_base_dnnc(dataset, train_head, pred_score):
         "can you tell me why is my bank account frozen",
     ]
     predictions = scorer.predict(test_data)
-    np.testing.assert_almost_equal(np.array([[0.0, pred_score, 0.0]] * len(test_data)), predictions, decimal=0.5)
+    np.testing.assert_almost_equal(np.array([[0.0, pred_score, 0.0, 0.0]] * len(test_data)), predictions, decimal=0.5)
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)

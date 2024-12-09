@@ -14,6 +14,14 @@
             "id": 2,
             "name": "alarm",
             "description": "User wants to set or manage an alarm."
+        },
+        {
+            "id": 3,
+            "name": "alarm reservation",
+            "tags": ["alarm", "reservation"],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "User wants to set or manage an alarm second time."
         }
     ],
     "train": [
@@ -138,19 +146,124 @@
             "label": 2
         },
         {
-            "utterance": "how much is an overdraft fee for bank"
+            "utterance": "how much is an overdraft fee for bank",
+            "label": 3
         },
         {
-            "utterance": "why are exponents preformed before multiplication in the order of operations"
+            "utterance": "where is the dipstick",
+            "label": 3
         },
         {
-            "utterance": "what size wipers does this car take"
+            "utterance": "where is the dipstick",
+            "label": 3
         },
         {
-            "utterance": "where is the dipstick"
+            "utterance": "where is the dipstick",
+            "label": 3
+        },
+        {
+            "utterance": "where is the dipstick",
+            "label": 3
+        },
+        {
+            "utterance": "where is the dipstick",
+            "label": 3
+        },
+        {
+            "utterance": "where is the dipstick",
+            "label": 3
         },
         {
             "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
+        }
+    ],
+    "test": [
+        {
+            "utterance": "can i make a reservation for redrobin",
+            "label": 0
+        },
+        {
+            "utterance": "does redrobin do reservations",
+            "label": 0
+        },
+        {
+            "utterance": "does acero in maplewood allow reservations",
+            "label": 0
+        },
+        {
+            "utterance": "i think my account is blocked",
+            "label": 1
+        },
+        {
+            "utterance": "why is my bank account stopping all transactions from going through",
+            "label": 1
+        },
+        {
+            "utterance": "what would cause me to be locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "find out the reason why am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "make sure my alarm is set for three thirty in the morning",
+            "label": 2
+        },
+        {
+            "utterance": "please set an alarm for mid day",
+            "label": 2
+        },
+        {
+            "utterance": "have an alarm set for three in the morning",
+            "label": 2
+        },
+        {
+            "utterance": "set an alarm for me for 10:00 and another one set for 4:00",
+            "label": 2
+        },
+        {
+            "utterance": "set an alarm to go to sleep and another to wake up",
+            "label": 2
+        },
+        {
+            "utterance": "how much is an overdraft fee for bank",
+            "label": 3
+        },
+        {
+            "utterance": "why are exponents preformed before multiplication in the order of operations",
+            "label": 3
+        },
+        {
+            "utterance": "what size wipers does this car take",
+            "label": 3
+        },
+        {
+            "utterance": "how much is 1 share of aapl"
+        },
+        {
+            "utterance": "how is glue made"
         },
         {
             "utterance": "how is glue made"
