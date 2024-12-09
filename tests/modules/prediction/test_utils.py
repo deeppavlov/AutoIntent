@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from autointent.context.data_handler import Tag
 from autointent.modules.prediction._utils import apply_tags
+from autointent.schemas import Tag
 
 
 def sample_data():
