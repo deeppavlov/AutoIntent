@@ -126,7 +126,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-nbsphinx_execute = "never"
+# nbsphinx_execute = "never"
 nbsphinx_thumbnails = {
     "user_guides/*": "_static/square-white.svg",
 }
