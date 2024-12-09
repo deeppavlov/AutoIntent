@@ -9,7 +9,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, WrongClassificationError
@@ -17,18 +17,18 @@ from ._utils import InvalidNumClassesError, WrongClassificationError
 default_search_space = np.linspace(0, 1, num=100)
 
 
-class JinoosPredictorDumpMetadata(BaseMetadataDict):
+class JinoosDecisionDumpMetadata(BaseMetadataDict):
     """Metadata for Jinoos predictor dump."""
 
     thresh: float
     n_classes: int
 
 
-class JinoosPredictor(PredictionModule):
+class JinoosDecision(DecisionModule):
     """
     Jinoos predictor module.
 
-    JinoosPredictor predicts the best scores for single-label classification tasks
+    JinoosDecision predicts the best scores for single-label classification tasks
     and detects out-of-scope (OOS) samples based on a threshold.
 
     :ivar thresh: The optimized threshold value for OOS detection.
@@ -39,12 +39,12 @@ class JinoosPredictor(PredictionModule):
     --------
     .. testcode::
 
-        from autointent.modules import JinoosPredictor
+        from autointent.modules import JinoosDecision
         import numpy as np
         scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
         labels = [1, 0, 1]
         search_space = [0.3, 0.5, 0.7]
-        predictor = JinoosPredictor(search_space=search_space)
+        predictor = JinoosDecision(search_space=search_space)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
         predictions = predictor.predict(test_scores)
@@ -72,7 +72,7 @@ class JinoosPredictor(PredictionModule):
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "JinoosPredictor":
+    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "JinoosDecision":
         """
         Initialize from context.
 
@@ -99,7 +99,7 @@ class JinoosPredictor(PredictionModule):
         # TODO: use dev split instead of test split.
         multilabel = isinstance(labels[0], list)
         if multilabel:
-            msg = "JinoosPredictor is compatible with single-label classification only"
+            msg = "JinoosDecision is compatible with single-label classification only"
             raise WrongClassificationError(msg)
         self.n_classes = len(set(labels).difference([-1]))
 
@@ -131,7 +131,7 @@ class JinoosPredictor(PredictionModule):
 
         :param path: Path to dump
         """
-        self.metadata = JinoosPredictorDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
+        self.metadata = JinoosDecisionDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
 
         dump_dir = Path(path)
 
@@ -147,7 +147,7 @@ class JinoosPredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: JinoosPredictorDumpMetadata = json.load(file)
+            metadata: JinoosDecisionDumpMetadata = json.load(file)
 
         self.thresh = metadata["thresh"]
         self.metadata = metadata

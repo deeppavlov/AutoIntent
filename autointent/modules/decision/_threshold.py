@@ -10,7 +10,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, apply_tags
@@ -18,7 +18,7 @@ from ._utils import InvalidNumClassesError, apply_tags
 logger = logging.getLogger(__name__)
 
 
-class ThresholdPredictorDumpMetadata(BaseMetadataDict):
+class ThresholdDecisionDumpMetadata(BaseMetadataDict):
     """Threshold predictor metadata."""
 
     multilabel: bool
@@ -27,11 +27,11 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     n_classes: int
 
 
-class ThresholdPredictor(PredictionModule):
+class ThresholdDecision(DecisionModule):
     """
     Threshold predictor module.
 
-    ThresholdPredictor uses a predefined threshold (or array of thresholds) to predict
+    ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
     labels for single-label or multi-label classification tasks.
 
     :ivar metadata_dict_name: Filename for saving metadata to disk.
@@ -46,12 +46,12 @@ class ThresholdPredictor(PredictionModule):
     ===========================
     .. testcode::
 
-        from autointent.modules import ThresholdPredictor
+        from autointent.modules import ThresholdDecision
         import numpy as np
         scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
         labels = [1, 0, 1]
         threshold = 0.5
-        predictor = ThresholdPredictor(thresh=threshold)
+        predictor = ThresholdDecision(thresh=threshold)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
         predictions = predictor.predict(test_scores)
@@ -66,7 +66,7 @@ class ThresholdPredictor(PredictionModule):
     .. testcode::
 
         labels = [[1, 0], [0, 1], [1, 1]]
-        predictor = ThresholdPredictor(thresh=[0.5, 0.5])
+        predictor = ThresholdDecision(thresh=[0.5, 0.5])
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
         predictions = predictor.predict(test_scores)
@@ -79,7 +79,7 @@ class ThresholdPredictor(PredictionModule):
 
     """
 
-    metadata: ThresholdPredictorDumpMetadata
+    metadata: ThresholdDecisionDumpMetadata
     multilabel: bool
     n_classes: int
     tags: list[Tag] | None
@@ -97,7 +97,7 @@ class ThresholdPredictor(PredictionModule):
         self.thresh = thresh
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> "ThresholdPredictor":
+    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> "ThresholdDecision":
         """
         Initialize from context.
 
@@ -156,7 +156,7 @@ class ThresholdPredictor(PredictionModule):
 
         :param path: Path to dump
         """
-        self.metadata = ThresholdPredictorDumpMetadata(
+        self.metadata = ThresholdDecisionDumpMetadata(
             multilabel=self.multilabel,
             tags=self.tags,
             thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),  # type: ignore[typeddict-item]
@@ -179,7 +179,7 @@ class ThresholdPredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: ThresholdPredictorDumpMetadata = json.load(file)
+            metadata: ThresholdDecisionDumpMetadata = json.load(file)
 
         self.multilabel = metadata["multilabel"]
         self.tags = (

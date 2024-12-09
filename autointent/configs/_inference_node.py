@@ -12,7 +12,7 @@ class InferenceNodeConfig:
 
     node_type: NodeType
     """Type of the node. Should be one of the NODE_TYPES"""
-    module_type: str
+    module_name: str
     """Type of the module. Should be one of the Module"""
     module_config: dict[str, Any]
     """Configuration of the module"""

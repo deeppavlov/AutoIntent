@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from autointent.modules import TunablePredictor
-from autointent.modules.prediction._utils import InvalidNumClassesError
+from autointent.modules import TunableDecision
+from autointent.modules.decision._utils import InvalidNumClassesError
 
 
 @pytest.mark.parametrize(
@@ -24,7 +24,7 @@ def test_predict_scenarios(request, fixture_name, scores, desired):
     # Dynamically obtain fixture data
     fit_data = request.getfixturevalue(fixture_name)
 
-    predictor = TunablePredictor()
+    predictor = TunableDecision()
     predictor.fit(*fit_data)
     predictions = predictor.predict(scores)
 
@@ -32,7 +32,7 @@ def test_predict_scenarios(request, fixture_name, scores, desired):
 
 
 def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
-    predictor = TunablePredictor()
+    predictor = TunableDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
     with pytest.raises(InvalidNumClassesError):

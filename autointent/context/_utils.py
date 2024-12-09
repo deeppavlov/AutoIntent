@@ -54,9 +54,9 @@ def load_data(filepath: str | Path) -> Dataset:
     :return: A `Dataset` object containing the loaded data.
     """
     if filepath == "default-multiclass":
-        return Dataset.from_datasets("AutoIntent/clinc150_subset")
+        return Dataset.from_hub("AutoIntent/clinc150_subset")
     if filepath == "default-multilabel":
-        return Dataset.from_datasets("AutoIntent/clinc150_subset").to_multilabel().encode_labels()
+        return Dataset.from_hub("AutoIntent/clinc150_subset").to_multilabel().encode_labels()
     if not Path(filepath).exists():
-        return Dataset.from_datasets(str(filepath))
+        return Dataset.from_hub(str(filepath))
     return Dataset.from_json(filepath)

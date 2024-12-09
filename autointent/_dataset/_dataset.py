@@ -98,7 +98,7 @@ class Dataset(dict[str, HFDataset]):
         return DictReader().read(mapping)
 
     @classmethod
-    def from_datasets(cls, repo_id: str) -> "Dataset":
+    def from_hub(cls, repo_id: str) -> "Dataset":
         """
         Load a dataset from a Hugging Face repository.
 

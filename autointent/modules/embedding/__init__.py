@@ -1,5 +1,5 @@
 """These modules are used only for optimization as they use proxy metrics for choosing best embedding model."""
 
-from ._vectordb import VectorDBModule
+from ._retrieval import RetrievalEmbedding
 
-__all__ = ["VectorDBModule"]
+__all__ = ["RetrievalEmbedding"]

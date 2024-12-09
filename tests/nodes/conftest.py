@@ -7,46 +7,46 @@ from tests.conftest import get_dataset_path, setup_environment
 
 
 @pytest.fixture
-def retrieval_optimizer_multiclass():
-    return get_retrieval_optimizer(multilabel=False)
+def embedding_optimizer_multiclass():
+    return get_embedding_optimizer(multilabel=False)
 
 
 @pytest.fixture
-def retrieval_optimizer_multilabel():
-    return get_retrieval_optimizer(multilabel=True)
+def embedding_optimizer_multilabel():
+    return get_embedding_optimizer(multilabel=True)
 
 
-def get_retrieval_optimizer(multilabel: bool):
+def get_embedding_optimizer(multilabel: bool):
     metric = "retrieval_hit_rate"
     if multilabel:
         metric = metric + "_intersecting"
-    retrieval_optimizer_config = {
+    embedding_optimizer_config = {
         "metric": metric,
-        "node_type": "retrieval",
+        "node_type": "embedding",
         "search_space": [
             {
                 "k": [10],
                 "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
-                "module_type": "vector_db",
+                "module_name": "retrieval",
             },
         ],
     }
 
-    return NodeOptimizer(**retrieval_optimizer_config)
+    return NodeOptimizer(**embedding_optimizer_config)
 
 
 @pytest.fixture
-def scoring_optimizer_multiclass(retrieval_optimizer_multiclass):
+def scoring_optimizer_multiclass(embedding_optimizer_multiclass):
     context = get_context(multilabel=False)
-    retrieval_optimizer_multiclass.fit(context)
+    embedding_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"module_type": "linear"},
+            {"module_name": "linear"},
         ],
     }
 
@@ -54,15 +54,15 @@ def scoring_optimizer_multiclass(retrieval_optimizer_multiclass):
 
 
 @pytest.fixture
-def scoring_optimizer_multilabel(retrieval_optimizer_multilabel):
+def scoring_optimizer_multilabel(embedding_optimizer_multilabel):
     context = get_context(multilabel=True)
-    retrieval_optimizer_multilabel.fit(context)
+    embedding_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"module_type": "linear"},
+            {"module_name": "linear"},
         ],
     }
 

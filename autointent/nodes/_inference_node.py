@@ -31,7 +31,7 @@ class InferenceNode:
         :param config: Configuration for the node.
         """
         node_info = NODES_INFO[config.node_type]
-        module = node_info.modules_available[config.module_type](**config.module_config)
+        module = node_info.modules_available[config.module_name](**config.module_config)
         if config.load_path is not None:
             module.load(config.load_path)
         return cls(module, config.node_type)

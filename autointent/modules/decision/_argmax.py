@@ -1,4 +1,4 @@
-"""Argmax prediction module."""
+"""Argmax decision module."""
 
 import json
 from pathlib import Path
@@ -9,23 +9,23 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, WrongClassificationError
 
 
-class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
+class ArgmaxDecisionDumpMetadata(BaseMetadataDict):
     """Argmax predictor metadata."""
 
     n_classes: int
 
 
-class ArgmaxPredictor(PredictionModule):
+class ArgmaxDecision(DecisionModule):
     """
-    Argmax prediction module.
+    Argmax decision module.
 
-    The ArgmaxPredictor is a simple predictor that selects the class with the highest
+    The ArgmaxDecision is a simple predictor that selects the class with the highest
     score (argmax) for single-label classification tasks.
 
     :ivar n_classes: Number of classes in the dataset.
@@ -34,15 +34,15 @@ class ArgmaxPredictor(PredictionModule):
     --------
     .. testcode::
 
-        from autointent.modules import ArgmaxPredictor
+        from autointent.modules import ArgmaxDecision
         import numpy as np
-        predictor = ArgmaxPredictor()
+        predictor = ArgmaxDecision()
         train_scores = np.array([[0.2, 0.8, 0.0], [0.7, 0.1, 0.2]])
         labels = [1, 0]  # Single-label targets
         predictor.fit(train_scores, labels)
         test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
-        predictions = predictor.predict(test_scores)
-        print(predictions)
+        decisions = predictor.predict(test_scores)
+        print(decisions)
 
     .. testoutput::
 
@@ -57,7 +57,7 @@ class ArgmaxPredictor(PredictionModule):
         """Init."""
 
     @classmethod
-    def from_context(cls, context: Context) -> "ArgmaxPredictor":
+    def from_context(cls, context: Context) -> "ArgmaxDecision":
         """
         Initialize form context.
 
@@ -81,7 +81,7 @@ class ArgmaxPredictor(PredictionModule):
         """
         multilabel = isinstance(labels[0], list)
         if multilabel:
-            msg = "ArgmaxPredictor is compatible with single-label classifiction only"
+            msg = "ArgmaxDecision is compatible with single-label classifiction only"
             raise WrongClassificationError(msg)
         self.n_classes = scores.shape[1]
 
@@ -103,7 +103,7 @@ class ArgmaxPredictor(PredictionModule):
 
         :param path: Dump path.
         """
-        self.metadata = ArgmaxPredictorDumpMetadata(n_classes=self.n_classes)
+        self.metadata = ArgmaxDecisionDumpMetadata(n_classes=self.n_classes)
 
         dump_dir = Path(path)
 
@@ -115,7 +115,7 @@ class ArgmaxPredictor(PredictionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: ArgmaxPredictorDumpMetadata = json.load(file)
+            metadata: ArgmaxDecisionDumpMetadata = json.load(file)
 
         self.n_classes = metadata["n_classes"]
         self.metadata = metadata

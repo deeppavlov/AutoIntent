@@ -13,18 +13,18 @@ The automatic selection of a classifier occurs through the iteration of hyperpar
 Classification Stages
 ---------------------
 
-Intent classification can be divided into two stages: scoring and prediction. Scoring involves predicting the probabilities of the presence of each intent in a given utterance. Prediction involves forming the final prediction based on the provided probabilities.
+Intent classification can be divided into two stages: scoring and decision. Scoring involves predicting the probabilities of the presence of each intent in a given utterance. Prediction involves forming the final decision based on the provided probabilities.
 
 .. _key-oos:
 
 Out-of-domain utterances
 ------------------------
 
-If we want to detect out-of-domain examples, it is necessary to set a probability threshold during the prediction stage, at which the presence of some known intent can be asserted.
+If we want to detect out-of-domain examples, it is necessary to set a probability threshold during the decision stage, at which the presence of some known intent can be asserted.
 
 .. _key-nodes-modules:
 
 Nodes and Modules
 -----------------
 
-The scoring or prediction model, along with its hyperparameters that need to be iterated, is called an *optimization module*. A set of modules related to one optimization stage (scoring or prediction) is called an *optimization node*.
+The scoring or decision model, along with its hyperparameters that need to be iterated, is called an *optimization module*. A set of modules related to one optimization stage (scoring or decision) is called an *optimization node*.

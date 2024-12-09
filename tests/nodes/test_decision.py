@@ -10,33 +10,33 @@ from autointent.nodes import InferenceNode, NodeOptimizer
 logger = logging.getLogger(__name__)
 
 
-def test_prediction_multiclass(scoring_optimizer_multiclass):
+def test_decision_multiclass(scoring_optimizer_multiclass):
     context, scoring_optimizer_multiclass = scoring_optimizer_multiclass
     scoring_optimizer_multiclass.fit(context)
 
-    prediction_optimizer_config = {
-        "metric": "prediction_accuracy",
-        "node_type": "prediction",
+    decision_optimizer_config = {
+        "metric": "decision_accuracy",
+        "node_type": "decision",
         "search_space": [
-            {"module_type": "threshold", "thresh": [0.5]},
-            {"module_type": "tunable", "n_trials": [None, 3]},
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "tunable", "n_trials": [None, 3]},
             {
-                "module_type": "argmax",
+                "module_name": "argmax",
             },
             {
-                "module_type": "jinoos",
+                "module_name": "jinoos",
             },
         ],
     }
 
-    prediction_optimizer = NodeOptimizer(**prediction_optimizer_config)
+    decision_optimizer = NodeOptimizer(**decision_optimizer_config)
 
-    prediction_optimizer.fit(context)
+    decision_optimizer.fit(context)
 
-    for trial in context.optimization_info.trials.prediction:
+    for trial in context.optimization_info.trials.decision:
         config = InferenceNodeConfig(
-            node_type="prediction",
-            module_type=trial.module_type,
+            node_type="decision",
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )
@@ -49,28 +49,28 @@ def test_prediction_multiclass(scoring_optimizer_multiclass):
         torch.cuda.empty_cache()
 
 
-def test_prediction_multilabel(scoring_optimizer_multilabel):
+def test_decision_multilabel(scoring_optimizer_multilabel):
     context, scoring_optimizer_multilabel = scoring_optimizer_multilabel
     scoring_optimizer_multilabel.fit(context)
 
-    prediction_optimizer_config = {
-        "metric": "prediction_accuracy",
-        "node_type": "prediction",
+    decision_optimizer_config = {
+        "metric": "decision_accuracy",
+        "node_type": "decision",
         "search_space": [
-            {"module_type": "threshold", "thresh": [0.5]},
-            {"module_type": "tunable", "n_trials": [None, 3]},
-            {"module_type": "adaptive"},
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "tunable", "n_trials": [None, 3]},
+            {"module_name": "adaptive"},
         ],
     }
 
-    prediction_optimizer = NodeOptimizer(**prediction_optimizer_config)
+    decision_optimizer = NodeOptimizer(**decision_optimizer_config)
 
-    prediction_optimizer.fit(context)
+    decision_optimizer.fit(context)
 
-    for trial in context.optimization_info.trials.prediction:
+    for trial in context.optimization_info.trials.decision:
         config = InferenceNodeConfig(
-            node_type="prediction",
-            module_type=trial.module_type,
+            node_type="decision",
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )

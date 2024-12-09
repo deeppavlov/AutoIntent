@@ -8,7 +8,7 @@ from sklearn.metrics import coverage_error, label_ranking_average_precision_scor
 
 from ._converter import transform
 from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
-from .prediction import PredictionMetricFn, prediction_accuracy, prediction_f1, prediction_precision, prediction_recall
+from .decision import DecisionMetricFn, decision_accuracy, decision_f1, decision_precision, decision_recall
 
 logger = logging.getLogger(__name__)
 
@@ -99,18 +99,16 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
     return roc_auc_score(labels_, scores_, average="macro")  # type: ignore[no-any-return]
 
 
-def _calculate_prediction_metric(
-    func: PredictionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE
-) -> float:
+def _calculate_decision_metric(func: DecisionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
-    Calculate prediction metric.
+    Calculate decision metric.
 
-    This function applies the given prediction metric function `func` to evaluate the predictions.
-    It transforms the inputs and computes predictions based on the input scores:
-    - For multiclass classification, predictions are generated using `np.argmax`.
-    - For multilabel classification, predictions are generated using a threshold of 0.5.
+    This function applies the given decision metric function `func` to evaluate the decisions.
+    It transforms the inputs and computes decisions based on the input scores:
+    - For multiclass classification, decisions are generated using `np.argmax`.
+    - For multilabel classification, decisions are generated using a threshold of 0.5.
 
-    :param func: prediction metric function
+    :param func: decision metric function
     :param labels: ground truth labels for each utterance
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
@@ -131,56 +129,56 @@ def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
     r"""
     Calculate accuracy for multiclass and multilabel classification.
 
-    This function computes accuracy by using :func:`autointent.metrics.prediction.prediction_accuracy`
-    to evaluate predictions.
+    This function computes accuracy by using :func:`autointent.metrics.decision.decision_accuracy`
+    to evaluate decisions.
 
     :param labels: ground truth labels for each utterance
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    return _calculate_prediction_metric(prediction_accuracy, labels, scores)
+    return _calculate_decision_metric(decision_accuracy, labels, scores)
 
 
 def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate the F1 score for multiclass and multilabel classification.
 
-    This function computes the F1 score by using :func:`autointent.metrics.prediction.prediction_f1`
-    to evaluate predictions.
+    This function computes the F1 score by using :func:`autointent.metrics.decision.decision_f1`
+    to evaluate decisions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes
     :return: F1 score
     """
-    return _calculate_prediction_metric(prediction_f1, labels, scores)
+    return _calculate_decision_metric(decision_f1, labels, scores)
 
 
 def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate precision for multiclass and multilabel classification.
 
-    This function computes precision by using :func:`autointent.metrics.prediction.prediction_precision`
-    to evaluate predictions.
+    This function computes precision by using :func:`autointent.metrics.decision.decision_precision`
+    to evaluate decisions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes
     :return: Precision score
     """
-    return _calculate_prediction_metric(prediction_precision, labels, scores)
+    return _calculate_decision_metric(decision_precision, labels, scores)
 
 
 def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate recall for multiclass and multilabel classification.
 
-    This function computes recall by using :func:`autointent.metrics.prediction.prediction_recall`
-    to evaluate predictions.
+    This function computes recall by using :func:`autointent.metrics.decision.decision_recall`
+    to evaluate decisions.
 
     :param labels: Ground truth labels for each sample
     :param scores: For each sample, this list contains scores for each of `n_classes` classes
     :return: Recall score
     """
-    return _calculate_prediction_metric(prediction_recall, labels, scores)
+    return _calculate_decision_metric(decision_recall, labels, scores)
 
 
 def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
