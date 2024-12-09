@@ -10,7 +10,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, apply_tags
@@ -27,7 +27,7 @@ class ThresholdPredictorDumpMetadata(BaseMetadataDict):
     n_classes: int
 
 
-class ThresholdPredictor(PredictionModule):
+class ThresholdPredictor(DecisionModule):
     """
     Threshold predictor module.
 

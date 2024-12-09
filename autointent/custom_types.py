@@ -48,7 +48,7 @@ class NodeType(str, Enum):
     regexp = "regexp"
     retrieval = "retrieval"
     scoring = "scoring"
-    prediction = "prediction"
+    decision = "decision"
 
 
 class Split:

@@ -1,4 +1,4 @@
-"""Argmax prediction module."""
+"""Argmax decision module."""
 
 import json
 from pathlib import Path
@@ -9,7 +9,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, WrongClassificationError
@@ -21,9 +21,9 @@ class ArgmaxPredictorDumpMetadata(BaseMetadataDict):
     n_classes: int
 
 
-class ArgmaxPredictor(PredictionModule):
+class ArgmaxPredictor(DecisionModule):
     """
-    Argmax prediction module.
+    Argmax decision module.
 
     The ArgmaxPredictor is a simple predictor that selects the class with the highest
     score (argmax) for single-label classification tasks.
@@ -41,8 +41,8 @@ class ArgmaxPredictor(PredictionModule):
         labels = [1, 0]  # Single-label targets
         predictor.fit(train_scores, labels)
         test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
-        predictions = predictor.predict(test_scores)
-        print(predictions)
+        decisions = predictor.predict(test_scores)
+        print(decisions)
 
     .. testoutput::
 

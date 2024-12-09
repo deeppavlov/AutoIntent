@@ -9,13 +9,13 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.optimization_info import PredictorArtifact
 from autointent.custom_types import LabelType
-from autointent.metrics import PredictionMetricFn
+from autointent.metrics import DecisionMetricFn
 from autointent.modules.abc import Module
 from autointent.schemas import Tag
 
 
-class PredictionModule(Module, ABC):
-    """Base class for prediction modules."""
+class DecisionModule(Module, ABC):
+    """Base class for decision modules."""
 
     @abstractmethod
     def fit(
@@ -44,7 +44,7 @@ class PredictionModule(Module, ABC):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: PredictionMetricFn,
+        metric_fn: DecisionMetricFn,
     ) -> float:
         """
         Calculate metric on test set and return metric value.
@@ -54,24 +54,24 @@ class PredictionModule(Module, ABC):
         :param metric_fn: Metric function
         :return: Score
         """
-        labels, scores = get_prediction_evaluation_data(context, split)
-        self._predictions = self.predict(scores)
-        return metric_fn(labels, self._predictions)
+        labels, scores = get_decision_evaluation_data(context, split)
+        self._decisions = self.predict(scores)
+        return metric_fn(labels, self._decisions)
 
     def get_assets(self) -> PredictorArtifact:
         """Return useful assets that represent intermediate data into context."""
-        return PredictorArtifact(labels=self._predictions)
+        return PredictorArtifact(labels=self._decisions)
 
     def clear_cache(self) -> None:
         """Clear cache."""
 
 
-def get_prediction_evaluation_data(
+def get_decision_evaluation_data(
     context: Context,
     split: Literal["train", "validation", "test"],
 ) -> tuple[list[LabelType], npt.NDArray[np.float64]]:
     """
-    Get prediction evaluation data.
+    Get decision evaluation data.
 
     :param context: Context
     :param split: Target split

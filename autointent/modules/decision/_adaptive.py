@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score
 
 from autointent import Context
 from autointent.custom_types import LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
@@ -32,7 +32,7 @@ class AdaptivePredictorDumpMetadata(TypedDict):
     n_classes: int
 
 
-class AdaptivePredictor(PredictionModule):
+class AdaptivePredictor(DecisionModule):
     """
     Predictor for multi-label classification using adaptive thresholds.
 
@@ -49,14 +49,14 @@ class AdaptivePredictor(PredictionModule):
     --------
     .. testcode::
 
-        from autointent.modules.prediction import AdaptivePredictor
+        from autointent.modules.decision import AdaptivePredictor
         import numpy as np
         scores = np.array([[0.8, 0.1, 0.4], [0.2, 0.9, 0.5]])
         labels = [[1, 0, 0], [0, 1, 0]]
         predictor = AdaptivePredictor()
         predictor.fit(scores, labels)
-        predictions = predictor.predict(scores)
-        print(predictions)
+        decisions = predictor.predict(scores)
+        print(decisions)
 
     .. testoutput::
 

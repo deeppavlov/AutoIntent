@@ -96,8 +96,8 @@ search_space = [
         ],
     },
     {
-        "node_type": "prediction",
-        "metric": "prediction_accuracy",
+        "node_type": "decision",
+        "metric": "decision_accuracy",
         "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
     },
 ]

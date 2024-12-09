@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from autointent.modules import ThresholdPredictor
-from autointent.modules.prediction._utils import InvalidNumClassesError
+from autointent.modules.decision._utils import InvalidNumClassesError
 
 
 @pytest.mark.parametrize(

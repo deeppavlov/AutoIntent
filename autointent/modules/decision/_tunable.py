@@ -12,7 +12,7 @@ from sklearn.metrics import f1_score
 
 from autointent.context import Context
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.abc import PredictionModule
+from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
@@ -28,7 +28,7 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
     n_classes: int
 
 
-class TunablePredictor(PredictionModule):
+class TunablePredictor(DecisionModule):
     """
     Tunable predictor module.
 

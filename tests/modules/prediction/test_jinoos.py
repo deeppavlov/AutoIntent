@@ -5,7 +5,7 @@ import numpy.typing as npt
 import pytest
 
 from autointent.modules import JinoosPredictor
-from autointent.modules.prediction._utils import InvalidNumClassesError, WrongClassificationError
+from autointent.modules.decision._utils import InvalidNumClassesError, WrongClassificationError
 
 
 def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float):

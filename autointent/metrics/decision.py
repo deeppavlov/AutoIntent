@@ -12,27 +12,27 @@ from .custom_types import LABELS_VALUE_TYPE
 logger = logging.getLogger(__name__)
 
 
-class PredictionMetricFn(Protocol):
-    """Protocol for prediction metrics."""
+class DecisionMetricFn(Protocol):
+    """Protocol for decision metrics."""
 
     def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
         """
-        Calculate prediction metric.
+        Calculate decision metric.
 
         :param y_true: True values of labels
             - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
             - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
         :param y_pred: Predicted values of labels. Same shape as `y_true`
-        :return: Score of the prediction metric
+        :return: Score of the decision metric
         """
         ...
 
 
-def prediction_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate prediction accuracy. Supports both multiclass and multilabel.
+    Calculate decision accuracy. Supports both multiclass and multilabel.
 
-    The prediction accuracy is calculated as:
+    The decision accuracy is calculated as:
 
     .. math::
 
@@ -47,13 +47,13 @@ def prediction_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) ->
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction accuracy
+    :return: Score of the decision accuracy
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
     return np.mean(y_true_ == y_pred_)  # type: ignore[no-any-return]
 
 
-def _prediction_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
     Calculate roc_auc for multiclass.
 
@@ -72,7 +72,7 @@ def _prediction_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VAL
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction roc_auc
+    :return: Score of the decision roc_auc
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
 
@@ -86,7 +86,7 @@ def _prediction_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VAL
     return np.mean(roc_auc_scores)  # type: ignore[return-value]
 
 
-def _prediction_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
     Calculate roc_auc for multilabel.
 
@@ -96,12 +96,12 @@ def _prediction_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VAL
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction accuracy
+    :return: Score of the decision accuracy
     """
     return roc_auc_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-def prediction_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
     Calculate ROC AUC for multiclass and multilabel classification.
 
@@ -111,21 +111,21 @@ def prediction_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction ROC AUC
+    :return: Score of the decision ROC AUC
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
     if y_pred_.ndim == y_true_.ndim == 1:
-        return _prediction_roc_auc_multiclass(y_true_, y_pred_)
+        return _decision_roc_auc_multiclass(y_true_, y_pred_)
     if y_pred_.ndim == y_true_.ndim == 2:  # noqa: PLR2004
-        return _prediction_roc_auc_multilabel(y_true_, y_pred_)
+        return _decision_roc_auc_multilabel(y_true_, y_pred_)
     msg = "Something went wrong with labels dimensions"
     logger.error(msg)
     raise ValueError(msg)
 
 
-def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate prediction precision. Supports both multiclass and multilabel.
+    Calculate decision precision. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.precision_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html>`__
@@ -133,14 +133,14 @@ def prediction_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction precision
+    :return: Score of the decision precision
     """
     return precision_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate prediction recall. Supports both multiclass and multilabel.
+    Calculate decision recall. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.recall_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html>`__
@@ -148,14 +148,14 @@ def prediction_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction recall
+    :return: Score of the decision recall
     """
     return recall_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
 
 
-def prediction_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate prediction f1 score. Supports both multiclass and multilabel.
+    Calculate decision f1 score. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.f1_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`__
@@ -163,6 +163,6 @@ def prediction_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the prediction accuracy
+    :return: Score of the decision accuracy
     """
     return f1_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]

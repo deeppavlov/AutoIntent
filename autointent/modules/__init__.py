@@ -2,8 +2,8 @@
 
 from typing import TypeVar
 
-from .abc import Module, PredictionModule, RetrievalModule, ScoringModule
-from .prediction import (
+from .abc import DecisionModule, Module, RetrievalModule, ScoringModule
+from .decision import (
     AdaptivePredictor,
     ArgmaxPredictor,
     JinoosPredictor,
@@ -32,11 +32,11 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = _create_modules_dic
     [MLKnnScorer, LinearScorer, DescriptionScorer],
 )
 
-PREDICTION_MODULES_MULTICLASS: dict[str, type[PredictionModule]] = _create_modules_dict(
+PREDICTION_MODULES_MULTICLASS: dict[str, type[DecisionModule]] = _create_modules_dict(
     [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor],
 )
 
-PREDICTION_MODULES_MULTILABEL: dict[str, type[PredictionModule]] = _create_modules_dict(
+PREDICTION_MODULES_MULTILABEL: dict[str, type[DecisionModule]] = _create_modules_dict(
     [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
 )
 

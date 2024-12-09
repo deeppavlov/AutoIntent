@@ -179,7 +179,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         scores = self.nodes[NodeType.scoring].module.predict(utterances)  # type: ignore[union-attr]
-        return self.nodes[NodeType.prediction].module.predict(scores)  # type: ignore[union-attr]
+        return self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """
@@ -193,7 +193,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)  # type: ignore[union-attr]
-        predictions = self.nodes[NodeType.prediction].module.predict(scores)  # type: ignore[union-attr]
+        predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
         regexp_predictions, regexp_predictions_metadata = None, None
         if NodeType.regexp in self.nodes:
             regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(  # type: ignore[union-attr]

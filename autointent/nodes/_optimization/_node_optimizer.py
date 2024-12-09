@@ -12,7 +12,7 @@ import torch
 from autointent.context import Context
 from autointent.custom_types import NodeType
 from autointent.modules.abc import Module
-from autointent.modules.abc._prediction import get_prediction_evaluation_data
+from autointent.modules.abc._decision import get_decision_evaluation_data
 from autointent.nodes._nodes_info import NODES_INFO
 
 
@@ -115,8 +115,8 @@ class NodeOptimizer:
                 )
             else:
                 args = (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[assignment]
-        elif self.node_info.node_type == "prediction":
-            labels, scores = get_prediction_evaluation_data(context, "train")
+        elif self.node_info.node_type == "decision":
+            labels, scores = get_decision_evaluation_data(context, "train")
             args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
         elif self.node_info.node_type == "regexp":
             args = ()  # type: ignore[assignment]

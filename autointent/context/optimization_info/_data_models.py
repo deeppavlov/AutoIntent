@@ -68,9 +68,9 @@ def validate_node_name(value: str) -> str:
     :return: Validated node type string.
     :raises ValueError: If the node type is invalid.
     """
-    if value in [NodeType.retrieval, NodeType.scoring, NodeType.prediction, NodeType.regexp]:
+    if value in [NodeType.retrieval, NodeType.scoring, NodeType.decision, NodeType.regexp]:
         return value
-    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'prediction']"
+    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'decision']"
     raise ValueError(msg)
 
 
@@ -86,7 +86,7 @@ class Artifacts(BaseModel):
     regexp: list[RegexpArtifact] = []
     retrieval: list[RetrieverArtifact] = []
     scoring: list[ScorerArtifact] = []
-    prediction: list[PredictorArtifact] = []
+    decision: list[PredictorArtifact] = []
 
     def add_artifact(self, node_type: str, artifact: Artifact) -> None:
         """
@@ -138,7 +138,7 @@ class Trials(BaseModel):
     regexp: list[Trial] = []
     retrieval: list[Trial] = []
     scoring: list[Trial] = []
-    prediction: list[Trial] = []
+    decision: list[Trial] = []
 
     def get_trial(self, node_type: str, idx: int) -> Trial:
         """
@@ -178,8 +178,8 @@ class TrialsIds(BaseModel):
     """Best trial index for the retrieval node."""
     scoring: int | None = None
     """Best trial index for the scoring"""
-    prediction: int | None = None
-    """Best trial index for the prediction node."""
+    decision: int | None = None
+    """Best trial index for the decision node."""
 
     def get_best_trial_idx(self, node_type: str) -> int | None:
         """

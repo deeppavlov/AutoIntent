@@ -27,7 +27,7 @@ class ModulesList:
     regexp: list["Module"] = field(default_factory=list)
     retrieval: list["Module"] = field(default_factory=list)
     scoring: list["Module"] = field(default_factory=list)
-    prediction: list["Module"] = field(default_factory=list)
+    decision: list["Module"] = field(default_factory=list)
 
     def get(self, node_type: str) -> list["Module"]:
         """

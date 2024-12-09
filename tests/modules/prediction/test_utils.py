@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from autointent.modules.prediction._utils import apply_tags
+from autointent.modules.decision._utils import apply_tags
 from autointent.schemas import Tag
 
 

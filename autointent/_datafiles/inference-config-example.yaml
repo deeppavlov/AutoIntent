@@ -10,7 +10,7 @@
     k: 10
     weights: uniform
   load_path: .
-- node_type: prediction
+- node_type: decision
   module_name: threshold
   module_config:
     thresh: 0.5

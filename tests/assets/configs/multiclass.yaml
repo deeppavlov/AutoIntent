@@ -25,8 +25,8 @@
       m: [ 2, 3 ]
       cross_encoder_name:
         - cross-encoder/ms-marco-MiniLM-L-6-v2
-- node_type: prediction
-  metric: prediction_accuracy
+- node_type: decision
+  metric: decision_accuracy
   search_space:
     - module_name: threshold
       thresh: [0.5, [0.5, 0.5, 0.5, 0.5]]
