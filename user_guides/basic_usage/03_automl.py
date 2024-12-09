@@ -16,7 +16,7 @@ Let us use small subset of popular `clinc150` dataset for the demonstation.
 # %%
 from autointent import Dataset
 
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 dataset
 
 # %%
@@ -138,7 +138,7 @@ from autointent.configs import EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.utils import load_default_search_space
 
 # load data
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 
 # customize search space
 search_space = load_default_search_space(multilabel=False)

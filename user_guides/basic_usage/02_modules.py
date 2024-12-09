@@ -44,7 +44,7 @@ Secondly, you need to load training data (see previous chapter for detailed expl
 # %%
 from autointent import Dataset
 
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 
 # %% [markdown]
 """

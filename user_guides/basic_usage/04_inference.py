@@ -15,7 +15,7 @@ Here's the basic example:
 # %%
 from autointent import Dataset, Pipeline
 
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 pipeline = Pipeline.default_optimizer(multilabel=False)
 context = pipeline.fit(dataset)
 pipeline.predict(["hello, world!"])
@@ -59,7 +59,7 @@ from pathlib import Path
 from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig, VectorIndexConfig
 
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 pipeline = Pipeline.default_optimizer(multilabel=False)
 dump_dir = Path("my_dumps")
 pipeline.set_config(LoggingConfig(dump_dir=dump_dir, dump_modules=True, clear_ram=True))

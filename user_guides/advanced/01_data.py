@@ -191,7 +191,7 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 """
 
 # %%
-dataset = Dataset.from_datasets("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 
 # %% [markdown]
 """
