@@ -1,17 +1,17 @@
 - node_type: retrieval
-  module_type: vector_db
+  module_name: vector_db
   module_config:
     k: 10
     model_name: infgrad/stella-base-en-v2
   load_path: .
 - node_type: scoring
-  module_type: knn
+  module_name: knn
   module_config:
     k: 10
     weights: uniform
   load_path: .
 - node_type: prediction
-  module_type: threshold
+  module_name: threshold
   module_config:
     thresh: 0.5
   load_path: .

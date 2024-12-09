@@ -18,13 +18,13 @@ def test_prediction_multiclass(scoring_optimizer_multiclass):
         "metric": "prediction_accuracy",
         "node_type": "prediction",
         "search_space": [
-            {"module_type": "threshold", "thresh": [0.5]},
-            {"module_type": "tunable", "n_trials": [None, 3]},
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "tunable", "n_trials": [None, 3]},
             {
-                "module_type": "argmax",
+                "module_name": "argmax",
             },
             {
-                "module_type": "jinoos",
+                "module_name": "jinoos",
             },
         ],
     }
@@ -36,7 +36,7 @@ def test_prediction_multiclass(scoring_optimizer_multiclass):
     for trial in context.optimization_info.trials.prediction:
         config = InferenceNodeConfig(
             node_type="prediction",
-            module_type=trial.module_type,
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )
@@ -57,9 +57,9 @@ def test_prediction_multilabel(scoring_optimizer_multilabel):
         "metric": "prediction_accuracy",
         "node_type": "prediction",
         "search_space": [
-            {"module_type": "threshold", "thresh": [0.5]},
-            {"module_type": "tunable", "n_trials": [None, 3]},
-            {"module_type": "adaptive"},
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "tunable", "n_trials": [None, 3]},
+            {"module_name": "adaptive"},
         ],
     }
 
@@ -70,7 +70,7 @@ def test_prediction_multilabel(scoring_optimizer_multilabel):
     for trial in context.optimization_info.trials.prediction:
         config = InferenceNodeConfig(
             node_type="prediction",
-            module_type=trial.module_type,
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )

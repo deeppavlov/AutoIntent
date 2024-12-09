@@ -53,7 +53,7 @@ Explanation:
 - node_type: retrieval
   metric: retrieval_hit_rate
   search_space:
-    - module_type: vector_db
+    - module_name: vector_db
       k: [10]
       embedder_name:
         - avsolatorio/GIST-small-Embedding-v0
@@ -61,11 +61,11 @@ Explanation:
 - node_type: scoring
   metric: scoring_roc_auc
   search_space:
-    - module_type: knn
+    - module_name: knn
       k: [1, 3, 5, 10]
       weights: ["uniform", "distance", "closest"]
-    - module_type: linear
-    - module_type: dnnc
+    - module_name: linear
+    - module_name: dnnc
       cross_encoder_name:
         - BAAI/bge-reranker-base
         - cross-encoder/ms-marco-MiniLM-L-6-v2
@@ -73,8 +73,8 @@ Explanation:
 - node_type: prediction
   metric: prediction_accuracy
   search_space:
-    - module_type: threshold
+    - module_name: threshold
       thresh: [0.5]
-    - module_type: argmax
+    - module_name: argmax
 ```
 """

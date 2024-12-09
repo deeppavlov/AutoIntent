@@ -29,7 +29,7 @@ def get_retrieval_optimizer(multilabel: bool):
                 "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
-                "module_type": "vector_db",
+                "module_name": "vector_db",
             },
         ],
     }
@@ -46,7 +46,7 @@ def scoring_optimizer_multiclass(retrieval_optimizer_multiclass):
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"module_type": "linear"},
+            {"module_name": "linear"},
         ],
     }
 
@@ -62,7 +62,7 @@ def scoring_optimizer_multilabel(retrieval_optimizer_multilabel):
         "metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
-            {"module_type": "linear"},
+            {"module_name": "linear"},
         ],
     }
 

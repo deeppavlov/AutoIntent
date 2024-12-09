@@ -1,7 +1,7 @@
 - node_type: retrieval
   metric: retrieval_hit_rate_intersecting
   search_space:
-    - module_type: vector_db
+    - module_name: vector_db
       k: [10]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
@@ -9,13 +9,13 @@
 - node_type: scoring
   metric: scoring_roc_auc
   search_space:
-    - module_type: knn
+    - module_name: knn
       k: [5, 10]
       weights: [uniform, distance, closest]
-    - module_type: linear
-    - module_type: mlknn
+    - module_name: linear
+    - module_name: mlknn
       k: [5]
-    - module_type: rerank
+    - module_name: rerank
       k: [ 5, 10 ]
       weights: [ uniform, distance, closest ]
       m: [ 2, 3 ]
@@ -24,7 +24,7 @@
 - node_type: prediction
   metric: prediction_accuracy
   search_space:
-    - module_type: threshold
+    - module_name: threshold
       thresh: [0.5, [0.5, 0.5, 0.5, 0.5]]
-    - module_type: tunable
-    - module_type: adaptive
+    - module_name: tunable
+    - module_name: adaptive

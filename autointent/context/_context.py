@@ -18,7 +18,7 @@ from autointent.configs import (
 from ._utils import NumpyEncoder, load_data
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index_client import VectorIndex, VectorIndexClient
+from .vector_index_client import VectorIndexClient
 
 
 class Context:
@@ -95,15 +95,6 @@ class Context:
             force_multilabel=force_multilabel,
             random_seed=self.seed,
         )
-
-    def get_best_index(self) -> VectorIndex:
-        """
-        Retrieve the best vector index based on optimization results.
-
-        :return: Best vector index object.
-        """
-        model_name = self.optimization_info.get_best_embedder()
-        return self.vector_index_client.get_index(model_name)
 
     def get_inference_config(self) -> dict[str, Any]:
         """

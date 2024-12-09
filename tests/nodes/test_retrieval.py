@@ -19,7 +19,7 @@ def test_retrieval_multiclass():
     for trial in context.optimization_info.trials.retrieval:
         config = InferenceNodeConfig(
             node_type="retrieval",
-            module_type=trial.module_type,
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )
@@ -38,7 +38,7 @@ def test_retrieval_multilabel():
     for trial in context.optimization_info.trials.retrieval:
         config = InferenceNodeConfig(
             node_type="retrieval",
-            module_type=trial.module_type,
+            module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
         )
@@ -63,7 +63,7 @@ def get_retrieval_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
-                "module_type": "vector_db",
+                "module_name": "vector_db",
             },
         ],
     }

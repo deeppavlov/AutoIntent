@@ -69,7 +69,7 @@ class OptimizationInfo:
     def log_module_optimization(
         self,
         node_type: str,
-        module_type: str,
+        module_name: str,
         module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
@@ -81,7 +81,7 @@ class OptimizationInfo:
         Log optimization results for a module.
 
         :param node_type: Type of the node being optimized.
-        :param module_type: Type of the module.
+        :param module_name: Type of the module.
         :param module_params: Parameters of the module for the trial.
         :param metric_value: Metric value achieved by the module.
         :param metric_name: Name of the evaluation metric.
@@ -90,7 +90,7 @@ class OptimizationInfo:
         :param module: The module instance, if available.
         """
         trial = Trial(
-            module_type=module_type,
+            module_name=module_name,
             metric_name=metric_name,
             metric_value=metric_value,
             module_params=module_params,
@@ -214,7 +214,7 @@ class OptimizationInfo:
             trial = self.trials.get_trial(node_type, idx)
             item = {
                 "node_type": node_type.value,
-                "module_type": trial.module_type,
+                "module_name": trial.module_name,
                 "module_config": trial.module_params,
                 "load_path": trial.module_dump_dir,
             }

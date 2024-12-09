@@ -120,7 +120,7 @@ class Artifacts(BaseModel):
 class Trial(BaseModel):
     """Representation of an individual optimization trial."""
 
-    module_type: str
+    module_name: str
     """Type of the module being optimized."""
     module_params: dict[str, Any]
     """Parameters of the module for the trial."""
