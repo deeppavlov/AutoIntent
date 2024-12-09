@@ -1,3 +1,5 @@
+"""Heart of the library with different intent classification methods implemented."""
+
 from typing import TypeVar
 
 from .abc import Module, PredictionModule, RetrievalModule, ScoringModule

@@ -182,7 +182,11 @@ class ThresholdPredictor(PredictionModule):
             metadata: ThresholdPredictorDumpMetadata = json.load(file)
 
         self.multilabel = metadata["multilabel"]
-        self.tags = [Tag(**tag) for tag in metadata["tags"] if metadata["tags"] and isinstance(metadata["tags"], list)]  # type: ignore[arg-type, union-attr]
+        self.tags = (
+            [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
+            if metadata["tags"] and isinstance(metadata["tags"], list)
+            else None
+        )
         self.thresh = metadata["thresh"]
         self.n_classes = metadata["n_classes"]
         self.metadata = metadata
