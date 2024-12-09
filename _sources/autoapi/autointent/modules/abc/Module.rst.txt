@@ -1,0 +1,121 @@
+autointent.modules.abc.Module
+=============================
+
+.. py:class:: autointent.modules.abc.Module
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Base module.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: metadata_dict_name
+      :type:  str
+      :value: 'metadata.json'
+
+
+
+   .. py:attribute:: metadata
+      :type:  autointent.custom_types.BaseMetadataDict
+
+
+   .. py:method:: fit(*args, **kwargs)
+      :abstractmethod:
+
+
+      Fit the model.
+
+      :param args: Args to fit
+      :param kwargs: Kwargs to fit
+
+
+
+   .. py:method:: score(context, split, metric_fn)
+      :abstractmethod:
+
+
+      Calculate metric on test set and return metric value.
+
+      :param context: Context to score
+      :param metric_fn: Metric function
+
+
+
+   .. py:method:: get_assets()
+      :abstractmethod:
+
+
+      Return useful assets that represent intermediate data into context.
+
+
+
+   .. py:method:: clear_cache()
+      :abstractmethod:
+
+
+      Clear cache.
+
+
+
+   .. py:method:: dump(path)
+      :abstractmethod:
+
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
+
+
+   .. py:method:: load(path)
+      :abstractmethod:
+
+
+      Load data from dump.
+
+      :param path: Path to load
+
+
+
+   .. py:method:: predict(*args, **kwargs)
+      :abstractmethod:
+
+
+      Predict on the input.
+
+      :param args: args to predict.
+      :param kwargs: kwargs to predict.
+
+
+
+   .. py:method:: predict_with_metadata(*args, **kwargs)
+
+      Predict on the input with metadata.
+
+      :param args: args to predict.
+      :param kwargs: kwargs to predict.
+
+
+
+   .. py:method:: from_context(context, **kwargs)
+      :classmethod:
+
+      :abstractmethod:
+
+
+      Initialize self from context.
+
+      :param context: Context to init from.
+      :param kwargs: Additional kwargs.
+
+
+
+   .. py:method:: get_embedder_name()
+
+      Experimental method.
+
+

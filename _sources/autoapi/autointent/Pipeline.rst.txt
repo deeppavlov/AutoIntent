@@ -1,0 +1,99 @@
+autointent.Pipeline
+===================
+
+.. py:class:: autointent.Pipeline(nodes)
+
+   Pipeline optimizer class.
+
+
+   .. py:attribute:: nodes
+
+
+   .. py:method:: set_config(config)
+
+      Set configuration for the optimizer.
+
+      :param config: Configuration
+
+
+
+   .. py:method:: from_search_space(search_space)
+      :classmethod:
+
+
+      Create pipeline optimizer from dictionary search space.
+
+      :param config: Dictionary config
+
+
+
+   .. py:method:: default_optimizer(multilabel)
+      :classmethod:
+
+
+      Create pipeline optimizer with default search space for given classification task.
+
+      :param multilabel: Wether the task multi-label, or single-label.
+
+
+
+   .. py:method:: fit(dataset, force_multilabel = False, init_for_inference = True)
+
+      Optimize the pipeline from dataset.
+
+      :param dataset: Dataset for optimization
+      :param force_multilabel: Whether to force multilabel or not
+      :return: Context
+
+
+
+   .. py:method:: from_dict_config(nodes_configs)
+      :classmethod:
+
+
+      Create inference pipeline from dictionary config.
+
+      :param nodes_configs: list of dictionary config for nodes
+      :return: pipeline ready for inference
+
+
+
+   .. py:method:: from_config(nodes_configs)
+      :classmethod:
+
+
+      Create inference pipeline from config.
+
+      :param nodes_configs: list of config for nodes
+
+
+
+   .. py:method:: load(path)
+      :classmethod:
+
+
+      Load pipeline in inference mode.
+
+      This method loads fitted modules and tuned hyperparameters.
+      :path: path to optimization run directory
+      :return: initialized pipeline, ready for inference
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict the labels for the utterances.
+
+      :param utterances: list of utterances
+      :return: list of predicted labels
+
+
+
+   .. py:method:: predict_with_metadata(utterances)
+
+      Predict the labels for the utterances with metadata.
+
+      :param utterances: list of utterances
+      :return: prediction output
+
+

@@ -1,0 +1,30 @@
+autointent.nodes.ScoringNodeInfo
+================================
+
+.. py:class:: autointent.nodes.ScoringNodeInfo
+
+   Bases: :py:obj:`autointent.nodes._nodes_info._base.NodeInfo`
+
+
+   Scoring node info.
+
+
+   .. py:attribute:: metrics_available
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.ScoringMetricFn]]
+
+      Available metrics for the node.
+
+
+
+   .. py:attribute:: modules_available
+      :type:  ClassVar[collections.abc.Mapping[str, type[autointent.modules.abc.ScoringModule]]]
+
+      Available modules for the node.
+
+
+
+   .. py:attribute:: node_type
+
+      Node type.
+
+

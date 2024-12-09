@@ -1,0 +1,47 @@
+autointent.configs.EmbedderConfig
+=================================
+
+.. py:class:: autointent.configs.EmbedderConfig
+
+   Configuration for the embedder.
+
+   The embedder is used to embed the data before training the model. These parameters
+   will be applied to the embedder used in the optimization process in vector db.
+   Only one model can be used globally.
+
+
+   .. py:attribute:: batch_size
+      :type:  int
+      :value: 32
+
+
+      Batch size for the embedder
+
+
+
+   .. py:attribute:: max_length
+      :type:  int | None
+      :value: None
+
+
+      Max length for the embedder. If None, the max length will be taken from model config
+
+
+
+   .. py:attribute:: use_cache
+      :type:  bool
+      :value: False
+
+
+      Flag indicating whether to cache embeddings for reuse, improving performance in repeated operations.
+
+
+
+   .. py:attribute:: device
+      :type:  str
+      :value: 'cpu'
+
+
+      Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc.
+
+

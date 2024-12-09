@@ -1,0 +1,163 @@
+autointent.modules.embedding.RetrievalEmbedding
+===============================================
+
+.. py:class:: autointent.modules.embedding.RetrievalEmbedding(k, embedder_name, db_dir = None, embedder_device = 'cpu', batch_size = 32, max_length = None, embedder_use_cache = False)
+
+   Bases: :py:obj:`autointent.modules.abc.EmbeddingModule`
+
+
+   Module for managing retrieval operations using a vector database.
+
+   RetrievalEmbedding provides methods for indexing, querying, and managing a vector database for tasks
+   such as nearest neighbor retrieval.
+
+   :ivar vector_index: The vector index used for nearest neighbor retrieval.
+   :ivar name: Name of the module, defaults to "retrieval".
+
+   Examples
+   --------
+   .. testsetup::
+
+       db_dir = "doctests-db"
+
+   .. testcode::
+
+       from autointent.modules.embedding import RetrievalEmbedding
+       utterances = ["bye", "how are you?", "good morning"]
+       labels = [0, 1, 1]
+       retrieval = RetrievalEmbedding(
+           k=2,
+           embedder_name="sergeyzh/rubert-tiny-turbo",
+           db_dir=db_dir,
+       )
+       retrieval.fit(utterances, labels)
+       predictions = retrieval.predict(["how is the weather today?"])
+       print(predictions)
+
+   .. testoutput::
+
+       ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
+
+   .. testcleanup::
+
+       import shutil
+       shutil.rmtree(db_dir)
+
+
+
+   .. py:attribute:: vector_index
+      :type:  autointent.context.vector_index_client.VectorIndex
+
+
+   .. py:attribute:: name
+      :value: 'retrieval'
+
+
+
+   .. py:attribute:: embedder_name
+
+
+   .. py:attribute:: embedder_device
+      :value: 'cpu'
+
+
+
+   .. py:attribute:: batch_size
+      :value: 32
+
+
+
+   .. py:attribute:: max_length
+      :value: None
+
+
+
+   .. py:attribute:: embedder_use_cache
+      :value: False
+
+
+
+   .. py:method:: from_context(context, k, embedder_name)
+      :classmethod:
+
+
+      Create a RetrievalEmbedding instance using a Context object.
+
+      :param context: The context containing configurations and utilities.
+      :param k: Number of nearest neighbors to retrieve.
+      :param embedder_name: Name of the embedder to use.
+      :return: Initialized RetrievalEmbedding instance.
+
+
+
+   .. py:property:: db_dir
+      :type: str
+
+
+      Get the directory for the vector database.
+
+      :return: Path to the database directory.
+
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Fit the vector index using the provided utterances and labels.
+
+      :param utterances: List of text data to index.
+      :param labels: List of corresponding labels for the utterances.
+
+
+
+   .. py:method:: score(context, split, metric_fn)
+
+      Evaluate the embedding model using a specified metric function.
+
+      :param context: The context containing test data and labels.
+      :param split: Target split
+      :param metric_fn: Function to compute the retrieval metric.
+      :return: Computed metric score.
+
+
+
+   .. py:method:: get_assets()
+
+      Get the retriever artifacts for this module.
+
+      :return: A RetrieverArtifact object containing embedder information.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the vector index.
+
+
+
+   .. py:method:: dump(path)
+
+      Save the module's metadata and vector index to a specified directory.
+
+      :param path: Path to the directory where assets will be dumped.
+
+
+
+   .. py:method:: load(path)
+
+      Load the module's metadata and vector index from a specified directory.
+
+      :param path: Path to the directory containing the dumped assets.
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict the nearest neighbors for a list of utterances.
+
+      :param utterances: List of utterances for which nearest neighbors are to be retrieved.
+      :return: A tuple containing:
+          - labels: List of retrieved labels for each utterance.
+          - distances: List of distances to the nearest neighbors.
+          - texts: List of retrieved text data corresponding to the neighbors.
+
+

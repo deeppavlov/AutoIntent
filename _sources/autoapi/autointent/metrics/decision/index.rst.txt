@@ -1,0 +1,58 @@
+autointent.metrics.decision
+===========================
+
+.. py:module:: autointent.metrics.decision
+
+.. autoapi-nested-parse::
+
+   Prediction metrics for multiclass and multilabel classification tasks.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.metrics.decision.logger
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/decision/DecisionMetricFn
+
+.. autoapisummary::
+
+   autointent.metrics.decision.DecisionMetricFn
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/decision/decision_accuracy
+   /autoapi/autointent/metrics/decision/decision_roc_auc
+   /autoapi/autointent/metrics/decision/decision_precision
+   /autoapi/autointent/metrics/decision/decision_recall
+   /autoapi/autointent/metrics/decision/decision_f1
+
+.. autoapisummary::
+
+   autointent.metrics.decision.decision_accuracy
+   autointent.metrics.decision.decision_roc_auc
+   autointent.metrics.decision.decision_precision
+   autointent.metrics.decision.decision_recall
+   autointent.metrics.decision.decision_f1
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+

@@ -1,0 +1,85 @@
+autointent.context.vector_index_client.VectorIndexClient
+========================================================
+
+.. py:class:: autointent.context.vector_index_client.VectorIndexClient(embedder_device, db_dir, embedder_batch_size = 32, embedder_max_length = None, embedder_use_cache = False)
+
+   Client interface for managing vector indexes.
+
+   This class provides methods for creating, persisting, loading, and deleting
+   vector indexes. Indexes are stored in a specified directory and associated
+   with embedding models.
+
+
+   .. py:attribute:: embedder_device
+
+
+   .. py:attribute:: db_dir
+
+
+   .. py:attribute:: embedder_batch_size
+      :value: 32
+
+
+
+   .. py:attribute:: embedder_max_length
+      :value: None
+
+
+
+   .. py:attribute:: embedder_use_cache
+      :value: False
+
+
+
+   .. py:method:: create_index(model_name, utterances = None, labels = None)
+
+      Create a new vector index for the specified model.
+
+      :param model_name: Name of the embedding model (Hugging Face repo, not a local path).
+      :param utterances: Optional list of utterances to add to the index.
+      :param labels: Optional list of labels corresponding to the utterances.
+      :return: A `VectorIndex` instance.
+      :raises ValueError: If only one of `utterances` or `labels` is provided.
+
+
+
+   .. py:method:: dump(index)
+
+      Persist the vector index to disk.
+
+      :param index: The `VectorIndex` instance to save.
+
+
+
+   .. py:method:: delete_index(model_name)
+
+      Delete a vector index and its associated data.
+
+      :param model_name: Name of the model.
+
+
+
+   .. py:method:: get_index(model_name)
+
+      Load a vector index for a given model.
+
+      :param model_name: Name of the model.
+      :return: The loaded `VectorIndex` instance.
+      :raises NonExistingIndexError: If the index does not exist.
+
+
+
+   .. py:method:: exists(model_name)
+
+      Check if a vector index exists for a given model.
+
+      :param model_name: Name of the model.
+      :return: True if the index exists, False otherwise.
+
+
+
+   .. py:method:: delete_db()
+
+      Delete all vector indexes and their associated data from disk.
+
+

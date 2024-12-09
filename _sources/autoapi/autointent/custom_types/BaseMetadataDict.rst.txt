@@ -1,0 +1,10 @@
+autointent.custom_types.BaseMetadataDict
+========================================
+
+.. py:class:: autointent.custom_types.BaseMetadataDict
+
+   Bases: :py:obj:`TypedDict`
+
+
+   Base metadata dictionary for storing additional information.
+

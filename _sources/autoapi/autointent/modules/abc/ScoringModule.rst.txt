@@ -1,0 +1,43 @@
+autointent.modules.abc.ScoringModule
+====================================
+
+.. py:class:: autointent.modules.abc.ScoringModule
+
+   Bases: :py:obj:`autointent.modules.abc.Module`, :py:obj:`abc.ABC`
+
+
+   Abstract base class for scoring modules.
+
+   Scoring modules predict scores for utterances and evaluate their performance
+   using a scoring metric.
+
+
+   .. py:method:: score(context, split, metric_fn)
+
+      Evaluate the scorer on a test set and compute the specified metric.
+
+      :param context: Context containing test set and other data.
+      :param split: Target split
+      :param metric_fn: Function to compute the scoring metric.
+      :return: Computed metric value for the test set.
+
+
+
+   .. py:method:: get_assets()
+
+      Retrieve assets generated during scoring.
+
+      :return: ScorerArtifact containing test scores and out-of-scope (OOS) scores.
+
+
+
+   .. py:method:: predict(utterances)
+      :abstractmethod:
+
+
+      Predict scores for a list of utterances.
+
+      :param utterances: List of utterances to score.
+      :return: Array of predicted scores.
+
+

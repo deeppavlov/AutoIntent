@@ -1,0 +1,28 @@
+autointent.metrics.retrieval_ndcg_intersecting
+==============================================
+
+.. py:function:: autointent.metrics.retrieval_ndcg_intersecting(query_labels, candidates_labels, k = None)
+
+   Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
+
+   NDCG at position :math:`k` for intersecting labels is calculated as:
+
+   .. math::
+
+       \text{NDCG@k}_{\text{intersecting}} = \frac{\text{DCG@k}_{\text{intersecting}}}
+       {\text{IDCG@k}_{\text{intersecting}}}
+
+   where:
+
+   - :math:`\text{DCG@k}_{\text{intersecting}}` is the Discounted Cumulative Gain for the intersecting labels at position :math:`k`,
+   - :math:`\text{IDCG@k}_{\text{intersecting}}` is the Ideal Discounted Cumulative Gain for the intersecting labels at position :math:`k`.
+
+   Intersecting relevance is determined by checking whether the query labels overlap with
+   the candidate labels.
+   NDCG values are normalized between 0 and 1, where 1 indicates the ideal ranking.
+
+   :param query_labels: For each query, this list contains its class labels
+   :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
+   :param k: Number of top items to consider for each query
+   :return: Score of the retrieval metric
+

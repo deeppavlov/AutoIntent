@@ -1,0 +1,32 @@
+autointent.modules.decision
+===========================
+
+.. py:module:: autointent.modules.decision
+
+.. autoapi-nested-parse::
+
+   These modules take predicted probabilities and apply some decision rule to define final set of predicted labels.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/decision/AdaptiveDecision
+   /autoapi/autointent/modules/decision/ArgmaxDecision
+   /autoapi/autointent/modules/decision/JinoosDecision
+   /autoapi/autointent/modules/decision/ThresholdDecision
+   /autoapi/autointent/modules/decision/TunableDecision
+
+.. autoapisummary::
+
+   autointent.modules.decision.AdaptiveDecision
+   autointent.modules.decision.ArgmaxDecision
+   autointent.modules.decision.JinoosDecision
+   autointent.modules.decision.ThresholdDecision
+   autointent.modules.decision.TunableDecision
+
+

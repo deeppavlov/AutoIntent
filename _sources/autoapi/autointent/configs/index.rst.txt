@@ -1,0 +1,36 @@
+autointent.configs
+==================
+
+.. py:module:: autointent.configs
+
+.. autoapi-nested-parse::
+
+   Dataclasses for the configuration of the :class:`autointent.Embedder` and other objects.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/configs/InferenceNodeConfig
+   /autoapi/autointent/configs/DataConfig
+   /autoapi/autointent/configs/EmbedderConfig
+   /autoapi/autointent/configs/LoggingConfig
+   /autoapi/autointent/configs/OptimizationConfig
+   /autoapi/autointent/configs/TaskConfig
+   /autoapi/autointent/configs/VectorIndexConfig
+
+.. autoapisummary::
+
+   autointent.configs.InferenceNodeConfig
+   autointent.configs.DataConfig
+   autointent.configs.EmbedderConfig
+   autointent.configs.LoggingConfig
+   autointent.configs.OptimizationConfig
+   autointent.configs.TaskConfig
+   autointent.configs.VectorIndexConfig
+
+

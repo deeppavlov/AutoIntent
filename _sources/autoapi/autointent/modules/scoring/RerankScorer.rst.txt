@@ -1,0 +1,65 @@
+autointent.modules.scoring.RerankScorer
+=======================================
+
+.. py:class:: autointent.modules.scoring.RerankScorer(embedder_name, k, weights, cross_encoder_name, m = None, rank_threshold_cutoff = None, db_dir = None, embedder_device = 'cpu', batch_size = 32, max_length = None)
+
+   Bases: :py:obj:`autointent.modules.scoring._knn.knn.KNNScorer`
+
+
+   Re-ranking scorer using a cross-encoder for intent classification.
+
+   This module uses a cross-encoder to re-rank the nearest neighbors retrieved by a KNN scorer.
+
+   :ivar name: Name of the scorer, defaults to "rerank".
+   :ivar _scorer: CrossEncoder instance for re-ranking.
+
+
+   .. py:attribute:: name
+      :value: 'rerank'
+
+
+
+   .. py:attribute:: cross_encoder_name
+
+
+   .. py:attribute:: m
+
+
+   .. py:attribute:: rank_threshold_cutoff
+      :value: None
+
+
+
+   .. py:method:: from_context(context, k, weights, cross_encoder_name, embedder_name = None, m = None, rank_threshold_cutoff = None)
+      :classmethod:
+
+
+      Create a RerankScorer instance from a given context.
+
+      :param context: Context object containing optimization information and vector index client.
+      :param k: Number of closest neighbors to consider during inference.
+      :param weights: Weighting strategy.
+      :param cross_encoder_name: Name of the cross-encoder model used for re-ranking.
+      :param embedder_name: Name of the embedder used for vectorization, or None to use the best existing embedder.
+      :param m: Number of top-ranked neighbors to consider, or None to use k.
+      :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
+      :return: An instance of RerankScorer.
+
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Fit the RerankScorer with utterances and labels.
+
+      :param utterances: List of utterances to fit the scorer.
+      :param labels: List of labels corresponding to the utterances.
+
+
+
+   .. py:method:: load(path)
+
+      Load the RerankScorer from a given path.
+
+      :param path: Path to the directory containing the dumped metadata.
+
+

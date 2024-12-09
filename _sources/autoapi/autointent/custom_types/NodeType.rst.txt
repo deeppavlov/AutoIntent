@@ -1,0 +1,30 @@
+autointent.custom_types.NodeType
+================================
+
+.. py:class:: autointent.custom_types.NodeType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Enumeration of node types in the AutoIntent pipeline.
+
+
+   .. py:attribute:: regexp
+      :value: 'regexp'
+
+
+
+   .. py:attribute:: embedding
+      :value: 'embedding'
+
+
+
+   .. py:attribute:: scoring
+      :value: 'scoring'
+
+
+
+   .. py:attribute:: decision
+      :value: 'decision'
+
+

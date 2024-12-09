@@ -1,0 +1,29 @@
+autointent.metrics.retrieval.retrieval_map
+==========================================
+
+.. py:function:: autointent.metrics.retrieval.retrieval_map(query_labels, candidates_labels, k = None)
+
+   Calculate the mean average precision at position k.
+
+   The Mean Average Precision (MAP) is computed as the average of the average precision
+   (AP) scores for all queries. The average precision for a single query computes the precision at each rank
+   position considering the top-k retrieved items.
+
+   MAP is given by:
+
+   .. math::
+
+       \text{MAP} = \frac{1}{Q} \sum_{q=1}^{Q} \text{AP}(q, c, k)
+
+   where:
+   - :math:`Q` is the total number of queries,
+   - :math:`\text{AP}(q, c, k)` is the average precision for the :math:`q`-th query,
+   calculated considering the true labels for that query :math:`q`, the ranked candidate
+   labels :math:`c`, and the number `k` which determines the number of top items to consider.
+
+   :param query_labels: For each query, this list contains its class labels
+   :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
+    (from most to least relevant)
+   :param k: Number of top items to consider for each query
+   :return: Score of the retrieval metric
+

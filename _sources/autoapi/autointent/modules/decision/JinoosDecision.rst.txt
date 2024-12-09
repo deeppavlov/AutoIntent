@@ -1,0 +1,116 @@
+autointent.modules.decision.JinoosDecision
+==========================================
+
+.. py:class:: autointent.modules.decision.JinoosDecision(search_space = None)
+
+   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+
+
+   Jinoos predictor module.
+
+   JinoosDecision predicts the best scores for single-label classification tasks
+   and detects out-of-scope (OOS) samples based on a threshold.
+
+   :ivar thresh: The optimized threshold value for OOS detection.
+   :ivar name: Name of the predictor, defaults to "adaptive".
+   :ivar n_classes: Number of classes determined during fitting.
+
+   Examples
+   --------
+   .. testcode::
+
+       from autointent.modules import JinoosDecision
+       import numpy as np
+       scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+       labels = [1, 0, 1]
+       search_space = [0.3, 0.5, 0.7]
+       predictor = JinoosDecision(search_space=search_space)
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [1 0]
+
+
+
+   .. py:attribute:: thresh
+      :type:  float
+
+
+   .. py:attribute:: name
+      :value: 'jinoos'
+
+
+
+   .. py:attribute:: n_classes
+      :type:  int
+
+
+   .. py:attribute:: search_space
+
+
+   .. py:method:: from_context(context, search_space = None)
+      :classmethod:
+
+
+      Initialize from context.
+
+      :param context: Context
+      :param search_space: Search space
+
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+
+      Fit the model.
+
+      :param scores: Scores to fit
+      :param labels: Labels to fit
+      :param tags: Tags to fit
+
+
+
+   .. py:method:: predict(scores)
+
+      Predict the best score.
+
+      :param scores: Scores to predict
+
+
+
+   .. py:method:: dump(path)
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
+
+
+   .. py:method:: load(path)
+
+      Load data from dump.
+
+      :param path: Path to load
+
+
+
+   .. py:method:: jinoos_score(y_true, y_pred)
+      :staticmethod:
+
+
+      Calculate Jinoos score.
+
+      .. math::
+
+          \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}}
+
+      where $C_{in}$ is the number of correctly predicted in-domain labels
+       and $N_{in}$ is the total number of in-domain labels. The same for OOS samples
+
+      :param y_true: True labels
+      :param y_pred: Predicted labels
+
+

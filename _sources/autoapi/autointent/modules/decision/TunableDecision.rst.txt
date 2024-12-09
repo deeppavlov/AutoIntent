@@ -1,0 +1,131 @@
+autointent.modules.decision.TunableDecision
+===========================================
+
+.. py:class:: autointent.modules.decision.TunableDecision(n_trials = 320, seed = 0, tags = None)
+
+   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+
+
+   Tunable predictor module.
+
+   TunableDecision uses an optimization process to find the best thresholds for predicting labels
+   in single-label or multi-label classification tasks. It is designed for datasets with varying
+   score distributions and supports out-of-scope (OOS) detection.
+
+   :ivar name: Name of the predictor, defaults to "tunable".
+   :ivar multilabel: Whether the task is multi-label classification.
+   :ivar n_classes: Number of classes determined during fitting.
+   :ivar tags: Tags for predictions, if any.
+
+   Examples
+   --------
+   Single-label classification
+   ===========================
+   .. testcode::
+
+       import numpy as np
+       from autointent.modules import TunableDecision
+       scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+       labels = [1, 0, 1]
+       predictor = TunableDecision(n_trials=100, seed=42)
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [1 0]
+
+   Multi-label classification
+   ==========================
+   .. testcode::
+
+       labels = [[1, 0], [0, 1], [1, 1]]
+       predictor = TunableDecision(n_trials=100, seed=42)
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [[1 1]
+        [1 1]]
+
+
+
+   .. py:attribute:: name
+      :value: 'tunable'
+
+
+
+   .. py:attribute:: multilabel
+      :type:  bool
+
+
+   .. py:attribute:: n_classes
+      :type:  int
+
+
+   .. py:attribute:: tags
+      :type:  list[autointent.schemas.Tag] | None
+
+
+   .. py:attribute:: n_trials
+      :value: 320
+
+
+
+   .. py:attribute:: seed
+      :value: 0
+
+
+
+   .. py:method:: from_context(context, n_trials = 320)
+      :classmethod:
+
+
+      Initialize from context.
+
+      :param context: Context
+      :param n_trials: Number of trials
+
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+
+      Fit module.
+
+      When data doesn't contain out-of-scope utterances, using TunableDecision imposes unnecessary
+       computational overhead.
+
+      :param scores: Scores to fit
+      :param labels: Labels to fit
+      :param tags: Tags to fit
+
+
+
+   .. py:method:: predict(scores)
+
+      Predict the best score.
+
+      :param scores: Scores to predict
+
+
+
+   .. py:method:: dump(path)
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
+
+
+   .. py:method:: load(path)
+
+      Load data from dump.
+
+      :param path: Path to load
+
+

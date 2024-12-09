@@ -1,0 +1,197 @@
+autointent.modules.scoring.DNNCScorer
+=====================================
+
+.. py:class:: autointent.modules.scoring.DNNCScorer(cross_encoder_name, embedder_name, k, db_dir = None, device = 'cpu', train_head = False, batch_size = 32, max_length = None, embedder_use_cache = False)
+
+   Bases: :py:obj:`autointent.modules.abc.ScoringModule`
+
+
+   Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
+
+   This module uses a CrossEncoder for scoring candidate intents and can optionally
+   train a logistic regression head on top of cross-encoder features.
+
+   .. code-block:: bibtex
+
+       @misc{zhang2020discriminativenearestneighborfewshot,
+         title={Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference},
+         author={Jian-Guo Zhang and Kazuma Hashimoto and Wenhao Liu and Chien-Sheng Wu and Yao Wan and
+         Philip S. Yu and Richard Socher and Caiming Xiong},
+         year={2020},
+         eprint={2010.13009},
+         archivePrefix={arXiv},
+         primaryClass={cs.CL},
+         url={https://arxiv.org/abs/2010.13009},
+       }
+
+   :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`crossencoder`).
+   :ivar model: The model used for scoring, which could be a `CrossEncoder` or a `CrossEncoderWithLogreg`.
+   :ivar prebuilt_index: Flag indicating whether a prebuilt vector index is used.
+   :ivar _db_dir: Path to the database directory where the vector index is stored.
+   :ivar name: Name of the scorer, defaults to "dnnc".
+
+   Examples
+   --------
+   .. testsetup::
+
+       db_dir = "doctests-db"
+
+   .. testcode::
+
+       from autointent.modules.scoring import DNNCScorer
+       utterances = ["what is your name?", "how are you?"]
+       labels = [0, 1]
+       scorer = DNNCScorer(
+           cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
+           embedder_name="sergeyzh/rubert-tiny-turbo",
+           k=5,
+           db_dir=db_dir,
+       )
+       scorer.fit(utterances, labels)
+
+       test_utterances = ["Hello!", "What's up?"]
+       scores = scorer.predict(test_utterances)
+       print(scores)  # Outputs similarity scores for the utterances
+
+
+   .. testoutput::
+
+       [[-8.90408421  0.        ]
+        [-8.10923195  0.        ]]
+
+   .. testcleanup::
+
+       import shutil
+       shutil.rmtree(db_dir)
+
+
+
+   .. py:attribute:: name
+      :value: 'dnnc'
+
+
+
+   .. py:attribute:: crossencoder_subdir
+      :type:  str
+      :value: 'crossencoder'
+
+
+
+   .. py:attribute:: model
+      :type:  sentence_transformers.CrossEncoder | autointent.modules.scoring._dnnc.head_training.CrossEncoderWithLogreg
+
+
+   .. py:attribute:: prebuilt_index
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: cross_encoder_name
+
+
+   .. py:attribute:: embedder_name
+
+
+   .. py:attribute:: k
+
+
+   .. py:attribute:: train_head
+      :value: False
+
+
+
+   .. py:attribute:: device
+      :value: 'cpu'
+
+
+
+   .. py:attribute:: batch_size
+      :value: 32
+
+
+
+   .. py:attribute:: max_length
+      :value: None
+
+
+
+   .. py:attribute:: embedder_use_cache
+      :value: False
+
+
+
+   .. py:property:: db_dir
+      :type: str
+
+
+      Get the database directory for the vector index.
+
+      :return: Path to the database directory.
+
+
+
+   .. py:method:: from_context(context, cross_encoder_name, k, embedder_name = None, train_head = False)
+      :classmethod:
+
+
+      Create a DNNCScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities.
+      :param cross_encoder_name: Name of the cross-encoder model.
+      :param k: Number of nearest neighbors to retrieve.
+      :param embedder_name: Name of the embedder model, or None to use the best embedder.
+      :param train_head: Whether to train a logistic regression head, defaults to False.
+      :return: Initialized DNNCScorer instance.
+
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Fit the scorer by training or loading the vector index and optionally training a logistic regression head.
+
+      :param utterances: List of training utterances.
+      :param labels: List of labels corresponding to the utterances.
+      :raises ValueError: If the vector index mismatches the provided utterances.
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict class scores for the given utterances.
+
+      :param utterances: List of utterances to score.
+      :return: Array of predicted scores.
+
+
+
+   .. py:method:: predict_with_metadata(utterances)
+
+      Predict class scores along with metadata for the given utterances.
+
+      :param utterances: List of utterances to score.
+      :return: Tuple of scores and metadata containing neighbor details and scores.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the vector index.
+
+
+
+   .. py:method:: dump(path)
+
+      Save the DNNCScorer's metadata, vector index, and model to disk.
+
+      :param path: Path to the directory where assets will be dumped.
+
+
+
+   .. py:method:: load(path)
+
+      Load the DNNCScorer's metadata, vector index, and model from disk.
+
+      :param path: Path to the directory containing the dumped assets.
+
+

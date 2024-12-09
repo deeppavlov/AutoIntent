@@ -1,0 +1,28 @@
+autointent.nodes.NodeInfo
+=========================
+
+.. py:class:: autointent.nodes.NodeInfo
+
+   Base node info class.
+
+
+   .. py:attribute:: metrics_available
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.METRIC_FN]]
+
+      Available metrics for the node.
+
+
+
+   .. py:attribute:: modules_available
+      :type:  ClassVar[collections.abc.Mapping[str, type[autointent.modules.abc.Module]]]
+
+      Available modules for the node.
+
+
+
+   .. py:attribute:: node_type
+      :type:  autointent.custom_types.NodeType
+
+      Node type.
+
+

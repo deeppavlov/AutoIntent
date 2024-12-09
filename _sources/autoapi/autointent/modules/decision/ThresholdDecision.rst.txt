@@ -1,0 +1,126 @@
+autointent.modules.decision.ThresholdDecision
+=============================================
+
+.. py:class:: autointent.modules.decision.ThresholdDecision(thresh)
+
+   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+
+
+   Threshold predictor module.
+
+   ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
+   labels for single-label or multi-label classification tasks.
+
+   :ivar metadata_dict_name: Filename for saving metadata to disk.
+   :ivar multilabel: If True, the model supports multi-label classification.
+   :ivar n_classes: Number of classes in the dataset.
+   :ivar tags: Tags for predictions (if any).
+   :ivar name: Name of the predictor, defaults to "adaptive".
+
+   Examples
+   --------
+   Single-label classification
+   ===========================
+   .. testcode::
+
+       from autointent.modules import ThresholdDecision
+       import numpy as np
+       scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+       labels = [1, 0, 1]
+       threshold = 0.5
+       predictor = ThresholdDecision(thresh=threshold)
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [1 0]
+
+   Multi-label classification
+   ==========================
+   .. testcode::
+
+       labels = [[1, 0], [0, 1], [1, 1]]
+       predictor = ThresholdDecision(thresh=[0.5, 0.5])
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [[0 1]
+        [1 0]]
+
+
+
+   .. py:attribute:: metadata
+      :type:  ThresholdDecisionDumpMetadata
+
+
+   .. py:attribute:: multilabel
+      :type:  bool
+
+
+   .. py:attribute:: n_classes
+      :type:  int
+
+
+   .. py:attribute:: tags
+      :type:  list[autointent.schemas.Tag] | None
+
+
+   .. py:attribute:: name
+      :value: 'threshold'
+
+
+
+   .. py:attribute:: thresh
+
+
+   .. py:method:: from_context(context, thresh = 0.5)
+      :classmethod:
+
+
+      Initialize from context.
+
+      :param context: Context
+      :param thresh: Threshold
+
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+
+      Fit the model.
+
+      :param scores: Scores to fit
+      :param labels: Labels to fit
+      :param tags: Tags to fit
+
+
+
+   .. py:method:: predict(scores)
+
+      Predict the best score.
+
+      :param scores: Scores to predict
+
+
+
+   .. py:method:: dump(path)
+
+      Dump the metadata.
+
+      :param path: Path to dump
+
+
+
+   .. py:method:: load(path)
+
+      Load the metadata.
+
+      :param path: Path to load
+
+

@@ -1,0 +1,35 @@
+autointent.custom_types.LogLevel
+================================
+
+.. py:class:: autointent.custom_types.LogLevel
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Logging levels for the AutoIntent framework.
+
+
+   .. py:attribute:: DEBUG
+      :value: 'DEBUG'
+
+
+
+   .. py:attribute:: INFO
+      :value: 'INFO'
+
+
+
+   .. py:attribute:: WARNING
+      :value: 'WARNING'
+
+
+
+   .. py:attribute:: ERROR
+      :value: 'ERROR'
+
+
+
+   .. py:attribute:: CRITICAL
+      :value: 'CRITICAL'
+
+
