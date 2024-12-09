@@ -19,7 +19,7 @@ from ._threshold import multiclass_predict, multilabel_predict
 from ._utils import InvalidNumClassesError
 
 
-class TunablePredictorDumpMetadata(BaseMetadataDict):
+class TunableDecisionDumpMetadata(BaseMetadataDict):
     """Tunable predictor metadata."""
 
     multilabel: bool
@@ -28,11 +28,11 @@ class TunablePredictorDumpMetadata(BaseMetadataDict):
     n_classes: int
 
 
-class TunablePredictor(DecisionModule):
+class TunableDecision(DecisionModule):
     """
     Tunable predictor module.
 
-    TunablePredictor uses an optimization process to find the best thresholds for predicting labels
+    TunableDecision uses an optimization process to find the best thresholds for predicting labels
     in single-label or multi-label classification tasks. It is designed for datasets with varying
     score distributions and supports out-of-scope (OOS) detection.
 
@@ -48,10 +48,10 @@ class TunablePredictor(DecisionModule):
     .. testcode::
 
         import numpy as np
-        from autointent.modules import TunablePredictor
+        from autointent.modules import TunableDecision
         scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
         labels = [1, 0, 1]
-        predictor = TunablePredictor(n_trials=100, seed=42)
+        predictor = TunableDecision(n_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
         predictions = predictor.predict(test_scores)
@@ -66,7 +66,7 @@ class TunablePredictor(DecisionModule):
     .. testcode::
 
         labels = [[1, 0], [0, 1], [1, 1]]
-        predictor = TunablePredictor(n_trials=100, seed=42)
+        predictor = TunableDecision(n_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
         predictions = predictor.predict(test_scores)
@@ -102,7 +102,7 @@ class TunablePredictor(DecisionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: int = 320) -> "TunablePredictor":
+    def from_context(cls, context: Context, n_trials: int = 320) -> "TunableDecision":
         """
         Initialize from context.
 
@@ -120,7 +120,7 @@ class TunablePredictor(DecisionModule):
         """
         Fit module.
 
-        When data doesn't contain out-of-scope utterances, using TunablePredictor imposes unnecessary
+        When data doesn't contain out-of-scope utterances, using TunableDecision imposes unnecessary
          computational overhead.
 
         :param scores: Scores to fit
@@ -162,7 +162,7 @@ class TunablePredictor(DecisionModule):
 
         :param path: Path to dump
         """
-        self.metadata = TunablePredictorDumpMetadata(
+        self.metadata = TunableDecisionDumpMetadata(
             multilabel=self.multilabel,
             thresh=self.thresh.tolist(),  # type: ignore[typeddict-item]
             tags=self.tags,
@@ -189,7 +189,7 @@ class TunablePredictor(DecisionModule):
 
         metadata["tags"] = [Tag(**tag) for tag in metadata["tags"]] if metadata["tags"] else None
 
-        self.metadata: TunablePredictorDumpMetadata = metadata
+        self.metadata: TunableDecisionDumpMetadata = metadata
         self.thresh = np.array(metadata["thresh"])
         self.multilabel = metadata["multilabel"]
         self.tags = metadata["tags"]

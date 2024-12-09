@@ -48,7 +48,7 @@ class ScorerArtifact(Artifact):
     )
 
 
-class PredictorArtifact(Artifact):
+class DecisionArtifact(Artifact):
     """
     Artifact containing outputs from the predictor node.
 
@@ -86,7 +86,7 @@ class Artifacts(BaseModel):
     regexp: list[RegexpArtifact] = []
     retrieval: list[RetrieverArtifact] = []
     scoring: list[ScorerArtifact] = []
-    decision: list[PredictorArtifact] = []
+    decision: list[DecisionArtifact] = []
 
     def add_artifact(self, node_type: str, artifact: Artifact) -> None:
         """

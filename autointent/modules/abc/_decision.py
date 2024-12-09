@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.context.optimization_info import PredictorArtifact
+from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import LabelType
 from autointent.metrics import DecisionMetricFn
 from autointent.modules.abc import Module
@@ -58,9 +58,9 @@ class DecisionModule(Module, ABC):
         self._decisions = self.predict(scores)
         return metric_fn(labels, self._decisions)
 
-    def get_assets(self) -> PredictorArtifact:
+    def get_assets(self) -> DecisionArtifact:
         """Return useful assets that represent intermediate data into context."""
-        return PredictorArtifact(labels=self._decisions)
+        return DecisionArtifact(labels=self._decisions)
 
     def clear_cache(self) -> None:
         """Clear cache."""

@@ -4,11 +4,11 @@ from typing import TypeVar
 
 from .abc import DecisionModule, Module, RetrievalModule, ScoringModule
 from .decision import (
-    AdaptivePredictor,
-    ArgmaxPredictor,
-    JinoosPredictor,
-    ThresholdPredictor,
-    TunablePredictor,
+    AdaptiveDecision,
+    ArgmaxDecision,
+    JinoosDecision,
+    ThresholdDecision,
+    TunableDecision,
 )
 from .retrieval import VectorDBModule
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer
@@ -33,11 +33,11 @@ SCORING_MODULES_MULTILABEL: dict[str, type[ScoringModule]] = _create_modules_dic
 )
 
 PREDICTION_MODULES_MULTICLASS: dict[str, type[DecisionModule]] = _create_modules_dict(
-    [ArgmaxPredictor, JinoosPredictor, ThresholdPredictor, TunablePredictor],
+    [ArgmaxDecision, JinoosDecision, ThresholdDecision, TunableDecision],
 )
 
 PREDICTION_MODULES_MULTILABEL: dict[str, type[DecisionModule]] = _create_modules_dict(
-    [AdaptivePredictor, ThresholdPredictor, TunablePredictor],
+    [AdaptiveDecision, ThresholdDecision, TunableDecision],
 )
 
 __all__ = []  # type: ignore[var-annotated]

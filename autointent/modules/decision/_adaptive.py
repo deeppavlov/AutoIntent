@@ -1,4 +1,4 @@
-"""AdaptivePredictor module for multi-label classification with adaptive thresholds."""
+"""AdaptiveDecision module for multi-label classification with adaptive thresholds."""
 
 import json
 from pathlib import Path
@@ -18,9 +18,9 @@ from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
 default_search_space = np.linspace(0, 1, num=10)
 
 
-class AdaptivePredictorDumpMetadata(TypedDict):
+class AdaptiveDecisionDumpMetadata(TypedDict):
     """
-    Metadata structure for saving the state of an AdaptivePredictor.
+    Metadata structure for saving the state of an AdaptiveDecision.
 
     :ivar r: The selected threshold scaling factor.
     :ivar tags: List of Tag objects for mutually exclusive classes.
@@ -32,11 +32,11 @@ class AdaptivePredictorDumpMetadata(TypedDict):
     n_classes: int
 
 
-class AdaptivePredictor(DecisionModule):
+class AdaptiveDecision(DecisionModule):
     """
-    Predictor for multi-label classification using adaptive thresholds.
+    Decision for multi-label classification using adaptive thresholds.
 
-    The AdaptivePredictor calculates optimal thresholds based on the given
+    The AdaptiveDecision calculates optimal thresholds based on the given
     scores and labels, ensuring the best performance on multi-label data.
 
     :ivar metadata_dict_name: Filename for saving metadata to disk.
@@ -49,11 +49,11 @@ class AdaptivePredictor(DecisionModule):
     --------
     .. testcode::
 
-        from autointent.modules.decision import AdaptivePredictor
+        from autointent.modules.decision import AdaptiveDecision
         import numpy as np
         scores = np.array([[0.8, 0.1, 0.4], [0.2, 0.9, 0.5]])
         labels = [[1, 0, 0], [0, 1, 0]]
-        predictor = AdaptivePredictor()
+        predictor = AdaptiveDecision()
         predictor.fit(scores, labels)
         decisions = predictor.predict(scores)
         print(decisions)
@@ -73,7 +73,7 @@ class AdaptivePredictor(DecisionModule):
 
     def __init__(self, search_space: list[float] | None = None) -> None:
         """
-        Initialize the AdaptivePredictor.
+        Initialize the AdaptiveDecision.
 
         :param search_space: List of threshold scaling factors to search for optimal performance.
                              Defaults to a range between 0 and 1.
@@ -81,13 +81,13 @@ class AdaptivePredictor(DecisionModule):
         self.search_space = search_space if search_space is not None else default_search_space
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "AdaptivePredictor":
+    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "AdaptiveDecision":
         """
-        Create an AdaptivePredictor instance using a Context object.
+        Create an AdaptiveDecision instance using a Context object.
 
         :param context: Context containing configurations and utilities.
         :param search_space: List of threshold scaling factors, or None for default.
-        :return: Initialized AdaptivePredictor instance.
+        :return: Initialized AdaptiveDecision instance.
         """
         return cls(
             search_space=search_space,
@@ -111,7 +111,7 @@ class AdaptivePredictor(DecisionModule):
         multilabel = isinstance(labels[0], list)
         if not multilabel:
             msg = (
-                "AdaptivePredictor is not designed to perform multiclass classification. "
+                "AdaptiveDecision is not designed to perform multiclass classification. "
                 "Consider using other predictor algorithms."
             )
             raise WrongClassificationError(msg)
@@ -146,7 +146,7 @@ class AdaptivePredictor(DecisionModule):
         """
         dump_dir = Path(path)
 
-        metadata = AdaptivePredictorDumpMetadata(
+        metadata = AdaptiveDecisionDumpMetadata(
             r=self._r,
             tags=[t.model_dump() for t in self.tags] if self.tags else None,  # type: ignore[misc]
             n_classes=self.n_classes,
@@ -164,7 +164,7 @@ class AdaptivePredictor(DecisionModule):
         dump_dir = Path(path)
 
         with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: AdaptivePredictorDumpMetadata = json.load(file)
+            metadata: AdaptiveDecisionDumpMetadata = json.load(file)
 
         if metadata["tags"] is not None and isinstance(metadata["tags"], list):
             self.tags = [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
