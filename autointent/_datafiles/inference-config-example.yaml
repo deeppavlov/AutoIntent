@@ -1,5 +1,5 @@
-- node_type: retrieval
-  module_name: vector_db
+- node_type: embedding
+  module_name: retrieval
   module_config:
     k: 10
     model_name: infgrad/stella-base-en-v2

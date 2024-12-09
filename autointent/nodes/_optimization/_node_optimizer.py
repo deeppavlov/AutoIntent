@@ -106,7 +106,7 @@ class NodeOptimizer:
         :param module: Module to fit
         :param context: Context to use
         """
-        if self.node_info.node_type in ["retrieval", "scoring"]:
+        if self.node_info.node_type in ["embedding", "scoring"]:
             if module.__class__.__name__ == "DescriptionScorer":
                 args = (
                     context.data_handler.train_utterances(0),

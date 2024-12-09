@@ -72,11 +72,11 @@ The search space for the entire pipeline looks approximately like this:
 # %%
 search_space = [
     {
-        "node_type": "retrieval",
+        "node_type": "embedding",
         "metric": "retrieval_hit_rate",
         "search_space": [
             {
-                "module_name": "vector_db",
+                "module_name": "retrieval",
                 "k": [10],
                 "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
             }

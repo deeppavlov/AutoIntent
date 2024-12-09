@@ -23,9 +23,9 @@ class RegexpArtifact(Artifact):
 
 class RetrieverArtifact(Artifact):
     """
-    Artifact containing details from the retrieval node.
+    Artifact containing details from the embedding node.
 
-    Name of the embedding model chosen after retrieval optimization.
+    Name of the embedding model chosen after embedding optimization.
     """
 
     embedder_name: str
@@ -68,9 +68,9 @@ def validate_node_name(value: str) -> str:
     :return: Validated node type string.
     :raises ValueError: If the node type is invalid.
     """
-    if value in [NodeType.retrieval, NodeType.scoring, NodeType.decision, NodeType.regexp]:
+    if value in [NodeType.embedding, NodeType.scoring, NodeType.decision, NodeType.regexp]:
         return value
-    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'decision']"
+    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'embedding', 'scoring', 'decision']"
     raise ValueError(msg)
 
 
@@ -84,7 +84,7 @@ class Artifacts(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     regexp: list[RegexpArtifact] = []
-    retrieval: list[RetrieverArtifact] = []
+    embedding: list[RetrieverArtifact] = []
     scoring: list[ScorerArtifact] = []
     decision: list[DecisionArtifact] = []
 
@@ -136,7 +136,7 @@ class Trials(BaseModel):
     """Container for managing optimization trials for pipeline nodes."""
 
     regexp: list[Trial] = []
-    retrieval: list[Trial] = []
+    embedding: list[Trial] = []
     scoring: list[Trial] = []
     decision: list[Trial] = []
 
@@ -174,8 +174,8 @@ class TrialsIds(BaseModel):
 
     regexp: int | None = None
     """Best trial index for the regexp node."""
-    retrieval: int | None = None
-    """Best trial index for the retrieval node."""
+    embedding: int | None = None
+    """Best trial index for the embedding node."""
     scoring: int | None = None
     """Best trial index for the scoring"""
     decision: int | None = None

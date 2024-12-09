@@ -46,7 +46,7 @@ class NodeType(str, Enum):
     """Enumeration of node types in the AutoIntent pipeline."""
 
     regexp = "regexp"
-    retrieval = "retrieval"
+    embedding = "embedding"
     scoring = "scoring"
     decision = "decision"
 

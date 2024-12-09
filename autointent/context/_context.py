@@ -228,5 +228,5 @@ class Context:
 
         :return: True if there are saved modules, False otherwise.
         """
-        node_types = ["regexp", "retrieval", "scoring", "decision"]
+        node_types = ["regexp", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)

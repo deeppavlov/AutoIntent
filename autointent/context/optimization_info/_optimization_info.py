@@ -1,6 +1,6 @@
 """Module for managing pipeline optimization.
 
-This module handles the tracking, logging, and retrieval of optimization artifacts,
+This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
 
@@ -25,7 +25,7 @@ class ModulesList:
     """Container for managing lists of modules for each node type."""
 
     regexp: list["Module"] = field(default_factory=list)
-    retrieval: list["Module"] = field(default_factory=list)
+    embedding: list["Module"] = field(default_factory=list)
     scoring: list["Module"] = field(default_factory=list)
     decision: list["Module"] = field(default_factory=list)
 
@@ -33,7 +33,7 @@ class ModulesList:
         """
         Retrieve the list of modules for a specific node type.
 
-        :param node_type: The type of node (e.g., "regexp", "retrieval").
+        :param node_type: The type of node (e.g., "regexp", "embedding").
         :return: List of modules for the specified node type.
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]
@@ -144,7 +144,7 @@ class OptimizationInfo:
 
         :return: Name of the best embedder.
         """
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
+        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:

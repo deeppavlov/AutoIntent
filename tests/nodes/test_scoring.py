@@ -11,9 +11,9 @@ from .conftest import get_context
 logger = logging.getLogger(__name__)
 
 
-def test_scoring_multiclass(retrieval_optimizer_multiclass):
+def test_scoring_multiclass(embedding_optimizer_multiclass):
     context = get_context(multilabel=False)
-    retrieval_optimizer_multiclass.fit(context)
+    embedding_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",
@@ -70,9 +70,9 @@ def test_scoring_multiclass(retrieval_optimizer_multiclass):
         torch.cuda.empty_cache()
 
 
-def test_scoring_multilabel(retrieval_optimizer_multilabel):
+def test_scoring_multilabel(embedding_optimizer_multilabel):
     context = get_context(multilabel=True)
-    retrieval_optimizer_multilabel.fit(context)
+    embedding_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
         "metric": "scoring_roc_auc",

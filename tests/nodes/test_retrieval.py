@@ -11,14 +11,14 @@ from .conftest import get_context
 logger = logging.getLogger(__name__)
 
 
-def test_retrieval_multiclass():
+def test_embedding_multiclass():
     context = get_context(multilabel=False)
-    retrieval_optimizer = get_retrieval_optimizer(multilabel=False)
-    retrieval_optimizer.fit(context)
+    embedding_optimizer = get_embedding_optimizer(multilabel=False)
+    embedding_optimizer.fit(context)
 
-    for trial in context.optimization_info.trials.retrieval:
+    for trial in context.optimization_info.trials.embedding:
         config = InferenceNodeConfig(
-            node_type="retrieval",
+            node_type="embedding",
             module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
@@ -30,14 +30,14 @@ def test_retrieval_multiclass():
         torch.cuda.empty_cache()
 
 
-def test_retrieval_multilabel():
+def test_embedding_multilabel():
     context = get_context(multilabel=True)
-    retrieval_optimizer = get_retrieval_optimizer(multilabel=True)
-    retrieval_optimizer.fit(context)
+    embedding_optimizer = get_embedding_optimizer(multilabel=True)
+    embedding_optimizer.fit(context)
 
-    for trial in context.optimization_info.trials.retrieval:
+    for trial in context.optimization_info.trials.embedding:
         config = InferenceNodeConfig(
-            node_type="retrieval",
+            node_type="embedding",
             module_name=trial.module_name,
             module_config=trial.module_params,
             load_path=trial.module_dump_dir,
@@ -49,13 +49,13 @@ def test_retrieval_multilabel():
         torch.cuda.empty_cache()
 
 
-def get_retrieval_optimizer(multilabel: bool):
+def get_embedding_optimizer(multilabel: bool):
     metric = "retrieval_hit_rate"
     if multilabel:
         metric = metric + "_intersecting"
-    retrieval_optimizer_config = {
+    embedding_optimizer_config = {
         "metric": metric,
-        "node_type": "retrieval",
+        "node_type": "embedding",
         "search_space": [
             {
                 "k": [10],
@@ -63,9 +63,9 @@ def get_retrieval_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
-                "module_name": "vector_db",
+                "module_name": "retrieval",
             },
         ],
     }
 
-    return NodeOptimizer(**retrieval_optimizer_config)
+    return NodeOptimizer(**embedding_optimizer_config)

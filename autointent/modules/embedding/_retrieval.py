@@ -1,4 +1,4 @@
-"""VectorDBModule class for managing and interacting with a vector database for retrieval tasks."""
+"""RetrievalEmbedding class for managing and interacting with a vector database for retrieval tasks."""
 
 import json
 from pathlib import Path
@@ -9,26 +9,26 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RetrievalMetricFn
-from autointent.modules.abc import RetrievalModule
+from autointent.modules.abc import EmbeddingModule
 
 
 class VectorDBMetadata(BaseMetadataDict):
-    """Metadata class for VectorDBModule."""
+    """Metadata class for RetrievalEmbedding."""
 
     db_dir: str
     batch_size: int
     max_length: int | None
 
 
-class VectorDBModule(RetrievalModule):
+class RetrievalEmbedding(EmbeddingModule):
     r"""
     Module for managing retrieval operations using a vector database.
 
-    VectorDBModule provides methods for indexing, querying, and managing a vector database for tasks
+    RetrievalEmbedding provides methods for indexing, querying, and managing a vector database for tasks
     such as nearest neighbor retrieval.
 
     :ivar vector_index: The vector index used for nearest neighbor retrieval.
-    :ivar name: Name of the module, defaults to "vector_db".
+    :ivar name: Name of the module, defaults to "retrieval".
 
     Examples
     --------
@@ -38,16 +38,16 @@ class VectorDBModule(RetrievalModule):
 
     .. testcode::
 
-        from autointent.modules.retrieval import VectorDBModule
+        from autointent.modules.embedding import RetrievalEmbedding
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
-        vector_db = VectorDBModule(
+        retrieval = RetrievalEmbedding(
             k=2,
             embedder_name="sergeyzh/rubert-tiny-turbo",
             db_dir=db_dir,
         )
-        vector_db.fit(utterances, labels)
-        predictions = vector_db.predict(["how is the weather today?"])
+        retrieval.fit(utterances, labels)
+        predictions = retrieval.predict(["how is the weather today?"])
         print(predictions)
 
     .. testoutput::
@@ -62,7 +62,7 @@ class VectorDBModule(RetrievalModule):
     """
 
     vector_index: VectorIndex
-    name = "vector_db"
+    name = "retrieval"
 
     def __init__(
         self,
@@ -75,7 +75,7 @@ class VectorDBModule(RetrievalModule):
         embedder_use_cache: bool = False,
     ) -> None:
         """
-        Initialize the VectorDBModule.
+        Initialize the RetrievalEmbedding.
 
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
@@ -100,14 +100,14 @@ class VectorDBModule(RetrievalModule):
         context: Context,
         k: int,
         embedder_name: str,
-    ) -> "VectorDBModule":
+    ) -> "RetrievalEmbedding":
         """
-        Create a VectorDBModule instance using a Context object.
+        Create a RetrievalEmbedding instance using a Context object.
 
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
-        :return: Initialized VectorDBModule instance.
+        :return: Initialized RetrievalEmbedding instance.
         """
         return cls(
             k=k,
@@ -153,7 +153,7 @@ class VectorDBModule(RetrievalModule):
         metric_fn: RetrievalMetricFn,
     ) -> float:
         """
-        Evaluate the retrieval model using a specified metric function.
+        Evaluate the embedding model using a specified metric function.
 
         :param context: The context containing test data and labels.
         :param split: Target split

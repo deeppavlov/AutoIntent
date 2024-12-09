@@ -15,7 +15,7 @@ from autointent.modules.abc import Module
 from ._base import NodeInfo
 
 
-class RetrievalNodeInfo(NodeInfo):
+class EmbeddingNodeInfo(NodeInfo):
     """Retrieval node info."""
 
     metrics_available: ClassVar[Mapping[str, RetrievalMetricFn]] = (
@@ -26,4 +26,4 @@ class RetrievalNodeInfo(NodeInfo):
         RETRIEVAL_MODULES_MULTICLASS | RETRIEVAL_MODULES_MULTILABEL  # type: ignore[has-type]
     )
 
-    node_type = NodeType.retrieval
+    node_type = NodeType.embedding
