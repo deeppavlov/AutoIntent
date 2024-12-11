@@ -3,6 +3,7 @@
 import logging
 from typing import Any, TypedDict, cast
 
+from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
@@ -192,50 +193,27 @@ class DataHandler:
         return self.dataset.dump()
 
     def _split(self, random_seed: int) -> None:
+        has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
+        has_test_split = any(split.startswith(Split.TEST) for split in self.dataset)
+
+        if Split.TRAIN in self.dataset:
+            self._split_train(random_seed)
+
         if Split.TEST not in self.dataset:
-            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
-                self.dataset,
-                split=Split.TRAIN,
-                test_size=0.2,
-                random_seed=random_seed,
-            )
+            test_size = 0.1 if has_validation_split else 0.2
+            self._split_test(test_size, random_seed)
 
-        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
-            self.dataset,
-            split=Split.TRAIN,
-            test_size=0.5,
-            random_seed=random_seed,
-        )
-        self.dataset.pop(Split.TRAIN)
-
-        for idx in range(2):
-            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
-                self.dataset,
-                split=f"{Split.TRAIN}_{idx}",
-                test_size=0.2,
-                random_seed=random_seed,
-            )
+        if not has_validation_split:
+            if not has_test_split:
+                self._split_validation_from_test(random_seed)
+                self._split_validation(random_seed)
+            else:
+                self._split_validation_from_train(random_seed)
+        elif Split.VALIDATION in self.dataset:
+            self._split_validation(random_seed)
 
         if self.has_oos_samples():
-            self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
-                self.dataset[Split.OOS]
-                .train_test_split(
-                    test_size=0.2,
-                    shuffle=True,
-                    seed=random_seed,
-                )
-                .values()
-            )
-            self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
-                self.dataset[f"{Split.OOS}_1"]
-                .train_test_split(
-                    test_size=0.5,
-                    shuffle=True,
-                    seed=random_seed,
-                )
-                .values()
-            )
-            self.dataset.pop(Split.OOS)
+            self._split_oos(random_seed)
 
         for split in self.dataset:
             if split.startswith(Split.OOS):
@@ -247,3 +225,78 @@ class DataHandler:
                     f"({n_classes_split} != {self.n_classes})"
                 )
                 raise ValueError(message)
+
+    def _split_train(self, random_seed: int) -> None:
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
+            self.dataset,
+            split=Split.TRAIN,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+        self.dataset.pop(Split.TRAIN)
+
+    def _split_validation(self, random_seed: int) -> None:
+        self.dataset[f"{Split.VALIDATION}_0"], self.dataset[f"{Split.VALIDATION}_1"] = split_dataset(
+            self.dataset,
+            split=Split.VALIDATION,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+        self.dataset.pop(Split.VALIDATION)
+
+    def _split_validation_from_test(self, random_seed: int) -> None:
+        self.dataset[Split.TEST], self.dataset[Split.VALIDATION] = split_dataset(
+            self.dataset,
+            split=Split.TEST,
+            test_size=0.5,
+            random_seed=random_seed,
+        )
+
+    def _split_validation_from_train(self, random_seed: int) -> None:
+        for idx in range(2):
+            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+                self.dataset,
+                split=f"{Split.TRAIN}_{idx}",
+                test_size=0.2,
+                random_seed=random_seed,
+            )
+
+    def _split_test(self, test_size: float, random_seed: int) -> None:
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(
+            self.dataset,
+            split=f"{Split.TRAIN}_0",
+            test_size=test_size,
+            random_seed=random_seed,
+        )
+        self.dataset[f"{Split.TRAIN}_1"], self.dataset[f"{Split.TEST}_1"] = split_dataset(
+            self.dataset,
+            split=f"{Split.TRAIN}_1",
+            test_size=test_size,
+            random_seed=random_seed,
+        )
+        self.dataset[Split.TEST] = concatenate_datasets(
+            [self.dataset[f"{Split.TEST}_0"], self.dataset[f"{Split.TEST}_1"]],
+        )
+        self.dataset.pop(f"{Split.TEST}_0")
+        self.dataset.pop(f"{Split.TEST}_1")
+
+    def _split_oos(self, random_seed: int) -> None:
+        self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
+            self.dataset[Split.OOS]
+            .train_test_split(
+                test_size=0.2,
+                shuffle=True,
+                seed=random_seed,
+            )
+            .values()
+        )
+        self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
+            self.dataset[f"{Split.OOS}_1"]
+            .train_test_split(
+                test_size=0.5,
+                shuffle=True,
+                seed=random_seed,
+            )
+            .values()
+        )
+        self.dataset.pop(Split.OOS)

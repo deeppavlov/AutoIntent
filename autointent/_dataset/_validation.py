@@ -9,13 +9,22 @@ class DatasetReader(BaseModel):
     """
     A class to represent a dataset reader for handling training, validation, and test data.
 
-    :param train: List of samples for training.
+    :param train: List of samples for training. Defaults to an empty list.
+    :param train_0: List of samples for scoring module training. Defaults to an empty list.
+    :param train_1: List of samples for decision module training. Defaults to an empty list.
     :param validation: List of samples for validation. Defaults to an empty list.
+    :param validation_0: List of samples for scoring module validation. Defaults to an empty list.
+    :param validation_1: List of samples for decision module validation. Defaults to an empty list.
     :param test: List of samples for testing. Defaults to an empty list.
     :param intents: List of intents associated with the dataset.
     """
 
     train: list[Sample]
+    train_0: list[Sample] = []
+    train_1: list[Sample] = []
+    validation: list[Sample] = []
+    validation_0: list[Sample] = []
+    validation_1: list[Sample] = []
     test: list[Sample] = []
     intents: list[Intent] = []
 
@@ -27,6 +36,23 @@ class DatasetReader(BaseModel):
         :raises ValueError: If intents or samples are not properly validated.
         :return: The validated DatasetReader instance.
         """
+        if self.train and (self.train_0 or self.train_1):
+            message = "If `train` is provided, `train_0` and `train_1` should be empty."
+            raise ValueError(message)
+        if not self.train and (not self.train_0 or not self.train_1):
+            message = "Both `train_0` and `train_1` must be provided if `train` is empty."
+            raise ValueError(message)
+
+        if self.validation and (self.validation_0 or self.validation_1):
+            message = "If `validation` is provided, `validation_0` and `validation_1` should be empty."
+            raise ValueError(message)
+        if not self.validation:
+            message = "Either both `validation_0` and `validation_1` must be provided, or neither of them."
+            if not self.validation_0 and self.validation_1:
+                raise ValueError(message)
+            if self.validation_0 and not self.validation_1:
+                raise ValueError(message)
+
         self._validate_intents()
         for split in [self.train, self.test]:
             self._validate_split(split)
