@@ -74,7 +74,7 @@ class Dataset(dict[str, HFDataset]):
 
         :return: Number of classes.
         """
-        return self.get_n_classes(Split.TRAIN)
+        return len(self.intents)
 
     @classmethod
     def from_json(cls, filepath: str | Path) -> "Dataset":
