@@ -48,11 +48,14 @@ class Dataset(dict[str, HFDataset]):
 
         self.intents = intents
 
+        self._encoded_labels = False
+
+        if self.multilabel:
+            self._encode_labels()
+
         oos_split = self._create_oos_split()
         if oos_split is not None:
             self[Split.OOS] = oos_split
-
-        self._encoded_labels = False
 
     @property
     def multilabel(self) -> bool:
@@ -121,17 +124,6 @@ class Dataset(dict[str, HFDataset]):
         """
         return {split_name: split.to_list() for split_name, split in self.items()}
 
-    def encode_labels(self) -> "Dataset":
-        """
-        Encode dataset labels into one-hot or multilabel format.
-
-        :return: Self, with labels encoded.
-        """
-        for split_name, split in self.items():
-            self[split_name] = split.map(self._encode_label)
-        self._encoded_labels = True
-        return self
-
     def to_multilabel(self) -> "Dataset":
         """
         Convert dataset labels to multilabel format.
@@ -140,6 +132,7 @@ class Dataset(dict[str, HFDataset]):
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
+        self._encode_labels()
         return self
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
@@ -187,6 +180,17 @@ class Dataset(dict[str, HFDataset]):
                         if label_:
                             classes.add(idx)
         return len(classes)
+
+    def _encode_labels(self) -> "Dataset":
+        """
+        Encode dataset labels into one-hot or multilabel format.
+
+        :return: Self, with labels encoded.
+        """
+        for split_name, split in self.items():
+            self[split_name] = split.map(self._encode_label)
+        self._encoded_labels = True
+        return self
 
     def _is_oos(self, sample: Sample) -> bool:
         """

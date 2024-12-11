@@ -46,8 +46,6 @@ class DataHandler:
         self.dataset = dataset
         if force_multilabel:
             self.dataset = self.dataset.to_multilabel()
-        if self.dataset.multilabel:
-            self.dataset = self.dataset.encode_labels()
 
         self.n_classes = self.dataset.n_classes
 
