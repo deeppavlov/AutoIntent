@@ -1,5 +1,6 @@
 """File with Dataset definition."""
 
+import json
 from collections import defaultdict
 from functools import cached_property
 from pathlib import Path
@@ -116,14 +117,6 @@ class Dataset(dict[str, HFDataset]):
             intents=[Intent.model_validate(intent) for intent in intents],
         )
 
-    def dump(self) -> dict[str, list[dict[str, Any]]]:
-        """
-        Convert the dataset splits to a dictionary of lists.
-
-        :return: Dictionary containing dataset splits as lists.
-        """
-        return {split_name: split.to_list() for split_name, split in self.items()}
-
     def to_multilabel(self) -> "Dataset":
         """
         Convert dataset labels to multilabel format.
@@ -134,6 +127,25 @@ class Dataset(dict[str, HFDataset]):
             self[split_name] = split.map(self._to_multilabel)
         self._encode_labels()
         return self
+
+    def to_dict(self) -> dict[str, list[dict[str, Any]]]:
+        """
+        Convert the dataset splits and intents to a dictionary of lists.
+
+        :return: A dictionary containing dataset splits and intents as lists of dictionaries.
+        """
+        mapping = {split_name: split.to_list() for split_name, split in self.items()}
+        mapping[Split.INTENTS] = [intent.model_dump() for intent in self.intents]
+        return mapping
+
+    def to_json(self, filepath: str | Path) -> None:
+        """
+        Save the dataset splits and intents to a JSON file.
+
+        :param filepath: The path to the file where the JSON data will be saved.
+        """
+        with Path(filepath).open("w") as file:
+            json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
         """

@@ -91,26 +91,6 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.test_labels() == [[1, 0], [0, 1]]
 
 
-def test_dump_method(sample_multiclass_data):
-    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
-
-    dump = handler.dump()
-
-    for split in ["train_0", "validation_0", "train_1", "validation_1", "test"]:
-        assert split in dump
-
-    assert dump["train_0"] == [
-        {"utterance": "hello", "label": 0},
-        {"utterance": "bye", "label": 1},
-        {"utterance": "hi", "label": 0},
-        {"utterance": "take care", "label": 1},
-    ]
-    assert dump["test"] == [
-        {"utterance": "greetings", "label": 0},
-        {"utterance": "farewell", "label": 1},
-    ]
-
-
 @pytest.mark.skip("All data validations will be refactored later")
 def test_error_handling(
     sample_multiclass_intent_records,

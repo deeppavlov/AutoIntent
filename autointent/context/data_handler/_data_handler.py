@@ -1,7 +1,8 @@
 """Data Handler file."""
 
 import logging
-from typing import Any, TypedDict, cast
+from pathlib import Path
+from typing import TypedDict, cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
@@ -182,13 +183,13 @@ class DataHandler:
         """
         return any(split.startswith(Split.OOS) for split in self.dataset)
 
-    def dump(self) -> dict[str, list[dict[str, Any]]]:
+    def dump(self, filepath: str | Path) -> None:
         """
-        Dump the dataset splits.
+        Save the dataset splits and intents to a JSON file.
 
-        :return: Dataset dump.
+        :param filepath: The path to the file where the JSON data will be saved.
         """
-        return self.dataset.dump()
+        self.dataset.to_json(filepath)
 
     def _split(self, random_seed: int) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
