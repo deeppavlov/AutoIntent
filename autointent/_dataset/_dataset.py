@@ -78,18 +78,6 @@ class Dataset(dict[str, HFDataset]):
         return len(self.intents)
 
     @classmethod
-    def from_json(cls, filepath: str | Path) -> "Dataset":
-        """
-        Load a dataset from a JSON file.
-
-        :param filepath: Path to the JSON file.
-        :return: Initialized Dataset object.
-        """
-        from ._reader import JsonReader
-
-        return JsonReader().read(filepath)
-
-    @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
         """
         Load a dataset from a dictionary mapping.
@@ -100,6 +88,18 @@ class Dataset(dict[str, HFDataset]):
         from ._reader import DictReader
 
         return DictReader().read(mapping)
+
+    @classmethod
+    def from_json(cls, filepath: str | Path) -> "Dataset":
+        """
+        Load a dataset from a JSON file.
+
+        :param filepath: Path to the JSON file.
+        :return: Initialized Dataset object.
+        """
+        from ._reader import JsonReader
+
+        return JsonReader().read(filepath)
 
     @classmethod
     def from_hub(cls, repo_id: str) -> "Dataset":
