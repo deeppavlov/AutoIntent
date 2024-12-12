@@ -11,7 +11,6 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
-from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -39,8 +38,6 @@ class LinearScorer(ScoringModule):
 
     :ivar classifier_file_name: Filename for saving the classifier to disk.
     :ivar embedding_model_subdir: Directory for saving the embedding model.
-    :ivar precomputed_embeddings: Flag indicating if embeddings are precomputed.
-    :ivar db_dir: Path to the database directory.
     :ivar name: Name of the scorer, defaults to "linear".
 
     Example
@@ -67,8 +64,6 @@ class LinearScorer(ScoringModule):
 
     classifier_file_name: str = "classifier.joblib"
     embedding_model_subdir: str = "embedding_model"
-    precomputed_embeddings: bool = False
-    db_dir: str
     name = "linear"
 
     def __init__(
@@ -116,23 +111,14 @@ class LinearScorer(ScoringModule):
         :param embedder_name: Name of the embedder, or None to use the best embedder.
         :return: Initialized LinearScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
-            precomputed_embeddings = True
-        else:
-            precomputed_embeddings = context.vector_index_client.exists(embedder_name)
-
-        instance = cls(
-            embedder_name=embedder_name,
+        return cls(
+            embedder_name=embedder_name if embedder_name else context.optimization_info.get_best_embedder(),
             embedder_device=context.get_device(),
             seed=context.seed,
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
-        instance.precomputed_embeddings = precomputed_embeddings
-        instance.db_dir = str(context.get_db_dir())
-        return instance
 
     def get_embedder_name(self) -> str:
         """
@@ -156,30 +142,14 @@ class LinearScorer(ScoringModule):
         """
         self._multilabel = isinstance(labels[0], list)
 
-        if self.precomputed_embeddings:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            vector_index_client = VectorIndexClient(
-                self.embedder_device,
-                self.db_dir,
-                self.batch_size,
-                self.max_length,
-                self.embedder_use_cache,
-            )
-            vector_index = vector_index_client.get_index(self.embedder_name)
-            features = vector_index.get_all_embeddings()
-            if len(features) != len(utterances):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-            embedder = vector_index.embedder
-        else:
-            embedder = Embedder(
-                device=self.embedder_device,
-                model_name=self.embedder_name,
-                batch_size=self.batch_size,
-                max_length=self.max_length,
-                use_cache=self.embedder_use_cache,
-            )
-            features = embedder.embed(utterances)
+        embedder = Embedder(
+            device=self.embedder_device,
+            model_name=self.embedder_name,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+            use_cache=self.embedder_use_cache,
+        )
+        features = embedder.embed(utterances)
 
         if self._multilabel:
             base_clf = LogisticRegression()

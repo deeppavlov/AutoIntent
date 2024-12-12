@@ -1,5 +1,6 @@
 """File with Dataset definition."""
 
+import json
 from collections import defaultdict
 from functools import cached_property
 from pathlib import Path
@@ -48,11 +49,14 @@ class Dataset(dict[str, HFDataset]):
 
         self.intents = intents
 
+        self._encoded_labels = False
+
+        if self.multilabel:
+            self._encode_labels()
+
         oos_split = self._create_oos_split()
         if oos_split is not None:
             self[Split.OOS] = oos_split
-
-        self._encoded_labels = False
 
     @property
     def multilabel(self) -> bool:
@@ -71,19 +75,7 @@ class Dataset(dict[str, HFDataset]):
 
         :return: Number of classes.
         """
-        return self.get_n_classes(Split.TRAIN)
-
-    @classmethod
-    def from_json(cls, filepath: str | Path) -> "Dataset":
-        """
-        Load a dataset from a JSON file.
-
-        :param filepath: Path to the JSON file.
-        :return: Initialized Dataset object.
-        """
-        from ._reader import JsonReader
-
-        return JsonReader().read(filepath)
+        return len(self.intents)
 
     @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
@@ -96,6 +88,18 @@ class Dataset(dict[str, HFDataset]):
         from ._reader import DictReader
 
         return DictReader().read(mapping)
+
+    @classmethod
+    def from_json(cls, filepath: str | Path) -> "Dataset":
+        """
+        Load a dataset from a JSON file.
+
+        :param filepath: Path to the JSON file.
+        :return: Initialized Dataset object.
+        """
+        from ._reader import JsonReader
+
+        return JsonReader().read(filepath)
 
     @classmethod
     def from_hub(cls, repo_id: str) -> "Dataset":
@@ -113,25 +117,6 @@ class Dataset(dict[str, HFDataset]):
             intents=[Intent.model_validate(intent) for intent in intents],
         )
 
-    def dump(self) -> dict[str, list[dict[str, Any]]]:
-        """
-        Convert the dataset splits to a dictionary of lists.
-
-        :return: Dictionary containing dataset splits as lists.
-        """
-        return {split_name: split.to_list() for split_name, split in self.items()}
-
-    def encode_labels(self) -> "Dataset":
-        """
-        Encode dataset labels into one-hot or multilabel format.
-
-        :return: Self, with labels encoded.
-        """
-        for split_name, split in self.items():
-            self[split_name] = split.map(self._encode_label)
-        self._encoded_labels = True
-        return self
-
     def to_multilabel(self) -> "Dataset":
         """
         Convert dataset labels to multilabel format.
@@ -140,7 +125,27 @@ class Dataset(dict[str, HFDataset]):
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
+        self._encode_labels()
         return self
+
+    def to_dict(self) -> dict[str, list[dict[str, Any]]]:
+        """
+        Convert the dataset splits and intents to a dictionary of lists.
+
+        :return: A dictionary containing dataset splits and intents as lists of dictionaries.
+        """
+        mapping = {split_name: split.to_list() for split_name, split in self.items()}
+        mapping[Split.INTENTS] = [intent.model_dump() for intent in self.intents]
+        return mapping
+
+    def to_json(self, filepath: str | Path) -> None:
+        """
+        Save the dataset splits and intents to a JSON file.
+
+        :param filepath: The path to the file where the JSON data will be saved.
+        """
+        with Path(filepath).open("w") as file:
+            json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
         """
@@ -187,6 +192,17 @@ class Dataset(dict[str, HFDataset]):
                         if label_:
                             classes.add(idx)
         return len(classes)
+
+    def _encode_labels(self) -> "Dataset":
+        """
+        Encode dataset labels into one-hot or multilabel format.
+
+        :return: Self, with labels encoded.
+        """
+        for split_name, split in self.items():
+            self[split_name] = split.map(self._encode_label)
+        self._encoded_labels = True
+        return self
 
     def _is_oos(self, sample: Sample) -> bool:
         """
