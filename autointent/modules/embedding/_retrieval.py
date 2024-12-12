@@ -96,12 +96,13 @@ class LogRegEmbedding(EmbeddingModule):
         self.classifier = LogisticRegression()
         self.label_encoder = LabelEncoder()
 
-        super().__init__()
+        super().__init__(k=k)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
+        k: int,
         embedder_name: str,
     ) -> "LogRegEmbedding":
         """
@@ -112,6 +113,7 @@ class LogRegEmbedding(EmbeddingModule):
         :return: Initialized LogRegEmbedding instance.
         """
         return cls(
+            k=k,
             embedder_name=embedder_name,
             db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
@@ -147,11 +149,9 @@ class LogRegEmbedding(EmbeddingModule):
         )
         self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
-        embeddings = self.vector_index.get_all_embeddings(utterances)
-
+        embeddings = self.vector_index.get_all_embeddings()
         self.label_encoder.fit(labels)
         encoded_labels = self.label_encoder.transform(labels)
-
         self.classifier.fit(embeddings, encoded_labels)
 
     def score(
@@ -178,8 +178,7 @@ class LogRegEmbedding(EmbeddingModule):
             message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
             raise ValueError(message)
 
-        embeddings = self._generate_embeddings(utterances)
-
+        embeddings = self.vector_index.embedder.embed(utterances)
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
@@ -213,7 +212,6 @@ class LogRegEmbedding(EmbeddingModule):
         with (dump_dir / "metadata.json").open("w") as file:
             json.dump(metadata.__dict__, file, indent=4)
 
-        # Save the logistic regression model
         model_path = dump_dir / "logreg_model.json"
         with model_path.open("w") as file:
             json.dump(
@@ -226,7 +224,6 @@ class LogRegEmbedding(EmbeddingModule):
                 indent=4,
             )
 
-        # Save the embedder, if necessary
         super().dump(path)
 
     def load(self, path: str) -> None:
@@ -243,17 +240,16 @@ class LogRegEmbedding(EmbeddingModule):
             self.max_length = metadata_dict.get("max_length", self.max_length)
             self._db_dir = metadata_dict.get("db_dir", self._db_dir)
 
-        # Load the logistic regression model
         model_path = dump_dir / "logreg_model.json"
         with model_path.open() as file:
             model_data = json.load(file)
             self.classifier = LogisticRegression()
+            self.k = model_data["k"]
             self.classifier.coef_ = [model_data["coef"]]
             self.classifier.intercept_ = model_data["intercept"]
             self.label_encoder = LabelEncoder()
             self.label_encoder.classes_ = model_data["classes"]
 
-        # Load the embedder, if necessary
         super().load(path)
 
     def predict(self, utterances: list[str]) -> list[int | list[int]]:
@@ -261,16 +257,23 @@ class LogRegEmbedding(EmbeddingModule):
         Predict labels for a list of utterances.
 
         :param utterances: List of utterances for classification.
-        :return: List of predicted labels.
+        :return: A tuple containing:
+            - labels: List of predicted labels for each utterance.
+            - scores: List of dummy confidence scores (set to 1.0 for all predictions).
+            - texts: List of the input utterances.
         """
-        # Generate embeddings for utterances
-        embeddings = self._generate_embeddings(utterances)
-
-        # Predict labels
+        embeddings = self.vector_index.embedder.embed(utterances)
         predicted_encoded = self.classifier.predict(embeddings)
-        predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
+        predicted_labels = self.label_encoder.inverse_transform(predicted_encoded).tolist()
+        predicted_probabilities = self.classifier.predict_proba(embeddings).tolist()
 
-        return predicted_labels.tolist()
+        labels = self.vector_index.get_all_labels()
+
+        labels = [[label] for label in predicted_labels]
+        scores = [[prob] for prob in predicted_probabilities]
+        texts = [self.vector_index.texts[labels == pl][: self.k] for pl in predicted_labels]
+
+        return labels, scores, texts
 
 
 class RetrievalEmbedding(EmbeddingModule):
