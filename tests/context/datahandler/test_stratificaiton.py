@@ -18,7 +18,7 @@ def test_train_test_split(dataset):
 
 
 def test_multilabel_train_test_split(dataset):
-    dataset = dataset.to_multilabel().encode_labels()
+    dataset = dataset.to_multilabel()
     dataset[Split.TRAIN], dataset[Split.TEST] = split_dataset(
         dataset,
         split=Split.TRAIN,
