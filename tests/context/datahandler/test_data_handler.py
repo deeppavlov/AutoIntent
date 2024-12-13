@@ -2,6 +2,7 @@ import pytest
 
 from autointent import Dataset
 from autointent.context.data_handler import DataHandler
+from autointent.schemas import Sample
 
 
 @pytest.fixture
@@ -64,6 +65,10 @@ def sample_multilabel_data():
     }
 
 
+def mock_split():
+    return [{"utterance": "Hello!", "label": 0}]
+
+
 def test_data_handler_initialization(sample_multiclass_data):
     handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
@@ -91,40 +96,81 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.test_labels() == [[1, 0], [0, 1]]
 
 
-def test_dump_method(sample_multiclass_data):
-    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
+@pytest.mark.parametrize("label", [0, [0], None])
+def test_sample_initialization(label):
+    sample = Sample(utterance="Hello!", label=label)
+    assert sample.label == label
 
-    dump = handler.dump()
 
-    for split in ["train_0", "validation_0", "train_1", "validation_1", "test"]:
-        assert split in dump
+@pytest.mark.parametrize("label", [-1, [-1], []])
+def test_sample_validation(label):
+    with pytest.raises(ValueError):
+        Sample(utterance="Hello!", label=label)
 
-    assert dump["train_0"] == [
-        {"utterance": "hello", "label": 0},
-        {"utterance": "bye", "label": 1},
-        {"utterance": "hi", "label": 0},
-        {"utterance": "take care", "label": 1},
+
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"train": mock_split()},
+        {"train": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "test": mock_split()},
+        {"train": mock_split(), "validation": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "test": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split(), "validation_1": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {
+            "train_0": mock_split(),
+            "train_1": mock_split(),
+            "validation_0": mock_split(),
+            "validation_1": mock_split(),
+            "test": mock_split(),
+        },
     ]
-    assert dump["test"] == [
-        {"utterance": "greetings", "label": 0},
-        {"utterance": "farewell", "label": 1},
+)
+def test_dataset_initialization(mapping):
+    dataset = Dataset.from_dict(mapping)
+    for split in mapping:
+        assert split in dataset
+
+
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {},
+        {"train_0": mock_split()},
+        {"train_1": mock_split()},
+        {"train": mock_split(), "train_0": mock_split()},
+        {"train": mock_split(), "train_1": mock_split()},
+        {"train": mock_split(), "train_0": mock_split(), "train_1": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split()},
+        {"train": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "oos": mock_split()}
     ]
+)
+def test_dataset_validation(mapping):
+    with pytest.raises(ValueError):
+        Dataset.from_dict(mapping)
 
 
-@pytest.mark.skip("All data validations will be refactored later")
-def test_error_handling(
-    sample_multiclass_intent_records,
-    sample_multilabel_utterance_records,
-    sample_test_utterance_records,
-):
-    with pytest.raises(ValueError, match="unexpected classification mode value"):
-        DataHandler(
-            sample_multiclass_intent_records,
-            sample_multilabel_utterance_records,
-            sample_test_utterance_records,
-            mode="invalid_mode",
-            seed=42,
-        )
-
-    with pytest.raises(ValueError, match="No data provided"):
-        DataHandler([], [], [], mode="multiclass", seed=42)
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"train": [{"utterance": "Hello!", "label": 0}], "intents": [{"id": 1}]},
+        {"train": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}], "intents": [{"id": 0}]},
+        {
+            "train": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}],
+            "test": [{"utterance": "Hello!", "label": 0}],
+        },
+        {"train": [{"utterance": "Hello!"}]},
+    ]
+)
+def test_intents_validation(mapping):
+    with pytest.raises(ValueError):
+        Dataset.from_dict(mapping)
