@@ -1,7 +1,5 @@
 import pytest
 
-from pydantic import ValidationError
-
 from autointent import Dataset
 from autointent.context.data_handler import DataHandler
 from autointent.schemas import Sample
@@ -67,6 +65,10 @@ def sample_multilabel_data():
     }
 
 
+def mock_split():
+    return [{"utterance": "Hello!", "label": 0}]
+
+
 def test_data_handler_initialization(sample_multiclass_data):
     handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
@@ -94,63 +96,81 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.test_labels() == [[1, 0], [0, 1]]
 
 
-def test_sample_validation():
-    utterance = "Hello!"
-    Sample(utterance="Hello!", label=0)
-    with pytest.raises(ValueError):
-        Sample(utterance=utterance, label=[])
-    with pytest.raises(ValueError):
-        Sample(utterance=utterance, label=-1)
-    with pytest.raises(ValueError):
-        Sample(utterance=utterance, label=[-1])
+@pytest.mark.parametrize("label", [0, [0], None])
+def test_sample_initialization(label):
+    sample = Sample(utterance="Hello!", label=label)
+    assert sample.label == label
 
 
-def test_dataset_validation():
-    mock_split = [{"utterance": "Hello!", "label": 0}]
+@pytest.mark.parametrize("label", [-1, [-1], []])
+def test_sample_validation(label):
+    with pytest.raises(ValueError):
+        Sample(utterance="Hello!", label=label)
 
-    Dataset.from_dict({"train": mock_split})
-    Dataset.from_dict({"train_0": mock_split, "train_1": mock_split})
 
-    with pytest.raises(ValueError):
-        Dataset.from_dict({})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "train_0": mock_split, "train_1": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "train_0": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "train_1": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train_0": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train_1": mock_split})
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"train": mock_split()},
+        {"train": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "test": mock_split()},
+        {"train": mock_split(), "validation": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "test": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split(), "validation_1": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation": mock_split(), "test": mock_split()},
+        {"train_0": mock_split(), "train_1": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {
+            "train_0": mock_split(),
+            "train_1": mock_split(),
+            "validation_0": mock_split(),
+            "validation_1": mock_split(),
+            "test": mock_split(),
+        },
+    ]
+)
+def test_dataset_initialization(mapping):
+    dataset = Dataset.from_dict(mapping)
+    for split in mapping:
+        assert split in dataset
 
-    Dataset.from_dict({"train": mock_split, "validation": mock_split})
-    Dataset.from_dict({"train": mock_split, "validation_0": mock_split, "validation_1": mock_split})
 
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {},
+        {"train_0": mock_split()},
+        {"train_1": mock_split()},
+        {"train": mock_split(), "train_0": mock_split()},
+        {"train": mock_split(), "train_1": mock_split()},
+        {"train": mock_split(), "train_0": mock_split(), "train_1": mock_split()},
+        {"train": mock_split(), "validation_0": mock_split()},
+        {"train": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
+        {"train": mock_split(), "oos": mock_split()}
+    ]
+)
+def test_dataset_validation(mapping):
     with pytest.raises(ValueError):
-        Dataset.from_dict(
-            {"train": mock_split, "validation": mock_split, "validation_0": mock_split, "validation_1": mock_split},
-        )
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "validation": mock_split, "validation_0": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "validation": mock_split, "validation_1": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "validation_0": mock_split})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "validation_1": mock_split})
+        Dataset.from_dict(mapping)
 
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": mock_split, "intents": [{"id": 1}]})
-    with pytest.raises(ValueError):
-        Dataset.from_dict({"train": [{"utterance": "Hello!", "label": 1}], "intents": [{"id": 0}]})
 
+@pytest.mark.parametrize(
+    "mapping",
+    [
+        {"train": [{"utterance": "Hello!", "label": 0}], "intents": [{"id": 1}]},
+        {"train": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}], "intents": [{"id": 0}]},
+        {
+            "train": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}],
+            "test": [{"utterance": "Hello!", "label": 0}],
+        },
+        {"train": [{"utterance": "Hello!"}]},
+    ]
+)
+def test_intents_validation(mapping):
     with pytest.raises(ValueError):
-        Dataset.from_dict({"train": [{"utterance": "Hello!"}]})
-    with pytest.raises(ValueError):
-        Dataset.from_dict(
-            {"train": mock_split, "test": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}]},
-        )
-
-    with pytest.raises(ValidationError):
-        Dataset.from_dict({"train": mock_split, "oos": mock_split})
+        Dataset.from_dict(mapping)
