@@ -259,7 +259,7 @@ class LogRegEmbedding(EmbeddingModule):
         :param utterances: List of utterances for classification.
         :return: A tuple containing:
             - labels: List of predicted labels for each utterance.
-            - scores: List of dummy confidence scores (set to 1.0 for all predictions).
+            - scores: List of dummy confidence scores.
             - texts: List of the input utterances.
         """
         embeddings = self.vector_index.embedder.embed(utterances)
@@ -269,11 +269,9 @@ class LogRegEmbedding(EmbeddingModule):
 
         labels = self.vector_index.get_all_labels()
 
-        labels = [[label] for label in predicted_labels]
-        scores = [[prob] for prob in predicted_probabilities]
-        texts = [self.vector_index.texts[labels == pl][: self.k] for pl in predicted_labels]
+        texts = [self.vector_index.texts[labels == label][: self.k] for label in predicted_labels]
 
-        return labels, scores, texts
+        return predicted_labels, predicted_probabilities, texts
 
 
 class RetrievalEmbedding(EmbeddingModule):
