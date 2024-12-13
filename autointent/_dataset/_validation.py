@@ -1,6 +1,6 @@
 """File with definitions of DatasetReader and DatasetValidator."""
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from autointent.schemas import Intent, Sample
 
@@ -28,6 +28,8 @@ class DatasetReader(BaseModel):
     test: list[Sample] = []
     intents: list[Intent] = []
 
+    model_config = ConfigDict(extra="forbid")
+
     @model_validator(mode="after")
     def validate_dataset(self) -> "DatasetReader":
         """
@@ -54,7 +56,13 @@ class DatasetReader(BaseModel):
                 raise ValueError(message)
 
         splits = [
-            self.train, self.train_0, self.train_1, self.validation, self.validation_0, self.validation_1, self.test,
+            self.train,
+            self.train_0,
+            self.train_1,
+            self.validation,
+            self.validation_0,
+            self.validation_1,
+            self.test,
         ]
         splits = [split for split in splits if split]
 
@@ -66,10 +74,7 @@ class DatasetReader(BaseModel):
             )
             raise ValueError(message)
         if not n_classes[0]:
-            message = (
-                "Number of classes is zero or undefined. "
-                "Ensure at least one class is present in the splits."
-            )
+            message = "Number of classes is zero or undefined. " "Ensure at least one class is present in the splits."
             raise ValueError(message)
 
         self._validate_intents(n_classes[0])

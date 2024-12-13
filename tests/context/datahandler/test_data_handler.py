@@ -1,5 +1,7 @@
 import pytest
 
+from pydantic import ValidationError
+
 from autointent import Dataset
 from autointent.context.data_handler import DataHandler
 from autointent.schemas import Sample
@@ -147,5 +149,8 @@ def test_dataset_validation():
         Dataset.from_dict({"train": [{"utterance": "Hello!"}]})
     with pytest.raises(ValueError):
         Dataset.from_dict(
-            {"train": mock_split, "test": [{"utterance": "Hello!", "label": 1}, {"utterance": "Hello!", "label": 0}]},
+            {"train": mock_split, "test": [{"utterance": "Hello!", "label": 0}, {"utterance": "Hello!", "label": 1}]},
         )
+
+    with pytest.raises(ValidationError):
+        Dataset.from_dict({"train": mock_split, "oos": mock_split})
