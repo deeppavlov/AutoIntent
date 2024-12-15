@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.preprocessing import LabelEncoder
 
 from autointent.context import Context
@@ -63,7 +63,7 @@ class LogRegEmbedding(EmbeddingModule):
 
     """
 
-    classifier: LogisticRegression
+    classifier: LogisticRegressionCV
     label_encoder: LabelEncoder
     name = "logreg"
 
@@ -76,6 +76,7 @@ class LogRegEmbedding(EmbeddingModule):
         batch_size: int = 32,
         max_length: int | None = None,
         embedder_use_cache: bool = False,
+        **kwargs,
     ) -> None:
         """
         Initialize the RetrievalEmbedding.
@@ -93,7 +94,7 @@ class LogRegEmbedding(EmbeddingModule):
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
-        self.classifier = LogisticRegression()
+        self.classifier = LogisticRegressionCV(**kwargs)
         self.label_encoder = LabelEncoder()
 
         super().__init__(k=k)
@@ -104,6 +105,7 @@ class LogRegEmbedding(EmbeddingModule):
         context: Context,
         k: int,
         embedder_name: str,
+        **kwargs,
     ) -> "LogRegEmbedding":
         """
         Create a LogRegEmbedding instance using a Context object.
@@ -120,6 +122,7 @@ class LogRegEmbedding(EmbeddingModule):
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
+            **kwargs,
         )
 
     @property
@@ -182,7 +185,7 @@ class LogRegEmbedding(EmbeddingModule):
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
-        return metric_fn(labels, predicted_labels)
+        return metric_fn(labels, [predicted_labels])
 
     def get_assets(self) -> RetrieverArtifact:
         """
@@ -243,7 +246,7 @@ class LogRegEmbedding(EmbeddingModule):
         model_path = dump_dir / "logreg_model.json"
         with model_path.open() as file:
             model_data = json.load(file)
-            self.classifier = LogisticRegression()
+            self.classifier = LogisticRegressionCV()
             self.k = model_data["k"]
             self.classifier.coef_ = [model_data["coef"]]
             self.classifier.intercept_ = model_data["intercept"]
