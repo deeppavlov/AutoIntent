@@ -189,5 +189,7 @@ module = [
     "faiss",
     "datasets",
     "joblib",
+    "torch.utils.tensorboard",
+    "tensorboardX",
 ]
 ignore_missing_imports = true

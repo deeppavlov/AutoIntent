@@ -103,4 +103,4 @@ def get_decision_evaluation_data(
         labels = np.concatenate([labels, np.array(oos_labels)])
         return_scores = np.concatenate([scores, oos_scores])
 
-    return labels.tolist(), return_scores  # type: ignore[return-value]
+    return labels.tolist(), return_scores

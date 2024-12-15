@@ -159,7 +159,7 @@ class ThresholdDecision(DecisionModule):
         self.metadata = ThresholdDecisionDumpMetadata(
             multilabel=self.multilabel,
             tags=self.tags,
-            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),  # type: ignore[typeddict-item]
+            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),
             n_classes=self.n_classes,
         )
 

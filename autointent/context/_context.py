@@ -8,6 +8,7 @@ from typing import Any
 import yaml
 
 from autointent import Dataset
+from autointent._callbacks.base import CallbackHandler, get_callbacks
 from autointent.configs import (
     DataConfig,
     EmbedderConfig,
@@ -32,6 +33,7 @@ class Context:
     data_handler: DataHandler
     vector_index_client: VectorIndexClient
     optimization_info: OptimizationInfo
+    callback_handler = CallbackHandler()
 
     def __init__(self, seed: int = 42) -> None:
         """
@@ -49,6 +51,7 @@ class Context:
         :param config: Logging configuration settings.
         """
         self.logging_config = config
+        self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
     def configure_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:

@@ -313,7 +313,7 @@ def retrieval_hit_rate(
         if query_label in candidate_labels:
             hit_count += 1
 
-    return hit_count / num_queries
+    return float(hit_count / num_queries)
 
 
 def retrieval_hit_rate_intersecting(
@@ -358,7 +358,7 @@ def retrieval_hit_rate_intersecting(
         if np.sum(query_label * candidate_labels_sum) > 0:
             hit_count += 1
 
-    return hit_count / num_queries
+    return float(hit_count / num_queries)
 
 
 def retrieval_hit_rate_macro(
@@ -447,7 +447,7 @@ def retrieval_precision(
 
         total_precision += precision_at_k
 
-    return total_precision / num_queries
+    return float(total_precision / num_queries)
 
 
 def retrieval_precision_intersecting(
@@ -494,7 +494,7 @@ def retrieval_precision_intersecting(
 
         total_precision += precision_at_k
 
-    return total_precision / num_queries
+    return float(total_precision / num_queries)
 
 
 def retrieval_precision_macro(
@@ -724,7 +724,7 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
                 mrr_sum += 1.0 / (rank + 1)
                 break
 
-    return mrr_sum / num_queries
+    return float(mrr_sum / num_queries)
 
 
 def retrieval_mrr_intersecting(
@@ -764,7 +764,7 @@ def retrieval_mrr_intersecting(
                 mrr_sum += 1.0 / (rank + 1)
                 break
 
-    return mrr_sum / num_queries
+    return float(mrr_sum / num_queries)
 
 
 def retrieval_mrr_macro(

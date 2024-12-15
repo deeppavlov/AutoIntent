@@ -164,7 +164,7 @@ class TunableDecision(DecisionModule):
         """
         self.metadata = TunableDecisionDumpMetadata(
             multilabel=self.multilabel,
-            thresh=self.thresh.tolist(),  # type: ignore[typeddict-item]
+            thresh=self.thresh.tolist(),
             tags=self.tags,
             n_classes=self.n_classes,
         )
