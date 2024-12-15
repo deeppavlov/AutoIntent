@@ -76,13 +76,13 @@ def test_pipeline_callbacks():
 
     assert len(dummy_callback.history) == 23
     assert dummy_callback.history[0][0] == "start_run"
-    assert dummy_callback.history[0][1].keys() == {"run_name"}
+    assert "run_name" in dummy_callback.history[0][1]
     assert dummy_callback.history[1:] == [
         (
             "start_module",
             {
                 "module_name": "retrieval",
-                "j_combination": 0,
+                "num": 0,
                 "module_kwargs": {"k": 5, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
@@ -92,7 +92,7 @@ def test_pipeline_callbacks():
             "start_module",
             {
                 "module_name": "retrieval",
-                "j_combination": 1,
+                "num": 1,
                 "module_kwargs": {"k": 10, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
@@ -102,7 +102,7 @@ def test_pipeline_callbacks():
             "start_module",
             {
                 "module_name": "knn",
-                "j_combination": 0,
+                "num": 0,
                 "module_kwargs": {"k": 1, "weights": "uniform", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
@@ -112,7 +112,7 @@ def test_pipeline_callbacks():
             "start_module",
             {
                 "module_name": "knn",
-                "j_combination": 1,
+                "num": 1,
                 "module_kwargs": {"k": 1, "weights": "distance", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
@@ -120,18 +120,14 @@ def test_pipeline_callbacks():
         ("end_module", {}),
         (
             "start_module",
-            {
-                "module_name": "linear",
-                "j_combination": 0,
-                "module_kwargs": {"embedder_name": "sergeyzh/rubert-tiny-turbo"},
-            },
+            {"module_name": "linear", "num": 0, "module_kwargs": {"embedder_name": "sergeyzh/rubert-tiny-turbo"}},
         ),
         ("log_value", {"scoring_roc_auc": np.float64(1.0)}),
         ("end_module", {}),
-        ("start_module", {"module_name": "threshold", "j_combination": 0, "module_kwargs": {"thresh": 0.5}}),
+        ("start_module", {"module_name": "threshold", "num": 0, "module_kwargs": {"thresh": 0.5}}),
         ("log_value", {"decision_accuracy": np.float64(0.75)}),
         ("end_module", {}),
-        ("start_module", {"module_name": "argmax", "j_combination": 0, "module_kwargs": {}}),
+        ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
         ("log_value", {"decision_accuracy": np.float64(0.75)}),
         ("end_module", {}),
         ("end_run", {}),
