@@ -460,7 +460,7 @@ class RetrievalEmbedding(EmbeddingModule):
         self.metadata = VectorDBMetadata(
             batch_size=self.batch_size,
             max_length=self.max_length,
-            db_dir=self.db_dir,
+            db_dir=str(self.db_dir),
         )
 
         dump_dir = Path(path)
