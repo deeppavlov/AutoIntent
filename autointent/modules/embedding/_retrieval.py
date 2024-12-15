@@ -23,6 +23,15 @@ class VectorDBMetadata(BaseMetadataDict):
     max_length: int | None
 
 
+class ClassifierMetadata(BaseMetadataDict):
+    """Metadata class for LogisticRegressionCV and LabelEncoder."""
+
+    coef_: list[list[float]]
+    intercept_: list[float]
+    params: dict[str, any]
+    classes: list[str]
+
+
 class LogRegEmbedding(EmbeddingModule):
     r"""
     Module for managing classification operations using logistic regression.
@@ -63,6 +72,7 @@ class LogRegEmbedding(EmbeddingModule):
 
     """
 
+    vector_index: VectorIndex
     classifier: LogisticRegressionCV
     label_encoder: LabelEncoder
     name = "logreg"
@@ -201,33 +211,29 @@ class LogRegEmbedding(EmbeddingModule):
 
     def dump(self, path: str) -> None:
         """
-        Save the module's metadata and model parameters to a specified directory.
+        Save the module's metadata, classifier parameters, and label encoder to a specified directory.
 
         :param path: Path to the directory where assets will be dumped.
         """
-        metadata = VectorDBMetadata(
+        self.metadata = VectorDBMetadata(
             batch_size=self.batch_size,
             max_length=self.max_length,
-            db_dir=self.db_dir,
+            db_dir=str(self.db_dir),
         )
 
         dump_dir = Path(path)
-        with (dump_dir / "metadata.json").open("w") as file:
-            json.dump(metadata.__dict__, file, indent=4)
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(self.metadata, file, indent=4)
+        self.vector_index.dump(dump_dir)
 
-        model_path = dump_dir / "logreg_model.json"
-        with model_path.open("w") as file:
-            json.dump(
-                {
-                    "coef": self.classifier.coef_.tolist(),
-                    "intercept": self.classifier.intercept_.tolist(),
-                    "classes": self.label_encoder.classes_.tolist(),
-                },
-                file,
-                indent=4,
-            )
-
-        super().dump(path)
+        self.classifier_metadata = ClassifierMetadata(
+            coef_=self.classifier.coef_.tolist(),
+            intercept_=self.classifier.intercept_.tolist(),
+            classes=self.label_encoder.classes_.tolist(),
+            params=self.classifier.get_params(),
+        )
+        with (dump_dir / "classifier.json").open("w") as file:
+            json.dump(self.classifier_metadata, file, indent=4)
 
     def load(self, path: str) -> None:
         """
@@ -236,24 +242,28 @@ class LogRegEmbedding(EmbeddingModule):
         :param path: Path to the directory containing the dumped assets.
         """
         dump_dir = Path(path)
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            self.metadata: VectorDBMetadata = json.load(file)
 
-        with (dump_dir / "metadata.json").open() as file:
-            metadata_dict = json.load(file)
-            self.batch_size = metadata_dict.get("batch_size", self.batch_size)
-            self.max_length = metadata_dict.get("max_length", self.max_length)
-            self._db_dir = metadata_dict.get("db_dir", self._db_dir)
+        vector_index_client = VectorIndexClient(
+            embedder_device=self.embedder_device,
+            db_dir=self.metadata["db_dir"],
+            embedder_batch_size=self.metadata["batch_size"],
+            embedder_max_length=self.metadata["max_length"],
+            embedder_use_cache=self.embedder_use_cache,
+        )
+        self.vector_index = vector_index_client.get_index(self.embedder_name)
 
-        model_path = dump_dir / "logreg_model.json"
-        with model_path.open() as file:
-            model_data = json.load(file)
-            self.classifier = LogisticRegressionCV()
-            self.k = model_data["k"]
-            self.classifier.coef_ = [model_data["coef"]]
-            self.classifier.intercept_ = model_data["intercept"]
-            self.label_encoder = LabelEncoder()
-            self.label_encoder.classes_ = model_data["classes"]
+        with (dump_dir / "classifier.json").open() as file:
+            self.classifier_metadata: ClassifierMetadata = json.load(file)
 
-        super().load(path)
+        self.classifier = LogisticRegressionCV()
+        self.classifier.set_params(**self.classifier_metadata["params"])
+        self.classifier.coef_ = self.classifier_metadata["coef_"]
+        self.classifier.intercept_ = self.classifier_metadata["intercept_"]
+
+        self.label_encoder = LabelEncoder()
+        self.label_encoder.classes_ = self.classifier_metadata["classes"]
 
     def predict(self, utterances: list[str]) -> list[int | list[int]]:
         """
