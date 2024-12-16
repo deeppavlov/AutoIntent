@@ -63,12 +63,11 @@ class Pipeline:
         """
         Create pipeline optimizer from dictionary search space.
 
-        :param config: Dictionary config
+        :param search_space: Dictionary config
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
-        if isinstance(search_space, list):
-            nodes = [NodeOptimizer(**node) for node in search_space]
+        nodes = [NodeOptimizer(**node) for node in search_space]
         return cls(nodes)
 
     @classmethod
@@ -76,7 +75,7 @@ class Pipeline:
         """
         Create pipeline optimizer with default search space for given classification task.
 
-        :param multilabel: Wether the task multi-label, or single-label.
+        :param multilabel: Whether the task multi-label, or single-label.
         """
         return cls.from_search_space(load_default_search_space(multilabel))
 
@@ -88,6 +87,10 @@ class Pipeline:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")
+        self.context.callback_handler.start_run(
+            run_name=self.context.logging_config.get_run_name(),
+            dirpath=self.context.logging_config.get_dirpath(),
+        )
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
             if node_optimizer is not None:
@@ -95,6 +98,7 @@ class Pipeline:
         if not context.vector_index_config.save_db:
             self._logger.info("removing vector database from file system...")
             context.vector_index_client.delete_db()
+        self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
         """
@@ -110,6 +114,7 @@ class Pipeline:
 
         :param dataset: Dataset for optimization
         :param force_multilabel: Whether to force multilabel or not
+        :param init_for_inference: Whether to initialize pipeline for inference
         :return: Context
         """
         if self._is_inference():
@@ -135,8 +140,10 @@ class Pipeline:
         predictions = self.predict(context.data_handler.test_utterances())
         for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
-                context.data_handler.test_labels(), predictions,
+                context.data_handler.test_labels(),
+                predictions,
             )
+        context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
 
