@@ -12,6 +12,7 @@ import yaml
 from autointent import Context, Dataset
 from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import NodeType
+from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
 
@@ -108,7 +109,7 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, force_multilabel: bool = False, init_for_inference: bool = True) -> Context:
+    def fit(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -128,15 +129,20 @@ class Pipeline:
 
         self._fit(context)
 
-        if init_for_inference:
-            if context.is_ram_to_clear():
-                nodes_configs = context.optimization_info.get_inference_nodes_config()
-                nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
-            else:
-                modules_dict = context.optimization_info.get_best_modules()
-                nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
+        if context.is_ram_to_clear():
+            nodes_configs = context.optimization_info.get_inference_nodes_config()
+            nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
+        else:
+            modules_dict = context.optimization_info.get_best_modules()
+            nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
 
-            self.nodes = {node.node_type: node for node in nodes_list}
+        self.nodes = {node.node_type: node for node in nodes_list}
+
+        predictions = self.predict(context.data_handler.test_utterances())
+        for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
+            context.optimization_info.pipeline_metrics[metric_name] = metric(
+                context.data_handler.test_labels(), predictions,
+            )
 
         return context
 
