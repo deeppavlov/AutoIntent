@@ -192,5 +192,6 @@ module = [
     "joblib",
     "torch.utils.tensorboard",
     "tensorboardX",
+    "wandb",
 ]
 ignore_missing_imports = true
