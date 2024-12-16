@@ -51,6 +51,14 @@ class OptimizerCallback(ABC):
     def end_run(self) -> None:
         """End a run."""
 
+    @abstractmethod
+    def log_final_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log final metrics.
+
+        :param metrics: Final metrics.
+        """
+
 
 class CallbackHandler(OptimizerCallback):
     """Internal class that just calls the list of callbacks in order."""
@@ -97,7 +105,16 @@ class CallbackHandler(OptimizerCallback):
         self.call_events("end_module")
 
     def end_run(self) -> None:
+        """End a run."""
         self.call_events("end_run")
+
+    def log_final_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log final metrics.
+
+        :param metrics: Final metrics.
+        """
+        self.call_events("log_final_metrics", metrics=metrics)
 
     def call_events(self, event: str, **kwargs: Any) -> None:  # noqa: ANN401
         for callback in self.callbacks:
@@ -157,6 +174,21 @@ class WandbCallback(OptimizerCallback):
         :param kwargs: Data to log.
         """
         self.wandb.log(kwargs)
+
+    def log_final_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log final metrics.
+
+        :param metrics: Final metrics.
+        """
+        self.wandb.init(
+            project=self.project_name,
+            group=self.group,
+            name="final_metrics",
+            config=metrics,
+        )
+        self.wandb.log(metrics)
+        self.wandb.finish()
 
     def end_module(self) -> None:
         """End a module."""
@@ -232,6 +264,25 @@ class TensorBoardCallback(OptimizerCallback):
         for key, value in kwargs.items():
             if isinstance(value, int | float):
                 self.module_writer.add_scalar(key, value)
+            else:
+                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+
+    def log_final_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log final metrics.
+
+        :param metrics: Final metrics.
+        """
+        if self.module_writer is None:
+            msg = "start_run must be called before log_final_metrics."
+            raise RuntimeError(msg)
+
+        log_dir = Path(self.dirpath) / "final_metrics"
+        self.module_writer = self.writer(log_dir=log_dir)  # type: ignore[no-untyped-call]
+
+        for key, value in metrics.items():
+            if isinstance(value, int | float):
+                self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]
             else:
                 self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
 

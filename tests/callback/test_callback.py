@@ -30,6 +30,9 @@ class DummyCallback(OptimizerCallback):
     def end_run(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("end_run", kwargs))
 
+    def log_final_metrics(self, **kwargs: dict[str, Any]) -> None:
+        self.history.append(("log_final_metrics", kwargs))
+
 
 def test_pipeline_callbacks():
     db_dir, dump_dir, logs_dir = setup_environment()

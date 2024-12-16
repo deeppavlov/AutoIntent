@@ -87,7 +87,6 @@ class Pipeline:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")
-        # TODO what's difference between self.context.logging_config and self.logging_config
         self.context.callback_handler.start_run(
             run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.get_dirpath(),
@@ -141,8 +140,10 @@ class Pipeline:
         predictions = self.predict(context.data_handler.test_utterances())
         for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
-                context.data_handler.test_labels(), predictions,
+                context.data_handler.test_labels(),
+                predictions,
             )
+        context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
 
