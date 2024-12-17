@@ -1,0 +1,21 @@
+autointent.schemas.Tag
+======================
+
+.. py:class:: autointent.schemas.Tag(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Represents a tag associated with intent classes.
+
+   Tags are used to define constraints such that if two intent classes share
+   a common tag, they cannot both be assigned to the same sample.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:attribute:: intent_ids
+      :type:  list[int]
+

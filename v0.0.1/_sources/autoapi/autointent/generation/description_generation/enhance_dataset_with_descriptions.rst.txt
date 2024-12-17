@@ -1,0 +1,15 @@
+autointent.generation.description_generation.enhance_dataset_with_descriptions
+==============================================================================
+
+.. py:function:: autointent.generation.description_generation.enhance_dataset_with_descriptions(dataset, client, prompt, model_name = 'gpt-4o-mini')
+
+   Enhances a dataset by generating descriptions for intents using an OpenAI model.
+
+   :param dataset: The dataset containing utterances and intents that require descriptions.
+   :param client: The OpenAI client used to generate the descriptions.
+   :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
+                                     and {user_utterances} to format the content sent to the model.
+   :param model_name: The OpenAI model to use for generating descriptions.
+
+   :returns: The dataset with intents enhanced by generated descriptions.
+
