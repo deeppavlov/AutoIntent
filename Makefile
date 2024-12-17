@@ -38,6 +38,10 @@ test-docs: docs
 serve-docs: docs
 	$(poetry) python -m http.server -d docs/build/html 8333
 
+.PHONY: multi-version
+multi-version:
+	$(poetry) python -m sphinx-multiversion docs/source docs/build/html
+
 .PHONY: clean-docs
 clean-docs:
 	rm -rf docs/build

@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - dev
+    - multiversion
   pull_request:
     branches:
       - dev
@@ -46,7 +47,7 @@ jobs:
 
       - name: build documentation
         run: |
-          make docs
+          make multi-version
 
       - name: save branch name without slashes
         env:
