@@ -73,7 +73,7 @@ def generate_versions_json(app, repo_root, base_url):
     os.makedirs(static_dir, exist_ok=True)
 
     # Generate and write versions JSON
-    versions = get_sorted_versions(repo_root)
+    versions = get_sorted_versions(repo_root, base_url)
     versions_path = os.path.join(static_dir, 'versions.json')
 
     # Always generate a JSON, even if empty
