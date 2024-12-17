@@ -45,9 +45,15 @@ jobs:
         run: |
           make test-docs
 
-      - name: build documentation
+#      - name: build documentation
+#        if: ${{ github.ref != 'refs/heads/dev' }}
+#        run: |
+#          make docs
+#
+      - name: build multiversion documentation
+        if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
-          make multi-version
+          make docs
 
       - name: save branch name without slashes
         env:
@@ -66,7 +72,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.6.4
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        # if: ${{ github.ref == 'refs/heads/dev' }}
         with:
           branch: gh-pages
           folder: docs/build/html/
