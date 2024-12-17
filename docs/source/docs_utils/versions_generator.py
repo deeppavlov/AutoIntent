@@ -9,7 +9,7 @@ import json
 import subprocess
 
 
-def get_sorted_versions(repo_root):
+def get_sorted_versions(repo_root, base_url):
     # Get the git repository root
     tags_output = subprocess.check_output(['git', '-C', repo_root, 'tag'], text=True).strip().split('\n')
     # Change to the repository root
@@ -34,13 +34,14 @@ def get_sorted_versions(repo_root):
         versions.append({
             "name": f"{sorted_tags[0]} (stable)",
             "version": sorted_tags[0].lstrip('v'),
-            "url": f"/{sorted_tags[0].lstrip('v')}/"
+            "url": f"{base_url}/{sorted_tags[0].lstrip('v')}/",
+            "preferred": True,
         })
 
     for tag in sorted_tags[1:]:
         versions.append({
             "version": tag.lstrip('v'),
-            "url": f"/{tag.lstrip('v')}/"
+            "url": f"{base_url}/{tag.lstrip('v')}/"
         })
 
     # Get branches
@@ -55,13 +56,13 @@ def get_sorted_versions(repo_root):
     for branch in dev_branches:
         versions.append({
             "version": f"{branch} (dev)",
-            "url": f"/{branch}/"
+            "url": f"{base_url}/{branch}/"
         })
 
     return versions
 
 
-def generate_versions_json(app, repo_root):
+def generate_versions_json(app, repo_root, base_url):
     """
     Sphinx extension to generate versions.json during documentation build.
     """

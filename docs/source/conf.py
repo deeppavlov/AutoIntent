@@ -9,6 +9,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from importlib.metadata import version
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
@@ -83,7 +84,9 @@ autoapi_add_toctree_entry = False
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
+version = version("autointent").replace("dev", "")  # may differ
 
+BASE_URL = "https://deeppavlov.github.io/AutoIntent"
 html_theme_options = {
     "logo": {
         "text": "AutoIntent",
@@ -104,6 +107,11 @@ html_theme_options = {
             "type": "local",
         },
     ],
+    "switcher": {
+        "json_url": f"{BASE_URL}/_static/versions.json",
+        "version_match": version,
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
     "show_toc_level": 3,
 }
 
@@ -133,11 +141,11 @@ nbsphinx_thumbnails = {
     "user_guides/*": "_static/square-white.svg",
 }
 
-html_sidebars = {
-    '**': [
-        'versioning.html',
-    ],
-}
+# html_sidebars = {
+#     '**': [
+#         'versioning.html',
+#     ],
+# }
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
@@ -156,7 +164,7 @@ smv_released_pattern = r'^(refs/tags/.*|refs/heads/dev)$'
 
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ".."))  # if conf.py is in docs/
 def setup(app) -> None:  # noqa: ANN001
-    generate_versions_json(app, repo_root)
+    generate_versions_json(app, repo_root, BASE_URL)
     # versions = get_sorted_versions()
     # with open('docs/source/_static/versions.json', 'w') as f:
     #     json.dump(versions, f, indent=4)
