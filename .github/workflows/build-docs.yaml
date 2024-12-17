@@ -53,7 +53,7 @@ jobs:
       - name: build multiversion documentation
         # if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
-          make docs
+          make multi-version-docs
 
       - name: save branch name without slashes
         env:
