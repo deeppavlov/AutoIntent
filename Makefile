@@ -40,7 +40,7 @@ serve-docs: docs
 
 .PHONY: multi-version-docs
 multi-version-docs:
-	$(poetry) python -m sphinx-multiversion docs/source docs/build/html
+	$(poetry) sphinx-multiversion docs/source docs/build/html
 
 .PHONY: clean-docs
 clean-docs:
