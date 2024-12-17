@@ -51,7 +51,7 @@ jobs:
 #          make docs
 #
       - name: build multiversion documentation
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        # if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
           make docs
 
