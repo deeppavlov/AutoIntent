@@ -1,0 +1,29 @@
+autointent.metrics.retrieval.retrieval_hit_rate_intersecting
+============================================================
+
+.. py:function:: autointent.metrics.retrieval.retrieval_hit_rate_intersecting(query_labels, candidates_labels, k = None)
+
+   Calculate the hit rate at position k for the intersecting labels.
+
+   The intersecting hit rate is calculated as:
+
+   .. math::
+
+       \text{Hit Rate}_{\text{intersecting}} = \frac{\sum_{i=1}^N \mathbb{1} \left( \sum_{j=1}^k
+       \left( y_{\text{query},i} \cdot y_{\text{candidates},i,j} \right) > 0 \right)}{N}
+
+   where:
+   - :math:`N` is the total number of queries,
+   - :math:`y_{\text{query},i}` is the one-hot encoded label vector for the :math:`i`-th query,
+   - :math:`y_{\text{candidates},i,j}` is the one-hot encoded label vector of the :math:`j`-th
+   candidate for the :math:`i`-th query,
+   - :math:`k` is the number of top candidates considered,
+   - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
+   is true and 0 otherwise.
+
+   :param query_labels: For each query, this list contains its class labels
+   :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
+    (from most to least relevant)
+   :param k: Number of top items to consider for each query
+   :return: Score of the retrieval metric
+
