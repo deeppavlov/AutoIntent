@@ -52,7 +52,7 @@ jobs:
         if: github.event_name == 'pull_request' && github.base_ref == 'dev'
         run: |
           echo "Testing documentation build for PR..."
-          sphinx-build docs/source docs/build/html
+          poetry run sphinx-build docs/source docs/build/html
 
 
       - name: Generate missing tags list
@@ -86,14 +86,14 @@ jobs:
             echo "Building docs for $TAG..."
             git checkout $TAG
             mkdir -p docs/build/versions/$TAG
-            sphinx-build docs/source docs/build/versions/$TAG
+            poetry run sphinx-build docs/source docs/build/versions/$TAG
           done
 
       - name: Build documentation for dev branch
         if: github.ref == 'refs/heads/dev'
         run: |
           echo "Building docs for dev branch..."
-          sphinx-build docs/source docs/build/versions/dev
+          poetry run sphinx-build docs/source docs/build/versions/dev
 
       - name: Deploy to GitHub Pages
         if: github.event_name != 'pull_request'
