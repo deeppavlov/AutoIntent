@@ -1,10 +1,13 @@
-name: Build and publish docs
+name: Build and Publish Multi-Version Docs
 
 on:
   push:
     branches:
-    - dev
-    - multiversion
+      - dev
+      - multiversion
+  release:
+    types:
+      - published
   pull_request:
     branches:
       - dev
@@ -18,16 +21,17 @@ permissions:
   contents: write
 
 jobs:
-  publish:
-    name: build and publish docs
+  build-docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: set up python 3.10
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -40,43 +44,93 @@ jobs:
         run: |
           sudo apt install pandoc
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           poetry install --with docs
 
-      - name: Test documentation
+      - name: Test documentation build
+        if: github.event_name == 'pull_request' && github.base_ref == 'dev'
         run: |
-          make test-docs
+          echo "Testing documentation build for PR..."
+          sphinx-build docs/source docs/build/html
 
-#      - name: build documentation
-#        if: ${{ github.ref != 'refs/heads/dev' }}
-#        run: |
-#          make docs
-#
-      - name: build multiversion documentation
-        # if: ${{ github.ref == 'refs/heads/dev' }}
+
+      - name: Generate missing tags list
+        if: github.event_name == 'push' || github.event_name == 'release'
+        id: missing_tags
         run: |
-          make multi-version-docs
+          # Fetch existing documentation versions from gh-pages
+          mkdir -p existing_versions
+          git fetch origin gh-pages --depth=1
+          git checkout origin/gh-pages -- docs/versions || true
+          
+          # List existing tags and built versions
+          EXISTING_VERSIONS=$(ls docs/versions | tr '\n' ' ')
+          ALL_TAGS=$(git tag --list "v*" | tr '\n' ' ')
+          
+          # Find missing tags
+          MISSING_TAGS=""
+          for TAG in $ALL_TAGS; do
+            if [[ ! " $EXISTING_VERSIONS " =~ " $TAG " ]]; then
+              MISSING_TAGS+="$TAG "
+            fi
+          done
+          
+          echo "Missing tags: $MISSING_TAGS"
+          echo "missing_tags=${MISSING_TAGS}" >> $GITHUB_ENV
 
-      - name: save branch name without slashes
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      - name: Build documentation for missing tags
+        if: env.missing_tags != ''
         run: |
-          BRANCH_NAME=${{ env.BRANCH_NAME }}
-          BRANCH_NAME=${BRANCH_NAME////_}
-          echo BRANCH_NAME=${BRANCH_NAME} >> $GITHUB_ENV
+          for TAG in ${{ env.missing_tags }}; do
+            echo "Building docs for $TAG..."
+            git checkout $TAG
+            mkdir -p docs/build/versions/$TAG
+            sphinx-build docs/source docs/build/versions/$TAG
+          done
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('github-pages-for-branch-{0}', env.BRANCH_NAME) }}
-          path: docs/build/
-          retention-days: 3
+      - name: Build documentation for dev branch
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          echo "Building docs for dev branch..."
+          sphinx-build docs/source docs/build/versions/dev
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.6.4
-        # if: ${{ github.ref == 'refs/heads/dev' }}
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          branch: gh-pages
-          folder: docs/build/html/
-          single-commit: True
+          github_token: ${{ github.token }}
+          publish_dir: docs/build/versions
+          keep_files: true
+
+  update-static:
+    name: Update Static Files in Old Releases
+    runs-on: ubuntu-latest
+    needs: build-docs
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Update _static in all versions
+        run: |
+          # Define path to the updated _static directory
+          UPDATED_STATIC_DIR=docs/source/_static
+          TARGET_STATIC_DIRS=$(find docs/versions/ -type d -name "_static")
+          
+          # Copy updated _static to all versions
+          for DIR in $TARGET_STATIC_DIRS; do
+            echo "Updating $DIR..."
+            cp -r ${UPDATED_STATIC_DIR}/* ${DIR}/
+          done
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Update _static files in all documentation versions" || echo "No changes to commit"
+          git push
