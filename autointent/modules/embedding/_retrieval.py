@@ -11,7 +11,7 @@ from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.metrics import RetrievalMetricFn
+from autointent.metrics import RetrievalMetricFn, ScoringMetricFn
 from autointent.modules.abc import EmbeddingModule
 
 
@@ -168,7 +168,7 @@ class LogRegEmbedding(EmbeddingModule):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: RetrievalMetricFn,
+        metric_fn: ScoringMetricFn,
     ) -> float:
         """
         Evaluate the model using a specified metric function.
