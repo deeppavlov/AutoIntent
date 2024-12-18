@@ -119,7 +119,7 @@ jobs:
       - name: Update _static in all versions
         run: |
           # Define path to the updated _static directory
-          UPDATED_STATIC_DIR=docs/source/_static
+          UPDATED_STATIC_DIR=versions/dev/_static
           TARGET_STATIC_DIRS=$(find versions/ -type d -name "_static")
           
           # Copy updated _static to all versions
