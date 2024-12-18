@@ -7,7 +7,7 @@ from typing import Literal
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.preprocessing import LabelEncoder
 
-from autointent.context import Context
+from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
@@ -72,7 +72,6 @@ class LogRegEmbedding(EmbeddingModule):
 
     """
 
-    vector_index: VectorIndex
     classifier: LogisticRegressionCV
     label_encoder: LabelEncoder
     name = "logreg"
@@ -153,16 +152,14 @@ class LogRegEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
-        vector_index_client = VectorIndexClient(
-            self.embedder_device,
-            self.db_dir,
-            embedder_batch_size=self.batch_size,
-            embedder_max_length=self.max_length,
-            embedder_use_cache=self.embedder_use_cache,
+        self.embedder = Embedder(
+            device=self.embedder_device,
+            model_name=self.embedder_name,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+            use_cache=self.embedder_use_cache,
         )
-        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
-
-        embeddings = self.vector_index.get_all_embeddings()
+        embeddings = self.embedder.embed(utterances)
         self.label_encoder.fit(labels)
         encoded_labels = self.label_encoder.transform(labels)
         self.classifier.fit(embeddings, encoded_labels)
@@ -191,7 +188,7 @@ class LogRegEmbedding(EmbeddingModule):
             message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
             raise ValueError(message)
 
-        embeddings = self.vector_index.embedder.embed(utterances)
+        embeddings = self.embedder.embed(utterances)
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
@@ -264,27 +261,6 @@ class LogRegEmbedding(EmbeddingModule):
 
         self.label_encoder = LabelEncoder()
         self.label_encoder.classes_ = self.classifier_metadata["classes"]
-
-    def predict(self, utterances: list[str]) -> list[int | list[int]]:
-        """
-        Predict labels for a list of utterances.
-
-        :param utterances: List of utterances for classification.
-        :return: A tuple containing:
-            - labels: List of predicted labels for each utterance.
-            - scores: List of dummy confidence scores.
-            - texts: List of the input utterances.
-        """
-        embeddings = self.vector_index.embedder.embed(utterances)
-        predicted_encoded = self.classifier.predict(embeddings)
-        predicted_labels = self.label_encoder.inverse_transform(predicted_encoded).tolist()
-        predicted_probabilities = self.classifier.predict_proba(embeddings).tolist()
-
-        labels = self.vector_index.get_all_labels()
-
-        texts = [self.vector_index.texts[labels == label][: self.k] for label in predicted_labels]
-
-        return predicted_labels, predicted_probabilities, texts
 
 
 class RetrievalEmbedding(EmbeddingModule):
