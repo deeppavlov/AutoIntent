@@ -33,15 +33,15 @@ def get_sorted_versions(repo_root, base_url):
     if sorted_tags:
         versions.append({
             "name": f"{sorted_tags[0]} (stable)",
-            "version": sorted_tags[0].lstrip('v'),
-            "url": f"{base_url}/{sorted_tags[0].lstrip('v')}/",
+            "version": sorted_tags[0],
+            "url": f"{base_url}/{sorted_tags[0]}/",
             "preferred": True,
         })
 
     for tag in sorted_tags[1:]:
         versions.append({
-            "version": tag.lstrip('v'),
-            "url": f"{base_url}/{tag.lstrip('v')}/"
+            "version": tag,
+            "url": f"{base_url}/{tag}/"
         })
 
     # Get branches
