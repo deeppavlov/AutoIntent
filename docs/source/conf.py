@@ -2,22 +2,22 @@
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
-import json
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 import os
 import sys
-from pathlib import Path
 from importlib.metadata import version
+from pathlib import Path
+
+from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
 
 from docs_utils.skip_members import skip_member  # noqa: E402
-from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
-from docs_utils.versions_generator import generate_versions_json, get_sorted_versions  # noqa: E402
+from docs_utils.versions_generator import generate_versions_json  # noqa: E402
 
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
@@ -148,38 +148,38 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 # sphinx_multiversion
 # Whitelist for tags matching v1.0.0, v2.1.0 format
 # smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
-smv_tag_whitelist = r'^.*$'
+smv_tag_whitelist = r"^.*$"
 
 # Whitelist for the dev branch
-smv_branch_whitelist = r'^dev$'
+smv_branch_whitelist = r"^dev$"
 
 # Output format (keeping your current format)
-smv_outputdir_format = 'versions/{ref.name}'
+smv_outputdir_format = "versions/{ref.name}"
 
 # Include both tags and dev branch as released
-smv_released_pattern = r'^(refs/tags/.*|refs/heads/dev)$'
+smv_released_pattern = r"^(refs/tags/.*|refs/heads/dev)$"
 
-smv_remote_whitelist = r'^(origin|upstream)$' # Use branches from origin and upstream
+smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and upstream
 
-repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ".."))  # if conf.py is in docs/
+repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
+
+
 def setup(app) -> None:  # noqa: ANN001
-    generate_versions_json(app, repo_root, BASE_URL)
-    # versions = get_sorted_versions()
-    # with open('docs/source/_static/versions.json', 'w') as f:
-    #     json.dump(versions, f, indent=4)
-#   generate_tutorial_links_for_notebook_creation(
-#         include=[
-#             (
-#                 "user_guides.basic_usage",
-#                 "Basic Usage",
-#             ),
-#             (
-#                 "user_guides.advanced",
-#                 "Advanced Usage",
-#             ),
-#             ("user_guides.cli", "CLI Usage"),
-#         ],
-#         source="user_guides",
-#         destination="docs/source/user_guides",
-#     )
-#     app.connect("autoapi-skip-member", skip_member)
+    generate_versions_json(repo_root, BASE_URL)
+
+    generate_tutorial_links_for_notebook_creation(
+        include=[
+            (
+                "user_guides.basic_usage",
+                "Basic Usage",
+            ),
+            (
+                "user_guides.advanced",
+                "Advanced Usage",
+            ),
+            ("user_guides.cli", "CLI Usage"),
+        ],
+        source="user_guides",
+        destination="docs/source/user_guides",
+    )
+    app.connect("autoapi-skip-member", skip_member)

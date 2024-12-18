@@ -129,7 +129,7 @@ def test_sample_validation(label):
             "validation_1": mock_split(),
             "test": mock_split(),
         },
-    ]
+    ],
 )
 def test_dataset_initialization(mapping):
     dataset = Dataset.from_dict(mapping)
@@ -151,8 +151,8 @@ def test_dataset_initialization(mapping):
         {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split()},
         {"train": mock_split(), "validation": mock_split(), "validation_1": mock_split()},
         {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
-        {"train": mock_split(), "oos": mock_split()}
-    ]
+        {"train": mock_split(), "oos": mock_split()},
+    ],
 )
 def test_dataset_validation(mapping):
     with pytest.raises(ValueError):
@@ -169,7 +169,7 @@ def test_dataset_validation(mapping):
             "test": [{"utterance": "Hello!", "label": 0}],
         },
         {"train": [{"utterance": "Hello!"}]},
-    ]
+    ],
 )
 def test_intents_validation(mapping):
     with pytest.raises(ValueError):

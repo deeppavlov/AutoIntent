@@ -135,7 +135,8 @@ class Pipeline:
         predictions = self.predict(context.data_handler.test_utterances())
         for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
-                context.data_handler.test_labels(), predictions,
+                context.data_handler.test_labels(),
+                predictions,
             )
 
         return context
