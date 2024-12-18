@@ -19,6 +19,10 @@ autointent.context.optimization_info.OptimizationInfo
    .. py:attribute:: modules
 
 
+   .. py:attribute:: pipeline_metrics
+      :type:  dict[str, float]
+
+
    .. py:method:: log_module_optimization(node_type, module_name, module_params, metric_value, metric_name, artifact, module_dump_dir, module = None)
 
       Log optimization results for a module.
