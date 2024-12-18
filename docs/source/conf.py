@@ -86,13 +86,13 @@ html_static_path = ["../_static"]
 version = version("autointent").replace("dev", "")  # may differ
 
 BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions"
-BASE_STATIC_URL = "https://deeppavlov.github.io/AutoIntent/versions/dev/_static"
+BASE_STATIC_URL = f"{BASE_URL}/dev/_static"
 
 html_theme_options = {
     "logo": {
         "text": "AutoIntent",
-        "image_light": f"{BASE_URL}/logo-light.svg",
-        "image_dark": f"{BASE_URL}/logo-dark.svg",
+        "image_light": f"{BASE_STATIC_URL}/logo-light.svg",
+        "image_dark": f"{BASE_STATIC_URL}/logo-dark.svg",
     },
     "icon_links": [
         {
@@ -104,19 +104,19 @@ html_theme_options = {
         {
             "name": "HuggingFace",
             "url": "https://huggingface.co/AutoIntent",
-            "icon": f"{BASE_URL}/hf-logo.svg",
+            "icon": f"{BASE_STATIC_URL}/hf-logo.svg",
             "type": "local",
         },
     ],
     "switcher": {
-        "json_url": f"{BASE_URL}/versions.json",
+        "json_url": f"{BASE_STATIC_URL}/versions.json",
         "version_match": version,
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
     "show_toc_level": 3,
 }
 
-html_favicon = f"{BASE_URL}/logo-white.svg"
+html_favicon = f"{BASE_STATIC_URL}/logo-white.svg"
 html_show_sourcelink = False
 
 toc_object_entries_show_parents = "hide"
