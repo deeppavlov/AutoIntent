@@ -5,17 +5,19 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
 import os
 import sys
+from importlib.metadata import version
 from pathlib import Path
+
+from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
 
 from docs_utils.skip_members import skip_member  # noqa: E402
-from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
+from docs_utils.versions_generator import generate_versions_json  # noqa: E402
 
 project = "AutoIntent"
 copyright = "2024, DeepPavlov"
@@ -44,6 +46,7 @@ extensions = [
     "sphinx_copybutton",
     "nbsphinx",
     "sphinx.ext.intersphinx",
+    "sphinx_multiversion",
 ]
 
 templates_path = ["_templates"]
@@ -81,12 +84,16 @@ autoapi_add_toctree_entry = False
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
+version = version("autointent").replace("dev", "")  # may differ
+
+BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions"
+BASE_STATIC_URL = f"{BASE_URL}/dev/_static"
 
 html_theme_options = {
     "logo": {
         "text": "AutoIntent",
-        "image_light": "../_static/logo-light.svg",
-        "image_dark": "../_static/logo-dark.svg",
+        "image_light": f"{BASE_STATIC_URL}/logo-light.svg",
+        "image_dark": f"{BASE_STATIC_URL}/logo-dark.svg",
     },
     "icon_links": [
         {
@@ -98,14 +105,19 @@ html_theme_options = {
         {
             "name": "HuggingFace",
             "url": "https://huggingface.co/AutoIntent",
-            "icon": "../_static/hf-logo.svg",
+            "icon": f"{BASE_STATIC_URL}/hf-logo.svg",
             "type": "local",
         },
     ],
+    "switcher": {
+        "json_url": f"{BASE_STATIC_URL}/versions.json",
+        "version_match": version,
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
     "show_toc_level": 3,
 }
 
-html_favicon = "../_static/logo-white.svg"
+html_favicon = f"{BASE_STATIC_URL}/logo-white.svg"
 html_show_sourcelink = False
 
 toc_object_entries_show_parents = "hide"
@@ -133,8 +145,28 @@ nbsphinx_thumbnails = {
 
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
+# sphinx_multiversion
+# Whitelist for tags matching v1.0.0, v2.1.0 format
+# smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+smv_tag_whitelist = r"^.*$"
+
+# Whitelist for the dev branch
+smv_branch_whitelist = r"^dev$"
+
+# Output format (keeping your current format)
+smv_outputdir_format = "versions/{ref.name}"
+
+# Include both tags and dev branch as released
+smv_released_pattern = r"^(refs/tags/.*|refs/heads/dev)$"
+
+smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and upstream
+
+repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
+
 
 def setup(app) -> None:  # noqa: ANN001
+    generate_versions_json(repo_root, BASE_URL)
+
     generate_tutorial_links_for_notebook_creation(
         include=[
             (
