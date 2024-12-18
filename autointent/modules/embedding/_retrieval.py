@@ -36,7 +36,7 @@ class LogRegEmbedding(EmbeddingModule):
     r"""
     Module for managing classification operations using logistic regression.
 
-    LogRegEmbedding provides methods for indexing, training, and predicting based on embeddings
+    LogRegEmbedding provides methods for indexing, and training based on embeddings
     for classification tasks.
 
     :ivar classifier: The trained logistic regression model.
@@ -81,12 +81,12 @@ class LogRegEmbedding(EmbeddingModule):
         self,
         k: int,
         embedder_name: str,
+        cv: int = 3,
         db_dir: str | None = None,
         embedder_device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
         embedder_use_cache: bool = False,
-        **kwargs,
     ) -> None:
         """
         Initialize the RetrievalEmbedding.
@@ -104,7 +104,7 @@ class LogRegEmbedding(EmbeddingModule):
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
-        self.classifier = LogisticRegressionCV(**kwargs)
+        self.classifier = LogisticRegressionCV(cv=cv)
         self.label_encoder = LabelEncoder()
 
         super().__init__(k=k)
@@ -114,8 +114,8 @@ class LogRegEmbedding(EmbeddingModule):
         cls,
         context: Context,
         k: int,
+        cv: int,
         embedder_name: str,
-        **kwargs,
     ) -> "LogRegEmbedding":
         """
         Create a LogRegEmbedding instance using a Context object.
@@ -126,13 +126,13 @@ class LogRegEmbedding(EmbeddingModule):
         """
         return cls(
             k=k,
+            cv=cv,
             embedder_name=embedder_name,
             db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
-            **kwargs,
         )
 
     @property
