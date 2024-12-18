@@ -86,12 +86,12 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
 version = version("autointent").replace("dev", "")  # may differ
 
-BASE_URL = "https://deeppavlov.github.io/AutoIntent"
+BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions/dev"
 html_theme_options = {
     "logo": {
         "text": "AutoIntent",
-        "image_light": "../_static/logo-light.svg",
-        "image_dark": "../_static/logo-dark.svg",
+        "image_light": f"{BASE_URL}/_static/logo-light.svg",
+        "image_dark": f"{BASE_URL}/_static/logo-dark.svg",
     },
     "icon_links": [
         {
@@ -103,7 +103,7 @@ html_theme_options = {
         {
             "name": "HuggingFace",
             "url": "https://huggingface.co/AutoIntent",
-            "icon": "../_static/hf-logo.svg",
+            "icon": f"{BASE_URL}/_static/hf-logo.svg",
             "type": "local",
         },
     ],
@@ -115,7 +115,7 @@ html_theme_options = {
     "show_toc_level": 3,
 }
 
-html_favicon = "../_static/logo-white.svg"
+html_favicon = f"{BASE_URL}/_static/logo-white.svg"
 html_show_sourcelink = False
 
 toc_object_entries_show_parents = "hide"
@@ -141,26 +141,7 @@ nbsphinx_thumbnails = {
     "user_guides/*": "_static/square-white.svg",
 }
 
-# html_sidebars = {
-#     '**': [
-#         'versioning.html',
-#     ],
-# }
-
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-
-# sphinx-multiversion
-# Whitelist for tags matching v1.0, v2.1 format
-smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
-
-# Whitelist for the dev branch
-smv_branch_whitelist = r'^dev$'
-
-# Output format (keeping your current format)
-smv_outputdir_format = 'versions/{config.version}/{ref.name}'
-
-# Include both tags and dev branch as released
-smv_released_pattern = r'^(refs/tags/.*|refs/heads/dev)$'
 
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ".."))  # if conf.py is in docs/
 def setup(app) -> None:  # noqa: ANN001
