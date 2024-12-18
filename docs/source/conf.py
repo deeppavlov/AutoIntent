@@ -46,7 +46,6 @@ extensions = [
     "sphinx_copybutton",
     "nbsphinx",
     "sphinx.ext.intersphinx",
-    "sphinx_multiversion",
 ]
 
 templates_path = ["_templates"]
