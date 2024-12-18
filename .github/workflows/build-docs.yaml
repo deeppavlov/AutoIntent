@@ -23,6 +23,7 @@ jobs:
   build-docs:
     name: Build Documentation
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,26 +48,24 @@ jobs:
         run: |
           poetry install --with docs
 
-      - name: Test documentation build
-#        if: github.event_name == 'pull_request' && github.base_ref == 'dev'
+      - name: Run tests
         run: |
-          echo "Testing documentation build for PR..."
+          echo "Testing documentation build..."
           make test-docs
 
+      - name: Build documentation
+        if: ${{ github.ref == 'refs/heads/dev' }}
+        run: |
+          make docs
+
       - name: build multiversion documentation
-        # if: ${{ github.ref == 'refs/heads/dev' }}
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
           make multi-version-docs
 
-#      - name: Build documentation for dev branch
-#        # if: github.ref == 'refs/heads/dev'
-#        run: |
-#          echo "Building docs for dev branch..."
-#          poetry run sphinx-build docs/source docs/build/versions/dev
-
       - name: Deploy to GitHub Pages
-        # if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         with:
           github_token: ${{ github.token }}
           publish_dir: docs/build/html/versions
