@@ -125,7 +125,7 @@ jobs:
           # Copy updated _static to all versions
           for DIR in $TARGET_STATIC_DIRS; do
             echo "Updating $DIR..."
-            cp --update all -r ${UPDATED_STATIC_DIR}/* ${DIR}/
+            cp -r ${UPDATED_STATIC_DIR}/* ${DIR}/ || true
           done
 
       - name: Commit and push changes
