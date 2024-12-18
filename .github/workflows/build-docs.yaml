@@ -132,6 +132,6 @@ jobs:
           git add .
           git commit -m "Update _static files in all documentation versions" || echo "No changes to commit"
           git push
-        with:
-          github_token: ${{ github.token }}
+        # with:
+        #   github_token: ${{ github.token }}
 
