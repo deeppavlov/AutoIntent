@@ -46,17 +46,6 @@ autointent.Dataset
 
 
 
-   .. py:method:: from_dict(mapping)
-      :classmethod:
-
-
-      Load a dataset from a dictionary mapping.
-
-      :param mapping: Dictionary representing the dataset.
-      :return: Initialized Dataset object.
-
-
-
    .. py:method:: from_json(filepath)
       :classmethod:
 
@@ -64,6 +53,17 @@ autointent.Dataset
       Load a dataset from a JSON file.
 
       :param filepath: Path to the JSON file.
+      :return: Initialized Dataset object.
+
+
+
+   .. py:method:: from_dict(mapping)
+      :classmethod:
+
+
+      Load a dataset from a dictionary mapping.
+
+      :param mapping: Dictionary representing the dataset.
       :return: Initialized Dataset object.
 
 
@@ -79,27 +79,27 @@ autointent.Dataset
 
 
 
+   .. py:method:: dump()
+
+      Convert the dataset splits to a dictionary of lists.
+
+      :return: Dictionary containing dataset splits as lists.
+
+
+
+   .. py:method:: encode_labels()
+
+      Encode dataset labels into one-hot or multilabel format.
+
+      :return: Self, with labels encoded.
+
+
+
    .. py:method:: to_multilabel()
 
       Convert dataset labels to multilabel format.
 
       :return: Self, with labels converted to multilabel.
-
-
-
-   .. py:method:: to_dict()
-
-      Convert the dataset splits and intents to a dictionary of lists.
-
-      :return: A dictionary containing dataset splits and intents as lists of dictionaries.
-
-
-
-   .. py:method:: to_json(filepath)
-
-      Save the dataset splits and intents to a JSON file.
-
-      :param filepath: The path to the file where the JSON data will be saved.
 
 
 
