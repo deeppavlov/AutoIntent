@@ -56,7 +56,7 @@ jobs:
 
 
       - name: Generate missing tags list
-        if: github.event_name == 'push' || github.event_name == 'release'
+#        if: github.event_name == 'push' || github.event_name == 'release'
         id: missing_tags
         run: |
           # Fetch existing documentation versions from gh-pages
@@ -125,7 +125,7 @@ jobs:
           # Copy updated _static to all versions
           for DIR in $TARGET_STATIC_DIRS; do
             echo "Updating $DIR..."
-            cp -r ${UPDATED_STATIC_DIR}/* ${DIR}/
+            cp --update all -r ${UPDATED_STATIC_DIR}/* ${DIR}/
           done
 
       - name: Commit and push changes
