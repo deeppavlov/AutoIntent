@@ -1,40 +1,40 @@
-# name: unit tests
-#
-# on:
-#   push:
-#     branches:
-#       - dev
-#   pull_request:
-#     branches:
-#       - dev
-#
-# jobs:
-#   test:
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         os: [ ubuntu-latest ]
-#         python-version: [ "3.10", "3.11", "3.12" ]
-#         include:
-#           - os: windows-latest
-#             python-version: "3.10"
-#
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v4
-#
-#     - name: Setup Python ${{ matrix.python-version }}
-#       uses: actions/setup-python@v5
-#       with:
-#         python-version: ${{ matrix.python-version }}
-#         cache: "pip"
-#
-#     - name: Install dependencies
-#       run: |
-#           pip install .
-#           pip install pytest pytest-asyncio
-#
-#     - name: Run tests
-#       run: |
-#         pytest --ignore=tests/nodes --ignore=tests/pipeline
+name: unit tests
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ "3.10", "3.11", "3.12" ]
+        include:
+          - os: windows-latest
+            python-version: "3.10"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: "pip"
+
+    - name: Install dependencies
+      run: |
+          pip install .
+          pip install pytest pytest-asyncio
+
+    - name: Run tests
+      run: |
+        pytest --ignore=tests/nodes --ignore=tests/pipeline
