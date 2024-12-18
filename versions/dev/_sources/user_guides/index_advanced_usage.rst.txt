@@ -1,7 +1,0 @@
-Advanced Usage
-==============
-
-.. nbgallery::
-   user_guides.advanced.01_data.py
-   user_guides.advanced.02_search_space.py
-   user_guides.advanced.03_caching.py
