@@ -62,10 +62,10 @@ jobs:
           # Fetch existing documentation versions from gh-pages
           mkdir -p existing_versions
           git fetch origin gh-pages --depth=1
-          git checkout origin/gh-pages -- docs/versions || true
+          git checkout origin/gh-pages -- versions || true
           
           # List existing tags and built versions
-          EXISTING_VERSIONS=$(ls docs/versions | tr '\n' ' ')
+          EXISTING_VERSIONS=$(ls versions | tr '\n' ' ')
           ALL_TAGS=$(git tag --list "v*" | tr '\n' ' ')
           
           # Find missing tags
@@ -119,7 +119,7 @@ jobs:
         run: |
           # Define path to the updated _static directory
           UPDATED_STATIC_DIR=docs/source/_static
-          TARGET_STATIC_DIRS=$(find docs/versions/ -type d -name "_static")
+          TARGET_STATIC_DIRS=$(find versions/ -type d -name "_static")
           
           # Copy updated _static to all versions
           for DIR in $TARGET_STATIC_DIRS; do
@@ -129,8 +129,9 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
           git add .
           git commit -m "Update _static files in all documentation versions" || echo "No changes to commit"
           git push
+        with:
+          github_token: ${{ github.token }}
+
