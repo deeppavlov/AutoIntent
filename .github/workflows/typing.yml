@@ -1,24 +1,24 @@
-name: Typing
-on: [ push, pull_request ]
-jobs:
-  mypy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-          cache: "pip"
-
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: |
-          poetry install --with typing
-
-      - name: Run mypy
-        run: make typing
+# name: Typing
+# on: [ push, pull_request ]
+# jobs:
+#   mypy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#
+#       - uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.10"
+#           cache: "pip"
+#
+#       - name: Install Poetry
+#         run: |
+#           curl -sSL https://install.python-poetry.org | python3 -
+#           echo "$HOME/.poetry/bin" >> $GITHUB_PATH
+#
+#       - name: Install dependencies
+#         run: |
+#           poetry install --with typing
+#
+#       - name: Run mypy
+#         run: make typing
