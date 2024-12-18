@@ -147,16 +147,19 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 # sphinx_multiversion
 # Whitelist for tags matching v1.0.0, v2.1.0 format
-smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+# smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+smv_tag_whitelist = r'^.*$'
 
 # Whitelist for the dev branch
 smv_branch_whitelist = r'^dev$'
 
 # Output format (keeping your current format)
-smv_outputdir_format = 'versions/{config.version}'
+smv_outputdir_format = 'versions/{ref.name}'
 
 # Include both tags and dev branch as released
 smv_released_pattern = r'^(refs/tags/.*|refs/heads/dev)$'
+
+smv_remote_whitelist = r'^(origin|upstream)$' # Use branches from origin and upstream
 
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', ".."))  # if conf.py is in docs/
 def setup(app) -> None:  # noqa: ANN001

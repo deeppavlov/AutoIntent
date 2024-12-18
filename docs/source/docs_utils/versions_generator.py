@@ -10,22 +10,13 @@ import subprocess
 
 
 def get_sorted_versions(repo_root, base_url):
-    # Get the git repository root
-    tags_output = subprocess.check_output(['git', '-C', repo_root, 'tag'], text=True).strip().split('\n')
-    # Change to the repository root
-    original_cwd = os.getcwd()
     os.chdir(repo_root)
     # Fetch tags and branches
     tags_output = subprocess.check_output(['git', 'tag'], text=True).strip().split('\n')
     tag_regex = re.compile(r"^v\d+\.\d+\.\d+$")  # Matches tags like v0.0.1
     tags = [tag for tag in tags_output if tag_regex.match(tag)]
 
-    # Sort tags
-    def version_key(tag):
-        version = tag.lstrip('v')
-        return [int(x) for x in version.split('.')]
-
-    sorted_tags = sorted(tags, key=version_key, reverse=True)
+    sorted_tags = sorted(tags, reverse=True)
 
     # Prepare versions list (similar to previous implementation)
     versions = []
