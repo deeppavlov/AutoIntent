@@ -31,12 +31,16 @@ docs:
 	$(poetry) python -m sphinx build -b html docs/source docs/build/html
 
 .PHONY: test-docs
-test-docs: docs
+test-docs:
 	$(poetry) python -m sphinx build -b doctest docs/source docs/build/html
 
 .PHONY: serve-docs
 serve-docs: docs
 	$(poetry) python -m http.server -d docs/build/html 8333
+
+.PHONY: multi-version-docs
+multi-version-docs:
+	$(poetry) sphinx-multiversion docs/source docs/build/html
 
 .PHONY: clean-docs
 clean-docs:
