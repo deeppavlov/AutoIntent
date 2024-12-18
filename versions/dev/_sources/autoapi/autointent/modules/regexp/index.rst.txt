@@ -1,0 +1,24 @@
+autointent.modules.regexp
+=========================
+
+.. py:module:: autointent.modules.regexp
+
+.. autoapi-nested-parse::
+
+   Weakly supported module for now.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/regexp/RegExp
+
+.. autoapisummary::
+
+   autointent.modules.regexp.RegExp
+
+

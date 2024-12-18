@@ -1,0 +1,39 @@
+autointent.metrics.regexp
+=========================
+
+.. py:module:: autointent.metrics.regexp
+
+.. autoapi-nested-parse::
+
+   Regexp metrics for intent recognition.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/regexp/RegexpMetricFn
+
+.. autoapisummary::
+
+   autointent.metrics.regexp.RegexpMetricFn
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/metrics/regexp/regexp_partial_accuracy
+   /autoapi/autointent/metrics/regexp/regexp_partial_precision
+
+.. autoapisummary::
+
+   autointent.metrics.regexp.regexp_partial_accuracy
+   autointent.metrics.regexp.regexp_partial_precision
+
+

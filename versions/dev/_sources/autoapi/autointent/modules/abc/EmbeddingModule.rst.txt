@@ -1,0 +1,13 @@
+autointent.modules.abc.EmbeddingModule
+======================================
+
+.. py:class:: autointent.modules.abc.EmbeddingModule(k)
+
+   Bases: :py:obj:`autointent.modules.abc.Module`, :py:obj:`abc.ABC`
+
+
+   Base class for embedding modules.
+
+
+   .. py:attribute:: k
+

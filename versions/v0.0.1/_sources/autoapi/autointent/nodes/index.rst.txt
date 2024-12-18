@@ -1,0 +1,36 @@
+autointent.nodes
+================
+
+.. py:module:: autointent.nodes
+
+.. autoapi-nested-parse::
+
+   Some core components used in AutoIntent behind the scenes.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/nodes/InferenceNode
+   /autoapi/autointent/nodes/DecisionNodeInfo
+   /autoapi/autointent/nodes/EmbeddingNodeInfo
+   /autoapi/autointent/nodes/NodeInfo
+   /autoapi/autointent/nodes/RegExpNodeInfo
+   /autoapi/autointent/nodes/ScoringNodeInfo
+   /autoapi/autointent/nodes/NodeOptimizer
+
+.. autoapisummary::
+
+   autointent.nodes.InferenceNode
+   autointent.nodes.DecisionNodeInfo
+   autointent.nodes.EmbeddingNodeInfo
+   autointent.nodes.NodeInfo
+   autointent.nodes.RegExpNodeInfo
+   autointent.nodes.ScoringNodeInfo
+   autointent.nodes.NodeOptimizer
+
+
