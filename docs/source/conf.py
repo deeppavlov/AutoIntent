@@ -85,7 +85,7 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
 version = version("autointent").replace("dev", "")  # may differ
 
-BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions/dev"
+BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions"
 html_theme_options = {
     "logo": {
         "text": "AutoIntent",
