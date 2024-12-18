@@ -58,11 +58,11 @@ jobs:
         run: |
           make multi-version-docs
 
-      - name: Build documentation for dev branch
-        # if: github.ref == 'refs/heads/dev'
-        run: |
-          echo "Building docs for dev branch..."
-          poetry run sphinx-build docs/source docs/build/versions/dev
+#      - name: Build documentation for dev branch
+#        # if: github.ref == 'refs/heads/dev'
+#        run: |
+#          echo "Building docs for dev branch..."
+#          poetry run sphinx-build docs/source docs/build/versions/dev
 
       - name: Deploy to GitHub Pages
         # if: github.event_name != 'pull_request'
