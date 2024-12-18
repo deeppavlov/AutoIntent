@@ -37,7 +37,7 @@ autointent.Pipeline
 
 
 
-   .. py:method:: fit(dataset, force_multilabel = False, init_for_inference = True)
+   .. py:method:: fit(dataset, force_multilabel = False)
 
       Optimize the pipeline from dataset.
 

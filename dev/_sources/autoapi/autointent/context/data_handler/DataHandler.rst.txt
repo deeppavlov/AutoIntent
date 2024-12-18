@@ -130,10 +130,10 @@ autointent.context.data_handler.DataHandler
 
 
 
-   .. py:method:: dump()
+   .. py:method:: dump(filepath)
 
-      Dump the dataset splits.
+      Save the dataset splits and intents to a JSON file.
 
-      :return: Dataset dump.
+      :param filepath: The path to the file where the JSON data will be saved.
 
 
