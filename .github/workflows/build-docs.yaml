@@ -101,6 +101,7 @@ jobs:
         with:
           github_token: ${{ github.token }}
           publish_dir: docs/build/versions
+          destination_dir: versions
           keep_files: true
 
   update-static:
