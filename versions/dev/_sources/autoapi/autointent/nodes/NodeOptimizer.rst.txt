@@ -1,0 +1,47 @@
+autointent.nodes.NodeOptimizer
+==============================
+
+.. py:class:: autointent.nodes.NodeOptimizer(node_type, search_space, metric)
+
+   Node optimizer class.
+
+
+   .. py:attribute:: node_type
+
+
+   .. py:attribute:: node_info
+
+
+   .. py:attribute:: metric_name
+
+
+   .. py:attribute:: modules_search_spaces
+
+
+   .. py:method:: fit(context)
+
+      Fit the node optimizer.
+
+      :param context: Context
+
+
+
+   .. py:method:: get_module_dump_dir(dump_dir, module_name, j_combination)
+
+      Get module dump directory.
+
+      :param dump_dir: The base directory where the module dump directories will be created.
+      :param module_name: The type of the module being optimized.
+      :param j_combination: The index of the parameter combination being used.
+      :return: The path to the module dump directory as a string.
+
+
+
+   .. py:method:: module_fit(module, context)
+
+      Fit the module.
+
+      :param module: Module to fit
+      :param context: Context to use
+
+

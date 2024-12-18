@@ -1,0 +1,30 @@
+autointent.nodes.EmbeddingNodeInfo
+==================================
+
+.. py:class:: autointent.nodes.EmbeddingNodeInfo
+
+   Bases: :py:obj:`autointent.nodes._nodes_info._base.NodeInfo`
+
+
+   Retrieval node info.
+
+
+   .. py:attribute:: metrics_available
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.RetrievalMetricFn]]
+
+      Available metrics for the node.
+
+
+
+   .. py:attribute:: modules_available
+      :type:  ClassVar[collections.abc.Mapping[str, type[autointent.modules.abc.Module]]]
+
+      Available modules for the node.
+
+
+
+   .. py:attribute:: node_type
+
+      Node type.
+
+

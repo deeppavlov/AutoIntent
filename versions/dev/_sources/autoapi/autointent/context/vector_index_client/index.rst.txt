@@ -1,0 +1,34 @@
+autointent.context.vector_index_client
+======================================
+
+.. py:module:: autointent.context.vector_index_client
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/context/vector_index_client/VectorIndex
+   /autoapi/autointent/context/vector_index_client/VectorIndexClient
+
+.. autoapisummary::
+
+   autointent.context.vector_index_client.VectorIndex
+   autointent.context.vector_index_client.VectorIndexClient
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/context/vector_index_client/get_db_dir
+
+.. autoapisummary::
+
+   autointent.context.vector_index_client.get_db_dir
+
+
