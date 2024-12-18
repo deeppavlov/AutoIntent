@@ -1,0 +1,34 @@
+autointent.configs.DataConfig
+=============================
+
+.. py:class:: autointent.configs.DataConfig
+
+   Configuration for the data used in the optimization process.
+
+
+   .. py:attribute:: train_path
+      :type:  str | pathlib.Path
+      :value: '???'
+
+
+      Path to the training data
+
+
+
+   .. py:attribute:: test_path
+      :type:  pathlib.Path | None
+      :value: None
+
+
+      Path to the testing data. If None, no testing data will be used
+
+
+
+   .. py:attribute:: force_multilabel
+      :type:  bool
+      :value: False
+
+
+      Force multilabel classification even if the data is multiclass
+
+

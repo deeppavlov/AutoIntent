@@ -1,0 +1,23 @@
+autointent.context.optimization_info.DecisionArtifact
+=====================================================
+
+.. py:class:: autointent.context.optimization_info.DecisionArtifact(/, **data)
+
+   Bases: :py:obj:`Artifact`
+
+
+   Artifact containing outputs from the predictor node.
+
+   Outputs from the best predictor, numpy array of shape (n_samples,) or
+   (n_samples, n_classes) depending on classification mode (multi-class or multi-label)
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+
+   .. py:attribute:: labels
+      :type:  numpy.typing.NDArray[numpy.float64]
+

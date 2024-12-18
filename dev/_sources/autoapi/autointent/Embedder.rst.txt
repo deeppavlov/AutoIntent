@@ -1,0 +1,93 @@
+autointent.Embedder
+===================
+
+.. py:class:: autointent.Embedder(model_name, device = 'cpu', batch_size = 32, max_length = None, use_cache = False)
+
+   A wrapper for managing embedding models using Sentence Transformers.
+
+   This class handles initialization, saving, loading, and clearing of
+   embedding models, as well as calculating embeddings for input texts.
+
+
+   .. py:attribute:: embedder_subdir
+      :type:  str
+      :value: 'sentence_transformers'
+
+
+
+   .. py:attribute:: metadata_dict_name
+      :type:  str
+      :value: 'metadata.json'
+
+
+
+   .. py:attribute:: model_name
+
+
+   .. py:attribute:: device
+      :value: 'cpu'
+
+
+
+   .. py:attribute:: batch_size
+      :value: 32
+
+
+
+   .. py:attribute:: max_length
+      :value: None
+
+
+
+   .. py:attribute:: use_cache
+      :value: False
+
+
+
+   .. py:attribute:: logger
+
+
+   .. py:method:: __hash__()
+
+      Compute a hash value for the Embedder.
+
+      :returns: The hash value of the Embedder.
+
+
+
+   .. py:method:: clear_ram()
+
+      Move the embedding model to CPU and delete it from memory.
+
+
+
+   .. py:method:: delete()
+
+      Delete the embedding model and its associated directory.
+
+
+
+   .. py:method:: dump(path)
+
+      Save the embedding model and metadata to disk.
+
+      :param path: Path to the directory where the model will be saved.
+
+
+
+   .. py:method:: load(path)
+
+      Load the embedding model and metadata from disk.
+
+      :param path: Path to the directory where the model is stored.
+
+
+
+   .. py:method:: embed(utterances)
+
+      Calculate embeddings for a list of utterances.
+
+      :param utterances: List of input texts to calculate embeddings for.
+      :return: A numpy array of embeddings.
+
+
