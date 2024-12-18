@@ -1,0 +1,158 @@
+autointent.context.Context
+==========================
+
+.. py:class:: autointent.context.Context(seed = 42)
+
+   Context manager for configuring and managing data handling, vector indexing, and optimization.
+
+   This class provides methods to set up logging, configure data and vector index components,
+   manage datasets, and retrieve various configurations for inference and optimization.
+
+
+   .. py:attribute:: data_handler
+      :type:  autointent.context.data_handler.DataHandler
+
+
+   .. py:attribute:: vector_index_client
+      :type:  autointent.context.vector_index_client.VectorIndexClient
+
+
+   .. py:attribute:: optimization_info
+      :type:  autointent.context.optimization_info.OptimizationInfo
+
+
+   .. py:attribute:: seed
+      :value: 42
+
+
+
+   .. py:method:: configure_logging(config)
+
+      Configure logging settings.
+
+      :param config: Logging configuration settings.
+
+
+
+   .. py:method:: configure_vector_index(config, embedder_config = None)
+
+      Configure the vector index client and embedder.
+
+      :param config: Configuration for the vector index.
+      :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+
+
+
+   .. py:method:: configure_data(config)
+
+      Configure data handling.
+
+      :param config: Configuration for the data handling process.
+
+
+
+   .. py:method:: set_dataset(dataset, force_multilabel = False)
+
+      Set the datasets for training, validation and testing.
+
+      :param dataset: Dataset.
+      :param force_multilabel: Whether to force multilabel classification.
+
+
+
+   .. py:method:: get_inference_config()
+
+      Generate configuration settings for inference.
+
+      :return: Dictionary containing inference configuration.
+
+
+
+   .. py:method:: dump()
+
+      Save logs, configurations, and datasets to disk.
+
+      Dumps evaluation results, training/test data splits, and inference configurations
+      to the specified logging directory.
+
+
+
+   .. py:method:: get_db_dir()
+
+      Get the database directory of the vector index.
+
+      :return: Path to the database directory.
+
+
+
+   .. py:method:: get_device()
+
+      Get the embedder device used by the vector index client.
+
+      :return: Device name.
+
+
+
+   .. py:method:: get_batch_size()
+
+      Get the batch size used by the embedder.
+
+      :return: Batch size.
+
+
+
+   .. py:method:: get_max_length()
+
+      Get the maximum sequence length for embeddings.
+
+      :return: Maximum length or None if not set.
+
+
+
+   .. py:method:: get_use_cache()
+
+      Check if caching is enabled for the embedder.
+
+      :return: True if caching is enabled, False otherwise.
+
+
+
+   .. py:method:: get_dump_dir()
+
+      Get the directory for saving dumped modules.
+
+      :return: Path to the dump directory or None if dumping is disabled.
+
+
+
+   .. py:method:: is_multilabel()
+
+      Check if the dataset is configured for multilabel classification.
+
+      :return: True if multilabel classification is enabled, False otherwise.
+
+
+
+   .. py:method:: get_n_classes()
+
+      Get the number of classes in the dataset.
+
+      :return: Number of classes.
+
+
+
+   .. py:method:: is_ram_to_clear()
+
+      Check if RAM clearing is enabled in the logging configuration.
+
+      :return: True if RAM clearing is enabled, False otherwise.
+
+
+
+   .. py:method:: has_saved_modules()
+
+      Check if any modules have been saved.
+
+      :return: True if there are saved modules, False otherwise.
+
+
