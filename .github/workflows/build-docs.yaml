@@ -90,13 +90,13 @@ jobs:
           done
 
       - name: Build documentation for dev branch
-        if: github.ref == 'refs/heads/dev'
+        # if: github.ref == 'refs/heads/dev'
         run: |
           echo "Building docs for dev branch..."
           poetry run sphinx-build docs/source docs/build/versions/dev
 
       - name: Deploy to GitHub Pages
-        if: github.event_name != 'pull_request'
+        # if: github.event_name != 'pull_request'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ github.token }}
