@@ -226,8 +226,8 @@ class LogRegEmbedding(EmbeddingModule):
         return RetrieverArtifact(embedder_name=self.embedder_name)
 
     def clear_cache(self) -> None:
-        """Clear cached data in memory used by the embedder."""
-        super().clear_cache()
+        """Clear cached data in memory used by the vector index."""
+        self.vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         """
@@ -275,7 +275,7 @@ class LogRegEmbedding(EmbeddingModule):
         self.label_encoder = LabelEncoder()
         self.label_encoder.classes_ = self.metadata["classes"]
 
-    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+    def predict(self, utterances: list[str]) -> None:
         pass
 
 
