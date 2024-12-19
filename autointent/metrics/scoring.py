@@ -247,7 +247,7 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
 
 def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
-    supports multilabel.
+    Supports multilabel.
 
     Compute the average number of label pairs that are incorrectly ordered given y_score
     weighted by the size of the label set and the number of labels not in the label set.
