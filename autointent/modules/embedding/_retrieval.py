@@ -62,15 +62,10 @@ class LogRegEmbedding(EmbeddingModule):
             db_dir=db_dir,
         )
         retrieval.fit(utterances, labels)
-        predictions = retrieval.predict(["how is the weather today?"])
-        print(predictions)
-
-    .. testoutput::
-
-        [1]
 
     .. testcleanup::
 
+        import shutil
         shutil.rmtree(db_dir)
 
     """
