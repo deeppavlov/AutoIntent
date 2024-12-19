@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Literal
 
+import joblib
+from joblib import load as joblib_load
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
@@ -16,7 +18,7 @@ from autointent.metrics import RetrievalMetricFn, ScoringMetricFn
 from autointent.modules.abc import EmbeddingModule
 
 
-class VectorDBMetadata(BaseMetadataDict):
+class RetrievalMetadata(BaseMetadataDict):
     """Metadata class for RetrievalEmbedding."""
 
     db_dir: str
@@ -24,12 +26,12 @@ class VectorDBMetadata(BaseMetadataDict):
     max_length: int | None
 
 
-class ClassifierMetadata(BaseMetadataDict):
+class LogRegMetadata(BaseMetadataDict):
     """Metadata class for LogisticRegressionCV and LabelEncoder."""
 
-    coef_: list[list[float]]
-    intercept_: list[float]
-    params: dict[str, any]
+    db_dir: str
+    batch_size: int
+    max_length: int | None
     classes: list[str]
 
 
@@ -154,6 +156,15 @@ class LogRegEmbedding(EmbeddingModule):
         """
         self._multilabel = isinstance(labels[0], list)
 
+        vector_index_client = VectorIndexClient(
+            self.embedder_device,
+            self.db_dir,
+            embedder_batch_size=self.batch_size,
+            embedder_max_length=self.max_length,
+            embedder_use_cache=self.embedder_use_cache,
+        )
+        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+
         self.embedder = Embedder(
             device=self.embedder_device,
             model_name=self.embedder_name,
@@ -224,10 +235,11 @@ class LogRegEmbedding(EmbeddingModule):
 
         :param path: Path to the directory where assets will be dumped.
         """
-        self.metadata = VectorDBMetadata(
+        self.metadata = LogRegMetadata(
             batch_size=self.batch_size,
             max_length=self.max_length,
             db_dir=str(self.db_dir),
+            classes=self.label_encoder.classes_.tolist(),
         )
 
         dump_dir = Path(path)
@@ -235,14 +247,8 @@ class LogRegEmbedding(EmbeddingModule):
             json.dump(self.metadata, file, indent=4)
         self.vector_index.dump(dump_dir)
 
-        self.classifier_metadata = ClassifierMetadata(
-            coef_=self.classifier.coef_.tolist(),
-            intercept_=self.classifier.intercept_.tolist(),
-            classes=self.label_encoder.classes_.tolist(),
-            params=self.classifier.get_params(),
-        )
-        with (dump_dir / "classifier.json").open("w") as file:
-            json.dump(self.classifier_metadata, file, indent=4)
+        classifier_path = dump_dir / "classifier.joblib"
+        joblib.dump(self.classifier, classifier_path)
 
     def load(self, path: str) -> None:
         """
@@ -251,8 +257,9 @@ class LogRegEmbedding(EmbeddingModule):
         :param path: Path to the directory containing the dumped assets.
         """
         dump_dir = Path(path)
+
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: VectorDBMetadata = json.load(file)
+            self.metadata: LogRegMetadata = json.load(file)
 
         vector_index_client = VectorIndexClient(
             embedder_device=self.embedder_device,
@@ -263,16 +270,10 @@ class LogRegEmbedding(EmbeddingModule):
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 
-        with (dump_dir / "classifier.json").open() as file:
-            self.classifier_metadata: ClassifierMetadata = json.load(file)
-
-        self.classifier = LogisticRegressionCV()
-        self.classifier.set_params(**self.classifier_metadata["params"])
-        self.classifier.coef_ = self.classifier_metadata["coef_"]
-        self.classifier.intercept_ = self.classifier_metadata["intercept_"]
-
+        classifier_path = dump_dir / "classifier.joblib"
+        self.classifier = joblib_load(classifier_path)
         self.label_encoder = LabelEncoder()
-        self.label_encoder.classes_ = self.classifier_metadata["classes"]
+        self.label_encoder.classes_ = self.metadata["classes"]
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
         pass
@@ -448,7 +449,7 @@ class RetrievalEmbedding(EmbeddingModule):
 
         :param path: Path to the directory where assets will be dumped.
         """
-        self.metadata = VectorDBMetadata(
+        self.metadata = RetrievalMetadata(
             batch_size=self.batch_size,
             max_length=self.max_length,
             db_dir=str(self.db_dir),
@@ -467,7 +468,7 @@ class RetrievalEmbedding(EmbeddingModule):
         """
         dump_dir = Path(path)
         with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: VectorDBMetadata = json.load(file)
+            self.metadata: RetrievalMetadata = json.load(file)
 
         vector_index_client = VectorIndexClient(
             embedder_device=self.embedder_device,
