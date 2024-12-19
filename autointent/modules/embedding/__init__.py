@@ -2,4 +2,4 @@
 
 from ._retrieval import LogRegEmbedding, RetrievalEmbedding
 
-__all__ = ["RetrievalEmbedding", "LogRegEmbedding"]
+__all__ = ["LogRegEmbedding", "RetrievalEmbedding"]
