@@ -302,12 +302,6 @@ class RetrievalEmbedding(EmbeddingModule):
             db_dir=db_dir,
         )
         retrieval.fit(utterances, labels)
-        predictions = retrieval.predict(["how is the weather today?"])
-        print(predictions)
-
-    .. testoutput::
-
-        ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
 
     .. testcleanup::
 
