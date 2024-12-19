@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 from typing import Literal
 
-from sklearn.linear_model import LogisticRegressionCV
-from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 
 from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
@@ -103,8 +104,7 @@ class LogRegEmbedding(EmbeddingModule):
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
-        self.classifier = LogisticRegressionCV(cv=cv)
-        self.label_encoder = LabelEncoder()
+        self.cv = cv
 
         super().__init__(k=k)
 
@@ -152,6 +152,8 @@ class LogRegEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        self._multilabel = isinstance(labels[0], list)
+
         self.embedder = Embedder(
             device=self.embedder_device,
             model_name=self.embedder_name,
@@ -160,6 +162,16 @@ class LogRegEmbedding(EmbeddingModule):
             use_cache=self.embedder_use_cache,
         )
         embeddings = self.embedder.embed(utterances)
+        if self._multilabel:
+            self.label_encoder = MultiLabelBinarizer()
+            encoded_labels = self.label_encoder.fit_transform(labels)
+            base_clf = LogisticRegression()
+            self.classifier = MultiOutputClassifier(base_clf)
+        else:
+            self.label_encoder = LabelEncoder()
+            encoded_labels = self.label_encoder.fit_transform(labels)
+            self.classifier = LogisticRegressionCV(cv=self.cv)
+
         self.label_encoder.fit(labels)
         encoded_labels = self.label_encoder.transform(labels)
         self.classifier.fit(embeddings, encoded_labels)
@@ -192,7 +204,7 @@ class LogRegEmbedding(EmbeddingModule):
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
-        return metric_fn(labels, [predicted_labels])
+        return metric_fn(labels, predicted_labels.reshape(-1, 1))
 
     def get_assets(self) -> RetrieverArtifact:
         """
@@ -261,6 +273,9 @@ class LogRegEmbedding(EmbeddingModule):
 
         self.label_encoder = LabelEncoder()
         self.label_encoder.classes_ = self.classifier_metadata["classes"]
+
+    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+        pass
 
 
 class RetrievalEmbedding(EmbeddingModule):
