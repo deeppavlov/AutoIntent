@@ -475,17 +475,5 @@ class RetrievalEmbedding(EmbeddingModule):
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 
-    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
-        """
-        Predict the nearest neighbors for a list of utterances.
-
-        :param utterances: List of utterances for which nearest neighbors are to be retrieved.
-        :return: A tuple containing:
-            - labels: List of retrieved labels for each utterance.
-            - distances: List of distances to the nearest neighbors.
-            - texts: List of retrieved text data corresponding to the neighbors.
-        """
-        return self.vector_index.query(
-            utterances,
-            self.k,
-        )
+    def predict(self, utterances: list[str]) -> None:
+        pass
