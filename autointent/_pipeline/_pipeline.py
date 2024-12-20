@@ -114,7 +114,6 @@ class Pipeline:
 
         :param dataset: Dataset for optimization
         :param force_multilabel: Whether to force multilabel or not
-        :param init_for_inference: Whether to initialize pipeline for inference
         :return: Context
         """
         if self._is_inference():

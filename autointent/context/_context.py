@@ -8,7 +8,7 @@ from typing import Any
 import yaml
 
 from autointent import Dataset
-from autointent._callbacks.base import CallbackHandler, get_callbacks
+from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
     DataConfig,
     EmbedderConfig,

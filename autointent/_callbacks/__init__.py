@@ -1,0 +1,34 @@
+from autointent._callbacks.base import OptimizerCallback
+from autointent._callbacks.callback_handler import CallbackHandler
+from autointent._callbacks.tensorboard import TensorBoardCallback
+from autointent._callbacks.wandb import WandbCallback
+
+REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback]}
+
+
+def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
+    """
+    Get the list of callbacks.
+
+    :param reporters: List of reporters to use.
+    :return: Callback handler.
+    """
+    if not reporters:
+        return CallbackHandler()
+
+    reporters_cb = []
+    for reporter in reporters:
+        if reporter not in REPORTERS:
+            msg = f"Reporter {reporter} not supported. Supported reporters {','.join(REPORTERS)}"
+            raise ValueError(msg)
+        reporters_cb.append(REPORTERS[reporter])
+    return CallbackHandler(callbacks=reporters_cb)
+
+
+__all__ = [
+    "CallbackHandler",
+    "OptimizerCallback",
+    "TensorBoardCallback",
+    "WandbCallback",
+    "get_callbacks",
+]

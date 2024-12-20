@@ -4,7 +4,7 @@ from typing import Any
 import numpy as np
 
 from autointent import Context, Dataset, Pipeline
-from autointent._callbacks.base import CallbackHandler, OptimizerCallback
+from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import LoggingConfig, VectorIndexConfig
 from tests.conftest import setup_environment
 
