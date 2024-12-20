@@ -1,9 +1,12 @@
-name: Build and publish docs
+name: Build and Publish Multi-Version Docs
 
 on:
   push:
     branches:
-    - dev
+      - dev
+  release:
+    types:
+      - published
   pull_request:
     branches:
       - dev
@@ -17,13 +20,18 @@ permissions:
   contents: write
 
 jobs:
-  publish:
-    name: build and publish docs
+  build-docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: set up python 3.10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -36,37 +44,30 @@ jobs:
         run: |
           sudo apt install pandoc
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           poetry install --with docs
 
-      - name: Test documentation
+      - name: Run tests
         run: |
+          echo "Testing documentation build..."
           make test-docs
 
-      - name: build documentation
+      - name: Build documentation
+        if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
           make docs
 
-      - name: save branch name without slashes
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      - name: build multiversion documentation
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
-          BRANCH_NAME=${{ env.BRANCH_NAME }}
-          BRANCH_NAME=${BRANCH_NAME////_}
-          echo BRANCH_NAME=${BRANCH_NAME} >> $GITHUB_ENV
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('github-pages-for-branch-{0}', env.BRANCH_NAME) }}
-          path: docs/build/
-          retention-days: 3
+          make multi-version-docs
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.6.4
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         with:
-          branch: gh-pages
-          folder: docs/build/html/
-          single-commit: True
+          github_token: ${{ github.token }}
+          publish_dir: docs/build/html/versions
+          destination_dir: versions
+          keep_files: true
