@@ -23,7 +23,7 @@ autointent.Pipeline
 
       Create pipeline optimizer from dictionary search space.
 
-      :param config: Dictionary config
+      :param search_space: Dictionary config
 
 
 
@@ -33,7 +33,7 @@ autointent.Pipeline
 
       Create pipeline optimizer with default search space for given classification task.
 
-      :param multilabel: Wether the task multi-label, or single-label.
+      :param multilabel: Whether the task multi-label, or single-label.
 
 
 

@@ -21,6 +21,9 @@ autointent.context.Context
       :type:  autointent.context.optimization_info.OptimizationInfo
 
 
+   .. py:attribute:: callback_handler
+
+
    .. py:attribute:: seed
       :value: 42
 

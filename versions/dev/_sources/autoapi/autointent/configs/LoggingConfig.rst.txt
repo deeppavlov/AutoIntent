@@ -52,6 +52,15 @@ autointent.configs.LoggingConfig
 
 
 
+   .. py:attribute:: report_to
+      :type:  list[str] | None
+      :value: None
+
+
+      List of callbacks to report to. If None, no callbacks will be used
+
+
+
    .. py:method:: __post_init__()
 
       Define the run name, directory path and dump directory.
@@ -67,6 +76,18 @@ autointent.configs.LoggingConfig
    .. py:method:: define_dirpath()
 
       Define the directory path. If None, the logs will be saved in the current working directory.
+
+
+
+   .. py:method:: get_dirpath()
+
+      Get the directory path.
+
+
+
+   .. py:method:: get_run_name()
+
+      Get the run name.
 
 
 

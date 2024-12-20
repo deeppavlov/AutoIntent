@@ -61,7 +61,7 @@
     <link rel="prev" title="autointent.configs.EmbedderConfig" href="EmbedderConfig.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="0.0.1" />
   </head>
   
   
@@ -693,6 +693,12 @@ If None, the logs will be saved in the current working directory</p>
 <dd><p>Whether to clear the RAM after dumping the modules</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.configs.LoggingConfig.report_to">
+<span class="sig-name descname"><span class="pre">report_to</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#autointent.configs.LoggingConfig.report_to" title="Link to this definition">#</a></dt>
+<dd><p>List of callbacks to report to. If None, no callbacks will be used</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="autointent.configs.LoggingConfig.__post_init__">
 <span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autointent.configs.LoggingConfig.__post_init__" title="Link to this definition">#</a></dt>
@@ -722,6 +728,28 @@ If None, the logs will be saved in the current working directory</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.configs.LoggingConfig.get_dirpath">
+<span class="sig-name descname"><span class="pre">get_dirpath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autointent.configs.LoggingConfig.get_dirpath" title="Link to this definition">#</a></dt>
+<dd><p>Get the directory path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)">pathlib.Path</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.configs.LoggingConfig.get_run_name">
+<span class="sig-name descname"><span class="pre">get_run_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autointent.configs.LoggingConfig.get_run_name" title="Link to this definition">#</a></dt>
+<dd><p>Get the run name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -794,9 +822,12 @@ If None, the logs will be saved in the current working directory</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.dump_dir"><code class="docutils literal notranslate"><span class="pre">dump_dir</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.dump_modules"><code class="docutils literal notranslate"><span class="pre">dump_modules</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.clear_ram"><code class="docutils literal notranslate"><span class="pre">clear_ram</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.report_to"><code class="docutils literal notranslate"><span class="pre">report_to</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.__post_init__"><code class="docutils literal notranslate"><span class="pre">__post_init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.define_run_name"><code class="docutils literal notranslate"><span class="pre">define_run_name()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.define_dirpath"><code class="docutils literal notranslate"><span class="pre">define_dirpath()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.get_dirpath"><code class="docutils literal notranslate"><span class="pre">get_dirpath()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.get_run_name"><code class="docutils literal notranslate"><span class="pre">get_run_name()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.configs.LoggingConfig.define_dump_dir"><code class="docutils literal notranslate"><span class="pre">define_dump_dir()</span></code></a></li>
 </ul>
 </li>
