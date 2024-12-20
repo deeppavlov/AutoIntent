@@ -10,6 +10,8 @@ import sys
 from importlib.metadata import version
 from pathlib import Path
 
+from sphinx.application import Sphinx
+
 from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
 
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
@@ -164,8 +166,9 @@ smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and up
 repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
 
 
-def setup(app) -> None:  # noqa: ANN001
+def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)
+    user_guids_dir = app.srcdir / "docs" / "source" / "user_guides"
 
     generate_tutorial_links_for_notebook_creation(
         include=[
@@ -180,6 +183,6 @@ def setup(app) -> None:  # noqa: ANN001
             ("user_guides.cli", "CLI Usage"),
         ],
         source="user_guides",
-        destination="docs/source/user_guides",
+        destination=user_guids_dir,
     )
     app.connect("autoapi-skip-member", skip_member)
