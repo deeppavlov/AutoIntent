@@ -182,6 +182,7 @@ generate_tutorial_links_for_notebook_creation(
     destination=user_guids_dir,
 )
 
+
 def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)
     user_guids_dir = app.srcdir / "user_guides"
