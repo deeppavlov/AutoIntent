@@ -1,0 +1,6 @@
+CLI Usage
+=========
+
+.. nbgallery::
+   user_guides.cli.01_search_space.py
+   user_guides.cli.02_basic_usage.py
