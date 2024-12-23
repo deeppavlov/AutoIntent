@@ -165,11 +165,27 @@ smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and up
 
 repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
 
+user_guids_dir = repo_root / "docs" / "source" / "user_guides"
+generate_tutorial_links_for_notebook_creation(
+    include=[
+        (
+            "user_guides.basic_usage",
+            "Basic Usage",
+        ),
+        (
+            "user_guides.advanced",
+            "Advanced Usage",
+        ),
+        ("user_guides.cli", "CLI Usage"),
+    ],
+    source="user_guides",
+    destination=user_guids_dir,
+)
 
 def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)
-    user_guids_dir = app.srcdir / "docs" / "source" / "user_guides"
-
+    user_guids_dir = app.srcdir / "user_guides"
+    print(user_guids_dir)
     generate_tutorial_links_for_notebook_creation(
         include=[
             (
@@ -185,4 +201,5 @@ def setup(app: Sphinx) -> None:
         source="user_guides",
         destination=user_guids_dir,
     )
+
     app.connect("autoapi-skip-member", skip_member)

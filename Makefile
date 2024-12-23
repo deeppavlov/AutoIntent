@@ -35,7 +35,7 @@ test-docs:
 	$(poetry) python -m sphinx build -b doctest docs/source docs/build/html
 
 .PHONY: serve-docs
-serve-docs: docs
+serve-docs:
 	$(poetry) python -m http.server -d docs/build/html 8333
 
 .PHONY: multi-version-docs
