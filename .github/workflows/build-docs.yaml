@@ -49,12 +49,13 @@ jobs:
           poetry install --with docs
 
       - name: Run tests
+        if: github.event_name != 'workflow_dispatch'
         run: |
           echo "Testing documentation build..."
           make test-docs
 
       - name: Build documentation
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        if: ${{ github.ref == 'refs/heads/dev' }} && github.event_name != 'workflow_dispatch'
         run: |
           make docs
 
