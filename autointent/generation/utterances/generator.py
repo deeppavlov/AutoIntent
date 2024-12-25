@@ -1,12 +1,13 @@
 import os
 
 import openai
-from dotenv import load_dotenv
+
+# from dotenv import load_dotenv
 
 
 class Generator:
     def __init__(self):
-        load_dotenv()
+        # load_dotenv()
         self.client = openai.OpenAI(base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"])
         self.model_name = os.environ["OPENAI_MODEL_NAME"]
 

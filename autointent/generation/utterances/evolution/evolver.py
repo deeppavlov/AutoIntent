@@ -36,7 +36,7 @@ class UtteranceEvolver:
 
 
 def load_prompts() -> dict[str, str]:
-    files = ires.files("autointent.generation.evolution.chat_templates")
+    files = ires.files("autointent.generation.utterances.evolution.chat_templates")
 
     res = {}
     for file_name in ["reasoning.yaml", "concretizing.yaml", "abstract.yaml", "base_instruction.txt"]:
