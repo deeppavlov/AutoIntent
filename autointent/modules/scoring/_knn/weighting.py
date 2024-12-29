@@ -95,5 +95,5 @@ def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
     indices = (*tuple(np.indices(labels.shape)), labels)
-    onehot_labels[indices] = 1
+    onehot_labels[indices] = 1  # type: ignore[index]
     return onehot_labels
