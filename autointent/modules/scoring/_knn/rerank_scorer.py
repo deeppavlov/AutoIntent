@@ -6,9 +6,8 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sentence_transformers import CrossEncoder
-from torch.nn import Sigmoid
 
+from autointent._transformers import NLITransformer
 from autointent.context import Context
 from autointent.custom_types import WEIGHT_TYPES, LabelType
 
@@ -40,7 +39,7 @@ class RerankScorer(KNNScorer):
     """
 
     name = "rerank"
-    _scorer: CrossEncoder
+    _scorer: NLITransformer
 
     def __init__(
         self,
@@ -138,7 +137,9 @@ class RerankScorer(KNNScorer):
         :param utterances: List of utterances to fit the scorer.
         :param labels: List of labels corresponding to the utterances.
         """
-        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length)  # type: ignore[arg-type]
+        self._scorer = NLITransformer(
+            self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length, batch_size=self.batch_size
+        )
 
         super().fit(utterances, labels)
 
@@ -179,7 +180,9 @@ class RerankScorer(KNNScorer):
         self.m = metadata["m"] if metadata["m"] else self.k
         self.cross_encoder_name = metadata["cross_encoder_name"]
         self.rank_threshold_cutoff = metadata["rank_threshold_cutoff"]
-        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length)  # type: ignore[arg-type]
+        self._scorer = NLITransformer(
+            self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length, batch_size=self.batch_size
+        )
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """
@@ -197,9 +200,7 @@ class RerankScorer(KNNScorer):
         for query, query_labels, query_distances, query_docs in zip(
             utterances, knn_labels, knn_distances, knn_neighbors, strict=True
         ):
-            cur_ranks = self._scorer.rank(
-                query, query_docs, top_k=self.m, batch_size=self.batch_size, activation_fct=Sigmoid()
-            )
+            cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
             for dst, src in zip(
                 [labels, distances, neighbours], [query_labels, query_distances, query_docs], strict=True

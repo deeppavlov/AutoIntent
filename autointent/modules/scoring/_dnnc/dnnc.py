@@ -8,14 +8,12 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sentence_transformers import CrossEncoder
 
 from autointent import Context
+from autointent._transformers import NLITransformer
 from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
-
-from .head_training import CrossEncoderWithLogreg
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +92,7 @@ class DNNCScorer(ScoringModule):
     name = "dnnc"
 
     crossencoder_subdir: str = "crossencoder"
-    model: CrossEncoder | CrossEncoderWithLogreg
+    model: NLITransformer
     prebuilt_index: bool = False
 
     def __init__(
@@ -192,8 +190,6 @@ class DNNCScorer(ScoringModule):
         """
         self.n_classes = len(set(labels))
 
-        self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
-
         vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
 
         if self.prebuilt_index:
@@ -205,10 +201,8 @@ class DNNCScorer(ScoringModule):
         else:
             self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
-        if self.train_head:
-            model = CrossEncoderWithLogreg(self.model)
-            model.fit(utterances, labels)
-            self.model = model
+        self.model = NLITransformer(self.cross_encoder_name, train_classifier=self.train_head, device=self.device)
+        self.model.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -256,9 +250,9 @@ class DNNCScorer(ScoringModule):
             logger.error(msg)
             raise ValueError(msg)
 
-        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self.model.predict(flattened_text_pairs)  # type: ignore[assignment]
+        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self.model.predict(flattened_text_pairs)
         return [
-            flattened_cross_encoder_scores[i : i + self.k].tolist()  # type: ignore[misc]
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
@@ -322,10 +316,7 @@ class DNNCScorer(ScoringModule):
         self.vector_index = vector_index_client.get_index(self.embedder_name)
 
         crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
-        if self.train_head:
-            self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
-        else:
-            self.model = CrossEncoder(crossencoder_dir, device=self.device)
+        self.model = NLITransformer.load(crossencoder_dir)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         """

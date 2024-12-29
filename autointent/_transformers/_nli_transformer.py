@@ -1,10 +1,13 @@
-"""CrossEncoderWithLogreg class for cross-encoder-based binary classification with logistic regression."""
+"""NLITransformer class for cross-encoder-based estimation of meaning closeness.
+
+Can be used to rank retrieved sentences by meaning closeness to provided utterance.
+"""
 
 import itertools as it
 import logging
 from pathlib import Path
 from random import shuffle
-from typing import Any, TypeVar
+from typing import Any
 
 import joblib
 import numpy as np
@@ -12,6 +15,7 @@ import numpy.typing as npt
 import torch
 from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
+from torch import nn
 
 from autointent.custom_types import LabelType
 
@@ -54,15 +58,13 @@ def construct_samples(
     return pairs, labels
 
 
-CrossEncoderType = TypeVar("CrossEncoderType", bound="CrossEncoderWithLogreg")
-
-
-class CrossEncoderWithLogreg:
+class NLITransformer:
     r"""
-    Cross-encoder with logistic regression for binary classification.
+    Cross-encoder for NLI.
 
-    This class uses a SentenceTransformers CrossEncoder model to extract features
-    and LogisticRegressionCV for classification.
+    In the hart this class uses a SentenceTransformers CrossEncoder model to extract features.
+    Then it uses either the model's clissifier or our custom trained LogisticRegressionCV
+    (custom classifier layer in the future) to rank documents using similarity score to the query.
 
     :ivar cross_encoder: The CrossEncoder model used to extract features.
     :ivar batch_size: Batch size for processing text pairs.
@@ -72,10 +74,8 @@ class CrossEncoderWithLogreg:
     Examples
     --------
     Creating and fitting the CrossEncoderWithLogreg:
-    >>> from autointent.modules import CrossEncoderWithLogreg
-    >>> from sentence_transformers import CrossEncoder
-    >>> model = CrossEncoder("cross-encoder-model")
-    >>> scorer = CrossEncoderWithLogreg(model)
+    >>> from autointent._transformers import NLITransformer
+    >>> scorer = NLITransformer("cross-encoder-model")
     >>> utterances = ["What is your name?", "How old are you?"]
     >>> labels = [1, 0]
     >>> scorer.fit(utterances, labels)
@@ -87,18 +87,38 @@ class CrossEncoderWithLogreg:
 
     Saving and loading the model:
     >>> scorer.save("outputs/")
-    >>> loaded_scorer = CrossEncoderWithLogreg.load("outputs/")
+    >>> loaded_scorer = NLITransformer.load("outputs/")
     """
 
-    def __init__(self, model: CrossEncoder, batch_size: int = 326) -> None:
+    def __init__(
+        self,
+        model: str,
+        device: str = "cpu",
+        train_classifier: bool = False,
+        batch_size: int = 326,
+        max_length: int | None = None,
+    ) -> None:
         """
-        Initialize the CrossEncoderWithLogreg.
+        Initialize the NLITransformer.
 
-        :param model: The CrossEncoder model to use.
+        :param model: The CrossEncoder model name to use.
+        :param device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param train_classifier: Whether to train a custom classifier, defaults to False.
         :param batch_size: Batch size for processing text pairs, defaults to 326.
+        :param max_length (int, optional): Max length for input sequences for the cross encoder.
         """
-        self.cross_encoder = model
+        self.cross_encoder = CrossEncoder(model, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
+        self.train_classifier = train_classifier
         self.batch_size = batch_size
+        self.max_length = max_length
+        self._clf = None
+
+        if train_classifier:
+            self._logits_list: list[npt.NDArray[Any]] = []
+            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
+
+    def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
+        self._logits_list.append(input_tensor[0].cpu().numpy())
 
     @torch.no_grad()
     def get_features(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
@@ -108,20 +128,15 @@ class CrossEncoderWithLogreg:
         :param pairs: List of text pairs.
         :return: Numpy array of extracted features.
         """
-        logits_list: list[npt.NDArray[Any]] = []
+        if not self.train_classifier:
+            return np.array(self.cross_encoder.predict(pairs, batch_size=self.batch_size, activation_fct=nn.Sigmoid()))
 
-        def hook_function(module, input_tensor, output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ARG001, ANN001
-            logits_list.append(input_tensor[0].cpu().numpy())
+        # put the data through, features will be taken in the hook
+        self.cross_encoder.predict(pairs, batch_size=self.batch_size)
 
-        handler = self.cross_encoder.model.classifier.register_forward_hook(hook_function)
-
-        for i in range(0, len(pairs), self.batch_size):
-            batch = pairs[i : i + self.batch_size]
-            self.cross_encoder.predict(batch)
-
-        handler.remove()
-
-        return np.concatenate(logits_list, axis=0)
+        res = self._logits_list
+        self._logits_list = []
+        return np.concatenate(res, axis=0)
 
     def _fit(self, pairs: list[list[str]], labels: list[LabelType]) -> None:
         """
@@ -139,6 +154,8 @@ class CrossEncoderWithLogreg:
 
         features = self.get_features(pairs)
 
+        # TODO: LogisticRegressionCV has class_weight="balanced". Is it better to use it instead of balance_factor in
+        # construct_samples?
         clf = LogisticRegressionCV()
         clf.fit(features, labels)
 
@@ -151,6 +168,9 @@ class CrossEncoderWithLogreg:
         :param utterances: List of utterances (texts).
         :param labels: Intent class labels corresponding to the utterances.
         """
+        if not self.train_classifier:
+            return  # do nothing if the classifier is not to be re-trained
+
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
@@ -161,8 +181,40 @@ class CrossEncoderWithLogreg:
         :param pairs: List of text pairs to classify.
         :return: Numpy array of probabilities.
         """
+        if self.train_classifier and self._clf is None:
+            msg = "Classifier is not trained yet"
+            raise ValueError(msg)
+
         features = self.get_features(pairs)
-        return self._clf.predict_proba(features)[:, 1]  # type: ignore[no-any-return]
+
+        if self._clf is not None:
+            return self._clf.predict_proba(features)[:, 1]
+
+        return features
+
+    def rank(
+        self,
+        query: str,
+        query_docs: list[str],
+        top_k: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Rank documents according to meaning closeness to the query.
+
+        :param query: The reference document.
+        :query_docs: List of documents to rank
+        :top_k: how many document to return
+        :return: array of dictionaries of ranked items.
+        """
+        query_doc_pairs = [[query, doc] for doc in query_docs]
+        scores = self.predict(query_doc_pairs)
+
+        if top_k is None:
+            top_k = len(query_docs)
+
+        results = [{"corpus_id": i, "score": scores[i]} for i in range(len(query_docs))]
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results[:top_k]
 
     def save(self, path: str) -> None:
         """
@@ -186,8 +238,11 @@ class CrossEncoderWithLogreg:
         """
         self._clf = clf
 
+        if clf is None:
+            self.train_classifier = False
+
     @classmethod
-    def load(cls, path: str) -> "CrossEncoderWithLogreg":
+    def load(cls, path: str) -> "NLITransformer":
         """
         Load the model and classifier from disk.
 
