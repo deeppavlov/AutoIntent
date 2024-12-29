@@ -46,7 +46,7 @@ hydra-core = "^1.3.2"
 faiss-cpu = "^1.9.0"
 openai = "^1.52.1"
 datasets = "^3.1.0"
-ruff = "^0.8.0"
+ruff = "==0.8.4"
 xxhash = "^3.5.0"
 
 [tool.poetry.group.dev]
@@ -95,6 +95,8 @@ sphinx-autodoc-typehints = "^2.5.0"
 sphinx-copybutton = "^0.5.2"
 sphinx-autoapi = "^3.3.3"
 ipykernel = "^6.29.5"
+tensorboardx = "^2.6.2.2"
+sphinx-multiversion = "^0.2.4"
 
 [tool.poetry.scripts]
 "autointent" = "autointent._pipeline._cli_endpoint:optimize"
@@ -189,5 +191,8 @@ module = [
     "faiss",
     "datasets",
     "joblib",
+    "torch.utils.tensorboard",
+    "tensorboardX",
+    "wandb",
 ]
 ignore_missing_imports = true

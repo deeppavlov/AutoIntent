@@ -39,6 +39,7 @@ class Module(ABC):
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
+        :param split: Split to score on
         :param metric_fn: Metric function
         """
 

@@ -45,6 +45,8 @@ class LoggingConfig:
     """Whether to dump the modules or not"""
     clear_ram: bool = False
     """Whether to clear the RAM after dumping the modules"""
+    report_to: list[str] | None = None
+    """List of callbacks to report to. If None, no callbacks will be used"""
 
     def __post_init__(self) -> None:
         """Define the run name, directory path and dump directory."""
@@ -62,6 +64,18 @@ class LoggingConfig:
         if self.run_name is None:
             raise ValueError
         self.dirpath = dirpath / self.run_name
+
+    def get_dirpath(self) -> Path:
+        """Get the directory path."""
+        if self.dirpath is None:
+            raise ValueError
+        return self.dirpath
+
+    def get_run_name(self) -> str:
+        """Get the run name."""
+        if self.run_name is None:
+            raise ValueError
+        return self.run_name
 
     def define_dump_dir(self) -> None:
         """Define the dump directory. If None, the modules will not be dumped."""

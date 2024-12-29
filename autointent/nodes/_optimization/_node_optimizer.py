@@ -48,6 +48,9 @@ class NodeOptimizer:
                 module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
 
                 self._logger.debug("initializing %s module...", module_name)
+                context.callback_handler.start_module(
+                    module_name=module_name, num=j_combination, module_kwargs=module_kwargs
+                )
                 module = self.node_info.modules_available[module_name].from_context(context, **module_kwargs)
 
                 embedder_name = module.get_embedder_name()
@@ -59,6 +62,10 @@ class NodeOptimizer:
 
                 self._logger.debug("scoring %s module...", module_name)
                 metric_value = module.score(context, "validation", self.node_info.metrics_available[self.metric_name])
+
+                log_data = {self.metric_name: metric_value}
+                context.callback_handler.log_value(**log_data)  # type: ignore[arg-type]
+                context.callback_handler.end_module()
 
                 dump_dir = context.get_dump_dir()
 

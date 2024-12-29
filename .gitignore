@@ -177,3 +177,5 @@ poetry.lock
 indexes_dirnames.json
 tests_logs
 tests/logs
+runs/
+vector_db*
