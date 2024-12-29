@@ -97,6 +97,7 @@ class NLITransformer:
         train_classifier: bool = False,
         batch_size: int = 326,
         max_length: int | None = None,
+        classifier_head: LogisticRegressionCV | None = None,
     ) -> None:
         """
         Initialize the NLITransformer.
@@ -106,14 +107,16 @@ class NLITransformer:
         :param train_classifier: Whether to train a custom classifier, defaults to False.
         :param batch_size: Batch size for processing text pairs, defaults to 326.
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
+        :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
         self.cross_encoder = CrossEncoder(model, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
-        self.train_classifier = train_classifier
+        self.train_classifier = False
         self.batch_size = batch_size
         self.max_length = max_length
-        self._clf = None
+        self._clf = classifier_head
 
-        if train_classifier:
+        if classifier_head is not None or train_classifier:
+            self.train_classifier = True
             self._logits_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
@@ -188,7 +191,7 @@ class NLITransformer:
         features = self.get_features(pairs)
 
         if self._clf is not None:
-            return self._clf.predict_proba(features)[:, 1]
+            return np.array(self._clf.predict_proba(features)[:, 1])
 
         return features
 
@@ -230,17 +233,6 @@ class NLITransformer:
         clf_path = dump_dir / "classifier.joblib"
         joblib.dump(self._clf, clf_path)
 
-    def set_classifier(self, clf: LogisticRegressionCV) -> None:
-        """
-        Set the logistic regression classifier.
-
-        :param clf: LogisticRegressionCV instance.
-        """
-        self._clf = clf
-
-        if clf is None:
-            self.train_classifier = False
-
     @classmethod
     def load(cls, path: str) -> "NLITransformer":
         """
@@ -257,9 +249,5 @@ class NLITransformer:
 
         # Load sentence transformer model
         crossencoder_dir = str(dump_dir / "crossencoder")
-        model = CrossEncoder(crossencoder_dir)
 
-        res = cls(model)
-        res.set_classifier(clf)
-
-        return res
+        return cls(crossencoder_dir, classifier_head=clf)
