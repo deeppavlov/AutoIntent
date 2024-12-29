@@ -79,8 +79,8 @@ class DNNCScorer(ScoringModule):
 
     .. testoutput::
 
-        [[0.00013581  0.        ]
-         [0.00030066  0.        ]]
+        [[0.00013582 0.        ]
+         [0.00030066 0.        ]]
 
     .. testcleanup::
 
