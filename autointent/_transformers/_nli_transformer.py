@@ -247,7 +247,7 @@ class NLITransformer:
         Load the model and classifier from disk.
 
         :param path: Directory path containing the saved model and classifier.
-        :return: Initialized CrossEncoderWithLogreg instance.
+        :return: Initialized NLITransformer instance.
         """
         dump_dir = Path(path)
 
