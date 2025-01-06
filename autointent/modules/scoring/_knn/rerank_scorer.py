@@ -52,8 +52,8 @@ class RerankScorer(KNNScorer):
         rank_threshold_cutoff: int | None = None,
         db_dir: str | None = None,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
     ) -> None:
         """
         Initialize the RerankScorer.
@@ -69,8 +69,8 @@ class RerankScorer(KNNScorer):
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
         :param db_dir: Path to the database directory, or None to use default.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding and cross encoder, or None for default.
         """
         super().__init__(
             embedder_name=embedder_name,
@@ -78,8 +78,8 @@ class RerankScorer(KNNScorer):
             weights=weights,
             db_dir=db_dir,
             embedder_device=embedder_device,
-            batch_size=batch_size,
-            max_length=max_length,
+            embedder_batch_size=embedder_batch_size,
+            embedder_max_length=embedder_max_length,
         )
 
         self.cross_encoder_name = cross_encoder_name
@@ -121,8 +121,8 @@ class RerankScorer(KNNScorer):
             rank_threshold_cutoff=rank_threshold_cutoff,
             db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
         )
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
@@ -132,7 +132,9 @@ class RerankScorer(KNNScorer):
         :param utterances: List of utterances to fit the scorer.
         :param labels: List of labels corresponding to the utterances.
         """
-        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length)  # type: ignore[arg-type]
+        self._scorer = CrossEncoder(
+            self.cross_encoder_name, device=self.embedder_device, max_length=self.embedder_max_length
+        )  # type: ignore[arg-type]
 
         super().fit(utterances, labels)
 
@@ -173,7 +175,9 @@ class RerankScorer(KNNScorer):
         self.m = metadata["m"] if metadata["m"] else self.k
         self.cross_encoder_name = metadata["cross_encoder_name"]
         self.rank_threshold_cutoff = metadata["rank_threshold_cutoff"]
-        self._scorer = CrossEncoder(self.cross_encoder_name, device=self.embedder_device, max_length=self.max_length)  # type: ignore[arg-type]
+        self._scorer = CrossEncoder(
+            self.cross_encoder_name, device=self.embedder_device, max_length=self.embedder_max_length
+        )  # type: ignore[arg-type]
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """

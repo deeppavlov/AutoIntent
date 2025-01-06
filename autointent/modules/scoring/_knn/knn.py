@@ -22,15 +22,15 @@ class KNNScorerDumpMetadata(BaseMetadataDict):
     :ivar n_classes: Number of classes in the dataset.
     :ivar multilabel: Whether the task is multilabel classification.
     :ivar db_dir: Path to the database directory.
-    :ivar batch_size: Batch size used for embedding.
-    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
+    :ivar embedder_batch_size: Batch size used for embedding.
+    :ivar embedder_max_length: Maximum sequence length for embedding, or None if not specified.
     """
 
     n_classes: int
     multilabel: bool
     db_dir: str
-    batch_size: int
-    max_length: int | None
+    embedder_batch_size: int
+    embedder_max_length: int | None
 
 
 class KNNScorer(ScoringModule):
@@ -80,7 +80,6 @@ class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
     name = "knn"
-    max_length: int | None
 
     def __init__(
         self,
@@ -89,8 +88,8 @@ class KNNScorer(ScoringModule):
         weights: WEIGHT_TYPES = "distance",
         db_dir: str | None = None,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
         embedder_use_cache: bool = True,
     ) -> None:
         """
@@ -104,8 +103,8 @@ class KNNScorer(ScoringModule):
             - "closest": Only the closest neighbor of each class is weighted.
         :param db_dir: Path to the database directory, or None to use default.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder_name = embedder_name
@@ -113,8 +112,8 @@ class KNNScorer(ScoringModule):
         self.weights = weights
         self._db_dir = db_dir
         self.embedder_device = embedder_device
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
 
     @property
@@ -154,8 +153,8 @@ class KNNScorer(ScoringModule):
             weights=weights,
             db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
 
@@ -183,7 +182,11 @@ class KNNScorer(ScoringModule):
             self.multilabel = False
 
         vector_index_client = VectorIndexClient(
-            self.embedder_device, self.db_dir, embedder_use_cache=self.embedder_use_cache
+            self.embedder_device,
+            self.db_dir,
+            embedder_use_cache=self.embedder_use_cache,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
         self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
@@ -231,8 +234,8 @@ class KNNScorer(ScoringModule):
             db_dir=self.db_dir,
             n_classes=self.n_classes,
             multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
 
     def load(self, path: str) -> None:
@@ -255,8 +258,8 @@ class KNNScorer(ScoringModule):
         vector_index_client = VectorIndexClient(
             embedder_device=self.embedder_device,
             db_dir=metadata["db_dir"],
-            embedder_batch_size=metadata["batch_size"],
-            embedder_max_length=metadata["max_length"],
+            embedder_batch_size=metadata["embedder_batch_size"],
+            embedder_max_length=metadata["embedder_max_length"],
             embedder_use_cache=self.embedder_use_cache,
         )
         self._vector_index = vector_index_client.get_index(self.embedder_name)
