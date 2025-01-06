@@ -51,7 +51,6 @@ class DNNCScorer(ScoringModule):
 
     :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`crossencoder`).
     :ivar model: The model used for scoring, which could be a `CrossEncoder` or a `CrossEncoderWithLogreg`.
-    :ivar prebuilt_index: Flag indicating whether a prebuilt vector index is used.
     :ivar _db_dir: Path to the database directory where the vector index is stored.
     :ivar name: Name of the scorer, defaults to "dnnc".
 
@@ -95,7 +94,6 @@ class DNNCScorer(ScoringModule):
 
     crossencoder_subdir: str = "crossencoder"
     model: CrossEncoder | CrossEncoderWithLogreg
-    prebuilt_index: bool = False
 
     def __init__(
         self,
