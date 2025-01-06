@@ -111,11 +111,8 @@ class RerankScorer(KNNScorer):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
-        else:
-            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             embedder_name=embedder_name,
             k=k,
             weights=weights,
@@ -127,9 +124,6 @@ class RerankScorer(KNNScorer):
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
         )
-        # TODO: needs re-thinking....
-        instance.prebuilt_index = prebuilt_index
-        return instance
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         """

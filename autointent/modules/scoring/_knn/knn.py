@@ -43,7 +43,6 @@ class KNNScorer(ScoringModule):
     :ivar weights: Weighting strategy used for scoring.
     :ivar _vector_index: VectorIndex instance for neighbor retrieval.
     :ivar name: Name of the scorer, defaults to "knn".
-    :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
 
     Examples
     --------
@@ -81,7 +80,6 @@ class KNNScorer(ScoringModule):
     weights: WEIGHT_TYPES
     _vector_index: VectorIndex
     name = "knn"
-    prebuilt_index: bool = False
     max_length: int | None
 
     def __init__(
@@ -149,11 +147,8 @@ class KNNScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
-        else:
-            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             embedder_name=embedder_name,
             k=k,
             weights=weights,
@@ -163,8 +158,6 @@ class KNNScorer(ScoringModule):
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
-        instance.prebuilt_index = prebuilt_index
-        return instance
 
     def get_embedder_name(self) -> str:
         """
@@ -188,18 +181,11 @@ class KNNScorer(ScoringModule):
         else:
             self.n_classes = len(set(labels))
             self.multilabel = False
+
         vector_index_client = VectorIndexClient(
             self.embedder_device, self.db_dir, embedder_use_cache=self.embedder_use_cache
         )
-
-        if self.prebuilt_index:
-            # this happens only after RetrievalNode optimization
-            self._vector_index = vector_index_client.get_index(self.embedder_name)
-            if len(utterances) != len(self._vector_index.texts):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-        else:
-            self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
