@@ -164,11 +164,8 @@ class DNNCScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
-        else:
-            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             cross_encoder_name=cross_encoder_name,
             embedder_name=embedder_name,
             k=k,
@@ -179,8 +176,6 @@ class DNNCScorer(ScoringModule):
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
-        instance.prebuilt_index = prebuilt_index
-        return instance
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         """
@@ -195,15 +190,7 @@ class DNNCScorer(ScoringModule):
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
-
-        if self.prebuilt_index:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.embedder_name)
-            if len(utterances) != len(self.vector_index.texts):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-        else:
-            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
