@@ -196,7 +196,7 @@ class RerankScorer(KNNScorer):
             utterances, knn_labels, knn_distances, knn_neighbors, strict=True
         ):
             cur_ranks = self._scorer.rank(
-                query, query_docs, top_k=self.m, batch_size=self.batch_size, activation_fct=Sigmoid()
+                query, query_docs, top_k=self.m, batch_size=self.embedder_batch_size, activation_fct=Sigmoid()
             )
 
             for dst, src in zip(
