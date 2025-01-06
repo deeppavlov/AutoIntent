@@ -121,7 +121,7 @@ class VectorIndex:
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
             raise ValueError(msg)
 
-        cos_sim, indices = self.index.search(embedding, k)
+        cos_sim, indices = self.index.search(embedding, k)  # TODO add caching similar to Embedder.embed() caching
         distances = 1 - cos_sim
 
         results = []
