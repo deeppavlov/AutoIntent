@@ -19,8 +19,8 @@ class DescriptionScorerDumpMetadata(TypedDict):
 
     n_classes: int
     multilabel: bool
-    batch_size: int
-    max_length: int | None
+    embedder_batch_size: int
+    embedder_max_length: int | None
 
 
 class DescriptionScorer(ScoringModule):
@@ -48,8 +48,8 @@ class DescriptionScorer(ScoringModule):
         embedder_name: str,
         temperature: float = 1.0,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
         embedder_use_cache: bool = True,
     ) -> None:
         """
@@ -58,15 +58,15 @@ class DescriptionScorer(ScoringModule):
         :param embedder_name: Name of the embedder model.
         :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
         :param embedder_device: Device to run the embedder on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, defaults to None.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding, defaults to None.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.temperature = temperature
         self.embedder_device = embedder_device
         self.embedder_name = embedder_name
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
 
     @classmethod
@@ -92,6 +92,8 @@ class DescriptionScorer(ScoringModule):
             embedder_device=context.get_device(),
             embedder_name=embedder_name,
             embedder_use_cache=context.get_use_cache(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
         )
 
     def get_embedder_name(self) -> str:
@@ -133,8 +135,8 @@ class DescriptionScorer(ScoringModule):
         embedder = Embedder(
             device=self.embedder_device,
             model_name=self.embedder_name,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            batch_size=self.embedder_batch_size,
+            max_length=self.embedder_max_length,
             use_cache=self.embedder_use_cache,
         )
 
@@ -170,8 +172,8 @@ class DescriptionScorer(ScoringModule):
         self.metadata = DescriptionScorerDumpMetadata(
             n_classes=self.n_classes,
             multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
 
         dump_dir = Path(path)
@@ -201,7 +203,7 @@ class DescriptionScorer(ScoringModule):
         self.embedder = Embedder(
             device=self.embedder_device,
             model_name=embedder_dir,
-            batch_size=self.metadata["batch_size"],
-            max_length=self.metadata["max_length"],
+            batch_size=self.metadata["embedder_batch_size"],
+            max_length=self.metadata["embedder_max_length"],
             use_cache=self.embedder_use_cache,
         )
