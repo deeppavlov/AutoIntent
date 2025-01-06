@@ -133,8 +133,10 @@ class RerankScorer(KNNScorer):
         :param labels: List of labels corresponding to the utterances.
         """
         self._scorer = CrossEncoder(
-            self.cross_encoder_name, device=self.embedder_device, max_length=self.embedder_max_length
-        )  # type: ignore[arg-type]
+            self.cross_encoder_name,
+            device=self.embedder_device,
+            max_length=self.embedder_max_length,  # type: ignore[arg-type]
+        )
 
         super().fit(utterances, labels)
 
@@ -176,8 +178,10 @@ class RerankScorer(KNNScorer):
         self.cross_encoder_name = metadata["cross_encoder_name"]
         self.rank_threshold_cutoff = metadata["rank_threshold_cutoff"]
         self._scorer = CrossEncoder(
-            self.cross_encoder_name, device=self.embedder_device, max_length=self.embedder_max_length
-        )  # type: ignore[arg-type]
+            self.cross_encoder_name,
+            device=self.embedder_device,
+            max_length=self.embedder_max_length,  # type: ignore[arg-type]
+        )
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """
