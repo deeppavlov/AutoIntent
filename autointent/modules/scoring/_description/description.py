@@ -32,7 +32,6 @@ class DescriptionScorer(ScoringModule):
 
     :ivar weights_file_name: Filename for saving the description vectors (`description_vectors.npy`).
     :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
-    :ivar precomputed_embeddings: Flag indicating whether precomputed embeddings are used.
     :ivar embedding_model_subdir: Directory for storing the embedder's model files.
     :ivar name: Name of the scorer, defaults to "description".
 
