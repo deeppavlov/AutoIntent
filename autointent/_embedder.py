@@ -60,7 +60,7 @@ class Embedder:
         device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
-        use_cache: bool = False,
+        use_cache: bool = True,
     ) -> None:
         """
         Initialize the Embedder.
@@ -69,7 +69,7 @@ class Embedder:
         :param device: Device to run the model on (e.g., "cpu", "cuda").
         :param batch_size: Batch size for embedding calculations.
         :param max_length: Maximum sequence length for the embedding model.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
+        :param use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.model_name = model_name
         self.device = device

@@ -32,7 +32,7 @@ class VectorIndexClient:
         db_dir: str | Path | None,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the VectorIndexClient.

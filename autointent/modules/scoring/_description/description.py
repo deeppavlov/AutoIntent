@@ -50,7 +50,7 @@ class DescriptionScorer(ScoringModule):
         embedder_device: str = "cpu",
         batch_size: int = 32,
         max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the DescriptionScorer.
