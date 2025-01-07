@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 import numpy.typing as npt
 
-from autointent._dump_tools import dump_attrs
+from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import BaseMetadataDict
@@ -59,7 +59,7 @@ class Module(ABC):
 
         :param path: Path to dump
         """
-        dump_attrs(vars(self), Path(path))
+        Dumper.dump(vars(self), Path(path))
 
     @abstractmethod
     def load(self, path: str) -> None:
