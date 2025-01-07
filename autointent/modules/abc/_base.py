@@ -4,24 +4,11 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Literal
 
-import numpy as np
 import numpy.typing as npt
-from sentence_transformers import CrossEncoder, SentenceTransformer
-from sklearn.base import BaseEstimator
 
-from autointent import Embedder
-from autointent._dump_tools import (
-    dump_arrays,
-    dump_constants,
-    dump_cross_encoders,
-    dump_embedders,
-    dump_estimators,
-    dump_indexes,
-    dump_sentence_transformers,
-)
+from autointent._dump_tools import dump_attrs
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
-from autointent.context.vector_index_client import VectorIndex
 from autointent.custom_types import BaseMetadataDict
 from autointent.metrics import METRIC_FN
 
@@ -72,37 +59,7 @@ class Module(ABC):
 
         :param path: Path to dump
         """
-        constants = {}
-        arrays = {}
-        embedders = {}
-        indexes = {}
-        estimators = {}
-        sentence_transformers = {}
-        cross_encoders = {}
-
-        for key, val in vars(self).items():
-            if isinstance(val, str | bool | int | float | list):
-                constants[key] = val
-            elif isinstance(val, np.ndarray):
-                arrays[key] = val
-            elif isinstance(val, Embedder):
-                embedders[key] = val
-            elif isinstance(val, VectorIndex):
-                indexes[key] = val
-            elif isinstance(val, BaseEstimator):
-                estimators[key] = val
-            elif isinstance(val, SentenceTransformer):
-                sentence_transformers[key] = val
-            elif isinstance(val, CrossEncoder):
-                cross_encoders[key] = val
-
-        dump_constants(constants, Path(path))
-        dump_arrays(arrays, Path(path))
-        dump_embedders(embedders, Path(path))
-        dump_indexes(indexes, Path(path))
-        dump_estimators(estimators, Path(path))
-        dump_sentence_transformers(sentence_transformers, Path(path))
-        dump_cross_encoders(cross_encoders, Path(path))
+        dump_attrs(vars(self), Path(path))
 
     @abstractmethod
     def load(self, path: str) -> None:
