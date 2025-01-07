@@ -10,6 +10,7 @@ from sklearn.base import BaseEstimator
 
 from autointent import Embedder
 from autointent.context.vector_index_client import VectorIndex
+from autointent.modules.abc import Module
 
 ModuleSimpleAttributes = str | int | float | bool | list["ModuleSimpleAttributes"]
 
@@ -34,8 +35,9 @@ class Dumper:
     cross_encoders = "cross_encoders"
 
     @staticmethod
-    def dump(attrs: dict[str, ModuleAttributes], path: Path) -> None:
+    def dump(module: Module, path: Path) -> None:
         """Dump modules attributes to filestystem."""
+        attrs: dict[str, ModuleAttributes] = vars(module)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
 
@@ -62,3 +64,20 @@ class Dumper:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
+
+    @staticmethod
+    def load(module: Module, path: Path) -> None:
+        """Load attributes from file system."""
+        for child in path.iterdir():
+            if child.name == Dumper.simple_attrs:
+                with child.open() as file:
+                    simple_attrs = json.load(file)
+            elif child.name == Dumper.arrays:
+                arrays = np.load(child)
+            elif child.name == Dumper.embedders:
+                embedders = {embedder_dump.name: Embedder(embedder_dump) for embedder_dump in child.iterdir()}
+            elif child.name == Dumper.indexes:
+                # before this, i need to refactor vector index loading and dumping
+                # now, we have some inconsistency which can be solved by encapsulating
+                # loading and dumping within VectoIndexClient (now, this encapsulation is not strict enough)
+                ...
