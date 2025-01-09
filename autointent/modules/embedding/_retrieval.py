@@ -3,9 +3,9 @@
 from pathlib import Path
 from typing import Literal
 
+from autointent import VectorIndex
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.context.vector_index_client import VectorIndex
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RetrievalMetricFn
 from autointent.modules.abc import EmbeddingModule

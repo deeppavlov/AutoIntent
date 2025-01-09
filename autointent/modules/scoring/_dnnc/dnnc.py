@@ -1,17 +1,14 @@
 """DNNCScorer class for scoring utterances using deep neural network classifiers (DNNC)."""
 
 import itertools as it
-import json
 import logging
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 from sentence_transformers import CrossEncoder
 
-from autointent import Context
-from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
+from autointent import Context, VectorIndex
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -100,7 +97,6 @@ class DNNCScorer(ScoringModule):
         cross_encoder_name: str,
         embedder_name: str,
         k: int,
-        db_dir: str | None = None,
         device: str = "cpu",
         train_head: bool = False,
         batch_size: int = 32,
@@ -113,7 +109,6 @@ class DNNCScorer(ScoringModule):
         :param cross_encoder_name: Name of the cross-encoder model.
         :param embedder_name: Name of the embedder model.
         :param k: Number of nearest neighbors to retrieve.
-        :param db_dir: Path to the database directory, or None to use default.
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param train_head: Whether to train a logistic regression head, defaults to False.
         :param batch_size: Batch size for processing text pairs, defaults to 32.
@@ -125,21 +120,9 @@ class DNNCScorer(ScoringModule):
         self.k = k
         self.train_head = train_head
         self.device = device
-        self._db_dir = db_dir
         self.batch_size = batch_size
         self.max_length = max_length
         self.embedder_use_cache = embedder_use_cache
-
-    @property
-    def db_dir(self) -> str:
-        """
-        Get the database directory for the vector index.
-
-        :return: Path to the database directory.
-        """
-        if self._db_dir is None:
-            self._db_dir = str(get_db_dir())
-        return self._db_dir
 
     @classmethod
     def from_context(
@@ -169,7 +152,6 @@ class DNNCScorer(ScoringModule):
             k=k,
             train_head=train_head,
             device=context.get_device(),
-            db_dir=str(context.get_db_dir()),
             batch_size=context.get_batch_size(),
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
@@ -187,8 +169,14 @@ class DNNCScorer(ScoringModule):
 
         self.model = CrossEncoder(self.cross_encoder_name, trust_remote_code=True, device=self.device)
 
-        vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
-        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self.vector_index = VectorIndex(
+            self.embedder_name,
+            self.device,
+            self.batch_size,
+            self.max_length,
+            self.embedder_use_cache,
+        )
+        self.vector_index.add(utterances, labels)
 
         if self.train_head:
             model = CrossEncoderWithLogreg(self.model)
@@ -263,54 +251,6 @@ class DNNCScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
         self.vector_index.clear_ram()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the DNNCScorer's metadata, vector index, and model to disk.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self.metadata = DNNCScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
-
-        dump_dir = Path(path)
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
-        self.model.save(crossencoder_dir)
-        self.vector_index.dump(Path(self.db_dir))
-
-    def load(self, path: str) -> None:
-        """
-        Load the DNNCScorer's metadata, vector index, and model from disk.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        dump_dir = Path(path)
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: DNNCScorerDumpMetadata = json.load(file)
-
-        self.n_classes = self.metadata["n_classes"]
-
-        vector_index_client = VectorIndexClient(
-            embedder_device=self.device,
-            db_dir=self.metadata["db_dir"],
-            embedder_batch_size=self.metadata["batch_size"],
-            embedder_max_length=self.metadata["max_length"],
-            embedder_use_cache=self.embedder_use_cache,
-        )
-        self.vector_index = vector_index_client.get_index(self.embedder_name)
-
-        crossencoder_dir = str(dump_dir / self.crossencoder_subdir)
-        if self.train_head:
-            self.model = CrossEncoderWithLogreg.load(crossencoder_dir)
-        else:
-            self.model = CrossEncoder(crossencoder_dir, device=self.device)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         """

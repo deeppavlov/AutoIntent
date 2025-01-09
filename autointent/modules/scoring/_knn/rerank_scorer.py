@@ -1,7 +1,5 @@
 """RerankScorer class for re-ranking based on cross-encoder scoring."""
 
-import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -50,7 +48,6 @@ class RerankScorer(KNNScorer):
         cross_encoder_name: str,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
-        db_dir: str | None = None,
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
@@ -67,7 +64,6 @@ class RerankScorer(KNNScorer):
         :param cross_encoder_name: Name of the cross-encoder model used for re-ranking.
         :param m: Number of top-ranked neighbors to consider, or None to use k.
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
-        :param db_dir: Path to the database directory, or None to use default.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
         :param embedder_max_length: Maximum sequence length for embedding and cross encoder, or None for default.
@@ -76,7 +72,6 @@ class RerankScorer(KNNScorer):
             embedder_name=embedder_name,
             k=k,
             weights=weights,
-            db_dir=db_dir,
             embedder_device=embedder_device,
             embedder_batch_size=embedder_batch_size,
             embedder_max_length=embedder_max_length,
@@ -119,7 +114,6 @@ class RerankScorer(KNNScorer):
             cross_encoder_name=cross_encoder_name,
             m=m,
             rank_threshold_cutoff=rank_threshold_cutoff,
-            db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
@@ -139,49 +133,6 @@ class RerankScorer(KNNScorer):
         )
 
         super().fit(utterances, labels)
-
-    def _store_state_to_metadata(self) -> RerankScorerDumpMetadata:
-        """
-        Store the current state of the RerankScorer to metadata.
-
-        :return: Metadata containing the current state of the RerankScorer.
-        """
-        return RerankScorerDumpMetadata(
-            **super()._store_state_to_metadata(),
-            m=self.m,
-            cross_encoder_name=self.cross_encoder_name,
-            rank_threshold_cutoff=self.rank_threshold_cutoff,
-        )
-
-    def load(self, path: str) -> None:
-        """
-        Load the RerankScorer from a given path.
-
-        :param path: Path to the directory containing the dumped metadata.
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: RerankScorerDumpMetadata = json.load(file)
-
-        self._restore_state_from_metadata(self.metadata)
-
-    def _restore_state_from_metadata(self, metadata: RerankScorerDumpMetadata) -> None:
-        """
-        Restore the state of the RerankScorer from metadata.
-
-        :param metadata: Metadata containing the state of the RerankScorer.
-        """
-        super()._restore_state_from_metadata(metadata)
-
-        self.m = metadata["m"] if metadata["m"] else self.k
-        self.cross_encoder_name = metadata["cross_encoder_name"]
-        self.rank_threshold_cutoff = metadata["rank_threshold_cutoff"]
-        self._scorer = CrossEncoder(
-            self.cross_encoder_name,
-            device=self.embedder_device,
-            max_length=self.embedder_max_length,  # type: ignore[arg-type]
-        )
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """

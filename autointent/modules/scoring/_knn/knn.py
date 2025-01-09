@@ -1,14 +1,11 @@
 """KNNScorer class for k-nearest neighbors scoring."""
 
-import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 
-from autointent.context import Context
-from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
+from autointent import Context, VectorIndex
 from autointent.custom_types import WEIGHT_TYPES, BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -86,7 +83,6 @@ class KNNScorer(ScoringModule):
         embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES = "distance",
-        db_dir: str | None = None,
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
@@ -101,7 +97,6 @@ class KNNScorer(ScoringModule):
             - "uniform" (or False): Equal weight for all neighbors.
             - "distance" (or True): Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
-        :param db_dir: Path to the database directory, or None to use default.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
         :param embedder_max_length: Maximum sequence length for embedding, or None for default.
@@ -110,22 +105,10 @@ class KNNScorer(ScoringModule):
         self.embedder_name = embedder_name
         self.k = k
         self.weights = weights
-        self._db_dir = db_dir
         self.embedder_device = embedder_device
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
-
-    @property
-    def db_dir(self) -> str:
-        """
-        Get the database directory for the vector index.
-
-        :return: Path to the database directory.
-        """
-        if self._db_dir is None:
-            self._db_dir = str(get_db_dir())
-        return self._db_dir
 
     @classmethod
     def from_context(
@@ -151,7 +134,6 @@ class KNNScorer(ScoringModule):
             embedder_name=embedder_name,
             k=k,
             weights=weights,
-            db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
@@ -181,14 +163,14 @@ class KNNScorer(ScoringModule):
             self.n_classes = len(set(labels))
             self.multilabel = False
 
-        vector_index_client = VectorIndexClient(
+        self._vector_index = VectorIndex(
+            self.embedder_name,
             self.embedder_device,
-            self.db_dir,
-            embedder_use_cache=self.embedder_use_cache,
-            embedder_batch_size=self.embedder_batch_size,
-            embedder_max_length=self.embedder_max_length,
+            self.embedder_batch_size,
+            self.embedder_max_length,
+            self.embedder_use_cache,
         )
-        self._vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self._vector_index.add(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -213,56 +195,6 @@ class KNNScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the KNNScorer's metadata and vector index to disk.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self.metadata = self._store_state_to_metadata()
-
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-        self._vector_index.dump(dump_dir)
-
-    def _store_state_to_metadata(self) -> KNNScorerDumpMetadata:
-        return KNNScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            multilabel=self.multilabel,
-            embedder_batch_size=self.embedder_batch_size,
-            embedder_max_length=self.embedder_max_length,
-        )
-
-    def load(self, path: str) -> None:
-        """
-        Load the KNNScorer's metadata and vector index from disk.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: KNNScorerDumpMetadata = json.load(file)
-
-        self._restore_state_from_metadata(self.metadata)
-
-    def _restore_state_from_metadata(self, metadata: KNNScorerDumpMetadata) -> None:
-        self.n_classes = metadata["n_classes"]
-        self.multilabel = metadata["multilabel"]
-
-        vector_index_client = VectorIndexClient(
-            embedder_device=self.embedder_device,
-            db_dir=metadata["db_dir"],
-            embedder_batch_size=metadata["embedder_batch_size"],
-            embedder_max_length=metadata["embedder_max_length"],
-            embedder_use_cache=self.embedder_use_cache,
-        )
-        self._vector_index = vector_index_client.get_index(self.embedder_name)
 
     def _get_neighbours(
         self, utterances: list[str]

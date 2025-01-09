@@ -97,7 +97,7 @@ class Pipeline:
                 node_optimizer.fit(context)  # type: ignore[union-attr]
         if not context.vector_index_config.save_db:
             self._logger.info("removing vector database from file system...")
-            context.vector_index_client.delete_db()
+            # TODO clear cache from appdirs
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
