@@ -7,7 +7,7 @@ management of embeddings for nearest neighbor search.
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import faiss
 import numpy as np
@@ -15,6 +15,19 @@ import numpy.typing as npt
 
 from autointent import Embedder
 from autointent.custom_types import LabelType
+
+
+class VectorIndexMetadata(TypedDict):
+    embedder_model_name: str
+    embedder_device: str
+    embedder_batch_size: int
+    embedder_max_length: int | None
+    embedder_use_cache: bool
+
+
+class VectorIndexData(TypedDict):
+    texts: list[str]
+    labels: list[LabelType]
 
 
 class VectorIndex:
@@ -27,7 +40,7 @@ class VectorIndex:
 
     def __init__(
         self,
-        model_name: str,
+        embedder_model_name: str,
         embedder_device: str,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
@@ -36,15 +49,14 @@ class VectorIndex:
         """
         Initialize the vector index.
 
-        :param model_name: Name of the embedding model to use.
+        :param embedder_model_name: Name of the embedding model to use.
         :param embedder_device: Device for running the embedding model (e.g., "cpu", "cuda").
         :param embedder_batch_size: Batch size for the embedder.
         :param embedder_max_length: Maximum sequence length for the embedder.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.model_name = model_name
         self.embedder = Embedder(
-            model_name=model_name,
+            model_name=embedder_model_name,
             batch_size=embedder_batch_size,
             device=embedder_device,
             max_length=embedder_max_length,
@@ -64,7 +76,7 @@ class VectorIndex:
         :param texts: List of input texts.
         :param labels: List of labels corresponding to the texts.
         """
-        self.logger.debug("Adding embeddings to vector index %s", self.model_name)
+        self.logger.debug("Adding embeddings to vector index %s", self.embedder.model_name)
         embeddings = self.embedder.embed(texts)
 
         if not hasattr(self, "index"):
@@ -83,7 +95,7 @@ class VectorIndex:
 
     def delete(self) -> None:
         """Delete the vector index and all associated data from disk and memory."""
-        self.logger.debug("Deleting vector index %s", self.model_name)
+        self.logger.debug("Deleting vector index %s", self.embedder.model_name)
         self.embedder.delete()
         self.clear_ram()
         (self.dump_dir / "index.faiss").unlink()
@@ -92,7 +104,7 @@ class VectorIndex:
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        self.logger.debug("Clearing vector index %s from RAM", self.model_name)
+        self.logger.debug("Clearing vector index %s from RAM", self.embedder.model_name)
         self.index.reset()
         self.labels = []
         self.texts = []
@@ -185,23 +197,48 @@ class VectorIndex:
         """
         dir_path.mkdir(parents=True, exist_ok=True)
         self.dump_dir = dir_path
-        faiss.write_index(self.index, str(self.dump_dir / "index.faiss"))
-        self.embedder.dump(self.dump_dir / "embedding_model")
-        with (self.dump_dir / "texts.json").open("w") as file:
-            json.dump(self.texts, file, indent=4, ensure_ascii=False)
-        with (self.dump_dir / "labels.json").open("w") as file:
-            json.dump(self.labels, file, indent=4, ensure_ascii=False)
 
-    def load(self, dir_path: Path) -> None:
+        data = VectorIndexData(texts=self.texts, labels=self.labels)
+        with (self.dump_dir / "data.json").open("w") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+
+        metadata = VectorIndexMetadata(
+            embedder_max_length=self.embedder.max_length,
+            embedder_model_name=self.embedder.model_name,
+            embedder_device=self.embedder.device,
+            embedder_batch_size=self.embedder.batch_size,
+            embedder_use_cache=self.embedder.use_cache,
+        )
+
+        with (self.dump_dir / "metadata.json").open("w") as file:
+            json.dump(metadata, file, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def load(
+        cls,
+        dir_path: Path,
+        embedder_device: str | None = None,
+        embedder_batch_size: int | None = None,
+        embedder_use_cache: bool | None = None,
+    ) -> "VectorIndex":
         """
         Load the index and associated data from disk.
 
         :param dir_path: Directory path where the data is stored.
         """
-        self.dump_dir = Path(dir_path)
-        self.index = faiss.read_index(str(dir_path / "index.faiss"))
-        self.embedder = Embedder(model_name=dir_path / "embedding_model", device=self.embedder_device)
-        with (dir_path / "texts.json").open() as file:
-            self.texts = json.load(file)
-        with (dir_path / "labels.json").open() as file:
-            self.labels = json.load(file)
+        with (dir_path / "metadata.json").open() as file:
+            metadata: VectorIndexMetadata = json.load(file)
+
+        instance = cls(
+            embedder_model_name=metadata["embedder_model_name"],
+            embedder_device=embedder_device or metadata["embedder_device"],
+            embedder_batch_size=embedder_batch_size or metadata["embedder_batch_size"],
+            embedder_max_length=metadata["embedder_max_length"],
+            embedder_use_cache=embedder_use_cache or metadata["embedder_use_cache"],
+        )
+
+        with (dir_path / "data.json").open() as file:
+            data: VectorIndexData = json.load(file)
+
+        instance.add(**data)
+        return instance
