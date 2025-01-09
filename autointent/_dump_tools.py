@@ -83,11 +83,13 @@ class Dumper:
                 estimators = {estimator_dump.name: joblib.load(estimator_dump) for estimator_dump in child.iterdir()}
             elif child.name == Dumper.sentence_transformers:
                 sentence_transformers = {
-                    transformer_dump.name: SentenceTransformer(transformer_dump) for transformer_dump in child.iterdir()
+                    transformer_dump.name: SentenceTransformer(str(transformer_dump))
+                    for transformer_dump in child.iterdir()
                 }
             elif child.name == Dumper.cross_encoders:
                 cross_encoders = {
-                    cross_encoder_dump.name: CrossEncoder(cross_encoder_dump) for cross_encoder_dump in child.iterdir()
+                    cross_encoder_dump.name: CrossEncoder(str(cross_encoder_dump))
+                    for cross_encoder_dump in child.iterdir()
                 }
             else:
                 # TODO add list[Tag] handling

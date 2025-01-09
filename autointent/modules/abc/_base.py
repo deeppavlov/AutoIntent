@@ -59,15 +59,15 @@ class Module(ABC):
 
         :param path: Path to dump
         """
-        Dumper.dump(vars(self), Path(path))
+        Dumper.dump(self, Path(path))
 
-    @abstractmethod
     def load(self, path: str) -> None:
         """
         Load data from dump.
 
         :param path: Path to load
         """
+        Dumper.load(self, Path(path))
 
     @abstractmethod
     def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
