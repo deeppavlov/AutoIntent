@@ -75,9 +75,23 @@ class Dumper:
             elif child.name == Dumper.arrays:
                 arrays = np.load(child)
             elif child.name == Dumper.embedders:
-                embedders = {embedder_dump.name: Embedder(embedder_dump) for embedder_dump in child.iterdir()}
+                # TODO propagate custom loading params (such as device, batch size etc) to this line
+                embedders = {embedder_dump.name: Embedder.load(embedder_dump) for embedder_dump in child.iterdir()}
             elif child.name == Dumper.indexes:
-                # before this, i need to refactor vector index loading and dumping
-                # now, we have some inconsistency which can be solved by encapsulating
-                # loading and dumping within VectoIndexClient (now, this encapsulation is not strict enough)
-                ...
+                indexes = {index_dump.name: VectorIndex.load(index_dump) for index_dump in child.iterdir()}
+            elif child.name == Dumper.estimators:
+                estimators = {estimator_dump.name: joblib.load(estimator_dump) for estimator_dump in child.iterdir()}
+            elif child.name == Dumper.sentence_transformers:
+                sentence_transformers = {
+                    transformer_dump.name: SentenceTransformer(transformer_dump) for transformer_dump in child.iterdir()
+                }
+            elif child.name == Dumper.cross_encoders:
+                cross_encoders = {
+                    cross_encoder_dump.name: CrossEncoder(cross_encoder_dump) for cross_encoder_dump in child.iterdir()
+                }
+            else:
+                msg = f"Found unexpected child {child}"
+                raise ValueError(msg)
+        module.__dict__.update(
+            simple_attrs | arrays | embedders | indexes | estimators | sentence_transformers | cross_encoders
+        )
