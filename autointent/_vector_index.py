@@ -60,7 +60,7 @@ class VectorIndex:
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder = Embedder(
-            model_name=embedder_model_name,
+            model_name_or_path=embedder_model_name,
             batch_size=embedder_batch_size,
             device=embedder_device,
             max_length=embedder_max_length,
@@ -207,7 +207,7 @@ class VectorIndex:
 
         metadata = VectorIndexMetadata(
             embedder_max_length=self.embedder.max_length,
-            embedder_model_name=self.embedder.model_name,
+            embedder_model_name=str(self.embedder.model_name),
             embedder_device=self.embedder.device,
             embedder_batch_size=self.embedder.batch_size,
             embedder_use_cache=self.embedder.use_cache,

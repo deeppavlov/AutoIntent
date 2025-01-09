@@ -8,8 +8,7 @@ import numpy.typing as npt
 from sentence_transformers import CrossEncoder, SentenceTransformer
 from sklearn.base import BaseEstimator
 
-from autointent import Embedder
-from autointent.context.vector_index_client import VectorIndex
+from autointent import Embedder, VectorIndex
 from autointent.modules.abc import Module
 
 ModuleSimpleAttributes = str | int | float | bool | list["ModuleSimpleAttributes"]
