@@ -1,14 +1,12 @@
 """MLKnnScorer class for multi-label k-nearest neighbors classification."""
 
-import json
-from pathlib import Path
 from typing import Any, TypedDict
 
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent import Context
-from autointent.context.vector_index_client import VectorIndexClient, get_db_dir
+from autointent.context.vector_index_client import VectorIndex
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -97,7 +95,6 @@ class MLKnnScorer(ScoringModule):
         self,
         k: int,
         embedder_name: str,
-        db_dir: str | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         embedder_device: str = "cpu",
@@ -110,7 +107,6 @@ class MLKnnScorer(ScoringModule):
 
         :param k: Number of nearest neighbors to consider.
         :param embedder_name: Name of the embedder used for vectorization.
-        :param db_dir: Path to the database directory, or None to use default.
         :param s: Smoothing parameter for probability calculations, defaults to 1.0.
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
@@ -122,22 +118,10 @@ class MLKnnScorer(ScoringModule):
         self.embedder_name = embedder_name
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
-        self._db_dir = db_dir
         self.embedder_device = embedder_device
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
-
-    @property
-    def db_dir(self) -> str:
-        """
-        Get the database directory for the vector index.
-
-        :return: Path to the database directory.
-        """
-        if self._db_dir is None:
-            self._db_dir = str(get_db_dir())
-        return self._db_dir
 
     @classmethod
     def from_context(
@@ -166,7 +150,6 @@ class MLKnnScorer(ScoringModule):
             embedder_name=embedder_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
@@ -196,20 +179,16 @@ class MLKnnScorer(ScoringModule):
 
         self.n_classes = len(labels[0])
 
-        vector_index_client = VectorIndexClient(
+        self.vector_index = VectorIndex(
+            self.embedder_name,
             self.embedder_device,
-            self.db_dir,
-            embedder_use_cache=self.embedder_use_cache,
-            embedder_batch_size=self.embedder_batch_size,
-            embedder_max_length=self.embedder_max_length,
+            self.embedder_batch_size,
+            self.embedder_max_length,
+            self.embedder_use_cache,
         )
-        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self.vector_index.add(utterances, labels)
 
-        self.features = (
-            self.vector_index.embedder.embed(utterances)
-            if self.vector_index.is_empty()
-            else self.vector_index.get_all_embeddings()
-        )
+        self.features = self.vector_index.get_all_embeddings()
         self.labels = np.array(labels)
         self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
@@ -298,60 +277,6 @@ class MLKnnScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
         self.vector_index.clear_ram()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the MLKnnScorer's metadata and probabilities to disk.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self.metadata = MLKnnScorerDumpMetadata(
-            db_dir=self.db_dir,
-            n_classes=self.n_classes,
-            embedder_batch_size=self.embedder_batch_size,
-            embedder_max_length=self.embedder_max_length,
-        )
-
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-        arrays_to_save = ArrayToSave(
-            prior_prob_true=self._prior_prob_true,
-            prior_prob_false=self._prior_prob_false,
-            cond_prob_true=self._cond_prob_true,
-            cond_prob_false=self._cond_prob_false,
-        )
-        np.savez(dump_dir / self.arrays_filename, **arrays_to_save)
-
-    def load(self, path: str) -> None:
-        """
-        Load the MLKnnScorer's metadata and probabilities from disk.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.metadata: MLKnnScorerDumpMetadata = json.load(file)
-        self.n_classes = self.metadata["n_classes"]
-
-        arrays: ArrayToSave = np.load(dump_dir / self.arrays_filename)
-
-        self._prior_prob_true = arrays["prior_prob_true"]
-        self._prior_prob_false = arrays["prior_prob_false"]
-        self._cond_prob_true = arrays["cond_prob_true"]
-        self._cond_prob_false = arrays["cond_prob_false"]
-
-        vector_index_client = VectorIndexClient(
-            embedder_device=self.embedder_device,
-            db_dir=self.metadata["db_dir"],
-            embedder_batch_size=self.metadata["embedder_batch_size"],
-            embedder_max_length=self.metadata["embedder_max_length"],
-            embedder_use_cache=self.embedder_use_cache,
-        )
-        self.vector_index = vector_index_client.get_index(self.embedder_name)
 
     def _predict(
         self,
