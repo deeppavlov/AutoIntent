@@ -6,6 +6,7 @@ management of embeddings for nearest neighbor search.
 
 import json
 import logging
+import shutil
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -37,6 +38,9 @@ class VectorIndex:
     This class allows adding, querying, and managing embeddings and their associated
     labels for efficient nearest neighbor search.
     """
+
+    _data_file = "data.json"
+    _meta_data_file = "metadata.json"
 
     def __init__(
         self,
@@ -98,13 +102,12 @@ class VectorIndex:
         self.logger.debug("Deleting vector index %s", self.embedder.model_name)
         self.embedder.delete()
         self.clear_ram()
-        (self.dump_dir / "index.faiss").unlink()
-        (self.dump_dir / "texts.json").unlink()
-        (self.dump_dir / "labels.json").unlink()
+        shutil.rmtree(self.dump_dir)
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
         self.logger.debug("Clearing vector index %s from RAM", self.embedder.model_name)
+        self.embedder.clear_ram()
         self.index.reset()
         self.labels = []
         self.texts = []
@@ -199,7 +202,7 @@ class VectorIndex:
         self.dump_dir = dir_path
 
         data = VectorIndexData(texts=self.texts, labels=self.labels)
-        with (self.dump_dir / "data.json").open("w") as file:
+        with (self.dump_dir / self._data_file).open("w") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
         metadata = VectorIndexMetadata(
@@ -210,7 +213,7 @@ class VectorIndex:
             embedder_use_cache=self.embedder.use_cache,
         )
 
-        with (self.dump_dir / "metadata.json").open("w") as file:
+        with (self.dump_dir / self._meta_data_file).open("w") as file:
             json.dump(metadata, file, indent=4, ensure_ascii=False)
 
     @classmethod
@@ -226,7 +229,7 @@ class VectorIndex:
 
         :param dir_path: Directory path where the data is stored.
         """
-        with (dir_path / "metadata.json").open() as file:
+        with (dir_path / cls._meta_data_file).open() as file:
             metadata: VectorIndexMetadata = json.load(file)
 
         instance = cls(
@@ -237,7 +240,7 @@ class VectorIndex:
             embedder_use_cache=embedder_use_cache or metadata["embedder_use_cache"],
         )
 
-        with (dir_path / "data.json").open() as file:
+        with (dir_path / cls._data_file).open() as file:
             data: VectorIndexData = json.load(file)
 
         instance.add(**data)
