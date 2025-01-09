@@ -133,7 +133,7 @@ class DescriptionScorer(ScoringModule):
 
         embedder = Embedder(
             device=self.embedder_device,
-            model_name=self.embedder_name,
+            model_name_or_path=self.embedder_name,
             batch_size=self.embedder_batch_size,
             max_length=self.embedder_max_length,
             use_cache=self.embedder_use_cache,
@@ -201,7 +201,7 @@ class DescriptionScorer(ScoringModule):
         embedder_dir = dump_dir / self.embedding_model_subdir
         self.embedder = Embedder(
             device=self.embedder_device,
-            model_name=embedder_dir,
+            model_name_or_path=embedder_dir,
             batch_size=self.metadata["embedder_batch_size"],
             max_length=self.metadata["embedder_max_length"],
             use_cache=self.embedder_use_cache,

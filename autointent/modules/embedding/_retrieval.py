@@ -108,7 +108,6 @@ class RetrievalEmbedding(EmbeddingModule):
         return cls(
             k=k,
             embedder_name=embedder_name,
-            db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
@@ -127,7 +126,7 @@ class RetrievalEmbedding(EmbeddingModule):
             self.embedder_device,
             self.embedder_batch_size,
             self.embedder_max_length,
-            self.embedder_use_cache
+            self.embedder_use_cache,
         )
         self.vector_index.add(utterances, labels)
 
