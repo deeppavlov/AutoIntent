@@ -90,6 +90,8 @@ class Dumper:
                     cross_encoder_dump.name: CrossEncoder(cross_encoder_dump) for cross_encoder_dump in child.iterdir()
                 }
             else:
+                # TODO add list[Tag] handling
+                # TODO add CrossEncoderWithLogreg handling
                 msg = f"Found unexpected child {child}"
                 raise ValueError(msg)
         module.__dict__.update(
