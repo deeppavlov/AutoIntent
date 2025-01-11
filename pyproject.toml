@@ -56,7 +56,6 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "autointent" = "autointent._pipeline._cli_endpoint:optimize"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
-"clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 
 
 [tool.poetry.group.dev]

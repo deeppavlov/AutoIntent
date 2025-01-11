@@ -127,6 +127,7 @@ class Pipeline:
         context.set_dataset(dataset, force_multilabel)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
+        context.configure_cross_encoder(self.cross_encoder_config)
 
         self._fit(context)
 

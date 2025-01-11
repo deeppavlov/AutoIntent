@@ -5,11 +5,7 @@ from typing import Literal
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import (
-    EmbedderConfig,
-    LoggingConfig,
-    VectorIndexConfig,
-)
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, LoggingConfig, VectorIndexConfig
 from autointent.utils import load_search_space
 from tests.conftest import setup_environment
 
@@ -38,6 +34,7 @@ def test_inference_config(dataset, task_type):
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
+    pipeline_optimizer.set_config(CrossEncoderConfig())
 
     context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
     inference_config = context.optimization_info.get_inference_nodes_config()
@@ -54,7 +51,6 @@ def test_inference_config(dataset, task_type):
     assert len(rich_outputs.predictions) == len(utterances)
 
     context.dump()
-    context.vector_index_client.delete_db()
 
 
 @pytest.mark.parametrize(
@@ -84,4 +80,3 @@ def test_inference_context(dataset, task_type):
     assert len(rich_outputs.predictions) == len(utterances)
 
     context.dump()
-    context.vector_index_client.delete_db()

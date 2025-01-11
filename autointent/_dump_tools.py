@@ -84,7 +84,7 @@ class Dumper:
                 with child.open() as file:
                     simple_attrs = json.load(file)
             elif child.name == Dumper.arrays:
-                arrays = np.load(child)
+                arrays = dict(np.load(child))
             elif child.name == Dumper.embedders:
                 # TODO propagate custom loading params (such as device, batch size etc) to this line
                 embedders = {embedder_dump.name: Embedder.load(embedder_dump) for embedder_dump in child.iterdir()}

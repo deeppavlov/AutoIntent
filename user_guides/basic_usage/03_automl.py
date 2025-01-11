@@ -93,7 +93,7 @@ custom_pipeline.set_config(embedder_config)
 """
 ## Vector Index Settings
 
-%mddoclink(class,context.vector_index_client,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
+%mddoclink(class,,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
 
 Default options are the following:
 """
