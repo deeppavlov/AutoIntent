@@ -24,7 +24,7 @@ lint:
 
 .PHONY: sync
 sync:
-	poetry install --sync --with dev,test,lint,typing,docs
+	poetry sync
 
 .PHONY: docs
 docs:
