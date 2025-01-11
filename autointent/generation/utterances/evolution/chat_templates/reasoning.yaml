@@ -1,13 +1,11 @@
-- role: system
-  content: |
-    {base_instruction}
-    1. If the utterance can be understood and answered with just a few simple thinking processes, you can rewrite it to explicitly request multiple-step reasoning.
-    2. Rewritten utterance should require readers to make multiple logical connections or inferences.
-    3. Rewritten utterance should be concise and understandable by humans.
-    4. Rewritten utterance must be fully answerable.
-    5. Rewritten utterance should not contain more than 10 words.
 - role: user
   content: |
+    {base_instruction}
+    1. Rewrite the utterance by removing specific inquiries or replacing with more generic.
+    2. Rewritten utterance should be concise and understandable by humans.
+    3. Rewritten utterance must be fully answerable.
+    4. Rewritten utterance should not contain more than 10 words.
+
     Intent Class:
     Asking for Directions
 

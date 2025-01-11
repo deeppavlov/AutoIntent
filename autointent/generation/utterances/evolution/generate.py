@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from time import sleep
 
 import pandas as pd
 from datasets import Dataset, DatasetDict, load_dataset
@@ -58,10 +57,8 @@ def main():
     for idx, sample in df_merged.iterrows():
         print(sample)
         try:
-            sleep(1)
             generated_utterances = generator(sample["utterance"].strip(), sample["name"], args.n_evolutions)
         except Exception as e:
-            print(e)
             continue
         new_utterances.extend(generated_utterances)
         new_intents.extend([sample["name"]] * len(generated_utterances))
