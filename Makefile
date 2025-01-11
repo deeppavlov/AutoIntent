@@ -3,7 +3,7 @@ poetry = poetry run
 
 .PHONY: install
 install:
-	poetry install --with dev,test,lint,typing,docs
+	poetry install --with dev,test,typing,docs
 
 .PHONY: test
 test:
@@ -24,7 +24,7 @@ lint:
 
 .PHONY: sync
 sync:
-	poetry install --sync --with dev,test,lint,typing,docs
+	poetry sync
 
 .PHONY: docs
 docs:
