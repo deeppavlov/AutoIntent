@@ -49,7 +49,6 @@ class DNNCScorer(ScoringModule):
 
     :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`crossencoder`).
     :ivar model: The model used for scoring, which could be a `CrossEncoder` or a `CrossEncoderWithLogreg`.
-    :ivar prebuilt_index: Flag indicating whether a prebuilt vector index is used.
     :ivar _db_dir: Path to the database directory where the vector index is stored.
     :ivar name: Name of the scorer, defaults to "dnnc".
 
@@ -93,7 +92,6 @@ class DNNCScorer(ScoringModule):
 
     crossencoder_subdir: str = "crossencoder"
     model: NLITransformer
-    prebuilt_index: bool = False
 
     def __init__(
         self,
@@ -105,7 +103,7 @@ class DNNCScorer(ScoringModule):
         train_head: bool = False,
         batch_size: int = 32,
         max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the DNNCScorer.
@@ -162,11 +160,8 @@ class DNNCScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
-        else:
-            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             cross_encoder_name=cross_encoder_name,
             embedder_name=embedder_name,
             k=k,
@@ -177,8 +172,6 @@ class DNNCScorer(ScoringModule):
             max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
-        instance.prebuilt_index = prebuilt_index
-        return instance
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         """
@@ -191,15 +184,7 @@ class DNNCScorer(ScoringModule):
         self.n_classes = len(set(labels))
 
         vector_index_client = VectorIndexClient(self.device, self.db_dir, embedder_use_cache=self.embedder_use_cache)
-
-        if self.prebuilt_index:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.embedder_name)
-            if len(utterances) != len(self.vector_index.texts):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-        else:
-            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         self.model = NLITransformer(self.cross_encoder_name, train_classifier=self.train_head, device=self.device)
         self.model.fit(utterances, labels)

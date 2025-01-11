@@ -31,7 +31,7 @@ class VectorIndex:
         embedder_device: str,
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the vector index.
@@ -121,7 +121,7 @@ class VectorIndex:
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
             raise ValueError(msg)
 
-        cos_sim, indices = self.index.search(embedding, k)
+        cos_sim, indices = self.index.search(embedding, k)  # TODO add caching similar to Embedder.embed() caching
         distances = 1 - cos_sim
 
         results = []
