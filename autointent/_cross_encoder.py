@@ -1,4 +1,4 @@
-"""NLITransformer class for cross-encoder-based estimation of meaning closeness.
+"""CrossEncoder class for cross-encoder-based estimation of meaning closeness.
 
 Can be used to rank retrieved sentences by meaning closeness to provided utterance.
 """
@@ -12,8 +12,8 @@ from typing import Any
 import joblib
 import numpy as np
 import numpy.typing as npt
+import sentence_transformers as st
 import torch
-from sentence_transformers import CrossEncoder
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
@@ -58,7 +58,7 @@ def construct_samples(
     return pairs, labels
 
 
-class NLITransformer:
+class CrossEncoder:
     r"""
     Cross-encoder for NLI.
 
@@ -74,8 +74,8 @@ class NLITransformer:
     Examples
     --------
     Creating and fitting the CrossEncoderWithLogreg:
-    >>> from autointent._transformers import NLITransformer
-    >>> scorer = NLITransformer("cross-encoder-model")
+    >>> from autointent import CrossEncoder
+    >>> scorer = CrossEncoder("cross-encoder-model")
     >>> utterances = ["What is your name?", "How old are you?"]
     >>> labels = [1, 0]
     >>> scorer.fit(utterances, labels)
@@ -87,7 +87,7 @@ class NLITransformer:
 
     Saving and loading the model:
     >>> scorer.save("outputs/")
-    >>> loaded_scorer = NLITransformer.load("outputs/")
+    >>> loaded_scorer = CrossEncoder.load("outputs/")
     """
 
     def __init__(
@@ -100,7 +100,7 @@ class NLITransformer:
         classifier_head: LogisticRegressionCV | None = None,
     ) -> None:
         """
-        Initialize the NLITransformer.
+        Initialize the CrossEncoder.
 
         :param model: The CrossEncoder model name to use.
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
@@ -109,7 +109,7 @@ class NLITransformer:
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
-        self.cross_encoder = CrossEncoder(model, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
+        self.cross_encoder = st.CrossEncoder(model, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
         self.train_classifier = False
         self.batch_size = batch_size
         self.max_length = max_length
@@ -237,12 +237,12 @@ class NLITransformer:
         joblib.dump(self._clf, clf_path)
 
     @classmethod
-    def load(cls, path: str) -> "NLITransformer":
+    def load(cls, path: str) -> "CrossEncoder":
         """
         Load the model and classifier from disk.
 
         :param path: Directory path containing the saved model and classifier.
-        :return: Initialized NLITransformer instance.
+        :return: Initialized CrossEncoder instance.
         """
         dump_dir = Path(path)
 

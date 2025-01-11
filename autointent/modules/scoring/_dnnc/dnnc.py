@@ -7,8 +7,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from autointent import Context, VectorIndex
-from autointent._transformers import NLITransformer
+from autointent import Context, CrossEncoder, VectorIndex
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -88,7 +87,7 @@ class DNNCScorer(ScoringModule):
     name = "dnnc"
 
     crossencoder_subdir: str = "crossencoder"
-    model: NLITransformer
+    model: CrossEncoder
 
     def __init__(
         self,
@@ -174,7 +173,7 @@ class DNNCScorer(ScoringModule):
         )
         self.vector_index.add(utterances, labels)
 
-        self.model = NLITransformer(self.cross_encoder_name, train_classifier=self.train_head, device=self.device)
+        self.model = CrossEncoder(self.cross_encoder_name, train_classifier=self.train_head, device=self.device)
         self.model.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

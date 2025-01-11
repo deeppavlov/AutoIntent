@@ -2,8 +2,7 @@ import importlib.resources as ires
 
 import pytest
 
-from autointent import Dataset
-from autointent._transformers import NLITransformer
+from autointent import CrossEncoder, Dataset
 from autointent.context.data_handler import DataHandler
 
 
@@ -14,7 +13,7 @@ def data_handler():
 
 
 def test_nli_transformer_predict_without_trained_head(data_handler):
-    model = NLITransformer(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
+    model = CrossEncoder(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
     with pytest.raises(ValueError, match="Classifier is not trained yet"):
         model.predict(data_handler.train_utterances())
 
@@ -49,7 +48,7 @@ def check_ranking(ranked, labels):
 
 
 def test_nli_transformer_predict_with_train_head(data_handler):
-    model = NLITransformer(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
+    model = CrossEncoder(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
     texts = data_handler.train_utterances()
     labels = data_handler.train_labels()
     model.fit(texts, labels)
@@ -61,7 +60,7 @@ def test_nli_transformer_predict_with_train_head(data_handler):
 
 
 def test_nli_transformer_predict_default(data_handler):
-    model = NLITransformer(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
+    model = CrossEncoder(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
     texts = data_handler.train_utterances()
     labels = data_handler.train_labels()
     predicted = model.predict(build_pairs(texts))
@@ -72,7 +71,7 @@ def test_nli_transformer_predict_default(data_handler):
 
 
 def test_nli_transformer_predict_default_with_fit(data_handler):
-    model = NLITransformer(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
+    model = CrossEncoder(model="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
     texts = data_handler.train_utterances()
     labels = data_handler.train_labels()
     model.fit(texts, labels)

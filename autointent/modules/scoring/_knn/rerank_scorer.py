@@ -5,8 +5,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from autointent._transformers import NLITransformer
-from autointent.context import Context
+from autointent import Context, CrossEncoder
 from autointent.custom_types import WEIGHT_TYPES, LabelType
 
 from .knn import KNNScorer, KNNScorerDumpMetadata
@@ -37,7 +36,7 @@ class RerankScorer(KNNScorer):
     """
 
     name = "rerank"
-    _scorer: NLITransformer
+    _scorer: CrossEncoder
 
     def __init__(
         self,
@@ -125,7 +124,7 @@ class RerankScorer(KNNScorer):
         :param utterances: List of utterances to fit the scorer.
         :param labels: List of labels corresponding to the utterances.
         """
-        self._scorer = NLITransformer(
+        self._scorer = CrossEncoder(
             self.cross_encoder_name,
             device=self.embedder_device,
             max_length=self.embedder_max_length,
