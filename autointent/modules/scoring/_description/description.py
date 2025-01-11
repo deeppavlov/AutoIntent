@@ -26,11 +26,11 @@ class DescriptionScorer(ScoringModule):
     """
 
     _weights_file_name: str = "description_vectors.npy"
-    embedder: Embedder
+    _embedder: Embedder
     name = "description"
     _n_classes: int
     _multilabel: bool
-    description_vectors: NDArray[Any]
+    _description_vectors: NDArray[Any]
 
     def __init__(
         self,
@@ -129,8 +129,8 @@ class DescriptionScorer(ScoringModule):
             use_cache=self.embedder_use_cache,
         )
 
-        self.description_vectors = embedder.embed(descriptions)
-        self.embedder = embedder
+        self._description_vectors = embedder.embed(descriptions)
+        self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         """
@@ -139,8 +139,8 @@ class DescriptionScorer(ScoringModule):
         :param utterances: List of utterances to score.
         :return: Array of probabilities for each utterance.
         """
-        utterance_vectors = self.embedder.embed(utterances)
-        similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self.description_vectors)
+        utterance_vectors = self._embedder.embed(utterances)
+        similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
 
         if self._multilabel:
             probabilites = scipy.special.expit(similarities / self.temperature)
@@ -150,4 +150,4 @@ class DescriptionScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
-        self.embedder.clear_ram()
+        self._embedder.clear_ram()
