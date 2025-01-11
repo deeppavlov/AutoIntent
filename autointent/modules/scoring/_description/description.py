@@ -19,13 +19,11 @@ class DescriptionScorer(ScoringModule):
     DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
     between the two, using either cosine similarity and softmax.
 
-    :ivar _weights_file_name: Filename for saving the description vectors (`description_vectors.npy`).
     :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
     :ivar name: Name of the scorer, defaults to "description".
 
     """
 
-    _weights_file_name: str = "description_vectors.npy"
     _embedder: Embedder
     name = "description"
     _n_classes: int

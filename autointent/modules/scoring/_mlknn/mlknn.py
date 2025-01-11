@@ -54,6 +54,7 @@ class MLKnnScorer(ScoringModule):
 
     name = "mlknn"
     _n_classes: int
+    _vector_index: VectorIndex
     _prior_prob_true: NDArray[Any]
     _prior_prob_false: NDArray[Any]
     _cond_prob_true: NDArray[Any]
