@@ -10,10 +10,10 @@ from sklearn.base import BaseEstimator
 from autointent import CrossEncoder, Embedder, VectorIndex
 from autointent.schemas import TagsList
 
-ModuleSimpleAttributes = None | str | int | float | bool | list["ModuleSimpleAttributes"]
+ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | npt.NDArray[Any] | Embedder | VectorIndex | BaseEstimator | CrossEncoder
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | CrossEncoder  # type: ignore[type-arg]
 )
 
 

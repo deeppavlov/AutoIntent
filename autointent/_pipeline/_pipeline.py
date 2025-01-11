@@ -10,7 +10,7 @@ import numpy.typing as npt
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
@@ -38,11 +38,12 @@ class Pipeline:
             self.logging_config = LoggingConfig(dump_dir=None)
             self.vector_index_config = VectorIndexConfig()
             self.embedder_config = EmbedderConfig()
+            self.cross_encoder_config = CrossEncoderConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig | CrossEncoderConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -54,6 +55,8 @@ class Pipeline:
             self.vector_index_config = config
         elif isinstance(config, EmbedderConfig):
             self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
         else:
             msg = "unknown config type"
             raise TypeError(msg)
