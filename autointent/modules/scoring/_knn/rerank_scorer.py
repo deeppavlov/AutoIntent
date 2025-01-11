@@ -8,21 +8,7 @@ import numpy.typing as npt
 from autointent import Context, CrossEncoder
 from autointent.custom_types import WEIGHT_TYPES, LabelType
 
-from .knn import KNNScorer, KNNScorerDumpMetadata
-
-
-class RerankScorerDumpMetadata(KNNScorerDumpMetadata):
-    """
-    Metadata for dumping the state of a RerankScorer.
-
-    :ivar cross_encoder_name: Name of the cross-encoder model used.
-    :ivar m: Number of top-ranked neighbors to consider, or None to use k.
-    :ivar rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
-    """
-
-    cross_encoder_name: str
-    m: int | None
-    rank_threshold_cutoff: int | None
+from .knn import KNNScorer
 
 
 class RerankScorer(KNNScorer):
@@ -38,17 +24,21 @@ class RerankScorer(KNNScorer):
     name = "rerank"
     _scorer: CrossEncoder
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
+        cross_encoder_name: str,
         embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES,
-        cross_encoder_name: str,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
+        cross_encoder_device: str = "cpu",
+        cross_encoder_batch_size: int = 32,
+        cross_encoder_max_length: int | None = None,
+        train_head: bool = False,
     ) -> None:
         """
         Initialize the RerankScorer.
@@ -76,6 +66,11 @@ class RerankScorer(KNNScorer):
         )
 
         self.cross_encoder_name = cross_encoder_name
+        self.cross_encoder_device = cross_encoder_device
+        self.cross_encoder_batch_size = cross_encoder_batch_size
+        self.cross_encoder_max_length = cross_encoder_max_length
+        self.train_head = train_head
+
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff
 
@@ -126,9 +121,9 @@ class RerankScorer(KNNScorer):
         """
         self._scorer = CrossEncoder(
             self.cross_encoder_name,
-            device=self.embedder_device,
-            max_length=self.embedder_max_length,
-            batch_size=self.embedder_batch_size,
+            device=self.cross_encoder_device,
+            max_length=self.cross_encoder_max_length,
+            batch_size=self.cross_encoder_batch_size,
         )
 
         super().fit(utterances, labels)
