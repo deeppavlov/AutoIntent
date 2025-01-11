@@ -100,8 +100,7 @@ def test_optimization_pipeline_cli(task_type):
         task=TaskConfig(
             search_space_path=get_search_space_path(task_type),
         ),
-        vector_index=VectorIndexConfig(
-        ),
+        vector_index=VectorIndexConfig(),
         logs=LoggingConfig(
             dirpath=Path(logs_dir),
         ),

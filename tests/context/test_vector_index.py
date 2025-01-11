@@ -13,7 +13,6 @@ def data_handler():
     return MockDataHandler()
 
 
-
 def test_create_collection(data_handler):
     dump_dir, logs_dir = setup_environment()
     vector_index = VectorIndex(embedder_model_name="bert-base-uncased", embedder_device="cpu")
