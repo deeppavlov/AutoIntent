@@ -15,7 +15,7 @@ def data_handler():
 
 
 def test_create_collection(data_handler):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     vector_index = VectorIndex(embedder_model_name="bert-base-uncased", embedder_device="cpu")
     vector_index.add(
         data_handler.utterances_train,

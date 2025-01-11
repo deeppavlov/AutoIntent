@@ -59,8 +59,6 @@ logs:
   dump_dir: "/home/user/AutoIntent/runs/awful_hippo_10-30-2024_19-42-12/modules_dumps"
 
 vector_index:
-# Location where to save faiss database file. Omit to use your system's default cache directory.
-  db_dir: null
 
 # Specify device in torch notation
   device: cpu

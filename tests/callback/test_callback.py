@@ -35,7 +35,7 @@ class DummyCallback(OptimizerCallback):
 
 
 def test_pipeline_callbacks():
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
     search_space = [
@@ -66,7 +66,7 @@ def test_pipeline_callbacks():
     ]
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     context = Context()
-    context.configure_vector_index(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True))
+    context.configure_vector_index(VectorIndexConfig(save_db=True))
     context.configure_logging(
         LoggingConfig(run_name="dummy_run_name", dirpath=Path(logs_dir).resolve(), dump_modules=False)
     )

@@ -70,10 +70,10 @@ def scoring_optimizer_multilabel(embedding_optimizer_multilabel):
 
 
 def get_context(multilabel):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     res = Context()
     res.configure_data(DataConfig(get_dataset_path(), force_multilabel=multilabel))
     res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
-    res.configure_vector_index(VectorIndexConfig(db_dir=db_dir), EmbedderConfig(device="cpu"))
+    res.configure_vector_index(VectorIndexConfig(), EmbedderConfig(device="cpu"))
     return res

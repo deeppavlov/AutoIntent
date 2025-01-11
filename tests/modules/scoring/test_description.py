@@ -14,7 +14,7 @@ from tests.conftest import setup_environment
     ],
 )
 def test_description_scorer(dataset, expected_prediction, multilabel):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     data_handler = DataHandler(dataset, force_multilabel=multilabel)
 
     scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, embedder_device="cpu")

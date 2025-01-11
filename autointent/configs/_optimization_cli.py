@@ -89,8 +89,6 @@ class LoggingConfig:
 class VectorIndexConfig:
     """Configuration for the vector index."""
 
-    db_dir: Path | None = None
-    """Path to the directory where the vector index database will be saved. If None, the database will not be saved"""
     save_db: bool = False
     """Whether to save the vector index database or not"""
 

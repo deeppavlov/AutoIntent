@@ -27,7 +27,6 @@ def optimize(cfg: OptimizationConfig) -> None:
 
     logger.debug("Run Name: %s", cfg.logs.run_name)
     logger.debug("logs and assets: %s", cfg.logs.dirpath)
-    logger.debug("Vector index path: %s", cfg.vector_index.db_dir)
 
     # create shared objects for a whole pipeline
     context = Context(cfg.seed)

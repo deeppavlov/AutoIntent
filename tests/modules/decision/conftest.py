@@ -8,7 +8,7 @@ from tests.conftest import setup_environment
 
 @pytest.fixture
 def multiclass_fit_data(dataset):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
@@ -16,7 +16,6 @@ def multiclass_fit_data(dataset):
         "k": 3,
         "weights": "distance",
         "embedder_name": "sergeyzh/rubert-tiny-turbo",
-        "db_dir": db_dir,
     }
     scorer = KNNScorer(**knn_params)
 
@@ -28,7 +27,7 @@ def multiclass_fit_data(dataset):
 
 @pytest.fixture
 def multilabel_fit_data(dataset):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset, force_multilabel=True)
 
@@ -36,7 +35,6 @@ def multilabel_fit_data(dataset):
         "k": 3,
         "weights": "distance",
         "embedder_name": "sergeyzh/rubert-tiny-turbo",
-        "db_dir": db_dir,
     }
     scorer = KNNScorer(**knn_params)
 

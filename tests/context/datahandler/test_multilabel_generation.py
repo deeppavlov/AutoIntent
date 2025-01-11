@@ -16,6 +16,6 @@ def mock_data_handler():
 
 
 def test_vector_index_initialization():
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     index = VectorIndex(embedder_device="cpu")
     assert index.embedder_device == "cpu"

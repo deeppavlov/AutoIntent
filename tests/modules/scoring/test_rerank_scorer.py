@@ -6,7 +6,7 @@ from tests.conftest import setup_environment
 
 
 def test_base_rerank_scorer(dataset):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
@@ -16,7 +16,6 @@ def test_base_rerank_scorer(dataset):
         embedder_name="sergeyzh/rubert-tiny-turbo",
         m=2,
         cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-        db_dir=db_dir,
         embedder_device="cpu",
     )
 

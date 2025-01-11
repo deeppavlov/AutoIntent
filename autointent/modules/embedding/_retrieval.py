@@ -6,16 +6,9 @@ from typing import Literal
 from autointent import VectorIndex
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.metrics import RetrievalMetricFn
 from autointent.modules.abc import EmbeddingModule
-
-
-class VectorDBMetadata(BaseMetadataDict):
-    """Metadata class for RetrievalEmbedding."""
-
-    embedder_batch_size: int
-    embedder_max_length: int | None
 
 
 class RetrievalEmbedding(EmbeddingModule):
@@ -30,9 +23,6 @@ class RetrievalEmbedding(EmbeddingModule):
 
     Examples
     --------
-    .. testsetup::
-
-        db_dir = "doctests-db"
 
     .. testcode::
 
@@ -42,7 +32,6 @@ class RetrievalEmbedding(EmbeddingModule):
         retrieval = RetrievalEmbedding(
             k=2,
             embedder_name="sergeyzh/rubert-tiny-turbo",
-            db_dir=db_dir,
         )
         retrieval.fit(utterances, labels)
         predictions = retrieval.predict(["how is the weather today?"])
@@ -52,14 +41,9 @@ class RetrievalEmbedding(EmbeddingModule):
 
         ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
 
-    .. testcleanup::
-
-        import shutil
-        shutil.rmtree(db_dir)
-
     """
 
-    vector_index: VectorIndex
+    _vector_index: VectorIndex
     name = "retrieval"
 
     def __init__(
@@ -76,7 +60,6 @@ class RetrievalEmbedding(EmbeddingModule):
 
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
-        :param db_dir: Path to the database directory. If None, defaults will be used.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation.
         :param max_length: Maximum sequence length for embeddings. None if not set.
@@ -121,14 +104,14 @@ class RetrievalEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
-        self.vector_index = VectorIndex(
+        self._vector_index = VectorIndex(
             self.embedder_name,
             self.embedder_device,
             self.embedder_batch_size,
             self.embedder_max_length,
             self.embedder_use_cache,
         )
-        self.vector_index.add(utterances, labels)
+        self._vector_index.add(utterances, labels)
 
     def score(
         self,
@@ -153,7 +136,7 @@ class RetrievalEmbedding(EmbeddingModule):
         else:
             message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
             raise ValueError(message)
-        predictions, _, _ = self.vector_index.query(utterances, self.k)
+        predictions, _, _ = self._vector_index.query(utterances, self.k)
         return metric_fn(labels, predictions)
 
     def get_assets(self) -> RetrieverArtifact:
@@ -166,7 +149,7 @@ class RetrievalEmbedding(EmbeddingModule):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self.vector_index.clear_ram()
+        self._vector_index.clear_ram()
 
     def dump(self, path: str) -> None:
         """
@@ -174,7 +157,7 @@ class RetrievalEmbedding(EmbeddingModule):
 
         :param path: Path to the directory where assets will be dumped.
         """
-        self.vector_index.dump(Path(path))
+        self._vector_index.dump(Path(path))
 
     def load(self, path: str) -> None:
         """
@@ -182,7 +165,7 @@ class RetrievalEmbedding(EmbeddingModule):
 
         :param path: Path to the directory containing the dumped assets.
         """
-        self.vector_index = VectorIndex.load(Path(path))
+        self._vector_index = VectorIndex.load(Path(path))
 
     def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
         """
@@ -194,7 +177,7 @@ class RetrievalEmbedding(EmbeddingModule):
             - distances: List of distances to the nearest neighbors.
             - texts: List of retrieved text data corresponding to the neighbors.
         """
-        return self.vector_index.query(
+        return self._vector_index.query(
             utterances,
             self.k,
         )

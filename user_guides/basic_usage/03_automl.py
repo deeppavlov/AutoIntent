@@ -101,11 +101,10 @@ Default options are the following:
 # %%
 from autointent.configs import VectorIndexConfig
 
-vector_index_config = VectorIndexConfig(db_dir=None, save_db=False)
+vector_index_config = VectorIndexConfig(save_db=False)
 
 # %% [markdown]
 """
-- `db_dir=None` tells AutoIntent to store intermediate files in a current working directory
 - `save_db=False` tells AutoIntent to clear all the files after auto configuration is finished
 
 These settings can be applied in a familiar way:

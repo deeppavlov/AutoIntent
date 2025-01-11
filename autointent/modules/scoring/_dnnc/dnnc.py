@@ -8,19 +8,10 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, CrossEncoder, VectorIndex
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
 
 logger = logging.getLogger(__name__)
-
-
-class DNNCScorerDumpMetadata(BaseMetadataDict):
-    """Metadata for dumping the state of a DNNCScorer."""
-
-    db_dir: str
-    n_classes: int
-    batch_size: int
-    max_length: int | None
 
 
 class DNNCScorer(ScoringModule):
@@ -50,9 +41,6 @@ class DNNCScorer(ScoringModule):
 
     Examples
     --------
-    .. testsetup::
-
-        db_dir = "doctests-db"
 
     .. testcode::
 
@@ -63,7 +51,6 @@ class DNNCScorer(ScoringModule):
             cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
             embedder_name="sergeyzh/rubert-tiny-turbo",
             k=5,
-            db_dir=db_dir,
         )
         scorer.fit(utterances, labels)
 
@@ -76,11 +63,6 @@ class DNNCScorer(ScoringModule):
 
         [[0.00013581 0.        ]
          [0.00030066 0.        ]]
-
-    .. testcleanup::
-
-        import shutil
-        shutil.rmtree(db_dir)
 
     """
 

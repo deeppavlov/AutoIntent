@@ -21,9 +21,6 @@ class MLKnnScorer(ScoringModule):
 
     Example
     --------
-    .. testsetup::
-
-        db_dir = "doctests-db"
 
     .. testcode::
 
@@ -33,7 +30,6 @@ class MLKnnScorer(ScoringModule):
         scorer = MLKnnScorer(
             k=5,
             embedder_name="sergeyzh/rubert-tiny-turbo",
-            db_dir=db_dir,
         )
         scorer.fit(utterances, labels)
         test_utterances = ["Hi!", "What's up?"]
@@ -44,11 +40,6 @@ class MLKnnScorer(ScoringModule):
 
         [[0.5 0.5]
          [0.5 0.5]]
-
-    .. testcleanup::
-
-        import shutil
-        shutil.rmtree(db_dir)
 
     """
 
