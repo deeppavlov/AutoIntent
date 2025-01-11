@@ -85,9 +85,9 @@ class DNNCScorer(ScoringModule):
     """
 
     name = "dnnc"
-
-    crossencoder_subdir: str = "crossencoder"
-    model: CrossEncoder
+    _n_classes: int
+    _vector_index: VectorIndex
+    _cross_encoder: CrossEncoder
 
     def __init__(
         self,
@@ -162,19 +162,21 @@ class DNNCScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self.n_classes = len(set(labels))
+        self._n_classes = len(set(labels))
 
-        self.vector_index = VectorIndex(
+        self._vector_index = VectorIndex(
             self.embedder_name,
             self.device,
             self.batch_size,
             self.max_length,
             self.embedder_use_cache,
         )
-        self.vector_index.add(utterances, labels)
+        self._vector_index.add(utterances, labels)
 
-        self.model = CrossEncoder(self.cross_encoder_name, train_classifier=self.train_head, device=self.device)
-        self.model.fit(utterances, labels)
+        self._cross_encoder = CrossEncoder(
+            self.cross_encoder_name, train_classifier=self.train_head, device=self.device
+        )
+        self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """
@@ -222,7 +224,7 @@ class DNNCScorer(ScoringModule):
             logger.error(msg)
             raise ValueError(msg)
 
-        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self.model.predict(flattened_text_pairs)
+        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self._cross_encoder.predict(flattened_text_pairs)
         return [
             flattened_cross_encoder_scores[i : i + self.k].tolist()  # type: ignore[misc]
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
@@ -237,13 +239,11 @@ class DNNCScorer(ScoringModule):
 
         :return: (n_queries, n_classes) matrix with zeros everywhere except the class of the best neighbor utterance
         """
-        n_classes = self.n_classes
-
-        return build_result(np.array(scores), np.array(labels), n_classes)
+        return build_result(np.array(scores), np.array(labels), self._n_classes)
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self.vector_index.clear_ram()
+        self._vector_index.clear_ram()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         """
@@ -252,7 +252,7 @@ class DNNCScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Tuple containing class scores, neighbor utterances, and neighbor scores.
         """
-        labels, _, neighbors = self.vector_index.query(
+        labels, _, neighbors = self._vector_index.query(
             utterances,
             self.k,
         )
