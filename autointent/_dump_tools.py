@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any, TypeAlias
 
@@ -16,6 +17,8 @@ ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | CrossEncoder  # type: ignore[type-arg]
 )
 
+logger = logging.getLogger(__name__)
+
 
 class Dumper:
     tags = "tags"
@@ -27,11 +30,25 @@ class Dumper:
     cross_encoders = "cross_encoders"
 
     @staticmethod
+    def make_subdirectories(path: Path) -> None:
+        subdirectories = [
+            path / Dumper.tags,
+            path / Dumper.embedders,
+            path / Dumper.indexes,
+            path / Dumper.estimators,
+            path / Dumper.cross_encoders,
+        ]
+        for subdir in subdirectories:
+            subdir.mkdir(parents=True, exist_ok=True)
+
+    @staticmethod
     def dump(obj: Any, path: Path) -> None:  # noqa: ANN401
         """Dump modules attributes to filestystem."""
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
+
+        Dumper.make_subdirectories(path)
 
         for key, val in attrs.items():
             if isinstance(val, TagsList):
@@ -50,7 +67,7 @@ class Dumper:
                 val.save(str(path / Dumper.cross_encoders / key))
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
-                raise TypeError(msg)
+                logger.error(msg)
 
         with (path / Dumper.simple_attrs).open("w") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
@@ -82,5 +99,5 @@ class Dumper:
                 }
             else:
                 msg = f"Found unexpected child {child}"
-                raise ValueError(msg)
+                logger.error(msg)
         obj.__dict__.update(tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders)

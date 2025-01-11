@@ -243,6 +243,7 @@ class CrossEncoder:
         :param path: Directory path to save the model and classifier.
         """
         dump_dir = Path(path)
+        dump_dir.mkdir(parents=True)
 
         metadata = CrossEncoderMetadata(
             model_name=self.model_name,

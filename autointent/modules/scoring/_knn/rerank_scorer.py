@@ -83,7 +83,7 @@ class RerankScorer(KNNScorer):
         k: int,
         weights: WEIGHT_TYPES,
         cross_encoder_name: str,
-        train_head: bool,
+        train_head: bool = False,
         embedder_name: str | None = None,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
