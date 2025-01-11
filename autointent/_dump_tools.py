@@ -10,11 +10,13 @@ from sklearn.base import BaseEstimator
 
 from autointent import Embedder, VectorIndex
 from autointent.modules.abc import Module
+from autointent.schemas import TagsList
 
-ModuleSimpleAttributes = str | int | float | bool | list["ModuleSimpleAttributes"]
+ModuleSimpleAttributes = None | str | int | float | bool | list["ModuleSimpleAttributes"]
 
 ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes
+    | TagsList
     | npt.NDArray[Any]
     | Embedder
     | VectorIndex
@@ -25,6 +27,7 @@ ModuleAttributes: TypeAlias = (
 
 
 class Dumper:
+    tags = "tags"
     simple_attrs = "simple_attrs.json"
     arrays = "arrays.npz"
     embedders = "embedders"
@@ -41,7 +44,9 @@ class Dumper:
         arrays: dict[str, npt.NDArray[Any]] = {}
 
         for key, val in attrs.items():
-            if isinstance(val, ModuleSimpleAttributes):
+            if isinstance(val, TagsList):
+                val.dump(path / Dumper.tags / key)
+            elif isinstance(val, ModuleSimpleAttributes):
                 simple_attrs[key] = val
             elif isinstance(val, np.ndarray):
                 arrays[key] = val
@@ -68,7 +73,9 @@ class Dumper:
     def load(module: Module, path: Path) -> None:
         """Load attributes from file system."""
         for child in path.iterdir():
-            if child.name == Dumper.simple_attrs:
+            if child.name == Dumper.tags:
+                tags = {tags_dump.name: TagsList.load(tags_dump) for tags_dump in child.iterdir()}
+            elif child.name == Dumper.simple_attrs:
                 with child.open() as file:
                     simple_attrs = json.load(file)
             elif child.name == Dumper.arrays:
@@ -91,10 +98,9 @@ class Dumper:
                     for cross_encoder_dump in child.iterdir()
                 }
             else:
-                # TODO add list[Tag] handling
                 # TODO add CrossEncoderWithLogreg handling
                 msg = f"Found unexpected child {child}"
                 raise ValueError(msg)
         module.__dict__.update(
-            simple_attrs | arrays | embedders | indexes | estimators | sentence_transformers | cross_encoders
+            tags | simple_attrs | arrays | embedders | indexes | estimators | sentence_transformers | cross_encoders
         )
