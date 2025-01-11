@@ -73,6 +73,22 @@ class TensorBoardCallback(OptimizerCallback):
             else:
                 self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
 
+    def log_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log metrics during training.
+
+        :param metrics: Metrics to log.
+        """
+        if self.module_writer is None:
+            msg = "start_run must be called before log_value."
+            raise RuntimeError(msg)
+
+        for key, value in metrics.items():
+            if isinstance(value, int | float):
+                self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]
+            else:
+                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
         """
         Log final metrics.

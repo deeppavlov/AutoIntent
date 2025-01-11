@@ -59,6 +59,14 @@ class WandbCallback(OptimizerCallback):
         """
         self.wandb.log(kwargs)
 
+    def log_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log metrics during training.
+
+        :param metrics: Metrics to log.
+        """
+        self.wandb.log(metrics)
+
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
         """
         Log final metrics.

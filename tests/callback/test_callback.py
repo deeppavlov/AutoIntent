@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
 from autointent import Context, Dataset, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import LoggingConfig, VectorIndexConfig
@@ -23,6 +21,9 @@ class DummyCallback(OptimizerCallback):
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("log_value", kwargs))
+
+    def log_metrics(self, **kwargs: dict[str, Any]) -> None:
+        self.history.append(("log_metric", kwargs))
 
     def end_module(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("end_module", kwargs))
@@ -89,7 +90,18 @@ def test_pipeline_callbacks():
                 "module_kwargs": {"k": 5, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        ("log_value", {"retrieval_hit_rate": 1.0}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "retrieval_hit_rate": 1.0,
+                    "retrieval_map": 1.0,
+                    "retrieval_mrr": 1.0,
+                    "retrieval_ndcg": 1.0,
+                    "retrieval_precision": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -99,7 +111,18 @@ def test_pipeline_callbacks():
                 "module_kwargs": {"k": 10, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        ("log_value", {"retrieval_hit_rate": 1.0}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "retrieval_hit_rate": 1.0,
+                    "retrieval_map": 1.0,
+                    "retrieval_mrr": 1.0,
+                    "retrieval_ndcg": 1.0,
+                    "retrieval_precision": 0.8000000000000002,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -109,7 +132,19 @@ def test_pipeline_callbacks():
                 "module_kwargs": {"k": 1, "weights": "uniform", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        ("log_value", {"scoring_roc_auc": np.float64(1.0)}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 1.0,
+                    "scoring_f1": 1.0,
+                    "scoring_log_likelihood": 0.0,
+                    "scoring_precision": 1.0,
+                    "scoring_recall": 1.0,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -119,19 +154,65 @@ def test_pipeline_callbacks():
                 "module_kwargs": {"k": 1, "weights": "distance", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        ("log_value", {"scoring_roc_auc": np.float64(1.0)}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 1.0,
+                    "scoring_f1": 1.0,
+                    "scoring_log_likelihood": 0.0,
+                    "scoring_precision": 1.0,
+                    "scoring_recall": 1.0,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
             {"module_name": "linear", "num": 0, "module_kwargs": {"embedder_name": "sergeyzh/rubert-tiny-turbo"}},
         ),
-        ("log_value", {"scoring_roc_auc": np.float64(1.0)}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 1.0,
+                    "scoring_f1": 1.0,
+                    "scoring_log_likelihood": -0.3691714031014546,
+                    "scoring_precision": 1.0,
+                    "scoring_recall": 1.0,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         ("start_module", {"module_name": "threshold", "num": 0, "module_kwargs": {"thresh": 0.5}}),
-        ("log_value", {"decision_accuracy": np.float64(0.75)}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.75,
+                    "decision_f1": 0.6666666666666666,
+                    "decision_precision": 0.625,
+                    "decision_recall": 0.75,
+                    "decision_roc_auc": "Only one class present in y_true. ROC AUC score is not defined in that case.",
+                }
+            },
+        ),
         ("end_module", {}),
         ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
-        ("log_value", {"decision_accuracy": np.float64(0.75)}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.75,
+                    "decision_f1": 0.6666666666666666,
+                    "decision_precision": 0.625,
+                    "decision_recall": 0.75,
+                    "decision_roc_auc": "Only one class present in y_true. ROC AUC score is not defined in that case.",
+                }
+            },
+        ),
         ("end_module", {}),
         ("end_run", {}),
     ]

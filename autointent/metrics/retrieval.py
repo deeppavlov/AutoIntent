@@ -630,7 +630,7 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
         cur_idcg = _idcg(rel_scores, k)
         ndcg_scores.append(0.0 if cur_idcg == 0 else cur_dcg / cur_idcg)
 
-    return np.mean(ndcg_scores)  # type: ignore[return-value]
+    return float(np.mean(ndcg_scores))
 
 
 def retrieval_ndcg_intersecting(
