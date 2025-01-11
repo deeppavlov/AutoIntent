@@ -74,9 +74,11 @@ class KNNScorer(ScoringModule):
 
     """
 
-    weights: WEIGHT_TYPES
     _vector_index: VectorIndex
     name = "knn"
+    _embedder_name: str
+    _n_classes: int
+    _multilabel: bool
 
     def __init__(
         self,
@@ -157,11 +159,11 @@ class KNNScorer(ScoringModule):
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
         if isinstance(labels[0], list):
-            self.n_classes = len(labels[0])
-            self.multilabel = True
+            self._n_classes = len(labels[0])
+            self._multilabel = True
         else:
-            self.n_classes = len(set(labels))
-            self.multilabel = False
+            self._n_classes = len(set(labels))
+            self._multilabel = False
 
         self._vector_index = VectorIndex(
             self.embedder_name,
@@ -202,7 +204,7 @@ class KNNScorer(ScoringModule):
         return self._vector_index.query(utterances, self.k)
 
     def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:
-        return apply_weights(labels, distances, self.weights, self.n_classes, self.multilabel)
+        return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """
