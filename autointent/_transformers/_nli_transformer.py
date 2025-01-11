@@ -117,11 +117,11 @@ class NLITransformer:
 
         if classifier_head is not None or train_classifier:
             self.train_classifier = True
-            self._logits_list: list[npt.NDArray[Any]] = []
+            self._activations_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
-        self._logits_list.append(input_tensor[0].cpu().numpy())
+        self._activations_list.append(input_tensor[0].cpu().numpy())
 
     @torch.no_grad()
     def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
@@ -137,9 +137,9 @@ class NLITransformer:
         # put the data through, features will be taken in the hook
         self.cross_encoder.predict(pairs, batch_size=self.batch_size)
 
-        res = self._logits_list
-        self._logits_list = []
-        return np.concatenate(res, axis=0)
+        res = np.concatenate(self._activations_list, axis=0)
+        self._activations_list.clear()
+        return res
 
     def _fit(self, pairs: list[tuple[str, str]], labels: list[LabelType]) -> None:
         """
