@@ -58,7 +58,6 @@ class KNNScorer(ScoringModule):
 
     _vector_index: VectorIndex
     name = "knn"
-    _embedder_name: str
     _n_classes: int
     _multilabel: bool
 
