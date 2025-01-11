@@ -124,9 +124,12 @@ class NLITransformer:
         self._activations_list.append(input_tensor[0].cpu().numpy())
 
     @torch.no_grad()
-    def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+    def _get_features_or_predictions(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
-        Extract features from text pairs using the CrossEncoder model.
+        Extract features or get predictions using the CrossEncoder model.
+
+        If :py:attr:`~train_classifier` is ``True``, return raw activations from
+        cross-encoder transformer. Otherwise, get predictions from cross-encoder head.
 
         :param pairs: List of text pairs.
         :return: Numpy array of extracted features.
@@ -139,7 +142,7 @@ class NLITransformer:
 
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
-        return res
+        return res  # type: ignore[no-any-return]
 
     def _fit(self, pairs: list[tuple[str, str]], labels: list[LabelType]) -> None:
         """
@@ -155,7 +158,7 @@ class NLITransformer:
             logger.error(msg)
             raise ValueError(msg)
 
-        features = self.get_features(pairs)
+        features = self._get_features_or_predictions(pairs)
 
         # TODO: LogisticRegressionCV has class_weight="balanced". Is it better to use it instead of balance_factor in
         # construct_samples?
@@ -188,7 +191,7 @@ class NLITransformer:
             msg = "Classifier is not trained yet"
             raise ValueError(msg)
 
-        features = self.get_features(pairs)
+        features = self._get_features_or_predictions(pairs)
 
         if self._clf is not None:
             return np.array(self._clf.predict_proba(features)[:, 1])
