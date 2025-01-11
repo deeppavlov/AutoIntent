@@ -168,8 +168,7 @@ repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
 
 def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)
-    user_guids_dir = app.srcdir / "docs" / "source" / "user_guides"
-
+    user_guids_dir = app.srcdir / "user_guides"
     generate_tutorial_links_for_notebook_creation(
         include=[
             (
@@ -185,4 +184,5 @@ def setup(app: Sphinx) -> None:
         source="user_guides",
         destination=user_guids_dir,
     )
+
     app.connect("autoapi-skip-member", skip_member)

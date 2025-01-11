@@ -10,7 +10,6 @@ from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
-from autointent.context.vector_index_client import VectorIndex, VectorIndexClient
 from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -18,11 +17,10 @@ from autointent.modules.abc import ScoringModule
 class DescriptionScorerDumpMetadata(TypedDict):
     """Metadata for dumping the state of a DescriptionScorer."""
 
-    db_dir: str
     n_classes: int
     multilabel: bool
-    batch_size: int
-    max_length: int | None
+    embedder_batch_size: int
+    embedder_max_length: int | None
 
 
 class DescriptionScorer(ScoringModule):
@@ -34,20 +32,14 @@ class DescriptionScorer(ScoringModule):
 
     :ivar weights_file_name: Filename for saving the description vectors (`description_vectors.npy`).
     :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
-    :ivar precomputed_embeddings: Flag indicating whether precomputed embeddings are used.
     :ivar embedding_model_subdir: Directory for storing the embedder's model files.
-    :ivar _vector_index: Internal vector index used when embeddings are precomputed.
-    :ivar db_dir: Directory path where the vector database is stored.
     :ivar name: Name of the scorer, defaults to "description".
 
     """
 
     weights_file_name: str = "description_vectors.npy"
     embedder: Embedder
-    precomputed_embeddings: bool = False
     embedding_model_subdir: str = "embedding_model"
-    _vector_index: VectorIndex
-    db_dir: str
     name = "description"
 
     def __init__(
@@ -55,9 +47,9 @@ class DescriptionScorer(ScoringModule):
         embedder_name: str,
         temperature: float = 1.0,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the DescriptionScorer.
@@ -65,15 +57,15 @@ class DescriptionScorer(ScoringModule):
         :param embedder_name: Name of the embedder model.
         :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
         :param embedder_device: Device to run the embedder on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, defaults to None.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding, defaults to None.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.temperature = temperature
         self.embedder_device = embedder_device
         self.embedder_name = embedder_name
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
 
     @classmethod
@@ -93,19 +85,15 @@ class DescriptionScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            precomputed_embeddings = True
-        else:
-            precomputed_embeddings = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             temperature=temperature,
             embedder_device=context.get_device(),
             embedder_name=embedder_name,
             embedder_use_cache=context.get_use_cache(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
         )
-        instance.precomputed_embeddings = precomputed_embeddings
-        instance.db_dir = str(context.get_db_dir())
-        return instance
 
     def get_embedder_name(self) -> str:
         """
@@ -136,31 +124,6 @@ class DescriptionScorer(ScoringModule):
             self.n_classes = len(set(labels))
             self.multilabel = False
 
-        if self.precomputed_embeddings:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            vector_index_client = VectorIndexClient(
-                self.embedder_device,
-                self.db_dir,
-                self.batch_size,
-                self.max_length,
-                self.embedder_use_cache,
-            )
-            vector_index = vector_index_client.get_index(self.embedder_name)
-            features = vector_index.get_all_embeddings()
-            if len(features) != len(utterances):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-            embedder = vector_index.embedder
-        else:
-            embedder = Embedder(
-                device=self.embedder_device,
-                model_name=self.embedder_name,
-                batch_size=self.batch_size,
-                max_length=self.max_length,
-                use_cache=self.embedder_use_cache,
-            )
-            features = embedder.embed(utterances)
-
         if any(description is None for description in descriptions):
             error_text = (
                 "Some intent descriptions (label_description) are missing (None). "
@@ -168,7 +131,15 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        self.description_vectors = embedder.embed([desc for desc in descriptions if desc])
+        embedder = Embedder(
+            device=self.embedder_device,
+            model_name=self.embedder_name,
+            batch_size=self.embedder_batch_size,
+            max_length=self.embedder_max_length,
+            use_cache=self.embedder_use_cache,
+        )
+
+        self.description_vectors = embedder.embed(descriptions)
         self.embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
@@ -198,11 +169,10 @@ class DescriptionScorer(ScoringModule):
         :param path: Path to the directory where assets will be dumped.
         """
         self.metadata = DescriptionScorerDumpMetadata(
-            db_dir=str(self.db_dir),
             n_classes=self.n_classes,
             multilabel=self.multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
 
         dump_dir = Path(path)
@@ -232,7 +202,7 @@ class DescriptionScorer(ScoringModule):
         self.embedder = Embedder(
             device=self.embedder_device,
             model_name=embedder_dir,
-            batch_size=self.metadata["batch_size"],
-            max_length=self.metadata["max_length"],
+            batch_size=self.metadata["embedder_batch_size"],
+            max_length=self.metadata["embedder_max_length"],
             use_cache=self.embedder_use_cache,
         )

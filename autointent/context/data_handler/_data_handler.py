@@ -30,10 +30,7 @@ class DataHandler:
     """Data handler class."""
 
     def __init__(
-        self,
-        dataset: Dataset,
-        force_multilabel: bool = False,
-        random_seed: int = 0,
+        self, dataset: Dataset, force_multilabel: bool = False, random_seed: int = 0, split_train: bool = True
     ) -> None:
         """
         Initialize the data handler.
@@ -41,6 +38,8 @@ class DataHandler:
         :param dataset: Training dataset.
         :param force_multilabel: If True, force the dataset to be multilabel.
         :param random_seed: Seed for random number generation.
+        :param split_train: Perform or not splitting of train (default to split to be used in scoring and
+                            threshold search).
         """
         set_seed(random_seed)
 
@@ -50,7 +49,7 @@ class DataHandler:
 
         self.n_classes = self.dataset.n_classes
 
-        self._split(random_seed)
+        self._split(random_seed, split_train)
 
         self.regexp_patterns = [
             RegexPatterns(
@@ -191,11 +190,11 @@ class DataHandler:
         """
         self.dataset.to_json(filepath)
 
-    def _split(self, random_seed: int) -> None:
+    def _split(self, random_seed: int, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
         has_test_split = any(split.startswith(Split.TEST) for split in self.dataset)
 
-        if Split.TRAIN in self.dataset:
+        if split_train and Split.TRAIN in self.dataset:
             self._split_train(random_seed)
 
         if Split.TEST not in self.dataset:
@@ -252,13 +251,21 @@ class DataHandler:
         )
 
     def _split_validation_from_train(self, random_seed: int) -> None:
-        for idx in range(2):
-            self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+        if Split.TRAIN in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = split_dataset(
                 self.dataset,
-                split=f"{Split.TRAIN}_{idx}",
+                split=Split.TRAIN,
                 test_size=0.2,
                 random_seed=random_seed,
             )
+        else:
+            for idx in range(2):
+                self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
+                    self.dataset,
+                    split=f"{Split.TRAIN}_{idx}",
+                    test_size=0.2,
+                    random_seed=random_seed,
+                )
 
     def _split_test(self, test_size: float, random_seed: int) -> None:
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(

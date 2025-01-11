@@ -109,7 +109,7 @@ class EmbedderConfig:
     """Batch size for the embedder"""
     max_length: int | None = None
     """Max length for the embedder. If None, the max length will be taken from model config"""
-    use_cache: bool = False
+    use_cache: bool = True
     """Flag indicating whether to cache embeddings for reuse, improving performance in repeated operations."""
     device: str = "cpu"
     """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""

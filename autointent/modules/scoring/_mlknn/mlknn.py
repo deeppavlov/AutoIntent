@@ -19,14 +19,14 @@ class MLKnnScorerDumpMetadata(BaseMetadataDict):
 
     :ivar db_dir: Path to the database directory.
     :ivar n_classes: Number of classes in the dataset.
-    :ivar batch_size: Batch size used for embedding.
-    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
+    :ivar embedder_batch_size: Batch size used for embedding.
+    :ivar embedder_max_length: Maximum sequence length for embedding, or None if not specified.
     """
 
     db_dir: str
     n_classes: int
-    batch_size: int
-    max_length: int | None
+    embedder_batch_size: int
+    embedder_max_length: int | None
 
 
 class ArrayToSave(TypedDict):
@@ -54,7 +54,6 @@ class MLKnnScorer(ScoringModule):
 
     :ivar arrays_filename: Filename for saving probabilities to disk.
     :ivar metadata: Metadata about the scorer's configuration.
-    :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
     :ivar name: Name of the scorer, defaults to "mlknn".
 
     Example
@@ -92,7 +91,6 @@ class MLKnnScorer(ScoringModule):
 
     arrays_filename: str = "probs.npz"
     metadata: MLKnnScorerDumpMetadata
-    prebuilt_index: bool = False
     name = "mlknn"
 
     def __init__(
@@ -103,9 +101,9 @@ class MLKnnScorer(ScoringModule):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the MLKnnScorer.
@@ -116,8 +114,8 @@ class MLKnnScorer(ScoringModule):
         :param s: Smoothing parameter for probability calculations, defaults to 1.0.
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.k = k
@@ -126,8 +124,8 @@ class MLKnnScorer(ScoringModule):
         self.ignore_first_neighbours = ignore_first_neighbours
         self._db_dir = db_dir
         self.embedder_device = embedder_device
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
 
     @property
@@ -162,23 +160,18 @@ class MLKnnScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            prebuilt_index = True
-        else:
-            prebuilt_index = context.vector_index_client.exists(embedder_name)
 
-        instance = cls(
+        return cls(
             k=k,
             embedder_name=embedder_name,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
             db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
-        instance.prebuilt_index = prebuilt_index
-        return instance
 
     def get_embedder_name(self) -> str:
         """
@@ -204,17 +197,13 @@ class MLKnnScorer(ScoringModule):
         self.n_classes = len(labels[0])
 
         vector_index_client = VectorIndexClient(
-            self.embedder_device, self.db_dir, embedder_use_cache=self.embedder_use_cache
+            self.embedder_device,
+            self.db_dir,
+            embedder_use_cache=self.embedder_use_cache,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
-
-        if self.prebuilt_index:
-            # this happens only when LinearScorer is within Pipeline opimization after RetrievalNode optimization
-            self.vector_index = vector_index_client.get_index(self.embedder_name)
-            if len(utterances) != len(self.vector_index.texts):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-        else:
-            self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
+        self.vector_index = vector_index_client.create_index(self.embedder_name, utterances, labels)
 
         self.features = (
             self.vector_index.embedder.embed(utterances)
@@ -319,8 +308,8 @@ class MLKnnScorer(ScoringModule):
         self.metadata = MLKnnScorerDumpMetadata(
             db_dir=self.db_dir,
             n_classes=self.n_classes,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            embedder_batch_size=self.embedder_batch_size,
+            embedder_max_length=self.embedder_max_length,
         )
 
         dump_dir = Path(path)
@@ -358,8 +347,8 @@ class MLKnnScorer(ScoringModule):
         vector_index_client = VectorIndexClient(
             embedder_device=self.embedder_device,
             db_dir=self.metadata["db_dir"],
-            embedder_batch_size=self.metadata["batch_size"],
-            embedder_max_length=self.metadata["max_length"],
+            embedder_batch_size=self.metadata["embedder_batch_size"],
+            embedder_max_length=self.metadata["embedder_max_length"],
             embedder_use_cache=self.embedder_use_cache,
         )
         self.vector_index = vector_index_client.get_index(self.embedder_name)

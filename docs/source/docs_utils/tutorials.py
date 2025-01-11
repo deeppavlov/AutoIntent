@@ -1,4 +1,8 @@
+import logging
 from pathlib import Path
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def create_notebook_link(source: Path, destination: Path) -> None:
@@ -136,4 +140,6 @@ def generate_tutorial_links_for_notebook_creation(
             filtered_links += [link]
 
     for included in include:
-        create_index_file(included, filtered_links, dest / Path(f"index_{included[1].replace(' ', '_').lower()}.rst"))
+        path = dest / Path(f"index_{included[1].replace(' ', '_').lower()}.rst")
+        logger.info("dest %s", path)
+        create_index_file(included, filtered_links, path)
