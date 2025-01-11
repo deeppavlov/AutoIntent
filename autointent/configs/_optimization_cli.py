@@ -96,7 +96,23 @@ class VectorIndexConfig:
 
 
 @dataclass
-class EmbedderConfig:
+class TransformerConfig:
+    """
+    Base class for configuration for the transformer.
+
+    Transformer is used under the hood in :py:class:`autointent.Embedder` and :py:class:`autointent.CrossEncoder`.
+    """
+
+    batch_size: int = 32
+    """Batch size for the embedder"""
+    max_length: int | None = None
+    """Max length for the embedder. If None, the max length will be taken from model config"""
+    device: str = "cpu"
+    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
+
+
+@dataclass
+class EmbedderConfig(TransformerConfig):
     """
     Configuration for the embedder.
 
@@ -105,14 +121,22 @@ class EmbedderConfig:
     Only one model can be used globally.
     """
 
-    batch_size: int = 32
-    """Batch size for the embedder"""
-    max_length: int | None = None
-    """Max length for the embedder. If None, the max length will be taken from model config"""
     use_cache: bool = True
-    """Flag indicating whether to cache embeddings for reuse, improving performance in repeated operations."""
-    device: str = "cpu"
-    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
+    """Whether to cache embeddings for reuse, improving performance in repeated operations."""
+
+
+@dataclass
+class CrossEncoderConfig(TransformerConfig):
+    """
+    Configuration for the embedder.
+
+    The embedder is used to embed the data before training the model. These parameters
+    will be applied to the embedder used in the optimization process in vector db.
+    Only one model can be used globally.
+    """
+
+    train_head: bool = False
+    """Whether to train the ranking head of a cross encoder."""
 
 
 @dataclass
@@ -131,6 +155,8 @@ class OptimizationConfig:
     """Configuration for the vector index"""
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
     """Configuration for the embedder"""
+    cross_encoder: CrossEncoderConfig = field(default_factory=CrossEncoderConfig)
+    """Configuration for the cross encoder"""
 
     defaults: list[Any] = field(
         default_factory=lambda: [

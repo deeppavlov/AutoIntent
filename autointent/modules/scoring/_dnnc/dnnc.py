@@ -89,16 +89,19 @@ class DNNCScorer(ScoringModule):
     _vector_index: VectorIndex
     _cross_encoder: CrossEncoder
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         cross_encoder_name: str,
         embedder_name: str,
         k: int,
-        device: str = "cpu",
-        train_head: bool = False,
-        batch_size: int = 32,
-        max_length: int | None = None,
+        embedder_device: str = "cpu",
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
         embedder_use_cache: bool = True,
+        cross_encoder_device: str = "cpu",
+        cross_encoder_batch_size: int = 32,
+        cross_encoder_max_length: int | None = None,
+        train_head: bool = False,
     ) -> None:
         """
         Initialize the DNNCScorer.
@@ -115,11 +118,16 @@ class DNNCScorer(ScoringModule):
         self.cross_encoder_name = cross_encoder_name
         self.embedder_name = embedder_name
         self.k = k
-        self.train_head = train_head
-        self.device = device
-        self.batch_size = batch_size
-        self.max_length = max_length
+
+        self.embedder_device = embedder_device
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
+
+        self.cross_encoder_device = cross_encoder_device
+        self.cross_encoder_batch_size = cross_encoder_batch_size
+        self.cross_encoder_max_length = cross_encoder_max_length
+        self.train_head = train_head
 
     @classmethod
     def from_context(
@@ -144,14 +152,17 @@ class DNNCScorer(ScoringModule):
             embedder_name = context.optimization_info.get_best_embedder()
 
         return cls(
-            cross_encoder_name=cross_encoder_name,
-            embedder_name=embedder_name,
             k=k,
-            train_head=train_head,
-            device=context.get_device(),
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_name=embedder_name,
+            embedder_device=context.get_device(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
+            cross_encoder_name=cross_encoder_name,
+            cross_encoder_device=context.get_cross_encoder_device(),
+            cross_encoder_batch_size=context.get_cross_encoder_batch_size(),
+            cross_encoder_max_length=context.get_cross_encoder_max_length(),
+            train_head=train_head,
         )
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
@@ -166,15 +177,15 @@ class DNNCScorer(ScoringModule):
 
         self._vector_index = VectorIndex(
             self.embedder_name,
-            self.device,
-            self.batch_size,
-            self.max_length,
+            self.embedder_device,
+            self.embedder_batch_size,
+            self.embedder_max_length,
             self.embedder_use_cache,
         )
         self._vector_index.add(utterances, labels)
 
         self._cross_encoder = CrossEncoder(
-            self.cross_encoder_name, train_classifier=self.train_head, device=self.device
+            self.cross_encoder_name, train_classifier=self.train_head, device=self.cross_encoder_device
         )
         self._cross_encoder.fit(utterances, labels)
 

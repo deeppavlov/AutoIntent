@@ -10,6 +10,7 @@ import yaml
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
+    CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -63,6 +64,15 @@ class Context:
         if embedder_config is None:
             embedder_config = EmbedderConfig()
         self.embedder_config = embedder_config
+
+    def configure_cross_encoder(self, config: CrossEncoderConfig) -> None:
+        """
+        Configure the vector index client and embedder.
+
+        :param config: Configuration for the vector index.
+        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+        """
+        self.cross_encoder_config = config
 
     def configure_data(self, config: DataConfig) -> None:
         """
@@ -147,6 +157,14 @@ class Context:
         """
         return self.embedder_config.device
 
+    def get_cross_encoder_device(self) -> str:
+        """
+        Get the cross encoder device used by default during optimization.
+
+        :return: Device name.
+        """
+        return self.cross_encoder_config.device
+
     def get_batch_size(self) -> int:
         """
         Get the batch size used by the embedder.
@@ -155,6 +173,14 @@ class Context:
         """
         return self.embedder_config.batch_size
 
+    def get_cross_encoder_batch_size(self) -> int:
+        """
+        Get the batch size used by the cross encoder by default during optimization.
+
+        :return: Batch size.
+        """
+        return self.cross_encoder_config.batch_size
+
     def get_max_length(self) -> int | None:
         """
         Get the maximum sequence length for embeddings.
@@ -162,6 +188,14 @@ class Context:
         :return: Maximum length or None if not set.
         """
         return self.embedder_config.max_length
+
+    def get_cross_encoder_max_length(self) -> int | None:
+        """
+        Get the maximum sequence length for embeddings.
+
+        :return: Maximum length or None if not set.
+        """
+        return self.cross_encoder_config.max_length
 
     def get_use_cache(self) -> bool:
         """

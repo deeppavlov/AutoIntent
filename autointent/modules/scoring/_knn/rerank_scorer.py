@@ -38,6 +38,7 @@ class RerankScorer(KNNScorer):
         cross_encoder_device: str = "cpu",
         cross_encoder_batch_size: int = 32,
         cross_encoder_max_length: int | None = None,
+        embedder_use_cache: bool = True,
         train_head: bool = False,
     ) -> None:
         """
@@ -63,6 +64,7 @@ class RerankScorer(KNNScorer):
             embedder_device=embedder_device,
             embedder_batch_size=embedder_batch_size,
             embedder_max_length=embedder_max_length,
+            embedder_use_cache=embedder_use_cache,
         )
 
         self.cross_encoder_name = cross_encoder_name
@@ -81,6 +83,7 @@ class RerankScorer(KNNScorer):
         k: int,
         weights: WEIGHT_TYPES,
         cross_encoder_name: str,
+        train_head: bool,
         embedder_name: str | None = None,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
@@ -101,15 +104,20 @@ class RerankScorer(KNNScorer):
             embedder_name = context.optimization_info.get_best_embedder()
 
         return cls(
-            embedder_name=embedder_name,
             k=k,
             weights=weights,
-            cross_encoder_name=cross_encoder_name,
             m=m,
             rank_threshold_cutoff=rank_threshold_cutoff,
+            train_head=train_head,
+            embedder_name=embedder_name,
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
+            cross_encoder_name=cross_encoder_name,
+            cross_encoder_device=context.get_cross_encoder_device(),
+            cross_encoder_batch_size=context.get_cross_encoder_batch_size(),
+            cross_encoder_max_length=context.get_cross_encoder_max_length(),
         )
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
@@ -124,7 +132,9 @@ class RerankScorer(KNNScorer):
             device=self.cross_encoder_device,
             max_length=self.cross_encoder_max_length,
             batch_size=self.cross_encoder_batch_size,
+            train_classifier=self.train_head,
         )
+        self._scorer.fit(utterances, labels)
 
         super().fit(utterances, labels)
 

@@ -2,6 +2,7 @@
 
 from ._inference_node import InferenceNodeConfig
 from ._optimization_cli import (
+    CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -11,6 +12,7 @@ from ._optimization_cli import (
 )
 
 __all__ = [
+    "CrossEncoderConfig",
     "DataConfig",
     "EmbedderConfig",
     "InferenceNodeConfig",
