@@ -5,10 +5,9 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
-from sentence_transformers import CrossEncoder, SentenceTransformer
 from sklearn.base import BaseEstimator
 
-from autointent import Embedder, VectorIndex
+from autointent import CrossEncoder, Embedder, VectorIndex
 from autointent.modules.abc import Module
 from autointent.schemas import TagsList
 
@@ -21,7 +20,6 @@ ModuleAttributes: TypeAlias = (
     | Embedder
     | VectorIndex
     | BaseEstimator
-    | SentenceTransformer
     | CrossEncoder
 )
 
@@ -33,7 +31,6 @@ class Dumper:
     embedders = "embedders"
     indexes = "vector_indexes"
     estimators = "estimators"
-    sentence_transformers = "sentence_transformers"
     cross_encoders = "cross_encoders"
 
     @staticmethod
@@ -56,8 +53,6 @@ class Dumper:
                 val.dump(path / Dumper.indexes / key)
             elif isinstance(val, BaseEstimator):
                 joblib.dump(val, path / Dumper.estimators / key)
-            elif isinstance(val, SentenceTransformer):
-                val.save(str(path / Dumper.sentence_transformers / key))
             elif isinstance(val, CrossEncoder):
                 val.save(str(path / Dumper.cross_encoders / key))
             else:
@@ -87,20 +82,14 @@ class Dumper:
                 indexes = {index_dump.name: VectorIndex.load(index_dump) for index_dump in child.iterdir()}
             elif child.name == Dumper.estimators:
                 estimators = {estimator_dump.name: joblib.load(estimator_dump) for estimator_dump in child.iterdir()}
-            elif child.name == Dumper.sentence_transformers:
-                sentence_transformers = {
-                    transformer_dump.name: SentenceTransformer(str(transformer_dump))
-                    for transformer_dump in child.iterdir()
-                }
             elif child.name == Dumper.cross_encoders:
                 cross_encoders = {
-                    cross_encoder_dump.name: CrossEncoder(str(cross_encoder_dump))
+                    cross_encoder_dump.name: CrossEncoder.load(cross_encoder_dump)
                     for cross_encoder_dump in child.iterdir()
                 }
             else:
-                # TODO add CrossEncoderWithLogreg handling
                 msg = f"Found unexpected child {child}"
                 raise ValueError(msg)
         module.__dict__.update(
-            tags | simple_attrs | arrays | embedders | indexes | estimators | sentence_transformers | cross_encoders
+            tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders
         )

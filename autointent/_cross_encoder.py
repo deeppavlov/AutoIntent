@@ -4,10 +4,11 @@ Can be used to rank retrieved sentences by meaning closeness to provided utteran
 """
 
 import itertools as it
+import json
 import logging
 from pathlib import Path
 from random import shuffle
-from typing import Any
+from typing import Any, TypedDict
 
 import joblib
 import numpy as np
@@ -20,6 +21,14 @@ from torch import nn
 from autointent.custom_types import LabelType
 
 logger = logging.getLogger(__name__)
+
+
+class CrossEncoderMetadata(TypedDict):
+    model_name: str
+    train_classifier: bool
+    device: str
+    max_length: str | None
+    batch_size: int
 
 
 def construct_samples(
@@ -90,9 +99,12 @@ class CrossEncoder:
     >>> loaded_scorer = CrossEncoder.load("outputs/")
     """
 
+    metadata_file_name = "metadata.json"
+    classifier_file_name = "classifier.joblib"
+
     def __init__(
         self,
-        model: str,
+        model_name: str,
         device: str = "cpu",
         train_classifier: bool = False,
         batch_size: int = 326,
@@ -109,7 +121,9 @@ class CrossEncoder:
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
-        self.cross_encoder = st.CrossEncoder(model, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
+        self.model_name = model_name
+        self.device = device
+        self.cross_encoder = st.CrossEncoder(model_name, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
         self.train_classifier = False
         self.batch_size = batch_size
         self.max_length = max_length
@@ -230,27 +244,30 @@ class CrossEncoder:
         """
         dump_dir = Path(path)
 
-        crossencoder_dir = str(dump_dir / "crossencoder")
-        self.cross_encoder.save(crossencoder_dir)
+        metadata = CrossEncoderMetadata(
+            model_name=self.model_name,
+            train_classifier=self.train_classifier,
+            device=self.device,
+            max_length=self.max_length,
+            batch_size=self.batch_size
+        )
 
-        clf_path = dump_dir / "classifier.joblib"
-        joblib.dump(self._clf, clf_path)
+        with (dump_dir / self.metadata_file_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+        joblib.dump(self._clf, dump_dir / self.classifier_file_name)
 
     @classmethod
-    def load(cls, path: str) -> "CrossEncoder":
+    def load(cls, path: Path) -> "CrossEncoder":
         """
         Load the model and classifier from disk.
 
         :param path: Directory path containing the saved model and classifier.
         :return: Initialized CrossEncoder instance.
         """
-        dump_dir = Path(path)
+        clf = joblib.load(path / cls.classifier_file_name)
 
-        # Load sklearn model
-        clf_path = dump_dir / "classifier.joblib"
-        clf = joblib.load(clf_path)
+        with (path / cls.metadata_file_name).open() as file:
+            metadata: CrossEncoderMetadata = json.load(file)
 
-        # Load sentence transformer model
-        crossencoder_dir = str(dump_dir / "crossencoder")
-
-        return cls(crossencoder_dir, classifier_head=clf)
+        return cls(**metadata, classifier_head=clf)
