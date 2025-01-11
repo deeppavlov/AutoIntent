@@ -27,7 +27,7 @@ class CrossEncoderMetadata(TypedDict):
     model_name: str
     train_classifier: bool
     device: str
-    max_length: str | None
+    max_length: int | None
     batch_size: int
 
 
@@ -249,7 +249,7 @@ class CrossEncoder:
             train_classifier=self.train_classifier,
             device=self.device,
             max_length=self.max_length,
-            batch_size=self.batch_size
+            batch_size=self.batch_size,
         )
 
         with (dump_dir / self.metadata_file_name).open("w") as file:

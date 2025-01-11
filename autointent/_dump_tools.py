@@ -14,13 +14,7 @@ from autointent.schemas import TagsList
 ModuleSimpleAttributes = None | str | int | float | bool | list["ModuleSimpleAttributes"]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes
-    | TagsList
-    | npt.NDArray[Any]
-    | Embedder
-    | VectorIndex
-    | BaseEstimator
-    | CrossEncoder
+    ModuleSimpleAttributes | TagsList | npt.NDArray[Any] | Embedder | VectorIndex | BaseEstimator | CrossEncoder
 )
 
 
@@ -90,6 +84,4 @@ class Dumper:
             else:
                 msg = f"Found unexpected child {child}"
                 raise ValueError(msg)
-        module.__dict__.update(
-            tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders
-        )
+        module.__dict__.update(tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders)
