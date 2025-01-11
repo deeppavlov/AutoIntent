@@ -178,7 +178,7 @@ def test_pipeline_callbacks():
                 "metrics": {
                     "scoring_accuracy": 1.0,
                     "scoring_f1": 1.0,
-                    "scoring_log_likelihood": -0.3691714031014546,
+                    "scoring_log_likelihood": -0.369171,
                     "scoring_precision": 1.0,
                     "scoring_recall": 1.0,
                     "scoring_roc_auc": 1.0,

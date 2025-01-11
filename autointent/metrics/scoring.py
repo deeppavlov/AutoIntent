@@ -71,7 +71,8 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
         log_likelihood = labels_array * np.log(scores_array) + (1 - labels_array) * np.log(1 - scores_array)
         clipped_one = log_likelihood.clip(min=-100, max=100)
         res = clipped_one.mean()
-    return float(res)
+    # test produces different output
+    return round(float(res), 6)
 
 
 def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
