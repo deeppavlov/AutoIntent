@@ -1,45 +1,13 @@
 """MLKnnScorer class for multi-label k-nearest neighbors classification."""
 
-from typing import Any, TypedDict
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
-
-
-class MLKnnScorerDumpMetadata(BaseMetadataDict):
-    """
-    Metadata for dumping the state of an MLKnnScorer.
-
-    :ivar db_dir: Path to the database directory.
-    :ivar n_classes: Number of classes in the dataset.
-    :ivar embedder_batch_size: Batch size used for embedding.
-    :ivar embedder_max_length: Maximum sequence length for embedding, or None if not specified.
-    """
-
-    db_dir: str
-    n_classes: int
-    embedder_batch_size: int
-    embedder_max_length: int | None
-
-
-class ArrayToSave(TypedDict):
-    """
-    Data structure for saving prior and conditional probabilities.
-
-    :ivar prior_prob_true: Prior probabilities of each class being true.
-    :ivar prior_prob_false: Prior probabilities of each class being false.
-    :ivar cond_prob_true: Conditional probabilities given true labels.
-    :ivar cond_prob_false: Conditional probabilities given false labels.
-    """
-
-    prior_prob_true: NDArray[np.float64]
-    prior_prob_false: NDArray[np.float64]
-    cond_prob_true: NDArray[np.float64]
-    cond_prob_false: NDArray[np.float64]
 
 
 class MLKnnScorer(ScoringModule):
@@ -49,8 +17,6 @@ class MLKnnScorer(ScoringModule):
     This module implements ML-KNN, a multi-label classifier that computes probabilities
     based on the k-nearest neighbors of a query instance.
 
-    :ivar arrays_filename: Filename for saving probabilities to disk.
-    :ivar metadata: Metadata about the scorer's configuration.
     :ivar name: Name of the scorer, defaults to "mlknn".
 
     Example
@@ -86,9 +52,14 @@ class MLKnnScorer(ScoringModule):
 
     """
 
-    arrays_filename: str = "probs.npz"
-    metadata: MLKnnScorerDumpMetadata
     name = "mlknn"
+    _n_classes: int
+    _prior_prob_true: NDArray[Any]
+    _prior_prob_false: NDArray[Any]
+    _cond_prob_true: NDArray[Any]
+    _cond_prob_false: NDArray[Any]
+    _features: NDArray[Any]
+    _labels: NDArray[Any]
 
     def __init__(
         self,
@@ -176,20 +147,20 @@ class MLKnnScorer(ScoringModule):
             msg = "mlknn scorer support only multilabel input"
             raise TypeError(msg)
 
-        self.n_classes = len(labels[0])
+        self._n_classes = len(labels[0])
 
-        self.vector_index = VectorIndex(
+        self._vector_index = VectorIndex(
             self.embedder_name,
             self.embedder_device,
             self.embedder_batch_size,
             self.embedder_max_length,
             self.embedder_use_cache,
         )
-        self.vector_index.add(utterances, labels)
+        self._vector_index.add(utterances, labels)
 
-        self.features = self.vector_index.get_all_embeddings()
-        self.labels = np.array(labels)
-        self._prior_prob_true, self._prior_prob_false = self._compute_prior(self.labels)
+        self._features = self._vector_index.get_all_embeddings()
+        self._labels = np.array(labels)
+        self._prior_prob_true, self._prior_prob_false = self._compute_prior(self._labels)
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 
     def _compute_prior(self, y: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
@@ -209,17 +180,17 @@ class MLKnnScorer(ScoringModule):
 
         :return: Tuple of conditional probabilities for true and false labels.
         """
-        c = np.zeros((self.n_classes, self.k + 1), dtype=int)
-        cn = np.zeros((self.n_classes, self.k + 1), dtype=int)
+        c = np.zeros((self._n_classes, self.k + 1), dtype=int)
+        cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
 
-        neighbors_labels, _ = self._get_neighbors(self.features)
+        neighbors_labels, _ = self._get_neighbors(self._features)
 
-        for i in range(self.labels.shape[0]):
+        for i in range(self._labels.shape[0]):
             deltas = np.sum(neighbors_labels[i], axis=0).astype(int)
-            idx_helper = np.arange(self.n_classes)
+            idx_helper = np.arange(self._n_classes)
             deltas_idx = deltas[idx_helper]
-            c[idx_helper, deltas_idx] += self.labels[i]
-            cn[idx_helper, deltas_idx] += 1 - self.labels[i]
+            c[idx_helper, deltas_idx] += self._labels[i]
+            cn[idx_helper, deltas_idx] += 1 - self._labels[i]
 
         c_sum = c.sum(axis=1)
         cn_sum = cn.sum(axis=1)
@@ -233,7 +204,7 @@ class MLKnnScorer(ScoringModule):
         self,
         queries: list[str] | NDArray[Any],
     ) -> tuple[NDArray[np.int64], list[list[str]]]:
-        labels, _, neighbors = self.vector_index.query(
+        labels, _, neighbors = self._vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
         )
@@ -275,19 +246,19 @@ class MLKnnScorer(ScoringModule):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self.vector_index.clear_ram()
+        self._vector_index.clear_ram()
 
     def _predict(
         self,
         utterances: list[str],
     ) -> tuple[NDArray[np.float64], list[list[str]]]:
-        result = np.zeros((len(utterances), self.n_classes), dtype=float)
+        result = np.zeros((len(utterances), self._n_classes), dtype=float)
         neighbors_labels, neighbors = self._get_neighbors(utterances)
 
         for instance in range(neighbors_labels.shape[0]):
             deltas = np.sum(neighbors_labels[instance], axis=0).astype(int)
 
-            for label in range(self.n_classes):
+            for label in range(self._n_classes):
                 p_true = self._prior_prob_true[label] * self._cond_prob_true[label, deltas[label]]
                 p_false = self._prior_prob_false[label] * self._cond_prob_false[label, deltas[label]]
                 result[instance, label] = p_true / (p_true + p_false)
