@@ -34,6 +34,7 @@ def optimize(cfg: OptimizationConfig) -> None:
     context.configure_logging(cfg.logs)
     context.configure_vector_index(cfg.vector_index, cfg.embedder)
     context.configure_data(cfg.data)
+    context.configure_cross_encoder(cfg.cross_encoder)
 
     # run optimization
     search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)
