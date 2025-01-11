@@ -226,7 +226,7 @@ class DNNCScorer(ScoringModule):
             logger.error(msg)
             raise ValueError(msg)
 
-        text_pairs = [[[query, cand] for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
+        text_pairs = [[(query, cand) for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 

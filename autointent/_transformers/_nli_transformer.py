@@ -124,7 +124,7 @@ class NLITransformer:
         self._logits_list.append(input_tensor[0].cpu().numpy())
 
     @torch.no_grad()
-    def get_features(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
+    def get_features(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
         Extract features from text pairs using the CrossEncoder model.
 
@@ -141,7 +141,7 @@ class NLITransformer:
         self._logits_list = []
         return np.concatenate(res, axis=0)
 
-    def _fit(self, pairs: list[list[str]], labels: list[LabelType]) -> None:
+    def _fit(self, pairs: list[tuple[str, str]], labels: list[LabelType]) -> None:
         """
         Train the logistic regression model on cross-encoder features.
 
@@ -177,7 +177,7 @@ class NLITransformer:
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
-    def predict(self, pairs: list[list[str]]) -> npt.NDArray[Any]:
+    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
         Predict probabilities of two utterances having the same intent label.
 
@@ -209,7 +209,7 @@ class NLITransformer:
         :top_k: how many document to return
         :return: array of dictionaries of ranked items.
         """
-        query_doc_pairs = [[query, doc] for doc in query_docs]
+        query_doc_pairs = [(query, doc) for doc in query_docs]
         scores = self.predict(query_doc_pairs)
 
         if top_k is None:
