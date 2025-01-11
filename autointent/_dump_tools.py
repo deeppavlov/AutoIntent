@@ -8,7 +8,6 @@ import numpy.typing as npt
 from sklearn.base import BaseEstimator
 
 from autointent import CrossEncoder, Embedder, VectorIndex
-from autointent.modules.abc import Module
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list["ModuleSimpleAttributes"]
@@ -28,9 +27,9 @@ class Dumper:
     cross_encoders = "cross_encoders"
 
     @staticmethod
-    def dump(module: Module, path: Path) -> None:
+    def dump(obj: Any, path: Path) -> None:  # noqa: ANN401
         """Dump modules attributes to filestystem."""
-        attrs: dict[str, ModuleAttributes] = vars(module)
+        attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
 
@@ -59,7 +58,7 @@ class Dumper:
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
     @staticmethod
-    def load(module: Module, path: Path) -> None:
+    def load(obj: Any, path: Path) -> None:  # noqa: ANN401
         """Load attributes from file system."""
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -84,4 +83,4 @@ class Dumper:
             else:
                 msg = f"Found unexpected child {child}"
                 raise ValueError(msg)
-        module.__dict__.update(tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders)
+        obj.__dict__.update(tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders)
