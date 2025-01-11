@@ -6,28 +6,10 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import WEIGHT_TYPES, BaseMetadataDict, LabelType
+from autointent.custom_types import WEIGHT_TYPES, LabelType
 from autointent.modules.abc import ScoringModule
 
 from .weighting import apply_weights
-
-
-class KNNScorerDumpMetadata(BaseMetadataDict):
-    """
-    Metadata for dumping the state of a KNNScorer.
-
-    :ivar n_classes: Number of classes in the dataset.
-    :ivar multilabel: Whether the task is multilabel classification.
-    :ivar db_dir: Path to the database directory.
-    :ivar embedder_batch_size: Batch size used for embedding.
-    :ivar embedder_max_length: Maximum sequence length for embedding, or None if not specified.
-    """
-
-    n_classes: int
-    multilabel: bool
-    db_dir: str
-    embedder_batch_size: int
-    embedder_max_length: int | None
 
 
 class KNNScorer(ScoringModule):
