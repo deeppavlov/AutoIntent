@@ -8,13 +8,13 @@ import numpy as np
 import numpy.typing as npt
 from sklearn.base import BaseEstimator
 
-from autointent import CrossEncoder, Embedder, VectorIndex
+from autointent import Embedder, Ranker, VectorIndex
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | CrossEncoder  # type: ignore[type-arg]
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class Dumper:
                 val.dump(path / Dumper.indexes / key)
             elif isinstance(val, BaseEstimator):
                 joblib.dump(val, path / Dumper.estimators / key)
-            elif isinstance(val, CrossEncoder):
+            elif isinstance(val, Ranker):
                 val.save(str(path / Dumper.cross_encoders / key))
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
@@ -94,8 +94,7 @@ class Dumper:
                 estimators = {estimator_dump.name: joblib.load(estimator_dump) for estimator_dump in child.iterdir()}
             elif child.name == Dumper.cross_encoders:
                 cross_encoders = {
-                    cross_encoder_dump.name: CrossEncoder.load(cross_encoder_dump)
-                    for cross_encoder_dump in child.iterdir()
+                    cross_encoder_dump.name: Ranker.load(cross_encoder_dump) for cross_encoder_dump in child.iterdir()
                 }
             else:
                 msg = f"Found unexpected child {child}"

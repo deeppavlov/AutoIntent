@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from autointent import Context, CrossEncoder
+from autointent import Context, Ranker
 from autointent.custom_types import WEIGHT_TYPES, LabelType
 
 from .knn import KNNScorer
@@ -18,11 +18,11 @@ class RerankScorer(KNNScorer):
     This module uses a cross-encoder to re-rank the nearest neighbors retrieved by a KNN scorer.
 
     :ivar name: Name of the scorer, defaults to "rerank".
-    :ivar _scorer: CrossEncoder instance for re-ranking.
+    :ivar _scorer: Ranker instance for re-ranking.
     """
 
     name = "rerank"
-    _scorer: CrossEncoder
+    _scorer: Ranker
 
     def __init__(  # noqa: PLR0913
         self,
@@ -127,7 +127,7 @@ class RerankScorer(KNNScorer):
         :param utterances: List of utterances to fit the scorer.
         :param labels: List of labels corresponding to the utterances.
         """
-        self._scorer = CrossEncoder(
+        self._scorer = Ranker(
             self.cross_encoder_name,
             device=self.cross_encoder_device,
             max_length=self.cross_encoder_max_length,

@@ -1,6 +1,6 @@
 """This is AutoIntent API reference."""
 
-from ._cross_encoder import CrossEncoder
+from ._ranker import Ranker
 from ._embedder import Embedder
 from ._vector_index import VectorIndex
 from ._dataset import Dataset
@@ -9,4 +9,4 @@ from .context import Context
 from ._pipeline import Pipeline
 
 
-__all__ = ["Context", "CrossEncoder", "Dataset", "Embedder", "Hasher", "Pipeline", "VectorIndex"]
+__all__ = ["Context", "Dataset", "Embedder", "Hasher", "Pipeline", "Ranker", "VectorIndex"]

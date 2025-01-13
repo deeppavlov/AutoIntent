@@ -98,7 +98,7 @@ class TransformerConfig:
     """
     Base class for configuration for the transformer.
 
-    Transformer is used under the hood in :py:class:`autointent.Embedder` and :py:class:`autointent.CrossEncoder`.
+    Transformer is used under the hood in :py:class:`autointent.Embedder` and :py:class:`autointent.Ranker`.
     """
 
     batch_size: int = 32

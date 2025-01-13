@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from autointent import Context, CrossEncoder, VectorIndex
+from autointent import Context, Ranker, VectorIndex
 from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
 
@@ -18,7 +18,7 @@ class DNNCScorer(ScoringModule):
     r"""
     Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
 
-    This module uses a CrossEncoder for scoring candidate intents and can optionally
+    This module uses a Ranker for scoring candidate intents and can optionally
     train a logistic regression head on top of cross-encoder features.
 
     .. code-block:: bibtex
@@ -34,8 +34,8 @@ class DNNCScorer(ScoringModule):
           url={https://arxiv.org/abs/2010.13009},
         }
 
-    :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`crossencoder`).
-    :ivar model: The model used for scoring, which could be a `CrossEncoder` or a `CrossEncoderWithLogreg`.
+    :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`Ranker`).
+    :ivar model: The model used for scoring, which could be a `Ranker` or a `CrossEncoderWithLogreg`.
     :ivar _db_dir: Path to the database directory where the vector index is stored.
     :ivar name: Name of the scorer, defaults to "dnnc".
 
@@ -69,7 +69,7 @@ class DNNCScorer(ScoringModule):
     name = "dnnc"
     _n_classes: int
     _vector_index: VectorIndex
-    _cross_encoder: CrossEncoder
+    _cross_encoder: Ranker
 
     def __init__(  # noqa: PLR0913
         self,
@@ -166,7 +166,7 @@ class DNNCScorer(ScoringModule):
         )
         self._vector_index.add(utterances, labels)
 
-        self._cross_encoder = CrossEncoder(
+        self._cross_encoder = Ranker(
             self.cross_encoder_name, train_classifier=self.train_head, device=self.cross_encoder_device
         )
         self._cross_encoder.fit(utterances, labels)

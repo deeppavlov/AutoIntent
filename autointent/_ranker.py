@@ -1,4 +1,4 @@
-"""CrossEncoder class for cross-encoder-based estimation of meaning closeness.
+"""Ranker class for cross-encoder-based estimation of meaning closeness.
 
 Can be used to rank retrieved sentences by meaning closeness to provided utterance.
 """
@@ -67,15 +67,15 @@ def construct_samples(
     return pairs, labels
 
 
-class CrossEncoder:
+class Ranker:
     r"""
     Cross-encoder for NLI.
 
-    In the hart this class uses a SentenceTransformers CrossEncoder model to extract features.
+    In the hart this class uses a SentenceTransformers Ranker model to extract features.
     Then it uses either the model's clissifier or our custom trained LogisticRegressionCV
     (custom classifier layer in the future) to rank documents using similarity score to the query.
 
-    :ivar cross_encoder: The CrossEncoder model used to extract features.
+    :ivar cross_encoder: The Ranker model used to extract features.
     :ivar batch_size: Batch size for processing text pairs.
     :ivar _clf: The trained LogisticRegressionCV classifier.
     :ivar model_subdir: Directory for storing the cross-encoder model files.
@@ -83,8 +83,8 @@ class CrossEncoder:
     Examples
     --------
     Creating and fitting the CrossEncoderWithLogreg:
-    >>> from autointent import CrossEncoder
-    >>> scorer = CrossEncoder("cross-encoder-model")
+    >>> from autointent import Ranker
+    >>> scorer = Ranker("cross-encoder-model")
     >>> utterances = ["What is your name?", "How old are you?"]
     >>> labels = [1, 0]
     >>> scorer.fit(utterances, labels)
@@ -96,7 +96,7 @@ class CrossEncoder:
 
     Saving and loading the model:
     >>> scorer.save("outputs/")
-    >>> loaded_scorer = CrossEncoder.load("outputs/")
+    >>> loaded_scorer = Ranker.load("outputs/")
     """
 
     metadata_file_name = "metadata.json"
@@ -112,9 +112,9 @@ class CrossEncoder:
         classifier_head: LogisticRegressionCV | None = None,
     ) -> None:
         """
-        Initialize the CrossEncoder.
+        Initialize the Ranker.
 
-        :param model: The CrossEncoder model name to use.
+        :param model: The cross-encoder hugging face model name to use.
         :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param train_classifier: Whether to train a custom classifier, defaults to False.
         :param batch_size: Batch size for processing text pairs, defaults to 326.
@@ -140,7 +140,7 @@ class CrossEncoder:
     @torch.no_grad()
     def _get_features_or_predictions(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
         """
-        Extract features or get predictions using the CrossEncoder model.
+        Extract features or get predictions using the Ranker model.
 
         If :py:attr:`~train_classifier` is ``True``, return raw activations from
         cross-encoder transformer. Otherwise, get predictions from cross-encoder head.
@@ -259,12 +259,12 @@ class CrossEncoder:
         joblib.dump(self._clf, dump_dir / self.classifier_file_name)
 
     @classmethod
-    def load(cls, path: Path) -> "CrossEncoder":
+    def load(cls, path: Path) -> "Ranker":
         """
         Load the model and classifier from disk.
 
         :param path: Directory path containing the saved model and classifier.
-        :return: Initialized CrossEncoder instance.
+        :return: Initialized Ranker instance.
         """
         clf = joblib.load(path / cls.classifier_file_name)
 
