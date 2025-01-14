@@ -1,10 +1,12 @@
 """Base module for all modules."""
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any, Literal
 
 import numpy.typing as npt
 
+from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import BaseMetadataDict
@@ -49,21 +51,21 @@ class Module(ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
-    @abstractmethod
     def dump(self, path: str) -> None:
         """
         Dump all data needed for inference.
 
         :param path: Path to dump
         """
+        Dumper.dump(self, Path(path))
 
-    @abstractmethod
     def load(self, path: str) -> None:
         """
         Load data from dump.
 
         :param path: Path to load
         """
+        Dumper.load(self, Path(path))
 
     @abstractmethod
     def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:

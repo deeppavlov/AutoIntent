@@ -1,32 +1,15 @@
 """LinearScorer class for linear classification."""
 
-import json
-from pathlib import Path
 from typing import Any
 
-import joblib
 import numpy as np
 import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
-
-
-class LinearScorerDumpDict(BaseMetadataDict):
-    """
-    Metadata for dumping the state of a LinearScorer.
-
-    :ivar multilabel: Whether the task is multilabel classification.
-    :ivar embedder_batch_size: Batch size used for embedding.
-    :ivar embedder_max_length: Maximum sequence length for embedding, or None if not specified.
-    """
-
-    multilabel: bool
-    embedder_batch_size: int
-    embedder_max_length: int | None
 
 
 class LinearScorer(ScoringModule):
@@ -36,8 +19,6 @@ class LinearScorer(ScoringModule):
     This module uses embeddings generated from a transformer model to train a
     logistic regression classifier for intent classification.
 
-    :ivar classifier_file_name: Filename for saving the classifier to disk.
-    :ivar embedding_model_subdir: Directory for saving the embedding model.
     :ivar name: Name of the scorer, defaults to "linear".
 
     Example
@@ -62,9 +43,10 @@ class LinearScorer(ScoringModule):
 
     """
 
-    classifier_file_name: str = "classifier.joblib"
-    embedding_model_subdir: str = "embedding_model"
     name = "linear"
+    _multilabel: bool
+    _clf: LogisticRegressionCV | MultiOutputClassifier
+    _embedder: Embedder
 
     def __init__(
         self,
@@ -147,7 +129,7 @@ class LinearScorer(ScoringModule):
 
         embedder = Embedder(
             device=self.embedder_device,
-            model_name=self.embedder_name,
+            model_name_or_path=self.embedder_name,
             batch_size=self.embedder_batch_size,
             max_length=self.embedder_max_length,
             use_cache=self.embedder_use_cache,
@@ -181,55 +163,3 @@ class LinearScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         self._embedder.clear_ram()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the LinearScorer's metadata, classifier, and embedder to disk.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self.metadata = LinearScorerDumpDict(
-            multilabel=self._multilabel,
-            embedder_batch_size=self.embedder_batch_size,
-            embedder_max_length=self.embedder_max_length,
-        )
-
-        dump_dir = Path(path)
-
-        metadata_path = dump_dir / self.metadata_dict_name
-        with metadata_path.open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-        # Dump sklearn model
-        clf_path = dump_dir / self.classifier_file_name
-        joblib.dump(self._clf, clf_path)
-
-        # Dump sentence transformer model
-        self._embedder.dump(dump_dir / self.embedding_model_subdir)
-
-    def load(self, path: str) -> None:
-        """
-        Load the LinearScorer's metadata, classifier, and embedder from disk.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        dump_dir = Path(path)
-
-        metadata_path = dump_dir / self.metadata_dict_name
-        with metadata_path.open() as file:
-            metadata: LinearScorerDumpDict = json.load(file)
-        self._multilabel = metadata["multilabel"]
-
-        # Load sklearn model
-        clf_path = dump_dir / self.classifier_file_name
-        self._clf = joblib.load(clf_path)
-
-        # Load sentence transformer model
-        embedder_dir = dump_dir / self.embedding_model_subdir
-        self._embedder = Embedder(
-            device=self.embedder_device,
-            model_name=embedder_dir,
-            batch_size=metadata["embedder_batch_size"],
-            max_length=metadata["embedder_max_length"],
-            use_cache=self.embedder_use_cache,
-        )

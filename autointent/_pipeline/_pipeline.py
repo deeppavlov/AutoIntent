@@ -10,7 +10,7 @@ import numpy.typing as npt
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
@@ -38,11 +38,12 @@ class Pipeline:
             self.logging_config = LoggingConfig(dump_dir=None)
             self.vector_index_config = VectorIndexConfig()
             self.embedder_config = EmbedderConfig()
+            self.cross_encoder_config = CrossEncoderConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig | CrossEncoderConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -54,6 +55,8 @@ class Pipeline:
             self.vector_index_config = config
         elif isinstance(config, EmbedderConfig):
             self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
         else:
             msg = "unknown config type"
             raise TypeError(msg)
@@ -97,7 +100,7 @@ class Pipeline:
                 node_optimizer.fit(context)  # type: ignore[union-attr]
         if not context.vector_index_config.save_db:
             self._logger.info("removing vector database from file system...")
-            context.vector_index_client.delete_db()
+            # TODO clear cache from appdirs
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
@@ -124,6 +127,7 @@ class Pipeline:
         context.set_dataset(dataset, force_multilabel)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
+        context.configure_cross_encoder(self.cross_encoder_config)
 
         self._fit(context)
 

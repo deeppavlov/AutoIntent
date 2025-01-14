@@ -27,7 +27,6 @@ def optimize(cfg: OptimizationConfig) -> None:
 
     logger.debug("Run Name: %s", cfg.logs.run_name)
     logger.debug("logs and assets: %s", cfg.logs.dirpath)
-    logger.debug("Vector index path: %s", cfg.vector_index.db_dir)
 
     # create shared objects for a whole pipeline
     context = Context(cfg.seed)
@@ -35,6 +34,7 @@ def optimize(cfg: OptimizationConfig) -> None:
     context.configure_logging(cfg.logs)
     context.configure_vector_index(cfg.vector_index, cfg.embedder)
     context.configure_data(cfg.data)
+    context.configure_cross_encoder(cfg.cross_encoder)
 
     # run optimization
     search_space_config = load_config(cfg.task.search_space_path, context.is_multilabel(), logger)
