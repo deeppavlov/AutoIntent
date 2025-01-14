@@ -24,14 +24,12 @@ class ScoringModule(Module, ABC):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        main_metric: str,
     ) -> dict[str, float | str]:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 
         :param context: Context containing test set and other data.
         :param split: Target split
-        :param main_metric: Name of main metric for evaluation
         :return: Computed metrics value for the test set or error code of metrics
         """
         if split == "validation":

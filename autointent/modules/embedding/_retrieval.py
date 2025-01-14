@@ -150,14 +150,12 @@ class RetrievalEmbedding(EmbeddingModule):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        main_metric: str,
     ) -> dict[str, float | str]:
         """
         Evaluate the embedding model using a specified metric function.
 
         :param context: The context containing test data and labels.
         :param split: Target split
-        :param main_metric: Name of main metric for evaluation
         :return: Computed metrics value for the test set or error code of metrics
         """
         if split == "validation":

@@ -114,14 +114,12 @@ class RegExp(Module):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        main_metric: str,
     ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
         :param split: Split to score on
-        :param main_metric: Name of main metric for evaluation
         :return: Computed metrics value for the test set or error code of metrics
         """
         # TODO add parameter to a whole pipeline (or just to regexp module):

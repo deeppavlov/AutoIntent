@@ -61,7 +61,7 @@ class NodeOptimizer:
                 self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_name)
-                metrics = module.score(context, "validation", self.metric_name)
+                metrics = module.score(context, "validation")
                 metric_value = metrics[self.metric_name]
 
                 # some metrics can produce error. When main metric produces error raise it.
