@@ -7,9 +7,6 @@ from autointent import VectorIndex
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import LabelType
-from autointent.metrics import RetrievalMetricFn
-from autointent.context.vector_index_client import VectorIndex, VectorIndexClient, get_db_dir
-from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
