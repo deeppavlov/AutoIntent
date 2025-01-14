@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from autointent import Context, Dataset, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import LoggingConfig, VectorIndexConfig
@@ -195,7 +197,7 @@ def test_pipeline_callbacks():
                     "decision_f1": 0.6666666666666666,
                     "decision_precision": 0.625,
                     "decision_recall": 0.75,
-                    "decision_roc_auc": "Only one class present in y_true. ROC AUC score is not defined in that case.",
+                    "decision_roc_auc": np.nan,
                 }
             },
         ),
@@ -209,7 +211,7 @@ def test_pipeline_callbacks():
                     "decision_f1": 0.6666666666666666,
                     "decision_precision": 0.625,
                     "decision_recall": 0.75,
-                    "decision_roc_auc": "Only one class present in y_true. ROC AUC score is not defined in that case.",
+                    "decision_roc_auc": np.nan,
                 }
             },
         ),
