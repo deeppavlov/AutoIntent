@@ -25,6 +25,11 @@ class DummyCallback(OptimizerCallback):
         self.history.append(("log_value", kwargs))
 
     def log_metrics(self, **kwargs: dict[str, Any]) -> None:
+        metrics = kwargs["metrics"]
+        for metric_name, metric_value in metrics.items():
+            if not isinstance(metric_value, str) and np.isnan(metric_value):
+                metrics[metric_name] = None
+        kwargs["metrics"] = metrics
         self.history.append(("log_metric", kwargs))
 
     def end_module(self, **kwargs: dict[str, Any]) -> None:
@@ -197,7 +202,7 @@ def test_pipeline_callbacks():
                     "decision_f1": 0.6666666666666666,
                     "decision_precision": 0.625,
                     "decision_recall": 0.75,
-                    "decision_roc_auc": np.nan,
+                    "decision_roc_auc": None,
                 }
             },
         ),
@@ -211,7 +216,7 @@ def test_pipeline_callbacks():
                     "decision_f1": 0.6666666666666666,
                     "decision_precision": 0.625,
                     "decision_recall": 0.75,
-                    "decision_roc_auc": np.nan,
+                    "decision_roc_auc": None,
                 }
             },
         ),
