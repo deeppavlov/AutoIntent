@@ -137,9 +137,7 @@ class CrossEncoderConfig(TransformerConfig):
 class OptimizationConfig:
     """Configuration for the optimization process."""
 
-    seed: int = 0
-    """Seed for the random number generator"""
-    data: DataConfig = field(default_factory=DataConfig)
+    data: DataConfig
     """Configuration for the data used in the optimization process"""
     task: TaskConfig = field(default_factory=TaskConfig)
     """Configuration for the task to optimize"""
@@ -151,3 +149,5 @@ class OptimizationConfig:
     """Configuration for the embedder"""
     cross_encoder: CrossEncoderConfig = field(default_factory=CrossEncoderConfig)
     """Configuration for the cross encoder"""
+    seed: int = 0
+    """Seed for the random number generator"""
