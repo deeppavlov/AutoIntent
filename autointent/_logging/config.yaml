@@ -16,14 +16,11 @@ formatters:
       line: lineno
       thread_name: threadName
 handlers:
-  stderr:
+  stdout:
     class: logging.StreamHandler
-    level: INFO
     formatter: json
     stream: ext://sys.stdout
 loggers:
   root:
-    level: DEBUG
     handlers:
-    - stderr
-    - file
+    - stdout
