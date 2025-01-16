@@ -179,7 +179,6 @@ def setup(app: Sphinx) -> None:
                 "user_guides.advanced",
                 "Advanced Usage",
             ),
-            ("user_guides.cli", "CLI Usage"),
         ],
         source="user_guides",
         destination=user_guids_dir,
