@@ -69,7 +69,7 @@ class LoggingConfig(BaseModel):
 
     @property
     def safe_run_name(self) -> str:
-        # This property ensures that the type checker knows `run_name` is a `str`
+        """Use this method for type safety instead of :py:attr:`LoggingConfig.run_name`."""
         if self.run_name is None:
             msg = "run_name should not be None after validation"
             raise ValueError(msg)
@@ -77,7 +77,7 @@ class LoggingConfig(BaseModel):
 
     @property
     def safe_dirpath(self) -> Path:
-        # This property ensures that the type checker knows `run_name` is a `str`
+        """Use this method for type safety instead of :py:attr:`LoggingConfig.dirpath`."""
         if self.dirpath is None:
             msg = "dirpath should not be None after validation"
             raise ValueError(msg)
