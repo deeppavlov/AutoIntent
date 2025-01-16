@@ -18,9 +18,10 @@ formatters:
 handlers:
   stdout:
     class: logging.StreamHandler
-    formatter: json
+    formatter: simple
     stream: ext://sys.stdout
 loggers:
   root:
+    level: DEBUG
     handlers:
     - stdout
