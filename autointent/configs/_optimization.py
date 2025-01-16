@@ -54,9 +54,9 @@ class LoggingConfig(BaseModel):
         """Define the directory path. If None, the logs will be saved in the current working directory."""
         if v is None:
             v = Path.cwd() / "runs"
-        return v / info.data["run_name"]
+        return v / str(info.data["run_name"])
 
-    @field_validator("dump_dir", pre=True, always=True)
+    @field_validator("dump_dir", mode="before")
     @classmethod
     def define_dump_dir(cls, v: Path | None, info: ValidationInfo) -> Path:
         """Define the dump directory. If None, the modules will not be dumped."""
@@ -64,6 +64,21 @@ class LoggingConfig(BaseModel):
             v = info.data["dirpath"] / "modules_dumps"
         return v
 
+    @property
+    def safe_run_name(self) -> str:
+        # This property ensures that the type checker knows `run_name` is a `str`
+        if self.run_name is None:
+            msg = "run_name should not be None after validation"
+            raise ValueError(msg)
+        return self.run_name
+
+    @property
+    def safe_dirpath(self) -> Path:
+        # This property ensures that the type checker knows `run_name` is a `str`
+        if self.dirpath is None:
+            msg = "dirpath should not be None after validation"
+            raise ValueError(msg)
+        return self.dirpath
 
 class VectorIndexConfig(BaseModel):
     """Configuration for the vector index."""
