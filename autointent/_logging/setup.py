@@ -25,5 +25,4 @@ def setup_logging(level: LogLevel | str, log_to_filepath: Path | str | None = No
             "filename": str(log_to_filepath),
         }
 
-
     logging.config.dictConfig(config)
