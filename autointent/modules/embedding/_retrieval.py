@@ -36,10 +36,6 @@ class LogRegEmbedding(EmbeddingModule):
 
     Examples
     --------
-    .. testsetup::
-
-        db_dir = "doctests-db"
-
     .. testcode::
 
         from autointent.modules.embedding import LogRegEmbedding
@@ -48,15 +44,8 @@ class LogRegEmbedding(EmbeddingModule):
         retrieval = LogRegEmbedding(
             k=3,
             embedder_name="sergeyzh/rubert-tiny-turbo",
-            db_dir=db_dir,
         )
         retrieval.fit(utterances, labels)
-
-    .. testcleanup::
-
-        import shutil
-        shutil.rmtree(db_dir)
-
     """
 
     classifier: LogisticRegressionCV
@@ -76,7 +65,7 @@ class LogRegEmbedding(EmbeddingModule):
         """
         Initialize the LogRegEmbedding.
 
-        :param cv:
+        :param cv: the number of folds used in LogisticRegressionCV
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
@@ -104,7 +93,7 @@ class LogRegEmbedding(EmbeddingModule):
         """
         Create a LogRegEmbedding instance using a Context object.
 
-        :param cv:
+        :param cv: the number of folds used in LogisticRegressionCV
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
