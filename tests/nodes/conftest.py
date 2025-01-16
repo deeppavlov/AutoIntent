@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import Context
-from autointent.configs._optimization_cli import (
+from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,

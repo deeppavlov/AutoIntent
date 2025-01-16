@@ -1,7 +1,7 @@
 """Dataclasses for the configuration of the :class:`autointent.Embedder` and other objects."""
 
 from ._inference_node import InferenceNodeConfig
-from ._optimization_cli import (
+from ._optimization import (
     CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,

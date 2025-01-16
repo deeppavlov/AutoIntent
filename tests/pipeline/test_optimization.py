@@ -6,13 +6,9 @@ from typing import Literal
 import pytest
 
 from autointent import Pipeline
-from autointent._pipeline._cli_endpoint import optimize
 from autointent.configs import (
-    DataConfig,
     EmbedderConfig,
     LoggingConfig,
-    OptimizationConfig,
-    TaskConfig,
     VectorIndexConfig,
 )
 from autointent.utils import load_search_space
@@ -84,26 +80,3 @@ def test_dump_modules(dataset, task_type):
     context.dump()
 
     assert os.listdir(dump_dir)
-
-
-@pytest.mark.parametrize(
-    "task_type",
-    ["multiclass", "multilabel", "description"],
-)
-def test_optimization_pipeline_cli(task_type):
-    dump_dir, logs_dir = setup_environment()
-    config = OptimizationConfig(
-        data=DataConfig(
-            train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
-            force_multilabel=(task_type == "multilabel"),
-        ),
-        task=TaskConfig(
-            search_space_path=get_search_space_path(task_type),
-        ),
-        vector_index=VectorIndexConfig(),
-        logs=LoggingConfig(
-            dirpath=Path(logs_dir),
-        ),
-        embedder=EmbedderConfig(device="cpu"),
-    )
-    optimize(config)

@@ -2,10 +2,6 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
-
-from hydra.core.config_store import ConfigStore
-from omegaconf import MISSING
 
 from ._name import get_run_name
 
@@ -14,8 +10,8 @@ from ._name import get_run_name
 class DataConfig:
     """Configuration for the data used in the optimization process."""
 
-    train_path: str | Path = MISSING
-    """Path to the training data"""
+    train_path: str | Path
+    """Path to the training data. Can be local path or HF repo."""
     test_path: Path | None = None
     """Path to the testing data. If None, no testing data will be used"""
     force_multilabel: bool = False
@@ -155,58 +151,3 @@ class OptimizationConfig:
     """Configuration for the embedder"""
     cross_encoder: CrossEncoderConfig = field(default_factory=CrossEncoderConfig)
     """Configuration for the cross encoder"""
-
-    defaults: list[Any] = field(
-        default_factory=lambda: [
-            "_self_",
-            {"override hydra/job_logging": "autointent_standard_job_logger"},
-            {"override hydra/help": "autointent_help"},
-        ],
-    )
-
-
-logger_config = {
-    "version": 1,
-    "formatters": {"simple": {"format": "%(asctime)s - %(name)s [%(levelname)s] %(message)s"}},
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-            "stream": "ext://sys.stdout",
-        },
-        "file": {
-            "class": "logging.FileHandler",
-            "formatter": "simple",
-            "filename": "${hydra.runtime.output_dir}/${hydra.job.name}.log",
-        },
-    },
-    "root": {"level": "WARN", "handlers": ["console", "file"]},
-    "disable_existing_loggers": "false",
-}
-
-help_config = {
-    "app_name": "AutoIntent",
-    "header": "== ${hydra.help.app_name} ==",
-    "footer": """
-Powered by Hydra (https://hydra.cc)
-Use --hydra-help to view Hydra specific help""",
-    "template": """
-  ${hydra.help.header}
-
-  This is ${hydra.help.app_name}!
-  == Config ==
-  This is the config generated for this run.
-  You can override everything, for example:
-  python my_app.py db.user=foo db.pass=bar
-  -------
-  $CONFIG
-  -------
-
-  ${hydra.help.footer}""",
-}
-
-
-cs = ConfigStore.instance()
-cs.store(name="optimization_config", node=OptimizationConfig)
-cs.store(name="autointent_standard_job_logger", group="hydra/job_logging", node=logger_config)
-cs.store(name="autointent_help", group="hydra/help", node=help_config)
