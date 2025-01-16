@@ -181,7 +181,6 @@ module = [
     "appdirs",
     "sre_yield",
     "skmultilearn.model_selection",
-    "omegaconf",
     "hydra",
     "hydra.*",
     "transformers",
