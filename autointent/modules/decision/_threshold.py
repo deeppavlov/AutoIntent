@@ -23,7 +23,7 @@ class ThresholdDecisionDumpMetadata(BaseMetadataDict):
 
     multilabel: bool
     tags: list[Tag] | None
-    thresh: float | npt.NDArray[Any]
+    thresh: float | npt.NDArray[Any] | list[float]
     n_classes: int
 
 
@@ -187,7 +187,7 @@ class ThresholdDecision(DecisionModule):
             if metadata["tags"] and isinstance(metadata["tags"], list)
             else None
         )
-        self.thresh = metadata["thresh"]
+        self.thresh = metadata["thresh"]  # type: ignore[assignment]
         self.n_classes = metadata["n_classes"]
         self.metadata = metadata
 

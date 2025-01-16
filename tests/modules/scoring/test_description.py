@@ -14,7 +14,7 @@ from tests.conftest import setup_environment
     ],
 )
 def test_description_scorer(dataset, expected_prediction, multilabel):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     data_handler = DataHandler(dataset, force_multilabel=multilabel)
 
     scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, embedder_device="cpu")
@@ -24,7 +24,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
         data_handler.train_labels(0),
         data_handler.intent_descriptions,
     )
-    assert scorer.description_vectors.shape[0] == len(data_handler.intent_descriptions)
+    assert scorer._description_vectors.shape[0] == len(data_handler.intent_descriptions)
 
     test_utterances = [
         "What is the balance on my account?",

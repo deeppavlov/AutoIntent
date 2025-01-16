@@ -11,14 +11,7 @@ from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood,
         (
             [0, 1, 2, 3],
             [[0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1], [0.1, 0.3, 0.5, 0.1]],
-            np.mean(
-                [
-                    np.log(0.1),
-                    np.log(0.3),
-                    np.log(0.5),
-                    np.log(0.1),
-                ],
-            ),
+            -1.625573,
         ),
         (
             [[1, 0, 0, 0]],

@@ -2,8 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from autointent import VectorIndex
 from autointent.context.data_handler import DataHandler
-from autointent.context.vector_index_client import VectorIndexClient
 from tests.conftest import setup_environment
 
 
@@ -15,13 +15,7 @@ def mock_data_handler():
     return mock
 
 
-@pytest.fixture
-def vector_index():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    return VectorIndexClient(embedder_device="cpu", multilabel=False, n_classes=2, db_dir=db_dir)
-
-
 def test_vector_index_initialization():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    index = VectorIndexClient(embedder_device="cpu", db_dir=db_dir)
+    dump_dir, logs_dir = setup_environment()
+    index = VectorIndex(embedder_device="cpu", embedder_model_name="sergeyzh/rubert-tiny-turbo")
     assert index.embedder_device == "cpu"

@@ -65,6 +65,7 @@ class OptimizationInfo:
         self.trials = Trials()
         self._trials_best_ids = TrialsIds()
         self.modules = ModulesList()
+        self.pipeline_metrics: dict[str, float] = {}
 
     def log_module_optimization(
         self,
@@ -196,6 +197,7 @@ class OptimizationInfo:
         """
         node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NodeType}
         return {
+            "pipeline_metrics": self.pipeline_metrics,
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
         }

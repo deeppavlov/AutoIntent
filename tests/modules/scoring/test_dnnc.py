@@ -8,7 +8,7 @@ from tests.conftest import setup_environment
 
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1)])
 def test_base_dnnc(dataset, train_head, pred_score):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
@@ -17,8 +17,6 @@ def test_base_dnnc(dataset, train_head, pred_score):
         embedder_name="sergeyzh/rubert-tiny-turbo",
         k=3,
         train_head=train_head,
-        db_dir=db_dir,
-        device="cpu",
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))

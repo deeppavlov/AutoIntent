@@ -9,7 +9,7 @@ from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
-from autointent.metrics.regexp import RegexpMetricFn
+from autointent.metrics import REGEXP_METRICS
 from autointent.modules.abc import Module
 from autointent.schemas import Intent
 
@@ -114,13 +114,13 @@ class RegExp(Module):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: RegexpMetricFn,
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
-        :param metric_fn: Metric function
+        :param split: Split to score on
+        :return: Computed metrics value for the test set or error code of metrics
         """
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
@@ -133,7 +133,7 @@ class RegExp(Module):
         if assets["test_matches"] is None:
             msg = "no matches found"
             raise ValueError(msg)
-        return metric_fn(context.data_handler.test_labels(), assets["test_matches"])
+        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), REGEXP_METRICS)
 
     def clear_cache(self) -> None:
         """Clear cache."""

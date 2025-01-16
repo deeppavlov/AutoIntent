@@ -45,6 +45,8 @@ class LoggingConfig:
     """Whether to dump the modules or not"""
     clear_ram: bool = False
     """Whether to clear the RAM after dumping the modules"""
+    report_to: list[str] | None = None
+    """List of callbacks to report to. If None, no callbacks will be used"""
 
     def __post_init__(self) -> None:
         """Define the run name, directory path and dump directory."""
@@ -63,6 +65,18 @@ class LoggingConfig:
             raise ValueError
         self.dirpath = dirpath / self.run_name
 
+    def get_dirpath(self) -> Path:
+        """Get the directory path."""
+        if self.dirpath is None:
+            raise ValueError
+        return self.dirpath
+
+    def get_run_name(self) -> str:
+        """Get the run name."""
+        if self.run_name is None:
+            raise ValueError
+        return self.run_name
+
     def define_dump_dir(self) -> None:
         """Define the dump directory. If None, the modules will not be dumped."""
         if self.dump_dir is None:
@@ -75,14 +89,28 @@ class LoggingConfig:
 class VectorIndexConfig:
     """Configuration for the vector index."""
 
-    db_dir: Path | None = None
-    """Path to the directory where the vector index database will be saved. If None, the database will not be saved"""
     save_db: bool = False
     """Whether to save the vector index database or not"""
 
 
 @dataclass
-class EmbedderConfig:
+class TransformerConfig:
+    """
+    Base class for configuration for the transformer.
+
+    Transformer is used under the hood in :py:class:`autointent.Embedder` and :py:class:`autointent.Ranker`.
+    """
+
+    batch_size: int = 32
+    """Batch size for the embedder"""
+    max_length: int | None = None
+    """Max length for the embedder. If None, the max length will be taken from model config"""
+    device: str = "cpu"
+    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
+
+
+@dataclass
+class EmbedderConfig(TransformerConfig):
     """
     Configuration for the embedder.
 
@@ -91,14 +119,22 @@ class EmbedderConfig:
     Only one model can be used globally.
     """
 
-    batch_size: int = 32
-    """Batch size for the embedder"""
-    max_length: int | None = None
-    """Max length for the embedder. If None, the max length will be taken from model config"""
-    use_cache: bool = False
-    """Flag indicating whether to cache embeddings for reuse, improving performance in repeated operations."""
-    device: str = "cpu"
-    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
+    use_cache: bool = True
+    """Whether to cache embeddings for reuse, improving performance in repeated operations."""
+
+
+@dataclass
+class CrossEncoderConfig(TransformerConfig):
+    """
+    Configuration for the embedder.
+
+    The embedder is used to embed the data before training the model. These parameters
+    will be applied to the embedder used in the optimization process in vector db.
+    Only one model can be used globally.
+    """
+
+    train_head: bool = False
+    """Whether to train the ranking head of a cross encoder."""
 
 
 @dataclass
@@ -117,6 +153,8 @@ class OptimizationConfig:
     """Configuration for the vector index"""
     embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
     """Configuration for the embedder"""
+    cross_encoder: CrossEncoderConfig = field(default_factory=CrossEncoderConfig)
+    """Configuration for the cross encoder"""
 
     defaults: list[Any] = field(
         default_factory=lambda: [

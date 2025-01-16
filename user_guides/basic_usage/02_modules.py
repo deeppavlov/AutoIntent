@@ -34,7 +34,6 @@ At this moment, you do two things:
 - **Configure infrastructure**. You are allowed to
     - choose CUDA device (`embedder_device`)
     - customize embedder batch size (`batch_size`) and truncation length (`embedder_max_length`)
-    - location where to save module's assets (`db_dir`)
 
 ## Load Data
 

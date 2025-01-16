@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.context.vector_index_client import VectorIndexClient
+from autointent import VectorIndex
 from tests.conftest import setup_environment
 
 
@@ -13,18 +13,11 @@ def data_handler():
     return MockDataHandler()
 
 
-def test_vector_index_initialization():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    vector_index_client = VectorIndexClient("cpu", db_dir)
-    assert vector_index_client.embedder_device == "cpu"
-
-
 def test_create_collection(data_handler):
-    db_dir, dump_dir, logs_dir = setup_environment()
-    vector_index_client = VectorIndexClient("cpu", db_dir)
-    vector_index = vector_index_client.create_index(
-        "bert-base-uncased",
+    dump_dir, logs_dir = setup_environment()
+    vector_index = VectorIndex(embedder_model_name="bert-base-uncased", embedder_device="cpu")
+    vector_index.add(
         data_handler.utterances_train,
         data_handler.labels_train,
     )
-    assert vector_index.model_name == "bert-base-uncased"
+    assert vector_index.embedder.model_name == "bert-base-uncased"

@@ -50,7 +50,7 @@ def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
     :return: Score of the decision accuracy
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
-    return np.mean(y_true_ == y_pred_)  # type: ignore[no-any-return]
+    return float(np.mean(y_true_ == y_pred_))
 
 
 def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -83,7 +83,7 @@ def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE
         binarized_pred = (y_pred_ == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
-    return np.mean(roc_auc_scores)  # type: ignore[return-value]
+    return float(np.mean(roc_auc_scores))
 
 
 def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -98,7 +98,7 @@ def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return roc_auc_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
+    return float(roc_auc_score(y_true, y_pred, average="macro"))
 
 
 def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -135,7 +135,7 @@ def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
     :param y_pred: Predicted values of labels
     :return: Score of the decision precision
     """
-    return precision_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
+    return float(precision_score(y_true, y_pred, average="macro"))
 
 
 def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -150,7 +150,7 @@ def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> flo
     :param y_pred: Predicted values of labels
     :return: Score of the decision recall
     """
-    return recall_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
+    return float(recall_score(y_true, y_pred, average="macro"))
 
 
 def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -165,4 +165,4 @@ def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return f1_score(y_true, y_pred, average="macro")  # type: ignore[no-any-return]
+    return float(f1_score(y_true, y_pred, average="macro"))

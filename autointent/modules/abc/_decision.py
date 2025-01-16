@@ -9,7 +9,7 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import LabelType
-from autointent.metrics import DecisionMetricFn
+from autointent.metrics import PREDICTION_METRICS_MULTICLASS
 from autointent.modules.abc import Module
 from autointent.schemas import Tag
 
@@ -44,19 +44,17 @@ class DecisionModule(Module, ABC):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: DecisionMetricFn,
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
         :param split: Target split
-        :param metric_fn: Metric function
-        :return: Score
+        :return: Computed metrics value for the test set or error code of metrics
         """
         labels, scores = get_decision_evaluation_data(context, split)
         self._decisions = self.predict(scores)
-        return metric_fn(labels, self._decisions)
+        return self.score_metrics((labels, self._decisions), PREDICTION_METRICS_MULTICLASS)
 
     def get_assets(self) -> DecisionArtifact:
         """Return useful assets that represent intermediate data into context."""

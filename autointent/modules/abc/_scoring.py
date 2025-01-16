@@ -8,7 +8,7 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import Split
-from autointent.metrics import ScoringMetricFn
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import Module
 
 
@@ -24,15 +24,13 @@ class ScoringModule(Module, ABC):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: ScoringMetricFn,
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 
         :param context: Context containing test set and other data.
         :param split: Target split
-        :param metric_fn: Function to compute the scoring metric.
-        :return: Computed metric value for the test set.
+        :return: Computed metrics value for the test set or error code of metrics
         """
         if split == "validation":
             utterances = context.data_handler.validation_utterances(0)
@@ -58,7 +56,8 @@ class ScoringModule(Module, ABC):
         self._validation_scores = self.predict(context.data_handler.validation_utterances(1))
         self._test_scores = self.predict(context.data_handler.test_utterances())
 
-        return metric_fn(labels, scores)
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        return self.score_metrics((labels, scores), metrics_dict)
 
     def get_assets(self) -> ScorerArtifact:
         """
