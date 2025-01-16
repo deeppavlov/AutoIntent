@@ -1,13 +1,13 @@
 """Configuration for the optimization process."""
 
-from dataclasses import dataclass, field
 from pathlib import Path
+
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from ._name import get_run_name
 
 
-@dataclass
-class DataConfig:
+class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
 
     train_path: str | Path
@@ -18,16 +18,14 @@ class DataConfig:
     """Force multilabel classification even if the data is multiclass"""
 
 
-@dataclass
-class TaskConfig:
+class TaskConfig(BaseModel):
     """Configuration for the task to optimize."""
 
     search_space_path: Path | None = None
     """Path to the search space configuration file. If None, the default search space will be used"""
 
 
-@dataclass
-class LoggingConfig:
+class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
     run_name: str | None = None
@@ -44,53 +42,37 @@ class LoggingConfig:
     report_to: list[str] | None = None
     """List of callbacks to report to. If None, no callbacks will be used"""
 
-    def __post_init__(self) -> None:
-        """Define the run name, directory path and dump directory."""
-        self.define_run_name()
-        self.define_dirpath()
-        self.define_dump_dir()
-
-    def define_run_name(self) -> None:
+    @field_validator("run_name", mode="before")
+    @classmethod
+    def define_run_name(cls, v: str | None) -> str:
         """Define the run name. If None, a random name will be generated."""
-        self.run_name = get_run_name(self.run_name)
+        return get_run_name(v)
 
-    def define_dirpath(self) -> None:
+    @field_validator("dirpath", mode="before")
+    @classmethod
+    def define_dirpath(cls, v: Path | None, info: ValidationInfo) -> Path:
         """Define the directory path. If None, the logs will be saved in the current working directory."""
-        dirpath = Path.cwd() / "runs" if self.dirpath is None else self.dirpath
-        if self.run_name is None:
-            raise ValueError
-        self.dirpath = dirpath / self.run_name
+        if v is None:
+            v = Path.cwd() / "runs"
+        return v / info.data["run_name"]
 
-    def get_dirpath(self) -> Path:
-        """Get the directory path."""
-        if self.dirpath is None:
-            raise ValueError
-        return self.dirpath
-
-    def get_run_name(self) -> str:
-        """Get the run name."""
-        if self.run_name is None:
-            raise ValueError
-        return self.run_name
-
-    def define_dump_dir(self) -> None:
+    @field_validator("dump_dir", pre=True, always=True)
+    @classmethod
+    def define_dump_dir(cls, v: Path | None, info: ValidationInfo) -> Path:
         """Define the dump directory. If None, the modules will not be dumped."""
-        if self.dump_dir is None:
-            if self.dirpath is None:
-                raise ValueError
-            self.dump_dir = self.dirpath / "modules_dumps"
+        if v is None:
+            v = info.data["dirpath"] / "modules_dumps"
+        return v
 
 
-@dataclass
-class VectorIndexConfig:
+class VectorIndexConfig(BaseModel):
     """Configuration for the vector index."""
 
     save_db: bool = False
     """Whether to save the vector index database or not"""
 
 
-@dataclass
-class TransformerConfig:
+class TransformerConfig(BaseModel):
     """
     Base class for configuration for the transformer.
 
@@ -105,7 +87,6 @@ class TransformerConfig:
     """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
 
 
-@dataclass
 class EmbedderConfig(TransformerConfig):
     """
     Configuration for the embedder.
@@ -119,7 +100,6 @@ class EmbedderConfig(TransformerConfig):
     """Whether to cache embeddings for reuse, improving performance in repeated operations."""
 
 
-@dataclass
 class CrossEncoderConfig(TransformerConfig):
     """
     Configuration for the embedder.
@@ -133,21 +113,20 @@ class CrossEncoderConfig(TransformerConfig):
     """Whether to train the ranking head of a cross encoder."""
 
 
-@dataclass
-class OptimizationConfig:
+class OptimizationConfig(BaseModel):
     """Configuration for the optimization process."""
 
     data: DataConfig
     """Configuration for the data used in the optimization process"""
-    task: TaskConfig = field(default_factory=TaskConfig)
+    task: TaskConfig = Field(default_factory=TaskConfig)
     """Configuration for the task to optimize"""
-    logs: LoggingConfig = field(default_factory=LoggingConfig)
+    logs: LoggingConfig = Field(default_factory=LoggingConfig)
     """Configuration for the logging"""
-    vector_index: VectorIndexConfig = field(default_factory=VectorIndexConfig)
+    vector_index: VectorIndexConfig = Field(default_factory=VectorIndexConfig)
     """Configuration for the vector index"""
-    embedder: EmbedderConfig = field(default_factory=EmbedderConfig)
+    embedder: EmbedderConfig = Field(default_factory=EmbedderConfig)
     """Configuration for the embedder"""
-    cross_encoder: CrossEncoderConfig = field(default_factory=CrossEncoderConfig)
+    cross_encoder: CrossEncoderConfig = Field(default_factory=CrossEncoderConfig)
     """Configuration for the cross encoder"""
     seed: int = 0
     """Seed for the random number generator"""
