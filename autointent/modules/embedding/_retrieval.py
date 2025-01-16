@@ -17,20 +17,9 @@ from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_M
 from autointent.modules.abc import EmbeddingModule
 
 
-class RetrievalMetadata(BaseMetadataDict):
-    """Metadata class for RetrievalEmbedding."""
-
-    db_dir: str
-    batch_size: int
-    max_length: int | None
-
-
 class LogRegMetadata(BaseMetadataDict):
     """Metadata class for LogisticRegressionCV and LabelEncoder."""
 
-    db_dir: str
-    batch_size: int
-    max_length: int | None
     classes: list[str]
 
 
@@ -79,17 +68,17 @@ class LogRegEmbedding(EmbeddingModule):
         k: int,
         embedder_name: str,
         cv: int = 3,
-        db_dir: str | None = None,
         embedder_device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
-        embedder_use_cache: bool = False,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
+        embedder_use_cache: bool = True,
     ) -> None:
         """
-        Initialize the RetrievalEmbedding.
+        Initialize the LogRegEmbedding.
 
+        :param cv:
+        :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
-        :param db_dir: Path to the database directory. If None, defaults will be used.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation.
         :param max_length: Maximum sequence length for embeddings. None if not set.
@@ -97,9 +86,8 @@ class LogRegEmbedding(EmbeddingModule):
         """
         self.embedder_name = embedder_name
         self.embedder_device = embedder_device
-        self._db_dir = db_dir
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
         self.cv = cv
 
@@ -116,7 +104,9 @@ class LogRegEmbedding(EmbeddingModule):
         """
         Create a LogRegEmbedding instance using a Context object.
 
+        :param cv:
         :param context: The context containing configurations and utilities.
+        :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
         :return: Initialized LogRegEmbedding instance.
         """
@@ -124,12 +114,14 @@ class LogRegEmbedding(EmbeddingModule):
             k=k,
             cv=cv,
             embedder_name=embedder_name,
-            db_dir=str(context.get_db_dir()),
             embedder_device=context.get_device(),
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
             embedder_use_cache=context.get_use_cache(),
         )
+
+    def clear_cache(self) -> None:
+        """Clear cached data in memory used by the vector index."""
 
     def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
         """
@@ -140,23 +132,15 @@ class LogRegEmbedding(EmbeddingModule):
         """
         self._multilabel = isinstance(labels[0], list)
 
-        self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
-        )
-        self._vector_index.add(utterances, labels)
-
         self.embedder = Embedder(
             device=self.embedder_device,
-            model_name=self.embedder_name,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            model_name_or_path=self.embedder_name,
+            batch_size=self.embedder_batch_size,
+            max_length=self.embedder_max_length,
             use_cache=self.embedder_use_cache,
         )
         embeddings = self.embedder.embed(utterances)
+
         if self._multilabel:
             self.label_encoder = MultiLabelBinarizer()
             encoded_labels = self.label_encoder.fit_transform(labels)
@@ -209,42 +193,33 @@ class LogRegEmbedding(EmbeddingModule):
         """
         return RetrieverArtifact(embedder_name=self.embedder_name)
 
-    def clear_cache(self) -> None:
-        """Clear cached data in memory used by the vector index."""
-        self.vector_index.clear_ram()
-
-    def dump(self, path: str) -> None:
+    def dump(self, path: Path) -> None:
         """
         Save the module's metadata, classifier parameters, and label encoder to a specified directory.
 
         :param path: Path to the directory where assets will be dumped.
         """
-        self.metadata = LogRegMetadata(
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-            db_dir=str(self.db_dir),
+        metadata = LogRegMetadata(
             classes=self.label_encoder.classes_.tolist(),
         )
 
-        self._vector_index.dump(Path(path))
+        path.mkdir(parents=True, exist_ok=True)
+        with (path / self.metadata_dict_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
 
         classifier_path = "classifier.joblib"
-        joblib.dump(self.classifier, classifier_path)
+        joblib.dump(self.classifier, path / classifier_path)
 
-    def load(self, path: str) -> None:
+    def load(self, path: Path) -> None:
         """
         Load the module's metadata and model parameters from a specified directory.
 
         :param path: Path to the directory containing the dumped assets.
         """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
+        with (path / self.metadata_dict_name).open() as file:
             self.metadata: LogRegMetadata = json.load(file)
 
-        self._vector_index = VectorIndex.load(Path(path))
-
-        classifier_path = dump_dir / "classifier.joblib"
+        classifier_path = path / "classifier.joblib"
         self.classifier = joblib_load(classifier_path)
         self.label_encoder = LabelEncoder()
         self.label_encoder.classes_ = self.metadata["classes"]
