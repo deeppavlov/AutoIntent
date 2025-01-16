@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ._name import get_run_name
 
@@ -42,27 +42,30 @@ class LoggingConfig(BaseModel):
     report_to: list[str] | None = None
     """List of callbacks to report to. If None, no callbacks will be used"""
 
-    @field_validator("run_name", mode="before")
-    @classmethod
-    def define_run_name(cls, v: str | None) -> str:
+    @model_validator(mode="after")
+    def fill_nones(self) -> "LoggingConfig":
+        self.define_run_name()
+        self.define_dirpath()
+        self.define_dump_dir()
+        return self
+
+    def define_run_name(self) -> None:
         """Define the run name. If None, a random name will be generated."""
-        return get_run_name(v)
+        self.run_name = get_run_name(self.run_name)
 
-    @field_validator("dirpath", mode="before")
-    @classmethod
-    def define_dirpath(cls, v: Path | None, info: ValidationInfo) -> Path:
+    def define_dirpath(self) -> None:
         """Define the directory path. If None, the logs will be saved in the current working directory."""
-        if v is None:
-            v = Path.cwd() / "runs"
-        return v / str(info.data["run_name"])
+        dirpath = Path.cwd() / "runs" if self.dirpath is None else self.dirpath
+        if self.run_name is None:
+            raise ValueError
+        self.dirpath = dirpath / self.run_name
 
-    @field_validator("dump_dir", mode="before")
-    @classmethod
-    def define_dump_dir(cls, v: Path | None, info: ValidationInfo) -> Path:
+    def define_dump_dir(self) -> None:
         """Define the dump directory. If None, the modules will not be dumped."""
-        if v is None:
-            v = info.data["dirpath"] / "modules_dumps"
-        return v
+        if self.dump_dir is None:
+            if self.dirpath is None:
+                raise ValueError
+            self.dump_dir = self.dirpath / "modules_dumps"
 
     @property
     def safe_run_name(self) -> str:
@@ -79,6 +82,7 @@ class LoggingConfig(BaseModel):
             msg = "dirpath should not be None after validation"
             raise ValueError(msg)
         return self.dirpath
+
 
 class VectorIndexConfig(BaseModel):
     """Configuration for the vector index."""
