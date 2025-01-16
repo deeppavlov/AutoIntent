@@ -40,7 +40,10 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
 
@@ -58,7 +61,10 @@ def test_save_db(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
 
@@ -76,7 +82,10 @@ def test_dump_modules(dataset, task_type):
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
     assert os.listdir(dump_dir)

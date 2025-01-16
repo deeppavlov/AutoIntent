@@ -36,7 +36,10 @@ def test_inference_config(dataset, task_type):
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
     pipeline_optimizer.set_config(CrossEncoderConfig())
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     inference_config = context.optimization_info.get_inference_nodes_config()
 
     inference_pipeline = Pipeline.from_config(inference_config)
@@ -67,7 +70,10 @@ def test_inference_context(dataset, task_type):
     pipeline.set_config(VectorIndexConfig(save_db=True))
     pipeline.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline.fit(dataset)
     utterances = ["123", "hello world"]
     prediction = pipeline.predict(utterances)
 
