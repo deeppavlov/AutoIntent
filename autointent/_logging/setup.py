@@ -8,7 +8,17 @@ import yaml
 from autointent.custom_types import LogLevel
 
 
-def setup_logging(level: LogLevel | str, log_to_filepath: Path | str | None = None) -> None:
+def setup_logging(level: LogLevel | str, log_filename: Path | str | None = None) -> None:
+    """
+    Set stdout and file handlers for logging autointent internal actions.
+
+    The first parameter affects the logs to the standard output stream. The second parameter is optional.
+    If it is specified, then the "DEBUG" messages are logged to the file,
+    regardless of what is specified by the first parameter.
+
+    :param level: one of "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+    :param log_to_filepath: specify location of logfile, omit extension as suffix ``.log.jsonl`` will be appended.
+    """
     config_file = ires.files("autointent._logging").joinpath("config.yaml")
     with config_file.open() as f_in:
         config = yaml.safe_load(f_in)
@@ -16,13 +26,13 @@ def setup_logging(level: LogLevel | str, log_to_filepath: Path | str | None = No
     level = LogLevel(level)
     config["handlers"]["stdout"]["level"] = level.value
 
-    if log_to_filepath is not None:
+    if log_filename is not None:
         config["loggers"]["root"]["handlers"].append("file")
         config["handlers"]["file"] = {
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "json",
-            "filename": str(log_to_filepath),
+            "filename": str(log_filename) + ".log.jsonl",
         }
 
     logging.config.dictConfig(config)
