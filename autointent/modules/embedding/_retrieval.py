@@ -44,6 +44,7 @@ class LogRegEmbedding(EmbeddingModule):
         retrieval = LogRegEmbedding(
             k=3,
             embedder_name="sergeyzh/rubert-tiny-turbo",
+            cv=2
         )
         retrieval.fit(utterances, labels)
     """
