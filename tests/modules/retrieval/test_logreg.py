@@ -1,5 +1,4 @@
 import shutil
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -9,15 +8,13 @@ from tests.conftest import setup_environment
 
 
 def test_get_assets_returns_correct_artifact_for_logreg():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
     artifact = module.get_assets()
     assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"
 
 
 def test_fit_trains_model():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -29,8 +26,7 @@ def test_fit_trains_model():
 
 
 def test_score_evaluates_model():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -50,19 +46,17 @@ def test_score_evaluates_model():
 
 
 def test_dump_and_load_preserves_model_state():
-    db_dir, dump_dir, logs_dir = setup_environment()
-    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
+    dump_dir, _ = setup_environment()
+    module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
 
-    dump_path = Path(dump_dir)
-    dump_path.mkdir(parents=True, exist_ok=True)
-    module.dump(str(dump_path))
+    module.dump(dump_dir)
 
-    loaded_module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo", db_dir=db_dir)
-    loaded_module.load(str(dump_path))
+    loaded_module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
+    loaded_module.load(dump_dir)
     epsilon = 1e-6
 
     assert np.allclose(loaded_module.classifier.coef_, module.classifier.coef_, atol=epsilon)
@@ -70,4 +64,4 @@ def test_dump_and_load_preserves_model_state():
     assert np.array_equal(np.array(loaded_module.label_encoder.classes_), np.array(module.label_encoder.classes_))
     assert loaded_module.embedder_name == module.embedder_name
 
-    shutil.rmtree(dump_path)
+    shutil.rmtree(dump_dir)
