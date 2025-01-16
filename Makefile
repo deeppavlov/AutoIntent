@@ -24,7 +24,7 @@ lint:
 
 .PHONY: sync
 sync:
-	poetry sync
+	poetry sync --with dev,test,typing,docs
 
 .PHONY: docs
 docs:
