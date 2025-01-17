@@ -28,11 +28,14 @@ def setup_logging(level: LogLevel | str, log_filename: Path | str | None = None)
 
     if log_filename is not None:
         config["loggers"]["root"]["handlers"].append("file")
+
+        filename = str(log_filename) + ".log.jsonl"
         config["handlers"]["file"] = {
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "json",
-            "filename": str(log_filename) + ".log.jsonl",
+            "filename": filename,
         }
+        Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
     logging.config.dictConfig(config)
