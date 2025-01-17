@@ -69,7 +69,7 @@ If you don't have to customize logging, you can export our configuration. Everyt
 # %%
 from autointent import setup_logging
 
-setup_logging("INFO", log_to_filepath="tests/logs/my_exp")
+setup_logging("INFO", log_to_filename="tests/logs/my_exp")
 # %%
 """
 The first parameter affects the logs to the standard output stream. The second parameter is optional. If it is specified, then the "DEBUG" messages are logged to the file, regardless of what is specified by the first parameter.
