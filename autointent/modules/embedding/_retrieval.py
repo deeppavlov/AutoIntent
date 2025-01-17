@@ -13,7 +13,12 @@ from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 from autointent import Context, Embedder, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL, ScoringMetricFn
+from autointent.metrics import (
+    RETRIEVAL_METRICS_MULTICLASS,
+    RETRIEVAL_METRICS_MULTILABEL,
+    SCORING_METRICS_MULTICLASS,
+    SCORING_METRICS_MULTILABEL,
+)
 from autointent.modules.abc import EmbeddingModule
 
 
@@ -149,14 +154,12 @@ class LogRegEmbedding(EmbeddingModule):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: ScoringMetricFn,
     ) -> float:
         """
         Evaluate the model using a specified metric function.
 
         :param context: The context containing test data and labels.
         :param split: Target split ("validation" or "test").
-        :param metric_fn: Function to compute the retrieval metric.
         :return: Computed metric score.
         """
         if split == "validation":
@@ -173,7 +176,8 @@ class LogRegEmbedding(EmbeddingModule):
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
-        return metric_fn(labels, predicted_labels.reshape(-1, 1))
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        return self.score_metrics(([labels], [predicted_labels]), metrics_dict)
 
     def get_assets(self) -> RetrieverArtifact:
         """
