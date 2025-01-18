@@ -1,44 +1,49 @@
-import json
-import os
-from argparse import ArgumentParser
-from typing import Any
+"""CLI for basic utterance generator."""
 
+from argparse import ArgumentParser
+
+from autointent import load_dataset
 from autointent.generation.utterances.basic.utterance_generator import LengthType, StyleType, UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
 
 
-def read_json_dataset(file_path: os.PathLike):
-    with open(file_path) as file:
-        return json.load(file)
-
-
-def save_json_dataset(file_path: os.PathLike, intents: list[dict[str, Any]]):
-    dirname = os.path.dirname(file_path)
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
-    with open(file_path, "w") as file:
-        json.dump(intents, file, indent=4, ensure_ascii=False)
-
-
-def main():
+def main() -> None:
+    """ClI endpoint."""
     parser = ArgumentParser()
     parser.add_argument(
         "--input-path",
         type=str,
         required=True,
-        help="Path to json with intent records",
+        help="Path to json or hugging face repo with dataset",
     )
     parser.add_argument(
         "--output-path",
         type=str,
         required=True,
-        help="Where to save result",
+        help="Local path where to save result",
     )
     parser.add_argument(
-        "--n-shots",
+        "--output-repo",
+        type=str,
+        default=None,
+        help="Local path where to save result",
+    )
+    parser.add_argument(
+        "--private",
+        action="store_true",
+        help="Publish privately if --output-repo option is used"
+    )
+    parser.add_argument(
+        "--n-generations",
         type=int,
-        required=True,
+        default=5,
         help="Number of utterances to generate for each intent",
+    )
+    parser.add_argument(
+        "--n-sample-utterances",
+        type=int,
+        default=5,
+        help="Number of utterances to use as an example for augmentation",
     )
     parser.add_argument(
         "--custom-instruction",
@@ -66,14 +71,12 @@ def main():
     )
     args = parser.parse_args()
 
-    intents = read_json_dataset(args.input_path)
-
+    dataset = load_dataset(args.input_path)
     generator = UtteranceGenerator(Generator(), args.custom_instruction, args.length, args.style, args.same_punctuation)
-    for intent_record in intents:
-        generator(intent_record, args.n_shots, inplace=True)
+    generator.augment(dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances)
 
-    save_json_dataset(args.output_path, intents)
-
+    if args.output_repo is not None:
+        dataset.push_to_hub(args.output_repo)
 
 if __name__ == "__main__":
     main()
