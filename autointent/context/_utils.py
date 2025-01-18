@@ -40,7 +40,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def load_data(filepath: str | Path) -> Dataset:
+def load_dataset(filepath: str | Path) -> Dataset:
     """
     Load data from a specified path or use default sample data.
 
