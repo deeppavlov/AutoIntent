@@ -1,3 +1,3 @@
-from .scorer import SklearnScorer
+from .sklearn_scorer import SklearnScorer
 
 __all__ = ["SklearnScorer"]

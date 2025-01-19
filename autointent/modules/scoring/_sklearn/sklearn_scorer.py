@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +15,19 @@ from autointent import Context, Embedder
 from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.modules.abc import ScoringModule
 
-AVAILIABLE_CLASSIFIERS = {name: class_ for name, class_ in all_estimators() if hasattr(class_, "predict_proba")}
+logger = logging.getLogger(__name__)
+AVAILIABLE_CLASSIFIERS = {
+    name: class_
+    for name, class_ in all_estimators(
+        type_filter=[
+            # remove transformer (e.g. TfidfTransformer) from the list of available classifiers
+            "classifier",
+            "regressor",
+            "cluster",
+        ]
+    )
+    if hasattr(class_, "predict_proba")
+}
 
 
 class SklearnScorerDumpDict(BaseMetadataDict):
@@ -64,7 +77,7 @@ class SklearnScorer(ScoringModule):
         max_length: int | None = None,
     ) -> None:
         """
-        Initialize the LinearScorer.
+        Initialize the SklearnScorer.
 
         :param embedder_name: Name of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
@@ -84,7 +97,7 @@ class SklearnScorer(ScoringModule):
         self.batch_size = batch_size
         self.max_length = max_length
         self.clf_name = clf_name
-        self.clf_args = clf_args
+        self.clf_args = clf_args or {}
 
     @classmethod
     def from_context(
@@ -122,7 +135,7 @@ class SklearnScorer(ScoringModule):
         labels: list[LabelType],
     ) -> None:
         """
-        Train the chosen skearn classifier.
+        Train the chosen sklearn classifier.
 
         :param utterances: List of training utterances.
         :param labels: List of labels corresponding to the utterances.
@@ -137,11 +150,11 @@ class SklearnScorer(ScoringModule):
             max_length=self.max_length,
         )
         features = embedder.embed(utterances)
-        self.clf_args = {} if self.clf_args is None else self.clf_args
         if AVAILIABLE_CLASSIFIERS.get(self.clf_name):
             base_clf = AVAILIABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
+            logger.error(msg)
             raise ValueError(msg)
 
         clf = MultiOutputClassifier(base_clf) if self._multilabel else base_clf
@@ -170,7 +183,7 @@ class SklearnScorer(ScoringModule):
 
     def dump(self, path: str) -> None:
         """
-        Save the LinearScorer's metadata, classifier, and embedder to disk.
+        Save the SklearnScorer's metadata, classifier, and embedder to disk.
 
         :param path: Path to the directory where assets will be dumped.
         """

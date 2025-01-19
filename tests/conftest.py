@@ -7,7 +7,7 @@ import pytest
 from autointent import Dataset
 
 
-def setup_environment() -> tuple[Path, Path, Path]:
+def setup_environment() -> tuple[Path, Path]:
     logs_dir = ires.files("tests").joinpath("logs") / str(uuid4())
     dump_dir = logs_dir / "modules_dump"
     return dump_dir, logs_dir
