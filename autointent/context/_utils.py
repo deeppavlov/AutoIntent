@@ -4,7 +4,6 @@ This module provides utilities for loading datasets and serializing objects
 that include numpy data types.
 """
 
-import importlib.resources as ires
 import json
 from pathlib import Path
 from typing import Any
@@ -12,7 +11,7 @@ from typing import Any
 import numpy as np
 from omegaconf import ListConfig
 
-from .data_handler import Dataset
+from autointent import Dataset
 
 
 class NumpyEncoder(json.JSONEncoder):
@@ -55,11 +54,9 @@ def load_data(filepath: str | Path) -> Dataset:
     :return: A `Dataset` object containing the loaded data.
     """
     if filepath == "default-multiclass":
-        return Dataset.from_json(
-            ires.files("autointent.datafiles").joinpath("banking77.json"),  # type: ignore[arg-type]
-        )
+        return Dataset.from_hub("AutoIntent/clinc150_subset")
     if filepath == "default-multilabel":
-        return Dataset.from_json(
-            ires.files("autointent.datafiles").joinpath("dstc3-20shot.json"),  # type: ignore[arg-type]
-        )
+        return Dataset.from_hub("AutoIntent/clinc150_subset").to_multilabel()
+    if not Path(filepath).exists():
+        return Dataset.from_hub(str(filepath))
     return Dataset.from_json(filepath)

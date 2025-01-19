@@ -1,6 +1,8 @@
-from ._node import InferenceNodeConfig, NodeOptimizerConfig
+"""Dataclasses for the configuration of the :class:`autointent.Embedder` and other objects."""
+
+from ._inference_node import InferenceNodeConfig
 from ._optimization_cli import (
-    AugmentationConfig,
+    CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -10,12 +12,12 @@ from ._optimization_cli import (
 )
 
 __all__ = [
-    "AugmentationConfig",
+    "CrossEncoderConfig",
     "DataConfig",
     "EmbedderConfig",
     "InferenceNodeConfig",
+    "InferenceNodeConfig",
     "LoggingConfig",
-    "NodeOptimizerConfig",
     "OptimizationConfig",
     "TaskConfig",
     "VectorIndexConfig",

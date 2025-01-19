@@ -1,6 +1,6 @@
 """Module for managing pipeline optimization.
 
-This module handles the tracking, logging, and retrieval of optimization artifacts,
+This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
 
@@ -17,7 +17,7 @@ from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact
 from ._logger import get_logger
 
 if TYPE_CHECKING:
-    from autointent.modules import Module
+    from autointent.modules.abc import Module
 
 
 @dataclass
@@ -25,15 +25,15 @@ class ModulesList:
     """Container for managing lists of modules for each node type."""
 
     regexp: list["Module"] = field(default_factory=list)
-    retrieval: list["Module"] = field(default_factory=list)
+    embedding: list["Module"] = field(default_factory=list)
     scoring: list["Module"] = field(default_factory=list)
-    prediction: list["Module"] = field(default_factory=list)
+    decision: list["Module"] = field(default_factory=list)
 
     def get(self, node_type: str) -> list["Module"]:
         """
         Retrieve the list of modules for a specific node type.
 
-        :param node_type: The type of node (e.g., "regexp", "retrieval").
+        :param node_type: The type of node (e.g., "regexp", "embedding").
         :return: List of modules for the specified node type.
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]
@@ -65,11 +65,12 @@ class OptimizationInfo:
         self.trials = Trials()
         self._trials_best_ids = TrialsIds()
         self.modules = ModulesList()
+        self.pipeline_metrics: dict[str, float] = {}
 
     def log_module_optimization(
         self,
         node_type: str,
-        module_type: str,
+        module_name: str,
         module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
@@ -81,7 +82,7 @@ class OptimizationInfo:
         Log optimization results for a module.
 
         :param node_type: Type of the node being optimized.
-        :param module_type: Type of the module.
+        :param module_name: Type of the module.
         :param module_params: Parameters of the module for the trial.
         :param metric_value: Metric value achieved by the module.
         :param metric_name: Name of the evaluation metric.
@@ -90,7 +91,7 @@ class OptimizationInfo:
         :param module: The module instance, if available.
         """
         trial = Trial(
-            module_type=module_type,
+            module_name=module_name,
             metric_name=metric_name,
             metric_value=metric_value,
             module_params=module_params,
@@ -144,7 +145,7 @@ class OptimizationInfo:
 
         :return: Name of the best embedder.
         """
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.retrieval)  # type: ignore[assignment]
+        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
         return best_retriever_artifact.embedder_name
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:
@@ -196,11 +197,12 @@ class OptimizationInfo:
         """
         node_wise_metrics = {node_type: self._get_metrics_values(node_type) for node_type in NodeType}
         return {
+            "pipeline_metrics": self.pipeline_metrics,
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
         }
 
-    def get_inference_nodes_config(self) -> list[InferenceNodeConfig]:
+    def get_inference_nodes_config(self, asdict: bool = False) -> list[InferenceNodeConfig]:
         """
         Generate configuration for inference nodes based on the best trials.
 
@@ -212,15 +214,14 @@ class OptimizationInfo:
             if idx is None:
                 continue
             trial = self.trials.get_trial(node_type, idx)
-            res.append(
-                InferenceNodeConfig(
-                    node_type=node_type,
-                    module_type=trial.module_type,
-                    module_config=trial.module_params,
-                    load_path=trial.module_dump_dir,
-                ),
-            )
-        return res
+            item = {
+                "node_type": node_type.value,
+                "module_name": trial.module_name,
+                "module_config": trial.module_params,
+                "load_path": trial.module_dump_dir,
+            }
+            res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
+        return res  # type: ignore[return-value]
 
     def _get_best_module(self, node_type: str) -> "Module | None":
         """

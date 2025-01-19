@@ -6,7 +6,7 @@ from tests.conftest import setup_environment
 
 
 def test_base_rerank_scorer(dataset):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
 
     data_handler = DataHandler(dataset)
 
@@ -16,8 +16,7 @@ def test_base_rerank_scorer(dataset):
         embedder_name="sergeyzh/rubert-tiny-turbo",
         m=2,
         cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-        db_dir=db_dir,
-        device="cpu",
+        embedder_device="cpu",
     )
 
     test_data = [
@@ -31,7 +30,16 @@ def test_base_rerank_scorer(dataset):
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     predictions = scorer.predict(test_data)
     assert (
-        predictions == np.array([[0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0]])
+        predictions
+        == np.array(
+            [
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+            ]
+        )
     ).all()
 
     predictions, metadata = scorer.predict_with_metadata(test_data)

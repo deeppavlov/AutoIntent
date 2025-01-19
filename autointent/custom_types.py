@@ -7,15 +7,6 @@ the AutoIntent framework for improved type safety and clarity.
 from enum import Enum
 from typing import Literal, TypedDict
 
-# Literal type for task types
-TASK_TYPES = Literal["multiclass", "multilabel", "multiclass_as_multilabel"]
-"""
-Represents the supported task types in AutoIntent:
-- "multiclass": Single-label classification.
-- "multilabel": Multi-label classification.
-- "multiclass_as_multilabel": Multi-class treated as multi-label.
-"""
-
 
 class LogLevel(Enum):
     """Logging levels for the AutoIntent framework."""
@@ -30,7 +21,8 @@ class LogLevel(Enum):
 # Literal type for weight types in specific operations
 WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
 """
-Represents weight calculation methods:
+Represents weight calculation methods
+
 - "uniform": Equal weight for all elements.
 - "distance": Weights based on distance.
 - "closest": Prioritizes closest elements.
@@ -39,7 +31,8 @@ Represents weight calculation methods:
 # Type alias for label representation
 LabelType = int | list[int]
 """
-Type alias for label representation:
+Type alias for label representation
+
 - `int`: For single-label classification.
 - `list[int]`: For multi-label classification.
 """
@@ -53,6 +46,24 @@ class NodeType(str, Enum):
     """Enumeration of node types in the AutoIntent pipeline."""
 
     regexp = "regexp"
-    retrieval = "retrieval"
+    embedding = "embedding"
     scoring = "scoring"
-    prediction = "prediction"
+    decision = "decision"
+
+
+class Split:
+    """
+    Constants representing dataset splits.
+
+    :cvar str TRAIN: Training split.
+    :cvar str VALIDATION: Validation split.
+    :cvar str TEST: Testing split.
+    :cvar str OOS: Out-of-scope split.
+    :cvar str INTENTS: Intents split.
+    """
+
+    TRAIN = "train"
+    VALIDATION = "validation"
+    TEST = "test"
+    OOS = "oos"
+    INTENTS = "intents"

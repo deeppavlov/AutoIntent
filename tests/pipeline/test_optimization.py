@@ -5,7 +5,9 @@ from typing import Literal
 
 import pytest
 
-from autointent.configs._optimization_cli import (
+from autointent import Pipeline
+from autointent._pipeline._cli_endpoint import optimize
+from autointent.configs import (
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -13,8 +15,7 @@ from autointent.configs._optimization_cli import (
     TaskConfig,
     VectorIndexConfig,
 )
-from autointent.pipeline import Pipeline
-from autointent.pipeline._cli_endpoint import load_config, optimize
+from autointent.utils import load_search_space
 from tests.conftest import setup_environment
 
 TaskType = Literal["multiclass", "multilabel", "description"]
@@ -26,7 +27,7 @@ def get_search_space_path(task_type: TaskType):
 
 def get_search_space(task_type: TaskType):
     path = get_search_space_path(task_type)
-    return load_config(str(path), multilabel=task_type == "multilabel")
+    return load_search_space(path)
 
 
 @pytest.mark.parametrize(
@@ -34,16 +35,16 @@ def get_search_space(task_type: TaskType):
     ["multiclass", "multilabel", "description"],
 )
 def test_no_context_optimization(dataset, task_type):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig())
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
     context.dump()
 
 
@@ -52,19 +53,17 @@ def test_no_context_optimization(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_save_db(dataset, task_type):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), save_db=True, device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
     context.dump()
-
-    assert os.listdir(db_dir)
 
 
 @pytest.mark.parametrize(
@@ -72,16 +71,16 @@ def test_save_db(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_dump_modules(dataset, task_type):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(db_dir=Path(db_dir).resolve(), device="cpu"))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32))
+    pipeline_optimizer.set_config(VectorIndexConfig())
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"), init_for_inference=False)
+    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
     context.dump()
 
     assert os.listdir(dump_dir)
@@ -92,7 +91,7 @@ def test_dump_modules(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_optimization_pipeline_cli(task_type):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    dump_dir, logs_dir = setup_environment()
     config = OptimizationConfig(
         data=DataConfig(
             train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
@@ -101,12 +100,10 @@ def test_optimization_pipeline_cli(task_type):
         task=TaskConfig(
             search_space_path=get_search_space_path(task_type),
         ),
-        vector_index=VectorIndexConfig(
-            db_dir=db_dir,
-            device="cpu",
-        ),
+        vector_index=VectorIndexConfig(),
         logs=LoggingConfig(
             dirpath=Path(logs_dir),
         ),
+        embedder=EmbedderConfig(device="cpu"),
     )
     optimize(config)

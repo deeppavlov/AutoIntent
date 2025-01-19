@@ -23,9 +23,9 @@ class RegexpArtifact(Artifact):
 
 class RetrieverArtifact(Artifact):
     """
-    Artifact containing details from the retrieval node.
+    Artifact containing details from the embedding node.
 
-    Name of the embedding model chosen after retrieval optimization.
+    Name of the embedding model chosen after embedding optimization.
     """
 
     embedder_name: str
@@ -48,7 +48,7 @@ class ScorerArtifact(Artifact):
     )
 
 
-class PredictorArtifact(Artifact):
+class DecisionArtifact(Artifact):
     """
     Artifact containing outputs from the predictor node.
 
@@ -68,9 +68,9 @@ def validate_node_name(value: str) -> str:
     :return: Validated node type string.
     :raises ValueError: If the node type is invalid.
     """
-    if value in [NodeType.retrieval, NodeType.scoring, NodeType.prediction, NodeType.regexp]:
+    if value in [NodeType.embedding, NodeType.scoring, NodeType.decision, NodeType.regexp]:
         return value
-    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'retrieval', 'scoring', 'prediction']"
+    msg = f"Unknown node_type: {value}. Expected one of ['regexp', 'embedding', 'scoring', 'decision']"
     raise ValueError(msg)
 
 
@@ -84,9 +84,9 @@ class Artifacts(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     regexp: list[RegexpArtifact] = []
-    retrieval: list[RetrieverArtifact] = []
+    embedding: list[RetrieverArtifact] = []
     scoring: list[ScorerArtifact] = []
-    prediction: list[PredictorArtifact] = []
+    decision: list[DecisionArtifact] = []
 
     def add_artifact(self, node_type: str, artifact: Artifact) -> None:
         """
@@ -120,7 +120,7 @@ class Artifacts(BaseModel):
 class Trial(BaseModel):
     """Representation of an individual optimization trial."""
 
-    module_type: str
+    module_name: str
     """Type of the module being optimized."""
     module_params: dict[str, Any]
     """Parameters of the module for the trial."""
@@ -136,9 +136,9 @@ class Trials(BaseModel):
     """Container for managing optimization trials for pipeline nodes."""
 
     regexp: list[Trial] = []
-    retrieval: list[Trial] = []
+    embedding: list[Trial] = []
     scoring: list[Trial] = []
-    prediction: list[Trial] = []
+    decision: list[Trial] = []
 
     def get_trial(self, node_type: str, idx: int) -> Trial:
         """
@@ -174,12 +174,12 @@ class TrialsIds(BaseModel):
 
     regexp: int | None = None
     """Best trial index for the regexp node."""
-    retrieval: int | None = None
-    """Best trial index for the retrieval node."""
+    embedding: int | None = None
+    """Best trial index for the embedding node."""
     scoring: int | None = None
     """Best trial index for the scoring"""
-    prediction: int | None = None
-    """Best trial index for the prediction node."""
+    decision: int | None = None
+    """Best trial index for the decision node."""
 
     def get_best_trial_idx(self, node_type: str) -> int | None:
         """

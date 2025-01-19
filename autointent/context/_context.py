@@ -2,13 +2,15 @@
 
 import json
 import logging
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+from autointent import Dataset
+from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
+    CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -16,9 +18,8 @@ from autointent.configs import (
 )
 
 from ._utils import NumpyEncoder, load_data
-from .data_handler import DataHandler, Dataset
+from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index_client import VectorIndex, VectorIndexClient
 
 
 class Context:
@@ -30,8 +31,8 @@ class Context:
     """
 
     data_handler: DataHandler
-    vector_index_client: VectorIndexClient
     optimization_info: OptimizationInfo
+    callback_handler = CallbackHandler()
 
     def __init__(self, seed: int = 42) -> None:
         """
@@ -49,6 +50,7 @@ class Context:
         :param config: Logging configuration settings.
         """
         self.logging_config = config
+        self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
     def configure_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:
@@ -63,12 +65,14 @@ class Context:
             embedder_config = EmbedderConfig()
         self.embedder_config = embedder_config
 
-        self.vector_index_client = VectorIndexClient(
-            self.vector_index_config.device,
-            self.vector_index_config.db_dir,
-            self.embedder_config.batch_size,
-            self.embedder_config.max_length,
-        )
+    def configure_cross_encoder(self, config: CrossEncoderConfig) -> None:
+        """
+        Configure the vector index client and embedder.
+
+        :param config: Configuration for the vector index.
+        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+        """
+        self.cross_encoder_config = config
 
     def configure_data(self, config: DataConfig) -> None:
         """
@@ -95,27 +99,16 @@ class Context:
             random_seed=self.seed,
         )
 
-    def get_best_index(self) -> VectorIndex:
-        """
-        Retrieve the best vector index based on optimization results.
-
-        :return: Best vector index object.
-        """
-        model_name = self.optimization_info.get_best_embedder()
-        return self.vector_index_client.get_index(model_name)
-
     def get_inference_config(self) -> dict[str, Any]:
         """
         Generate configuration settings for inference.
 
         :return: Dictionary containing inference configuration.
         """
-        nodes_configs = [asdict(cfg) for cfg in self.optimization_info.get_inference_nodes_config()]
-        for cfg in nodes_configs:
-            cfg.pop("_target_")
+        nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
         return {
             "metadata": {
-                "device": self.get_device(),
+                "embedder_device": self.get_device(),
                 "multilabel": self.is_multilabel(),
                 "n_classes": self.get_n_classes(),
                 "seed": self.seed,
@@ -147,9 +140,7 @@ class Context:
         # self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
-        dataset_path = logs_dir / "dataset.json"
-        with dataset_path.open("w") as file:
-            json.dump(self.data_handler.dump(), file, indent=4, ensure_ascii=False)
+        self.data_handler.dump(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 
@@ -158,21 +149,21 @@ class Context:
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
 
-    def get_db_dir(self) -> Path:
-        """
-        Get the database directory of the vector index.
-
-        :return: Path to the database directory.
-        """
-        return self.vector_index_client.db_dir
-
     def get_device(self) -> str:
         """
-        Get the device used by the vector index client.
+        Get the embedder device used by the vector index client.
 
         :return: Device name.
         """
-        return self.vector_index_client.device
+        return self.embedder_config.device
+
+    def get_cross_encoder_device(self) -> str:
+        """
+        Get the cross encoder device used by default during optimization.
+
+        :return: Device name.
+        """
+        return self.cross_encoder_config.device
 
     def get_batch_size(self) -> int:
         """
@@ -180,7 +171,15 @@ class Context:
 
         :return: Batch size.
         """
-        return self.vector_index_client.embedder_batch_size
+        return self.embedder_config.batch_size
+
+    def get_cross_encoder_batch_size(self) -> int:
+        """
+        Get the batch size used by the cross encoder by default during optimization.
+
+        :return: Batch size.
+        """
+        return self.cross_encoder_config.batch_size
 
     def get_max_length(self) -> int | None:
         """
@@ -188,7 +187,23 @@ class Context:
 
         :return: Maximum length or None if not set.
         """
-        return self.vector_index_client.embedder_max_length
+        return self.embedder_config.max_length
+
+    def get_cross_encoder_max_length(self) -> int | None:
+        """
+        Get the maximum sequence length for embeddings.
+
+        :return: Maximum length or None if not set.
+        """
+        return self.cross_encoder_config.max_length
+
+    def get_use_cache(self) -> bool:
+        """
+        Check if caching is enabled for the embedder.
+
+        :return: True if caching is enabled, False otherwise.
+        """
+        return self.embedder_config.use_cache
 
     def get_dump_dir(self) -> Path | None:
         """
@@ -230,5 +245,5 @@ class Context:
 
         :return: True if there are saved modules, False otherwise.
         """
-        node_types = ["regexp", "retrieval", "scoring", "prediction"]
+        node_types = ["regexp", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)

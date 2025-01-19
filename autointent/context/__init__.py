@@ -1,5 +1,5 @@
-from autointent._embedder import Embedder
+"""Core utilities for auto ML features."""
 
 from ._context import Context
 
-__all__ = ["Context", "Embedder"]
+__all__ = ["Context"]

@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 
-from ._custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 
 logger = logging.getLogger(__name__)
 

@@ -35,7 +35,7 @@ def apply_weights(
         return closest_weighting(labels, distances, multilabel, n_classes)
 
     if weights == "uniform":
-        weights_ = np.ones((n_samples, n_candidates))
+        weights_: NDArray[Any] = np.ones((n_samples, n_candidates))
 
     elif weights == "distance":
         weights_ = 1 / (distances + 1e-5)
@@ -95,5 +95,5 @@ def to_onehot(labels: NDArray[Any], n_classes: int) -> NDArray[Any]:
     new_shape = (*labels.shape, n_classes)
     onehot_labels = np.zeros(shape=new_shape)
     indices = (*tuple(np.indices(labels.shape)), labels)
-    onehot_labels[indices] = 1
+    onehot_labels[indices] = 1  # type: ignore[index]
     return onehot_labels

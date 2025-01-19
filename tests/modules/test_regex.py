@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.modules import RegExp
+from autointent.modules.regexp import RegExp
 
 
 @pytest.mark.parametrize(

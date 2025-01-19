@@ -1,0 +1,231 @@
+"""Threshold."""
+
+import json
+import logging
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import numpy.typing as npt
+
+from autointent import Context
+from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.modules.abc import DecisionModule
+from autointent.schemas import Tag
+
+from ._utils import InvalidNumClassesError, apply_tags
+
+logger = logging.getLogger(__name__)
+
+
+class ThresholdDecisionDumpMetadata(BaseMetadataDict):
+    """Threshold predictor metadata."""
+
+    multilabel: bool
+    tags: list[Tag] | None
+    thresh: float | npt.NDArray[Any] | list[float]
+    n_classes: int
+
+
+class ThresholdDecision(DecisionModule):
+    """
+    Threshold predictor module.
+
+    ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
+    labels for single-label or multi-label classification tasks.
+
+    :ivar metadata_dict_name: Filename for saving metadata to disk.
+    :ivar multilabel: If True, the model supports multi-label classification.
+    :ivar n_classes: Number of classes in the dataset.
+    :ivar tags: Tags for predictions (if any).
+    :ivar name: Name of the predictor, defaults to "adaptive".
+
+    Examples
+    --------
+    Single-label classification
+    ===========================
+    .. testcode::
+
+        from autointent.modules import ThresholdDecision
+        import numpy as np
+        scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+        labels = [1, 0, 1]
+        threshold = 0.5
+        predictor = ThresholdDecision(thresh=threshold)
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
+
+    .. testoutput::
+
+        [1 0]
+
+    Multi-label classification
+    ==========================
+    .. testcode::
+
+        labels = [[1, 0], [0, 1], [1, 1]]
+        predictor = ThresholdDecision(thresh=[0.5, 0.5])
+        predictor.fit(scores, labels)
+        test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+        predictions = predictor.predict(test_scores)
+        print(predictions)
+
+    .. testoutput::
+
+        [[0 1]
+         [1 0]]
+
+    """
+
+    metadata: ThresholdDecisionDumpMetadata
+    multilabel: bool
+    n_classes: int
+    tags: list[Tag] | None
+    name = "threshold"
+
+    def __init__(
+        self,
+        thresh: float | npt.NDArray[Any],
+    ) -> None:
+        """
+        Initialize threshold predictor.
+
+        :param thresh: Threshold for the scores, shape (n_classes,) or float
+        """
+        self.thresh = thresh
+
+    @classmethod
+    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> "ThresholdDecision":
+        """
+        Initialize from context.
+
+        :param context: Context
+        :param thresh: Threshold
+        """
+        return cls(
+            thresh=thresh,
+        )
+
+    def fit(
+        self,
+        scores: npt.NDArray[Any],
+        labels: list[LabelType],
+        tags: list[Tag] | None = None,
+    ) -> None:
+        """
+        Fit the model.
+
+        :param scores: Scores to fit
+        :param labels: Labels to fit
+        :param tags: Tags to fit
+        """
+        self.tags = tags
+        self.multilabel = isinstance(labels[0], list)
+        self.n_classes = (
+            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
+        )
+
+        if not isinstance(self.thresh, float):
+            if len(self.thresh) != self.n_classes:
+                msg = (
+                    f"Number of thresholds provided doesn't match with number of classes."
+                    f" {len(self.thresh)} != {self.n_classes}"
+                )
+                logger.error(msg)
+                raise InvalidNumClassesError(msg)
+            self.thresh = np.array(self.thresh)
+
+    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """
+        Predict the best score.
+
+        :param scores: Scores to predict
+        """
+        if self.multilabel:
+            return multilabel_predict(scores, self.thresh, self.tags)
+        if scores.shape[1] != self.n_classes:
+            msg = "Provided scores number don't match with number of classes which predictor was trained on."
+            raise InvalidNumClassesError(msg)
+        return multiclass_predict(scores, self.thresh)
+
+    def dump(self, path: str) -> None:
+        """
+        Dump the metadata.
+
+        :param path: Path to dump
+        """
+        self.metadata = ThresholdDecisionDumpMetadata(
+            multilabel=self.multilabel,
+            tags=self.tags,
+            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),  # type: ignore[typeddict-item]
+            n_classes=self.n_classes,
+        )
+
+        dump_dir = Path(path)
+        metadata_json = self.metadata
+        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None  # type: ignore[misc]
+
+        with (dump_dir / self.metadata_dict_name).open("w") as file:
+            json.dump(metadata_json, file, indent=4)
+
+    def load(self, path: str) -> None:
+        """
+        Load the metadata.
+
+        :param path: Path to load
+        """
+        dump_dir = Path(path)
+
+        with (dump_dir / self.metadata_dict_name).open() as file:
+            metadata: ThresholdDecisionDumpMetadata = json.load(file)
+
+        self.multilabel = metadata["multilabel"]
+        self.tags = (
+            [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
+            if metadata["tags"] and isinstance(metadata["tags"], list)
+            else None
+        )
+        self.thresh = metadata["thresh"]  # type: ignore[assignment]
+        self.n_classes = metadata["n_classes"]
+        self.metadata = metadata
+
+
+def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
+    """
+    Make predictions for multiclass classification task.
+
+    :param scores: Scores from the model, shape (n_samples, n_classes)
+    :param thresh: Threshold for the scores, shape (n_classes,) or float
+    :return: Predicted classes, shape (n_samples,)
+    """
+    pred_classes: npt.NDArray[Any] = np.argmax(scores, axis=1)
+    best_scores = scores[np.arange(len(scores)), pred_classes]
+
+    if isinstance(thresh, float):
+        pred_classes[best_scores < thresh] = -1  # out of scope
+    else:
+        thresh_selected = thresh[pred_classes]
+        pred_classes[best_scores < thresh_selected] = -1  # out of scope
+
+    return pred_classes
+
+
+def multilabel_predict(
+    scores: npt.NDArray[Any],
+    thresh: float | npt.NDArray[Any],
+    tags: list[Tag] | None,
+) -> npt.NDArray[Any]:
+    """
+    Make predictions for multilabel classification task.
+
+    :param scores: Scores from the model, shape (n_samples, n_classes)
+    :param thresh: Threshold for the scores, shape (n_classes,) or float
+    :param tags: Tags for predictions
+    :return: Multilabel prediction
+    """
+    res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
+    if tags:
+        res = apply_tags(res, scores, tags)
+    return res

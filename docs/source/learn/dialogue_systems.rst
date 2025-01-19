@@ -1,30 +1,30 @@
 Dialogue Systems
 ================
 
-В этом разделе вы познакомитесь с основами построения диалоговых систем.
+In this section, you will get acquainted with the basics of building dialogue systems.
 
 Intents
 -------
 
-Диалоговая система в широком смысле --- это текстовый интерфейс взаимодействия с некоторым сервисом (будь то сервис по заказу еды или по получению информации о банковском счете). Обычно сервис поддерживает конечное количество API методов, которые вызываются во время диалога с пользователем. Чтобы определить, какой метод нужен в данный момент диалога используются классификаторы интентов. Если рассуждать в терминах машинного обучения, то это задача классификации текстов. 
+A dialogue system, in a broad sense, is a textual interface for interacting with a service (be it a food ordering service or a service for obtaining information about a bank account). Typically, the service supports a finite number of API methods that are invoked during the dialogue with the user. To determine which method is needed at a given moment in the dialogue, intent classifiers are used. If we reason in terms of machine learning, this is a text classification task.
 
-Хороший классификатор интентов должен учитывать особенности задачи создания диалоговой системы:
+A good intent classifier should consider the specifics of the dialogue system creation task:
 
-- Множественность домена. Количество API методов может быть достаточно большим, чтобы самому обучить классификатор
-- Детекция out-of-domain примеров. Необходимо обрабатывать случаи, когда пользователь высказывает неподдерживаемые интенты.
-- Множественность интента. В один момент диалога для некоторых задач может возникать сразу несколько взаимодополняющих интентов, и тогда, если рассуждать в терминах машинного обучения, задача сводится к multilabel классификации.
-- Огромный набор существующих методов и их гиперпараметров. Как говорится, "для данной задачи можно перебрать много гиперпараметров, и вы будете перебирать эти гиперпараметры".
-- Скупость обучающей выборки. Собрать разнообразную выборку из примеров реплик и тем более целых диалогов достаточно сложно.
-- Использование ML-классификаторов совместно с rule-based подходом.
+- Domain multiplicity. The number of API methods can be large enough to train the classifier yourself.
+- Detection of out-of-domain examples. It is necessary to handle cases where the user expresses unsupported intents.
+- Intent multiplicity. At one point in the dialogue, for some tasks, several complementary intents may arise at once, and then, in terms of machine learning, the task reduces to multilabel classification.
+- A vast set of existing methods and their hyperparameters. As they say, "for this task, you can go through many hyperparameters, and you will be going through these hyperparameters."
+- Scarcity of the training sample. Collecting a diverse sample of examples of replicas and even more so of entire dialogues is quite difficult.
+- Using ML classifiers together with a rule-based approach.
 
-Four of five problems перечисленных в этом списке решаются использованием библиотеки AutoIntent!
+Four out of five problems listed in this list are solved by using the AutoIntent library!
 
 Slots
 -----
 
 .. todo::
 
-    когда-нибудь
+    someday
 
 
 Script
@@ -32,5 +32,5 @@ Script
 
 .. todo::
 
-    когда-нибудь
+    someday
     

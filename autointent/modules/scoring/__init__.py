@@ -1,4 +1,3 @@
-from ._base import ScoringModule
 from ._description import DescriptionScorer
 from ._dnnc import DNNCScorer
 from ._knn import KNNScorer, RerankScorer

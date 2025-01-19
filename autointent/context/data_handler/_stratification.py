@@ -12,7 +12,7 @@ from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
 
-from ._dataset import Dataset
+from autointent import Dataset
 
 
 class StratifiedSplitter:
