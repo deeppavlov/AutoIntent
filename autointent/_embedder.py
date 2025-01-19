@@ -70,7 +70,7 @@ class Embedder:
         """
         Initialize the Embedder.
 
-        :param model_name: Path to a local model directory or a Hugging Face model name.
+        :param model_name_or_path: Path to a local model directory or a Hugging Face model name.
         :param device: Device to run the model on (e.g., "cpu", "cuda").
         :param batch_size: Batch size for embedding calculations.
         :param max_length: Maximum sequence length for the embedding model.

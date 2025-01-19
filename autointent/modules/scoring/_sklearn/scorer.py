@@ -5,14 +5,14 @@ from typing import Any
 import joblib
 import numpy as np
 import numpy.typing as npt
+from sklearn.linear_model import LogisticRegression
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.context.vector_index_client import VectorIndexClient
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.modules.scoring._base import ScoringModule
+from autointent.modules.abc import ScoringModule
 
 AVAILIABLE_CLASSIFIERS = {name: class_ for name, class_ in all_estimators() if hasattr(class_, "predict_proba")}
 
@@ -90,7 +90,7 @@ class SklearnScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        clf_name: str,
+        clf_name: str = LogisticRegression.__name__,
         clf_args: dict[str, Any] | None = None,
         embedder_name: str | None = None,
     ) -> Self:
@@ -105,10 +105,8 @@ class SklearnScorer(ScoringModule):
         """
         if embedder_name is None:
             embedder_name = context.optimization_info.get_best_embedder()
-            precomputed_embeddings = True
-        else:
-            precomputed_embeddings = context.vector_index_client.exists(embedder_name)
-        instance = cls(
+
+        return cls(
             embedder_name=embedder_name,
             device=context.get_device(),
             seed=context.seed,
@@ -117,9 +115,6 @@ class SklearnScorer(ScoringModule):
             clf_name=clf_name,
             clf_args=clf_args,
         )
-        instance.precomputed_embeddings = precomputed_embeddings
-        instance.db_dir = str(context.get_db_dir())
-        return instance
 
     def fit(
         self,
@@ -135,23 +130,13 @@ class SklearnScorer(ScoringModule):
         """
         self._multilabel = isinstance(labels[0], list)
 
-        if self.precomputed_embeddings:
-            # this happens only when SklearnScorer is within Pipeline opimization after RetrievalNode optimization
-            vector_index_client = VectorIndexClient(self.device, self.db_dir, self.batch_size, self.max_length)
-            vector_index = vector_index_client.get_index(self.embedder_name)
-            features = vector_index.get_all_embeddings()
-            if len(features) != len(utterances):
-                msg = "Vector index mismatches provided utterances"
-                raise ValueError(msg)
-            embedder = vector_index.embedder
-        else:
-            embedder = Embedder(
-                device=self.device,
-                model_name=self.embedder_name,
-                batch_size=self.batch_size,
-                max_length=self.max_length,
-            )
-            features = embedder.embed(utterances)
+        embedder = Embedder(
+            device=self.device,
+            model_name_or_path=self.embedder_name,
+            batch_size=self.batch_size,
+            max_length=self.max_length,
+        )
+        features = embedder.embed(utterances)
         self.clf_args = {} if self.clf_args is None else self.clf_args
         if AVAILIABLE_CLASSIFIERS.get(self.clf_name):
             base_clf = AVAILIABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
@@ -229,7 +214,7 @@ class SklearnScorer(ScoringModule):
         embedder_dir = dump_dir / self.embedding_model_subdir
         self._embedder = Embedder(
             device=self.device,
-            model_name=embedder_dir,
+            model_name_or_path=embedder_dir,
             batch_size=metadata["batch_size"],
             max_length=metadata["max_length"],
         )
