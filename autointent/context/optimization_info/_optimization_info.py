@@ -3,6 +3,7 @@
 This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
+
 import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
