@@ -5,7 +5,6 @@ from autointent.modules import LinearScorer
 
 
 def test_base_linear(dataset):
-
     data_handler = DataHandler(dataset)
 
     scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", embedder_device="cpu")

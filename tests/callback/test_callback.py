@@ -74,9 +74,7 @@ def test_pipeline_callbacks():
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     context = Context()
     context.configure_vector_index(VectorIndexConfig(save_db=True))
-    context.configure_logging(
-        LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False)
-    )
+    context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
     context.set_dataset(dataset)
 
