@@ -1,16 +1,37 @@
+"""CLI for evolutionary augmenter."""
 from argparse import ArgumentParser
 
-import pandas as pd
-from datasets import Dataset, DatasetDict, load_dataset
-
+from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
 
-def main():
+def main() -> None:
+    """CLI endpoint."""
     parser = ArgumentParser()
-    parser.add_argument("--input-path", type=str, required=True, help="Path to json with intent records")
-    parser.add_argument("--output-path", type=str, required=True, help="Where to save result")
+    parser.add_argument(
+        "--input-path",
+        type=str,
+        required=True,
+        help="Path to json or hugging face repo with dataset",
+    )
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        required=True,
+        help="Local path where to save result",
+    )
+    parser.add_argument(
+        "--output-repo",
+        type=str,
+        default=None,
+        help="Local path where to save result",
+    )
+    parser.add_argument(
+        "--private",
+        action="store_true",
+        help="Publish privately if --output-repo option is used"
+    )
     parser.add_argument("--n-evolutions", type=int, default=1, help="Number of utterances to generate for each intent")
     parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
     parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
@@ -38,42 +59,13 @@ def main():
     if args.goofy:
         evolutions.append("goofy")
 
-    dataset_utterances = load_dataset(args.input_path)["train"]
-    dataset_intents = load_dataset(args.input_path, name="intents")
-    splitted_dataset_intents = dataset_intents["intents"]
+    dataset = load_dataset(args.input_path)
 
-    df_utterances = pd.DataFrame(dataset_utterances)
-    df_intents = pd.DataFrame(splitted_dataset_intents)
-    print(df_utterances.columns)
-    print(df_intents.columns)
-
-    df_merged = df_utterances.merge(df_intents[["id", "name"]], left_on="label", right_on="id", how="left")
-
-    print(evolutions)
     generator = UtteranceEvolver(Generator(), evolutions, args.seed)
-    new_utterances = []
-    new_intents = []
-    labels = []
-    for idx, sample in df_merged.iterrows():
-        print(sample)
-        try:
-            generated_utterances = generator(sample["utterance"].strip(), sample["name"], args.n_evolutions)
-        except Exception as e:
-            continue
-        new_utterances.extend(generated_utterances)
-        new_intents.extend([sample["name"]] * len(generated_utterances))
-        labels.extend([sample["label"]] * len(generated_utterances))
+    generator.augment(dataset, n_evolutions=args.n_evolutions)
 
-    df_new_utterances = pd.DataFrame({"utterance": new_utterances, "label": labels})
-    df_utterances = Dataset.from_pandas(pd.concat([df_utterances, df_new_utterances], ignore_index=True))
-
-    dataset_dict = DatasetDict(
-        {
-            "train": df_utterances,
-        }
-    )
-    dataset_dict.push_to_hub(args.output_path, "default")
-    dataset_intents.push_to_hub(args.output_path, "intents")
+    if args.output_repo is not None:
+        dataset.push_to_hub(args.output_repo)
 
 
 if __name__ == "__main__":
