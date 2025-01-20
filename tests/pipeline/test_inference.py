@@ -1,5 +1,4 @@
 import importlib.resources as ires
-from pathlib import Path
 from typing import Literal
 
 import pytest
@@ -26,12 +25,12 @@ def get_search_space(task_type: TaskType):
     ["multiclass", "multilabel", "description"],
 )
 def test_inference_config(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
     pipeline_optimizer.set_config(CrossEncoderConfig())
@@ -61,12 +60,12 @@ def test_inference_config(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_inference_context(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline = Pipeline.from_search_space(search_space)
 
-    pipeline.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False, clear_ram=False))
+    pipeline.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
     pipeline.set_config(VectorIndexConfig(save_db=True))
     pipeline.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 

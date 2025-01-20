@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -43,7 +42,7 @@ class DummyCallback(OptimizerCallback):
 
 
 def test_pipeline_callbacks():
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
 
     dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
     search_space = [
@@ -75,9 +74,7 @@ def test_pipeline_callbacks():
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     context = Context()
     context.configure_vector_index(VectorIndexConfig(save_db=True))
-    context.configure_logging(
-        LoggingConfig(run_name="dummy_run_name", dirpath=Path(logs_dir).resolve(), dump_modules=False)
-    )
+    context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
     context.set_dataset(dataset)
 

@@ -1,16 +1,13 @@
 import importlib.resources as ires
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 
 from autointent import Dataset
 
 
-def setup_environment() -> tuple[Path, Path, Path]:
-    logs_dir = ires.files("tests").joinpath("logs") / str(uuid4())
-    dump_dir = logs_dir / "modules_dump"
-    return dump_dir, logs_dir
+def setup_environment() -> Path:
+    return ires.files("tests").joinpath("logs")
 
 
 def get_dataset_path():

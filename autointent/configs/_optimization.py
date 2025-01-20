@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from ._name import get_run_name
 
@@ -12,10 +12,6 @@ class DataConfig(BaseModel):
 
     train_path: str | Path
     """Path to the training data. Can be local path or HF repo."""
-    test_path: Path | None = None
-    """Path to the testing data. If None, no testing data will be used"""
-    force_multilabel: bool = False
-    """Force multilabel classification even if the data is multiclass"""
 
 
 class TaskConfig(BaseModel):
@@ -28,13 +24,10 @@ class TaskConfig(BaseModel):
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
-    run_name: str | None = None
+    project_dir: Path = Field(default_factory=lambda: Path.cwd() / "runs")
+    """Path to the directory with different runs."""
+    run_name: str = Field(default_factory=get_run_name)
     """Name of the run. If None, a random name will be generated"""
-    dirpath: Path | None = None
-    """Path to the directory where the logs will be saved.
-    If None, the logs will be saved in the current working directory"""
-    dump_dir: Path | None = None
-    """Path to the directory where the modules will be dumped. If None, the modules will not be dumped"""
     dump_modules: bool = False
     """Whether to dump the modules or not"""
     clear_ram: bool = False
@@ -42,46 +35,19 @@ class LoggingConfig(BaseModel):
     report_to: list[str] | None = None
     """List of callbacks to report to. If None, no callbacks will be used"""
 
-    @model_validator(mode="after")
-    def fill_nones(self) -> "LoggingConfig":
-        self.define_run_name()
-        self.define_dirpath()
-        self.define_dump_dir()
-        return self
-
-    def define_run_name(self) -> None:
-        """Define the run name. If None, a random name will be generated."""
-        self.run_name = get_run_name(self.run_name)
-
-    def define_dirpath(self) -> None:
-        """Define the directory path. If None, the logs will be saved in the current working directory."""
-        dirpath = Path.cwd() / "runs" if self.dirpath is None else self.dirpath
-        if self.run_name is None:
-            raise ValueError
-        self.dirpath = dirpath / self.run_name
-
-    def define_dump_dir(self) -> None:
-        """Define the dump directory. If None, the modules will not be dumped."""
-        if self.dump_dir is None:
-            if self.dirpath is None:
-                raise ValueError
-            self.dump_dir = self.dirpath / "modules_dumps"
+    @property
+    def dirpath(self) -> Path:
+        """Path to the directory where the logs will be saved."""
+        if not hasattr(self, "_dirpath"):
+            self._dirpath = self.project_dir / self.run_name
+        return self._dirpath
 
     @property
-    def safe_run_name(self) -> str:
-        """Use this method for type safety instead of :py:attr:`LoggingConfig.run_name`."""
-        if self.run_name is None:
-            msg = "run_name should not be None after validation"
-            raise ValueError(msg)
-        return self.run_name
-
-    @property
-    def safe_dirpath(self) -> Path:
-        """Use this method for type safety instead of :py:attr:`LoggingConfig.dirpath`."""
-        if self.dirpath is None:
-            msg = "dirpath should not be None after validation"
-            raise ValueError(msg)
-        return self.dirpath
+    def dump_dir(self) -> Path:
+        """Path to the directory where the modules will be dumped."""
+        if not hasattr(self, "_dump_dir"):
+            self._dump_dir = self.dirpath / "modules_dumps"
+        return self._dump_dir
 
 
 class VectorIndexConfig(BaseModel):
@@ -130,22 +96,3 @@ class CrossEncoderConfig(TransformerConfig):
 
     train_head: bool = False
     """Whether to train the ranking head of a cross encoder."""
-
-
-class OptimizationConfig(BaseModel):
-    """Configuration for the optimization process."""
-
-    data: DataConfig
-    """Configuration for the data used in the optimization process"""
-    task: TaskConfig = Field(default_factory=TaskConfig)
-    """Configuration for the task to optimize"""
-    logs: LoggingConfig = Field(default_factory=LoggingConfig)
-    """Configuration for the logging"""
-    vector_index: VectorIndexConfig = Field(default_factory=VectorIndexConfig)
-    """Configuration for the vector index"""
-    embedder: EmbedderConfig = Field(default_factory=EmbedderConfig)
-    """Configuration for the embedder"""
-    cross_encoder: CrossEncoderConfig = Field(default_factory=CrossEncoderConfig)
-    """Configuration for the cross encoder"""
-    seed: int = 0
-    """Seed for the random number generator"""

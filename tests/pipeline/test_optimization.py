@@ -1,6 +1,5 @@
 import importlib.resources as ires
 import os
-from pathlib import Path
 from typing import Literal
 
 import pytest
@@ -31,12 +30,12 @@ def get_search_space(task_type: TaskType):
     ["multiclass", "multilabel", "description"],
 )
 def test_no_context_optimization(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
@@ -52,12 +51,12 @@ def test_no_context_optimization(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_save_db(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
@@ -73,12 +72,12 @@ def test_save_db(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_dump_modules(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
@@ -88,4 +87,4 @@ def test_dump_modules(dataset, task_type):
     context = pipeline_optimizer.fit(dataset)
     context.dump()
 
-    assert os.listdir(dump_dir)
+    assert os.listdir(pipeline_optimizer.logging_config.dump_dir)

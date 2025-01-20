@@ -83,19 +83,16 @@ class Context:
         self.data_handler = DataHandler(
             dataset=load_data(config.train_path),
             random_seed=self.seed,
-            force_multilabel=config.force_multilabel,
         )
 
-    def set_dataset(self, dataset: Dataset, force_multilabel: bool = False) -> None:
+    def set_dataset(self, dataset: Dataset) -> None:
         """
         Set the datasets for training, validation and testing.
 
         :param dataset: Dataset.
-        :param force_multilabel: Whether to force multilabel classification.
         """
         self.data_handler = DataHandler(
             dataset=dataset,
-            force_multilabel=force_multilabel,
             random_seed=self.seed,
         )
 

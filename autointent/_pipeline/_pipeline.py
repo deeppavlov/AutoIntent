@@ -94,8 +94,8 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         self.context.callback_handler.start_run(
-            run_name=self.context.logging_config.safe_run_name,
-            dirpath=self.context.logging_config.safe_dirpath,
+            run_name=self.context.logging_config.run_name,
+            dirpath=self.context.logging_config.dirpath,
         )
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
@@ -119,7 +119,6 @@ class Pipeline:
         Optimize the pipeline from dataset.
 
         :param dataset: Dataset for optimization
-        :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
         if self._is_inference():

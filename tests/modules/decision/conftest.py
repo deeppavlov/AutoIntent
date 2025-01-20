@@ -3,13 +3,10 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
-from tests.conftest import setup_environment
 
 
 @pytest.fixture
 def multiclass_fit_data(dataset):
-    dump_dir, logs_dir = setup_environment()
-
     data_handler = DataHandler(dataset)
 
     knn_params = {
@@ -27,9 +24,7 @@ def multiclass_fit_data(dataset):
 
 @pytest.fixture
 def multilabel_fit_data(dataset):
-    dump_dir, logs_dir = setup_environment()
-
-    data_handler = DataHandler(dataset, force_multilabel=True)
+    data_handler = DataHandler(dataset.to_multilabel())
 
     knn_params = {
         "k": 3,

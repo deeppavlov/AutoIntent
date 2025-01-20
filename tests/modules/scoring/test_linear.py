@@ -2,12 +2,9 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
-from tests.conftest import setup_environment
 
 
 def test_base_linear(dataset):
-    dump_dir, logs_dir = setup_environment()
-
     data_handler = DataHandler(dataset)
 
     scorer = LinearScorer(embedder_name="sergeyzh/rubert-tiny-turbo", embedder_device="cpu")
