@@ -64,6 +64,8 @@ def main() -> None:
     generator = UtteranceEvolver(Generator(), evolutions, args.seed)
     generator.augment(dataset, n_evolutions=args.n_evolutions)
 
+    dataset.to_json(args.output_path)
+
     if args.output_repo is not None:
         dataset.push_to_hub(args.output_repo)
 

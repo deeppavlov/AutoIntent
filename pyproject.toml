@@ -58,6 +58,7 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
+"evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
 
 [tool.poetry.group.dev]
 optional = true

@@ -79,7 +79,7 @@ class UtteranceEvolver:
             )
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
-            dataset[split_name] = concatenate_datasets(original_split, generated_split)
+            dataset[split_name] = concatenate_datasets([original_split, generated_split])
         return [Sample(**sample) for sample in new_samples]
 
 
