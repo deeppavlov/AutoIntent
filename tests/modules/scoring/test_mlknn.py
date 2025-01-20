@@ -4,12 +4,9 @@ from datasets import Dataset as HFDataset
 from autointent.context.data_handler import DataHandler
 from autointent.custom_types import Split
 from autointent.modules.scoring import MLKnnScorer
-from tests.conftest import setup_environment
 
 
 def test_base_mlknn(dataset):
-    dump_dir, logs_dir = setup_environment()
-
     dataset[Split.TEST] = HFDataset.from_list(
         [
             {
