@@ -1,3 +1,5 @@
+# type: ignore  # noqa: PGH003
+
 import string
 from typing import Any
 

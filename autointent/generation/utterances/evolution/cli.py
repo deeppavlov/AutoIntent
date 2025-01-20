@@ -1,10 +1,14 @@
 """CLI for evolutionary augmenter."""
 
 from argparse import ArgumentParser
+from typing import TYPE_CHECKING
 
 from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
+
+if TYPE_CHECKING:
+    from .evolver import EvolutionType
 
 
 def main() -> None:
@@ -40,7 +44,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
-    evolutions = []
+    evolutions: list[EvolutionType] = []
     if args.reasoning:
         evolutions.append("reasoning")
     if args.concretizing:

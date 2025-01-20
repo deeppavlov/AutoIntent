@@ -18,11 +18,11 @@ class Generator:
     def get_chat_completion(self, messages: list[dict[str, str]]) -> str:
         """Prompt LLM and return its answer."""
         response = self.client.chat.completions.create(
-            messages=messages,
+            messages=messages,  # type: ignore[arg-type]
             model=self.model_name,
             max_tokens=150,
             n=1,
             stop=None,
             temperature=0.7,
         )
-        return response.choices[0].message.content
+        return response.choices[0].message.content  # type: ignore[return-value]

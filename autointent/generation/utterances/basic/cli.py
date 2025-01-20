@@ -50,13 +50,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--length",
-        choices=LengthType.__args__,
+        choices=LengthType.__args__,  # type: ignore[attr-defined]
         default="none",
         help="How to extend the prompt with length instruction",
     )
     parser.add_argument(
         "--style",
-        choices=StyleType.__args__,
+        choices=StyleType.__args__,  # type: ignore[attr-defined]
         default="none",
         help="How to extend the prompt with style instruction",
     )

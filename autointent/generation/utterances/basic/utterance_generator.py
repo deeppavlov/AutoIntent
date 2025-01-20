@@ -12,7 +12,7 @@ from datasets import concatenate_datasets
 from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.utils import safe_format
+from autointent.generation.utterances.utils import safe_format  # type: ignore[attr-defined]
 from autointent.schemas import Sample
 
 LengthType = Literal["none", "same", "longer", "shorter"]
@@ -62,7 +62,7 @@ class UtteranceGenerator:
     def augment(
         self,
         dataset: Dataset,
-        split_name: Split = Split.TRAIN,
+        split_name: str = Split.TRAIN,
         n_generations: int = 5,
         max_sample_utterances: int = 5,
         update_split: bool = True,
@@ -100,7 +100,7 @@ def _load_prompt() -> str:
 
 def _load_extra_instructions() -> dict[str, Any]:
     with ires.files("autointent.generation.utterances.basic").joinpath("extra_instructions.json").open() as file:
-        return json.load(file)
+        return json.load(file)  # type: ignore[no-any-return]
 
 
 def _add_extra_instructions(
@@ -123,7 +123,7 @@ def _add_extra_instructions(
     extra_instructions.extend(custom_instruction)
 
     parsed_extra_instructions = "\n    ".join([f"- {s}" for s in extra_instructions])
-    return safe_format(prompt_template_yaml, extra_instructions=parsed_extra_instructions)
+    return safe_format(prompt_template_yaml, extra_instructions=parsed_extra_instructions)  # type: ignore[no-any-return]
 
 
 def _format_utterances(utterances: list[str]) -> str:

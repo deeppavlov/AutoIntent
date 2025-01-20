@@ -15,7 +15,7 @@ from datasets import concatenate_datasets
 from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.utils import safe_format
+from autointent.generation.utterances.utils import safe_format  # type: ignore[attr-defined]
 from autointent.schemas import Sample
 
 EvolutionType = Literal["reasoning", "concretizing", "abstract", "formal", "informal", "funny", "goofy"]
@@ -29,16 +29,14 @@ class UtteranceEvolver:
     to change it in a specific way.
     """
 
-    def __init__(
-        self, generator: Generator, evolutions: list[EvolutionType] = EvolutionType.__args__, seed: int = 0
-    ) -> None:
+    def __init__(self, generator: Generator, evolutions: list[EvolutionType], seed: int = 0) -> None:
         """Initialize."""
         self.generator = generator
         self.evolutions = evolutions
         self.prompts = _load_prompts()
         random.seed(seed)
 
-    def _evolve(self, utterance: str, intent_name: str, evolution: EvolutionType) -> list[str]:
+    def _evolve(self, utterance: str, intent_name: str, evolution: EvolutionType) -> str:
         """Apply evolutions single time."""
         messages_yaml = safe_format(
             self.prompts[evolution],
@@ -58,7 +56,7 @@ class UtteranceEvolver:
         return res
 
     def augment(
-        self, dataset: Dataset, split_name: Split = Split.TRAIN, n_evolutions: int = 1, update_split: bool = True
+        self, dataset: Dataset, split_name: str = Split.TRAIN, n_evolutions: int = 1, update_split: bool = True
     ) -> list[Sample]:
         """
         Augment some split of dataset.
