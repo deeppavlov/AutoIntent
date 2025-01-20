@@ -6,7 +6,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
-from datasets import ClassLabel, Sequence, concatenate_datasets, get_dataset_config_names, load_dataset
+from datasets import ClassLabel, Sequence, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
 
 from autointent.custom_types import LabelType, Split
@@ -39,7 +39,7 @@ class Dataset(dict[str, HFDataset]):
 
     def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
         """
-        Initialize the dataset and configure OOS split if applicable.
+        Initialize the dataset.
 
         :param args: Positional arguments to initialize the dataset.
         :param intents: List of intents associated with the dataset.
@@ -53,10 +53,6 @@ class Dataset(dict[str, HFDataset]):
 
         if self.multilabel:
             self._encode_labels()
-
-        oos_split = self._create_oos_split()
-        if oos_split is not None:
-            self[Split.OOS] = oos_split
 
     @property
     def multilabel(self) -> bool:
@@ -144,7 +140,10 @@ class Dataset(dict[str, HFDataset]):
 
         :param filepath: The path to the file where the JSON data will be saved.
         """
-        with Path(filepath).open("w") as file:
+        path = Path(filepath)
+        if not path.parent.exists():
+            path.parent.mkdir(parents=True)
+        with path.open("w") as file:
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
@@ -204,15 +203,6 @@ class Dataset(dict[str, HFDataset]):
         self._encoded_labels = True
         return self
 
-    def _is_oos(self, sample: Sample) -> bool:
-        """
-        Check if a sample is out-of-scope.
-
-        :param sample: The sample to check.
-        :return: True if the sample is out-of-scope, False otherwise.
-        """
-        return sample["label"] is None
-
     def _to_multilabel(self, sample: Sample) -> Sample:
         """
         Convert a sample's label to multilabel format.
@@ -240,20 +230,6 @@ class Dataset(dict[str, HFDataset]):
                     one_hot_label[idx] = 1
         sample["label"] = one_hot_label
         return sample
-
-    def _create_oos_split(self) -> HFDataset | None:
-        """
-        Create an out-of-scope (OOS) split from the dataset.
-
-        :return: The OOS split if created, None otherwise.
-        """
-        oos_splits = [split.filter(self._is_oos) for split in self.values()]
-        oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
-        if oos_splits:
-            for split_name, split in self.items():
-                self[split_name] = split.filter(lambda sample: not self._is_oos(sample))
-            return concatenate_datasets(oos_splits)
-        return None
 
     def _cast_label_feature(self) -> None:
         """Cast the label feature of the dataset to the appropriate type."""

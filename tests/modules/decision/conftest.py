@@ -17,8 +17,8 @@ def multiclass_fit_data(dataset):
     scorer = KNNScorer(**knn_params)
 
     scorer.fit(data_handler.train_utterances(1), data_handler.train_labels(1))
-    scores = scorer.predict(data_handler.validation_utterances(1) + data_handler.oos_utterances(1))
-    labels = data_handler.validation_labels(1) + [-1] * len(data_handler.oos_utterances(1))
+    scores = scorer.predict(data_handler.validation_utterances(1))
+    labels = data_handler.validation_labels(1)
     return scores, labels
 
 
@@ -34,8 +34,8 @@ def multilabel_fit_data(dataset):
     scorer = KNNScorer(**knn_params)
 
     scorer.fit(data_handler.train_utterances(1), data_handler.train_labels(1))
-    scores = scorer.predict(data_handler.validation_utterances(1) + data_handler.oos_utterances(1))
-    labels = data_handler.validation_labels(1) + [[0] * data_handler.n_classes] * len(data_handler.oos_utterances(1))
+    scores = scorer.predict(data_handler.validation_utterances(1))
+    labels = data_handler.validation_labels(1)
     return scores, labels
 
 

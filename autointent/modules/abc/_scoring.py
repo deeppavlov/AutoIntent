@@ -7,7 +7,6 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
-from autointent.custom_types import Split
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import Module
 
@@ -44,14 +43,6 @@ class ScoringModule(Module, ABC):
 
         scores = self.predict(utterances)
 
-        self._oos_scores = None
-        if context.data_handler.has_oos_samples():
-            self._oos_scores = {
-                Split.TRAIN: self.predict(context.data_handler.oos_utterances(0)),
-                Split.VALIDATION: self.predict(context.data_handler.oos_utterances(1)),
-                Split.TEST: self.predict(context.data_handler.oos_utterances(2)),
-            }
-
         self._train_scores = self.predict(context.data_handler.train_utterances(1))
         self._validation_scores = self.predict(context.data_handler.validation_utterances(1))
         self._test_scores = self.predict(context.data_handler.test_utterances())
@@ -63,13 +54,12 @@ class ScoringModule(Module, ABC):
         """
         Retrieve assets generated during scoring.
 
-        :return: ScorerArtifact containing test scores and out-of-scope (OOS) scores.
+        :return: ScorerArtifact containing test, validation and test scores.
         """
         return ScorerArtifact(
             train_scores=self._train_scores,
             validation_scores=self._validation_scores,
             test_scores=self._test_scores,
-            oos_scores=self._oos_scores,
         )
 
     @abstractmethod

@@ -92,13 +92,4 @@ def get_decision_evaluation_data(
         message = f"No '{split}' scores found in the optimization info"
         raise ValueError(message)
 
-    oos_scores = context.optimization_info.get_best_oos_scores(split)
-    return_scores = scores
-    if oos_scores is not None:
-        oos_labels = (
-            [[0] * context.get_n_classes()] * len(oos_scores) if context.is_multilabel() else [-1] * len(oos_scores)  # type: ignore[list-item]
-        )
-        labels = np.concatenate([labels, np.array(oos_labels)])
-        return_scores = np.concatenate([scores, oos_scores])
-
-    return labels.tolist(), return_scores  # type: ignore[return-value]
+    return labels.tolist(), scores  # type: ignore[return-value]

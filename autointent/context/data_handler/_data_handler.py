@@ -153,30 +153,6 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
 
-    def oos_utterances(self, idx: int | None = None) -> list[str]:
-        """
-        Retrieve out-of-scope (OOS) utterances from the dataset.
-
-        If the dataset contains out-of-scope samples, retrieves the utterances
-        from the specified OOS split index (if provided) or the primary OOS split.
-        Returns an empty list if no OOS samples are available in the dataset.
-
-        :param idx: Optional index for a specific OOS split.
-        :return: List of out-of-scope utterances, or an empty list if unavailable.
-        """
-        if self.has_oos_samples():
-            split = f"{Split.OOS}_{idx}" if idx is not None else Split.OOS
-            return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
-        return []
-
-    def has_oos_samples(self) -> bool:
-        """
-        Check if there are out-of-scope samples.
-
-        :return: True if there are out-of-scope samples.
-        """
-        return any(split.startswith(Split.OOS) for split in self.dataset)
-
     def dump(self, filepath: str | Path) -> None:
         """
         Save the dataset splits and intents to a JSON file.
@@ -205,12 +181,7 @@ class DataHandler:
         elif Split.VALIDATION in self.dataset:
             self._split_validation(random_seed)
 
-        if self.has_oos_samples():
-            self._split_oos(random_seed)
-
         for split in self.dataset:
-            if split.startswith(Split.OOS):
-                continue
             n_classes_split = self.dataset.get_n_classes(split)
             if n_classes_split != self.n_classes:
                 message = (
@@ -280,24 +251,3 @@ class DataHandler:
         )
         self.dataset.pop(f"{Split.TEST}_0")
         self.dataset.pop(f"{Split.TEST}_1")
-
-    def _split_oos(self, random_seed: int) -> None:
-        self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
-            self.dataset[Split.OOS]
-            .train_test_split(
-                test_size=0.2,
-                shuffle=True,
-                seed=random_seed,
-            )
-            .values()
-        )
-        self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
-            self.dataset[f"{Split.OOS}_1"]
-            .train_test_split(
-                test_size=0.5,
-                shuffle=True,
-                seed=random_seed,
-            )
-            .values()
-        )
-        self.dataset.pop(Split.OOS)
