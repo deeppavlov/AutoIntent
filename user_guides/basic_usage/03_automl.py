@@ -117,13 +117,14 @@ custom_pipeline.set_config(vector_index_config)
 """
 ## Logging Settings
 
-The important thing is what assets you want to save during the pipeline auto-configuration process. You can control it with %mddoclink(class,configs,LoggingConfig). Default settings are the following:
+The important thing is what assets you want to save during the pipeline auto-configuration process. You can control it with %mddoclink(class,configs,LoggingConfig):
 """
 
 # %%
+from pathlib import Path
 from autointent.configs import LoggingConfig
 
-logging_config = LoggingConfig(run_name=None, dirpath=None, dump_dir=None, dump_modules=False, clear_ram=False)
+logging_config = LoggingConfig(project_dir=Path.cwd() / "runs", dump_modules=False, clear_ram=False)
 custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
