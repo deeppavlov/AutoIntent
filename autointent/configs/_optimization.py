@@ -24,6 +24,8 @@ class TaskConfig(BaseModel):
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
+    project_dir: Path = Field(default_factory=lambda: Path.cwd() / "runs")
+    """Path to the directory with different runs."""
     run_name: str = Field(default_factory=get_run_name)
     """Name of the run. If None, a random name will be generated"""
     dump_modules: bool = False
@@ -37,7 +39,7 @@ class LoggingConfig(BaseModel):
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
         if not hasattr(self, "_dirpath"):
-            self._dirpath = Path.cwd() / "runs" / self.run_name
+            self._dirpath = self.project_dir / self.run_name
         return self._dirpath
 
     @property
