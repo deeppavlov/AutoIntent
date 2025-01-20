@@ -16,6 +16,8 @@ from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import (
     RETRIEVAL_METRICS_MULTICLASS,
     RETRIEVAL_METRICS_MULTILABEL,
+    SCORING_METRICS_MULTICLASS,
+    SCORING_METRICS_MULTILABEL,
 )
 from autointent.modules.abc import EmbeddingModule
 
@@ -171,13 +173,9 @@ class LogRegEmbedding(EmbeddingModule):
             raise ValueError(message)
 
         embeddings = self.embedder.embed(utterances)
-        predicted_encoded = self.classifier.predict(embeddings)
-        predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
-
-        correct_predictions = sum(1 for true, pred in zip(labels, predicted_labels, strict=False) if true == pred)
-        accuracy = correct_predictions / len(labels)
-
-        return {"scoring_accuracy": accuracy}
+        predicted_encoded = self.classifier.predict_proba(embeddings)
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        return self.score_metrics((labels, predicted_encoded), metrics_dict)
 
     def get_assets(self) -> RetrieverArtifact:
         """
