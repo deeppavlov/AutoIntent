@@ -36,13 +36,9 @@ def test_score_evaluates_model():
     mock_context.data_handler.test_utterances.return_value = ["hello", "goodbye"]
     mock_context.data_handler.test_labels.return_value = [0, 1]
 
-    def mock_metric_fn(true_labels, predicted_labels):
-        return sum(1 for t, p in zip(true_labels, predicted_labels[0], strict=False) if t == p) / len(true_labels)
+    scores = module.score(mock_context, split="test")
 
-    score = module.score(mock_context, split="test", metric_fn=mock_metric_fn)
-
-    assert 0 <= score <= 1
-    assert score > 0
+    assert isinstance(scores, dict)
 
 
 def test_dump_and_load_preserves_model_state():
