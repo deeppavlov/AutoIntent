@@ -71,9 +71,7 @@ def main() -> None:
     generator = UtteranceGenerator(
         Generator(), args.custom_instruction or [], args.length, args.style, args.same_punctuation
     )
-    generator.augment(
-        dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances
-    )
+    generator.augment(dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances)
 
     dataset.to_json(args.output_path)
 

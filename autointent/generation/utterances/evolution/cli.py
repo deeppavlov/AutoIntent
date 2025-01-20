@@ -1,4 +1,5 @@
 """CLI for evolutionary augmenter."""
+
 from argparse import ArgumentParser
 
 from autointent import load_dataset
@@ -27,11 +28,7 @@ def main() -> None:
         default=None,
         help="Local path where to save result",
     )
-    parser.add_argument(
-        "--private",
-        action="store_true",
-        help="Publish privately if --output-repo option is used"
-    )
+    parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument("--n-evolutions", type=int, default=1, help="Number of utterances to generate for each intent")
     parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
     parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
