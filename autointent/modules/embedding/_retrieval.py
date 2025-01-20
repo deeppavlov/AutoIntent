@@ -16,8 +16,6 @@ from autointent.custom_types import BaseMetadataDict, LabelType
 from autointent.metrics import (
     RETRIEVAL_METRICS_MULTICLASS,
     RETRIEVAL_METRICS_MULTILABEL,
-    SCORING_METRICS_MULTICLASS,
-    SCORING_METRICS_MULTILABEL,
 )
 from autointent.modules.abc import EmbeddingModule
 
@@ -154,13 +152,13 @@ class LogRegEmbedding(EmbeddingModule):
         self,
         context: Context,
         split: Literal["validation", "test"],
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
-        Evaluate the model using a specified metric function.
+        Evaluate the model using accuracy metric.
 
         :param context: The context containing test data and labels.
         :param split: Target split ("validation" or "test").
-        :return: Computed metric score.
+        :return: Computed accuracy score.
         """
         if split == "validation":
             utterances = context.data_handler.validation_utterances(0)
@@ -176,8 +174,10 @@ class LogRegEmbedding(EmbeddingModule):
         predicted_encoded = self.classifier.predict(embeddings)
         predicted_labels = self.label_encoder.inverse_transform(predicted_encoded)
 
-        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
-        return self.score_metrics(([labels], [predicted_labels]), metrics_dict)
+        correct_predictions = sum(1 for true, pred in zip(labels, predicted_labels, strict=False) if true == pred)
+        accuracy = correct_predictions / len(labels)
+
+        return {"scoring_accuracy": accuracy}
 
     def get_assets(self) -> RetrieverArtifact:
         """
