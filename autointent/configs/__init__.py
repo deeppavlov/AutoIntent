@@ -6,7 +6,6 @@ from ._optimization import (
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
-    OptimizationConfig,
     TaskConfig,
     VectorIndexConfig,
 )
@@ -18,7 +17,6 @@ __all__ = [
     "InferenceNodeConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
-    "OptimizationConfig",
     "TaskConfig",
     "VectorIndexConfig",
 ]

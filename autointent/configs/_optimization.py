@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, model_validator
 
 from ._name import get_run_name
 
@@ -130,22 +130,3 @@ class CrossEncoderConfig(TransformerConfig):
 
     train_head: bool = False
     """Whether to train the ranking head of a cross encoder."""
-
-
-class OptimizationConfig(BaseModel):
-    """Configuration for the optimization process."""
-
-    data: DataConfig
-    """Configuration for the data used in the optimization process"""
-    task: TaskConfig = Field(default_factory=TaskConfig)
-    """Configuration for the task to optimize"""
-    logs: LoggingConfig = Field(default_factory=LoggingConfig)
-    """Configuration for the logging"""
-    vector_index: VectorIndexConfig = Field(default_factory=VectorIndexConfig)
-    """Configuration for the vector index"""
-    embedder: EmbedderConfig = Field(default_factory=EmbedderConfig)
-    """Configuration for the embedder"""
-    cross_encoder: CrossEncoderConfig = Field(default_factory=CrossEncoderConfig)
-    """Configuration for the cross encoder"""
-    seed: int = 0
-    """Seed for the random number generator"""
