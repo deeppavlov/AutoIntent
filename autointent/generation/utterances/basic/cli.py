@@ -28,11 +28,7 @@ def main() -> None:
         default=None,
         help="Local path where to save result",
     )
-    parser.add_argument(
-        "--private",
-        action="store_true",
-        help="Publish privately if --output-repo option is used"
-    )
+    parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument(
         "--n-generations",
         type=int,
@@ -72,11 +68,18 @@ def main() -> None:
     args = parser.parse_args()
 
     dataset = load_dataset(args.input_path)
-    generator = UtteranceGenerator(Generator(), args.custom_instruction, args.length, args.style, args.same_punctuation)
-    generator.augment(dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances)
+    generator = UtteranceGenerator(
+        Generator(), args.custom_instruction or [], args.length, args.style, args.same_punctuation
+    )
+    generator.augment(
+        dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances
+    )
+
+    dataset.to_json(args.output_path)
 
     if args.output_repo is not None:
-        dataset.push_to_hub(args.output_repo)
+        dataset.push_to_hub(args.output_repo, private=args.private)
+
 
 if __name__ == "__main__":
     main()

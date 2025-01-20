@@ -89,17 +89,17 @@ class UtteranceGenerator:
             )
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
-            dataset[split_name] = concatenate_datasets(original_split, generated_split)
+            dataset[split_name] = concatenate_datasets([original_split, generated_split])
         return [Sample(**sample) for sample in new_samples]
 
 
 def _load_prompt() -> str:
-    with ires.files("autointent.generation.basic").joinpath("chat_template.yaml").open() as file:
+    with ires.files("autointent.generation.utterances.basic").joinpath("chat_template.yaml").open() as file:
         return file.read()
 
 
 def _load_extra_instructions() -> dict[str, Any]:
-    with ires.files("autointent.generation.basic").joinpath("extra_instructions.json").open() as file:
+    with ires.files("autointent.generation.utterances.basic").joinpath("extra_instructions.json").open() as file:
         return json.load(file)
 
 

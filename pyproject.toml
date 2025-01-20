@@ -57,7 +57,7 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 "autointent" = "autointent._pipeline._cli_endpoint:optimize"
 "autointent-inference" = "autointent.pipeline.inference.cli_endpoint:main"
 "clear-cache" = "autointent.context.vector_index_client.cache:clear_chroma_cache"
-
+"basic-aug" = "autointent.generation.utterances.basic.cli:main"
 
 [tool.poetry.group.dev]
 optional = true
