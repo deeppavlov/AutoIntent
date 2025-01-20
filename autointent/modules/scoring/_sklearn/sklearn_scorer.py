@@ -1,9 +1,6 @@
-import json
 import logging
-from pathlib import Path
 from typing import Any
 
-import joblib
 import numpy as np
 import numpy.typing as npt
 from sklearn.linear_model import LogisticRegression
@@ -12,11 +9,11 @@ from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import ScoringModule
 
 logger = logging.getLogger(__name__)
-AVAILIABLE_CLASSIFIERS = {
+AVAILABLE_CLASSIFIERS = {
     name: class_
     for name, class_ in all_estimators(
         type_filter=[
@@ -30,20 +27,6 @@ AVAILIABLE_CLASSIFIERS = {
 }
 
 
-class SklearnScorerDumpDict(BaseMetadataDict):
-    """
-    Metadata for dumping the state of a SklearnScorer.
-
-    :ivar multilabel: Whether the task is multilabel classification.
-    :ivar batch_size: Batch size used for embedding.
-    :ivar max_length: Maximum sequence length for embedding, or None if not specified.
-    """
-
-    multilabel: bool
-    batch_size: int
-    max_length: int | None
-
-
 class SklearnScorer(ScoringModule):
     """
     Scoring module for classification using sklearn classifiers with implemented predict_proba() method.
@@ -51,30 +34,23 @@ class SklearnScorer(ScoringModule):
     This module uses embeddings generated from a transformer model to train
     chosen sklearn classifier for intent classification.
 
-    :ivar classifier_file_name: Filename for saving the classifier to disk.
-    :ivar embedding_model_subdir: Directory for saving the embedding model.
-    :ivar precomputed_embeddings: Flag indicating if embeddings are precomputed.
-    :ivar db_dir: Path to the database directory.
     :ivar name: Name of the scorer, defaults to "linear".
     """
 
-    classifier_file_name: str = "classifier.joblib"
-    embedding_model_subdir: str = "embedding_model"
-    precomputed_embeddings: bool = False
-    db_dir: str
     name = "sklearn"
 
     def __init__(
         self,
         embedder_name: str,
         clf_name: str,
+        embedder_batch_size: int = 32,
+        embedder_max_length: int | None = None,
+        embedder_device: str = "cpu",
+        embedder_use_cache: bool = True,
         cv: int = 3,
         clf_args: dict[str, Any] | None = None,
         n_jobs: int = -1,
-        device: str = "cpu",
         seed: int = 0,
-        batch_size: int = 32,
-        max_length: int | None = None,
     ) -> None:
         """
         Initialize the SklearnScorer.
@@ -84,20 +60,22 @@ class SklearnScorer(ScoringModule):
         :param cv: Number of cross-validation folds, defaults to 3.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
         :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
         :param seed: Random seed for reproducibility, defaults to 0.
-        :param batch_size: Batch size for embedding generation, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
+        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
+        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
+        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.cv = cv
         self.n_jobs = n_jobs
-        self.device = device
         self.seed = seed
         self.embedder_name = embedder_name
-        self.batch_size = batch_size
-        self.max_length = max_length
         self.clf_name = clf_name
         self.clf_args = clf_args or {}
+        self.embedder_batch_size = embedder_batch_size
+        self.embedder_max_length = embedder_max_length
+        self.embedder_device = embedder_device
+        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -121,10 +99,11 @@ class SklearnScorer(ScoringModule):
 
         return cls(
             embedder_name=embedder_name,
-            device=context.get_device(),
             seed=context.seed,
-            batch_size=context.get_batch_size(),
-            max_length=context.get_max_length(),
+            embedder_device=context.get_device(),
+            embedder_batch_size=context.get_batch_size(),
+            embedder_max_length=context.get_max_length(),
+            embedder_use_cache=context.get_use_cache(),
             clf_name=clf_name,
             clf_args=clf_args,
         )
@@ -144,14 +123,15 @@ class SklearnScorer(ScoringModule):
         self._multilabel = isinstance(labels[0], list)
 
         embedder = Embedder(
-            device=self.device,
+            device=self.embedder_device,
             model_name_or_path=self.embedder_name,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
+            batch_size=self.embedder_batch_size,
+            max_length=self.embedder_max_length,
+            use_cache=self.embedder_use_cache,
         )
         features = embedder.embed(utterances)
-        if AVAILIABLE_CLASSIFIERS.get(self.clf_name):
-            base_clf = AVAILIABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
+        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
+            base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
             logger.error(msg)
@@ -180,54 +160,3 @@ class SklearnScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         self._embedder.delete()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the SklearnScorer's metadata, classifier, and embedder to disk.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self.metadata = SklearnScorerDumpDict(
-            multilabel=self._multilabel,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-        )
-
-        dump_dir = Path(path)
-
-        metadata_path = dump_dir / self.metadata_dict_name
-        with metadata_path.open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-        # dump sklearn model
-        clf_path = dump_dir / self.classifier_file_name
-        joblib.dump(self._clf, clf_path)
-
-        # dump sentence transformer model
-        self._embedder.dump(dump_dir / self.embedding_model_subdir)
-
-    def load(self, path: str) -> None:
-        """
-        Load the SklearnScorer's metadata, classifier, and embedder from disk.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        dump_dir = Path(path)
-
-        metadata_path = dump_dir / self.metadata_dict_name
-        with metadata_path.open() as file:
-            metadata: SklearnScorerDumpDict = json.load(file)
-        self._multilabel = metadata["multilabel"]
-
-        # load sklearn model
-        clf_path = dump_dir / self.classifier_file_name
-        self._clf = joblib.load(clf_path)
-
-        # load sentence transformer model
-        embedder_dir = dump_dir / self.embedding_model_subdir
-        self._embedder = Embedder(
-            device=self.device,
-            model_name_or_path=embedder_dir,
-            batch_size=metadata["batch_size"],
-            max_length=metadata["max_length"],
-        )
