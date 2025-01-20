@@ -12,10 +12,6 @@ class DataConfig(BaseModel):
 
     train_path: str | Path
     """Path to the training data. Can be local path or HF repo."""
-    test_path: Path | None = None
-    """Path to the testing data. If None, no testing data will be used"""
-    force_multilabel: bool = False
-    """Force multilabel classification even if the data is multiclass"""
 
 
 class TaskConfig(BaseModel):

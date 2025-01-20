@@ -119,7 +119,6 @@ class Pipeline:
         Optimize the pipeline from dataset.
 
         :param dataset: Dataset for optimization
-        :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
         if self._is_inference():

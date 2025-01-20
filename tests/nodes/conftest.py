@@ -1,9 +1,8 @@
 import pytest
 
-from autointent import Context
+from autointent import Context, Dataset
 from autointent.configs import (
     CrossEncoderConfig,
-    DataConfig,
     EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
@@ -79,7 +78,10 @@ def get_context(multilabel):
     dump_dir, logs_dir = setup_environment()
 
     res = Context()
-    res.configure_data(DataConfig(train_path=get_dataset_path(), force_multilabel=multilabel))
+    dataset = Dataset.from_json(get_dataset_path())
+    if multilabel:
+        dataset = dataset.to_multilabel()
+    res.set_dataset(dataset)
     res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
     res.configure_vector_index(VectorIndexConfig(), EmbedderConfig(device="cpu"))
     res.configure_cross_encoder(CrossEncoderConfig())
