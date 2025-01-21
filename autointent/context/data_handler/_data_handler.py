@@ -245,7 +245,7 @@ class DataHandler:
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=0.2,
                     random_seed=random_seed,
-                    allow_oos_in_train=idx==1, # for decision node it's ok to have oos in train
+                    allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
 
     def _split_test(self, test_size: float, random_seed: int) -> None:
