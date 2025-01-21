@@ -6,8 +6,8 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
-from datasets import ClassLabel, Sequence, Value, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
+from datasets import Sequence, get_dataset_config_names, load_dataset
 
 from autointent.custom_types import LabelType, Split
 from autointent.schemas import Intent, Tag
@@ -183,16 +183,6 @@ class Dataset(dict[str, HFDataset]):
                             classes.add(idx)
         return len(classes)
 
-    def _encode_labels(self) -> "Dataset":
-        """
-        Encode dataset labels into one-hot or multilabel format.
-
-        :return: Self, with labels encoded.
-        """
-        for split_name, split in self.items():
-            self[split_name] = split.map(self._encode_label)
-        return self
-
     def _to_multilabel(self, sample: Sample) -> Sample:
         """
         Convert a sample's label to multilabel format.
@@ -205,18 +195,3 @@ class Dataset(dict[str, HFDataset]):
             ohe_vector[sample["label"]] = 1
             sample["label"] = ohe_vector
         return sample
-
-
-    def _cast_label_feature(self) -> None:
-        """Cast the label feature of the dataset to the appropriate type."""
-        for split_name, split in self.items():
-            new_features = split.features.copy()
-            if self.multilabel:
-                new_features[self.label_feature] = Sequence(
-                    Value("bool"), length=self.n_classes,
-                )
-            else:
-                new_features[self.label_feature] = ClassLabel(
-                    num_classes=self.n_classes,
-                )
-            self[split_name] = split.cast(new_features)

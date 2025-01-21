@@ -82,18 +82,22 @@ class Sample(BaseModel):
         """
         if self.label is None:
             return self
-        label = [self.label] if isinstance(self.label, int) else self.label
-        if not label:
+        if isinstance(self.label, int) and self.label < 0:
             message = (
-                "The `label` field cannot be empty for a multilabel sample. " "Please provide at least one valid label."
-            )
-            raise ValueError(message)
-        if any(label_ < 0 for label_ in label):
-            message = (
-                "All label values must be non-negative integers. "
+                f"All label values must be non-negative integers. Met {self.label} "
                 "Ensure that each label falls within the valid range of 0 to `n_classes - 1`."
             )
             raise ValueError(message)
+        if isinstance(self.label, list):
+            if len(self.label) == 0:
+                message = (
+                    "The `label` field cannot be empty for a multilabel sample. "
+                    "Please provide at least one valid label."
+                )
+                raise ValueError(message)
+            if any(lab not in [0, 1] for lab in self.label):
+                message = "In multi-label case, all labels need to be one hot encoded."
+                raise ValueError(message)
         return self
 
 
