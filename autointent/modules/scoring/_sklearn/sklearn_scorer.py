@@ -47,28 +47,19 @@ class SklearnScorer(ScoringModule):
         embedder_max_length: int | None = None,
         embedder_device: str = "cpu",
         embedder_use_cache: bool = True,
-        cv: int = 3,
         clf_args: dict[str, Any] | None = None,
-        n_jobs: int = -1,
-        seed: int = 0,
     ) -> None:
         """
         Initialize the SklearnScorer.
 
         :param embedder_name: Name of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
-        :param cv: Number of cross-validation folds, defaults to 3.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
-        :param seed: Random seed for reproducibility, defaults to 0.
         :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
         :param embedder_max_length: Maximum sequence length for embedding, or None for default.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.cv = cv
-        self.n_jobs = n_jobs
-        self.seed = seed
         self.embedder_name = embedder_name
         self.clf_name = clf_name
         self.clf_args = clf_args or {}
