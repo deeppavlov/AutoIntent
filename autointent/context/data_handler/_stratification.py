@@ -101,22 +101,47 @@ class StratifiedSplitter:
         Internally, this method creates a dataset copy with some integer assigned as OOS class id.
         With OOS samples treated as a separate class we obtain proportional distribution of them between two splits.
         """
+        # add oos as a class
         if not multilabel:
-            oos_class_id = len(dataset.unique(self.label_feature)) - 1
+            in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            n_classes = len(in_domain_sample[self.label_feature])
+            dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
         else:
-            n_classes = len(dataset[0][self.label_feature])
-            oos_class_id = [0] * n_classes
-        dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
-        train, test = self._split_without_oos(dataset, multilabel, self.test_size)
-        train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
-        test = test.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
+            oos_class_id = len(dataset.unique(self.label_feature)) - 1
+            dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
+
+        # perform stratified splitting
+        train, test = self._split_without_oos(dataset, multilabel=False, test_size=self.test_size)
+
+        # remove oos as a class
+        if not multilabel:
+            train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
+            test = test.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
+        else:
+            train = train.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
+            test = test.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
+
         return train, test
 
     def _map_label(
-        self, sample: dict[str, str | int | None], old: LabelType, new: LabelType
+        self, sample: dict[str, str | LabelType], old: LabelType, new: LabelType
     ) -> dict[str, str | LabelType]:
         if sample[self.label_feature] == old:
             sample[self.label_feature] = new
+        return sample
+
+    def _add_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
+        """Add OOS as a class for multi-label case."""
+        if sample[self.label_feature] is None:
+            sample[self.label_feature] = [0] * n_classes
+        sample[self.label_feature] += [1]
+        return sample
+
+    def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
+        """Remove OOS as a class for multi-label case."""
+        sample[self.label_feature] = sample[self.label_feature][:-1]
+        if sample[self.label_feature] == [0] * n_classes:
+            sample[self.label_feature] = None
         return sample
 
     def _split_disallow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
