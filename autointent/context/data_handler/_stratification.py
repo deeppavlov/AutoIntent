@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
 
 from autointent import Dataset
+from autointent.custom_types import LabelType
 
 
 class StratifiedSplitter:
@@ -100,7 +101,11 @@ class StratifiedSplitter:
         Internally, this method creates a dataset copy with some integer assigned as OOS class id.
         With OOS samples treated as a separate class we obtain proportional distribution of them between two splits.
         """
-        oos_class_id = len(dataset.unique(self.label_feature)) - 1
+        if not multilabel:
+            oos_class_id = len(dataset.unique(self.label_feature)) - 1
+        else:
+            n_classes = len(dataset[0][self.label_feature])
+            oos_class_id = [0] * n_classes
         dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
         train, test = self._split_without_oos(dataset, multilabel, self.test_size)
         train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
@@ -108,8 +113,8 @@ class StratifiedSplitter:
         return train, test
 
     def _map_label(
-        self, sample: dict[str, str | int | None], old: int | None, new: int | None
-    ) -> dict[str, str | int | None]:
+        self, sample: dict[str, str | int | None], old: LabelType, new: LabelType
+    ) -> dict[str, str | LabelType]:
         if sample[self.label_feature] == old:
             sample[self.label_feature] = new
         return sample
