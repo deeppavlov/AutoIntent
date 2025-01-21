@@ -19,6 +19,12 @@
         - avsolatorio/GIST-small-Embedding-v0
       k: [1, 3]
       train_head: [false, true]
+    - module_name: sklearn
+      embedder_name:
+        - sergeyzh/rubert-tiny-turbo
+      clf_name:
+        - LogisticRegression
+        - RandomForestClassifier
     - module_name: rerank
       k: [ 5, 10 ]
       weights: [uniform, distance, closest]
