@@ -51,7 +51,7 @@ class Dataset(dict[str, HFDataset]):
 
         self._encoded_labels = False
 
-        if self.multilabel:
+        if self.multilabel and not self._is_one_hot_encoded():
             self._encode_labels()
 
     @property
@@ -63,6 +63,20 @@ class Dataset(dict[str, HFDataset]):
         """
         split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
         return isinstance(self[split].features[self.label_feature], Sequence)
+
+    def _is_one_hot_encoded(self) -> bool:
+        """
+        Check the format of labels in multi-label case.
+
+        Dataset labels in multi-label case can be represented either by list of
+        integers or by list of zeros and ones
+        """
+        split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
+        in_domain_samples = self[split].filter(lambda sample: sample[self.label_feature] is not None)
+        return all(self._is_ohe_single(sample[self.label_feature]) for sample in in_domain_samples)
+
+    def _is_ohe_single(self, label: list[int]) -> bool:
+        return len(label) == self.n_classes and all(item in [0, 1] for item in label)
 
     @cached_property
     def n_classes(self) -> int:
