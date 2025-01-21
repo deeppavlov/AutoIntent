@@ -98,6 +98,12 @@ class Sample(BaseModel):
             if any(lab not in [0, 1] for lab in self.label):
                 message = "In multi-label case, all labels need to be one hot encoded."
                 raise ValueError(message)
+            if sum(self.label) == 0:
+                message = (
+                    "Found full-zero label. It must contain at least one 1. "
+                    "If you wanted to define OOS sample, simply omit the label field."
+                )
+                raise ValueError(message)
         return self
 
 
