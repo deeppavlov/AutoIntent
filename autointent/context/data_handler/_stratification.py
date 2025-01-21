@@ -71,7 +71,7 @@ class StratifiedSplitter:
         oos_samples = dataset.filter(lambda sample: sample[self.label_feature] is None)
         return len(oos_samples) > 0
 
-    def _split_without_oos(self, dataset: HFDataset, multilabel: bool, test_size: bool) -> tuple[HFDataset, HFDataset]:
+    def _split_without_oos(self, dataset: HFDataset, multilabel: bool, test_size: float) -> tuple[HFDataset, HFDataset]:
         splitter = self._split_multilabel if multilabel else self._split_multiclass
         splits = splitter(dataset, test_size)
         return dataset.select(splits[0]), dataset.select(splits[1])
