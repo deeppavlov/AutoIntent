@@ -191,20 +191,32 @@ class DataHandler:
                 raise ValueError(message)
 
     def _split_train(self, random_seed: int) -> None:
+        """
+        Split on two sets.
+
+        One is for scoring node optimizaton, one is for decision node.
+        """
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,
             split=Split.TRAIN,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
 
     def _split_validation(self, random_seed: int) -> None:
+        """
+        Split on two sets.
+
+        One is for scoring node optimizaton, one is for decision node.
+        """
         self.dataset[f"{Split.VALIDATION}_0"], self.dataset[f"{Split.VALIDATION}_1"] = split_dataset(
             self.dataset,
             split=Split.VALIDATION,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=False,  # only val data for decision node should contain OOS
         )
         self.dataset.pop(Split.VALIDATION)
 
@@ -214,6 +226,7 @@ class DataHandler:
             split=Split.TEST,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=True,  # both test and validation splits can contain OOS
         )
 
     def _split_validation_from_train(self, random_seed: int) -> None:
@@ -223,6 +236,7 @@ class DataHandler:
                 split=Split.TRAIN,
                 test_size=0.2,
                 random_seed=random_seed,
+                allow_oos_in_train=False,
             )
         else:
             for idx in range(2):
@@ -231,9 +245,11 @@ class DataHandler:
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=0.2,
                     random_seed=random_seed,
+                    allow_oos_in_train=idx==1, # for decision node it's ok to have oos in train
                 )
 
     def _split_test(self, test_size: float, random_seed: int) -> None:
+        """Obtain test set from train."""
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(
             self.dataset,
             split=f"{Split.TRAIN}_0",
@@ -245,6 +261,7 @@ class DataHandler:
             split=f"{Split.TRAIN}_1",
             test_size=test_size,
             random_seed=random_seed,
+            allow_oos_in_train=True,
         )
         self.dataset[Split.TEST] = concatenate_datasets(
             [self.dataset[f"{Split.TEST}_0"], self.dataset[f"{Split.TEST}_1"]],

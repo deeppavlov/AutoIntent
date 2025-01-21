@@ -46,7 +46,7 @@ class StratifiedSplitter:
         self.shuffle = shuffle
 
     def __call__(
-        self, dataset: HFDataset, multilabel: bool, allow_oos_in_train: bool = False
+        self, dataset: HFDataset, multilabel: bool, allow_oos_in_train: bool | None = None
     ) -> tuple[HFDataset, HFDataset]:
         """
         Split the dataset into training and testing subsets.
@@ -58,6 +58,12 @@ class StratifiedSplitter:
         """
         if not self._has_oos_samples(dataset):
             return self._split_without_oos(dataset, multilabel, self.test_size)
+        if allow_oos_in_train is None:
+            msg = (
+                "Error while splitting dataset. It contains OOS samples, "
+                "you need to set the parameter allow_oos_in_train."
+            )
+            raise ValueError(msg)
         splitter = self._split_allow_oos_in_train if allow_oos_in_train else self._split_disallow_oos_in_train
         return splitter(dataset, multilabel)
 
@@ -89,7 +95,7 @@ class StratifiedSplitter:
 
     def _split_allow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
         """
-        Equally distribute OOS samples between two splits.
+        Proportionally distribute OOS samples between two splits.
 
         Internally, this method creates a dataset copy with some integer assigned as OOS class id.
         With OOS samples treated as a separate class we obtain proportional distribution of them between two splits.
@@ -155,6 +161,7 @@ def split_dataset(
     split: str,
     test_size: float,
     random_seed: int,
+    allow_oos_in_train: bool | None = None,
 ) -> tuple[HFDataset, HFDataset]:
     """
     Split a Dataset object into training and testing subsets.
@@ -178,4 +185,4 @@ def split_dataset(
         label_feature=dataset.label_feature,
         random_seed=random_seed,
     )
-    return splitter(dataset[split], dataset.multilabel)
+    return splitter(dataset[split], dataset.multilabel, allow_oos_in_train=allow_oos_in_train)
