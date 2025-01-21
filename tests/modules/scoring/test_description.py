@@ -3,7 +3,6 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DescriptionScorer
-from tests.conftest import setup_environment
 
 
 @pytest.mark.parametrize(
@@ -14,8 +13,9 @@ from tests.conftest import setup_environment
     ],
 )
 def test_description_scorer(dataset, expected_prediction, multilabel):
-    dump_dir, logs_dir = setup_environment()
-    data_handler = DataHandler(dataset, force_multilabel=multilabel)
+    if multilabel:
+        dataset = dataset.to_multilabel()
+    data_handler = DataHandler(dataset)
 
     scorer = DescriptionScorer(embedder_name="sergeyzh/rubert-tiny-turbo", temperature=0.3, embedder_device="cpu")
 

@@ -1,18 +1,13 @@
 import importlib.resources as ires
 import os
-from pathlib import Path
 from typing import Literal
 
 import pytest
 
 from autointent import Pipeline
-from autointent._pipeline._cli_endpoint import optimize
 from autointent.configs import (
-    DataConfig,
     EmbedderConfig,
     LoggingConfig,
-    OptimizationConfig,
-    TaskConfig,
     VectorIndexConfig,
 )
 from autointent.utils import load_search_space
@@ -35,16 +30,19 @@ def get_search_space(task_type: TaskType):
     ["multiclass", "multilabel", "description"],
 )
 def test_no_context_optimization(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
 
@@ -53,16 +51,19 @@ def test_no_context_optimization(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_save_db(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_modules=False))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
 
@@ -71,39 +72,19 @@ def test_save_db(dataset, task_type):
     ["multiclass", "multilabel", "description"],
 )
 def test_dump_modules(dataset, task_type):
-    dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
-    pipeline_optimizer.set_config(LoggingConfig(dirpath=Path(logs_dir).resolve(), dump_dir=dump_dir, dump_modules=True))
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    context = pipeline_optimizer.fit(dataset, force_multilabel=(task_type == "multilabel"))
+    if task_type == "multilabel":
+        dataset = dataset.to_multilabel()
+
+    context = pipeline_optimizer.fit(dataset)
     context.dump()
 
-    assert os.listdir(dump_dir)
-
-
-@pytest.mark.parametrize(
-    "task_type",
-    ["multiclass", "multilabel", "description"],
-)
-def test_optimization_pipeline_cli(task_type):
-    dump_dir, logs_dir = setup_environment()
-    config = OptimizationConfig(
-        data=DataConfig(
-            train_path=ires.files("tests.assets.data").joinpath("clinc_subset.json"),
-            force_multilabel=(task_type == "multilabel"),
-        ),
-        task=TaskConfig(
-            search_space_path=get_search_space_path(task_type),
-        ),
-        vector_index=VectorIndexConfig(),
-        logs=LoggingConfig(
-            dirpath=Path(logs_dir),
-        ),
-        embedder=EmbedderConfig(device="cpu"),
-    )
-    optimize(config)
+    assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
