@@ -6,7 +6,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
-from datasets import ClassLabel, Sequence, get_dataset_config_names, load_dataset
+from datasets import ClassLabel, Sequence, Value, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
 
 from autointent.custom_types import LabelType, Split
@@ -49,11 +49,6 @@ class Dataset(dict[str, HFDataset]):
 
         self.intents = intents
 
-        self._encoded_labels = False
-
-        if self.multilabel and not self._is_one_hot_encoded():
-            self._encode_labels()
-
     @property
     def multilabel(self) -> bool:
         """
@@ -63,20 +58,6 @@ class Dataset(dict[str, HFDataset]):
         """
         split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
         return isinstance(self[split].features[self.label_feature], Sequence)
-
-    def _is_one_hot_encoded(self) -> bool:
-        """
-        Check the format of labels in multi-label case.
-
-        Dataset labels in multi-label case can be represented either by list of
-        integers or by list of zeros and ones
-        """
-        split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
-        in_domain_samples = self[split].filter(lambda sample: sample[self.label_feature] is not None)
-        return all(self._is_ohe_single(sample[self.label_feature]) for sample in in_domain_samples)
-
-    def _is_ohe_single(self, label: list[int]) -> bool:
-        return len(label) == self.n_classes and all(item in [0, 1] for item in label)
 
     @cached_property
     def n_classes(self) -> int:
@@ -135,7 +116,6 @@ class Dataset(dict[str, HFDataset]):
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
-        self._encode_labels()
         return self
 
     def to_dict(self) -> dict[str, list[dict[str, Any]]]:
@@ -194,13 +174,10 @@ class Dataset(dict[str, HFDataset]):
         """
         classes = set()
         for label in self[split][self.label_feature]:
-            match (label, self._encoded_labels):
-                case (int(), _):
+            match label:
+                case int():
                     classes.add(label)
-                case (list(), False):
-                    for label_ in label:
-                        classes.add(label_)
-                case (list(), True):
+                case list():
                     for idx, label_ in enumerate(label):
                         if label_:
                             classes.add(idx)
@@ -214,7 +191,6 @@ class Dataset(dict[str, HFDataset]):
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._encode_label)
-        self._encoded_labels = True
         return self
 
     def _to_multilabel(self, sample: Sample) -> Sample:
@@ -225,25 +201,11 @@ class Dataset(dict[str, HFDataset]):
         :return: Sample with label in multilabel format.
         """
         if isinstance(sample["label"], int):
-            sample["label"] = [sample["label"]]
+            ohe_vector = [0] * self.n_classes
+            ohe_vector[sample["label"]] = 1
+            sample["label"] = ohe_vector
         return sample
 
-    def _encode_label(self, sample: Sample) -> Sample:
-        """
-        Encode a sample's label as a one-hot vector.
-
-        :param sample: The sample to encode.
-        :return: Sample with encoded label.
-        """
-        one_hot_label = [0] * self.n_classes
-        match sample["label"]:
-            case int():
-                one_hot_label[sample["label"]] = 1
-            case list():
-                for idx in sample["label"]:
-                    one_hot_label[idx] = 1
-        sample["label"] = one_hot_label
-        return sample
 
     def _cast_label_feature(self) -> None:
         """Cast the label feature of the dataset to the appropriate type."""
@@ -251,7 +213,7 @@ class Dataset(dict[str, HFDataset]):
             new_features = split.features.copy()
             if self.multilabel:
                 new_features[self.label_feature] = Sequence(
-                    ClassLabel(num_classes=self.n_classes),
+                    Value("bool"), length=self.n_classes,
                 )
             else:
                 new_features[self.label_feature] = ClassLabel(
