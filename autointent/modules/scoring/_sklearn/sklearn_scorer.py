@@ -90,7 +90,6 @@ class SklearnScorer(ScoringModule):
 
         return cls(
             embedder_name=embedder_name,
-            seed=context.seed,
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
