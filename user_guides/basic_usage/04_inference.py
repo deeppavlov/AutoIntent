@@ -15,8 +15,31 @@ Here's the basic example:
 # %%
 from autointent import Dataset, Pipeline
 
+search_space = [
+    {
+        "node_type": "scoring",
+        "metric": "scoring_roc_auc",
+        "search_space": [
+            {
+                "module_name": "knn",
+                "k": [1],
+                "weights": ["uniform"],
+                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0"],
+            },
+        ],
+    },
+    {
+        "node_type": "decision",
+        "metric": "decision_accuracy",
+        "search_space": [
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "argmax"},
+        ],
+    },
+]
+
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
-pipeline = Pipeline.default_optimizer(multilabel=False)
+pipeline = Pipeline.from_search_space(search_space)
 context = pipeline.fit(dataset)
 pipeline.predict(["hello, world!"])
 
@@ -54,15 +77,12 @@ Firstly, your auto-configuration run should dump modules into file system:
 """
 
 # %%
-from pathlib import Path
-
 from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig, VectorIndexConfig
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
-pipeline = Pipeline.default_optimizer(multilabel=False)
-dump_dir = Path("my_dumps")
-pipeline.set_config(LoggingConfig(dump_dir=dump_dir, dump_modules=True, clear_ram=True))
+pipeline = Pipeline.from_search_space(search_space)
+pipeline.set_config(LoggingConfig(dump_modules=True, clear_ram=True))
 pipeline.set_config(VectorIndexConfig(save_db=True))
 
 # %% [markdown]
@@ -96,12 +116,3 @@ loaded_pipeline.predict(["hello, world!"])
 """
 ## That's all!
 """
-
-# %%
-# [you didn't see it]
-import shutil
-
-shutil.rmtree(dump_dir)
-
-for file in Path.cwd().glob("vector_db*"):
-    shutil.rmtree(file)

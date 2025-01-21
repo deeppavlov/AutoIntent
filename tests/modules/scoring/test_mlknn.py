@@ -4,12 +4,9 @@ from datasets import Dataset as HFDataset
 from autointent.context.data_handler import DataHandler
 from autointent.custom_types import Split
 from autointent.modules.scoring import MLKnnScorer
-from tests.conftest import setup_environment
 
 
 def test_base_mlknn(dataset):
-    dump_dir, logs_dir = setup_environment()
-
     dataset[Split.TEST] = HFDataset.from_list(
         [
             {
@@ -23,7 +20,7 @@ def test_base_mlknn(dataset):
         ],
     )
 
-    data_handler = DataHandler(dataset, force_multilabel=True)
+    data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, embedder_device="cpu")
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))

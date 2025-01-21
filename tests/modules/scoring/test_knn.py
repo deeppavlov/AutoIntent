@@ -2,12 +2,9 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
-from tests.conftest import setup_environment
 
 
 def test_base_knn(dataset):
-    dump_dir, logs_dir = setup_environment()
-
     data_handler = DataHandler(dataset)
 
     scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", embedder_device="cpu")

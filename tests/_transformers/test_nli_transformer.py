@@ -9,7 +9,7 @@ from autointent.context.data_handler import DataHandler
 @pytest.fixture
 def data_handler():
     data_path = ires.files("tests.assets.data").joinpath("clinc_subset.json")
-    return DataHandler(dataset=Dataset.from_json(data_path), random_seed=42, force_multilabel=False, split_train=False)
+    return DataHandler(dataset=Dataset.from_json(data_path), random_seed=42, split_train=False)
 
 
 def test_nli_transformer_predict_without_trained_head(data_handler):

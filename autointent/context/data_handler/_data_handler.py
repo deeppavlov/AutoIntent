@@ -29,14 +29,11 @@ class RegexPatterns(TypedDict):
 class DataHandler:
     """Data handler class."""
 
-    def __init__(
-        self, dataset: Dataset, force_multilabel: bool = False, random_seed: int = 0, split_train: bool = True
-    ) -> None:
+    def __init__(self, dataset: Dataset, random_seed: int = 0, split_train: bool = True) -> None:
         """
         Initialize the data handler.
 
         :param dataset: Training dataset.
-        :param force_multilabel: If True, force the dataset to be multilabel.
         :param random_seed: Seed for random number generation.
         :param split_train: Perform or not splitting of train (default to split to be used in scoring and
                             threshold search).
@@ -44,8 +41,6 @@ class DataHandler:
         set_seed(random_seed)
 
         self.dataset = dataset
-        if force_multilabel:
-            self.dataset = self.dataset.to_multilabel()
 
         self.n_classes = self.dataset.n_classes
 

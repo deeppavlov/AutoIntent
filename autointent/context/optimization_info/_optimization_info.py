@@ -4,6 +4,7 @@ This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
 
+import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -14,7 +15,6 @@ from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
-from ._logger import get_logger
 
 if TYPE_CHECKING:
     from autointent.modules.abc import Module
@@ -59,7 +59,7 @@ class OptimizationInfo:
 
     def __init__(self) -> None:
         """Initialize optimization info."""
-        self._logger = get_logger()
+        self._logger = logging.getLogger(__name__)
 
         self.artifacts = Artifacts()
         self.trials = Trials()
@@ -98,7 +98,7 @@ class OptimizationInfo:
             module_dump_dir=module_dump_dir,
         )
         self.trials.add_trial(node_type, trial)
-        self._logger.info(trial.model_dump())
+        self._logger.debug("module %s fitted and saved to optimization info", module_name, extra=trial.model_dump())
 
         if module:
             self.modules.add_module(node_type, module)
