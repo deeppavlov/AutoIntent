@@ -10,6 +10,7 @@ import numpy.typing as npt
 from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
+from autointent.custom_types import LabelType
 
 logger = logging.getLogger(__name__)
 
@@ -141,6 +142,21 @@ class Module(ABC):
                 )
             logger.warning(msg)
 
+    @staticmethod
+    def _get_task_specs(labels: list[LabelType]) -> tuple[int, bool, bool]:
+        """
+        Infer number of classes, type of classification and whether data contains OOS samples.
+
+        :param scores: training scores
+        :param labels: training labels
+        :return: number of classes, indicator if it's a multi-label task,
+                    indicator if data contains oos samples
+        """
+        contains_oos_samples = any(label is None for label in labels)
+        in_domain_label = next(lab for lab in labels if lab is not None)
+        multilabel = isinstance(in_domain_label, list)
+        n_classes = len(labels[0]) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
+        return n_classes, multilabel, contains_oos_samples
 
 class WrongClassificationError(Exception):
     """
