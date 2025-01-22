@@ -163,7 +163,6 @@ class DataHandler:
 
     def _split(self, random_seed: int, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
-        has_test_split = any(split.startswith(Split.TEST) for split in self.dataset)
 
         if split_train and Split.TRAIN in self.dataset:
             self._split_train(random_seed)
@@ -173,11 +172,7 @@ class DataHandler:
             self._split_test(test_size, random_seed)
 
         if not has_validation_split:
-            if not has_test_split:
-                self._split_validation_from_test(random_seed)
-                self._split_validation(random_seed)
-            else:
-                self._split_validation_from_train(random_seed)
+            self._split_validation_from_train(random_seed)
         elif Split.VALIDATION in self.dataset:
             self._split_validation(random_seed)
 
@@ -236,7 +231,7 @@ class DataHandler:
                 split=Split.TRAIN,
                 test_size=0.2,
                 random_seed=random_seed,
-                allow_oos_in_train=False,
+                allow_oos_in_train=True,
             )
         else:
             for idx in range(2):
