@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 from autointent.modules import AdaptiveDecision
-from autointent.modules.decision._utils import InvalidNumClassesError, WrongClassificationError
+from autointent.modules.abc import WrongClassificationError
+from autointent.modules.decision._utils import InvalidNumClassesError
 
 
 def test_multilabel(multilabel_fit_data):

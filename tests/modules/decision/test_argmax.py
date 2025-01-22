@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
 
+from autointent.modules.abc import WrongClassificationError
 from autointent.modules.decision import ArgmaxDecision
-from autointent.modules.decision._utils import InvalidNumClassesError, WrongClassificationError
+from autointent.modules.decision._utils import InvalidNumClassesError
 
 
 def test_multiclass(multiclass_fit_data, scores):

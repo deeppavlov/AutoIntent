@@ -140,7 +140,6 @@ class Module(ABC):
                     "contain it. So, using this method reduces the power of classification."
                 )
             logger.warning(msg)
-            raise ValueError
 
 
 class WrongClassificationError(Exception):
