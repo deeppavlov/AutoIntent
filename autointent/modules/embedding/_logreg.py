@@ -2,9 +2,10 @@
 
 from typing import Literal
 
+import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
+from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
@@ -122,18 +123,15 @@ class LogRegEmbedding(EmbeddingModule):
         embeddings = self.embedder.embed(utterances)
 
         if self._multilabel:
-            self._label_encoder = MultiLabelBinarizer()
-            encoded_labels = self._label_encoder.fit_transform(labels)
+            self._label_encoder = None
             base_clf = LogisticRegression()
             self._classifier = MultiOutputClassifier(base_clf)
         else:
             self._label_encoder = LabelEncoder()
-            encoded_labels = self._label_encoder.fit_transform(labels)
+            labels = self._label_encoder.fit_transform(labels)
             self._classifier = LogisticRegressionCV(cv=self.cv)
 
-        self._label_encoder.fit(labels)
-        encoded_labels = self._label_encoder.transform(labels)
-        self._classifier.fit(embeddings, encoded_labels)
+        self._classifier.fit(embeddings, labels)
 
     def score(
         self,
@@ -158,9 +156,11 @@ class LogRegEmbedding(EmbeddingModule):
             raise ValueError(message)
 
         embeddings = self.embedder.embed(utterances)
-        predicted_encoded = self._classifier.predict_proba(embeddings)
+        probas = self._classifier.predict_proba(embeddings)
+        if self._multilabel:
+            probas = np.stack(probas, axis=1)[..., 1]
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
-        return self.score_metrics((labels, predicted_encoded), metrics_dict)
+        return self.score_metrics((labels, probas), metrics_dict)
 
     def get_assets(self) -> RetrieverArtifact:
         """
