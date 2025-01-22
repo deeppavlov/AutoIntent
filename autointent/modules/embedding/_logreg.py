@@ -13,10 +13,7 @@ from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import BaseMetadataDict, LabelType
-from autointent.metrics import (
-    SCORING_METRICS_MULTICLASS,
-    SCORING_METRICS_MULTILABEL,
-)
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
 

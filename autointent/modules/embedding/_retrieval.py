@@ -6,10 +6,7 @@ from typing import Literal
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import LabelType
-from autointent.metrics import (
-    RETRIEVAL_METRICS_MULTICLASS,
-    RETRIEVAL_METRICS_MULTILABEL,
-)
+from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
 
