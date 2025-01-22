@@ -102,7 +102,7 @@ class StratifiedSplitter:
         With OOS samples treated as a separate class we obtain proportional distribution of them between two splits.
         """
         # add oos as a class
-        if not multilabel:
+        if multilabel:
             in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
             n_classes = len(in_domain_sample[self.label_feature])
             dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
@@ -114,12 +114,12 @@ class StratifiedSplitter:
         train, test = self._split_without_oos(dataset, multilabel=False, test_size=self.test_size)
 
         # remove oos as a class
-        if not multilabel:
-            train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
-            test = test.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
-        else:
+        if multilabel:
             train = train.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
             test = test.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
+        else:
+            train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
+            test = test.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
 
         return train, test
 
