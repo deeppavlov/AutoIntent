@@ -37,6 +37,11 @@ def test_scoring_multiclass(embedding_optimizer_multiclass):
                 "train_head": [False, True],
             },
             {
+                "module_name": "sklearn",
+                "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                "clf_name": ["LogisticRegression", "RandomForestClassifier"],
+            },
+            {
                 "module_name": "description",
                 "temperature": [1.0, 0.5, 0.1, 0.05],
                 "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
@@ -89,6 +94,14 @@ def test_scoring_multilabel(embedding_optimizer_multilabel):
                 "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
             },
             {"module_name": "mlknn", "k": [5], "embedder_name": ["sergeyzh/rubert-tiny-turbo"]},
+            {
+                "module_name": "sklearn",
+                "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                "clf_name": [
+                    "LogisticRegression",
+                    "RandomForestClassifier",
+                ],
+            },
             {
                 "module_name": "rerank",
                 "weights": ["uniform", "distance", "closest"],
