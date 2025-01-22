@@ -5,10 +5,10 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sklearn.metrics import f1_score
 
 from autointent import Context
 from autointent.custom_types import LabelType
+from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -157,4 +157,4 @@ def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float
     :param y_pred: Array of shape (n_samples, n_classes) with predicted labels.
     :return: Weighted F1 score.
     """
-    return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]
+    return decision_f1(y_true, y_pred)

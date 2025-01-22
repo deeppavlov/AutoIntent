@@ -63,8 +63,7 @@ class DecisionModule(Module, ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
-    @staticmethod
-    def _validate_inputs(scores: npt.NDArray[Any], labels: list[LabelType]) -> tuple[int, bool]:
+    def _validate_inputs(self, scores: npt.NDArray[Any], labels: list[LabelType]) -> tuple[int, bool]:
         """
         Sanity check if labels and scores are valid to be a training data for decision module.
 
@@ -73,10 +72,8 @@ class DecisionModule(Module, ABC):
         :return: number of classes, indicator if it's a multi-label task,
                     indicator if data contains oos samples
         """
-        contains_oos_samples = any(label is None for label in labels)
-        in_domain_label = next(lab for lab in labels if lab is not None)
-        multilabel = isinstance(in_domain_label, list)
-        n_classes = len(labels[0]) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
+        n_classes, multilabel, contains_oos_samples = super()._get_task_specs(labels)
+
         if n_classes != scores.shape[1]:
             msg = (
                 "There is a mismatch between provided labels and scores. "

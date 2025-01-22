@@ -1,11 +1,14 @@
 """Prediction metrics for multiclass and multilabel classification tasks."""
 
 import logging
+from functools import partial
 from typing import Any, Protocol
 
 import numpy as np
 import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+
+from autointent.custom_types import LabelType
 
 from ._converter import transform
 from .custom_types import LABELS_VALUE_TYPE
@@ -29,6 +32,34 @@ class DecisionMetricFn(Protocol):
         ...
 
 
+def handle_oos(
+    y_true: list[LabelType | None], y_pred: list[LabelType | None]
+) -> tuple[list[LabelType], list[LabelType]]:
+    """Convert labels of OOS samples to make them usable in decision metrics."""
+    in_domain_labels = list(filter(lambda lab: lab is not None, y_true))
+    multilabel = isinstance(in_domain_labels[0], list)
+    if multilabel:
+        func = _add_oos_multilabel
+        n_classes = len(in_domain_labels[0])
+    else:
+        func = _add_oos_multiclass
+        n_classes = len(set(in_domain_labels))
+    func = partial(func, n_classes=n_classes)
+    return list(map(func, y_true)), list(map(func, y_pred))
+
+
+def _add_oos_multiclass(label: int | None, n_classes: int) -> int:
+    if label is None:
+        return n_classes
+    return label
+
+
+def _add_oos_multilabel(label: list[int] | None, n_classes: int) -> list[int]:
+    if label is None:
+        return [0] * n_classes + [1]
+    return [*label, 1]
+
+
 def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
     Calculate decision accuracy. Supports both multiclass and multilabel.
@@ -50,7 +81,7 @@ def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
+    y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     return float(np.mean(y_true_ == y_pred_))
 
 
@@ -97,7 +128,7 @@ def _decision_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[A
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return float(roc_auc_score(y_true, y_pred, average="macro"))
+    return float(roc_auc_score(handle_oos(y_true), handle_oos(y_pred), average="macro"))
 
 
 def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -112,7 +143,7 @@ def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> fl
     :param y_pred: Predicted values of labels
     :return: Score of the decision ROC AUC
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
+    y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     if y_pred_.ndim == y_true_.ndim == 1:
         return _decision_roc_auc_multiclass(y_true_, y_pred_)
     if y_pred_.ndim == y_true_.ndim == 2:  # noqa: PLR2004
@@ -134,7 +165,7 @@ def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
     :param y_pred: Predicted values of labels
     :return: Score of the decision precision
     """
-    return float(precision_score(*transform(y_true, y_pred), average="macro"))
+    return float(precision_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
 def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -149,7 +180,7 @@ def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> flo
     :param y_pred: Predicted values of labels
     :return: Score of the decision recall
     """
-    return float(recall_score(*transform(y_true, y_pred), average="macro"))
+    return float(recall_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
 def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -164,4 +195,4 @@ def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return float(f1_score(*transform(y_true, y_pred), average="macro"))
+    return float(f1_score(*handle_oos(y_true, y_pred), average="macro"))
