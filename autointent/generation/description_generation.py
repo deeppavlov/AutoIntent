@@ -24,8 +24,10 @@ def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:
     for sample in samples:
         match sample.label:
             case list():
-                for label in sample.label:
-                    label_mapping[label].append(sample.utterance)
+                # parse one hot encoding
+                for class_id, label in enumerate(sample.label):
+                    if label:
+                        label_mapping[class_id].append(sample.utterance)
             case int():
                 label_mapping[sample.label].append(sample.utterance)
 
