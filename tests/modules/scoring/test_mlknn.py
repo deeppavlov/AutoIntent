@@ -1,25 +1,10 @@
 import numpy as np
-from datasets import Dataset as HFDataset
 
 from autointent.context.data_handler import DataHandler
-from autointent.custom_types import Split
 from autointent.modules.scoring import MLKnnScorer
 
 
 def test_base_mlknn(dataset):
-    dataset[Split.TEST] = HFDataset.from_list(
-        [
-            {
-                "utterance": "why is there a hold on my american saving bank account",
-                "label": [0, 1, 2],
-            },
-            {
-                "utterance": "i am nost sure why my account is blocked",
-                "label": [0, 3],
-            },
-        ],
-    )
-
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, embedder_device="cpu")
