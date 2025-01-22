@@ -28,7 +28,7 @@ def test_predict_scenarios(request, fixture_name, scores, desired):
     predictor.fit(*fit_data)
     predictions = predictor.predict(scores)
 
-    assert (predictions == desired)
+    assert predictions == desired
 
 
 def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):

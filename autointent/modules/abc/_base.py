@@ -163,6 +163,7 @@ class Module(ABC):
         n_classes = len(labels[0]) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
         return n_classes, multilabel, contains_oos_samples
 
+
 class WrongClassificationError(Exception):
     """
     Exception raised when a classification module is used with incompatible data.

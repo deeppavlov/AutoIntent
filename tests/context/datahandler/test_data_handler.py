@@ -56,7 +56,7 @@ def sample_multilabel_data():
             {"utterance": "bye, have a great day", "label": [0, 1]},
             {"utterance": "what's up?", "label": [1, 0]},
             {"utterance": "later, see you soon", "label": [1, 0]},
-            {"utterance": "greetings and salutations", "label": [1,0]},
+            {"utterance": "greetings and salutations", "label": [1, 0]},
         ],
         "test": [
             {"utterance": "greetings", "label": [0, 1]},
