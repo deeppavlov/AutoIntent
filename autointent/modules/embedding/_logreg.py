@@ -39,8 +39,8 @@ class LogRegEmbedding(EmbeddingModule):
         retrieval.fit(utterances, labels)
     """
 
-    classifier: LogisticRegressionCV
-    label_encoder: LabelEncoder
+    _classifier: LogisticRegressionCV
+    _label_encoder: LabelEncoder
     name = "logreg"
 
     def __init__(
@@ -122,18 +122,18 @@ class LogRegEmbedding(EmbeddingModule):
         embeddings = self.embedder.embed(utterances)
 
         if self._multilabel:
-            self.label_encoder = MultiLabelBinarizer()
-            encoded_labels = self.label_encoder.fit_transform(labels)
+            self._label_encoder = MultiLabelBinarizer()
+            encoded_labels = self._label_encoder.fit_transform(labels)
             base_clf = LogisticRegression()
-            self.classifier = MultiOutputClassifier(base_clf)
+            self._classifier = MultiOutputClassifier(base_clf)
         else:
-            self.label_encoder = LabelEncoder()
-            encoded_labels = self.label_encoder.fit_transform(labels)
-            self.classifier = LogisticRegressionCV(cv=self.cv)
+            self._label_encoder = LabelEncoder()
+            encoded_labels = self._label_encoder.fit_transform(labels)
+            self._classifier = LogisticRegressionCV(cv=self.cv)
 
-        self.label_encoder.fit(labels)
-        encoded_labels = self.label_encoder.transform(labels)
-        self.classifier.fit(embeddings, encoded_labels)
+        self._label_encoder.fit(labels)
+        encoded_labels = self._label_encoder.transform(labels)
+        self._classifier.fit(embeddings, encoded_labels)
 
     def score(
         self,
@@ -158,7 +158,7 @@ class LogRegEmbedding(EmbeddingModule):
             raise ValueError(message)
 
         embeddings = self.embedder.embed(utterances)
-        predicted_encoded = self.classifier.predict_proba(embeddings)
+        predicted_encoded = self._classifier.predict_proba(embeddings)
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         return self.score_metrics((labels, predicted_encoded), metrics_dict)
 
