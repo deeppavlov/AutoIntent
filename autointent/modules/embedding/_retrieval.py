@@ -6,7 +6,7 @@ from typing import Literal
 from autointent import VectorIndex
 from autointent.context import Context
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
@@ -97,7 +97,7 @@ class RetrievalEmbedding(EmbeddingModule):
             embedder_use_cache=context.get_use_cache(),
         )
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the vector index using the provided utterances and labels.
 

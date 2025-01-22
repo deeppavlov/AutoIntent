@@ -15,7 +15,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Embedder
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 
 
 class VectorIndexMetadata(TypedDict):
@@ -28,7 +28,7 @@ class VectorIndexMetadata(TypedDict):
 
 class VectorIndexData(TypedDict):
     texts: list[str]
-    labels: list[LabelType]
+    labels: ListOfLabels
 
 
 class VectorIndex:
@@ -68,12 +68,12 @@ class VectorIndex:
         )
         self.embedder_device = embedder_device
 
-        self.labels: list[LabelType] = []  # (n_samples,) or (n_samples, n_classes)
+        self.labels: ListOfLabels = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
 
         self.logger = logging.getLogger(__name__)
 
-    def add(self, texts: list[str], labels: list[LabelType]) -> None:
+    def add(self, texts: list[str], labels: ListOfLabels) -> None:
         """
         Add texts and their corresponding labels to the index.
 
@@ -160,7 +160,7 @@ class VectorIndex:
             raise ValueError(msg)
         return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
-    def get_all_labels(self) -> list[LabelType]:
+    def get_all_labels(self) -> ListOfLabels:
         """
         Retrieve all labels stored in the index.
 
@@ -172,7 +172,7 @@ class VectorIndex:
         self,
         queries: list[str] | npt.NDArray[np.float32],
         k: int,
-    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         """
         Query the index to retrieve nearest neighbors.
 

@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import WEIGHT_TYPES, LabelType
+from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 from .weighting import apply_weights
@@ -124,7 +124,7 @@ class KNNScorer(ScoringModule):
         """
         return self.embedder_name
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the scorer by training or loading the vector index.
 
@@ -170,7 +170,7 @@ class KNNScorer(ScoringModule):
 
     def _get_neighbours(
         self, utterances: list[str]
-    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         return self._vector_index.query(utterances, self.k)
 
     def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:

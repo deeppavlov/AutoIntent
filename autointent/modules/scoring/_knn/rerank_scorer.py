@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, Ranker
-from autointent.custom_types import WEIGHT_TYPES, LabelType
+from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 
 from .knn import KNNScorer
 
@@ -120,7 +120,7 @@ class RerankScorer(KNNScorer):
             cross_encoder_max_length=context.get_cross_encoder_max_length(),
         )
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the RerankScorer with utterances and labels.
 
@@ -147,7 +147,7 @@ class RerankScorer(KNNScorer):
         """
         knn_labels, knn_distances, knn_neighbors = self._get_neighbours(utterances)
 
-        labels: list[list[LabelType]] = []
+        labels: list[ListOfLabels] = []
         distances: list[list[float]] = []
         neighbours: list[list[str]] = []
 

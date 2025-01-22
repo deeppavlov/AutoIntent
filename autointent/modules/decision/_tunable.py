@@ -8,7 +8,7 @@ import optuna
 from optuna.trial import Trial
 
 from autointent.context import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
@@ -106,7 +106,7 @@ class TunableDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -136,7 +136,7 @@ class TunableDecision(DecisionModule):
         )
         self.thresh = thresh_optimizer.best_thresholds
 
-    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
         """
         Predict the best score.
 
@@ -181,7 +181,7 @@ class ThreshOptimizer:
     def fit(
         self,
         probas: npt.NDArray[Any],
-        labels: list[LabelType | None],
+        labels: ListOfGenericLabels,
         seed: int,
         tags: list[Tag] | None = None,
     ) -> None:

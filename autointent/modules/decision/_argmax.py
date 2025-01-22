@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -66,7 +66,7 @@ class ArgmaxDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """

@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel, model_validator
 
-from autointent.custom_types import LabelType
+from autointent.custom_types import LabelWithOOS
 
 
 class Tag(BaseModel):
@@ -52,7 +52,7 @@ class Sample(BaseModel):
     """
 
     utterance: str
-    label: LabelType | None = None
+    label: LabelWithOOS = None
 
     @model_validator(mode="after")
     def validate_sample(self) -> "Sample":

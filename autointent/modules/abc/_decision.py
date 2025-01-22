@@ -8,7 +8,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 from autointent.metrics import PREDICTION_METRICS_MULTICLASS
 from autointent.modules.abc import Module
 from autointent.schemas import Tag
@@ -21,7 +21,7 @@ class DecisionModule(Module, ABC):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -33,7 +33,7 @@ class DecisionModule(Module, ABC):
         """
 
     @abstractmethod
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
         """
         Predict the best score.
 
@@ -63,7 +63,9 @@ class DecisionModule(Module, ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
-    def _validate_inputs(self, scores: npt.NDArray[Any], labels: list[LabelType]) -> tuple[int, bool]:
+    def _validate_inputs(
+        self, scores: npt.NDArray[Any], labels: ListOfGenericLabels
+    ) -> tuple[int, bool]:
         """
         Sanity check if labels and scores are valid to be a training data for decision module.
 
@@ -88,7 +90,7 @@ class DecisionModule(Module, ABC):
 def get_decision_evaluation_data(
     context: Context,
     split: Literal["train", "validation", "test"],
-) -> tuple[list[LabelType], npt.NDArray[np.float64]]:
+) -> tuple[ListOfGenericLabels, npt.NDArray[np.float64]]:
     """
     Get decision evaluation data.
 
@@ -113,4 +115,4 @@ def get_decision_evaluation_data(
         message = f"No '{split}' scores found in the optimization info"
         raise ValueError(message)
 
-    return labels, scores  # type: ignore[return-value]
+    return labels, scores

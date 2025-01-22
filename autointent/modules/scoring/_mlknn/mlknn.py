@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 
@@ -126,7 +126,7 @@ class MLKnnScorer(ScoringModule):
         """
         return self.embedder_name
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the scorer by training or loading the vector index and calculating probabilities.
 

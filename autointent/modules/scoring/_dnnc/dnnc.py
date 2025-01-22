@@ -8,7 +8,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, Ranker, VectorIndex
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 logger = logging.getLogger(__name__)
@@ -147,7 +147,7 @@ class DNNCScorer(ScoringModule):
             train_head=train_head,
         )
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the scorer by training or loading the vector index and optionally training a logistic regression head.
 
@@ -223,7 +223,7 @@ class DNNCScorer(ScoringModule):
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 
-    def _build_result(self, scores: list[list[float]], labels: list[list[LabelType]]) -> npt.NDArray[Any]:
+    def _build_result(self, scores: list[list[float]], labels: list[ListOfLabels]) -> npt.NDArray[Any]:
         """
         Build a result matrix with scores assigned to the best neighbor's class.
 

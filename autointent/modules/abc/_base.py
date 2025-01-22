@@ -10,7 +10,7 @@ import numpy.typing as npt
 from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,9 @@ class Module(ABC):
         Dumper.load(self, Path(path))
 
     @abstractmethod
-    def predict(self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]) -> npt.NDArray[Any]:
+    def predict(
+        self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]
+    ) -> ListOfGenericLabels | npt.NDArray[Any]:
         """
         Predict on the input.
 
@@ -83,7 +85,7 @@ class Module(ABC):
         self,
         *args: list[str] | npt.NDArray[Any],
         **kwargs: dict[str, Any],
-    ) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
+    ) -> tuple[ListOfGenericLabels | npt.NDArray[Any], list[dict[str, Any]] | None]:
         """
         Predict on the input with metadata.
 
@@ -148,7 +150,7 @@ class Module(ABC):
             logger.warning(msg)
 
     @staticmethod
-    def _get_task_specs(labels: list[LabelType]) -> tuple[int, bool, bool]:
+    def _get_task_specs(labels: ListOfGenericLabels) -> tuple[int, bool, bool]:
         """
         Infer number of classes, type of classification and whether data contains OOS samples.
 

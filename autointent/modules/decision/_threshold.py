@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -102,7 +102,7 @@ class ThresholdDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -127,7 +127,7 @@ class ThresholdDecision(DecisionModule):
                 raise InvalidNumClassesError(msg)
             self.thresh = np.array(self.thresh)
 
-    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
         """
         Predict the best score.
 

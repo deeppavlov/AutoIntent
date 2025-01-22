@@ -100,7 +100,9 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
     return float(roc_auc_score(labels_, scores_, average="macro"))
 
 
-def _calculate_decision_metric(func: DecisionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+def _calculate_decision_metric(
+    func: DecisionMetricFn, labels: list[int] | list[list[int]], scores: SCORES_VALUE_TYPE
+) -> float:
     r"""
     Calculate decision metric.
 

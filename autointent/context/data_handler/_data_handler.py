@@ -8,7 +8,7 @@ from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import LabelType, Split
+from autointent.custom_types import ListOfGenericLabels, Split
 
 from ._stratification import split_dataset
 
@@ -83,7 +83,7 @@ class DataHandler:
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def train_labels(self, idx: int | None = None) -> list[LabelType]:
+    def train_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve training labels from the dataset.
 
@@ -95,7 +95,7 @@ class DataHandler:
         :return: List of training labels.
         """
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -111,7 +111,7 @@ class DataHandler:
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def validation_labels(self, idx: int | None = None) -> list[LabelType]:
+    def validation_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve validation labels from the dataset.
 
@@ -123,7 +123,7 @@ class DataHandler:
         :return: List of validation labels.
         """
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -139,7 +139,7 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def test_labels(self, idx: int | None = None) -> list[LabelType]:
+    def test_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve test labels from the dataset.
 
@@ -151,7 +151,7 @@ class DataHandler:
         :return: List of test labels.
         """
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def dump(self, filepath: str | Path) -> None:
         """

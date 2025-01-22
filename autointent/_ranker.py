@@ -18,7 +18,7 @@ import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +158,7 @@ class Ranker:
         self._activations_list.clear()
         return res  # type: ignore[no-any-return]
 
-    def _fit(self, pairs: list[tuple[str, str]], labels: list[LabelType]) -> None:
+    def _fit(self, pairs: list[tuple[str, str]], labels: ListOfLabels) -> None:
         """
         Train the logistic regression model on cross-encoder features.
 
@@ -181,7 +181,7 @@ class Ranker:
 
         self._clf = clf
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Construct training samples and train the logistic regression classifier.
 

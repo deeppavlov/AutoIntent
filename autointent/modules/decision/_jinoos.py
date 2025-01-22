@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -80,7 +80,7 @@ class JinoosDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -118,7 +118,7 @@ class JinoosDecision(DecisionModule):
         return [lab if lab != -1 else None for lab in y_pred]
 
     @staticmethod
-    def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:
+    def jinoos_score(y_true: ListOfGenericLabels, y_pred: npt.NDArray[Any]) -> float:
         r"""
         Calculate Jinoos score.
 

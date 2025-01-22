@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
 from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
@@ -84,7 +84,7 @@ class AdaptiveDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -109,7 +109,7 @@ class AdaptiveDecision(DecisionModule):
 
         self._r = float(self.search_space[np.argmax(metrics_list)])
 
-    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfLabelsWithOOS:
         """
         Predict labels for the given scores.
 
@@ -133,7 +133,7 @@ def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]
     return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
-def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> list[LabelType | None]:
+def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> ListOfLabelsWithOOS:
     """
     Predict binary labels for multi-label classification.
 
@@ -149,7 +149,7 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     return [lab if sum(lab) > 0 else None for lab in res.tolist()]
 
 
-def multilabel_score(y_true: list[LabelType | None], y_pred: list[LabelType | None]) -> float:
+def multilabel_score(y_true: ListOfLabelsWithOOS, y_pred: ListOfLabelsWithOOS) -> float:
     """
     Calculate the weighted F1 score for multi-label classification.
 

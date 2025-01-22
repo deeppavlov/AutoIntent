@@ -9,7 +9,7 @@ from typing import Any, TypedDict
 from datasets import Dataset as HFDataset
 from datasets import Sequence, get_dataset_config_names, load_dataset
 
-from autointent.custom_types import LabelType, Split
+from autointent.custom_types import LabelWithOOS, Split
 from autointent.schemas import Intent, Tag
 
 
@@ -17,12 +17,12 @@ class Sample(TypedDict):
     """
     Typed dictionary representing a dataset sample.
 
-    :param str utterance: The text of the utterance.
-    :param LabelType | None label: The label associated with the utterance, or None if out-of-scope.
+    :param utterance: The text of the utterance.
+    :param label: The label associated with the utterance, or None if out-of-scope.
     """
 
     utterance: str
-    label: LabelType | None
+    label: LabelWithOOS
 
 
 class Dataset(dict[str, HFDataset]):

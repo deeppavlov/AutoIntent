@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 
@@ -116,7 +116,7 @@ class LinearScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LabelType],
+        labels: ListOfLabels,
     ) -> None:
         """
         Train the logistic regression classifier.

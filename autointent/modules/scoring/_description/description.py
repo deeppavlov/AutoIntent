@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 
@@ -94,7 +94,7 @@ class DescriptionScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LabelType],
+        labels: ListOfLabels,
         descriptions: list[str],
     ) -> None:
         """
