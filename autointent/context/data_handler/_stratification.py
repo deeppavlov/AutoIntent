@@ -134,14 +134,14 @@ class StratifiedSplitter:
         """Add OOS as a class for multi-label case."""
         if sample[self.label_feature] is None:
             sample[self.label_feature] = [0] * n_classes
-        sample[self.label_feature] += [1]
+        sample[self.label_feature] += [1]  # type: ignore[operator]
         return sample
 
     def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
         """Remove OOS as a class for multi-label case."""
-        sample[self.label_feature] = sample[self.label_feature][:-1]
+        sample[self.label_feature] = sample[self.label_feature][:-1]  # type: ignore[index]
         if sample[self.label_feature] == [0] * n_classes:
-            sample[self.label_feature] = None
+            sample[self.label_feature] = None  # type: ignore[assignment]
         return sample
 
     def _split_disallow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
