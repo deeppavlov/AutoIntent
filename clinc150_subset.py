@@ -26,9 +26,9 @@ if __name__ == "__main__":
     train_0, train_1 = splitter(train, multilabel=False, allow_oos_in_train=False)
 
     splitter = StratifiedSplitter(test_size=0.5, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
-    val, test = splitter(val, multilabel=False, allow_oos_in_train=False)
+    val, test = splitter(val, multilabel=False, allow_oos_in_train=True)
 
-    splitter = StratifiedSplitter(test_size=0.5, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
+    splitter = StratifiedSplitter(test_size=0.6, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
     val_0, val_1 = splitter(val, multilabel=False, allow_oos_in_train=False)
 
     clinc150_subset = Dataset.from_dict(

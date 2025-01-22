@@ -149,72 +149,38 @@
     ],
     "validation_0": [
         {
+            "utterance": "how come a hold was placed on my 401k account",
+            "label": 1
+        },
+        {
             "utterance": "what is the status of my new credit card application",
             "label": 3
         },
         {
-            "utterance": "how come a hold was placed on my 401k account",
-            "label": 1
+            "utterance": "do they take reservations at carrabbas",
+            "label": 0
+        },
+        {
+            "utterance": "make an alarm for tomorrow at twilight",
+            "label": 2
+        }
+    ],
+    "validation_1": [
+        {
+            "utterance": "where can i find out the status of my credit card application",
+            "label": 3
         },
         {
             "utterance": "is it possible to make reservations with famous dave's restaurant",
             "label": 0
         },
         {
-            "utterance": "set alarm for 5 am",
-            "label": 2
-        },
-        {
-            "utterance": "where can i find out the status of my credit card application",
-            "label": 3
-        },
-        {
             "utterance": "what's with the block on my bank account",
             "label": 1
-        }
-    ],
-    "validation_1": [
-        {
-            "utterance": "do they take reservations at carrabbas",
-            "label": 0
         },
         {
-            "utterance": "look to see if my application for the barclay's card has gone through yet",
-            "label": 3
-        },
-        {
-            "utterance": "i need you to set an alarm for 8am tomorrow",
+            "utterance": "set alarm for 5 am",
             "label": 2
-        },
-        {
-            "utterance": "does the steakhouse on main st take reservations",
-            "label": 0
-        },
-        {
-            "utterance": "make an alarm for tomorrow at twilight",
-            "label": 2
-        },
-        {
-            "utterance": "help me please, my account is blocked",
-            "label": 1
-        }
-    ],
-    "test": [
-        {
-            "utterance": "has there been any changes in the status of my credit card application",
-            "label": 3
-        },
-        {
-            "utterance": "make an alarm 6am",
-            "label": 2
-        },
-        {
-            "utterance": "does pho king in ceres take reservations",
-            "label": 0
-        },
-        {
-            "utterance": "can i talk to someone about why there is a hold on my checking account",
-            "label": 1
         },
         {
             "utterance": "how many points per game is lebron james averaging this season",
@@ -225,27 +191,61 @@
             "label": null
         },
         {
+            "utterance": "how many sides are in a hexagon",
+            "label": null
+        },
+        {
+            "utterance": "how many students attend ucsb",
+            "label": null
+        }
+    ],
+    "test": [
+        {
+            "utterance": "does pho king in ceres take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "make an alarm 6am",
+            "label": 2
+        },
+        {
+            "utterance": "i need you to set an alarm for 8am tomorrow",
+            "label": 2
+        },
+        {
             "utterance": "We were excited to eat here, it is difficult to find. They were closed at 3 p.m. on a Saturday.",
             "label": null
+        },
+        {
+            "utterance": "does the steakhouse on main st take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "has there been any changes in the status of my credit card application",
+            "label": 3
+        },
+        {
+            "utterance": "look to see if my application for the barclay's card has gone through yet",
+            "label": 3
+        },
+        {
+            "utterance": "can i talk to someone about why there is a hold on my checking account",
+            "label": 1
+        },
+        {
+            "utterance": "help me please, my account is blocked",
+            "label": 1
         },
         {
             "utterance": "why are exponents preformed before multiplication in the order of operations",
             "label": null
         },
         {
-            "utterance": "Went here with my roommate last week for a late breakfast and was pleasantly surprised! I got the Eggs Benedict and a chocolate croissant while my roommate went for the French toast with fresh fruit. Everything was very tasty, although my roommate could have easily handled a larger portion. \\nAll the employees were super sweet and the French owner's eclectic playlist really added to how much I enjoyed the experience. Will have to go again for lunch or dinner!",
-            "label": null
-        },
-        {
-            "utterance": "how many students attend ucsb",
-            "label": null
-        },
-        {
-            "utterance": "how many sides are in a hexagon",
-            "label": null
-        },
-        {
             "utterance": "We recently adopted our dog from my mom-in-law who lives in Casa Grande and I wanted to get Bruno in to see a vet in Tempe. I looked up a few offices and saw this location had an awesome rating. I was pleased to see someone I respect, Shayna K. from Scottsdale Doggie Suites, providing a 5 star rating and that was it. \\n\\nI immediately decided to make a new patient appointment for my furry baby. The office is clean, the staff is nice, and they made Bruno feel right at home. \\n\\nDr. Berthiaume came in and was very informative. I think he could tell I was a nervous \\\"new mom\\\" and he helped me stay at ease. He suggested one medication for Bruno which is for heartworm prevention but didn't pressure me into making a purchase right then and there. He gave me a pamplet on it and told me to do some research on my own first. (AMEN!)\\n\\nWhen I told them about my concern about him scratching his ears a lot, they took swabs but didn't run them. Dr. B. said if he saw anything \\\"bad\\\" he would have ran them for a test but didn't want to charge me for anything Bruno didn't need done. He suggested to have Bruno's stool tested but said we could bring in a sample anytime and they would send it off then. There was NO pressure to have tests done so they could get money out of me. \\n\\nThey genuinely cared about Bruno and my wallet. I will be going back, this is going to be my dog's doctor, and I appreciate how awesome everyone was. It is so refreshing to find a place that really care about the patients they see and the owners.",
+            "label": null
+        },
+        {
+            "utterance": "Went here with my roommate last week for a late breakfast and was pleasantly surprised! I got the Eggs Benedict and a chocolate croissant while my roommate went for the French toast with fresh fruit. Everything was very tasty, although my roommate could have easily handled a larger portion. \\nAll the employees were super sweet and the French owner's eclectic playlist really added to how much I enjoyed the experience. Will have to go again for lunch or dinner!",
             "label": null
         }
     ],
