@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
-from autointent.custom_types import NodeType
+from autointent.custom_types import LabelType, NodeType
 
 
 class Artifact(BaseModel):
@@ -53,7 +53,7 @@ class DecisionArtifact(Artifact):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    labels: NDArray[np.float64]
+    labels: list[LabelType | None]
 
 
 def validate_node_name(value: str) -> str:

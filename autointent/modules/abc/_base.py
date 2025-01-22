@@ -115,10 +115,10 @@ class Module(ABC):
         """
         metrics = {}
         for metric_name, metric_fn in metrics_dict.items():
-            try:
-                metrics[metric_name] = metric_fn(*params)
-            except Exception as e:  # noqa: PERF203, BLE001
-                metrics[metric_name] = str(e)
+            # try:
+            metrics[metric_name] = metric_fn(*params)
+            # except Exception as e:  # nqa: PERF203, BLE001
+            #     metrics[metric_name] = str(e)
         return metrics
 
     def _validate_multilabel(self, data_is_multilabel: bool) -> None:

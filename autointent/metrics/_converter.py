@@ -43,7 +43,7 @@ def _handle_oos(labels: list[LabelType | None]) -> list[LabelType]:
         func = _add_oos_multiclass
         n_classes = len(set(in_domain_labels))
     func = partial(func, n_classes=n_classes)
-    return list(filter(func, labels))
+    return list(map(func, labels))
 
 def _add_oos_multiclass(label: int | None, n_classes: int) -> int:
     if label is None:
