@@ -97,13 +97,13 @@ def get_decision_evaluation_data(
     :return:
     """
     if split == "train":
-        labels = np.array(context.data_handler.train_labels(1))
+        labels = context.data_handler.train_labels(1)
         scores = context.optimization_info.get_best_train_scores()
     elif split == "validation":
-        labels = np.array(context.data_handler.validation_labels(1))
+        labels = context.data_handler.validation_labels(1)
         scores = context.optimization_info.get_best_validation_scores()
     elif split == "test":
-        labels = np.array(context.data_handler.test_labels())
+        labels = context.data_handler.test_labels()
         scores = context.optimization_info.get_best_test_scores()
     else:
         message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation', or 'test'."
@@ -113,4 +113,4 @@ def get_decision_evaluation_data(
         message = f"No '{split}' scores found in the optimization info"
         raise ValueError(message)
 
-    return labels.tolist(), scores  # type: ignore[return-value]
+    return labels, scores  # type: ignore[return-value]

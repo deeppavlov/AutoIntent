@@ -128,7 +128,7 @@ def _decision_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[A
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return float(roc_auc_score(handle_oos(y_true), handle_oos(y_pred), average="macro"))
+    return float(roc_auc_score(y_true, y_pred, average="macro"))
 
 
 def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
