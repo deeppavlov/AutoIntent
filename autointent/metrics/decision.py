@@ -1,9 +1,10 @@
 """Prediction metrics for multiclass and multilabel classification tasks."""
 
 import logging
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
+import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
 from ._converter import transform
@@ -53,7 +54,7 @@ def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
     return float(np.mean(y_true_ == y_pred_))
 
 
-def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     r"""
     Calculate roc_auc for multiclass.
 
@@ -74,19 +75,17 @@ def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE
     :param y_pred: Predicted values of labels
     :return: Score of the decision roc_auc
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
-
     n_classes = len(np.unique(y_true))
     roc_auc_scores: list[float] = []
     for k in range(n_classes):
-        binarized_true = (y_true_ == k).astype(int)
-        binarized_pred = (y_pred_ == k).astype(int)
+        binarized_true = (y_true == k).astype(int)
+        binarized_pred = (y_pred == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
     return float(np.mean(roc_auc_scores))
 
 
-def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     r"""
     Calculate roc_auc for multilabel.
 
@@ -135,7 +134,7 @@ def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
     :param y_pred: Predicted values of labels
     :return: Score of the decision precision
     """
-    return float(precision_score(y_true, y_pred, average="macro"))
+    return float(precision_score(*transform(y_true, y_pred), average="macro"))
 
 
 def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -150,7 +149,7 @@ def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> flo
     :param y_pred: Predicted values of labels
     :return: Score of the decision recall
     """
-    return float(recall_score(y_true, y_pred, average="macro"))
+    return float(recall_score(*transform(y_true, y_pred), average="macro"))
 
 
 def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
@@ -165,4 +164,4 @@ def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return float(f1_score(y_true, y_pred, average="macro"))
+    return float(f1_score(*transform(y_true, y_pred), average="macro"))

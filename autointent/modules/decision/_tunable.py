@@ -135,7 +135,7 @@ class TunableDecision(DecisionModule):
         )
         self.thresh = thresh_optimizer.best_thresholds
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
         """
         Predict the best score.
 
@@ -145,8 +145,10 @@ class TunableDecision(DecisionModule):
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
         if self._multilabel:
-            return multilabel_predict(scores, self.thresh, self.tags)
-        return multiclass_predict(scores, self.thresh)
+            y_pred = multilabel_predict(scores, self.thresh, self.tags)
+            return [lab if sum(lab) > 0 else None for lab in y_pred]
+        y_pred = multiclass_predict(scores, self.thresh)
+        return [lab if lab != -1 else None for lab in y_pred]
 
 
 class ThreshOptimizer:

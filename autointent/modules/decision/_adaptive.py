@@ -108,7 +108,7 @@ class AdaptiveDecision(DecisionModule):
 
         self._r = float(self.search_space[np.argmax(metrics_list)])
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
         """
         Predict labels for the given scores.
 
@@ -118,7 +118,8 @@ class AdaptiveDecision(DecisionModule):
         """
         if scores.shape[1] != self._n_classes:
             raise InvalidNumClassesError
-        return multilabel_predict(scores, self._r, self.tags)
+        y_pred = multilabel_predict(scores, self._r, self.tags).tolist()
+        return [lab if sum(lab) > 0 else None for lab in y_pred]
 
 
 def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:

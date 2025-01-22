@@ -104,7 +104,7 @@ class JinoosDecision(DecisionModule):
 
         self._thresh = float(self.search_space[np.argmax(metrics_list)])
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> list[int | None]:
         """
         Predict the best score.
 
@@ -113,7 +113,8 @@ class JinoosDecision(DecisionModule):
         if scores.shape[1] != self._n_classes:
             raise InvalidNumClassesError
         pred_classes, best_scores = _predict(scores)
-        return _detect_oos(pred_classes, best_scores, self._thresh)
+        y_pred = _detect_oos(pred_classes, best_scores, self._thresh).tolist()
+        return [lab if lab != -1 else None for lab in y_pred]
 
     @staticmethod
     def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:
@@ -161,6 +162,8 @@ def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], np
 def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
     """
     Detect out of scope samples.
+
+    OOS samples are marked with label -1.
 
     :param classes: Classes to detect
     :param scores: Scores to detect

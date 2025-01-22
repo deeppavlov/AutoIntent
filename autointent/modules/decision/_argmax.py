@@ -80,7 +80,7 @@ class ArgmaxDecision(DecisionModule):
         self._validate_multilabel(multilabel)
         self._validate_oos(contains_oos)
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> list[int]:
         """
         Predict the argmax.
 
@@ -89,4 +89,4 @@ class ArgmaxDecision(DecisionModule):
         """
         if scores.shape[1] != self._n_classes:
             raise InvalidNumClassesError
-        return np.argmax(scores, axis=1)  # type: ignore[no-any-return]
+        return np.argmax(scores, axis=1).tolist()  # type: ignore[no-any-return]

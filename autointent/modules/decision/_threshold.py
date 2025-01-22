@@ -126,18 +126,20 @@ class ThresholdDecision(DecisionModule):
                 raise InvalidNumClassesError(msg)
             self.thresh = np.array(self.thresh)
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> list[LabelType | None]:
         """
         Predict the best score.
 
         :param scores: Scores to predict
         """
-        if self._multilabel:
-            return multilabel_predict(scores, self.thresh, self.tags)
         if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
-        return multiclass_predict(scores, self.thresh)
+        if self._multilabel:
+            y_pred = multilabel_predict(scores, self.thresh, self.tags)
+            return [lab if sum(lab) > 0 else None for lab in y_pred]
+        y_pred = multiclass_predict(scores, self.thresh)
+        return [lab if lab != -1 else None for lab in y_pred]
 
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
