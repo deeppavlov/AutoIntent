@@ -1,5 +1,6 @@
 """Base module for all modules."""
 
+import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Literal
@@ -9,16 +10,16 @@ import numpy.typing as npt
 from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
-from autointent.custom_types import BaseMetadataDict
+
+logger = logging.getLogger(__name__)
 
 
 class Module(ABC):
     """Base module."""
 
+    supports_oos: bool
+    supports_multilabel: bool
     name: str
-
-    metadata_dict_name: str = "metadata.json"
-    metadata: BaseMetadataDict
 
     @abstractmethod
     def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
@@ -119,3 +120,44 @@ class Module(ABC):
             except Exception as e:  # noqa: PERF203, BLE001
                 metrics[metric_name] = str(e)
         return metrics
+
+    def _validate_multilabel(self, data_is_multilabel: bool) -> None:
+        if data_is_multilabel and not self.supports_multilabel:
+            msg = f'"{self.name}" module is incompatible with multi-label classifiction.'
+            logger.error(msg)
+            raise WrongClassificationError(msg)
+
+    def _validate_oos(self, data_contains_oos: bool) -> None:
+        if data_contains_oos != self.supports_oos:
+            if self.supports_oos and not data_contains_oos:
+                msg = (
+                    f'"{self.name}" is designed to handle OOS samples, but your data doesn\'t '
+                    "contain any of it. So, using this method puts unnecessary computational overhead."
+                )
+            elif not self.supports_oos and data_contains_oos:
+                msg = (
+                    f'"{self.name}" is NOT designed to handle OOS samples, but your data '
+                    "contain it. So, using this method reduces the power of classification."
+                )
+            logger.warning(msg)
+            raise ValueError
+
+
+class WrongClassificationError(Exception):
+    """
+    Exception raised when a classification module is used with incompatible data.
+
+    This error typically occurs when a multiclass module is called on multilabel data
+    or vice versa.
+
+    :param message: Error message, defaults to a standard incompatibility message.
+    """
+
+    def __init__(self, message: str = "Multiclass module is called on multilabel data or vice-versa") -> None:
+        """
+        Initialize the exception.
+
+        :param message: Error message, defaults to a standard incompatibility message.
+        """
+        self.message = message
+        super().__init__(message)

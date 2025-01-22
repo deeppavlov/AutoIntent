@@ -1,8 +1,7 @@
 """AdaptiveDecision module for multi-label classification with adaptive thresholds."""
 
-import json
-from pathlib import Path
-from typing import Any, TypedDict
+import logging
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -13,23 +12,10 @@ from autointent.custom_types import LabelType
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
+from ._utils import InvalidNumClassesError, apply_tags
 
 default_search_space = np.linspace(0, 1, num=10)
-
-
-class AdaptiveDecisionDumpMetadata(TypedDict):
-    """
-    Metadata structure for saving the state of an AdaptiveDecision.
-
-    :ivar r: The selected threshold scaling factor.
-    :ivar tags: List of Tag objects for mutually exclusive classes.
-    :ivar n_classes: Number of classes used during training.
-    """
-
-    r: float
-    tags: list[Tag] | None
-    n_classes: int
+logger = logging.getLogger(__name__)
 
 
 class AdaptiveDecision(DecisionModule):
@@ -65,10 +51,11 @@ class AdaptiveDecision(DecisionModule):
 
     """
 
-    metadata_dict_name = "metadata.json"
-    n_classes: int
+    _n_classes: int
     _r: float
     tags: list[Tag] | None
+    supports_multilabel = True
+    supports_oos = False
     name = "adaptive"
 
     def __init__(self, search_space: list[float] | None = None) -> None:
@@ -108,14 +95,10 @@ class AdaptiveDecision(DecisionModule):
         :raises WrongClassificationError: If used on non-multi-label data.
         """
         self.tags = tags
-        multilabel = isinstance(labels[0], list)
-        if not multilabel:
-            msg = (
-                "AdaptiveDecision is not designed to perform multiclass classification. "
-                "Consider using other predictor algorithms."
-            )
-            raise WrongClassificationError(msg)
-        self.n_classes = len(labels[0]) if multilabel else len(set(labels).difference([-1]))  # type: ignore[arg-type]
+
+        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
+        self._validate_multilabel(multilabel)
+        self._validate_oos(contains_oos)
 
         metrics_list = []
         for r in self.search_space:
@@ -133,47 +116,9 @@ class AdaptiveDecision(DecisionModule):
         :return: Array of shape (n_samples, n_classes) with predicted binary labels.
         :raises InvalidNumClassesError: If the number of classes does not match the trained predictor.
         """
-        if scores.shape[1] != self.n_classes:
-            msg = "Provided scores number doesn't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+        if scores.shape[1] != self._n_classes:
+            raise InvalidNumClassesError
         return multilabel_predict(scores, self._r, self.tags)
-
-    def dump(self, path: str) -> None:
-        """
-        Save the predictor's metadata to disk.
-
-        :param path: Path to the directory where metadata will be saved.
-        """
-        dump_dir = Path(path)
-
-        metadata = AdaptiveDecisionDumpMetadata(
-            r=self._r,
-            tags=[t.model_dump() for t in self.tags] if self.tags else None,  # type: ignore[misc]
-            n_classes=self.n_classes,
-        )
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
-
-    def load(self, path: str) -> None:
-        """
-        Load the predictor's metadata from disk.
-
-        :param path: Path to the directory containing saved metadata.
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: AdaptiveDecisionDumpMetadata = json.load(file)
-
-        if metadata["tags"] is not None and isinstance(metadata["tags"], list):
-            self.tags = [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
-        else:
-            self.tags = None
-
-        self._r = metadata["r"]
-        self.n_classes = metadata["n_classes"]
-        self.metadata = metadata
 
 
 def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:

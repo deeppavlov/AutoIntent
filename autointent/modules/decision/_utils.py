@@ -6,6 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent.schemas import Tag
+from autointent.custom_types import LabelType
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
@@ -48,25 +49,6 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
     return labels
 
 
-class WrongClassificationError(Exception):
-    """
-    Exception raised when a classification module is used with incompatible data.
-
-    This error typically occurs when a multiclass module is called on multilabel data
-    or vice versa.
-
-    :param message: Error message, defaults to a standard incompatibility message.
-    """
-
-    def __init__(self, message: str = "Multiclass module is called on multilabel data or vice-versa") -> None:
-        """
-        Initialize the exception.
-
-        :param message: Error message, defaults to a standard incompatibility message.
-        """
-        self.message = message
-        super().__init__(message)
-
 
 class InvalidNumClassesError(Exception):
     """
@@ -78,11 +60,11 @@ class InvalidNumClassesError(Exception):
     :param message: Error message, defaults to a standard class incompatibility message.
     """
 
-    def __init__(self, message: str = "Data with incompatible number of classes was sent to module") -> None:
+    def __init__(self, message: str | None = None) -> None:
         """
         Initialize the exception.
 
         :param message: Error message, defaults to a standard incompatibility message.
         """
-        self.message = message
+        self.message = message or "Provided scores number don't match with number of classes which module was trained on."
         super().__init__(message)

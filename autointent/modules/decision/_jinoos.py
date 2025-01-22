@@ -1,27 +1,18 @@
 """Jinoos predictor module."""
 
-import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, WrongClassificationError
+from ._utils import InvalidNumClassesError
 
 default_search_space = np.linspace(0, 1, num=100)
-
-
-class JinoosDecisionDumpMetadata(BaseMetadataDict):
-    """Metadata for Jinoos predictor dump."""
-
-    thresh: float
-    n_classes: int
 
 
 class JinoosDecision(DecisionModule):
@@ -58,7 +49,9 @@ class JinoosDecision(DecisionModule):
 
     thresh: float
     name = "jinoos"
-    n_classes: int
+    _n_classes: int
+    supports_multilabel = False
+    supports_oos = True
 
     def __init__(
         self,
@@ -97,11 +90,9 @@ class JinoosDecision(DecisionModule):
         :param tags: Tags to fit
         """
         # TODO: use dev split instead of test split.
-        multilabel = isinstance(labels[0], list)
-        if multilabel:
-            msg = "JinoosDecision is compatible with single-label classification only"
-            raise WrongClassificationError(msg)
-        self.n_classes = len(set(labels).difference([-1]))
+        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
+        self._validate_multilabel(multilabel)
+        self._validate_oos(contains_oos)
 
         pred_classes, best_scores = _predict(scores)
 
@@ -111,7 +102,7 @@ class JinoosDecision(DecisionModule):
             metric_value = self.jinoos_score(labels, y_pred)
             metrics_list.append(metric_value)
 
-        self.thresh = float(self.search_space[np.argmax(metrics_list)])
+        self._thresh = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
         """
@@ -119,39 +110,10 @@ class JinoosDecision(DecisionModule):
 
         :param scores: Scores to predict
         """
-        if scores.shape[1] != self.n_classes:
-            msg = "Provided scores number don't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+        if scores.shape[1] != self._n_classes:
+            raise InvalidNumClassesError
         pred_classes, best_scores = _predict(scores)
-        return _detect_oos(pred_classes, best_scores, self.thresh)
-
-    def dump(self, path: str) -> None:
-        """
-        Dump all data needed for inference.
-
-        :param path: Path to dump
-        """
-        self.metadata = JinoosDecisionDumpMetadata(thresh=self.thresh, n_classes=self.n_classes)
-
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.metadata, file, indent=4)
-
-    def load(self, path: str) -> None:
-        """
-        Load data from dump.
-
-        :param path: Path to load
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: JinoosDecisionDumpMetadata = json.load(file)
-
-        self.thresh = metadata["thresh"]
-        self.metadata = metadata
-        self.n_classes = metadata["n_classes"]
+        return _detect_oos(pred_classes, best_scores, self._thresh)
 
     @staticmethod
     def jinoos_score(y_true: list[LabelType] | npt.NDArray[Any], y_pred: list[LabelType] | npt.NDArray[Any]) -> float:

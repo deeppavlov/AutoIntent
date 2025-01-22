@@ -1,7 +1,5 @@
 """Tunable predictor module."""
 
-import json
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -11,21 +9,12 @@ from optuna.trial import Trial
 from sklearn.metrics import f1_score
 
 from autointent.context import Context
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
 from ._utils import InvalidNumClassesError
-
-
-class TunableDecisionDumpMetadata(BaseMetadataDict):
-    """Tunable predictor metadata."""
-
-    multilabel: bool
-    thresh: list[float]
-    tags: list[Tag] | None
-    n_classes: int
 
 
 class TunableDecision(DecisionModule):
@@ -80,8 +69,10 @@ class TunableDecision(DecisionModule):
     """
 
     name = "tunable"
-    multilabel: bool
-    n_classes: int
+    _multilabel: bool
+    _n_classes: int
+    supports_multilabel = True
+    supports_oos = True
     tags: list[Tag] | None
 
     def __init__(
@@ -128,12 +119,13 @@ class TunableDecision(DecisionModule):
         :param tags: Tags to fit
         """
         self.tags = tags
-        self.multilabel = isinstance(labels[0], list)
-        self.n_classes = (
-            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
-        )
+        self._n_classes, self._multilabel, contains_oos = self._validate_inputs(scores, labels)
+        self._validate_multilabel(self._multilabel)
+        self._validate_oos(contains_oos)
 
-        thresh_optimizer = ThreshOptimizer(n_classes=self.n_classes, multilabel=self.multilabel, n_trials=self.n_trials)
+        thresh_optimizer = ThreshOptimizer(
+            n_classes=self._n_classes, multilabel=self._multilabel, n_trials=self.n_trials
+        )
 
         thresh_optimizer.fit(
             probas=scores,
@@ -149,51 +141,12 @@ class TunableDecision(DecisionModule):
 
         :param scores: Scores to predict
         """
-        if scores.shape[1] != self.n_classes:
+        if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
-        if self.multilabel:
+        if self._multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
-
-    def dump(self, path: str) -> None:
-        """
-        Dump all data needed for inference.
-
-        :param path: Path to dump
-        """
-        self.metadata = TunableDecisionDumpMetadata(
-            multilabel=self.multilabel,
-            thresh=self.thresh.tolist(),  # type: ignore[typeddict-item]
-            tags=self.tags,
-            n_classes=self.n_classes,
-        )
-
-        dump_dir = Path(path)
-        metadata_json = self.metadata
-        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None  # type: ignore[misc]
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata_json, file, indent=4)
-
-    def load(self, path: str) -> None:
-        """
-        Load data from dump.
-
-        :param path: Path to load
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata = json.load(file)
-
-        metadata["tags"] = [Tag(**tag) for tag in metadata["tags"]] if metadata["tags"] else None
-
-        self.metadata: TunableDecisionDumpMetadata = metadata
-        self.thresh = np.array(metadata["thresh"])
-        self.multilabel = metadata["multilabel"]
-        self.tags = metadata["tags"]
-        self.n_classes = metadata["n_classes"]
 
 
 class ThreshOptimizer:
