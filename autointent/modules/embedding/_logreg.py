@@ -1,26 +1,16 @@
 """LogRegEmbedding class for managing and interacting with a vector database for retrieval tasks."""
 
-import json
-from pathlib import Path
 from typing import Literal
 
-import joblib
-from joblib import load as joblib_load
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder, MultiLabelBinarizer
 
 from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import LabelType
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
-
-
-class LogRegMetadata(BaseMetadataDict):
-    """Metadata class for LogisticRegressionCV and LabelEncoder."""
-
-    classes: list[str]
 
 
 class LogRegEmbedding(EmbeddingModule):
@@ -179,37 +169,6 @@ class LogRegEmbedding(EmbeddingModule):
         :return: A RetrieverArtifact object containing embedder information.
         """
         return RetrieverArtifact(embedder_name=self.embedder_name)
-
-    def dump(self, path: Path) -> None:
-        """
-        Save the module's metadata, classifier parameters, and label encoder to a specified directory.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        metadata = LogRegMetadata(
-            classes=self.label_encoder.classes_.tolist(),
-        )
-
-        path.mkdir(parents=True, exist_ok=True)
-        with (path / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
-
-        classifier_path = "classifier.joblib"
-        joblib.dump(self.classifier, path / classifier_path)
-
-    def load(self, path: Path) -> None:
-        """
-        Load the module's metadata and model parameters from a specified directory.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        with (path / self.metadata_dict_name).open() as file:
-            self.metadata: LogRegMetadata = json.load(file)
-
-        classifier_path = path / "classifier.joblib"
-        self.classifier = joblib_load(classifier_path)
-        self.label_encoder = LabelEncoder()
-        self.label_encoder.classes_ = self.metadata["classes"]
 
     def predict(self, utterances: list[str]) -> None:
         pass
