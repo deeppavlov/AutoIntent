@@ -44,10 +44,7 @@ def test_inference_config(dataset, task_type):
     inference_pipeline = Pipeline.from_config(inference_config)
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
-    if task_type == "multilabel":
-        assert prediction.shape == (2, len(dataset.intents))
-    else:
-        assert prediction.shape == (2,)
+    assert len(prediction) == 2
 
     rich_outputs = inference_pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
@@ -76,10 +73,7 @@ def test_inference_context(dataset, task_type):
     utterances = ["123", "hello world"]
     prediction = pipeline.predict(utterances)
 
-    if task_type == "multilabel":
-        assert prediction.shape == (2, len(dataset.intents))
-    else:
-        assert prediction.shape == (2,)
+    assert len(prediction) == 2
 
     rich_outputs = pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)

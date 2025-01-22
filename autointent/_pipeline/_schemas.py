@@ -9,7 +9,7 @@ class InferencePipelineUtteranceOutput(BaseModel):
     """Output of the inference pipeline for a single utterance."""
 
     utterance: str
-    prediction: LabelType
+    prediction: LabelType | None
     regexp_prediction: LabelType | None
     regexp_prediction_metadata: Any
     score: list[float]
@@ -19,6 +19,6 @@ class InferencePipelineUtteranceOutput(BaseModel):
 class InferencePipelineOutput(BaseModel):
     """Output of the inference pipeline."""
 
-    predictions: list[LabelType]
+    predictions: list[LabelType | None]
     regexp_predictions: list[LabelType] | None = None
     utterances: list[InferencePipelineUtteranceOutput] | None = None

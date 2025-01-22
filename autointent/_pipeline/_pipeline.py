@@ -6,12 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import numpy.typing as npt
 import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import NodeType
+from autointent.custom_types import LabelType, NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
@@ -185,7 +184,7 @@ class Pipeline:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
-    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+    def predict(self, utterances: list[str]) -> list[LabelType | None]:
         """
         Predict the labels for the utterances.
 
