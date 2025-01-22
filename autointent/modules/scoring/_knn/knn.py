@@ -51,6 +51,8 @@ class KNNScorer(ScoringModule):
     name = "knn"
     _n_classes: int
     _multilabel: bool
+    supports_multilabel = True
+    supports_oos = False
 
     def __init__(
         self,
@@ -130,12 +132,8 @@ class KNNScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        if isinstance(labels[0], list):
-            self._n_classes = len(labels[0])
-            self._multilabel = True
-        else:
-            self._n_classes = len(set(labels))
-            self._multilabel = False
+        self._n_classes, self._multilabel, contains_oos = self._get_task_specs(labels)
+        self._validate_oos(contains_oos)
 
         self._vector_index = VectorIndex(
             self.embedder_name,
