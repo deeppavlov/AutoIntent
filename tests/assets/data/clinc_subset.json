@@ -256,7 +256,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": null
+            "description": "some description to some intent"
         },
         {
             "id": 1,
@@ -264,7 +264,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": null
+            "description": "some description to another intent"
         },
         {
             "id": 2,
@@ -272,7 +272,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": null
+            "description": "another description to some intent"
         },
         {
             "id": 3,
@@ -280,7 +280,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": null
+            "description": "another description to another intent"
         }
     ]
 }

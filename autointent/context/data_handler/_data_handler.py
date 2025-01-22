@@ -55,7 +55,7 @@ class DataHandler:
             for intent in self.dataset.intents
         ]
 
-        self.intent_descriptions = [intent.name for intent in self.dataset.intents]
+        self.intent_descriptions = [intent.description for intent in self.dataset.intents]
         self.tags = self.dataset.get_tags()
 
         self._logger = logger
