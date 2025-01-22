@@ -2,6 +2,7 @@
   metric: retrieval_hit_rate_intersecting
   search_space:
     - module_name: logreg
+      cv: [2]
       k: [10]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
