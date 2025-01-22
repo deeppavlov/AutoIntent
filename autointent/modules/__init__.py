@@ -10,7 +10,6 @@ from .decision import (
     ThresholdDecision,
     TunableDecision,
 )
-
 from .embedding import LogRegEmbedding, RetrievalEmbedding
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, SklearnScorer
 
