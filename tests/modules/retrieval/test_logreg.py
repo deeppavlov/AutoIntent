@@ -42,17 +42,17 @@ def test_score_evaluates_model():
 
 
 def test_dump_and_load_preserves_model_state():
-    dump_dir, _ = setup_environment()
+    project_dir = setup_environment()
     module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
 
-    module.dump(dump_dir)
+    module.dump(project_dir)
 
     loaded_module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
-    loaded_module.load(dump_dir)
+    loaded_module.load(project_dir)
     epsilon = 1e-6
 
     assert np.allclose(loaded_module.classifier.coef_, module.classifier.coef_, atol=epsilon)
@@ -60,4 +60,4 @@ def test_dump_and_load_preserves_model_state():
     assert np.array_equal(np.array(loaded_module.label_encoder.classes_), np.array(module.label_encoder.classes_))
     assert loaded_module.embedder_name == module.embedder_name
 
-    shutil.rmtree(dump_dir)
+    shutil.rmtree(project_dir)
