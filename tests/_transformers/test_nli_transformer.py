@@ -9,13 +9,13 @@ from autointent.context.data_handler import DataHandler
 @pytest.fixture
 def data_handler():
     data_path = ires.files("tests.assets.data").joinpath("clinc_subset.json")
-    return DataHandler(dataset=Dataset.from_json(data_path), random_seed=42, split_train=False)
+    return DataHandler(dataset=Dataset.from_json(data_path), random_seed=42)
 
 
 def test_nli_transformer_predict_without_trained_head(data_handler):
     model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
     with pytest.raises(ValueError, match="Classifier is not trained yet"):
-        model.predict(data_handler.train_utterances())
+        model.predict(data_handler.train_utterances(0))
 
 
 def build_pairs(texts):
@@ -49,8 +49,8 @@ def check_ranking(ranked, labels):
 
 def test_nli_transformer_predict_with_train_head(data_handler):
     model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
-    texts = data_handler.train_utterances()
-    labels = data_handler.train_labels()
+    texts = data_handler.train_utterances(0)
+    labels = data_handler.train_labels(0)
     model.fit(texts, labels)
     predicted = model.predict(build_pairs(texts))
     check_predictions(predicted, labels)
@@ -61,8 +61,8 @@ def test_nli_transformer_predict_with_train_head(data_handler):
 
 def test_nli_transformer_predict_default(data_handler):
     model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
-    texts = data_handler.train_utterances()
-    labels = data_handler.train_labels()
+    texts = data_handler.train_utterances(0)
+    labels = data_handler.train_labels(0)
     predicted = model.predict(build_pairs(texts))
     check_predictions(predicted, labels)
 
@@ -72,8 +72,8 @@ def test_nli_transformer_predict_default(data_handler):
 
 def test_nli_transformer_predict_default_with_fit(data_handler):
     model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
-    texts = data_handler.train_utterances()
-    labels = data_handler.train_labels()
+    texts = data_handler.train_utterances(0)
+    labels = data_handler.train_labels(0)
     model.fit(texts, labels)
     predicted = model.predict(build_pairs(texts))
     check_predictions(predicted, labels)
