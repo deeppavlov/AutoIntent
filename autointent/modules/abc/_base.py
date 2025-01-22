@@ -20,6 +20,7 @@ class Module(ABC):
 
     supports_oos: bool
     supports_multilabel: bool
+    supports_multiclass: bool
     name: str
 
     @abstractmethod
@@ -125,6 +126,10 @@ class Module(ABC):
     def _validate_multilabel(self, data_is_multilabel: bool) -> None:
         if data_is_multilabel and not self.supports_multilabel:
             msg = f'"{self.name}" module is incompatible with multi-label classifiction.'
+            logger.error(msg)
+            raise WrongClassificationError(msg)
+        if not data_is_multilabel and not self.supports_multiclass:
+            msg = f'"{self.name}" module is incompatible with multi-class classifiction.'
             logger.error(msg)
             raise WrongClassificationError(msg)
 

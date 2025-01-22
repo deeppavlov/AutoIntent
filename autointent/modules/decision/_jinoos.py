@@ -51,6 +51,7 @@ class JinoosDecision(DecisionModule):
     name = "jinoos"
     _n_classes: int
     supports_multilabel = False
+    supports_multiclass = True
     supports_oos = True
 
     def __init__(

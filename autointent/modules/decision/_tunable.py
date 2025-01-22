@@ -6,10 +6,10 @@ import numpy as np
 import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
-from sklearn.metrics import f1_score
 
 from autointent.context import Context
 from autointent.custom_types import LabelType
+from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -72,6 +72,7 @@ class TunableDecision(DecisionModule):
     _multilabel: bool
     _n_classes: int
     supports_multilabel = True
+    supports_multiclass = True
     supports_oos = True
     tags: list[Tag] | None
 
@@ -129,7 +130,7 @@ class TunableDecision(DecisionModule):
 
         thresh_optimizer.fit(
             probas=scores,
-            labels=np.array(labels),
+            labels=labels,
             seed=self.seed,
             tags=self.tags,
         )
@@ -145,10 +146,8 @@ class TunableDecision(DecisionModule):
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
         if self._multilabel:
-            y_pred = multilabel_predict(scores, self.thresh, self.tags)
-            return [lab if sum(lab) > 0 else None for lab in y_pred]
-        y_pred = multiclass_predict(scores, self.thresh)
-        return [lab if lab != -1 else None for lab in y_pred]
+            return multilabel_predict(scores, self.thresh, self.tags)
+        return multiclass_predict(scores, self.thresh)
 
 
 class ThreshOptimizer:
@@ -177,12 +176,12 @@ class ThreshOptimizer:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        return f1_score(self.labels, y_pred, average="macro")  # type: ignore[no-any-return]
+        return decision_f1(self.labels, y_pred)  # type: ignore[no-any-return]
 
     def fit(
         self,
         probas: npt.NDArray[Any],
-        labels: npt.NDArray[Any],
+        labels: list[LabelType | None],
         seed: int,
         tags: list[Tag] | None = None,
     ) -> None:

@@ -55,6 +55,7 @@ class AdaptiveDecision(DecisionModule):
     _r: float
     tags: list[Tag] | None
     supports_multilabel = True
+    supports_multiclass = False
     supports_oos = False
     name = "adaptive"
 
@@ -118,8 +119,7 @@ class AdaptiveDecision(DecisionModule):
         """
         if scores.shape[1] != self._n_classes:
             raise InvalidNumClassesError
-        y_pred = multilabel_predict(scores, self._r, self.tags).tolist()
-        return [lab if sum(lab) > 0 else None for lab in y_pred]
+        return multilabel_predict(scores, self._r, self.tags)
 
 
 def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -133,7 +133,7 @@ def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]
     return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
-def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
+def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> list[LabelType | None]:
     """
     Predict binary labels for multi-label classification.
 
@@ -146,10 +146,10 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     res = (scores >= thresh[:, None]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return res
+    return [lab if sum(lab) > 0 else None for lab in res]
 
 
-def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float:
+def multilabel_score(y_true: list[LabelType | None], y_pred: list[LabelType | None]) -> float:
     """
     Calculate the weighted F1 score for multi-label classification.
 

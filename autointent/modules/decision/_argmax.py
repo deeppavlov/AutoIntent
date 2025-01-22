@@ -48,6 +48,7 @@ class ArgmaxDecision(DecisionModule):
     name = "argmax"
     supports_oos = False
     supports_multilabel = False
+    supports_multiclass = True
     _n_classes: int
 
     def __init__(self) -> None:

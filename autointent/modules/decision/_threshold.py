@@ -74,6 +74,7 @@ class ThresholdDecision(DecisionModule):
     name = "threshold"
     supports_oos = True
     supports_multilabel = True
+    supports_multiclass = True
 
     def __init__(
         self,
@@ -136,10 +137,8 @@ class ThresholdDecision(DecisionModule):
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
             raise InvalidNumClassesError(msg)
         if self._multilabel:
-            y_pred = multilabel_predict(scores, self.thresh, self.tags)
-            return [lab if sum(lab) > 0 else None for lab in y_pred]
-        y_pred = multiclass_predict(scores, self.thresh)
-        return [lab if lab != -1 else None for lab in y_pred]
+            return multilabel_predict(scores, self.thresh, self.tags)
+        return multiclass_predict(scores, self.thresh)
 
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -159,7 +158,7 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
         thresh_selected = thresh[pred_classes]
         pred_classes[best_scores < thresh_selected] = -1  # out of scope
 
-    return pred_classes
+    return [lab if lab != -1 else None for lab in pred_classes.tolist()]
 
 
 def multilabel_predict(
@@ -178,4 +177,4 @@ def multilabel_predict(
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return res
+    return [lab if sum(lab) > 0 else None for lab in res.tolist()]
