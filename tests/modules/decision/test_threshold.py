@@ -9,13 +9,13 @@ from autointent.modules.decision._utils import InvalidNumClassesError
     ("fit_fixture", "threshold", "expected"),
     [
         # Multiclass with a single scalar threshold
-        ("multiclass_fit_data", 0.5, np.array([1, 0, 2])),
+        ("multiclass_fit_data", 0.5, [1, 0, 2]),
         # Multilabel with a single scalar threshold
-        ("multilabel_fit_data", 0.5, np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0]])),
+        ("multilabel_fit_data", 0.5, [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0]]),
         # Multiclass with an array of thresholds
-        ("multiclass_fit_data", np.array([0.5, 0.5, 0.8, 0.5]), np.array([1, 0, -1])),
+        ("multiclass_fit_data", [0.5, 0.5, 0.8, 0.5], [1, 0, None]),
         # Multilabel with an array of thresholds
-        ("multilabel_fit_data", np.array([0.5, 0.5, 0.8, 0.5]), np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]])),
+        ("multilabel_fit_data", [0.5, 0.5, 0.8, 0.5], [[0, 1, 0, 0], [1, 0, 0, 0], None]),
     ],
 )
 def test_predict(fit_fixture, threshold, expected, request, scores):
@@ -24,7 +24,7 @@ def test_predict(fit_fixture, threshold, expected, request, scores):
     predictor = ThresholdDecision(threshold)
     predictor.fit(*fit_data)
     predictions = predictor.predict(scores)
-    np.testing.assert_array_equal(predictions, expected)
+    assert predictions == expected
 
 
 def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):

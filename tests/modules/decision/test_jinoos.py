@@ -24,7 +24,7 @@ def test_predict_returns_correct_indices(multiclass_fit_data, scores):
     predictor.fit(*multiclass_fit_data)
     # inference
     predictions = predictor.predict(scores)
-    desired = detect_oos(scores, np.array([1, 0, 2]), predictor.thresh)
+    desired = detect_oos(scores, np.array([1, 0, 2]), predictor._thresh)
 
     np.testing.assert_array_equal(predictions, desired)
 
