@@ -1,23 +1,23 @@
-from autointent import Dataset
-from autointent.context.data_handler._stratification import StratifiedSplitter
+"""Script for creating clinc150 subset that is used as test data in out testing workflow."""
+
 from datasets import concatenate_datasets
 
+from autointent import Dataset
+from autointent.context.data_handler._stratification import StratifiedSplitter
+
 if __name__ == "__main__":
-    
     clinc = Dataset.from_hub("AutoIntent/clinc150")
     intents_subset = clinc.intents[:4]
     intent_ids = [intent.id for intent in intents_subset]
     train = clinc["train"].filter(lambda sample: sample["label"] in intent_ids)
     oos = clinc["train"].filter(lambda sample: sample["label"] is None)
 
-    
     splitter = StratifiedSplitter(test_size=0.1, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
     _, train = splitter(train, multilabel=False)
 
     splitter = StratifiedSplitter(test_size=0.1, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
     _, oos = splitter(oos, multilabel=False, allow_oos_in_train=True)
 
-    
     subset = concatenate_datasets([train, oos])
     splitter = StratifiedSplitter(test_size=0.4, label_feature=clinc.label_feature, random_seed=42, shuffle=True)
     train, val = splitter(subset, multilabel=False, allow_oos_in_train=True)

@@ -116,7 +116,6 @@ class ThresholdDecision(DecisionModule):
         self._validate_multilabel(self._multilabel)
         self._validate_oos(contains_oos)
 
-
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self._n_classes:
                 msg = (

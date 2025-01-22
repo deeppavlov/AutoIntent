@@ -6,7 +6,6 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent.schemas import Tag
-from autointent.custom_types import LabelType
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
@@ -49,7 +48,6 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
     return labels
 
 
-
 class InvalidNumClassesError(Exception):
     """
     Exception raised when the data contains an incompatible number of classes.
@@ -66,5 +64,7 @@ class InvalidNumClassesError(Exception):
 
         :param message: Error message, defaults to a standard incompatibility message.
         """
-        self.message = message or "Provided scores number don't match with number of classes which module was trained on."
+        self.message = (
+            message or "Provided scores number don't match with number of classes which module was trained on."
+        )
         super().__init__(message)
