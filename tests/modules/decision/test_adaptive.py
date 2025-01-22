@@ -4,6 +4,7 @@ import pytest
 from autointent.modules import AdaptiveDecision
 from autointent.modules.abc import WrongClassificationError
 from autointent.modules.decision._utils import InvalidNumClassesError
+from tests.conftest import setup_environment
 
 
 def test_multilabel(multilabel_fit_data):
@@ -28,3 +29,18 @@ def test_fails_on_wrong_clf_problem(multiclass_fit_data):
     predictor = AdaptiveDecision()
     with pytest.raises(WrongClassificationError):
         predictor.fit(*multiclass_fit_data)
+
+
+def test_dump_load(multilabel_fit_data):
+    predictor = AdaptiveDecision()
+    predictor.fit(*multilabel_fit_data)
+    preds = predictor.predict(multilabel_fit_data[0])
+
+    path = setup_environment() / "adaptive_module"
+    predictor.dump(path)
+
+    predictor = AdaptiveDecision()
+    predictor.load(path)
+    new_preds = predictor.predict(multilabel_fit_data[0])
+
+    assert all(p == n for p, n in zip(preds, new_preds, strict=True))
