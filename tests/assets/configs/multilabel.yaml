@@ -1,7 +1,7 @@
 - node_type: embedding
   metric: retrieval_hit_rate_intersecting
   search_space:
-    - module_name: retrieval
+    - module_name: logreg
       k: [10]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
