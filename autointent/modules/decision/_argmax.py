@@ -11,7 +11,7 @@ from autointent.custom_types import ListOfGenericLabels
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError
+from ._utils import MismatchNumClassesError
 
 logger = logging.getLogger(__name__)
 
@@ -86,8 +86,8 @@ class ArgmaxDecision(DecisionModule):
         Predict the argmax.
 
         :param scores: Scores to predict
-        :raises InvalidNumClassesError: If the number of classes is invalid.
+        :raises MismatchNumClassesError: If the number of classes is invalid.
         """
         if scores.shape[1] != self._n_classes:
-            raise InvalidNumClassesError
+            raise MismatchNumClassesError
         return np.argmax(scores, axis=1).tolist()  # type: ignore[no-any-return]

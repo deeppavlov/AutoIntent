@@ -11,6 +11,7 @@ from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import ListOfGenericLabels
+from autointent.exceptions import WrongClassificationError
 
 logger = logging.getLogger(__name__)
 
@@ -164,23 +165,3 @@ class Module(ABC):
         multilabel = isinstance(in_domain_label, list)
         n_classes = len(labels[0]) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
         return n_classes, multilabel, contains_oos_samples
-
-
-class WrongClassificationError(Exception):
-    """
-    Exception raised when a classification module is used with incompatible data.
-
-    This error typically occurs when a multiclass module is called on multilabel data
-    or vice versa.
-
-    :param message: Error message, defaults to a standard incompatibility message.
-    """
-
-    def __init__(self, message: str = "Multiclass module is called on multilabel data or vice-versa") -> None:
-        """
-        Initialize the exception.
-
-        :param message: Error message, defaults to a standard incompatibility message.
-        """
-        self.message = message
-        super().__init__(message)

@@ -11,7 +11,7 @@ from autointent.custom_types import ListOfGenericLabels, MultiLabel
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, apply_tags
+from ._utils import MismatchNumClassesError, apply_tags
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ class ThresholdDecision(DecisionModule):
                     f" {len(self.thresh)} != {self._n_classes}"
                 )
                 logger.error(msg)
-                raise InvalidNumClassesError(msg)
+                raise MismatchNumClassesError(msg)
             self.thresh = np.array(self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
@@ -134,7 +134,7 @@ class ThresholdDecision(DecisionModule):
         """
         if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+            raise MismatchNumClassesError(msg)
         if self._multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)

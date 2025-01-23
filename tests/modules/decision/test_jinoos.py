@@ -4,9 +4,8 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules import JinoosDecision
-from autointent.modules.abc import WrongClassificationError
-from autointent.modules.decision._utils import InvalidNumClassesError
 
 
 def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float):
@@ -33,7 +32,7 @@ def test_fails_on_wrong_n_classes(multiclass_fit_data):
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    with pytest.raises(InvalidNumClassesError):
+    with pytest.raises(MismatchNumClassesError):
         predictor.predict(scores)
 
 

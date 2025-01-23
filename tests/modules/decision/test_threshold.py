@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from autointent.modules import ThresholdDecision
-from autointent.modules.decision._utils import InvalidNumClassesError
+from autointent.modules.decision._utils import MismatchNumClassesError
 
 
 @pytest.mark.parametrize(
@@ -31,11 +31,11 @@ def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
     predictor = ThresholdDecision(thresh=0.5)
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    with pytest.raises(InvalidNumClassesError):
+    with pytest.raises(MismatchNumClassesError):
         predictor.predict(scores)
 
 
 def test_fails_on_wrong_n_classes_fit(multiclass_fit_data):
     predictor = ThresholdDecision(thresh=[0.5])
-    with pytest.raises(InvalidNumClassesError):
+    with pytest.raises(MismatchNumClassesError):
         predictor.fit(*multiclass_fit_data)

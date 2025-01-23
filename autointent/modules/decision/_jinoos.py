@@ -10,7 +10,7 @@ from autointent.custom_types import ListOfGenericLabels
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError
+from ._utils import MismatchNumClassesError
 
 default_search_space = np.linspace(0, 1, num=100)
 
@@ -112,7 +112,7 @@ class JinoosDecision(DecisionModule):
         :param scores: Scores to predict
         """
         if scores.shape[1] != self._n_classes:
-            raise InvalidNumClassesError
+            raise MismatchNumClassesError
         pred_classes, best_scores = _predict(scores)
         y_pred: list[int] = _detect_oos(pred_classes, best_scores, self._thresh).tolist()  # type: ignore[assignment]
         return [lab if lab != -1 else None for lab in y_pred]

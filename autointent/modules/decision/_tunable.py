@@ -14,7 +14,7 @@ from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
-from ._utils import InvalidNumClassesError
+from ._utils import MismatchNumClassesError
 
 
 class TunableDecision(DecisionModule):
@@ -143,7 +143,7 @@ class TunableDecision(DecisionModule):
         """
         if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+            raise MismatchNumClassesError(msg)
         if self._multilabel:
             return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)

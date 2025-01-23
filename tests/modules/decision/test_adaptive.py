@@ -1,9 +1,8 @@
 import numpy as np
 import pytest
 
+from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules import AdaptiveDecision
-from autointent.modules.abc import WrongClassificationError
-from autointent.modules.decision._utils import InvalidNumClassesError
 from tests.conftest import setup_environment
 
 
@@ -21,7 +20,7 @@ def test_fails_on_wrong_n_classes_predict(multilabel_fit_data):
     predictor = AdaptiveDecision()
     predictor.fit(*multilabel_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    with pytest.raises(InvalidNumClassesError):
+    with pytest.raises(MismatchNumClassesError):
         predictor.predict(scores)
 
 

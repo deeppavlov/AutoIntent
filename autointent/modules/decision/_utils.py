@@ -46,25 +46,3 @@ def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Ta
         labels[:, intent_ids] = labels_sub
 
     return labels
-
-
-class InvalidNumClassesError(Exception):
-    """
-    Exception raised when the data contains an incompatible number of classes.
-
-    This error indicates that the number of classes in the input data does not match
-    the expected number of classes for the module.
-
-    :param message: Error message, defaults to a standard class incompatibility message.
-    """
-
-    def __init__(self, message: str | None = None) -> None:
-        """
-        Initialize the exception.
-
-        :param message: Error message, defaults to a standard incompatibility message.
-        """
-        self.message = (
-            message or "Provided scores number don't match with number of classes which module was trained on."
-        )
-        super().__init__(message)

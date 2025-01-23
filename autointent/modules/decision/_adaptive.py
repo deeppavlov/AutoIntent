@@ -12,7 +12,7 @@ from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, apply_tags
+from ._utils import MismatchNumClassesError, apply_tags
 
 default_search_space = np.linspace(0, 1, num=10)
 logger = logging.getLogger(__name__)
@@ -114,10 +114,10 @@ class AdaptiveDecision(DecisionModule):
 
         :param scores: Array of shape (n_samples, n_classes) with predicted scores.
         :return: Array of shape (n_samples, n_classes) with predicted binary labels.
-        :raises InvalidNumClassesError: If the number of classes does not match the trained predictor.
+        :raises MismatchNumClassesError: If the number of classes does not match the trained predictor.
         """
         if scores.shape[1] != self._n_classes:
-            raise InvalidNumClassesError
+            raise MismatchNumClassesError
         return multilabel_predict(scores, self._r, self.tags)
 
 
