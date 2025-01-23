@@ -32,16 +32,16 @@ class ArgmaxDecision(DecisionModule):
         from autointent.modules import ArgmaxDecision
         import numpy as np
         predictor = ArgmaxDecision()
-        train_scores = np.array([[0.2, 0.8, 0.0], [0.7, 0.1, 0.2]])
+        train_scores = np.array([[0.2, 0.8], [0.7, 0.3]])
         labels = [1, 0]  # Single-label targets
         predictor.fit(train_scores, labels)
-        test_scores = np.array([[0.1, 0.5, 0.4], [0.6, 0.3, 0.1]])
+        test_scores = np.array([[0.1, 0.9], [0.6, 0.4]])
         decisions = predictor.predict(test_scores)
         print(decisions)
 
     .. testoutput::
 
-        [1 0]
+        [1, 0]
 
     """
 

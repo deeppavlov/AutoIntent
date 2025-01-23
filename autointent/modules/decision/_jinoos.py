@@ -43,7 +43,7 @@ class JinoosDecision(DecisionModule):
 
     .. testoutput::
 
-        [1 0]
+        [1, 0]
 
     """
 

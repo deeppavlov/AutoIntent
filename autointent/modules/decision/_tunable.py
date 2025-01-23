@@ -48,7 +48,7 @@ class TunableDecision(DecisionModule):
 
     .. testoutput::
 
-        [1 0]
+        [1, 0]
 
     Multi-label classification
     ==========================
@@ -63,8 +63,7 @@ class TunableDecision(DecisionModule):
 
     .. testoutput::
 
-        [[1 1]
-         [1 1]]
+        [[1, 1], [1, 1]]
 
     """
 
