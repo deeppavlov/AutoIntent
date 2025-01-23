@@ -176,7 +176,7 @@ class ThreshOptimizer:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        return decision_f1(self.labels, y_pred)  # type: ignore[no-any-return]
+        return decision_f1(self.labels, y_pred)
 
     def fit(
         self,

@@ -1,8 +1,6 @@
 """Module for regular expressions based intent detection."""
 
-import json
 import re
-from pathlib import Path
 from typing import Any, Literal, TypedDict
 
 from autointent import Context
@@ -139,30 +137,6 @@ class RegExp(Module):
     def get_assets(self) -> Artifact:
         """Get assets."""
         return Artifact()
-
-    def load(self, path: str) -> None:
-        """
-        Load data from dump.
-
-        :param path: Path to load
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.regexp_patterns = json.load(file)
-
-        self._compile_regex_patterns()
-
-    def dump(self, path: str) -> None:
-        """
-        Dump all data needed for inference.
-
-        :param path: Path to dump
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.regexp_patterns, file, indent=4)
 
     def _compile_regex_patterns(self) -> None:
         """Compile regex patterns."""

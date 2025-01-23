@@ -86,7 +86,7 @@ class VectorIndex:
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(embeddings)
-        self.labels.extend(labels)
+        self.labels.extend(labels)  # type: ignore[arg-type]
         self.texts.extend(texts)
 
     def is_empty(self) -> bool:
@@ -186,9 +186,9 @@ class VectorIndex:
         func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
         all_results = func(queries, k)  # type: ignore[arg-type]
 
-        all_labels = [[self.labels[result["id"]] for result in results] for results in all_results]
+        all_labels: list[ListOfLabels] = [[self.labels[result["id"]] for result in results] for results in all_results]
         all_distances = [[float(result["distance"]) for result in results] for results in all_results]
-        all_texts = [[self.texts[result["id"]] for result in results] for results in all_results]
+        all_texts: list[list[str]] = [[self.texts[result["id"]] for result in results] for results in all_results]
 
         return all_labels, all_distances, all_texts
 

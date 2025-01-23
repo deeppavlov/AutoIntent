@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
+from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
@@ -146,10 +146,11 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     res = (scores >= thresh[:, None]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return [lab if sum(lab) > 0 else None for lab in res.tolist()]
+    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    return [lab if sum(lab) > 0 else None for lab in y_pred]
 
 
-def multilabel_score(y_true: ListOfLabelsWithOOS, y_pred: ListOfLabelsWithOOS) -> float:
+def multilabel_score(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     """
     Calculate the weighted F1 score for multi-label classification.
 

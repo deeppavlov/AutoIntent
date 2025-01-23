@@ -168,9 +168,7 @@ class KNNScorer(ScoringModule):
         """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
 
-    def _get_neighbours(
-        self, utterances: list[str]
-    ) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+    def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         return self._vector_index.query(utterances, self.k)
 
     def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:

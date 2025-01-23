@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels
+from autointent.custom_types import ListOfGenericLabels, MultiLabel
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
@@ -141,7 +141,7 @@ class ThresholdDecision(DecisionModule):
         return multiclass_predict(scores, self.thresh)
 
 
-def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
+def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> ListOfGenericLabels:
     """
     Make predictions for multiclass classification task.
 
@@ -158,14 +158,15 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
         thresh_selected = thresh[pred_classes]
         pred_classes[best_scores < thresh_selected] = -1  # out of scope
 
-    return [lab if lab != -1 else None for lab in pred_classes.tolist()]
+    y_pred: list[int] = pred_classes.tolist()  # type: ignore[assignment]
+    return [lab if lab != -1 else None for lab in y_pred]
 
 
 def multilabel_predict(
     scores: npt.NDArray[Any],
     thresh: float | npt.NDArray[Any],
     tags: list[Tag] | None,
-) -> npt.NDArray[Any]:
+) -> ListOfGenericLabels:
     """
     Make predictions for multilabel classification task.
 
@@ -177,4 +178,5 @@ def multilabel_predict(
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return [lab if sum(lab) > 0 else None for lab in res.tolist()]
+    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    return [lab if sum(lab) > 0 else None for lab in y_pred]

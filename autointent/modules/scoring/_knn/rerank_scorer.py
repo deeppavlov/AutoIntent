@@ -159,7 +159,7 @@ class RerankScorer(KNNScorer):
             for dst, src in zip(
                 [labels, distances, neighbours], [query_labels, query_distances, query_docs], strict=True
             ):
-                dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined, index]
+                dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
 
         scores = self._count_scores(np.array(labels), np.array(distances))
         return scores, neighbours

@@ -167,7 +167,7 @@ class RetrievalEmbedding(EmbeddingModule):
         """
         self._vector_index = VectorIndex.load(Path(path))
 
-    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+    def predict(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         """
         Predict the nearest neighbors for a list of utterances.
 

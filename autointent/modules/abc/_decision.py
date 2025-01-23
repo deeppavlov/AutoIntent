@@ -63,9 +63,7 @@ class DecisionModule(Module, ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
-    def _validate_inputs(
-        self, scores: npt.NDArray[Any], labels: ListOfGenericLabels
-    ) -> tuple[int, bool]:
+    def _validate_inputs(self, scores: npt.NDArray[Any], labels: ListOfGenericLabels) -> tuple[int, bool, bool]:
         """
         Sanity check if labels and scores are valid to be a training data for decision module.
 
