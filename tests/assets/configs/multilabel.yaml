@@ -1,5 +1,5 @@
 - node_type: embedding
-  metric: retrieval_hit_rate_intersecting
+  metric: scoring_accuracy
   search_space:
     - module_name: logreg
       cv: [2]
