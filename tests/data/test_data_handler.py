@@ -104,7 +104,7 @@ def test_sample_initialization(label):
 
 @pytest.mark.parametrize("label", [-1, [-1], []])
 def test_sample_validation(label):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Sample(utterance="Hello!", label=label)
 
 
@@ -154,7 +154,7 @@ def test_dataset_initialization(mapping):
     ],
 )
 def test_dataset_validation(mapping):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
 
 
@@ -171,5 +171,5 @@ def test_dataset_validation(mapping):
     ],
 )
 def test_intents_validation(mapping):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
