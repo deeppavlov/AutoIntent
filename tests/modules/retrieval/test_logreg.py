@@ -16,8 +16,8 @@ def test_fit_trains_model():
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
 
-    assert module.classifier.coef_ is not None
-    assert len(module.classifier.coef_) > 0
+    assert module._classifier.coef_ is not None
+    assert len(module._classifier.coef_) > 0
     assert module.label_encoder.classes_.tolist() == [0, 1]
 
 

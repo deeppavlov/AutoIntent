@@ -113,14 +113,14 @@ class LogRegEmbedding(EmbeddingModule):
         """
         self._multilabel = isinstance(labels[0], list)
 
-        self.embedder = Embedder(
+        self._embedder = Embedder(
             device=self.embedder_device,
             model_name_or_path=self.embedder_name,
             batch_size=self.embedder_batch_size,
             max_length=self.embedder_max_length,
             use_cache=self.embedder_use_cache,
         )
-        embeddings = self.embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances)
 
         if self._multilabel:
             self._label_encoder = None
@@ -155,7 +155,7 @@ class LogRegEmbedding(EmbeddingModule):
             message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
             raise ValueError(message)
 
-        embeddings = self.embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances)
         probas = self._classifier.predict_proba(embeddings)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
