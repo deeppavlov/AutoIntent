@@ -18,7 +18,7 @@ def test_fit_trains_model():
 
     assert module._classifier.coef_ is not None
     assert len(module._classifier.coef_) > 0
-    assert module.label_encoder.classes_.tolist() == [0, 1]
+    assert module._label_encoder.classes_.tolist() == [0, 1]
 
 
 def test_score_evaluates_model():
