@@ -12,6 +12,7 @@ from typing import TypedDict
 
 import numpy as np
 import numpy.typing as npt
+import torch
 from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
@@ -58,6 +59,7 @@ class Embedder:
     """
 
     metadata_dict_name: str = "metadata.json"
+    dump_dir: Path | None = None
 
     def __init__(
         self,
@@ -70,7 +72,7 @@ class Embedder:
         """
         Initialize the Embedder.
 
-        :param model_name: Path to a local model directory or a Hugging Face model name.
+        :param model_name_or_path: Path to a local model directory or a Hugging Face model name.
         :param device: Device to run the model on (e.g., "cpu", "cuda").
         :param batch_size: Batch size for embedding calculations.
         :param max_length: Maximum sequence length for the embedding model.
@@ -103,11 +105,13 @@ class Embedder:
         self.logger.debug("Clearing embedder %s from memory", self.model_name)
         self.embedding_model.cpu()
         del self.embedding_model
+        torch.cuda.empty_cache()
 
     def delete(self) -> None:
         """Delete the embedding model and its associated directory."""
         self.clear_ram()
-        shutil.rmtree(self.dump_dir)
+        if self.dump_dir is not None:
+            shutil.rmtree(self.dump_dir)
 
     def dump(self, path: Path) -> None:
         """
