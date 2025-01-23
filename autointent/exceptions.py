@@ -1,5 +1,6 @@
 """Custom exceptions that are raised by AutoIntent."""
 
+
 class WrongClassificationError(Exception):
     """
     Exception raised when a classification module is used with incompatible data.
@@ -18,6 +19,7 @@ class WrongClassificationError(Exception):
         """
         self.message = message
         super().__init__(message)
+
 
 class MismatchNumClassesError(Exception):
     """
