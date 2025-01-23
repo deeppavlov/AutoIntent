@@ -41,6 +41,7 @@ def create_clinc150_subset():
         {"train_0": train_0, "train_1": train_1, "validation_0": val_0, "validation_1": val_1, "test": test}
     )
 
+
 def test():
     dataset = create_clinc150_subset()
 
@@ -49,7 +50,7 @@ def test():
         "train_0": {"total": 18, "oos": 0},
         "train_1": {"total": 18, "oos": 12},
         "validation_0": {"total": 4, "oos": 0},
-        "validation_1": {"total": 8, "oos": 4}
+        "validation_1": {"total": 8, "oos": 4},
     }
 
     for split_name in dataset:
