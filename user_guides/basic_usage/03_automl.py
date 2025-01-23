@@ -20,7 +20,7 @@ dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 dataset
 
 # %%
-dataset["train"][0]
+dataset["train_0"][0]
 
 
 # %% [markdown]
