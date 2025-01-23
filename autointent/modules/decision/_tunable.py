@@ -9,12 +9,12 @@ from optuna.trial import Trial
 
 from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
+from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
-from ._utils import MismatchNumClassesError
 
 
 class TunableDecision(DecisionModule):

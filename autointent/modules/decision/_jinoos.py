@@ -7,10 +7,9 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
+from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
-
-from ._utils import MismatchNumClassesError
 
 default_search_space = np.linspace(0, 1, num=100)
 

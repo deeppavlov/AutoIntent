@@ -8,10 +8,9 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
+from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
-
-from ._utils import MismatchNumClassesError
 
 logger = logging.getLogger(__name__)
 
