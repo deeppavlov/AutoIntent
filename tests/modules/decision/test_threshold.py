@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
+from autointent.exceptions import MismatchNumClassesError
 from autointent.modules import ThresholdDecision
-from autointent.modules.decision._utils import MismatchNumClassesError
 
 
 @pytest.mark.parametrize(
