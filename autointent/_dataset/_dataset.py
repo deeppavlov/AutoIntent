@@ -144,7 +144,10 @@ class Dataset(dict[str, HFDataset]):
 
         :param filepath: The path to the file where the JSON data will be saved.
         """
-        with Path(filepath).open("w") as file:
+        path = Path(filepath)
+        if not path.parent.exists():
+            path.parent.mkdir(parents=True)
+        with path.open("w") as file:
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
