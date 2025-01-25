@@ -30,8 +30,8 @@ def test_score_evaluates_model():
 
     mock_context = MagicMock()
     mock_context.data_handler.test_utterances.return_value = ["hello", "goodbye"]
-    mock_context.data_handler.test_labels.return_value = [0, 1]
+    mock_context.data_handler.test_labels.return_value = [[1, 0], [0, 1]]
 
-    scores = module.score(mock_context, split="validation")
+    scores = module.score(mock_context, split="test")
 
     assert isinstance(scores, dict)
