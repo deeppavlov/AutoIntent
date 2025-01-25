@@ -6,10 +6,10 @@ from functools import cached_property
 from pathlib import Path
 from typing import Any, TypedDict
 
-from datasets import ClassLabel, Sequence, concatenate_datasets, get_dataset_config_names, load_dataset
 from datasets import Dataset as HFDataset
+from datasets import Sequence, get_dataset_config_names, load_dataset
 
-from autointent.custom_types import LabelType, Split
+from autointent.custom_types import LabelWithOOS, Split
 from autointent.schemas import Intent, Tag
 
 
@@ -17,12 +17,12 @@ class Sample(TypedDict):
     """
     Typed dictionary representing a dataset sample.
 
-    :param str utterance: The text of the utterance.
-    :param LabelType | None label: The label associated with the utterance, or None if out-of-scope.
+    :param utterance: The text of the utterance.
+    :param label: The label associated with the utterance, or None if out-of-scope.
     """
 
     utterance: str
-    label: LabelType | None
+    label: LabelWithOOS
 
 
 class Dataset(dict[str, HFDataset]):
@@ -39,7 +39,7 @@ class Dataset(dict[str, HFDataset]):
 
     def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
         """
-        Initialize the dataset and configure OOS split if applicable.
+        Initialize the dataset.
 
         :param args: Positional arguments to initialize the dataset.
         :param intents: List of intents associated with the dataset.
@@ -48,15 +48,6 @@ class Dataset(dict[str, HFDataset]):
         super().__init__(*args, **kwargs)
 
         self.intents = intents
-
-        self._encoded_labels = False
-
-        if self.multilabel:
-            self._encode_labels()
-
-        oos_split = self._create_oos_split()
-        if oos_split is not None:
-            self[Split.OOS] = oos_split
 
     @property
     def multilabel(self) -> bool:
@@ -125,7 +116,6 @@ class Dataset(dict[str, HFDataset]):
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
-        self._encode_labels()
         return self
 
     def to_dict(self) -> dict[str, list[dict[str, Any]]]:
@@ -144,7 +134,10 @@ class Dataset(dict[str, HFDataset]):
 
         :param filepath: The path to the file where the JSON data will be saved.
         """
-        with Path(filepath).open("w") as file:
+        path = Path(filepath)
+        if not path.parent.exists():
+            path.parent.mkdir(parents=True)
+        with path.open("w") as file:
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
@@ -181,37 +174,14 @@ class Dataset(dict[str, HFDataset]):
         """
         classes = set()
         for label in self[split][self.label_feature]:
-            match (label, self._encoded_labels):
-                case (int(), _):
+            match label:
+                case int():
                     classes.add(label)
-                case (list(), False):
-                    for label_ in label:
-                        classes.add(label_)
-                case (list(), True):
+                case list():
                     for idx, label_ in enumerate(label):
                         if label_:
                             classes.add(idx)
         return len(classes)
-
-    def _encode_labels(self) -> "Dataset":
-        """
-        Encode dataset labels into one-hot or multilabel format.
-
-        :return: Self, with labels encoded.
-        """
-        for split_name, split in self.items():
-            self[split_name] = split.map(self._encode_label)
-        self._encoded_labels = True
-        return self
-
-    def _is_oos(self, sample: Sample) -> bool:
-        """
-        Check if a sample is out-of-scope.
-
-        :param sample: The sample to check.
-        :return: True if the sample is out-of-scope, False otherwise.
-        """
-        return sample["label"] is None
 
     def _to_multilabel(self, sample: Sample) -> Sample:
         """
@@ -221,50 +191,7 @@ class Dataset(dict[str, HFDataset]):
         :return: Sample with label in multilabel format.
         """
         if isinstance(sample["label"], int):
-            sample["label"] = [sample["label"]]
+            ohe_vector = [0] * self.n_classes
+            ohe_vector[sample["label"]] = 1
+            sample["label"] = ohe_vector
         return sample
-
-    def _encode_label(self, sample: Sample) -> Sample:
-        """
-        Encode a sample's label as a one-hot vector.
-
-        :param sample: The sample to encode.
-        :return: Sample with encoded label.
-        """
-        one_hot_label = [0] * self.n_classes
-        match sample["label"]:
-            case int():
-                one_hot_label[sample["label"]] = 1
-            case list():
-                for idx in sample["label"]:
-                    one_hot_label[idx] = 1
-        sample["label"] = one_hot_label
-        return sample
-
-    def _create_oos_split(self) -> HFDataset | None:
-        """
-        Create an out-of-scope (OOS) split from the dataset.
-
-        :return: The OOS split if created, None otherwise.
-        """
-        oos_splits = [split.filter(self._is_oos) for split in self.values()]
-        oos_splits = [oos_split for oos_split in oos_splits if oos_split.num_rows]
-        if oos_splits:
-            for split_name, split in self.items():
-                self[split_name] = split.filter(lambda sample: not self._is_oos(sample))
-            return concatenate_datasets(oos_splits)
-        return None
-
-    def _cast_label_feature(self) -> None:
-        """Cast the label feature of the dataset to the appropriate type."""
-        for split_name, split in self.items():
-            new_features = split.features.copy()
-            if self.multilabel:
-                new_features[self.label_feature] = Sequence(
-                    ClassLabel(num_classes=self.n_classes),
-                )
-            else:
-                new_features[self.label_feature] = ClassLabel(
-                    num_classes=self.n_classes,
-                )
-            self[split_name] = split.cast(new_features)

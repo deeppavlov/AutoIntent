@@ -1,6 +1,5 @@
 """Retrieval metrics."""
 
-from collections.abc import Callable
 from typing import Any, Protocol
 
 import numpy as np
@@ -36,7 +35,7 @@ class RetrievalMetricFn(Protocol):
 
 
 def _macrofy(
-    metric_fn: Callable[[npt.NDArray[Any], npt.NDArray[Any], int | None], float],
+    metric_fn: RetrievalMetricFn,
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
@@ -72,7 +71,7 @@ def _macrofy(
     for i in range(n_classes):
         binarized_query_labels = query_labels_[..., i]
         binarized_candidates_labels = candidates_labels_[..., i]
-        classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))
+        classwise_values.append(metric_fn(binarized_query_labels, binarized_candidates_labels, k))  # type: ignore[arg-type]
 
     return np.mean(classwise_values)  # type: ignore[return-value]
 
@@ -136,12 +135,12 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    ap_list = [_average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
+    ap_list = [_average_precision(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]  # type: ignore[arg-type]
     return sum(ap_list) / len(ap_list)
 
 
 def _average_precision_intersecting(
-    query_label: LABELS_VALUE_TYPE, candidate_labels: CANDIDATE_TYPE, k: int | None = None
+    query_label: list[int], candidate_labels: CANDIDATE_TYPE, k: int | None = None
 ) -> float:
     r"""
     Calculate the average precision at position k for the intersecting labels.
@@ -212,7 +211,7 @@ def retrieval_map_intersecting(
     :param k: Number of top items to consider for each query
     :return: Score of the retrieval metric
     """
-    ap_list = [_average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]
+    ap_list = [_average_precision_intersecting(q, c, k) for q, c in zip(query_labels, candidates_labels, strict=True)]  # type: ignore[arg-type]
     return sum(ap_list) / len(ap_list)
 
 

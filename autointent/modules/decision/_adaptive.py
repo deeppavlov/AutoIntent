@@ -1,35 +1,22 @@
 """AdaptiveDecision module for multi-label classification with adaptive thresholds."""
 
-import json
-from pathlib import Path
-from typing import Any, TypedDict
+import logging
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sklearn.metrics import f1_score
 
 from autointent import Context
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
+from autointent.exceptions import MismatchNumClassesError
+from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, WrongClassificationError, apply_tags
+from ._utils import apply_tags
 
 default_search_space = np.linspace(0, 1, num=10)
-
-
-class AdaptiveDecisionDumpMetadata(TypedDict):
-    """
-    Metadata structure for saving the state of an AdaptiveDecision.
-
-    :ivar r: The selected threshold scaling factor.
-    :ivar tags: List of Tag objects for mutually exclusive classes.
-    :ivar n_classes: Number of classes used during training.
-    """
-
-    r: float
-    tags: list[Tag] | None
-    n_classes: int
+logger = logging.getLogger(__name__)
 
 
 class AdaptiveDecision(DecisionModule):
@@ -60,15 +47,16 @@ class AdaptiveDecision(DecisionModule):
 
     .. testoutput::
 
-        [[1 0 0]
-         [0 1 0]]
+        [[1, 0, 1], [0, 1, 1]]
 
     """
 
-    metadata_dict_name = "metadata.json"
-    n_classes: int
+    _n_classes: int
     _r: float
     tags: list[Tag] | None
+    supports_multilabel = True
+    supports_multiclass = False
+    supports_oos = False
     name = "adaptive"
 
     def __init__(self, search_space: list[float] | None = None) -> None:
@@ -96,7 +84,7 @@ class AdaptiveDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -108,14 +96,10 @@ class AdaptiveDecision(DecisionModule):
         :raises WrongClassificationError: If used on non-multi-label data.
         """
         self.tags = tags
-        multilabel = isinstance(labels[0], list)
-        if not multilabel:
-            msg = (
-                "AdaptiveDecision is not designed to perform multiclass classification. "
-                "Consider using other predictor algorithms."
-            )
-            raise WrongClassificationError(msg)
-        self.n_classes = len(labels[0]) if multilabel else len(set(labels).difference([-1]))  # type: ignore[arg-type]
+
+        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
+        self._validate_multilabel(multilabel)
+        self._validate_oos(contains_oos)
 
         metrics_list = []
         for r in self.search_space:
@@ -125,55 +109,17 @@ class AdaptiveDecision(DecisionModule):
 
         self._r = float(self.search_space[np.argmax(metrics_list)])
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfLabelsWithOOS:
         """
         Predict labels for the given scores.
 
         :param scores: Array of shape (n_samples, n_classes) with predicted scores.
         :return: Array of shape (n_samples, n_classes) with predicted binary labels.
-        :raises InvalidNumClassesError: If the number of classes does not match the trained predictor.
+        :raises MismatchNumClassesError: If the number of classes does not match the trained predictor.
         """
-        if scores.shape[1] != self.n_classes:
-            msg = "Provided scores number doesn't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+        if scores.shape[1] != self._n_classes:
+            raise MismatchNumClassesError
         return multilabel_predict(scores, self._r, self.tags)
-
-    def dump(self, path: str) -> None:
-        """
-        Save the predictor's metadata to disk.
-
-        :param path: Path to the directory where metadata will be saved.
-        """
-        dump_dir = Path(path)
-
-        metadata = AdaptiveDecisionDumpMetadata(
-            r=self._r,
-            tags=[t.model_dump() for t in self.tags] if self.tags else None,  # type: ignore[misc]
-            n_classes=self.n_classes,
-        )
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
-
-    def load(self, path: str) -> None:
-        """
-        Load the predictor's metadata from disk.
-
-        :param path: Path to the directory containing saved metadata.
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: AdaptiveDecisionDumpMetadata = json.load(file)
-
-        if metadata["tags"] is not None and isinstance(metadata["tags"], list):
-            self.tags = [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
-        else:
-            self.tags = None
-
-        self._r = metadata["r"]
-        self.n_classes = metadata["n_classes"]
-        self.metadata = metadata
 
 
 def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
@@ -187,7 +133,7 @@ def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]
     return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
-def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> npt.NDArray[Any]:
+def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> ListOfLabelsWithOOS:
     """
     Predict binary labels for multi-label classification.
 
@@ -200,10 +146,11 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     res = (scores >= thresh[:, None]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return res
+    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    return [lab if sum(lab) > 0 else None for lab in y_pred]
 
 
-def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float:
+def multilabel_score(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     """
     Calculate the weighted F1 score for multi-label classification.
 
@@ -211,4 +158,4 @@ def multilabel_score(y_true: list[LabelType], y_pred: npt.NDArray[Any]) -> float
     :param y_pred: Array of shape (n_samples, n_classes) with predicted labels.
     :return: Weighted F1 score.
     """
-    return f1_score(y_pred, y_true, average="weighted")  # type: ignore[no-any-return]
+    return decision_f1(y_true, y_pred)

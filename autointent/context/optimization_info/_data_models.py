@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
-from autointent.custom_types import NodeType
+from autointent.custom_types import ListOfLabelsWithOOS, NodeType
 
 
 class Artifact(BaseModel):
@@ -42,10 +42,6 @@ class ScorerArtifact(Artifact):
     train_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for train utterances")
     validation_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for validation utterances")
     test_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for test utterances")
-    oos_scores: dict[str, NDArray[np.float64]] | None = Field(
-        None,
-        description="Scorer outputs for out-of-scope utterances",
-    )
 
 
 class DecisionArtifact(Artifact):
@@ -57,7 +53,7 @@ class DecisionArtifact(Artifact):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    labels: NDArray[np.float64]
+    labels: ListOfLabelsWithOOS
 
 
 def validate_node_name(value: str) -> str:

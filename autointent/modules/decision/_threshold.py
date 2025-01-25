@@ -1,30 +1,20 @@
 """Threshold."""
 
-import json
 import logging
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import BaseMetadataDict, LabelType
+from autointent.custom_types import ListOfGenericLabels, MultiLabel
+from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
-from ._utils import InvalidNumClassesError, apply_tags
+from ._utils import apply_tags
 
 logger = logging.getLogger(__name__)
-
-
-class ThresholdDecisionDumpMetadata(BaseMetadataDict):
-    """Threshold predictor metadata."""
-
-    multilabel: bool
-    tags: list[Tag] | None
-    thresh: float | npt.NDArray[Any] | list[float]
-    n_classes: int
 
 
 class ThresholdDecision(DecisionModule):
@@ -59,7 +49,7 @@ class ThresholdDecision(DecisionModule):
 
     .. testoutput::
 
-        [1 0]
+        [1, 0]
 
     Multi-label classification
     ==========================
@@ -74,16 +64,17 @@ class ThresholdDecision(DecisionModule):
 
     .. testoutput::
 
-        [[0 1]
-         [1 0]]
+        [[0, 1], [1, 0]]
 
     """
 
-    metadata: ThresholdDecisionDumpMetadata
-    multilabel: bool
-    n_classes: int
+    _multilabel: bool
+    _n_classes: int
     tags: list[Tag] | None
     name = "threshold"
+    supports_oos = True
+    supports_multilabel = True
+    supports_multiclass = True
 
     def __init__(
         self,
@@ -111,7 +102,7 @@ class ThresholdDecision(DecisionModule):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -122,77 +113,35 @@ class ThresholdDecision(DecisionModule):
         :param tags: Tags to fit
         """
         self.tags = tags
-        self.multilabel = isinstance(labels[0], list)
-        self.n_classes = (
-            len(labels[0]) if self.multilabel and isinstance(labels[0], list) else len(set(labels).difference([-1]))
-        )
+        self._n_classes, self._multilabel, contains_oos = self._validate_inputs(scores, labels)
+        self._validate_multilabel(self._multilabel)
+        self._validate_oos(contains_oos)
 
         if not isinstance(self.thresh, float):
-            if len(self.thresh) != self.n_classes:
+            if len(self.thresh) != self._n_classes:
                 msg = (
                     f"Number of thresholds provided doesn't match with number of classes."
-                    f" {len(self.thresh)} != {self.n_classes}"
+                    f" {len(self.thresh)} != {self._n_classes}"
                 )
                 logger.error(msg)
-                raise InvalidNumClassesError(msg)
+                raise MismatchNumClassesError(msg)
             self.thresh = np.array(self.thresh)
 
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
         """
         Predict the best score.
 
         :param scores: Scores to predict
         """
-        if self.multilabel:
-            return multilabel_predict(scores, self.thresh, self.tags)
-        if scores.shape[1] != self.n_classes:
+        if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
-            raise InvalidNumClassesError(msg)
+            raise MismatchNumClassesError(msg)
+        if self._multilabel:
+            return multilabel_predict(scores, self.thresh, self.tags)
         return multiclass_predict(scores, self.thresh)
 
-    def dump(self, path: str) -> None:
-        """
-        Dump the metadata.
 
-        :param path: Path to dump
-        """
-        self.metadata = ThresholdDecisionDumpMetadata(
-            multilabel=self.multilabel,
-            tags=self.tags,
-            thresh=self.thresh if isinstance(self.thresh, float) else self.thresh.tolist(),  # type: ignore[typeddict-item]
-            n_classes=self.n_classes,
-        )
-
-        dump_dir = Path(path)
-        metadata_json = self.metadata
-        metadata_json["tags"] = [tag.model_dump() for tag in metadata_json["tags"]] if metadata_json["tags"] else None  # type: ignore[misc]
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(metadata_json, file, indent=4)
-
-    def load(self, path: str) -> None:
-        """
-        Load the metadata.
-
-        :param path: Path to load
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            metadata: ThresholdDecisionDumpMetadata = json.load(file)
-
-        self.multilabel = metadata["multilabel"]
-        self.tags = (
-            [Tag(**tag) for tag in metadata["tags"]]  # type: ignore[arg-type]
-            if metadata["tags"] and isinstance(metadata["tags"], list)
-            else None
-        )
-        self.thresh = metadata["thresh"]  # type: ignore[assignment]
-        self.n_classes = metadata["n_classes"]
-        self.metadata = metadata
-
-
-def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> npt.NDArray[Any]:
+def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> ListOfGenericLabels:
     """
     Make predictions for multiclass classification task.
 
@@ -209,14 +158,15 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
         thresh_selected = thresh[pred_classes]
         pred_classes[best_scores < thresh_selected] = -1  # out of scope
 
-    return pred_classes
+    y_pred: list[int] = pred_classes.tolist()  # type: ignore[assignment]
+    return [lab if lab != -1 else None for lab in y_pred]
 
 
 def multilabel_predict(
     scores: npt.NDArray[Any],
     thresh: float | npt.NDArray[Any],
     tags: list[Tag] | None,
-) -> npt.NDArray[Any]:
+) -> ListOfGenericLabels:
     """
     Make predictions for multilabel classification task.
 
@@ -228,4 +178,5 @@ def multilabel_predict(
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    return res
+    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    return [lab if sum(lab) > 0 else None for lab in y_pred]

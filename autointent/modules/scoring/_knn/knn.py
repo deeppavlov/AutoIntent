@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import WEIGHT_TYPES, LabelType
+from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 from .weighting import apply_weights
@@ -51,6 +51,8 @@ class KNNScorer(ScoringModule):
     name = "knn"
     _n_classes: int
     _multilabel: bool
+    supports_multilabel = True
+    supports_oos = False
 
     def __init__(
         self,
@@ -122,7 +124,7 @@ class KNNScorer(ScoringModule):
         """
         return self.embedder_name
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the scorer by training or loading the vector index.
 
@@ -130,12 +132,8 @@ class KNNScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        if isinstance(labels[0], list):
-            self._n_classes = len(labels[0])
-            self._multilabel = True
-        else:
-            self._n_classes = len(set(labels))
-            self._multilabel = False
+        self._n_classes, self._multilabel, contains_oos = self._get_task_specs(labels)
+        self._validate_oos(contains_oos)
 
         self._vector_index = VectorIndex(
             self.embedder_name,
@@ -170,9 +168,7 @@ class KNNScorer(ScoringModule):
         """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
 
-    def _get_neighbours(
-        self, utterances: list[str]
-    ) -> tuple[list[list[LabelType]], list[list[float]], list[list[str]]]:
+    def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         return self._vector_index.query(utterances, self.k)
 
     def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:

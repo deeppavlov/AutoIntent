@@ -66,18 +66,9 @@ class DatasetReader(BaseModel):
         ]
         splits = [split for split in splits if split]
 
-        n_classes = [self._get_n_classes(split) for split in splits]
-        if len(set(n_classes)) != 1:
-            message = (
-                f"Mismatch in number of classes across splits. Found class counts: {n_classes}. "
-                "Ensure all splits have the same number of classes."
-            )
-            raise ValueError(message)
-        if not n_classes[0]:
-            message = "Number of classes is zero or undefined. " "Ensure at least one class is present in the splits."
-            raise ValueError(message)
+        n_classes = self._validate_classes(splits)
 
-        self._validate_intents(n_classes[0])
+        self._validate_intents(n_classes)
 
         for split in splits:
             self._validate_split(split)
@@ -99,6 +90,20 @@ class DatasetReader(BaseModel):
                     for label in sample.label:
                         classes.add(label)
         return len(classes)
+
+    def _validate_classes(self, splits: list[list[Sample]]) -> int:
+        """Validate that each split has all classes."""
+        n_classes = [self._get_n_classes(split) for split in splits]
+        if len(set(n_classes)) != 1:
+            message = (
+                f"Mismatch in number of classes across splits. Found class counts: {n_classes}. "
+                "Ensure all splits have the same number of classes."
+            )
+            raise ValueError(message)
+        if not n_classes[0]:
+            message = "Number of classes is zero or undefined. " "Ensure at least one class is present in the splits."
+            raise ValueError(message)
+        return n_classes[0]
 
     def _validate_intents(self, n_classes: int) -> "DatasetReader":
         """
@@ -132,7 +137,8 @@ class DatasetReader(BaseModel):
         intent_ids = {intent.id for intent in self.intents}
         for sample in split:
             message = (
-                f"Sample with label {sample.label} references a non-existent intent ID. " f"Valid IDs are {intent_ids}."
+                f"Sample with label {sample.label} and utterance {sample.utterance[:10]}... "
+                f"references a non-existent intent ID. Valid IDs are {intent_ids}."
             )
             if isinstance(sample.label, int) and sample.label not in intent_ids:
                 raise ValueError(message)

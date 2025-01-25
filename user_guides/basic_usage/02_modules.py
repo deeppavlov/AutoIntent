@@ -44,6 +44,7 @@ Secondly, you need to load training data (see previous chapter for detailed expl
 from autointent import Dataset
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset
 
 # %% [markdown]
 """
@@ -51,7 +52,7 @@ dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 """
 
 # %%
-scorer.fit(dataset["train"]["utterance"], dataset["train"]["label"])
+scorer.fit(dataset["train_0"]["utterance"], dataset["train_0"]["label"])
 
 # %% [markdown]
 """
@@ -106,10 +107,7 @@ loaded_scorer.predict_with_metadata(["hello world!"])
 """
 
 # %%
-# [you didn't see it]
+# [we need to clean the space]
 import shutil
 
 shutil.rmtree(pathdir.parent)
-
-for file in Path.cwd().glob("vector_db*"):
-    shutil.rmtree(file)

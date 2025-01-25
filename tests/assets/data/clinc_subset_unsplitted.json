@@ -1,5 +1,5 @@
 {
-    "train_0": [
+    "train": [
         {
             "utterance": "do they take reservations at mcdonalds",
             "label": 0
@@ -71,9 +71,7 @@
         {
             "utterance": "i need you to schedule an alarm",
             "label": 2
-        }
-    ],
-    "train_1": [
+        },
         {
             "utterance": "why am i seeing a hold on my boa account",
             "label": 1
@@ -147,7 +145,7 @@
             "label": null
         }
     ],
-    "validation_0": [
+    "validation": [
         {
             "utterance": "how come a hold was placed on my 401k account",
             "label": 1
@@ -163,9 +161,7 @@
         {
             "utterance": "make an alarm for tomorrow at twilight",
             "label": 2
-        }
-    ],
-    "validation_1": [
+        },
         {
             "utterance": "where can i find out the status of my credit card application",
             "label": 3
@@ -256,7 +252,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": "some description to some intent"
+            "description": null
         },
         {
             "id": 1,
@@ -264,7 +260,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": "some description to another intent"
+            "description": null
         },
         {
             "id": 2,
@@ -272,7 +268,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": "another description to some intent"
+            "description": null
         },
         {
             "id": 3,
@@ -280,7 +276,7 @@
             "tags": [],
             "regexp_full_match": [],
             "regexp_partial_match": [],
-            "description": "another description to another intent"
+            "description": null
         }
     ]
 }

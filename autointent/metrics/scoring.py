@@ -100,7 +100,9 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
     return float(roc_auc_score(labels_, scores_, average="macro"))
 
 
-def _calculate_decision_metric(func: DecisionMetricFn, labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+def _calculate_decision_metric(
+    func: DecisionMetricFn, labels: list[int] | list[list[int]], scores: SCORES_VALUE_TYPE
+) -> float:
     r"""
     Calculate decision metric.
 
@@ -114,14 +116,12 @@ def _calculate_decision_metric(func: DecisionMetricFn, labels: LABELS_VALUE_TYPE
     :param scores: for each utterance, this list contains scores for each of `n_classes` classes
     :return: Score of the scoring metric
     """
-    labels_, scores_ = transform(labels, scores)
-
-    if labels_.ndim == 1:
-        pred_labels = np.argmax(scores, axis=1)
-        res = func(labels_, pred_labels)
+    if isinstance(labels[0], int):
+        pred_labels = np.argmax(scores, axis=1).tolist()
+        res = func(labels, pred_labels)
     else:
-        pred_labels = (scores_ > 0.5).astype(int)  # noqa: PLR2004
-        res = func(labels_, pred_labels)
+        pred_labels = (np.array(scores) > 0.5).astype(int).tolist()  # noqa: PLR2004
+        res = func(labels, pred_labels)
 
     return res
 

@@ -5,7 +5,7 @@ from typing import Literal
 
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
@@ -90,7 +90,7 @@ class RetrievalEmbedding(EmbeddingModule):
             embedder_use_cache=context.get_use_cache(),
         )
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Fit the vector index using the provided utterances and labels.
 
@@ -160,7 +160,7 @@ class RetrievalEmbedding(EmbeddingModule):
         """
         self._vector_index = VectorIndex.load(Path(path))
 
-    def predict(self, utterances: list[str]) -> tuple[list[list[int | list[int]]], list[list[float]], list[list[str]]]:
+    def predict(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         """
         Predict the nearest neighbors for a list of utterances.
 

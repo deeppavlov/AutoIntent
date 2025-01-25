@@ -2,7 +2,7 @@ from typing import Any
 
 import numpy as np
 
-from autointent import Context, Dataset, Pipeline
+from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import LoggingConfig, VectorIndexConfig
 from tests.conftest import setup_environment
@@ -41,10 +41,9 @@ class DummyCallback(OptimizerCallback):
         self.history.append(("log_final_metrics", kwargs))
 
 
-def test_pipeline_callbacks():
+def test_pipeline_callbacks(dataset):
     project_dir = setup_environment()
 
-    dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
     search_space = [
         {
             "node_type": "embedding",
@@ -99,10 +98,10 @@ def test_pipeline_callbacks():
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 1.0,
+                    "retrieval_map": 0.9875,
                     "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 1.0,
-                    "retrieval_precision": 1.0,
+                    "retrieval_ndcg": 0.9957230204891719,
+                    "retrieval_precision": 0.8500000000000001,
                 }
             },
         ),
@@ -120,10 +119,10 @@ def test_pipeline_callbacks():
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 1.0,
+                    "retrieval_map": 0.9816666666666667,
                     "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 1.0,
-                    "retrieval_precision": 0.8000000000000002,
+                    "retrieval_ndcg": 0.9936857382141969,
+                    "retrieval_precision": 0.44999999999999996,
                 }
             },
         ),
@@ -180,11 +179,11 @@ def test_pipeline_callbacks():
             "log_metric",
             {
                 "metrics": {
-                    "scoring_accuracy": 1.0,
-                    "scoring_f1": 1.0,
-                    "scoring_log_likelihood": -0.369171,
-                    "scoring_precision": 1.0,
-                    "scoring_recall": 1.0,
+                    "scoring_accuracy": 0.75,
+                    "scoring_f1": 0.6666666666666666,
+                    "scoring_log_likelihood": -0.439819,
+                    "scoring_precision": 0.625,
+                    "scoring_recall": 0.75,
                     "scoring_roc_auc": 1.0,
                 }
             },
@@ -195,11 +194,11 @@ def test_pipeline_callbacks():
             "log_metric",
             {
                 "metrics": {
-                    "decision_accuracy": 0.75,
-                    "decision_f1": 0.6666666666666666,
-                    "decision_precision": 0.625,
-                    "decision_recall": 0.75,
-                    "decision_roc_auc": None,
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
                 }
             },
         ),
@@ -209,11 +208,11 @@ def test_pipeline_callbacks():
             "log_metric",
             {
                 "metrics": {
-                    "decision_accuracy": 0.75,
-                    "decision_f1": 0.6666666666666666,
-                    "decision_precision": 0.625,
-                    "decision_recall": 0.75,
-                    "decision_roc_auc": None,
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
                 }
             },
         ),

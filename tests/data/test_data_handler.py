@@ -46,21 +46,21 @@ def sample_multilabel_data():
     return {
         "train": [
             {"utterance": "hello and goodbye", "label": [0, 1]},
-            {"utterance": "hi there", "label": [0]},
-            {"utterance": "farewell and see you later", "label": [1]},
-            {"utterance": "good morning", "label": [0]},
-            {"utterance": "goodbye for now", "label": [1]},
-            {"utterance": "hey, how's it going?", "label": [0]},
-            {"utterance": "so long and take care", "label": [1]},
-            {"utterance": "hello, nice to meet you", "label": [0]},
-            {"utterance": "bye, have a great day", "label": [1]},
-            {"utterance": "what's up?", "label": [0]},
-            {"utterance": "later, see you soon", "label": [1]},
-            {"utterance": "greetings and salutations", "label": [0]},
+            {"utterance": "hi there", "label": [0, 1]},
+            {"utterance": "farewell and see you later", "label": [0, 1]},
+            {"utterance": "good morning", "label": [1, 0]},
+            {"utterance": "goodbye for now", "label": [1, 0]},
+            {"utterance": "hey, how's it going?", "label": [1, 0]},
+            {"utterance": "so long and take care", "label": [0, 1]},
+            {"utterance": "hello, nice to meet you", "label": [0, 1]},
+            {"utterance": "bye, have a great day", "label": [0, 1]},
+            {"utterance": "what's up?", "label": [1, 0]},
+            {"utterance": "later, see you soon", "label": [1, 0]},
+            {"utterance": "greetings and salutations", "label": [1, 0]},
         ],
         "test": [
-            {"utterance": "greetings", "label": [0]},
-            {"utterance": "farewell", "label": [1]},
+            {"utterance": "greetings", "label": [0, 1]},
+            {"utterance": "farewell", "label": [1, 0]},
         ],
     }
 
@@ -86,17 +86,17 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.multilabel is True
     assert handler.n_classes == 2
     assert handler.train_utterances(0) == [
+        "hey, how's it going?",
         "so long and take care",
-        "what's up?",
+        "hello, nice to meet you",
         "later, see you soon",
-        "greetings and salutations",
     ]
     assert handler.test_utterances() == ["greetings", "farewell"]
-    assert handler.train_labels(0) == [[0, 1], [1, 0], [0, 1], [1, 0]]
-    assert handler.test_labels() == [[1, 0], [0, 1]]
+    assert handler.train_labels(0) == [[1, 0], [0, 1], [0, 1], [1, 0]]
+    assert handler.test_labels() == [[0, 1], [1, 0]]
 
 
-@pytest.mark.parametrize("label", [0, [0], None])
+@pytest.mark.parametrize("label", [0, [0, 1, 0], None])
 def test_sample_initialization(label):
     sample = Sample(utterance="Hello!", label=label)
     assert sample.label == label
@@ -104,7 +104,7 @@ def test_sample_initialization(label):
 
 @pytest.mark.parametrize("label", [-1, [-1], []])
 def test_sample_validation(label):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Sample(utterance="Hello!", label=label)
 
 
@@ -151,11 +151,10 @@ def test_dataset_initialization(mapping):
         {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split()},
         {"train": mock_split(), "validation": mock_split(), "validation_1": mock_split()},
         {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
-        {"train": mock_split(), "oos": mock_split()},
     ],
 )
 def test_dataset_validation(mapping):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
 
 
@@ -172,5 +171,5 @@ def test_dataset_validation(mapping):
     ],
 )
 def test_intents_validation(mapping):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)

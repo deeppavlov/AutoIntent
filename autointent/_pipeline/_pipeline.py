@@ -3,20 +3,22 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import NodeType
+from autointent.custom_types import ListOfGenericLabels, NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
+
+if TYPE_CHECKING:
+    from autointent.modules.abc import DecisionModule, ScoringModule
 
 
 class Pipeline:
@@ -185,7 +187,7 @@ class Pipeline:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
-    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+    def predict(self, utterances: list[str]) -> ListOfGenericLabels:
         """
         Predict the labels for the utterances.
 
@@ -196,8 +198,11 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scores = self.nodes[NodeType.scoring].module.predict(utterances)  # type: ignore[union-attr]
-        return self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
+        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+
+        scores = scoring_module.predict(utterances)
+        return decision_module.predict(scores)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """
@@ -211,7 +216,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)  # type: ignore[union-attr]
-        predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
+        predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr,arg-type]
         regexp_predictions, regexp_predictions_metadata = None, None
         if NodeType.regexp in self.nodes:
             regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(  # type: ignore[union-attr]

@@ -6,7 +6,7 @@ trials, and modules during the pipeline's execution.
 
 import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -174,20 +174,6 @@ class OptimizationInfo:
         """
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
-
-    def get_best_oos_scores(self, split: Literal["train", "validation", "test"]) -> NDArray[np.float64] | None:
-        """
-        Retrieve the out-of-scope scores from the best scorer node.
-
-        :param split: The data split for which to retrieve the OOS scores.
-            Must be one of "train", "validation", or "test".
-        :return: A numpy array containing OOS scores for the specified split,
-            or `None` if no OOS scores are available.
-        """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
-        if best_scorer_artifact.oos_scores is not None:
-            return best_scorer_artifact.oos_scores[split]
-        return best_scorer_artifact.oos_scores
 
     def dump_evaluation_results(self) -> dict[str, Any]:
         """

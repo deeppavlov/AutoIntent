@@ -1,13 +1,16 @@
 """Prediction metrics for multiclass and multilabel classification tasks."""
 
 import logging
-from typing import Protocol
+from functools import partial
+from typing import Any, Protocol
 
 import numpy as np
+import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels
+
 from ._converter import transform
-from .custom_types import LABELS_VALUE_TYPE
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +18,7 @@ logger = logging.getLogger(__name__)
 class DecisionMetricFn(Protocol):
     """Protocol for decision metrics."""
 
-    def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+    def __call__(self, y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
         """
         Calculate decision metric.
 
@@ -28,7 +31,32 @@ class DecisionMetricFn(Protocol):
         ...
 
 
-def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def handle_oos(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> tuple[ListOfLabels, ListOfLabels]:
+    """Convert labels of OOS samples to make them usable in decision metrics."""
+    in_domain_labels = list(filter(lambda lab: lab is not None, y_true))
+    if isinstance(in_domain_labels[0], list):
+        func = _add_oos_multilabel
+        n_classes = len(in_domain_labels[0])
+    else:
+        func = _add_oos_multiclass  # type: ignore[assignment]
+        n_classes = len(set(in_domain_labels))
+    func = partial(func, n_classes=n_classes)
+    return list(map(func, y_true)), list(map(func, y_pred))
+
+
+def _add_oos_multiclass(label: int | None, n_classes: int) -> int:
+    if label is None:
+        return n_classes
+    return label
+
+
+def _add_oos_multilabel(label: list[int] | None, n_classes: int) -> list[int]:
+    if label is None:
+        return [0] * n_classes + [1]
+    return [*label, 1]
+
+
+def decision_accuracy(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     r"""
     Calculate decision accuracy. Supports both multiclass and multilabel.
 
@@ -49,11 +77,11 @@ def decision_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> f
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
+    y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     return float(np.mean(y_true_ == y_pred_))
 
 
-def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     r"""
     Calculate roc_auc for multiclass.
 
@@ -74,19 +102,17 @@ def _decision_roc_auc_multiclass(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE
     :param y_pred: Predicted values of labels
     :return: Score of the decision roc_auc
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
-
     n_classes = len(np.unique(y_true))
     roc_auc_scores: list[float] = []
     for k in range(n_classes):
-        binarized_true = (y_true_ == k).astype(int)
-        binarized_pred = (y_pred_ == k).astype(int)
+        binarized_true = (y_true == k).astype(int)
+        binarized_pred = (y_pred == k).astype(int)
         roc_auc_scores.append(roc_auc_score(binarized_true, binarized_pred))
 
     return float(np.mean(roc_auc_scores))
 
 
-def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def _decision_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
     r"""
     Calculate roc_auc for multilabel.
 
@@ -101,7 +127,7 @@ def _decision_roc_auc_multilabel(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE
     return float(roc_auc_score(y_true, y_pred, average="macro"))
 
 
-def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_roc_auc(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     r"""
     Calculate ROC AUC for multiclass and multilabel classification.
 
@@ -113,7 +139,7 @@ def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> fl
     :param y_pred: Predicted values of labels
     :return: Score of the decision ROC AUC
     """
-    y_true_, y_pred_ = transform(y_true, y_pred)
+    y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     if y_pred_.ndim == y_true_.ndim == 1:
         return _decision_roc_auc_multiclass(y_true_, y_pred_)
     if y_pred_.ndim == y_true_.ndim == 2:  # noqa: PLR2004
@@ -123,7 +149,7 @@ def decision_roc_auc(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> fl
     raise ValueError(msg)
 
 
-def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_precision(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     r"""
     Calculate decision precision. Supports both multiclass and multilabel.
 
@@ -135,10 +161,10 @@ def decision_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> 
     :param y_pred: Predicted values of labels
     :return: Score of the decision precision
     """
-    return float(precision_score(y_true, y_pred, average="macro"))
+    return float(precision_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
-def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_recall(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     r"""
     Calculate decision recall. Supports both multiclass and multilabel.
 
@@ -150,10 +176,10 @@ def decision_recall(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> flo
     :param y_pred: Predicted values of labels
     :return: Score of the decision recall
     """
-    return float(recall_score(y_true, y_pred, average="macro"))
+    return float(recall_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
-def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def decision_f1(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
     r"""
     Calculate decision f1 score. Supports both multiclass and multilabel.
 
@@ -165,4 +191,4 @@ def decision_f1(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     :param y_pred: Predicted values of labels
     :return: Score of the decision accuracy
     """
-    return float(f1_score(y_true, y_pred, average="macro"))
+    return float(f1_score(*handle_oos(y_true, y_pred), average="macro"))

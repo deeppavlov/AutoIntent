@@ -8,7 +8,7 @@ from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import LabelType, Split
+from autointent.custom_types import ListOfGenericLabels, Split
 
 from ._stratification import split_dataset
 
@@ -55,7 +55,7 @@ class DataHandler:
             for intent in self.dataset.intents
         ]
 
-        self.intent_descriptions = [intent.name for intent in self.dataset.intents]
+        self.intent_descriptions = [intent.description for intent in self.dataset.intents]
         self.tags = self.dataset.get_tags()
 
         self._logger = logger
@@ -83,7 +83,7 @@ class DataHandler:
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def train_labels(self, idx: int | None = None) -> list[LabelType]:
+    def train_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve training labels from the dataset.
 
@@ -95,7 +95,7 @@ class DataHandler:
         :return: List of training labels.
         """
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -111,7 +111,7 @@ class DataHandler:
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def validation_labels(self, idx: int | None = None) -> list[LabelType]:
+    def validation_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve validation labels from the dataset.
 
@@ -123,7 +123,7 @@ class DataHandler:
         :return: List of validation labels.
         """
         split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -139,7 +139,7 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
-    def test_labels(self, idx: int | None = None) -> list[LabelType]:
+    def test_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """
         Retrieve test labels from the dataset.
 
@@ -151,31 +151,7 @@ class DataHandler:
         :return: List of test labels.
         """
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
-        return cast(list[LabelType], self.dataset[split][self.dataset.label_feature])
-
-    def oos_utterances(self, idx: int | None = None) -> list[str]:
-        """
-        Retrieve out-of-scope (OOS) utterances from the dataset.
-
-        If the dataset contains out-of-scope samples, retrieves the utterances
-        from the specified OOS split index (if provided) or the primary OOS split.
-        Returns an empty list if no OOS samples are available in the dataset.
-
-        :param idx: Optional index for a specific OOS split.
-        :return: List of out-of-scope utterances, or an empty list if unavailable.
-        """
-        if self.has_oos_samples():
-            split = f"{Split.OOS}_{idx}" if idx is not None else Split.OOS
-            return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
-        return []
-
-    def has_oos_samples(self) -> bool:
-        """
-        Check if there are out-of-scope samples.
-
-        :return: True if there are out-of-scope samples.
-        """
-        return any(split.startswith(Split.OOS) for split in self.dataset)
+        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def dump(self, filepath: str | Path) -> None:
         """
@@ -187,7 +163,6 @@ class DataHandler:
 
     def _split(self, random_seed: int, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
-        has_test_split = any(split.startswith(Split.TEST) for split in self.dataset)
 
         if split_train and Split.TRAIN in self.dataset:
             self._split_train(random_seed)
@@ -197,20 +172,11 @@ class DataHandler:
             self._split_test(test_size, random_seed)
 
         if not has_validation_split:
-            if not has_test_split:
-                self._split_validation_from_test(random_seed)
-                self._split_validation(random_seed)
-            else:
-                self._split_validation_from_train(random_seed)
+            self._split_validation_from_train(random_seed)
         elif Split.VALIDATION in self.dataset:
             self._split_validation(random_seed)
 
-        if self.has_oos_samples():
-            self._split_oos(random_seed)
-
         for split in self.dataset:
-            if split.startswith(Split.OOS):
-                continue
             n_classes_split = self.dataset.get_n_classes(split)
             if n_classes_split != self.n_classes:
                 message = (
@@ -220,20 +186,32 @@ class DataHandler:
                 raise ValueError(message)
 
     def _split_train(self, random_seed: int) -> None:
+        """
+        Split on two sets.
+
+        One is for scoring node optimizaton, one is for decision node.
+        """
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,
             split=Split.TRAIN,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
 
     def _split_validation(self, random_seed: int) -> None:
+        """
+        Split on two sets.
+
+        One is for scoring node optimizaton, one is for decision node.
+        """
         self.dataset[f"{Split.VALIDATION}_0"], self.dataset[f"{Split.VALIDATION}_1"] = split_dataset(
             self.dataset,
             split=Split.VALIDATION,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=False,  # only val data for decision node should contain OOS
         )
         self.dataset.pop(Split.VALIDATION)
 
@@ -243,6 +221,7 @@ class DataHandler:
             split=Split.TEST,
             test_size=0.5,
             random_seed=random_seed,
+            allow_oos_in_train=True,  # both test and validation splits can contain OOS
         )
 
     def _split_validation_from_train(self, random_seed: int) -> None:
@@ -252,6 +231,7 @@ class DataHandler:
                 split=Split.TRAIN,
                 test_size=0.2,
                 random_seed=random_seed,
+                allow_oos_in_train=True,
             )
         else:
             for idx in range(2):
@@ -260,9 +240,11 @@ class DataHandler:
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=0.2,
                     random_seed=random_seed,
+                    allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
 
     def _split_test(self, test_size: float, random_seed: int) -> None:
+        """Obtain test set from train."""
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(
             self.dataset,
             split=f"{Split.TRAIN}_0",
@@ -274,30 +256,10 @@ class DataHandler:
             split=f"{Split.TRAIN}_1",
             test_size=test_size,
             random_seed=random_seed,
+            allow_oos_in_train=True,
         )
         self.dataset[Split.TEST] = concatenate_datasets(
             [self.dataset[f"{Split.TEST}_0"], self.dataset[f"{Split.TEST}_1"]],
         )
         self.dataset.pop(f"{Split.TEST}_0")
         self.dataset.pop(f"{Split.TEST}_1")
-
-    def _split_oos(self, random_seed: int) -> None:
-        self.dataset[f"{Split.OOS}_0"], self.dataset[f"{Split.OOS}_1"] = (
-            self.dataset[Split.OOS]
-            .train_test_split(
-                test_size=0.2,
-                shuffle=True,
-                seed=random_seed,
-            )
-            .values()
-        )
-        self.dataset[f"{Split.OOS}_1"], self.dataset[f"{Split.OOS}_2"] = (
-            self.dataset[f"{Split.OOS}_1"]
-            .train_test_split(
-                test_size=0.5,
-                shuffle=True,
-                seed=random_seed,
-            )
-            .values()
-        )
-        self.dataset.pop(Split.OOS)
