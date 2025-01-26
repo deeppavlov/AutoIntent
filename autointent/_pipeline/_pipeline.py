@@ -84,6 +84,9 @@ class Pipeline:
         Create pipeline optimizer with default search space for given classification task.
 
         :param multilabel: Whether the task multi-label, or single-label.
+        :param seed: random seed
+
+        :return: Pipeline
         """
         return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 
