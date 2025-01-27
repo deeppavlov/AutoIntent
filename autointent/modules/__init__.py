@@ -10,7 +10,7 @@ from .decision import (
     ThresholdDecision,
     TunableDecision,
 )
-from .embedding import LogRegEmbedding, RetrievalEmbedding
+from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, SklearnScorer
 
 T = TypeVar("T", bound=Module)
@@ -21,7 +21,7 @@ def _create_modules_dict(modules: list[type[T]]) -> dict[str, type[T]]:
 
 
 RETRIEVAL_MODULES_MULTICLASS: dict[str, type[EmbeddingModule]] = _create_modules_dict(
-    [RetrievalEmbedding, LogRegEmbedding]
+    [RetrievalAimedEmbedding, LogregAimedEmbedding]
 )
 
 RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS

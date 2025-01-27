@@ -1,4 +1,4 @@
-"""LogRegEmbedding class for managing and interacting with a vector database for retrieval tasks."""
+"""LogregAimedEmbedding class for a proxy optimzation of embedding."""
 
 from typing import Literal
 
@@ -10,17 +10,17 @@ from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
 
-class LogRegEmbedding(EmbeddingModule):
+class LogregAimedEmbedding(EmbeddingModule):
     r"""
-    Module for managing classification operations using logistic regression.
+    Module for configuring embeddings optimized for linear classification.
 
-    LogRegEmbedding provides methods for indexing, and training based on embeddings
-    for classification tasks.
+    The main purpose of this module is to be used at embedding node for optimizing
+    embedding configuration using its logreg classification quality as a sort of proxy metric.
 
     :ivar classifier: The trained logistic regression model.
     :ivar label_encoder: Label encoder for converting labels to numerical format.
@@ -30,10 +30,10 @@ class LogRegEmbedding(EmbeddingModule):
     --------
     .. testcode::
 
-        from autointent.modules.embedding import LogRegEmbedding
+        from autointent.modules.embedding import LogregAimedEmbedding
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
-        retrieval = LogRegEmbedding(
+        retrieval = LogregAimedEmbedding(
             k=3,
             embedder_name="sergeyzh/rubert-tiny-turbo",
             cv=2
@@ -56,7 +56,7 @@ class LogRegEmbedding(EmbeddingModule):
         embedder_use_cache: bool = True,
     ) -> None:
         """
-        Initialize the LogRegEmbedding.
+        Initialize the LogregAimedEmbedding.
 
         :param cv: the number of folds used in LogisticRegressionCV
         :param k: Number of nearest neighbors to retrieve.
@@ -82,15 +82,15 @@ class LogRegEmbedding(EmbeddingModule):
         k: int,
         cv: int,
         embedder_name: str,
-    ) -> "LogRegEmbedding":
+    ) -> "LogregAimedEmbedding":
         """
-        Create a LogRegEmbedding instance using a Context object.
+        Create a LogregAimedEmbedding instance using a Context object.
 
         :param cv: the number of folds used in LogisticRegressionCV
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
-        :return: Initialized LogRegEmbedding instance.
+        :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(
             k=k,
@@ -105,14 +105,14 @@ class LogRegEmbedding(EmbeddingModule):
     def clear_cache(self) -> None:
         pass
 
-    def fit(self, utterances: list[str], labels: list[LabelType]) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
         Train the logistic regression model using the provided utterances and labels.
 
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
-        self._multilabel = isinstance(labels[0], list)
+        self._validate_task(labels)
 
         self._embedder = Embedder(
             device=self.embedder_device,
