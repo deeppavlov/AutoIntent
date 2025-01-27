@@ -1,7 +1,12 @@
 import pytest
 
-from autointent import Context
-from autointent.configs._optimization_cli import DataConfig, EmbedderConfig, LoggingConfig, VectorIndexConfig
+from autointent import Context, Dataset
+from autointent.configs import (
+    CrossEncoderConfig,
+    EmbedderConfig,
+    LoggingConfig,
+    VectorIndexConfig,
+)
 from autointent.nodes import NodeOptimizer
 from tests.conftest import get_dataset_path, setup_environment
 
@@ -70,10 +75,14 @@ def scoring_optimizer_multilabel(embedding_optimizer_multilabel):
 
 
 def get_context(multilabel):
-    db_dir, dump_dir, logs_dir = setup_environment()
+    project_dir = setup_environment()
 
     res = Context()
-    res.configure_data(DataConfig(get_dataset_path(), force_multilabel=multilabel))
-    res.configure_logging(LoggingConfig(dirpath=logs_dir, dump_dir=dump_dir, dump_modules=True))
-    res.configure_vector_index(VectorIndexConfig(db_dir=db_dir), EmbedderConfig(device="cpu"))
+    dataset = Dataset.from_json(get_dataset_path())
+    if multilabel:
+        dataset = dataset.to_multilabel()
+    res.set_dataset(dataset)
+    res.configure_logging(LoggingConfig(project_dir=project_dir, dump_modules=True))
+    res.configure_vector_index(VectorIndexConfig(), EmbedderConfig(device="cpu"))
+    res.configure_cross_encoder(CrossEncoderConfig())
     return res

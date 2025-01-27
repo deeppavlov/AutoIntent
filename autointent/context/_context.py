@@ -10,6 +10,7 @@ import yaml
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
+    CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
     LoggingConfig,
@@ -19,7 +20,6 @@ from autointent.configs import (
 from ._utils import NumpyEncoder, load_dataset
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from .vector_index_client import VectorIndexClient
 
 
 class Context:
@@ -31,7 +31,6 @@ class Context:
     """
 
     data_handler: DataHandler
-    vector_index_client: VectorIndexClient
     optimization_info: OptimizationInfo
     callback_handler = CallbackHandler()
 
@@ -66,13 +65,14 @@ class Context:
             embedder_config = EmbedderConfig()
         self.embedder_config = embedder_config
 
-        self.vector_index_client = VectorIndexClient(
-            self.embedder_config.device,
-            self.vector_index_config.db_dir,
-            self.embedder_config.batch_size,
-            self.embedder_config.max_length,
-            self.embedder_config.use_cache,
-        )
+    def configure_cross_encoder(self, config: CrossEncoderConfig) -> None:
+        """
+        Configure the vector index client and embedder.
+
+        :param config: Configuration for the vector index.
+        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+        """
+        self.cross_encoder_config = config
 
     def configure_data(self, config: DataConfig) -> None:
         """
@@ -83,19 +83,16 @@ class Context:
         self.data_handler = DataHandler(
             dataset=load_dataset(config.train_path),
             random_seed=self.seed,
-            force_multilabel=config.force_multilabel,
         )
 
-    def set_dataset(self, dataset: Dataset, force_multilabel: bool = False) -> None:
+    def set_dataset(self, dataset: Dataset) -> None:
         """
         Set the datasets for training, validation and testing.
 
         :param dataset: Dataset.
-        :param force_multilabel: Whether to force multilabel classification.
         """
         self.data_handler = DataHandler(
             dataset=dataset,
-            force_multilabel=force_multilabel,
             random_seed=self.seed,
         )
 
@@ -149,21 +146,21 @@ class Context:
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
 
-    def get_db_dir(self) -> Path:
-        """
-        Get the database directory of the vector index.
-
-        :return: Path to the database directory.
-        """
-        return self.vector_index_client.db_dir
-
     def get_device(self) -> str:
         """
         Get the embedder device used by the vector index client.
 
         :return: Device name.
         """
-        return self.vector_index_client.embedder_device
+        return self.embedder_config.device
+
+    def get_cross_encoder_device(self) -> str:
+        """
+        Get the cross encoder device used by default during optimization.
+
+        :return: Device name.
+        """
+        return self.cross_encoder_config.device
 
     def get_batch_size(self) -> int:
         """
@@ -171,7 +168,15 @@ class Context:
 
         :return: Batch size.
         """
-        return self.vector_index_client.embedder_batch_size
+        return self.embedder_config.batch_size
+
+    def get_cross_encoder_batch_size(self) -> int:
+        """
+        Get the batch size used by the cross encoder by default during optimization.
+
+        :return: Batch size.
+        """
+        return self.cross_encoder_config.batch_size
 
     def get_max_length(self) -> int | None:
         """
@@ -179,7 +184,15 @@ class Context:
 
         :return: Maximum length or None if not set.
         """
-        return self.vector_index_client.embedder_max_length
+        return self.embedder_config.max_length
+
+    def get_cross_encoder_max_length(self) -> int | None:
+        """
+        Get the maximum sequence length for embeddings.
+
+        :return: Maximum length or None if not set.
+        """
+        return self.cross_encoder_config.max_length
 
     def get_use_cache(self) -> bool:
         """
@@ -187,7 +200,7 @@ class Context:
 
         :return: True if caching is enabled, False otherwise.
         """
-        return self.vector_index_client.embedder_use_cache
+        return self.embedder_config.use_cache
 
     def get_dump_dir(self) -> Path | None:
         """

@@ -61,10 +61,14 @@ class NodeOptimizer:
                 self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_name)
-                metric_value = module.score(context, "validation", self.node_info.metrics_available[self.metric_name])
+                metrics = module.score(context, "validation")
+                metric_value = metrics[self.metric_name]
 
-                log_data = {self.metric_name: metric_value}
-                context.callback_handler.log_value(**log_data)  # type: ignore[arg-type]
+                # some metrics can produce error. When main metric produces error raise it.
+                if isinstance(metric_value, str):
+                    raise Exception(metric_value)  # noqa: TRY004, TRY002
+
+                context.callback_handler.log_metrics(metrics)
                 context.callback_handler.end_module()
 
                 dump_dir = context.get_dump_dir()

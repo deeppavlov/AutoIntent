@@ -33,21 +33,21 @@ def test_get_utterances_by_id_multiple_multiclass_same_label():
 
 
 def test_get_utterances_by_id_single_multilabel_utterance():
-    samples = [Sample(utterance="Good morning", label=[1, 2])]
+    samples = [Sample(utterance="Good morning", label=[0, 1, 1, 0])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning"], 2: ["Good morning"]}
     assert result == expected_result
 
 
 def test_get_utterances_by_id_multiple_multilabel_utterances():
-    samples = [Sample(utterance="Good morning", label=[1, 2]), Sample(utterance="Good night", label=[1, 3])]
+    samples = [Sample(utterance="Good morning", label=[0, 1, 1, 0]), Sample(utterance="Good night", label=[0, 1, 0, 1])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning", "Good night"], 2: ["Good morning"], 3: ["Good night"]}
     assert result == expected_result
 
 
 def test_get_utterances_by_id_oos_utterances():
-    samples = [Sample(utterance="Unknown command", label=None), Sample(utterance="Hello", label=[2])]
+    samples = [Sample(utterance="Unknown command", label=None), Sample(utterance="Hello", label=[0, 0, 1])]
     result = group_utterances_by_label(samples)
     assert result == {2: ["Hello"]}
 
@@ -55,7 +55,7 @@ def test_get_utterances_by_id_oos_utterances():
 def test_get_utterances_by_id_mixed_types():
     samples = [
         Sample(utterance="Hello", label=1),
-        Sample(utterance="Good morning", label=[1, 3]),
+        Sample(utterance="Good morning", label=[0, 1, 0, 1]),
         Sample(utterance="Random text", label=None),
         Sample(utterance="Hi", label=3),
     ]

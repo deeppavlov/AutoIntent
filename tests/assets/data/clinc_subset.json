@@ -1,272 +1,286 @@
 {
-    "intents": [
+    "train_0": [
         {
-            "id": 0,
-            "name": "accept_reservations",
-            "description": "User wants to know if Red Robin accepts reservations."
-        },
-        {
-            "id": 1,
-            "name": "account_blocked",
-            "description": "User wants to know why their bank account is blocked or frozen."
-        },
-        {
-            "id": 2,
-            "name": "alarm",
-            "description": "User wants to set or manage an alarm."
-        },
-        {
-            "id": 3,
-            "name": "alarm reservation",
-            "tags": ["alarm", "reservation"],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
-            "description": "User wants to set or manage an alarm second time."
-        }
-    ],
-    "train": [
-        {
-            "utterance": "can i make a reservation for redrobin",
+            "utterance": "do they take reservations at mcdonalds",
             "label": 0
         },
         {
-            "utterance": "is it possible to make a reservation at redrobin",
-            "label": 0
-        },
-        {
-            "utterance": "does redrobin take reservations",
-            "label": 0
-        },
-        {
-            "utterance": "are reservations taken at redrobin",
-            "label": 0
-        },
-        {
-            "utterance": "does redrobin do reservations",
-            "label": 0
-        },
-        {
-            "utterance": "does acero in maplewood allow reservations",
-            "label": 0
-        },
-        {
-            "utterance": "do they take reservations at bar tartine",
-            "label": 0
-        },
-        {
-            "utterance": "does cowgirl creamery in san francisco take reservations",
-            "label": 0
-        },
-        {
-            "utterance": "can i get a reservation at melting pot tomorrow",
-            "label": 0
-        },
-        {
-            "utterance": "will they take reservations at torris",
-            "label": 0
-        },
-        {
-            "utterance": "i think my account is blocked",
-            "label": 1
-        },
-        {
-            "utterance": "why is my bank account stopping all transactions from going through",
-            "label": 1
-        },
-        {
-            "utterance": "what would cause me to be locked out of my bank account",
-            "label": 1
-        },
-        {
-            "utterance": "find out the reason why am i locked out of my bank account",
-            "label": 1
-        },
-        {
-            "utterance": "my account has a hold on it and i can't access my funds, why",
-            "label": 1
-        },
-        {
-            "utterance": "why is there a hold on my american saving bank account",
-            "label": 1
-        },
-        {
-            "utterance": "i am nost sure why my account is blocked",
-            "label": 1
-        },
-        {
-            "utterance": "why is there a hold on my capital one checking account",
-            "label": 1
-        },
-        {
-            "utterance": "i think my account is blocked but i do not know the reason",
-            "label": 1
+            "utterance": "i would like an update on the progress of my credit card application",
+            "label": 3
         },
         {
             "utterance": "can you tell me why is my bank account frozen",
             "label": 1
         },
         {
+            "utterance": "why in the world am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "who froze my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "has my amex application gone through yet",
+            "label": 3
+        },
+        {
+            "utterance": "does michael's accept reservations",
+            "label": 0
+        },
+        {
+            "utterance": "why cannot i take any money out from my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "does cowgirl creamery in san francisco take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "why am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "find out if la tour d'argent in paris takes reservations",
+            "label": 0
+        },
+        {
+            "utterance": "please set two alarms, one at 12 pm and the next at 1 pm",
+            "label": 2
+        },
+        {
+            "utterance": "will i be notified when my application has been processed",
+            "label": 3
+        },
+        {
             "utterance": "wake me up at noon tomorrow",
             "label": 2
+        },
+        {
+            "utterance": "was my application approved or not for a credit card at chase bank",
+            "label": 3
         },
         {
             "utterance": "set my alarm for getting up",
             "label": 2
         },
         {
-            "utterance": "make sure my alarm is set for three thirty in the morning",
-            "label": 2
-        },
-        {
-            "utterance": "please set an alarm for mid day",
-            "label": 2
-        },
-        {
-            "utterance": "have an alarm set for three in the morning",
-            "label": 2
-        },
-        {
-            "utterance": "set an alarm for me for 10:00 and another one set for 4:00",
-            "label": 2
-        },
-        {
-            "utterance": "set an alarm to go to sleep and another to wake up",
-            "label": 2
-        },
-        {
-            "utterance": "set alarm",
-            "label": 2
-        },
-        {
-            "utterance": "i need an alarm set",
-            "label": 2
-        },
-        {
-            "utterance": "you need to set alarm for me",
-            "label": 2
-        },
-        {
-            "utterance": "how much is an overdraft fee for bank",
+            "utterance": "has there been any notice that my card app has been looked at",
             "label": 3
         },
         {
-            "utterance": "where is the dipstick",
+            "utterance": "i need you to schedule an alarm",
+            "label": 2
+        }
+    ],
+    "train_1": [
+        {
+            "utterance": "why am i seeing a hold on my boa account",
+            "label": 1
+        },
+        {
+            "utterance": "set up an alarm",
+            "label": 2
+        },
+        {
+            "utterance": "did my american express card application go through yet",
             "label": 3
         },
         {
-            "utterance": "where is the dipstick",
+            "utterance": "please create an alarm for 12 noon",
+            "label": 2
+        },
+        {
+            "utterance": "does moes in la except rerservations",
+            "label": 0
+        },
+        {
+            "utterance": "do you know whether ihop does reservations",
+            "label": 0
+        },
+        {
+            "utterance": "My husband and I finally checked out this place after hearing about it only a couple weeks ago.  The idea of a cute storefront restaurant on Main Street intrigued us.  We went on a weeknight and found the place surprisingly full - there were only five (of about 15-20) tables available when we arrived.  However, we were quickly seated and provided with our requested drinks.\\n\\nWe had pork bellies and kale chips for our appetizers.  The pork bellies were divine.  The kale chips were a bit lacking in flair.  It was basically dry kale with paprika sprinkled on top.  Not much else.\\n\\nMy husband got the Local Dish burger and declared it good.  The fries he got on the side were great.  I ordered their chicken & peaches sandwich with coleslaw on the side.  The coleslaw was fantastic and I could have eaten more than the serving they gave me.  The chicken sandwich was average - but I loved knowing I was probably eating peaches from just a few blocks away at the Peach Stand.  The chicken itself was a bit dry but was helped by the pesto, spinach and peaches that came on it.\\n\\nWhy did I not give it more than 3 stars?  Because a second visit will be required, with other foods tried, before I decide to bump it up to four stars.  The restaurant was charming enough (and prices decent enough) that we'll most likely go back again the future.",
+            "label": null
+        },
+        {
+            "utterance": "who is the current captain of this ship",
+            "label": null
+        },
+        {
+            "utterance": "when was nintendo created",
+            "label": null
+        },
+        {
+            "utterance": "how many planets have we discovered",
+            "label": null
+        },
+        {
+            "utterance": "Brown rice is MUSH!  Today was the second time I've been since my office moved a block away.  I gave it another chance because there is no way a place like this would over cook their rice to the point where it practically melted together....think again.  I have been to Samurai Sams a million times over the years for the \\\"healthy alternative\\\" to fast food and either something has changed to the quality of food or I've been there too many times that I'm burned out.  The rice issue is huge...who wants mushy rice?  Like someone said in reviews below-everything is now premade just sitting there.  Not sure how true that is but thats what it seems.  Big bummer. :(",
+            "label": null
+        },
+        {
+            "utterance": "I have promoted shows out of this venue, checked out some of my favorite local bands here, and spent my last birthday here. The owner has always been very hospitable and professional. The security staff is very professional and the bar tenders are always pouring amazing drinks. Needless to say I love this bar anyone who is a fan of live music at intimate venues should like the bar's facebook page for regular updates on upcoming shows.",
+            "label": null
+        },
+        {
+            "utterance": "I LOVE Bloom Salon... all of their stylist are very qualified and provide excellent hair care...I prefer to book my appointments with Andrea, but if she is not available I am not afraid to book with anyone else.  Not only does this salon provide hair care, but they also offer skin, nails and massage therapy!!  What a great place with a relaxing atmosphere...I HIGHLY recommend this place.",
+            "label": null
+        },
+        {
+            "utterance": "Very Trendy hotel!!!  \\n\\nA friend was able to get me a free room for my birthday!   Thanks KJ!  :-)\\n\\nThe check in process was LONG-even in VIP, however I guess I shouldn't complain because it was free...\\n\\nThe room was cute and clean.   I enjoyed the views from the wraparound terrace.\\n\\nRoom service was GREAT!!!  \\n\\nI asked the bartender at the vesper bar  to  Surprise me with a drink that was fruity yet would still give me a buzz, she hooked me up with a SAGE 75!!!   Let's just say I enjoyed it to the fullest!!!  \\n\\nShopping in the hotel  left something to be desired.   \\n\\nI don't think I'll stay here again, however it was nice to experience it -  especially since it was free!  ;-)",
+            "label": null
+        },
+        {
+            "utterance": "Ice Pan is an interesting take on an already saturated chilled dessert market. The iced cream is made right in front of you with subtle variations on your classic flavors. This establishment is indeed somewhat pricey, but if you compare it to every other place on the strip, it is a perfectly acceptable amount to pay for a dessert.\\n\\nThe taste is nothing phenomenal, but they way they prepare it kinda is. the ice cream is made right in front of you as they turn milk and fruit into customized ice cream. The cream is poured onto this chilled pan / wok and freezes almost instantly. The ice cream masters then proceed to stir, scrape, slap, and slice the ice cream using knife-like spatulas with such speed and precision that you'd think you were watching a Benihana chef in action. Seriously, if they brought a knife to a gun fight, they would still have a chance at coming out on top.\\n\\nAs for eating the ice cream, the taste was a little light, which is kinda nice after a heavy Las Vegas meal, but deep down, I was kinda hoping for a little more umph from the flavor. Depending on who you get to prepare it, the consistency can be super creamy or hard and dense. If you get a more senior preparer, the cream comes out very smooth and can be almost gelato-like. If your preparer is the young one who has yet to master the tricks of the trade, the cream may be left on the ice pan a bit too long and freeze a little harder than it probably should.\\n\\nWith both ups and downs to this eatery, I think the Yelp rating system hit this one right on the mark, it is A-OK.",
+            "label": null
+        },
+        {
+            "utterance": "what's the average battery life of an android phone",
+            "label": null
+        },
+        {
+            "utterance": "what are some of picasso's most famous works",
+            "label": null
+        },
+        {
+            "utterance": "I've been going here a lot(pretty much a regular you could say.) It's a good place to include in your bar hopping plans. Wandos too busy? Fooseball taken at Vintage? Swing by Red Shed. It's also one of the few bars you can actually have a conversation at some  nights. One of my minor complaints is the jukebox. If there is no songs playing..it's just that--quiet. And at certain points in the night, you can hear a pin drop. Lines for the bathroom is sometimes annoying and I've felt really bad for the ladies here who have sometimes waited 30 minutes before the line moved one person :P",
+            "label": null
+        }
+    ],
+    "validation_0": [
+        {
+            "utterance": "how come a hold was placed on my 401k account",
+            "label": 1
+        },
+        {
+            "utterance": "what is the status of my new credit card application",
             "label": 3
         },
         {
-            "utterance": "where is the dipstick",
+            "utterance": "do they take reservations at carrabbas",
+            "label": 0
+        },
+        {
+            "utterance": "make an alarm for tomorrow at twilight",
+            "label": 2
+        }
+    ],
+    "validation_1": [
+        {
+            "utterance": "where can i find out the status of my credit card application",
             "label": 3
         },
         {
-            "utterance": "where is the dipstick",
-            "label": 3
+            "utterance": "is it possible to make reservations with famous dave's restaurant",
+            "label": 0
         },
         {
-            "utterance": "where is the dipstick",
-            "label": 3
+            "utterance": "what's with the block on my bank account",
+            "label": 1
         },
         {
-            "utterance": "where is the dipstick",
-            "label": 3
+            "utterance": "set alarm for 5 am",
+            "label": 2
         },
         {
-            "utterance": "how much is 1 share of aapl"
+            "utterance": "how many points per game is lebron james averaging this season",
+            "label": null
         },
         {
-            "utterance": "how is glue made"
+            "utterance": "i don't doubt that many people have bad experiences at this restaurant, because I can see how a lot of the food is overpriced the hosting station seemed to be a little lackluster.  My experience went quite smoothly however.  I went with four people, after our slightly confused looking hostess found us a seat, we were provided with great service.  The service was intelligent, but in a very scripted manner.  The beer was good, great compared to american craft and decent compared to european breweries.  The building is a lot of fun, huge renovated church with shiny stainless steel fermenting silos covering the side wall and the altar.  I chose the special for the night, which was rib-eye finished in the wood burning oven and a cranberry chutney.  It was good, charred on the outside, not overdone and a good cut of meat to begin with.  The prices are high for what you get though, meaning I wasn't stuffed after my meal.  Main Pro: Good local beer\\nMain Con: The smell of the bar, not the fermentation, was fairly strong.",
+            "label": null
         },
         {
-            "utterance": "how much is 1 share of aapl"
+            "utterance": "how many sides are in a hexagon",
+            "label": null
         },
         {
-            "utterance": "how is glue made"
-        },
-        {
-            "utterance": "how much is 1 share of aapl"
-        },
-        {
-            "utterance": "how is glue made"
-        },
-        {
-            "utterance": "how much is 1 share of aapl"
-        },
-        {
-            "utterance": "how is glue made"
+            "utterance": "how many students attend ucsb",
+            "label": null
         }
     ],
     "test": [
         {
-            "utterance": "can i make a reservation for redrobin",
+            "utterance": "does pho king in ceres take reservations",
             "label": 0
         },
         {
-            "utterance": "does redrobin do reservations",
+            "utterance": "make an alarm 6am",
+            "label": 2
+        },
+        {
+            "utterance": "i need you to set an alarm for 8am tomorrow",
+            "label": 2
+        },
+        {
+            "utterance": "We were excited to eat here, it is difficult to find. They were closed at 3 p.m. on a Saturday.",
+            "label": null
+        },
+        {
+            "utterance": "does the steakhouse on main st take reservations",
             "label": 0
         },
         {
-            "utterance": "does acero in maplewood allow reservations",
-            "label": 0
-        },
-        {
-            "utterance": "i think my account is blocked",
-            "label": 1
-        },
-        {
-            "utterance": "why is my bank account stopping all transactions from going through",
-            "label": 1
-        },
-        {
-            "utterance": "what would cause me to be locked out of my bank account",
-            "label": 1
-        },
-        {
-            "utterance": "find out the reason why am i locked out of my bank account",
-            "label": 1
-        },
-        {
-            "utterance": "make sure my alarm is set for three thirty in the morning",
-            "label": 2
-        },
-        {
-            "utterance": "please set an alarm for mid day",
-            "label": 2
-        },
-        {
-            "utterance": "have an alarm set for three in the morning",
-            "label": 2
-        },
-        {
-            "utterance": "set an alarm for me for 10:00 and another one set for 4:00",
-            "label": 2
-        },
-        {
-            "utterance": "set an alarm to go to sleep and another to wake up",
-            "label": 2
-        },
-        {
-            "utterance": "how much is an overdraft fee for bank",
+            "utterance": "has there been any changes in the status of my credit card application",
             "label": 3
+        },
+        {
+            "utterance": "look to see if my application for the barclay's card has gone through yet",
+            "label": 3
+        },
+        {
+            "utterance": "can i talk to someone about why there is a hold on my checking account",
+            "label": 1
+        },
+        {
+            "utterance": "help me please, my account is blocked",
+            "label": 1
         },
         {
             "utterance": "why are exponents preformed before multiplication in the order of operations",
-            "label": 3
+            "label": null
         },
         {
-            "utterance": "what size wipers does this car take",
-            "label": 3
+            "utterance": "We recently adopted our dog from my mom-in-law who lives in Casa Grande and I wanted to get Bruno in to see a vet in Tempe. I looked up a few offices and saw this location had an awesome rating. I was pleased to see someone I respect, Shayna K. from Scottsdale Doggie Suites, providing a 5 star rating and that was it. \\n\\nI immediately decided to make a new patient appointment for my furry baby. The office is clean, the staff is nice, and they made Bruno feel right at home. \\n\\nDr. Berthiaume came in and was very informative. I think he could tell I was a nervous \\\"new mom\\\" and he helped me stay at ease. He suggested one medication for Bruno which is for heartworm prevention but didn't pressure me into making a purchase right then and there. He gave me a pamplet on it and told me to do some research on my own first. (AMEN!)\\n\\nWhen I told them about my concern about him scratching his ears a lot, they took swabs but didn't run them. Dr. B. said if he saw anything \\\"bad\\\" he would have ran them for a test but didn't want to charge me for anything Bruno didn't need done. He suggested to have Bruno's stool tested but said we could bring in a sample anytime and they would send it off then. There was NO pressure to have tests done so they could get money out of me. \\n\\nThey genuinely cared about Bruno and my wallet. I will be going back, this is going to be my dog's doctor, and I appreciate how awesome everyone was. It is so refreshing to find a place that really care about the patients they see and the owners.",
+            "label": null
         },
         {
-            "utterance": "how much is 1 share of aapl"
+            "utterance": "Went here with my roommate last week for a late breakfast and was pleasantly surprised! I got the Eggs Benedict and a chocolate croissant while my roommate went for the French toast with fresh fruit. Everything was very tasty, although my roommate could have easily handled a larger portion. \\nAll the employees were super sweet and the French owner's eclectic playlist really added to how much I enjoyed the experience. Will have to go again for lunch or dinner!",
+            "label": null
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "some description to some intent"
         },
         {
-            "utterance": "how is glue made"
+            "id": 1,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "some description to another intent"
         },
         {
-            "utterance": "how is glue made"
+            "id": 2,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "another description to some intent"
+        },
+        {
+            "id": 3,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": "another description to another intent"
         }
     ]
 }

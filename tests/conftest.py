@@ -1,17 +1,13 @@
 import importlib.resources as ires
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 
 from autointent import Dataset
 
 
-def setup_environment() -> tuple[Path, Path, Path]:
-    logs_dir = ires.files("tests").joinpath("logs") / str(uuid4())
-    db_dir = logs_dir / "db"
-    dump_dir = logs_dir / "modules_dump"
-    return db_dir, dump_dir, logs_dir
+def setup_environment() -> Path:
+    return ires.files("tests").joinpath("logs")
 
 
 def get_dataset_path():
@@ -21,3 +17,9 @@ def get_dataset_path():
 @pytest.fixture
 def dataset():
     return Dataset.from_json(get_dataset_path())
+
+
+@pytest.fixture
+def dataset_unsplitted():
+    path = ires.files("tests.assets.data").joinpath("clinc_subset_unsplitted.json")
+    return Dataset.from_json(path)

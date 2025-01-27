@@ -1,15 +1,13 @@
 """Module for regular expressions based intent detection."""
 
-import json
 import re
-from pathlib import Path
 from typing import Any, Literal, TypedDict
 
 from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
-from autointent.metrics.regexp import RegexpMetricFn
+from autointent.metrics import REGEXP_METRICS
 from autointent.modules.abc import Module
 from autointent.schemas import Intent
 
@@ -114,26 +112,23 @@ class RegExp(Module):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: RegexpMetricFn,
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
-        :param metric_fn: Metric function
+        :param split: Split to score on
+        :return: Computed metrics value for the test set or error code of metrics
         """
         # TODO add parameter to a whole pipeline (or just to regexp module):
         # whether or not to omit utterances on next stages if they were detected with regexp module
         assets = {
             "test_matches": list(self.predict(context.data_handler.test_utterances())),
-            "oos_matches": None
-            if not context.data_handler.has_oos_samples()
-            else self.predict(context.data_handler.oos_utterances(2)),
         }
         if assets["test_matches"] is None:
             msg = "no matches found"
             raise ValueError(msg)
-        return metric_fn(context.data_handler.test_labels(), assets["test_matches"])
+        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), REGEXP_METRICS)
 
     def clear_cache(self) -> None:
         """Clear cache."""
@@ -142,30 +137,6 @@ class RegExp(Module):
     def get_assets(self) -> Artifact:
         """Get assets."""
         return Artifact()
-
-    def load(self, path: str) -> None:
-        """
-        Load data from dump.
-
-        :param path: Path to load
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open() as file:
-            self.regexp_patterns = json.load(file)
-
-        self._compile_regex_patterns()
-
-    def dump(self, path: str) -> None:
-        """
-        Dump all data needed for inference.
-
-        :param path: Path to dump
-        """
-        dump_dir = Path(path)
-
-        with (dump_dir / self.metadata_dict_name).open("w") as file:
-            json.dump(self.regexp_patterns, file, indent=4)
 
     def _compile_regex_patterns(self) -> None:
         """Compile regex patterns."""

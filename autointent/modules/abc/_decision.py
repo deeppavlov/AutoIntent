@@ -8,8 +8,8 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
-from autointent.custom_types import LabelType
-from autointent.metrics import DecisionMetricFn
+from autointent.custom_types import ListOfGenericLabels
+from autointent.metrics import PREDICTION_METRICS_MULTICLASS
 from autointent.modules.abc import Module
 from autointent.schemas import Tag
 
@@ -21,7 +21,7 @@ class DecisionModule(Module, ABC):
     def fit(
         self,
         scores: npt.NDArray[Any],
-        labels: list[LabelType],
+        labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
         """
@@ -33,7 +33,7 @@ class DecisionModule(Module, ABC):
         """
 
     @abstractmethod
-    def predict(self, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
+    def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
         """
         Predict the best score.
 
@@ -44,19 +44,17 @@ class DecisionModule(Module, ABC):
         self,
         context: Context,
         split: Literal["validation", "test"],
-        metric_fn: DecisionMetricFn,
-    ) -> float:
+    ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
 
         :param context: Context to score
         :param split: Target split
-        :param metric_fn: Metric function
-        :return: Score
+        :return: Computed metrics value for the test set or error code of metrics
         """
         labels, scores = get_decision_evaluation_data(context, split)
         self._decisions = self.predict(scores)
-        return metric_fn(labels, self._decisions)
+        return self.score_metrics((labels, self._decisions), PREDICTION_METRICS_MULTICLASS)
 
     def get_assets(self) -> DecisionArtifact:
         """Return useful assets that represent intermediate data into context."""
@@ -65,11 +63,23 @@ class DecisionModule(Module, ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
+    def _validate_task(self, scores: npt.NDArray[Any], labels: ListOfGenericLabels) -> None:
+        self._n_classes, self._multilabel, self._oos = self._get_task_specs(labels)
+        self._validate_multilabel(self._multilabel)
+        self._validate_oos(self._oos, raise_error=False)
+        if self._n_classes != scores.shape[1]:
+            msg = (
+                "There is a mismatch between provided labels and scores. "
+                f"Labels contains {self._n_classes} classes, but scores contain "
+                f"probabilities for {scores.shape[1]} classes."
+            )
+            raise ValueError(msg)
+
 
 def get_decision_evaluation_data(
     context: Context,
     split: Literal["train", "validation", "test"],
-) -> tuple[list[LabelType], npt.NDArray[np.float64]]:
+) -> tuple[ListOfGenericLabels, npt.NDArray[np.float64]]:
     """
     Get decision evaluation data.
 
@@ -78,13 +88,13 @@ def get_decision_evaluation_data(
     :return:
     """
     if split == "train":
-        labels = np.array(context.data_handler.train_labels(1))
+        labels = context.data_handler.train_labels(1)
         scores = context.optimization_info.get_best_train_scores()
     elif split == "validation":
-        labels = np.array(context.data_handler.validation_labels(1))
+        labels = context.data_handler.validation_labels(1)
         scores = context.optimization_info.get_best_validation_scores()
     elif split == "test":
-        labels = np.array(context.data_handler.test_labels())
+        labels = context.data_handler.test_labels()
         scores = context.optimization_info.get_best_test_scores()
     else:
         message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation', or 'test'."
@@ -94,13 +104,4 @@ def get_decision_evaluation_data(
         message = f"No '{split}' scores found in the optimization info"
         raise ValueError(message)
 
-    oos_scores = context.optimization_info.get_best_oos_scores(split)
-    return_scores = scores
-    if oos_scores is not None:
-        oos_labels = (
-            [[0] * context.get_n_classes()] * len(oos_scores) if context.is_multilabel() else [-1] * len(oos_scores)  # type: ignore[list-item]
-        )
-        labels = np.concatenate([labels, np.array(oos_labels)])
-        return_scores = np.concatenate([scores, oos_scores])
-
-    return labels.tolist(), return_scores  # type: ignore[return-value]
+    return labels, scores

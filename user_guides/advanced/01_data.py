@@ -202,7 +202,7 @@ For example, after initialization, an `oos` key may be added if OOS samples are 
 """
 
 # %%
-dataset["train"]
+dataset["train_0"]
 
 # %% [markdown]
 """
@@ -213,7 +213,7 @@ so you can work with them accordingly.
 """
 
 # %%
-dataset["train"][:5]  # get first 5 train samples
+dataset["train_0"][:5]  # get first 5 train samples
 
 # %% [markdown]
 """

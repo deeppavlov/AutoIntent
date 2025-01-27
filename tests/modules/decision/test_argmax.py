@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
+from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules.decision import ArgmaxDecision
-from autointent.modules.decision._utils import InvalidNumClassesError, WrongClassificationError
 
 
 def test_multiclass(multiclass_fit_data, scores):
@@ -16,7 +16,7 @@ def test_fails_on_wrong_n_classes(multiclass_fit_data):
     predictor = ArgmaxDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
-    with pytest.raises(InvalidNumClassesError):
+    with pytest.raises(MismatchNumClassesError):
         predictor.predict(scores)
 
 

@@ -53,7 +53,7 @@ After you converted your labeled data into JSON, you can load it into AutoIntent
 """
 
 # %%
-path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset_unsplitted.json")
 dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
@@ -96,7 +96,12 @@ To share your dataset on the Hugging Face Hub, use method %mddoclink(method,Data
 # %% [markdown]
 """
 Note: ensure that you are logged in using `huggingface-cli`.
+
+After that you can load the dataset with one line. For example:
 """
+
+# %%
+Dataset.from_hub("AutoIntent/banking77")
 
 # %% [markdown]
 """

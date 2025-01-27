@@ -9,22 +9,21 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from omegaconf import ListConfig
 
 from autointent import Dataset
 
 
 class NumpyEncoder(json.JSONEncoder):
     """
-    JSON encoder that handles numpy data types and OmegaConf ListConfig.
+    JSON encoder that handles numpy data types.
 
     This encoder extends the default `json.JSONEncoder` to serialize numpy
-    arrays, numpy data types, and OmegaConf ListConfig objects.
+    arrays, numpy data types.
     """
 
     def default(self, obj: Any) -> str | int | float | list[Any] | Any:  # noqa: ANN401
         """
-        Serialize objects with special handling for numpy and OmegaConf types.
+        Serialize objects with special handling for numpy.
 
         :param obj: Object to serialize.
         :return: JSON-serializable representation of the object.
@@ -35,8 +34,6 @@ class NumpyEncoder(json.JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isinstance(obj, ListConfig):
-            return list(obj)
         return super().default(obj)
 
 

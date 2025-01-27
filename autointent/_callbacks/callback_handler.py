@@ -44,6 +44,14 @@ class CallbackHandler(OptimizerCallback):
         """
         self.call_events("log_value", **kwargs)
 
+    def log_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log metrics during training.
+
+        :param metrics: Metrics to log.
+        """
+        self.call_events("log_metrics", metrics=metrics)
+
     def end_module(self) -> None:
         """End a module."""
         self.call_events("end_module")

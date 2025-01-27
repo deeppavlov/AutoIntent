@@ -3,20 +3,22 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import NodeType
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.custom_types import ListOfGenericLabels, NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
+
+if TYPE_CHECKING:
+    from autointent.modules.abc import DecisionModule, ScoringModule
 
 
 class Pipeline:
@@ -25,24 +27,28 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
+        seed: int = 42,
     ) -> None:
         """
         Initialize the pipeline optimizer.
 
         :param nodes: list of nodes
+        :param seed: random seed
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
+        self.seed = seed
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
             self.vector_index_config = VectorIndexConfig()
             self.embedder_config = EmbedderConfig()
+            self.cross_encoder_config = CrossEncoderConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig | CrossEncoderConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -54,12 +60,14 @@ class Pipeline:
             self.vector_index_config = config
         elif isinstance(config, EmbedderConfig):
             self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
         else:
             msg = "unknown config type"
             raise TypeError(msg)
 
     @classmethod
-    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str) -> "Pipeline":
+    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
         """
         Create pipeline optimizer from dictionary search space.
 
@@ -68,16 +76,16 @@ class Pipeline:
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
         nodes = [NodeOptimizer(**node) for node in search_space]
-        return cls(nodes)
+        return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def default_optimizer(cls, multilabel: bool) -> "Pipeline":
+    def default_optimizer(cls, multilabel: bool, seed: int = 42) -> "Pipeline":
         """
         Create pipeline optimizer with default search space for given classification task.
 
         :param multilabel: Whether the task multi-label, or single-label.
         """
-        return cls.from_search_space(load_default_search_space(multilabel))
+        return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 
     def _fit(self, context: Context) -> None:
         """
@@ -88,8 +96,8 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         self.context.callback_handler.start_run(
-            run_name=self.context.logging_config.get_run_name(),
-            dirpath=self.context.logging_config.get_dirpath(),
+            run_name=self.context.logging_config.run_name,
+            dirpath=self.context.logging_config.dirpath,
         )
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
@@ -97,7 +105,7 @@ class Pipeline:
                 node_optimizer.fit(context)  # type: ignore[union-attr]
         if not context.vector_index_config.save_db:
             self._logger.info("removing vector database from file system...")
-            context.vector_index_client.delete_db()
+            # TODO clear cache from appdirs
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
@@ -108,12 +116,11 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, force_multilabel: bool = False) -> Context:
+    def fit(self, dataset: Dataset) -> Context:
         """
         Optimize the pipeline from dataset.
 
         :param dataset: Dataset for optimization
-        :param force_multilabel: Whether to force multilabel or not
         :return: Context
         """
         if self._is_inference():
@@ -121,9 +128,10 @@ class Pipeline:
             raise RuntimeError(msg)
 
         context = Context()
-        context.set_dataset(dataset, force_multilabel)
+        context.set_dataset(dataset)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
+        context.configure_cross_encoder(self.cross_encoder_config)
 
         self._fit(context)
 
@@ -179,7 +187,7 @@ class Pipeline:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
-    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
+    def predict(self, utterances: list[str]) -> ListOfGenericLabels:
         """
         Predict the labels for the utterances.
 
@@ -190,8 +198,11 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scores = self.nodes[NodeType.scoring].module.predict(utterances)  # type: ignore[union-attr]
-        return self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
+        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+
+        scores = scoring_module.predict(utterances)
+        return decision_module.predict(scores)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """
@@ -205,7 +216,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)  # type: ignore[union-attr]
-        predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr]
+        predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr,arg-type]
         regexp_predictions, regexp_predictions_metadata = None, None
         if NodeType.regexp in self.nodes:
             regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(  # type: ignore[union-attr]

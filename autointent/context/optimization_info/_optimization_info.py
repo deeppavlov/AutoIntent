@@ -4,8 +4,9 @@ This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
 
+import logging
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,7 +15,6 @@ from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
-from ._logger import get_logger
 
 if TYPE_CHECKING:
     from autointent.modules.abc import Module
@@ -59,7 +59,7 @@ class OptimizationInfo:
 
     def __init__(self) -> None:
         """Initialize optimization info."""
-        self._logger = get_logger()
+        self._logger = logging.getLogger(__name__)
 
         self.artifacts = Artifacts()
         self.trials = Trials()
@@ -98,7 +98,7 @@ class OptimizationInfo:
             module_dump_dir=module_dump_dir,
         )
         self.trials.add_trial(node_type, trial)
-        self._logger.info(trial.model_dump())
+        self._logger.debug("module %s fitted and saved to optimization info", module_name, extra=trial.model_dump())
 
         if module:
             self.modules.add_module(node_type, module)
@@ -174,20 +174,6 @@ class OptimizationInfo:
         """
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
-
-    def get_best_oos_scores(self, split: Literal["train", "validation", "test"]) -> NDArray[np.float64] | None:
-        """
-        Retrieve the out-of-scope scores from the best scorer node.
-
-        :param split: The data split for which to retrieve the OOS scores.
-            Must be one of "train", "validation", or "test".
-        :return: A numpy array containing OOS scores for the specified split,
-            or `None` if no OOS scores are available.
-        """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
-        if best_scorer_artifact.oos_scores is not None:
-            return best_scorer_artifact.oos_scores[split]
-        return best_scorer_artifact.oos_scores
 
     def dump_evaluation_results(self) -> dict[str, Any]:
         """

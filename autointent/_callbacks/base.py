@@ -43,6 +43,14 @@ class OptimizerCallback(ABC):
         """
 
     @abstractmethod
+    def log_metrics(self, metrics: dict[str, Any]) -> None:
+        """
+        Log metrics during training.
+
+        :param metrics: Metrics to log.
+        """
+
+    @abstractmethod
     def end_module(self) -> None:
         """End a module."""
 

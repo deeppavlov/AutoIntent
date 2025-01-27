@@ -3,9 +3,13 @@
 This module provides data models for utterances, intents, and tags.
 """
 
+import json
+from pathlib import Path
+from typing import Any
+
 from pydantic import BaseModel, model_validator
 
-from autointent.custom_types import LabelType
+from autointent.custom_types import LabelWithOOS
 
 
 class Tag(BaseModel):
@@ -20,6 +24,24 @@ class Tag(BaseModel):
     intent_ids: list[int]
 
 
+class TagsList(list[Tag]):
+    def __init__(self, tags: list[Tag]) -> None:
+        super().__init__(tags)
+
+    def dump(self, path: Path) -> None:
+        serialized = [v.model_dump(mode="json") for v in self]
+        with path.open("w") as file:
+            json.dump(serialized, file, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def load(cls, path: Path) -> "TagsList":
+        """Load pydantic model from file system."""
+        with path.open() as file:
+            serialized: list[dict[str, Any]] = json.load(file)
+        parsed = [Tag(**t) for t in serialized]
+        return cls(parsed)
+
+
 class Sample(BaseModel):
     """
     Represents a sample with an utterance and an optional label.
@@ -30,7 +52,7 @@ class Sample(BaseModel):
     """
 
     utterance: str
-    label: LabelType | None = None
+    label: LabelWithOOS = None
 
     @model_validator(mode="after")
     def validate_sample(self) -> "Sample":
@@ -60,18 +82,28 @@ class Sample(BaseModel):
         """
         if self.label is None:
             return self
-        label = [self.label] if isinstance(self.label, int) else self.label
-        if not label:
+        if isinstance(self.label, int) and self.label < 0:
             message = (
-                "The `label` field cannot be empty for a multilabel sample. " "Please provide at least one valid label."
-            )
-            raise ValueError(message)
-        if any(label_ < 0 for label_ in label):
-            message = (
-                "All label values must be non-negative integers. "
+                f"All label values must be non-negative integers. Met {self.label} "
                 "Ensure that each label falls within the valid range of 0 to `n_classes - 1`."
             )
             raise ValueError(message)
+        if isinstance(self.label, list):
+            if len(self.label) == 0:
+                message = (
+                    "The `label` field cannot be empty for a multilabel sample. "
+                    "Please provide at least one valid label."
+                )
+                raise ValueError(message)
+            if any(lab not in [0, 1] for lab in self.label):
+                message = "In multi-label case, all labels need to be one hot encoded."
+                raise ValueError(message)
+            if sum(self.label) == 0:
+                message = (
+                    "Found full-zero label. It must contain at least one 1. "
+                    "If you wanted to define OOS sample, simply omit the label field."
+                )
+                raise ValueError(message)
         return self
 
 

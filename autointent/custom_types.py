@@ -5,7 +5,7 @@ the AutoIntent framework for improved type safety and clarity.
 """
 
 from enum import Enum
-from typing import Literal, TypedDict
+from typing import Literal, TypeAlias, TypedDict
 
 
 class LogLevel(Enum):
@@ -29,7 +29,15 @@ Represents weight calculation methods
 """
 
 # Type alias for label representation
-LabelType = int | list[int]
+SimpleLabel = int
+MultiLabel = list[int]
+SimpleLabelWithOOS = SimpleLabel | None
+MultiLabelWithOOS = MultiLabel | None
+ListOfLabels = list[SimpleLabel] | list[MultiLabel]
+ListOfLabelsWithOOS = list[SimpleLabelWithOOS] | list[MultiLabelWithOOS]
+LabelType: TypeAlias = SimpleLabel | MultiLabel
+LabelWithOOS = LabelType | None
+ListOfGenericLabels = ListOfLabels | ListOfLabelsWithOOS
 """
 Type alias for label representation
 
@@ -58,12 +66,10 @@ class Split:
     :cvar str TRAIN: Training split.
     :cvar str VALIDATION: Validation split.
     :cvar str TEST: Testing split.
-    :cvar str OOS: Out-of-scope split.
     :cvar str INTENTS: Intents split.
     """
 
     TRAIN = "train"
     VALIDATION = "validation"
     TEST = "test"
-    OOS = "oos"
     INTENTS = "intents"
