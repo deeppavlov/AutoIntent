@@ -44,10 +44,12 @@ class LogregAimedEmbedding(EmbeddingModule):
     _classifier: LogisticRegressionCV | MultiOutputClassifier
     _label_encoder: LabelEncoder | None
     name = "logreg"
+    supports_multiclass = True
+    supports_multilabel = True
+    supports_oos = False
 
     def __init__(
         self,
-        k: int,
         embedder_name: str,
         cv: int = 3,
         embedder_device: str = "cpu",
@@ -59,7 +61,6 @@ class LogregAimedEmbedding(EmbeddingModule):
         Initialize the LogregAimedEmbedding.
 
         :param cv: the number of folds used in LogisticRegressionCV
-        :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param batch_size: Batch size for embedding generation.
@@ -72,8 +73,6 @@ class LogregAimedEmbedding(EmbeddingModule):
         self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
         self.cv = cv
-
-        super().__init__(k=k)
 
     @classmethod
     def from_context(
@@ -88,12 +87,10 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         :param cv: the number of folds used in LogisticRegressionCV
         :param context: The context containing configurations and utilities.
-        :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
         :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(
-            k=k,
             cv=cv,
             embedder_name=embedder_name,
             embedder_device=context.get_device(),

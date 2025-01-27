@@ -37,6 +37,9 @@ class RetrievalAimedEmbedding(EmbeddingModule):
 
     _vector_index: VectorIndex
     name = "retrieval"
+    supports_multiclass = True
+    supports_multilabel = True
+    supports_oos = False
 
     def __init__(
         self,
@@ -57,13 +60,12 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         :param max_length: Maximum sequence length for embeddings. None if not set.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
+        self.k = k
         self.embedder_name = embedder_name
         self.embedder_device = embedder_device
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
-
-        super().__init__(k=k)
 
     @classmethod
     def from_context(
