@@ -3,6 +3,7 @@
 from typing import Literal
 
 import numpy as np
+from numpy.typing import NDArray
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -155,10 +156,7 @@ class LogRegEmbedding(EmbeddingModule):
             message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
             raise ValueError(message)
 
-        embeddings = self._embedder.embed(utterances)
-        probas = self._classifier.predict_proba(embeddings)
-        if self._multilabel:
-            probas = np.stack(probas, axis=1)[..., 1]
+        probas = self.predict(utterances)
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         return self.score_metrics((labels, probas), metrics_dict)
 
@@ -170,5 +168,11 @@ class LogRegEmbedding(EmbeddingModule):
         """
         return RetrieverArtifact(embedder_name=self.embedder_name)
 
-    def predict(self, utterances: list[str]) -> None:
-        pass
+    def predict(self, utterances: list[str]) -> NDArray[np.float64] | list[NDArray[np.float64]]:
+        embeddings = self._embedder.embed(utterances)
+        probas = self._classifier.predict_proba(embeddings)
+
+        if self._multilabel:
+            probas = np.stack(probas, axis=1)[..., 1]
+
+        return probas
