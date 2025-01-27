@@ -119,9 +119,7 @@ class TunableDecision(DecisionModule):
         :param tags: Tags to fit
         """
         self.tags = tags
-        self._n_classes, self._multilabel, contains_oos = self._validate_inputs(scores, labels)
-        self._validate_multilabel(self._multilabel)
-        self._validate_oos(contains_oos)
+        self._validate_task(scores, labels)
 
         thresh_optimizer = ThreshOptimizer(
             n_classes=self._n_classes, multilabel=self._multilabel, n_trials=self.n_trials

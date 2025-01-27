@@ -29,6 +29,8 @@ class DescriptionScorer(ScoringModule):
     _n_classes: int
     _multilabel: bool
     _description_vectors: NDArray[Any]
+    supports_multiclass = True
+    supports_multilabel = True
 
     def __init__(
         self,
@@ -105,12 +107,7 @@ class DescriptionScorer(ScoringModule):
         :param descriptions: List of intent descriptions.
         :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
         """
-        if isinstance(labels[0], list):
-            self._n_classes = len(labels[0])
-            self._multilabel = True
-        else:
-            self._n_classes = len(set(labels))
-            self._multilabel = False
+        self._validate_task(labels)
 
         if any(description is None for description in descriptions):
             error_text = (

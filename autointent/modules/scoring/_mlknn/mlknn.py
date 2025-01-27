@@ -52,6 +52,8 @@ class MLKnnScorer(ScoringModule):
     _cond_prob_false: NDArray[Any]
     _features: NDArray[Any]
     _labels: NDArray[Any]
+    supports_multiclass = False
+    supports_multilabel = True
 
     def __init__(
         self,
@@ -135,11 +137,7 @@ class MLKnnScorer(ScoringModule):
         :raises TypeError: If the labels are not multi-label.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        if not isinstance(labels[0], list):
-            msg = "mlknn scorer support only multilabel input"
-            raise TypeError(msg)
-
-        self._n_classes = len(labels[0])
+        self._validate_task(labels)
 
         self._vector_index = VectorIndex(
             self.embedder_name,

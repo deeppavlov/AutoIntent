@@ -17,7 +17,7 @@ from autointent.configs import (
     VectorIndexConfig,
 )
 
-from ._utils import NumpyEncoder, load_data
+from ._utils import NumpyEncoder, load_dataset
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 
@@ -81,7 +81,7 @@ class Context:
         :param config: Configuration for the data handling process.
         """
         self.data_handler = DataHandler(
-            dataset=load_data(config.train_path),
+            dataset=load_dataset(config.train_path),
             random_seed=self.seed,
         )
 

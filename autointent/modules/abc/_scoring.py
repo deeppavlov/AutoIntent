@@ -19,6 +19,8 @@ class ScoringModule(Module, ABC):
     using a scoring metric.
     """
 
+    supports_oos = False
+
     def score(
         self,
         context: Context,

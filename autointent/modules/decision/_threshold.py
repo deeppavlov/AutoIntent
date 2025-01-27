@@ -113,9 +113,7 @@ class ThresholdDecision(DecisionModule):
         :param tags: Tags to fit
         """
         self.tags = tags
-        self._n_classes, self._multilabel, contains_oos = self._validate_inputs(scores, labels)
-        self._validate_multilabel(self._multilabel)
-        self._validate_oos(contains_oos)
+        self._validate_task(scores, labels)
 
         if not isinstance(self.thresh, float):
             if len(self.thresh) != self._n_classes:
