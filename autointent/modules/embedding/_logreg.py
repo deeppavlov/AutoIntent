@@ -175,4 +175,4 @@ class LogRegEmbedding(EmbeddingModule):
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]
 
-        return probas
+        return probas  # type: ignore[no-any-return]
