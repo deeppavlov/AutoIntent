@@ -78,7 +78,6 @@ class LogregAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        k: int,
         cv: int,
         embedder_name: str,
     ) -> "LogregAimedEmbedding":

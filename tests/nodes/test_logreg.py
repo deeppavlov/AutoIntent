@@ -60,7 +60,6 @@ def get_embedding_optimizer(multilabel: bool):
         "node_type": "embedding",
         "search_space": [
             {
-                "k": [10],
                 "cv": [2],
                 "embedder_name": [
                     "sentence-transformers/all-MiniLM-L6-v2",
