@@ -9,7 +9,7 @@ from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 logger = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class SklearnScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LabelType],
+        labels: ListOfLabels,
     ) -> None:
         """
         Train the chosen sklearn classifier.
