@@ -3,7 +3,6 @@
   search_space:
     - module_name: logreg
       cv: [2]
-      k: [10]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
         - avsolatorio/GIST-small-Embedding-v0
