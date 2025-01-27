@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from autointent import Dataset
-from autointent.generation.description_generation import (
+from autointent.generation.intents.description_generation import (
     create_intent_description,
     enhance_dataset_with_descriptions,
     generate_intent_descriptions,
     group_utterances_by_label,
 )
-from autointent.generation.prompt_scheme import PromptDescription
+from autointent.generation.intents.prompt_scheme import PromptDescription
 from autointent.schemas import Intent, Sample
 
 

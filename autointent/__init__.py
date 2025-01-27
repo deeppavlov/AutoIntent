@@ -1,13 +1,14 @@
 """This is AutoIntent API reference."""
 
-from ._dataset import Dataset
-from ._embedder import Embedder
-from ._hash import Hasher
 from ._logging import setup_logging
-from ._pipeline import Pipeline
 from ._ranker import Ranker
+from ._embedder import Embedder
 from ._vector_index import VectorIndex
+from ._dataset import Dataset
+from ._hash import Hasher
 from .context import Context, load_dataset
+from ._pipeline import Pipeline
+
 
 __all__ = [
     "Context",
