@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 from autointent.modules.embedding import LogRegEmbedding
 
 
@@ -21,17 +19,15 @@ def test_fit_trains_model():
     assert module._label_encoder.classes_.tolist() == [0, 1]
 
 
-def test_score_evaluates_model():
+def test_predict_evaluates_model():
     module = LogRegEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
 
-    mock_context = MagicMock()
-    mock_context.data_handler.test_utterances.return_value = ["hello", "goodbye"]
-    mock_context.data_handler.test_labels.return_value = [[1, 0], [0, 1]]
+    probas = module.predict(["hello", "bye"])
 
-    scores = module.score(mock_context, split="test")
-
-    assert isinstance(scores, dict)
+    assert len(probas) == 2
+    assert probas[0][0] > probas[0][1]
+    assert probas[1][1] > probas[1][0]
