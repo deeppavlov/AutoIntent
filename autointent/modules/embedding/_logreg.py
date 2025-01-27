@@ -168,7 +168,7 @@ class LogRegEmbedding(EmbeddingModule):
         """
         return RetrieverArtifact(embedder_name=self.embedder_name)
 
-    def predict(self, utterances: list[str]) -> NDArray[np.float64] | list[NDArray[np.float64]]:
+    def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         embeddings = self._embedder.embed(utterances)
         probas = self._classifier.predict_proba(embeddings)
 
