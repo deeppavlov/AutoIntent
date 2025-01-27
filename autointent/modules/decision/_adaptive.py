@@ -97,9 +97,7 @@ class AdaptiveDecision(DecisionModule):
         """
         self.tags = tags
 
-        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
-        self._validate_multilabel(multilabel)
-        self._validate_oos(contains_oos)
+        self._validate_task(scores, labels)
 
         metrics_list = []
         for r in self.search_space:

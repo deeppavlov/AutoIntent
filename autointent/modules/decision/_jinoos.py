@@ -89,10 +89,7 @@ class JinoosDecision(DecisionModule):
         :param labels: Labels to fit
         :param tags: Tags to fit
         """
-        # TODO: use dev split instead of test split.
-        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
-        self._validate_multilabel(multilabel)
-        self._validate_oos(contains_oos)
+        self._validate_task(scores, labels)
 
         pred_classes, best_scores = _predict(scores)
 

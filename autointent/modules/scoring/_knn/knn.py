@@ -52,7 +52,7 @@ class KNNScorer(ScoringModule):
     _n_classes: int
     _multilabel: bool
     supports_multilabel = True
-    supports_oos = False
+    supports_multiclass = True
 
     def __init__(
         self,
@@ -132,8 +132,7 @@ class KNNScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self._n_classes, self._multilabel, contains_oos = self._get_task_specs(labels)
-        self._validate_oos(contains_oos)
+        self._validate_task(labels)
 
         self._vector_index = VectorIndex(
             self.embedder_name,

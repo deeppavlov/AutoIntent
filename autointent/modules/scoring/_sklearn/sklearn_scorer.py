@@ -38,6 +38,8 @@ class SklearnScorer(ScoringModule):
     """
 
     name = "sklearn"
+    supports_multilabel = True
+    supports_multiclass = True
 
     def __init__(
         self,
@@ -110,7 +112,7 @@ class SklearnScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self._multilabel = isinstance(labels[0], list)
+        self._validate_task(labels)
 
         embedder = Embedder(
             device=self.embedder_device,
