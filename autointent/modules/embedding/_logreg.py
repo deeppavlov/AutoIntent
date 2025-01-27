@@ -40,8 +40,8 @@ class LogRegEmbedding(EmbeddingModule):
         retrieval.fit(utterances, labels)
     """
 
-    _classifier: LogisticRegressionCV
-    _label_encoder: LabelEncoder
+    _classifier: LogisticRegressionCV | MultiOutputClassifier
+    _label_encoder: LabelEncoder | None
     name = "logreg"
 
     def __init__(
