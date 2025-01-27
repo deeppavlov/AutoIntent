@@ -271,7 +271,7 @@ async def test_generate_intent_descriptions_empty_utterances_patterns():
 def test_enhance_dataset_with_descriptions_basic():
     client = AsyncMock()
     with patch(
-        "autointent.generation.description_generation.generate_intent_descriptions",
+        "autointent.generation.intents.description_generation.generate_intent_descriptions",
         new=AsyncMock(
             return_value=[
                 Intent(id=1, name="Greeting", description="Generated description"),
@@ -319,7 +319,7 @@ def test_enhance_dataset_with_descriptions_basic():
 def test_enhance_dataset_with_existing_descriptions():
     client = AsyncMock()
     with patch(
-        "autointent.generation.description_generation.generate_intent_descriptions",
+        "autointent.generation.intents.description_generation.generate_intent_descriptions",
         new=AsyncMock(
             return_value=[
                 Intent(id=0, name="Greeting", description="Existing description"),
