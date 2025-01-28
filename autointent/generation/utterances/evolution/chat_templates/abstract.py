@@ -4,10 +4,11 @@ from typing import ClassVar
 
 from autointent.schemas import Intent
 
+from .base import EvolutionChatTemplate
 from .schemas import Message, Role
 
 
-class AbstractEvolution:
+class AbstractEvolution(EvolutionChatTemplate):
     """Chat template for evolution augmentation via abstraction."""
 
     _messages: ClassVar[list[Message]] = [
