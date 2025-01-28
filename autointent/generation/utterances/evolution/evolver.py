@@ -57,9 +57,7 @@ class UtteranceEvolver:
             utterance = sample[Dataset.utterance_feature]
             label = sample[Dataset.label_feature]
             intent_data = next(intent for intent in dataset.intents if intent.id == label)
-            generated_utterances = self(
-                utterance=utterance, intent_data=intent_data, n_evolutions=n_evolutions
-            )
+            generated_utterances = self(utterance=utterance, intent_data=intent_data, n_evolutions=n_evolutions)
             new_samples.extend(
                 [{Dataset.label_feature: intent_data.id, Dataset.utterance_feature: ut} for ut in generated_utterances]
             )

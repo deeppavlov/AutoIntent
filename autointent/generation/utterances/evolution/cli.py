@@ -7,6 +7,8 @@ from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
+from .chat_templates import AbstractEvolution, ConcreteEvolution, ReasoningEvolution
+
 if TYPE_CHECKING:
     from .evolver import EvolutionType
 
@@ -37,28 +39,16 @@ def main() -> None:
     parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
     parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
     parser.add_argument("--abstract", action="store_true", help="Whether to use `Abstract` evolution")
-    parser.add_argument("--formal", action="store_true", help="Whether to use `Formal` evolution")
-    parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
-    parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
-    parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
     evolutions: list[EvolutionType] = []
     if args.reasoning:
-        evolutions.append("reasoning")
+        evolutions.append(ReasoningEvolution)
     if args.concretizing:
-        evolutions.append("concretizing")
+        evolutions.append(ConcreteEvolution)
     if args.abstract:
-        evolutions.append("abstract")
-    if args.formal:
-        evolutions.append("formal")
-    if args.informal:
-        evolutions.append("informal")
-    if args.funny:
-        evolutions.append("funny")
-    if args.goofy:
-        evolutions.append("goofy")
+        evolutions.append(AbstractEvolution)
 
     dataset = load_dataset(args.input_path)
 
