@@ -1,13 +1,23 @@
 """Chat template for evolution augmentation via abstractization."""
 
 import random
+from abc import ABC, abstractmethod
 from typing import ClassVar
 
 from autointent import Dataset
 from autointent.generation.utterances.schemas import Message, Role
+from autointent.schemas import Intent
 
 
-class ExampleGenerator:
+class BaseSynthesizer(ABC):
+    """Base class."""
+
+    @abstractmethod
+    def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
+        """Generate examples for this intent."""
+
+
+class SynthesizerChatTemplate(BaseSynthesizer):
     """Chat template for generating additional examples for a given intent class."""
 
     _messages: ClassVar[list[Message]] = [
@@ -86,7 +96,13 @@ class ExampleGenerator:
         ),
     ]
 
-    def __init__(self, dataset: Dataset, split: str, extra_instructions: str | None = None) -> None:
+    def __init__(
+        self,
+        dataset: Dataset,
+        split: str,
+        extra_instructions: str | None = None,
+        max_sample_utterances: int | None = None,
+    ) -> None:
         """Initialize."""
         if extra_instructions is None:
             extra_instructions = ""
@@ -96,19 +112,19 @@ class ExampleGenerator:
 
         self.dataset = dataset
         self.split = split
+        self.max_sample_utterances = max_sample_utterances
 
-    def __call__(self, intent_id: int, n_examples: int, max_sample_utterances: int | None = None) -> list[Message]:
+    def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
         """Generate additional examples for the provided intent class."""
-        filtered_split = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] == intent_id)
+        filtered_split = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] == intent_data.id)
         sample_utterances = filtered_split[Dataset.utterance_feature]
-        intent = next(i for i in self.dataset.intents if i.id == intent_id)
-        if max_sample_utterances is not None:
-            sample_utterances = random.sample(sample_utterances, k=max_sample_utterances)
+        if self.max_sample_utterances is not None:
+            sample_utterances = random.sample(sample_utterances, k=self.max_sample_utterances)
         return [
             *self._messages,
             Message(
                 role=Role.USER,
-                content=f"Intent name: {intent.name}\n\n"
+                content=f"Intent name: {intent_data.name}\n\n"
                 f"Example Utterances:\n{sample_utterances}\n\n"
                 f"Please generate {n_examples} more examples for the provided intent class.\n",
             ),

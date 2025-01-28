@@ -3,8 +3,10 @@
 from argparse import ArgumentParser
 
 from autointent import load_dataset
-from autointent.generation.utterances.basic.utterance_generator import LengthType, StyleType, UtteranceGenerator
+from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
+
+from .chat_template import SynthesizerChatTemplate
 
 
 def main() -> None:
@@ -41,37 +43,12 @@ def main() -> None:
         default=5,
         help="Number of utterances to use as an example for augmentation",
     )
-    parser.add_argument(
-        "--custom-instruction",
-        type=str,
-        action="append",
-        help="Add extra instructions to default prompt."
-        "You can use this argument multiple times to add multiple instructions",
-    )
-    parser.add_argument(
-        "--length",
-        choices=LengthType.__args__,  # type: ignore[attr-defined]
-        default="none",
-        help="How to extend the prompt with length instruction",
-    )
-    parser.add_argument(
-        "--style",
-        choices=StyleType.__args__,  # type: ignore[attr-defined]
-        default="none",
-        help="How to extend the prompt with style instruction",
-    )
-    parser.add_argument(
-        "--same-punctuation",
-        action="store_true",
-        help="Whether to extend the prompt with punctuation instruction",
-    )
     args = parser.parse_args()
 
     dataset = load_dataset(args.input_path)
-    generator = UtteranceGenerator(
-        Generator(), args.custom_instruction or [], args.length, args.style, args.same_punctuation
-    )
-    generator.augment(dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances)
+    template = SynthesizerChatTemplate(dataset, "train", max_sample_utterances=args.n_sample_utterances)
+    generator = UtteranceGenerator(Generator(), template)
+    generator.augment(dataset, n_generations=args.n_generations)
 
     dataset.to_json(args.output_path)
 
