@@ -16,7 +16,7 @@ def test_scoring_multiclass(embedding_optimizer_multiclass):
     embedding_optimizer_multiclass.fit(context)
 
     scoring_optimizer_config = {
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
             {
@@ -80,7 +80,7 @@ def test_scoring_multilabel(embedding_optimizer_multilabel):
     embedding_optimizer_multilabel.fit(context)
 
     scoring_optimizer_config = {
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "node_type": "scoring",
         "search_space": [
             {

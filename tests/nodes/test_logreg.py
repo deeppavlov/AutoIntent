@@ -56,7 +56,7 @@ def get_embedding_optimizer(multilabel: bool):
     if multilabel:
         metric = "scoring_neg_coverage"
     embedding_optimizer_config = {
-        "metric": metric,
+        "target_metric": metric,
         "node_type": "embedding",
         "search_space": [
             {

@@ -38,7 +38,8 @@ class NodeOptimizer:
         self.decision_metric_name = decision_metric
 
         self.metrics = metrics if metrics is not None else []
-        self.metrics.append(self.decision_metric_name)
+        if self.decision_metric_name not in self.metrics:
+            self.metrics.append(self.decision_metric_name)
 
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
