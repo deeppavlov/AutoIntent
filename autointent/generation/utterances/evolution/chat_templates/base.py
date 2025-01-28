@@ -1,9 +1,9 @@
 """Base class for chat templates for evolution augmentation."""
+
 from abc import ABC, abstractmethod
 
+from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent
-
-from .schemas import Message
 
 
 class EvolutionChatTemplate(ABC):

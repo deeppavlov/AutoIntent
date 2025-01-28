@@ -2,10 +2,10 @@
 
 from typing import ClassVar
 
+from autointent.generation.utterances.schemas import Message, Role
 from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
-from .schemas import Message, Role
 
 
 class ReasoningEvolution(EvolutionChatTemplate):
