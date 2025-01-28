@@ -5,8 +5,7 @@ Deeply inspired by DeepEval evolutions.
 """
 
 import random
-from collections.abc import Callable
-from typing import Literal
+from collections.abc import Callable, Sequence
 
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
@@ -14,9 +13,8 @@ from datasets import concatenate_datasets
 from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances.generator import Generator
+from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent, Sample
-
-EvolutionType = Literal["reasoning", "concretizing", "abstract", "formal", "informal", "funny", "goofy"]
 
 
 class UtteranceEvolver:
@@ -27,7 +25,9 @@ class UtteranceEvolver:
     to change it in a specific way.
     """
 
-    def __init__(self, generator: Generator, prompt_makers: list[Callable], seed: int = 0) -> None:
+    def __init__(
+        self, generator: Generator, prompt_makers: Sequence[Callable[[str, Intent], list[Message]]], seed: int = 0
+    ) -> None:
         """Initialize."""
         self.generator = generator
         self.prompt_makers = prompt_makers
