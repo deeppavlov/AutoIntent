@@ -1,0 +1,33 @@
+- role: user
+  content: |
+    {base_instruction}
+    1. Rewrite the utterance in a silly, exaggerated, or nonsensical way while keeping the intent clear.
+    2. Use playful words, randomness, or exaggeration.
+    3. The rewritten utterance should still be answerable.
+    4. Keep it under 15 words.
+
+    Intent Class:
+    Reserve Restaurant
+
+    Utterance:
+    I want to reserve a table for 4 persons at 9 pm.
+- role: assistant
+  content: |
+    Need a feast for my hungry goblins at 9. Got room?
+- role: user
+  content: |
+    Intent Class:
+    requesting technical support
+
+    Utterance:
+    My Lenovo laptop is constantly rebooting and overheating.
+- role: assistant
+  content: |
+    My laptop's having an existential crisis—keeps rebooting and melting. Help!
+- role: user
+  content: |
+    Intent Class:
+    {intent_name}
+
+    Utterance:
+    {utterance}

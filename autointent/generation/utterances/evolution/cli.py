@@ -1,14 +1,15 @@
 """CLI for evolutionary augmenter."""
 
 from argparse import ArgumentParser
-from typing import TYPE_CHECKING
+from typing import get_args
 
 from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
-if TYPE_CHECKING:
-    from .evolver import EvolutionType
+from .evolver import EvolutionType
+
+EVOLUTION_TYPES: list[EvolutionType] = list(get_args(EvolutionType))
 
 
 def main() -> None:
@@ -34,32 +35,13 @@ def main() -> None:
     )
     parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument("--n-evolutions", type=int, default=1, help="Number of utterances to generate for each intent")
-    parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
-    parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
-    parser.add_argument("--abstract", action="store_true", help="Whether to use `Abstract` evolution")
-    parser.add_argument("--formal", action="store_true", help="Whether to use `Formal` evolution")
-    parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
-    parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
-    parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--evolutions", nargs="+", choices=EVOLUTION_TYPES, required=True, help="Evolution types to apply."
+    )
     args = parser.parse_args()
 
-    evolutions: list[EvolutionType] = []
-    if args.reasoning:
-        evolutions.append("reasoning")
-    if args.concretizing:
-        evolutions.append("concretizing")
-    if args.abstract:
-        evolutions.append("abstract")
-    if args.formal:
-        evolutions.append("formal")
-    if args.informal:
-        evolutions.append("informal")
-    if args.funny:
-        evolutions.append("funny")
-    if args.goofy:
-        evolutions.append("goofy")
-
+    evolutions: list[EvolutionType] = args.evolutions
     dataset = load_dataset(args.input_path)
 
     generator = UtteranceEvolver(Generator(), evolutions, args.seed)

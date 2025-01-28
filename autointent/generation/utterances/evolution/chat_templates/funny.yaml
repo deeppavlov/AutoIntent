@@ -1,0 +1,33 @@
+- role: user
+  content: |
+    {base_instruction}
+    1. Rewrite the utterance in a humorous way while maintaining its original meaning.
+    2. Use wordplay, exaggeration, or lighthearted phrasing.
+    3. The rewritten utterance should still be understandable and relevant.
+    4. Keep it within 15 words.
+
+    Intent Class:
+    Reserve Restaurant
+
+    Utterance:
+    I want to reserve a table for 4 persons at 9 pm.
+- role: assistant
+  content: |
+    Gotta feed my squad at 9 pm. Got a table for us?
+- role: user
+  content: |
+    Intent Class:
+    requesting technical support
+
+    Utterance:
+    My Lenovo laptop is constantly rebooting and overheating.
+- role: assistant
+  content: |
+    My Lenovo thinks it's a phoenix—keeps dying and rising in flames.
+- role: user
+  content: |
+    Intent Class:
+    {intent_name}
+
+    Utterance:
+    {utterance}

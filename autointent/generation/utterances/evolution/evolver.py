@@ -83,10 +83,12 @@ class UtteranceEvolver:
 
 def _load_prompts() -> dict[str, str]:
     files = ires.files("autointent.generation.utterances.evolution.chat_templates")
-
     res = {}
-    for file_name in ["reasoning.yaml", "concretizing.yaml", "abstract.yaml", "base_instruction.txt"]:
-        with files.joinpath(file_name).open() as file:
-            res[file_name.split(".")[0]] = file.read()
+
+    for file_path in files.iterdir():
+        if (file_path.suffix == ".yaml" and file_path.is_file()) or (file_path.name == "base_instruction.txt"):
+            key = file_path.stem
+            with file_path.open() as file:
+                res[key] = file.read()
 
     return res
