@@ -35,9 +35,7 @@ class Module(ABC):
 
     @abstractmethod
     def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
+        self, context: Context, split: Literal["validation", "test"], metrics: list[str]
     ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.

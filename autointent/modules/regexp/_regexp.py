@@ -109,9 +109,7 @@ class RegExp(Module):
         return list(prediction), matches
 
     def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
+        self, context: Context, split: Literal["validation", "test"], metrics: list[str]
     ) -> dict[str, float | str]:
         """
         Calculate metric on test set and return metric value.
@@ -128,7 +126,8 @@ class RegExp(Module):
         if assets["test_matches"] is None:
             msg = "no matches found"
             raise ValueError(msg)
-        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), REGEXP_METRICS)
+        chosen_metrics = {name: fn for name, fn in REGEXP_METRICS.items() if name in metrics}
+        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), chosen_metrics)
 
     def clear_cache(self) -> None:
         """Clear cache."""
