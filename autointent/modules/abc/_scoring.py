@@ -21,9 +21,7 @@ class ScoringModule(Module, ABC):
 
     supports_oos = False
 
-    def score(
-        self, context: Context, split: Literal["validation", "test"], metrics: list[str]
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 

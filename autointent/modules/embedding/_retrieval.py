@@ -109,9 +109,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         )
         self._vector_index.add(utterances, labels)
 
-    def score(
-        self, context: Context, split: Literal["validation", "test"], metrics: list[str]
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 

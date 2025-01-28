@@ -108,9 +108,7 @@ class RegExp(Module):
             matches["partial_matches"].extend(intent_matches["partial_matches"])
         return list(prediction), matches
 
-    def score(
-        self, context: Context, split: Literal["validation", "test"], metrics: list[str]
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
