@@ -23,7 +23,7 @@ class AbstractEvolution(EvolutionChatTemplate):
                 "3. Rewritten utterance must be fully answerable.\n"
                 "4. Rewritten utterance should not contain more than 10 words.\n\n"
                 "Intent name: Reserve Restaurant"
-                "Utterance: I want to reserve a table for 4 persons at 9 pm.",
+                "Utterance: I want to reserve a table for 4 persons at 9 pm."
             ),
         ),
         Message(role=Role.ASSISTANT, content="Please, reserve a table for me."),
@@ -39,6 +39,7 @@ class AbstractEvolution(EvolutionChatTemplate):
 
     def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
         """Make chat to complete."""
-        return self._messages + Message(
-            role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"
-        )
+        return [
+            *self._messages,
+            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
+        ]
