@@ -20,7 +20,11 @@ class NodeOptimizer:
     """Node optimizer class."""
 
     def __init__(
-        self, node_type: NodeType, search_space: list[dict[str, Any]], decision_metric: str, metrics: list[str] = []
+        self,
+        node_type: NodeType,
+        search_space: list[dict[str, Any]],
+        decision_metric: str,
+        metrics: list[str] | None = None,
     ) -> None:
         """
         Initialize the node optimizer.
@@ -33,7 +37,7 @@ class NodeOptimizer:
         self.node_info = NODES_INFO[node_type]
         self.decision_metric_name = decision_metric
 
-        self.metrics = metrics
+        self.metrics = metrics if metrics is not None else []
         self.metrics.append(self.decision_metric_name)
 
         self.modules_search_spaces = search_space  # TODO search space validation
