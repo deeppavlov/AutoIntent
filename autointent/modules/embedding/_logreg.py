@@ -34,7 +34,6 @@ class LogregAimedEmbedding(EmbeddingModule):
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
         retrieval = LogregAimedEmbedding(
-            k=3,
             embedder_name="sergeyzh/rubert-tiny-turbo",
             cv=2
         )
