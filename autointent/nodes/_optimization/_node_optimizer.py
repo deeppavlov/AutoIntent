@@ -23,7 +23,7 @@ class NodeOptimizer:
         self,
         node_type: NodeType,
         search_space: list[dict[str, Any]],
-        decision_metric: str,
+        target_metric: str,
         metrics: list[str] | None = None,
     ) -> None:
         """
@@ -35,7 +35,7 @@ class NodeOptimizer:
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
-        self.decision_metric_name = decision_metric
+        self.decision_metric_name = target_metric
 
         self.metrics = metrics if metrics is not None else []
         if self.decision_metric_name not in self.metrics:
