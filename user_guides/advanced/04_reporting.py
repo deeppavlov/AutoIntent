@@ -9,7 +9,7 @@ This script demonstrates how to report the optimization process using the AutoIn
 search_space = [
     {
         "node_type": "embedding",
-        "metric": "retrieval_hit_rate",
+        "target_metric": "retrieval_hit_rate",
         "search_space": [
             {
                 "module_name": "retrieval",
@@ -20,7 +20,7 @@ search_space = [
     },
     {
         "node_type": "scoring",
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "search_space": [
             {"module_name": "knn", "k": [1, 3, 5, 10], "weights": ["uniform", "distance", "closest"]},
             {"module_name": "linear"},
@@ -33,7 +33,7 @@ search_space = [
     },
     {
         "node_type": "decision",
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
     },
 ]
