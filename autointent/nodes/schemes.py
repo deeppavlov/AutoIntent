@@ -22,7 +22,7 @@ def generate_models_and_union_type_for_classes(
         globalns = getattr(cls.from_context, "__globals__", {})
         type_hints = get_type_hints(cls.from_context, globalns, None)  # Resolve forward refs
 
-        fields = {"module_name": (str, Field(default=cls.name))}
+        fields = {"module_name": (Literal[cls.name], Field(default=cls.name))}
 
         for param_name, param in init_signature.parameters.items():
             if param_name in ("self", "cls", "context"):
