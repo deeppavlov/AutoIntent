@@ -82,7 +82,7 @@ class ThresholdDecision(DecisionModule):
 
         :param thresh: Threshold for the scores, shape (n_classes,) or float
         """
-        self.thresh = thresh
+        self.thresh = thresh if isinstance(thresh, float) else np.array(thresh)
 
     @classmethod
     def from_context(cls, context: Context, thresh: float | list[float] = 0.5) -> "ThresholdDecision":

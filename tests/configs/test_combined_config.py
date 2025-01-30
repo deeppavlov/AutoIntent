@@ -51,7 +51,7 @@ def test_valid_optimizer_config(valid_optimizer_config):
     "task_type",
     ["multiclass", "multilabel"],
 )
-def test_inference_config(task_type):
+def test_optimizer_config(task_type):
     search_space = get_search_space(task_type)
     config = OptimizerConfig(search_space)
     assert config

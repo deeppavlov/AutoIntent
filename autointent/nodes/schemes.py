@@ -29,13 +29,9 @@ def generate_models_and_union_type_for_classes(
                 continue
 
             param_type: TypeAlias = type_hints.get(param_name, Any)  # type: ignore[valid-type]  # noqa: PYI042
-            default = param.default if param.default is not inspect.Parameter.empty else None
+            field = Field(default=[param.default]) if param.default is not inspect.Parameter.empty else Field(...)
 
-            # Ensure fields with defaults have the correct type
-            if default is None:
-                param_type = param_type | None
-
-            fields[param_name] = (list[param_type], Field(default=default))  # type: ignore[assignment]
+            fields[param_name] = (list[param_type], field)  # type: ignore[assignment]
 
         model_name = f"{cls.__name__}InitModel"
         models[cls.__name__] = type(
