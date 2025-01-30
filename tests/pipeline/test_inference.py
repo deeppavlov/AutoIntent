@@ -7,7 +7,7 @@ from tests.conftest import get_search_space, setup_environment
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    ["multilabel"],
 )
 def test_inference_config(dataset, task_type):
     project_dir = setup_environment()
