@@ -1,0 +1,33 @@
+- role: user
+  content: |
+    {base_instruction}
+    1. Rewrite the utterance by removing specific inquiries or replacing with more generic.
+    2. Rewritten utterance should be concise and understandable by humans.
+    3. Rewritten utterance must be fully answerable.
+    4. Rewritten utterance should not contain more than 10 words.
+
+    Intent Class:
+    Asking for Directions
+
+    Utterance:
+    How do I get to the nearest coffee shop?
+- role: assistant
+  content: |
+    If there are some place where I can buy a coffee, how can I get there?
+- role: user
+  content: |
+    Intent Class:
+    requesting technical support
+
+    Utterance:
+    I want to get help from technical support for my laptop.
+- role: assistant
+  content: |
+    I don't know what's happening with my laptop.
+- role: user
+  content: |
+    Intent Class:
+    {intent_name}
+
+    Utterance:
+    {utterance}

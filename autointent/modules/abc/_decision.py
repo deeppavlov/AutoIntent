@@ -63,26 +63,17 @@ class DecisionModule(Module, ABC):
     def clear_cache(self) -> None:
         """Clear cache."""
 
-    def _validate_inputs(self, scores: npt.NDArray[Any], labels: ListOfGenericLabels) -> tuple[int, bool, bool]:
-        """
-        Sanity check if labels and scores are valid to be a training data for decision module.
-
-        :param scores: training scores
-        :param labels: training labels
-        :return: number of classes, indicator if it's a multi-label task,
-                    indicator if data contains oos samples
-        """
-        n_classes, multilabel, contains_oos_samples = super()._get_task_specs(labels)
-
-        if n_classes != scores.shape[1]:
+    def _validate_task(self, scores: npt.NDArray[Any], labels: ListOfGenericLabels) -> None:
+        self._n_classes, self._multilabel, self._oos = self._get_task_specs(labels)
+        self._validate_multilabel(self._multilabel)
+        self._validate_oos(self._oos, raise_error=False)
+        if self._n_classes != scores.shape[1]:
             msg = (
                 "There is a mismatch between provided labels and scores. "
-                f"Labels contains {n_classes} classes, but scores contain "
+                f"Labels contains {self._n_classes} classes, but scores contain "
                 f"probabilities for {scores.shape[1]} classes."
             )
             raise ValueError(msg)
-
-        return n_classes, multilabel, contains_oos_samples
 
 
 def get_decision_evaluation_data(

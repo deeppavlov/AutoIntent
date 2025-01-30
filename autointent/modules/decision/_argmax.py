@@ -76,9 +76,7 @@ class ArgmaxDecision(DecisionModule):
         :param tags: Tags to fit
         :raises WrongClassificationError: If the classification is wrong.
         """
-        self._n_classes, multilabel, contains_oos = self._validate_inputs(scores, labels)
-        self._validate_multilabel(multilabel)
-        self._validate_oos(contains_oos)
+        self._validate_task(scores, labels)
 
     def predict(self, scores: npt.NDArray[Any]) -> list[int]:
         """

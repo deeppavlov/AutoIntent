@@ -37,9 +37,9 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def load_data(filepath: str | Path) -> Dataset:
+def load_dataset(path: str | Path) -> Dataset:
     """
-    Load data from a specified path or use default sample data.
+    Load data from a specified path or use default sample data or load from hugging face hub.
 
     This function loads a dataset from a JSON file or retrieves sample data
     included with the `autointent` package for default multiclass or multilabel
@@ -50,10 +50,10 @@ def load_data(filepath: str | Path) -> Dataset:
                       - "default-multilabel": Loads sample multilabel dataset.
     :return: A `Dataset` object containing the loaded data.
     """
-    if filepath == "default-multiclass":
+    if path == "default-multiclass":
         return Dataset.from_hub("AutoIntent/clinc150_subset")
-    if filepath == "default-multilabel":
+    if path == "default-multilabel":
         return Dataset.from_hub("AutoIntent/clinc150_subset").to_multilabel()
-    if not Path(filepath).exists():
-        return Dataset.from_hub(str(filepath))
-    return Dataset.from_json(filepath)
+    if not Path(path).exists():
+        return Dataset.from_hub(str(path))
+    return Dataset.from_json(path)

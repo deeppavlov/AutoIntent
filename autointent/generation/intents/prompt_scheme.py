@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, field_validator
 
-from autointent.generation.prompts import PROMPT_DESCRIPTION
+from autointent.generation.utterances.prompts import PROMPT_DESCRIPTION
 
 
 class PromptDescription(BaseModel):

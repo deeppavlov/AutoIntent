@@ -1,8 +1,8 @@
 - node_type: embedding
-  metric: retrieval_hit_rate_intersecting
+  metric: scoring_accuracy
   search_space:
-    - module_name: retrieval
-      k: [10]
+    - module_name: logreg
+      cv: [2]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
         - avsolatorio/GIST-small-Embedding-v0

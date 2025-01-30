@@ -1,0 +1,14 @@
+{
+    "length": {
+        "same": "Generated utterances should have the similar length in a sense of number of words to example utterances",
+        "longer": "Generated utterances can be a little bit longer in a sense of number of words than example utterances",
+        "shorter": "Generated utterances can be a little bit shorter in a sense of number of words than example utterances"
+    },
+    "style": {
+        "same": "Generated utterances should follow the same style of conversation as example utterances",
+        "formal": "Generated utterances should follow a formal style of conversation",
+        "informal": "Generated utterances doesn't have to follow a formal style of conversation",
+        "playful": "Generated utterances can be playful and funny"
+    },
+    "punctuation": "Generated utterances should follow the same punctuation style"
+}

@@ -47,6 +47,8 @@ class LinearScorer(ScoringModule):
     _multilabel: bool
     _clf: LogisticRegressionCV | MultiOutputClassifier
     _embedder: Embedder
+    supports_multiclass = True
+    supports_multilabel = True
 
     def __init__(
         self,
@@ -125,7 +127,7 @@ class LinearScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self._multilabel = isinstance(labels[0], list)
+        self._validate_task(labels)
 
         embedder = Embedder(
             device=self.embedder_device,

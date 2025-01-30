@@ -9,7 +9,7 @@ from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.custom_types import LabelType
+from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 
 logger = logging.getLogger(__name__)
@@ -38,6 +38,8 @@ class SklearnScorer(ScoringModule):
     """
 
     name = "sklearn"
+    supports_multilabel = True
+    supports_multiclass = True
 
     def __init__(
         self,
@@ -101,7 +103,7 @@ class SklearnScorer(ScoringModule):
     def fit(
         self,
         utterances: list[str],
-        labels: list[LabelType],
+        labels: ListOfLabels,
     ) -> None:
         """
         Train the chosen sklearn classifier.
@@ -110,7 +112,7 @@ class SklearnScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self._multilabel = isinstance(labels[0], list)
+        self._validate_task(labels)
 
         embedder = Embedder(
             device=self.embedder_device,
