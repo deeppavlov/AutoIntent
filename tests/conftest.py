@@ -1,9 +1,11 @@
 import importlib.resources as ires
 from pathlib import Path
+from typing import Literal
 
 import pytest
 
 from autointent import Dataset
+from autointent.utils import load_search_space
 
 
 def setup_environment() -> Path:
@@ -23,3 +25,15 @@ def dataset():
 def dataset_unsplitted():
     path = ires.files("tests.assets.data").joinpath("clinc_subset_unsplitted.json")
     return Dataset.from_json(path)
+
+
+TaskType = Literal["multiclass", "multilabel", "description"]
+
+
+def get_search_space_path(task_type: TaskType):
+    return ires.files("tests.assets.configs").joinpath(f"{task_type}.yaml")
+
+
+def get_search_space(task_type: TaskType):
+    path = get_search_space_path(task_type)
+    return load_search_space(path)

@@ -26,6 +26,8 @@ class RegexPatternsCompiled(TypedDict):
 class RegExp(Module):
     """Regular expressions based intent detection module."""
 
+    name = "regexp"
+
     @classmethod
     def from_context(cls, context: Context) -> "RegExp":
         """Initialize from context."""
