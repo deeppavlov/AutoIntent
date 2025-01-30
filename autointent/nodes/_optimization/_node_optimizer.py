@@ -30,7 +30,7 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.metric_name = metric
-        self.modules_search_spaces = search_space  # TODO search space validation
+        self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     def fit(self, context: Context) -> None:

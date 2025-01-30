@@ -16,6 +16,7 @@ from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
+from ..nodes.schemes import OptimizerConfig
 
 if TYPE_CHECKING:
     from autointent.modules.abc import DecisionModule, ScoringModule
@@ -72,9 +73,11 @@ class Pipeline:
         Create pipeline optimizer from dictionary search space.
 
         :param search_space: Dictionary config
+        :param seed: random seed
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
+        search_space = OptimizerConfig(search_space).model_dump()
         nodes = [NodeOptimizer(**node) for node in search_space]
         return cls(nodes=nodes, seed=seed)
 
