@@ -42,7 +42,7 @@ class UtteranceGenerator:
         """
         Augment some split of dataset.
 
-        Note that for now it supports only single-label datasets.
+        TODO Note that for now it supports only single-label datasets.
         """
         original_split = dataset[split_name]
         new_samples = []
