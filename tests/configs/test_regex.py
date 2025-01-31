@@ -7,7 +7,9 @@ from autointent.nodes import OptimizationConfig
 @pytest.fixture
 def valid_regexp_config():
     """Fixture for a valid RegExp node configuration."""
-    return [{"node_type": "regexp", "target_metric": "regexp_partial_accuracy", "search_space": [{"module_name": "regexp"}]}]
+    return [
+        {"node_type": "regexp", "target_metric": "regexp_partial_accuracy", "search_space": [{"module_name": "regexp"}]}
+    ]
 
 
 def test_valid_regexp_config(valid_regexp_config):

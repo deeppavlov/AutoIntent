@@ -28,7 +28,7 @@ def valid_optimizer_config():
         },
         {
             "node_type": "embedding",
-            "target_target_metric": "retrieval_hit_rate",
+            "target_metric": "retrieval_hit_rate",
             "search_space": [
                 {
                     "module_name": "retrieval",
