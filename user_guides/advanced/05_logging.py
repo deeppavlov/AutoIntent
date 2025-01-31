@@ -16,7 +16,7 @@ from autointent.configs import LoggingConfig
 search_space = [
     {
         "node_type": "scoring",
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "search_space": [
             {
                 "module_name": "knn",
@@ -28,7 +28,7 @@ search_space = [
     },
     {
         "node_type": "decision",
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "search_space": [
             {"module_name": "threshold", "thresh": [0.5]},
             {"module_name": "argmax"},

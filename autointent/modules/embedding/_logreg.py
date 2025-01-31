@@ -129,11 +129,7 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         self._classifier.fit(embeddings, labels)
 
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 
@@ -153,7 +149,8 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         probas = self.predict(utterances)
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
-        return self.score_metrics((labels, probas), metrics_dict)
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+        return self.score_metrics((labels, probas), chosen_metrics)
 
     def get_assets(self) -> RetrieverArtifact:
         """

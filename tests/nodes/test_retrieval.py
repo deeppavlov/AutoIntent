@@ -54,7 +54,7 @@ def get_embedding_optimizer(multilabel: bool):
     if multilabel:
         metric = metric + "_intersecting"
     embedding_optimizer_config = {
-        "metric": metric,
+        "target_metric": metric,
         "node_type": "embedding",
         "search_space": [
             {

@@ -49,13 +49,13 @@ See docs %mddoclink(class,modules.scoring,LinearScorer).
 """
 ### Optimization Node
 
-To set up the optimization node, you need to create a list of modules and specify the metric for optimization:
+To set up the optimization node, you need to create a list of modules and specify the target metric for optimization:
 """
 
 # %%
 scoring_node = {
     "node_type": "scoring",
-    "metric_name": "scoring_roc_auc",
+    "target_metric": "scoring_roc_auc",
     "search_space": [
         knn_module,
         linear_module,
@@ -73,7 +73,7 @@ The search space for the entire pipeline looks approximately like this:
 search_space = [
     {
         "node_type": "embedding",
-        "metric": "retrieval_hit_rate",
+        "target_metric": "retrieval_hit_rate",
         "search_space": [
             {
                 "module_name": "retrieval",
@@ -84,7 +84,7 @@ search_space = [
     },
     {
         "node_type": "scoring",
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "search_space": [
             {"module_name": "knn", "k": [1, 3, 5, 10], "weights": ["uniform", "distance", "closest"]},
             {"module_name": "linear"},
@@ -97,7 +97,7 @@ search_space = [
     },
     {
         "node_type": "decision",
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
     },
 ]
