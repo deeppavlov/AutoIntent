@@ -24,7 +24,7 @@ To set up the optimization module, you need to create the following dictionary:
 knn_module = {
     "module_name": "knn",
     "k": [1, 5, 10, 50],
-    "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
+    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
 }
 
 # %% [markdown]
@@ -78,7 +78,7 @@ search_space = [
             {
                 "module_name": "retrieval",
                 "k": [10],
-                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
+                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "sergeyzh/rubert-tiny-turbo"],
             }
         ],
     },
@@ -90,7 +90,7 @@ search_space = [
             {"module_name": "linear"},
             {
                 "module_name": "dnnc",
-                "cross_encoder_name": ["BAAI/bge-reranker-base", "cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
                 "k": [1, 3, 5, 10],
             },
         ],
