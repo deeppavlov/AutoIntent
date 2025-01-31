@@ -104,7 +104,6 @@ class RegexNodeValidator(BaseModel):
     target_metric: RegexpMetrics
     metrics: list[RegexpMetrics] | None = None
     search_space: list[RegexpSearchSpaceType]
-    param: float
 
 
 SearchSpaceTypes: TypeAlias = RegexNodeValidator | EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator
