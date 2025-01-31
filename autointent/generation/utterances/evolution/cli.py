@@ -1,5 +1,6 @@
 """CLI for evolutionary augmenter."""
 
+import logging
 from argparse import ArgumentParser
 
 from autointent import load_dataset
@@ -7,6 +8,9 @@ from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
 from .chat_templates import AbstractEvolution, ConcreteEvolution, EvolutionChatTemplate, ReasoningEvolution
+
+logging.basicConfig(level="INFO")
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -18,6 +22,7 @@ def main() -> None:
         required=True,
         help="Path to json or hugging face repo with dataset",
     )
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument(
         "--output-path",
         type=str,
@@ -47,9 +52,15 @@ def main() -> None:
         evolutions.append(AbstractEvolution())
 
     dataset = load_dataset(args.input_path)
+    n_before = len(dataset[args.split])
 
     generator = UtteranceEvolver(Generator(), evolutions, args.seed)
-    generator.augment(dataset, n_evolutions=args.n_evolutions)
+    new_samples = generator.augment(dataset, split_name=args.split, n_evolutions=args.n_evolutions)
+    n_after = len(dataset[args.split])
+
+    logger.info("# samples before %s", n_before)
+    logger.info("# samples generated %s", len(new_samples))
+    logger.info("# samples after %s", n_after)
 
     dataset.to_json(args.output_path)
 
