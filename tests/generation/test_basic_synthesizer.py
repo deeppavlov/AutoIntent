@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from autointent.generation.utterances.basic.chat_template import SynthesizerChatTemplate
+from autointent.generation.utterances import SynthesizerChatTemplate, UtteranceGenerator
 
 
 def has_unfilled_fields(template):
@@ -27,3 +27,26 @@ def test_extra_instructions(dataset):
     assert "football" in prompt
 
 
+def test_on_dataset(dataset):
+    mock_llm = Mock()
+    mock_llm.get_chat_completion.return_value = "1. LLM answer"
+
+    split_name = "train_0"
+
+    template = SynthesizerChatTemplate(dataset, split=split_name)
+    augmenter = UtteranceGenerator(mock_llm, template)
+
+    n_before = len(dataset[split_name])
+    new_samples = augmenter.augment(dataset, split_name=split_name, update_split=False)
+    n_after = len(dataset[split_name])
+
+    assert n_before == n_after
+    assert len(new_samples) == len(dataset.intents)
+    assert all(sample.utterance == "LLM answer" for sample in new_samples)
+
+    n_before = len(dataset[split_name])
+    new_samples = augmenter.augment(dataset, split_name=split_name, update_split=True)
+    n_after = len(dataset[split_name])
+
+    assert n_before + len(new_samples) == n_after
+    assert len(new_samples) == len(dataset.intents)
