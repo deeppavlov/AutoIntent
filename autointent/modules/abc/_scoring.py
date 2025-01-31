@@ -21,11 +21,7 @@ class ScoringModule(Module, ABC):
 
     supports_oos = False
 
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 
@@ -50,7 +46,8 @@ class ScoringModule(Module, ABC):
         self._test_scores = self.predict(context.data_handler.test_utterances())
 
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
-        return self.score_metrics((labels, scores), metrics_dict)
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+        return self.score_metrics((labels, scores), chosen_metrics)
 
     def get_assets(self) -> ScorerArtifact:
         """

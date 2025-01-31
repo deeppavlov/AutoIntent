@@ -24,9 +24,6 @@ class ThresholdDecision(DecisionModule):
     ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
     labels for single-label or multi-label classification tasks.
 
-    :ivar metadata_dict_name: Filename for saving metadata to disk.
-    :ivar multilabel: If True, the model supports multi-label classification.
-    :ivar n_classes: Number of classes in the dataset.
     :ivar tags: Tags for predictions (if any).
     :ivar name: Name of the predictor, defaults to "adaptive".
 
@@ -78,17 +75,17 @@ class ThresholdDecision(DecisionModule):
 
     def __init__(
         self,
-        thresh: float | npt.NDArray[Any],
+        thresh: float | list[float],
     ) -> None:
         """
         Initialize threshold predictor.
 
         :param thresh: Threshold for the scores, shape (n_classes,) or float
         """
-        self.thresh = thresh
+        self.thresh = thresh if isinstance(thresh, float) else np.array(thresh)
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | npt.NDArray[Any] = 0.5) -> "ThresholdDecision":
+    def from_context(cls, context: Context, thresh: float | list[float] = 0.5) -> "ThresholdDecision":
         """
         Initialize from context.
 

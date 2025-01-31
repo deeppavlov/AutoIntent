@@ -109,11 +109,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         )
         self._vector_index.add(utterances, labels)
 
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 
@@ -133,7 +129,8 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         predictions, _, _ = self._vector_index.query(utterances, self.k)
 
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
-        return self.score_metrics((labels, predictions), metrics_dict)
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+        return self.score_metrics((labels, predictions), chosen_metrics)
 
     def get_assets(self) -> RetrieverArtifact:
         """

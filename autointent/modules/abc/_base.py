@@ -34,11 +34,7 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
@@ -110,7 +106,7 @@ class Module(ABC):
         return None
 
     @staticmethod
-    def score_metrics(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float | str]:
+    def score_metrics(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:
         """
         Score metrics on the test set.
 

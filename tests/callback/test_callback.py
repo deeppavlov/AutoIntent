@@ -47,7 +47,8 @@ def test_pipeline_callbacks(dataset):
     search_space = [
         {
             "node_type": "embedding",
-            "metric": "retrieval_hit_rate",
+            "target_metric": "retrieval_hit_rate",
+            "metrics": ["retrieval_map", "retrieval_mrr", "retrieval_ndcg", "retrieval_precision"],
             "search_space": [
                 {
                     "module_name": "retrieval",
@@ -58,7 +59,14 @@ def test_pipeline_callbacks(dataset):
         },
         {
             "node_type": "scoring",
-            "metric": "scoring_roc_auc",
+            "target_metric": "scoring_roc_auc",
+            "metrics": [
+                "scoring_accuracy",
+                "scoring_f1",
+                "scoring_log_likelihood",
+                "scoring_precision",
+                "scoring_recall",
+            ],
             "search_space": [
                 {"module_name": "knn", "k": [1], "weights": ["uniform", "distance"]},
                 {"module_name": "linear"},
@@ -66,7 +74,14 @@ def test_pipeline_callbacks(dataset):
         },
         {
             "node_type": "decision",
-            "metric": "decision_accuracy",
+            "target_metric": "decision_accuracy",
+            "metrics": [
+                "decision_accuracy",
+                "decision_f1",
+                "decision_precision",
+                "decision_recall",
+                "decision_roc_auc",
+            ],
             "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
         },
     ]
