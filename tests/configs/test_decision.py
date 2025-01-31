@@ -10,7 +10,7 @@ def valid_decision_config():
     return [
         {
             "node_type": "decision",
-            "metric": "decision_roc_auc",
+            "target_metric": "decision_roc_auc",
             "search_space": [
                 {"module_name": "argmax"},
                 {"module_name": "jinoos", "search_space": [[0.3, 0.5, 0.7]]},
@@ -29,7 +29,7 @@ def test_valid_decision_config(valid_decision_config):
     """Test that a valid decision config passes validation."""
     config = OptimizationConfig(valid_decision_config)
     assert config[0].node_type == "decision"
-    assert config[0].metric == "decision_roc_auc"
+    assert config[0].target_metric == "decision_roc_auc"
     assert isinstance(config[0].search_space, list)
     assert config[0].search_space[0].module_name == "argmax"
 
@@ -39,7 +39,7 @@ def test_invalid_decision_config_missing_field():
     invalid_config = [
         {
             "node_type": "decision",
-            # Missing "metric"
+            # Missing "target_metric"
             "search_space": [{"module_name": "tunable", "n_trials": [100]}],
         }
     ]
@@ -53,7 +53,7 @@ def test_invalid_decision_config_wrong_type():
     invalid_config = [
         {
             "node_type": "decision",
-            "metric": "decision_roc_auc",
+            "target_metric": "decision_roc_auc",
             "search_space": [
                 {
                     "module_name": "threshold",

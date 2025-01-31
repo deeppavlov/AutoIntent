@@ -10,7 +10,7 @@ def valid_embedding_config():
     return [
         {
             "node_type": "embedding",
-            "metric": "retrieval_mrr",
+            "target_metric": "retrieval_mrr",
             "search_space": [
                 {"module_name": "logreg_embedding", "embedder_name": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
                 {"module_name": "retrieval", "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]},
@@ -23,7 +23,7 @@ def test_valid_embedding_config(valid_embedding_config):
     """Test that a valid embedding config passes validation."""
     config = OptimizationConfig(valid_embedding_config)
     assert config[0].node_type == "embedding"
-    assert config[0].metric == "retrieval_mrr"
+    assert config[0].target_metric == "retrieval_mrr"
     assert isinstance(config[0].search_space, list)
     assert config[0].search_space[0].module_name == "logreg_embedding"
     assert "embedder_name" in config[0].search_space[0].model_dump()
@@ -34,7 +34,7 @@ def test_invalid_embedding_config_missing_field():
     invalid_config = [
         {
             "node_type": "embedding",
-            # Missing "metric"
+            # Missing "target_metric"
             "search_space": [
                 {"module_name": "retrieval", "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]}
             ],
@@ -50,7 +50,7 @@ def test_invalid_embedding_config_wrong_type():
     invalid_config = [
         {
             "node_type": "embedding",
-            "metric": "retrieval_mrr",
+            "target_metric": "retrieval_mrr",
             "search_space": [
                 {
                     "module_name": "logreg_embedding",

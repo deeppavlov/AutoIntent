@@ -13,7 +13,7 @@ def valid_optimizer_config():
     return [
         {
             "node_type": "scoring",
-            "metric": "scoring_roc_auc",
+            "target_metric": "scoring_roc_auc",
             "search_space": [
                 {
                     "module_name": "dnnc",
@@ -28,7 +28,7 @@ def valid_optimizer_config():
         },
         {
             "node_type": "embedding",
-            "metric": "retrieval_hit_rate",
+            "target_target_metric": "retrieval_hit_rate",
             "search_space": [
                 {
                     "module_name": "retrieval",
@@ -62,7 +62,7 @@ def test_invalid_optimizer_config_missing_field():
     invalid_config = [
         {
             "node_type": "scoring",
-            # Missing "metric"
+            # Missing "target_metric"
             "search_space": [
                 {"module_name": "dnnc", "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"], "k": [1, 3]}
             ],
@@ -78,7 +78,7 @@ def test_invalid_optimizer_config_wrong_type():
     invalid_config = [
         {
             "node_type": "scoring",
-            "metric": "scoring_roc_auc",
+            "target_metric": "scoring_roc_auc",
             "search_space": [
                 {
                     "module_name": "dnnc",

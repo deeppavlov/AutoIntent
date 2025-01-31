@@ -56,7 +56,8 @@ class DecisionNodeValidator(BaseModel):
     """Search space configuration for the Decision node."""
 
     node_type: NodeType = NodeType.decision
-    metric: DecisionMetrics
+    target_metric: DecisionMetrics
+    metrics: list[DecisionMetrics] | None = None
     search_space: list[DecisionSearchSpaceType]
 
 
@@ -70,7 +71,8 @@ class EmbeddingNodeValidator(BaseModel):
     """Search space configuration for the Embedding node."""
 
     node_type: NodeType = NodeType.embedding
-    metric: EmbeddingMetrics
+    target_metric: EmbeddingMetrics
+    metrics: list[EmbeddingMetrics] | None = None
     search_space: list[EmbeddingSearchSpaceType]
 
 
@@ -84,7 +86,8 @@ class ScoringNodeValidator(BaseModel):
     """Search space configuration for the Scoring node."""
 
     node_type: NodeType = NodeType.scoring
-    metric: ScoringMetrics
+    target_metric: ScoringMetrics
+    metrics: list[ScoringMetrics] | None = None
     search_space: list[ScoringSearchSpaceType]
 
 
@@ -98,7 +101,8 @@ class RegexNodeValidator(BaseModel):
     """Search space configuration for the Regexp node."""
 
     node_type: NodeType = NodeType.regexp
-    metric: RegexpMetrics
+    target_metric: RegexpMetrics
+    metrics: list[RegexpMetrics] | None = None
     search_space: list[RegexpSearchSpaceType]
 
 

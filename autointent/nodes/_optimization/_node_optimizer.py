@@ -35,11 +35,11 @@ class NodeOptimizer:
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
-        self.decision_metric_name = target_metric
+        self.target_metric = target_metric
 
         self.metrics = metrics if metrics is not None else []
-        if self.decision_metric_name not in self.metrics:
-            self.metrics.append(self.decision_metric_name)
+        if self.target_metric not in self.metrics:
+            self.metrics.append(self.target_metric)
 
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
@@ -73,7 +73,7 @@ class NodeOptimizer:
 
                 self._logger.debug("scoring %s module...", module_name)
                 metrics_score = module.score(context, "validation", self.metrics)
-                metric_value = metrics_score[self.decision_metric_name]
+                metric_value = metrics_score[self.target_metric]
 
                 context.callback_handler.log_metrics(metrics_score)
                 context.callback_handler.end_module()
@@ -91,7 +91,7 @@ class NodeOptimizer:
                     module_name,
                     module_kwargs,
                     metric_value,
-                    self.decision_metric_name,
+                    self.target_metric,
                     module.get_assets(),  # retriever name / scores / predictions
                     module_dump_dir,
                     module=module if not context.is_ram_to_clear() else None,
