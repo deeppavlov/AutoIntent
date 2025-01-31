@@ -24,7 +24,7 @@ RETRIEVAL_MODULES_MULTICLASS: dict[str, type[EmbeddingModule]] = _create_modules
     [RetrievalAimedEmbedding, LogregAimedEmbedding]
 )
 
-RETRIEVAL_MODULES_MULTILABEL = RETRIEVAL_MODULES_MULTICLASS
+RETRIEVAL_MODULES_MULTILABEL: dict[str, type[EmbeddingModule]] = RETRIEVAL_MODULES_MULTICLASS
 
 SCORING_MODULES_MULTICLASS: dict[str, type[ScoringModule]] = _create_modules_dict(
     [

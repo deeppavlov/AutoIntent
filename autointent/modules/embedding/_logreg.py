@@ -22,8 +22,8 @@ class LogregAimedEmbedding(EmbeddingModule):
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its logreg classification quality as a sort of proxy metric.
 
-    :ivar classifier: The trained logistic regression model.
-    :ivar label_encoder: Label encoder for converting labels to numerical format.
+    :ivar _classifier: The trained logistic regression model.
+    :ivar _label_encoder: Label encoder for converting labels to numerical format.
     :ivar name: Name of the module, defaults to "logreg".
 
     Examples
@@ -42,7 +42,7 @@ class LogregAimedEmbedding(EmbeddingModule):
 
     _classifier: LogisticRegressionCV | MultiOutputClassifier
     _label_encoder: LabelEncoder | None
-    name = "logreg"
+    name = "logreg_embedding"
     supports_multiclass = True
     supports_multilabel = True
     supports_oos = False
@@ -62,8 +62,8 @@ class LogregAimedEmbedding(EmbeddingModule):
         :param cv: the number of folds used in LogisticRegressionCV
         :param embedder_name: Name of the embedder used for creating embeddings.
         :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation.
-        :param max_length: Maximum sequence length for embeddings. None if not set.
+        :param embedder_batch_size: Batch size for embedding generation.
+        :param embedder_max_length: Maximum sequence length for embeddings. None if not set.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.embedder_name = embedder_name

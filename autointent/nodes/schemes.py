@@ -52,7 +52,7 @@ DecisionSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes(
 DecisionMetrics: TypeAlias = Literal[tuple(DecisionNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
 
 
-class SearchSpaceDecisionConfigNodeItem(BaseModel):
+class DecisionNodeValidator(BaseModel):
     """Search space configuration for the Decision node."""
 
     node_type: NodeType = NodeType.decision
@@ -66,7 +66,7 @@ EmbeddingSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes
 EmbeddingMetrics: TypeAlias = Literal[tuple(EmbeddingNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
 
 
-class SearchSpaceEmbeddingConfigNodeItem(BaseModel):
+class EmbeddingNodeValidator(BaseModel):
     """Search space configuration for the Embedding node."""
 
     node_type: NodeType = NodeType.embedding
@@ -80,7 +80,7 @@ ScoringSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes( 
 ScoringMetrics: TypeAlias = Literal[tuple(ScoringNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
 
 
-class SearchSpaceScoringConfigNodeItem(BaseModel):
+class ScoringNodeValidator(BaseModel):
     """Search space configuration for the Scoring node."""
 
     node_type: NodeType = NodeType.scoring
@@ -94,7 +94,7 @@ RegexpSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes(  
 RegexpMetrics: TypeAlias = Literal[tuple(RegExpNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
 
 
-class SearchSpaceRegexpConfigNodeItem(BaseModel):
+class RegexNodeValidator(BaseModel):
     """Search space configuration for the Regexp node."""
 
     node_type: NodeType = NodeType.regexp
@@ -102,15 +102,10 @@ class SearchSpaceRegexpConfigNodeItem(BaseModel):
     search_space: list[RegexpSearchSpaceType]
 
 
-SearchSpaceTypes: TypeAlias = (
-    SearchSpaceRegexpConfigNodeItem
-    | SearchSpaceEmbeddingConfigNodeItem
-    | SearchSpaceScoringConfigNodeItem
-    | SearchSpaceDecisionConfigNodeItem
-)
+SearchSpaceTypes: TypeAlias = RegexNodeValidator | EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator
 
 
-class OptimizerConfig(RootModel[list[SearchSpaceTypes]]):
+class OptimizationConfig(RootModel[list[SearchSpaceTypes]]):
     """Optimizer configuration."""
 
     def __iter__(
