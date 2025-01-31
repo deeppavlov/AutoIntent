@@ -24,7 +24,7 @@ jobs:
           pip install .
 
     - name: Generate JSON Schema
-      run: python scripts/generate_schema.py
+      run: python scripts/generate_json_schema_config.py
 
     - name: Check for changes
       id: check_changes
