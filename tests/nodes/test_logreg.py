@@ -65,7 +65,7 @@ def get_embedding_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
-                "module_name": "logreg",
+                "module_name": "logreg_embedding",
             },
         ],
     }
