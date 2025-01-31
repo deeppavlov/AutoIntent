@@ -25,6 +25,7 @@ class LinearScorer(ScoringModule):
     --------
     .. testcode::
 
+        import numpy as np
         from autointent.modules import LinearScorer
         scorer = LinearScorer(
             embedder_name="sergeyzh/rubert-tiny-turbo", cv=2
@@ -34,12 +35,13 @@ class LinearScorer(ScoringModule):
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "bye"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)
+        with np.printoptions(precision=4):
+            print(probabilities)
 
     .. testoutput::
 
-        [[0.50000032 0.49999968]
-         [0.50000032 0.49999968]]
+        [[0.5 0.5]]
+         [0.5 0.5]]
 
     """
 
