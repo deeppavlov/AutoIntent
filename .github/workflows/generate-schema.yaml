@@ -34,6 +34,8 @@ jobs:
     - name: Commit and push changes
       if: env.changed == 'true'
       run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         git add docs/optimizer_config.schema.json
         git commit -m "Update optimizer_config.schema.json"
         git push
