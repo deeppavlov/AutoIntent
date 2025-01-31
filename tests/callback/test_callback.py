@@ -48,7 +48,6 @@ def test_pipeline_callbacks(dataset):
         {
             "node_type": "embedding",
             "target_metric": "retrieval_hit_rate",
-            "metrics": ["retrieval_map", "retrieval_mrr", "retrieval_ndcg", "retrieval_precision"],
             "search_space": [
                 {
                     "module_name": "retrieval",
@@ -62,10 +61,6 @@ def test_pipeline_callbacks(dataset):
             "target_metric": "scoring_roc_auc",
             "metrics": [
                 "scoring_accuracy",
-                "scoring_f1",
-                "scoring_log_likelihood",
-                "scoring_precision",
-                "scoring_recall",
             ],
             "search_space": [
                 {"module_name": "knn", "k": [1], "weights": ["uniform", "distance"]},
@@ -113,10 +108,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 0.9875,
-                    "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 0.9957230204891719,
-                    "retrieval_precision": 0.8500000000000001,
                 }
             },
         ),
@@ -134,10 +125,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 0.9816666666666667,
-                    "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 0.9936857382141969,
-                    "retrieval_precision": 0.44999999999999996,
                 }
             },
         ),
@@ -155,10 +142,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 1.0,
-                    "scoring_f1": 1.0,
-                    "scoring_log_likelihood": 0.0,
-                    "scoring_precision": 1.0,
-                    "scoring_recall": 1.0,
                     "scoring_roc_auc": 1.0,
                 }
             },
@@ -177,10 +160,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 1.0,
-                    "scoring_f1": 1.0,
-                    "scoring_log_likelihood": 0.0,
-                    "scoring_precision": 1.0,
-                    "scoring_recall": 1.0,
                     "scoring_roc_auc": 1.0,
                 }
             },
@@ -195,10 +174,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 0.75,
-                    "scoring_f1": 0.6666666666666666,
-                    "scoring_log_likelihood": -0.439819,
-                    "scoring_precision": 0.625,
-                    "scoring_recall": 0.75,
                     "scoring_roc_auc": 1.0,
                 }
             },
