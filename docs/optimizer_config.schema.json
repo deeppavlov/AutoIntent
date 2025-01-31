@@ -588,11 +588,16 @@
                     },
                     "title": "Search Space",
                     "type": "array"
+                },
+                "param": {
+                    "title": "Param",
+                    "type": "number"
                 }
             },
             "required": [
                 "target_metric",
-                "search_space"
+                "search_space",
+                "param"
             ],
             "title": "RegexNodeValidator",
             "type": "object"
