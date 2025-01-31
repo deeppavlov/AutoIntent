@@ -41,7 +41,7 @@ def get_multilabel_version(intent_records, config_string, seed):
     return res
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser()
     parser.add_argument("--input-path", type=str, required=True, help="path to intent records")
     parser.add_argument("--output-path", type=str, required=True)

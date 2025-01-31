@@ -1,10 +1,16 @@
 """CLI for basic utterance generator."""
 
+import logging
 from argparse import ArgumentParser
 
 from autointent import load_dataset
-from autointent.generation.utterances.basic.utterance_generator import LengthType, StyleType, UtteranceGenerator
+from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
+
+from .chat_template import SynthesizerChatTemplate
+
+logging.basicConfig(level="INFO")
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -28,6 +34,7 @@ def main() -> None:
         default=None,
         help="Local path where to save result",
     )
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument(
         "--n-generations",
@@ -41,37 +48,19 @@ def main() -> None:
         default=5,
         help="Number of utterances to use as an example for augmentation",
     )
-    parser.add_argument(
-        "--custom-instruction",
-        type=str,
-        action="append",
-        help="Add extra instructions to default prompt."
-        "You can use this argument multiple times to add multiple instructions",
-    )
-    parser.add_argument(
-        "--length",
-        choices=LengthType.__args__,  # type: ignore[attr-defined]
-        default="none",
-        help="How to extend the prompt with length instruction",
-    )
-    parser.add_argument(
-        "--style",
-        choices=StyleType.__args__,  # type: ignore[attr-defined]
-        default="none",
-        help="How to extend the prompt with style instruction",
-    )
-    parser.add_argument(
-        "--same-punctuation",
-        action="store_true",
-        help="Whether to extend the prompt with punctuation instruction",
-    )
     args = parser.parse_args()
 
     dataset = load_dataset(args.input_path)
-    generator = UtteranceGenerator(
-        Generator(), args.custom_instruction or [], args.length, args.style, args.same_punctuation
-    )
-    generator.augment(dataset, n_generations=args.n_generations, max_sample_utterances=args.n_sample_utterances)
+    template = SynthesizerChatTemplate(dataset, args.split, max_sample_utterances=args.n_sample_utterances)
+    generator = UtteranceGenerator(Generator(), template)
+
+    n_before = len(dataset[args.split])
+    new_samples = generator.augment(dataset, split_name=args.split, n_generations=args.n_generations)
+    n_after = len(dataset[args.split])
+
+    logger.info("# samples before %s", n_before)
+    logger.info("# samples generated %s", len(new_samples))
+    logger.info("# samples after %s", n_after)
 
     dataset.to_json(args.output_path)
 

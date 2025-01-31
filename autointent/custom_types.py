@@ -5,7 +5,7 @@ the AutoIntent framework for improved type safety and clarity.
 """
 
 from enum import Enum
-from typing import Literal, TypeAlias, TypedDict
+from typing import Literal, TypeAlias
 
 
 class LogLevel(Enum):
@@ -44,10 +44,6 @@ Type alias for label representation
 - `int`: For single-label classification.
 - `list[int]`: For multi-label classification.
 """
-
-
-class BaseMetadataDict(TypedDict):
-    """Base metadata dictionary for storing additional information."""
 
 
 class NodeType(str, Enum):

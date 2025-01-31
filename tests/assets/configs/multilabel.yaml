@@ -1,7 +1,7 @@
 - node_type: embedding
   target_metric: scoring_accuracy
   search_space:
-    - module_name: logreg
+    - module_name: logreg_embedding
       cv: [2]
       embedder_name:
         - sentence-transformers/all-MiniLM-L6-v2
