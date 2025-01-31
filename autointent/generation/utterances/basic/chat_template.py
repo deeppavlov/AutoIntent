@@ -2,6 +2,7 @@
 
 import random
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from typing import ClassVar
 
 from autointent import Dataset
@@ -20,7 +21,7 @@ class BaseSynthesizer(ABC):
 class SynthesizerChatTemplate(BaseSynthesizer):
     """Chat template for generating additional examples for a given intent class."""
 
-    _messages: ClassVar[list[Message]] = [
+    __messages: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,
             content=(
@@ -106,6 +107,8 @@ class SynthesizerChatTemplate(BaseSynthesizer):
         """Initialize."""
         if extra_instructions is None:
             extra_instructions = ""
+
+        self._messages = deepcopy(self.__messages)
 
         msg = self._messages[0]
         msg["content"] = msg["content"].format(extra_instructions=extra_instructions)
