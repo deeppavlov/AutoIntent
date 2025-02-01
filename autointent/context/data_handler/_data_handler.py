@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import Literal, TypedDict, cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
@@ -26,10 +26,12 @@ class RegexPatterns(TypedDict):
     """Partial match regex patterns."""
 
 
-class DataHandler:
+class DataHandler:  # TODO rename to Validator
     """Data handler class."""
 
-    def __init__(self, dataset: Dataset, random_seed: int = 0, split_train: bool = True) -> None:
+    def __init__(
+        self, dataset: Dataset, scheme: Literal["cv", "ho"], split_train: bool = True, random_seed: int = 0
+    ) -> None:
         """
         Initialize the data handler.
 
@@ -43,8 +45,12 @@ class DataHandler:
         self.dataset = dataset
 
         self.n_classes = self.dataset.n_classes
+        self.scheme = scheme
 
-        self._split(random_seed, split_train)
+        if scheme == "ho":
+            self._split_ho(random_seed, split_train)
+        elif scheme == "cv":
+            self._split_cv(random_seed)
 
         self.regexp_patterns = [
             RegexPatterns(
@@ -153,6 +159,23 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
+    def validation_iterator(self, idx: int | None = None) -> list[tuple[list, list, list, list]]:
+        if self.scheme == "ho":
+            return [
+                (
+                    self.train_utterances(idx),
+                    self.train_labels(idx),
+                    self.validation_utterances(idx),
+                    self.validation_labels(idx),
+                )
+            ]
+
+        if self.scheme == "cv":
+            raise NotImplementedError
+
+        msg = "something's wrong"
+        raise RuntimeError(msg)
+
     def dump(self, filepath: str | Path) -> None:
         """
         Save the dataset splits and intents to a JSON file.
@@ -161,7 +184,7 @@ class DataHandler:
         """
         self.dataset.to_json(filepath)
 
-    def _split(self, random_seed: int, split_train: bool) -> None:
+    def _split_ho(self, random_seed: int, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
         if split_train and Split.TRAIN in self.dataset:

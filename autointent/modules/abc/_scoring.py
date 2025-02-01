@@ -40,7 +40,7 @@ class ScoringModule(Module, ABC):
             return self.score_metrics((labels, scores), chosen_metrics)
 
         metrics_values = {name: [] for name in chosen_metrics}
-        for train_utterances, train_labels, val_utterances, val_labels in context.validation_iterator(0):
+        for train_utterances, train_labels, val_utterances, val_labels in context.data_handler.validation_iterator(0):
             self.fit(train_utterances, train_labels)
             val_scores = self.predict(val_utterances)
             for name, fn in chosen_metrics.items():
