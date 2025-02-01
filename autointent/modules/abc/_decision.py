@@ -72,6 +72,10 @@ class DecisionModule(Module, ABC):
             )
             raise ValueError(msg)
 
+    def get_train_data(self, context: Context) -> tuple[npt.NDArray[Any], ListOfGenericLabels, list[Tag]]:
+        labels, scores = get_decision_evaluation_data(context, "train")
+        return (scores, labels, context.data_handler.tags)
+
 
 def get_decision_evaluation_data(
     context: Context,

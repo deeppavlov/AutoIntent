@@ -146,3 +146,10 @@ class DescriptionScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         self._embedder.clear_ram()
+
+    def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
+        return (
+            context.data_handler.train_utterances(0),
+            context.data_handler.train_labels(0),
+            context.data_handler.intent_descriptions,
+        )

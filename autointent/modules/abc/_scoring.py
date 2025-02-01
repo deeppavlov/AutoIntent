@@ -8,6 +8,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import Module
 
@@ -59,6 +60,9 @@ class ScoringModule(Module, ABC):
             validation_scores=self._validation_scores,
             test_scores=self._test_scores,
         )
+
+    def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
+        return (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))
 
     @abstractmethod
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

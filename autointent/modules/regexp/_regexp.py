@@ -151,3 +151,6 @@ class RegExp(Module):
             )
             for regexp_patterns in self.regexp_patterns
         ]
+
+    def get_train_data(self, context: Context) -> tuple:
+        return ()
