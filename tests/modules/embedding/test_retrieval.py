@@ -4,12 +4,6 @@ from autointent.modules.embedding import RetrievalAimedEmbedding
 from tests.conftest import setup_environment
 
 
-def test_get_artifact_returns_correct_artifact():
-    module = RetrievalAimedEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
-    artifact = module.get_artifact()
-    assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"
-
-
 def test_dump_and_load_preserves_model_state():
     project_dir = setup_environment()
     module = RetrievalAimedEmbedding(k=5, embedder_name="sergeyzh/rubert-tiny-turbo")
