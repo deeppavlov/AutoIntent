@@ -2,8 +2,6 @@
 
 from random import Random
 
-from sklearn.model_selection import train_test_split
-
 from autointent import Dataset
 from autointent.custom_types import Split
 
@@ -32,9 +30,8 @@ def _sample_intent_regexp(
 def sample_from_regex(
     in_dataset: Dataset,
     n_shots: int,
+    split_name: str = Split.TRAIN,
     n_rep_limit: int = 20,
-    val_size: float = 0.2,
-    test_size: float = 0.2,
     random_seed: int | None = None,
 ) -> Dataset:
     """
@@ -42,9 +39,8 @@ def sample_from_regex(
 
     :param in_dataset: The dataset containing intents with regular exressions.
     :param n_shots: The maximum number of samples to produce for every intent.
+    :param split_name: Where to put the data.
     :param n_rep_limit: To limit the number of possible repetitions in a regular expression.
-    :param val_size: The proportion to be allocated for the validation part.
-    :param test_size: The proportion to be allocated for the test part.
     :param random_seed: To make your sampling deterministic.
 
     :returns: The dataset with sampled utterances.
@@ -53,23 +49,12 @@ def sample_from_regex(
     intents = in_dataset.intents
 
     splits: dict[str, list] = {  # type: ignore[type-arg]
-        Split.TRAIN: [],
-        Split.VALIDATION: [],
-        Split.TEST: [],
+        split_name: []
     }
 
     for intent in intents:
         utterances = _sample_intent_regexp(intent.regexp_full_match, n_shots, n_rep_limit, intent.id, rng)
-
-        x_train, x_remaining = train_test_split(utterances, test_size=val_size + test_size, random_state=random_seed)
-        splits[Split.TRAIN].extend(x_train)
-
-        x_val, x_test = train_test_split(
-            x_remaining, test_size=test_size / (test_size + val_size), random_state=random_seed
-        )
-
-        splits[Split.VALIDATION].extend(x_val)
-        splits[Split.TEST].extend(x_test)
+        splits[split_name].extend(utterances)
 
     splits["intents"] = intents
 
