@@ -47,7 +47,7 @@ def test_pipeline_callbacks(dataset):
     search_space = [
         {
             "node_type": "embedding",
-            "metric": "retrieval_hit_rate",
+            "target_metric": "retrieval_hit_rate",
             "search_space": [
                 {
                     "module_name": "retrieval",
@@ -58,7 +58,10 @@ def test_pipeline_callbacks(dataset):
         },
         {
             "node_type": "scoring",
-            "metric": "scoring_roc_auc",
+            "target_metric": "scoring_roc_auc",
+            "metrics": [
+                "scoring_accuracy",
+            ],
             "search_space": [
                 {"module_name": "knn", "k": [1], "weights": ["uniform", "distance"]},
                 {"module_name": "linear"},
@@ -66,7 +69,14 @@ def test_pipeline_callbacks(dataset):
         },
         {
             "node_type": "decision",
-            "metric": "decision_accuracy",
+            "target_metric": "decision_accuracy",
+            "metrics": [
+                "decision_accuracy",
+                "decision_f1",
+                "decision_precision",
+                "decision_recall",
+                "decision_roc_auc",
+            ],
             "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
         },
     ]
@@ -98,10 +108,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 0.9875,
-                    "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 0.9957230204891719,
-                    "retrieval_precision": 0.8500000000000001,
                 }
             },
         ),
@@ -119,10 +125,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "retrieval_hit_rate": 1.0,
-                    "retrieval_map": 0.9816666666666667,
-                    "retrieval_mrr": 1.0,
-                    "retrieval_ndcg": 0.9936857382141969,
-                    "retrieval_precision": 0.44999999999999996,
                 }
             },
         ),
@@ -140,10 +142,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 1.0,
-                    "scoring_f1": 1.0,
-                    "scoring_log_likelihood": 0.0,
-                    "scoring_precision": 1.0,
-                    "scoring_recall": 1.0,
                     "scoring_roc_auc": 1.0,
                 }
             },
@@ -162,10 +160,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 1.0,
-                    "scoring_f1": 1.0,
-                    "scoring_log_likelihood": 0.0,
-                    "scoring_precision": 1.0,
-                    "scoring_recall": 1.0,
                     "scoring_roc_auc": 1.0,
                 }
             },
@@ -180,10 +174,6 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "scoring_accuracy": 0.75,
-                    "scoring_f1": 0.6666666666666666,
-                    "scoring_log_likelihood": -0.439819,
-                    "scoring_precision": 0.625,
-                    "scoring_recall": 0.75,
                     "scoring_roc_auc": 1.0,
                 }
             },

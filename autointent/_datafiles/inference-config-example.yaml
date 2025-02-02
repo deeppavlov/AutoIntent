@@ -2,7 +2,7 @@
   module_name: retrieval
   module_config:
     k: 10
-    model_name: infgrad/stella-base-en-v2
+    model_name: sergeyzh/rubert-tiny-turbo
   load_path: .
 - node_type: scoring
   module_name: knn

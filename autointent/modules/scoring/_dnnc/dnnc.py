@@ -70,6 +70,8 @@ class DNNCScorer(ScoringModule):
     _n_classes: int
     _vector_index: VectorIndex
     _cross_encoder: Ranker
+    supports_multilabel = False
+    supports_multiclass = True
 
     def __init__(  # noqa: PLR0913
         self,
@@ -155,7 +157,7 @@ class DNNCScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
-        self._n_classes = len(set(labels))
+        self._validate_task(labels)
 
         self._vector_index = VectorIndex(
             self.embedder_name,

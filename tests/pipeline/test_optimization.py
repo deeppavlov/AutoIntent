@@ -1,4 +1,3 @@
-import importlib.resources as ires
 import os
 from typing import Literal
 
@@ -10,19 +9,9 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
 )
-from autointent.utils import load_search_space
-from tests.conftest import setup_environment
+from tests.conftest import get_search_space, setup_environment
 
 TaskType = Literal["multiclass", "multilabel", "description"]
-
-
-def get_search_space_path(task_type: TaskType):
-    return ires.files("tests.assets.configs").joinpath(f"{task_type}.yaml")
-
-
-def get_search_space(task_type: TaskType):
-    path = get_search_space_path(task_type)
-    return load_search_space(path)
 
 
 @pytest.mark.parametrize(

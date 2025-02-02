@@ -9,31 +9,31 @@ This script demonstrates how to report the optimization process using the AutoIn
 search_space = [
     {
         "node_type": "embedding",
-        "metric": "retrieval_hit_rate",
+        "target_metric": "retrieval_hit_rate",
         "search_space": [
             {
                 "module_name": "retrieval",
                 "k": [10],
-                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "infgrad/stella-base-en-v2"],
+                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "sergeyzh/rubert-tiny-turbo"],
             }
         ],
     },
     {
         "node_type": "scoring",
-        "metric": "scoring_roc_auc",
+        "target_metric": "scoring_roc_auc",
         "search_space": [
             {"module_name": "knn", "k": [1, 3, 5, 10], "weights": ["uniform", "distance", "closest"]},
             {"module_name": "linear"},
             {
                 "module_name": "dnnc",
-                "cross_encoder_name": ["BAAI/bge-reranker-base", "cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
                 "k": [1, 3, 5, 10],
             },
         ],
     },
     {
         "node_type": "decision",
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
     },
 ]

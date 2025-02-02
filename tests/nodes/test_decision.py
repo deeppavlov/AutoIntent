@@ -15,7 +15,7 @@ def test_decision_multiclass(scoring_optimizer_multiclass):
     scoring_optimizer_multiclass.fit(context)
 
     decision_optimizer_config = {
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "node_type": "decision",
         "search_space": [
             {"module_name": "threshold", "thresh": [0.5]},
@@ -54,7 +54,7 @@ def test_decision_multilabel(scoring_optimizer_multilabel):
     scoring_optimizer_multilabel.fit(context)
 
     decision_optimizer_config = {
-        "metric": "decision_accuracy",
+        "target_metric": "decision_accuracy",
         "node_type": "decision",
         "search_space": [
             {"module_name": "threshold", "thresh": [0.5]},

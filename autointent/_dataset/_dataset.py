@@ -100,13 +100,14 @@ class Dataset(dict[str, HFDataset]):
         :param repo_id: ID of the Hugging Face repository.
         :return: Initialized Dataset object.
         """
-        splits, intents = load_dataset(repo_id), []
+        from ._reader import DictReader
+
+        splits = load_dataset(repo_id)
+        mapping = dict(**splits)
         if Split.INTENTS in get_dataset_config_names(repo_id):
-            intents = load_dataset(repo_id, Split.INTENTS)[Split.INTENTS].to_list()
-        return cls(
-            splits.items(),
-            intents=[Intent.model_validate(intent) for intent in intents],
-        )
+            mapping["intents"] = load_dataset(repo_id, Split.INTENTS)[Split.INTENTS].to_list()
+
+        return DictReader().read(mapping)
 
     def to_multilabel(self) -> "Dataset":
         """

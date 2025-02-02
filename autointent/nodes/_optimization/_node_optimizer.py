@@ -19,7 +19,13 @@ from autointent.nodes._nodes_info import NODES_INFO
 class NodeOptimizer:
     """Node optimizer class."""
 
-    def __init__(self, node_type: NodeType, search_space: list[dict[str, Any]], metric: str) -> None:
+    def __init__(
+        self,
+        node_type: NodeType,
+        search_space: list[dict[str, Any]],
+        target_metric: str,
+        metrics: list[str] | None = None,
+    ) -> None:
         """
         Initialize the node optimizer.
 
@@ -29,7 +35,12 @@ class NodeOptimizer:
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
-        self.metric_name = metric
+        self.target_metric = target_metric
+
+        self.metrics = metrics if metrics is not None else []
+        if self.target_metric not in self.metrics:
+            self.metrics.append(self.target_metric)
+
         self.modules_search_spaces = search_space  # TODO search space validation
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
@@ -61,14 +72,10 @@ class NodeOptimizer:
                 self.module_fit(module, context)
 
                 self._logger.debug("scoring %s module...", module_name)
-                metrics = module.score(context, "validation")
-                metric_value = metrics[self.metric_name]
+                metrics_score = module.score(context, "validation", self.metrics)
+                metric_value = metrics_score[self.target_metric]
 
-                # some metrics can produce error. When main metric produces error raise it.
-                if isinstance(metric_value, str):
-                    raise Exception(metric_value)  # noqa: TRY004, TRY002
-
-                context.callback_handler.log_metrics(metrics)
+                context.callback_handler.log_metrics(metrics_score)
                 context.callback_handler.end_module()
 
                 dump_dir = context.get_dump_dir()
@@ -84,7 +91,7 @@ class NodeOptimizer:
                     module_name,
                     module_kwargs,
                     metric_value,
-                    self.metric_name,
+                    self.target_metric,
                     module.get_assets(),  # retriever name / scores / predictions
                     module_dump_dir,
                     module=module if not context.is_ram_to_clear() else None,

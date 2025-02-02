@@ -6,7 +6,18 @@ from ._embedder import Embedder
 from ._vector_index import VectorIndex
 from ._dataset import Dataset
 from ._hash import Hasher
-from .context import Context
+from .context import Context, load_dataset
 from ._pipeline import Pipeline
 
-__all__ = ["Context", "Dataset", "Embedder", "Hasher", "Pipeline", "Ranker", "VectorIndex", "setup_logging"]
+
+__all__ = [
+    "Context",
+    "Dataset",
+    "Embedder",
+    "Hasher",
+    "Pipeline",
+    "Ranker",
+    "VectorIndex",
+    "load_dataset",
+    "setup_logging",
+]

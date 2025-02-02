@@ -13,6 +13,7 @@ from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNode
 from autointent.custom_types import ListOfGenericLabels, NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
+from autointent.nodes.schemes import OptimizationConfig
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
@@ -72,10 +73,12 @@ class Pipeline:
         Create pipeline optimizer from dictionary search space.
 
         :param search_space: Dictionary config
+        :param seed: random seed
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
-        nodes = [NodeOptimizer(**node) for node in search_space]
+        validated_search_space = OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
+        nodes = [NodeOptimizer(**node) for node in validated_search_space]
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
@@ -84,6 +87,9 @@ class Pipeline:
         Create pipeline optimizer with default search space for given classification task.
 
         :param multilabel: Whether the task multi-label, or single-label.
+        :param seed: random seed
+
+        :return: Pipeline
         """
         return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 

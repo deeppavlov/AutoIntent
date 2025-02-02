@@ -1,22 +1,20 @@
-"""RetrievalEmbedding class for managing and interacting with a vector database for retrieval tasks."""
+"""RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
-from pathlib import Path
 from typing import Literal
 
-from autointent import VectorIndex
-from autointent.context import Context
+from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 
 
-class RetrievalEmbedding(EmbeddingModule):
+class RetrievalAimedEmbedding(EmbeddingModule):
     r"""
-    Module for managing retrieval operations using a vector database.
+    Module for configuring embeddings optimized for retrieval tasks.
 
-    RetrievalEmbedding provides methods for indexing, querying, and managing a vector database for tasks
-    such as nearest neighbor retrieval.
+    The main purpose of this module is to be used at embedding node for optimizing
+    embedding configuration using its retrieval quality as a sort of proxy metric.
 
     :ivar vector_index: The vector index used for nearest neighbor retrieval.
     :ivar name: Name of the module, defaults to "retrieval".
@@ -26,25 +24,22 @@ class RetrievalEmbedding(EmbeddingModule):
 
     .. testcode::
 
-        from autointent.modules.embedding import RetrievalEmbedding
+        from autointent.modules.embedding import RetrievalAimedEmbedding
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
-        retrieval = RetrievalEmbedding(
+        retrieval = RetrievalAimedEmbedding(
             k=2,
             embedder_name="sergeyzh/rubert-tiny-turbo",
         )
         retrieval.fit(utterances, labels)
-        predictions = retrieval.predict(["how is the weather today?"])
-        print(predictions)
-
-    .. testoutput::
-
-        ([[1, 1]], [[0.1525942087173462, 0.18616724014282227]], [['good morning', 'how are you?']])
 
     """
 
     _vector_index: VectorIndex
     name = "retrieval"
+    supports_multiclass = True
+    supports_multilabel = True
+    supports_oos = False
 
     def __init__(
         self,
@@ -56,7 +51,7 @@ class RetrievalEmbedding(EmbeddingModule):
         embedder_use_cache: bool = True,
     ) -> None:
         """
-        Initialize the RetrievalEmbedding.
+        Initialize the RetrievalAimedEmbedding.
 
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder used for creating embeddings.
@@ -65,13 +60,12 @@ class RetrievalEmbedding(EmbeddingModule):
         :param max_length: Maximum sequence length for embeddings. None if not set.
         :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
+        self.k = k
         self.embedder_name = embedder_name
         self.embedder_device = embedder_device
         self.embedder_batch_size = embedder_batch_size
         self.embedder_max_length = embedder_max_length
         self.embedder_use_cache = embedder_use_cache
-
-        super().__init__(k=k)
 
     @classmethod
     def from_context(
@@ -79,14 +73,14 @@ class RetrievalEmbedding(EmbeddingModule):
         context: Context,
         k: int,
         embedder_name: str,
-    ) -> "RetrievalEmbedding":
+    ) -> "RetrievalAimedEmbedding":
         """
-        Create a RetrievalEmbedding instance using a Context object.
+        Create an instance using a Context object.
 
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
         :param embedder_name: Name of the embedder to use.
-        :return: Initialized RetrievalEmbedding instance.
+        :return: Initialized RetrievalAimedEmbedding instance.
         """
         return cls(
             k=k,
@@ -104,6 +98,8 @@ class RetrievalEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        self._validate_task(labels)
+
         self._vector_index = VectorIndex(
             self.embedder_name,
             self.embedder_device,
@@ -113,11 +109,7 @@ class RetrievalEmbedding(EmbeddingModule):
         )
         self._vector_index.add(utterances, labels)
 
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 
@@ -137,7 +129,8 @@ class RetrievalEmbedding(EmbeddingModule):
         predictions, _, _ = self._vector_index.query(utterances, self.k)
 
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
-        return self.score_metrics((labels, predictions), metrics_dict)
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+        return self.score_metrics((labels, predictions), chosen_metrics)
 
     def get_assets(self) -> RetrieverArtifact:
         """
@@ -150,22 +143,6 @@ class RetrievalEmbedding(EmbeddingModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
-
-    def dump(self, path: str) -> None:
-        """
-        Save the module's metadata and vector index to a specified directory.
-
-        :param path: Path to the directory where assets will be dumped.
-        """
-        self._vector_index.dump(Path(path))
-
-    def load(self, path: str) -> None:
-        """
-        Load the module's metadata and vector index from a specified directory.
-
-        :param path: Path to the directory containing the dumped assets.
-        """
-        self._vector_index = VectorIndex.load(Path(path))
 
     def predict(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         """

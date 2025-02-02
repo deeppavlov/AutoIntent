@@ -34,11 +34,7 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
@@ -110,7 +106,7 @@ class Module(ABC):
         return None
 
     @staticmethod
-    def score_metrics(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float | str]:
+    def score_metrics(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:
         """
         Score metrics on the test set.
 
@@ -133,7 +129,7 @@ class Module(ABC):
             logger.error(msg)
             raise WrongClassificationError(msg)
 
-    def _validate_oos(self, data_contains_oos: bool) -> None:
+    def _validate_oos(self, data_contains_oos: bool, raise_error: bool = True) -> None:
         if data_contains_oos != self.supports_oos:
             if self.supports_oos and not data_contains_oos:
                 msg = (
@@ -143,9 +139,17 @@ class Module(ABC):
             elif not self.supports_oos and data_contains_oos:
                 msg = (
                     f'"{self.name}" is NOT designed to handle OOS samples, but your data '
-                    "contain it. So, using this method reduces the power of classification."
+                    "contains it. So, using this method reduces the power of classification."
                 )
+            if raise_error:
+                logger.error(msg)
+                raise ValueError(msg)
             logger.warning(msg)
+
+    def _validate_task(self, labels: ListOfGenericLabels) -> None:
+        self._n_classes, self._multilabel, self._oos = self._get_task_specs(labels)
+        self._validate_multilabel(self._multilabel)
+        self._validate_oos(self._oos)
 
     @staticmethod
     def _get_task_specs(labels: ListOfGenericLabels) -> tuple[int, bool, bool]:
