@@ -66,11 +66,8 @@ class NodeOptimizer:
                 if embedder_name is not None:
                     module_kwargs["embedder_name"] = embedder_name
 
-                self._logger.debug("optimizing %s module...", module_name)
-                self.module_fit(module, context)
-
                 self._logger.debug("scoring %s module...", module_name)
-                metrics_score = module.score(context, "validation", self.metrics)
+                metrics_score = module.score(context, test=False, metrics=self.metrics)
                 metric_value = metrics_score[self.target_metric]
 
                 context.callback_handler.log_metrics(metrics_score)

@@ -3,7 +3,7 @@
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import numpy.typing as npt
 
@@ -34,7 +34,7 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
+    def score(self, context: Context, test: bool, metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 

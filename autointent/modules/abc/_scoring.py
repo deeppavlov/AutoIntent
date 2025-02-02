@@ -41,11 +41,15 @@ class ScoringModule(Module, ABC):
             return self.score_metrics((labels, scores), chosen_metrics)
 
         metrics_values = {name: [] for name in chosen_metrics}
+        all_val_scores = []
         for train_utterances, train_labels, val_utterances, val_labels in context.data_handler.validation_iterator(0):
             self.fit(train_utterances, train_labels)
             val_scores = self.predict(val_utterances)
             for name, fn in chosen_metrics.items():
                 metrics_values[name].append(fn(val_labels, val_scores))
+            all_val_scores.append(val_scores)
+
+        self._validation_scores = np.concat(all_val_scores, axis=0)
 
         return {name: np.mean(values_list) for name, values_list in metrics_values.items()}
 
