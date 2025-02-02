@@ -25,7 +25,8 @@ class UtteranceGenerator:
     def __init__(self,
                  generator: Generator,
                  prompt_maker: Callable[[Intent, int], list[Message]],
-                 async_mode: bool = False) -> None:
+                 async_mode: bool = False
+        ) -> None:
         """Initialize."""
         self.generator = generator
         self.prompt_maker = prompt_maker
