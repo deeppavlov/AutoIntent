@@ -67,7 +67,7 @@ You can optimize RAM usage by saving all modules to file system. Just set the fo
 # %%
 from autointent.configs import LoggingConfig
 
-logging_config = LoggingConfig(dump_modules=True, clear_ram=True)
+logging_config = LoggingConfig(keep_in_ram=False)
 
 # %% [markdown]
 """
@@ -82,7 +82,7 @@ from autointent.configs import LoggingConfig, VectorIndexConfig
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 pipeline = Pipeline.from_search_space(search_space)
-pipeline.set_config(LoggingConfig(dump_modules=True, clear_ram=True))
+pipeline.set_config(LoggingConfig(keep_in_ram=False))
 pipeline.set_config(VectorIndexConfig(save_db=True))
 
 # %% [markdown]

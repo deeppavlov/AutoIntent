@@ -208,7 +208,7 @@ class Context:
 
         :return: Path to the dump directory or None if dumping is disabled.
         """
-        if self.logging_config.dump_modules:
+        if not self.logging_config.keep_in_ram:
             return self.logging_config.dump_dir
         return None
 
@@ -234,7 +234,7 @@ class Context:
 
         :return: True if RAM clearing is enabled, False otherwise.
         """
-        return self.logging_config.clear_ram
+        return not self.logging_config.keep_in_ram
 
     def has_saved_modules(self) -> bool:
         """

@@ -28,10 +28,8 @@ class LoggingConfig(BaseModel):
     """Path to the directory with different runs."""
     run_name: str = Field(default_factory=get_run_name)
     """Name of the run. If None, a random name will be generated"""
-    dump_modules: bool = False
-    """Whether to dump the modules or not"""
-    clear_ram: bool = False
-    """Whether to clear the RAM after dumping the modules"""
+    keep_in_ram: bool = True
+    """Whether to store modules in RAM or dump them into file system."""
     report_to: list[str] | None = None
     """List of callbacks to report to. If None, no callbacks will be used"""
 

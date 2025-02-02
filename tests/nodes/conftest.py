@@ -82,7 +82,7 @@ def get_context(multilabel):
     if multilabel:
         dataset = dataset.to_multilabel()
     res.set_dataset(dataset)
-    res.configure_logging(LoggingConfig(project_dir=project_dir, dump_modules=True))
+    res.configure_logging(LoggingConfig(project_dir=project_dir, keep_in_ram=False))
     res.configure_vector_index(VectorIndexConfig(), EmbedderConfig(device="cpu"))
     res.configure_cross_encoder(CrossEncoderConfig())
     return res

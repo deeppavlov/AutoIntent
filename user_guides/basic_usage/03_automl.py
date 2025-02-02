@@ -124,7 +124,7 @@ The important thing is what assets you want to save during the pipeline auto-con
 from pathlib import Path
 from autointent.configs import LoggingConfig
 
-logging_config = LoggingConfig(project_dir=Path.cwd() / "runs", dump_modules=False, clear_ram=False)
+logging_config = LoggingConfig(project_dir=Path.cwd() / "runs", keep_in_ram=True)
 custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
