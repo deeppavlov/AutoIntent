@@ -40,7 +40,7 @@ class DecisionModule(Module, ABC):
         :param scores: Scores to predict
         """
 
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
@@ -48,7 +48,20 @@ class DecisionModule(Module, ABC):
         :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        labels, scores = get_decision_evaluation_data(context, split)
+        labels, scores = get_decision_evaluation_data(context, "validation")
+        self._decisions = self.predict(scores)
+        chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
+        return self.score_metrics((labels, self._decisions), chosen_metrics)
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """
+        Calculate metric on test set and return metric value.
+
+        :param context: Context to score
+        :param split: Target split
+        :return: Computed metrics value for the test set or error code of metrics
+        """
+        labels, scores = get_decision_evaluation_data(context, "validation")
         self._decisions = self.predict(scores)
         chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
         return self.score_metrics((labels, self._decisions), chosen_metrics)
@@ -79,7 +92,7 @@ class DecisionModule(Module, ABC):
 
 def get_decision_evaluation_data(
     context: Context,
-    split: Literal["train", "validation", "test"],
+    split: Literal["train", "validation", "test"], # TODO add index to handle both ho and cv
 ) -> tuple[ListOfGenericLabels, npt.NDArray[np.float64]]:
     """
     Get decision evaluation data.

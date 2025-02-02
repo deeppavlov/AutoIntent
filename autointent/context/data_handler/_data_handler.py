@@ -1,6 +1,7 @@
 """Data Handler file."""
 
 import logging
+from collections.abc import Generator
 from pathlib import Path
 from typing import Literal, TypedDict, cast
 
@@ -30,7 +31,12 @@ class DataHandler:  # TODO rename to Validator
     """Data handler class."""
 
     def __init__(
-        self, dataset: Dataset, scheme: Literal["cv", "ho"], split_train: bool = True, random_seed: int = 0
+        self,
+        dataset: Dataset,
+        scheme: Literal["cv", "ho"],
+        split_train: bool = True,
+        random_seed: int = 0,
+        n_folds: int = 3,
     ) -> None:
         """
         Initialize the data handler.
@@ -46,6 +52,7 @@ class DataHandler:  # TODO rename to Validator
 
         self.n_classes = self.dataset.n_classes
         self.scheme = scheme
+        self.n_folds = n_folds
 
         if scheme == "ho":
             self._split_ho(random_seed, split_train)
@@ -159,19 +166,18 @@ class DataHandler:  # TODO rename to Validator
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def validation_iterator(self, idx: int | None = None) -> list[tuple[list, list, list, list]]:
+    def validation_iterator(self) -> Generator[tuple[list, list, list, list]]:
         if self.scheme == "ho":
-            return [
-                (
-                    self.train_utterances(idx),
-                    self.train_labels(idx),
-                    self.validation_utterances(idx),
-                    self.validation_labels(idx),
-                )
-            ]
+            msg = "Cannot call cross-validation on hold-out DataHandler"
+            raise RuntimeError(msg)
 
-        if self.scheme == "cv":
-            raise NotImplementedError
+        for j in range(self.n_folds):
+            val_utterances = self.train_utterances(j)
+            val_labels = self.train_labels(j)
+            train_folds = [i for i in range(self.n_folds) if i != j]
+            train_utterances = [ut for i_fold in train_folds for ut in self.train_utterances(i_fold)]
+            train_labels = [ut for i_fold in train_folds for ut in self.train_labels(i_fold)]
+            yield train_utterances, train_labels, val_utterances, val_labels
 
         msg = "something's wrong"
         raise RuntimeError(msg)
