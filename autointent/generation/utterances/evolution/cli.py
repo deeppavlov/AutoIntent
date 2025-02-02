@@ -53,6 +53,7 @@ def main() -> None:
     parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
     parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
     parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
+    parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     parser.add_argument("--seed", type=int, default=0)
 
     args = parser.parse_args()
@@ -80,7 +81,7 @@ def main() -> None:
     dataset = load_dataset(args.input_path)
     n_before = len(dataset[args.split])
 
-    generator = UtteranceEvolver(Generator(), evolutions, args.seed)
+    generator = UtteranceEvolver(Generator(), evolutions, args.seed, async_mode=args.async_mode)
     new_samples = generator.augment(dataset, split_name=args.split, n_evolutions=args.n_evolutions)
     n_after = len(dataset[args.split])
 
