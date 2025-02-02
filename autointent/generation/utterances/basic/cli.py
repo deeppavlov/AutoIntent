@@ -13,7 +13,7 @@ logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 
-def main() -> None:
+async def main() -> None:
     """CLI endpoint."""
     parser = ArgumentParser()
     parser.add_argument(

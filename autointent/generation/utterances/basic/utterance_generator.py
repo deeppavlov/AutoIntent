@@ -1,5 +1,4 @@
 """Basic generation of new utterances from existing ones."""
-
 import asyncio
 from collections.abc import Callable
 
@@ -34,10 +33,6 @@ class UtteranceGenerator:
 
     def __call__(self, intent_data: Intent, n_generations: int) -> list[str]:
         """Generate new utterances."""
-        if self.async_mode:
-            if asyncio.get_event_loop().is_running():
-                return asyncio.create_task(self._call_async(intent_data, n_generations))
-            return asyncio.run(self._call_async(intent_data, n_generations))
         messages = self.prompt_maker(intent_data, n_generations)
         response_text = self.generator.get_chat_completion(messages)
         return _extract_utterances(response_text)

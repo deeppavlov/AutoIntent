@@ -107,8 +107,7 @@ class UtteranceEvolver:
 
         for i, generated_utterances in enumerate(results):
             intent_data = next(intent for intent in dataset.intents if intent.id == original_split[i][
-                Dataset.label_feature
-            ])
+                Dataset.label_feature])
             new_samples.extend(
                 [{Dataset.label_feature: intent_data.id, Dataset.utterance_feature: ut} for ut in generated_utterances]
             )
