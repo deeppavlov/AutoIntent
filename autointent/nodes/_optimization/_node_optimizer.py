@@ -107,10 +107,10 @@ class NodeOptimizer:
         self._logger.info("%s node optimization is finished! saving best assets", self.node_info.node_type)
         # TODO refactor the following code (via implementing `autointent.load_module(path)` utility)
         trial_idx = context.optimization_info.get_best_trial_idx(self.node_type)
-        trial = context.optimization_info.trials.get_trial(self.node_type, trial_idx)
-        module_type, module_kwargs = scored_modules[trial_idx]
+        trial = context.optimization_info.trials.get_trial(self.node_type, trial_idx)  # type: ignore[arg-type]
+        module_type, module_kwargs = scored_modules[trial_idx]  # type: ignore[index]
         best_module: Module = module_type(**module_kwargs)
-        best_module.load(trial.module_dump_dir)
+        best_module.load(trial.module_dump_dir)  # type: ignore[arg-type]
         context.optimization_info.artifacts.add_artifact(self.node_type, best_module.get_artifact(context))
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
