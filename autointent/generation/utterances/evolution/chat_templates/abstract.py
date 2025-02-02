@@ -28,9 +28,9 @@ class AbstractEvolution(EvolutionChatTemplate):
         ),
         Message(role=Role.ASSISTANT, content="Please, reserve a table for me."),
         Message(
-            role=Role.ASSISTANT,
+            role=Role.USER,
             content=(
-                "Intent name: requesting technical support"
+                "Intent name: requesting technical support\n"
                 "Utterance: My Lenovo laptop is constantly rebooting and overheating."
             ),
         ),
