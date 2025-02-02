@@ -11,9 +11,9 @@ __all__ = [
     "AbstractEvolution",
     "ConcreteEvolution",
     "EvolutionChatTemplate",
-    "ReasoningEvolution",
     "FormalEvolution",
     "FunnyEvolution",
     "GoofyEvolution",
     "InformalEvolution",
+    "ReasoningEvolution",
 ]
