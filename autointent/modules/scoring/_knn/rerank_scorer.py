@@ -30,6 +30,7 @@ class RerankScorer(KNNScorer):
         embedder_name: str,
         k: int,
         weights: WEIGHT_TYPES,
+        use_crosencoder_scores: bool = False,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
         embedder_device: str = "cpu",
@@ -50,6 +51,7 @@ class RerankScorer(KNNScorer):
             - "uniform" (or False): Equal weight for all neighbors.
             - "distance" (or True): Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
+        :param use_crosencoder_scores: use crosencoder scores for the output probability vector computation
         :param cross_encoder_name: Name of the cross-encoder model used for re-ranking.
         :param m: Number of top-ranked neighbors to consider, or None to use k.
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
@@ -75,6 +77,7 @@ class RerankScorer(KNNScorer):
 
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff
+        self.use_crosencoder_scores = use_crosencoder_scores
 
     @classmethod
     def from_context(
@@ -87,6 +90,7 @@ class RerankScorer(KNNScorer):
         embedder_name: str | None = None,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
+        use_crosencoder_scores: bool = False,
     ) -> "RerankScorer":
         """
         Create a RerankScorer instance from a given context.
@@ -98,6 +102,7 @@ class RerankScorer(KNNScorer):
         :param embedder_name: Name of the embedder used for vectorization, or None to use the best existing embedder.
         :param m: Number of top-ranked neighbors to consider, or None to use k.
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
+        :param use_crosencoder_scores: use crosencoder scores for the output probability vector computation
         :return: An instance of RerankScorer.
         """
         if embedder_name is None:
@@ -107,6 +112,7 @@ class RerankScorer(KNNScorer):
             k=k,
             weights=weights,
             m=m,
+            use_crosencoder_scores=use_crosencoder_scores,
             rank_threshold_cutoff=rank_threshold_cutoff,
             train_head=train_head,
             embedder_name=embedder_name,
@@ -156,10 +162,14 @@ class RerankScorer(KNNScorer):
         ):
             cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
-            for dst, src in zip(
-                [labels, distances, neighbours], [query_labels, query_distances, query_docs], strict=True
-            ):
+            for dst, src in zip([labels, neighbours], [query_labels, query_docs], strict=True):
                 dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
 
+            if self.use_crosencoder_scores:
+                distances.append([rank["score"] for rank in cur_ranks])
+            else:
+                distances.append([query_distances[rank["corpus_id"]] for rank in cur_ranks])
+
         scores = self._count_scores(np.array(labels), np.array(distances))
+
         return scores, neighbours
