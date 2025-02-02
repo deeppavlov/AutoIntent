@@ -1,7 +1,5 @@
 from unittest.mock import AsyncMock, Mock
 
-import pytest
-
 from autointent.generation.utterances import SynthesizerChatTemplate, UtteranceGenerator
 
 
@@ -52,23 +50,6 @@ def test_on_dataset(dataset):
 
     assert n_before + len(new_samples) == n_after
     assert len(new_samples) == len(dataset.intents)
-
-@pytest.mark.asyncio
-async def test_default_chat_template_async(dataset):
-    template = SynthesizerChatTemplate(dataset, split="train_0")
-    prompt = template(dataset.intents[0], n_examples=1)
-    for msg in prompt:
-        assert not has_unfilled_fields(msg["content"])
-    assert "extra_instructions" not in prompt
-
-
-@pytest.mark.asyncio
-async def test_extra_instructions_async(dataset):
-    template = SynthesizerChatTemplate(dataset, split="train_0", extra_instructions="football")
-    prompt = template(dataset.intents[0], n_examples=1)[0]["content"]
-    assert "extra_instructions" not in prompt
-    assert "football" in prompt
-
 
 def test_on_dataset_async(dataset):
     mock_llm = AsyncMock()
