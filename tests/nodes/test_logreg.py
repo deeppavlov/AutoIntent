@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def test_embedding_multiclass():
     context = get_context(multilabel=False)
-    embedding_optimizer = get_embedding_optimizer(multilabel=False)
+    embedding_optimizer, metric = get_embedding_optimizer(multilabel=False)
     embedding_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.embedding:
@@ -24,7 +24,7 @@ def test_embedding_multiclass():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        scores = node.module.score(context, "validation")
+        scores = node.module.score(context, "validation", [metric])
         assert isinstance(scores, dict)
         node.module.clear_cache()
         gc.collect()
@@ -33,7 +33,7 @@ def test_embedding_multiclass():
 
 def test_embedding_multilabel():
     context = get_context(multilabel=True)
-    embedding_optimizer = get_embedding_optimizer(multilabel=True)
+    embedding_optimizer, metric = get_embedding_optimizer(multilabel=True)
     embedding_optimizer.fit(context)
 
     for trial in context.optimization_info.trials.embedding:
@@ -44,7 +44,7 @@ def test_embedding_multilabel():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        scores = node.module.score(context, "validation")
+        scores = node.module.score(context, "validation", [metric])
         assert isinstance(scores, dict)
         node.module.clear_cache()
         gc.collect()
@@ -56,7 +56,7 @@ def get_embedding_optimizer(multilabel: bool):
     if multilabel:
         metric = "scoring_neg_coverage"
     embedding_optimizer_config = {
-        "metric": metric,
+        "target_metric": metric,
         "node_type": "embedding",
         "search_space": [
             {
@@ -65,9 +65,9 @@ def get_embedding_optimizer(multilabel: bool):
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],
-                "module_name": "logreg",
+                "module_name": "logreg_embedding",
             },
         ],
     }
 
-    return NodeOptimizer(**embedding_optimizer_config)
+    return NodeOptimizer(**embedding_optimizer_config), metric

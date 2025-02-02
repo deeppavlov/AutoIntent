@@ -1,15 +1,16 @@
 """CLI for evolutionary augmenter."""
 
+import logging
 from argparse import ArgumentParser
-from typing import get_args
 
 from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
-from .evolver import EvolutionType
+from .chat_templates import AbstractEvolution, ConcreteEvolution, EvolutionChatTemplate, ReasoningEvolution
 
-EVOLUTION_TYPES: list[EvolutionType] = list(get_args(EvolutionType))
+logging.basicConfig(level="INFO")
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -21,6 +22,7 @@ def main() -> None:
         required=True,
         help="Path to json or hugging face repo with dataset",
     )
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument(
         "--output-path",
         type=str,
@@ -35,17 +37,30 @@ def main() -> None:
     )
     parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument("--n-evolutions", type=int, default=1, help="Number of utterances to generate for each intent")
+    parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
+    parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
+    parser.add_argument("--abstract", action="store_true", help="Whether to use `Abstract` evolution")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument(
-        "--evolutions", nargs="+", choices=EVOLUTION_TYPES, required=True, help="Evolution types to apply."
-    )
     args = parser.parse_args()
 
-    evolutions: list[EvolutionType] = args.evolutions
+    evolutions: list[EvolutionChatTemplate] = []
+    if args.reasoning:
+        evolutions.append(ReasoningEvolution())
+    if args.concretizing:
+        evolutions.append(ConcreteEvolution())
+    if args.abstract:
+        evolutions.append(AbstractEvolution())
+
     dataset = load_dataset(args.input_path)
+    n_before = len(dataset[args.split])
 
     generator = UtteranceEvolver(Generator(), evolutions, args.seed)
-    generator.augment(dataset, n_evolutions=args.n_evolutions)
+    new_samples = generator.augment(dataset, split_name=args.split, n_evolutions=args.n_evolutions)
+    n_after = len(dataset[args.split])
+
+    logger.info("# samples before %s", n_before)
+    logger.info("# samples generated %s", len(new_samples))
+    logger.info("# samples after %s", n_after)
 
     dataset.to_json(args.output_path)
 

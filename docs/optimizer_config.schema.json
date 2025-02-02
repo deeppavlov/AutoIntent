@@ -1,0 +1,957 @@
+{
+    "$defs": {
+        "AdaptiveDecisionInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "adaptive",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "search_space": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "number"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "AdaptiveDecisionInitModel",
+            "type": "object"
+        },
+        "ArgmaxDecisionInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "argmax",
+                    "title": "Module Name",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "ArgmaxDecisionInitModel",
+            "type": "object"
+        },
+        "DNNCScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "dnnc",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "cross_encoder_name": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Cross Encoder Name",
+                    "type": "array"
+                },
+                "k": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "K",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                },
+                "train_head": {
+                    "default": [
+                        false
+                    ],
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "Train Head",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "cross_encoder_name",
+                "k"
+            ],
+            "title": "DNNCScorerInitModel",
+            "type": "object"
+        },
+        "DecisionNodeValidator": {
+            "description": "Search space configuration for the Decision node.",
+            "properties": {
+                "node_type": {
+                    "$ref": "#/$defs/NodeType",
+                    "default": "decision"
+                },
+                "target_metric": {
+                    "enum": [
+                        "decision_accuracy",
+                        "decision_f1",
+                        "decision_precision",
+                        "decision_recall",
+                        "decision_roc_auc"
+                    ],
+                    "title": "Target Metric",
+                    "type": "string"
+                },
+                "metrics": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "decision_accuracy",
+                                    "decision_f1",
+                                    "decision_precision",
+                                    "decision_recall",
+                                    "decision_roc_auc"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Metrics"
+                },
+                "search_space": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/ArgmaxDecisionInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/JinoosDecisionInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/ThresholdDecisionInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/TunableDecisionInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/AdaptiveDecisionInitModel"
+                            }
+                        ]
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "target_metric",
+                "search_space"
+            ],
+            "title": "DecisionNodeValidator",
+            "type": "object"
+        },
+        "DescriptionScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "description",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "temperature": {
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "Temperature",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "temperature"
+            ],
+            "title": "DescriptionScorerInitModel",
+            "type": "object"
+        },
+        "EmbeddingNodeValidator": {
+            "description": "Search space configuration for the Embedding node.",
+            "properties": {
+                "node_type": {
+                    "$ref": "#/$defs/NodeType",
+                    "default": "embedding"
+                },
+                "target_metric": {
+                    "enum": [
+                        "retrieval_hit_rate",
+                        "retrieval_map",
+                        "retrieval_mrr",
+                        "retrieval_ndcg",
+                        "retrieval_precision",
+                        "retrieval_hit_rate_intersecting",
+                        "retrieval_hit_rate_macro",
+                        "retrieval_map_intersecting",
+                        "retrieval_map_macro",
+                        "retrieval_mrr_intersecting",
+                        "retrieval_mrr_macro",
+                        "retrieval_ndcg_intersecting",
+                        "retrieval_ndcg_macro",
+                        "retrieval_precision_intersecting",
+                        "retrieval_precision_macro",
+                        "scoring_accuracy",
+                        "scoring_f1",
+                        "scoring_log_likelihood",
+                        "scoring_precision",
+                        "scoring_recall",
+                        "scoring_roc_auc",
+                        "scoring_hit_rate",
+                        "scoring_map",
+                        "scoring_neg_coverage",
+                        "scoring_neg_ranking_loss"
+                    ],
+                    "title": "Target Metric",
+                    "type": "string"
+                },
+                "metrics": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "retrieval_hit_rate",
+                                    "retrieval_map",
+                                    "retrieval_mrr",
+                                    "retrieval_ndcg",
+                                    "retrieval_precision",
+                                    "retrieval_hit_rate_intersecting",
+                                    "retrieval_hit_rate_macro",
+                                    "retrieval_map_intersecting",
+                                    "retrieval_map_macro",
+                                    "retrieval_mrr_intersecting",
+                                    "retrieval_mrr_macro",
+                                    "retrieval_ndcg_intersecting",
+                                    "retrieval_ndcg_macro",
+                                    "retrieval_precision_intersecting",
+                                    "retrieval_precision_macro",
+                                    "scoring_accuracy",
+                                    "scoring_f1",
+                                    "scoring_log_likelihood",
+                                    "scoring_precision",
+                                    "scoring_recall",
+                                    "scoring_roc_auc",
+                                    "scoring_hit_rate",
+                                    "scoring_map",
+                                    "scoring_neg_coverage",
+                                    "scoring_neg_ranking_loss"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Metrics"
+                },
+                "search_space": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/RetrievalAimedEmbeddingInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/LogregAimedEmbeddingInitModel"
+                            }
+                        ]
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "target_metric",
+                "search_space"
+            ],
+            "title": "EmbeddingNodeValidator",
+            "type": "object"
+        },
+        "JinoosDecisionInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "jinoos",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "search_space": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "type": "number"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "JinoosDecisionInitModel",
+            "type": "object"
+        },
+        "KNNScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "knn",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "k": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "K",
+                    "type": "array"
+                },
+                "weights": {
+                    "items": {
+                        "enum": [
+                            "uniform",
+                            "distance",
+                            "closest"
+                        ],
+                        "type": "string"
+                    },
+                    "title": "Weights",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "k",
+                "weights"
+            ],
+            "title": "KNNScorerInitModel",
+            "type": "object"
+        },
+        "LinearScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "linear",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "LinearScorerInitModel",
+            "type": "object"
+        },
+        "LogregAimedEmbeddingInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "logreg_embedding",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "cv": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "Cv",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "cv",
+                "embedder_name"
+            ],
+            "title": "LogregAimedEmbeddingInitModel",
+            "type": "object"
+        },
+        "MLKnnScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "mlknn",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "k": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "K",
+                    "type": "array"
+                },
+                "s": {
+                    "default": [
+                        1.0
+                    ],
+                    "items": {
+                        "type": "number"
+                    },
+                    "title": "S",
+                    "type": "array"
+                },
+                "ignore_first_neighbours": {
+                    "default": [
+                        0
+                    ],
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "Ignore First Neighbours",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "k"
+            ],
+            "title": "MLKnnScorerInitModel",
+            "type": "object"
+        },
+        "NodeType": {
+            "description": "Enumeration of node types in the AutoIntent pipeline.",
+            "enum": [
+                "regexp",
+                "embedding",
+                "scoring",
+                "decision"
+            ],
+            "title": "NodeType",
+            "type": "string"
+        },
+        "RegExpInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "regexp",
+                    "title": "Module Name",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "RegExpInitModel",
+            "type": "object"
+        },
+        "RegexNodeValidator": {
+            "description": "Search space configuration for the Regexp node.",
+            "properties": {
+                "node_type": {
+                    "$ref": "#/$defs/NodeType",
+                    "default": "regexp"
+                },
+                "target_metric": {
+                    "enum": [
+                        "regexp_partial_accuracy",
+                        "regexp_partial_precision"
+                    ],
+                    "title": "Target Metric",
+                    "type": "string"
+                },
+                "metrics": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "regexp_partial_accuracy",
+                                    "regexp_partial_precision"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Metrics"
+                },
+                "search_space": {
+                    "items": {
+                        "$ref": "#/$defs/RegExpInitModel"
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "target_metric",
+                "search_space"
+            ],
+            "title": "RegexNodeValidator",
+            "type": "object"
+        },
+        "RerankScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "rerank",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "k": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "K",
+                    "type": "array"
+                },
+                "weights": {
+                    "items": {
+                        "enum": [
+                            "uniform",
+                            "distance",
+                            "closest"
+                        ],
+                        "type": "string"
+                    },
+                    "title": "Weights",
+                    "type": "array"
+                },
+                "cross_encoder_name": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Cross Encoder Name",
+                    "type": "array"
+                },
+                "train_head": {
+                    "default": [
+                        false
+                    ],
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "title": "Train Head",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                },
+                "m": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "M",
+                    "type": "array"
+                },
+                "rank_threshold_cutoff": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Rank Threshold Cutoff",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "k",
+                "weights",
+                "cross_encoder_name"
+            ],
+            "title": "RerankScorerInitModel",
+            "type": "object"
+        },
+        "RetrievalAimedEmbeddingInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "retrieval",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "k": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "K",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name",
+                "k",
+                "embedder_name"
+            ],
+            "title": "RetrievalAimedEmbeddingInitModel",
+            "type": "object"
+        },
+        "ScoringNodeValidator": {
+            "description": "Search space configuration for the Scoring node.",
+            "properties": {
+                "node_type": {
+                    "$ref": "#/$defs/NodeType",
+                    "default": "scoring"
+                },
+                "target_metric": {
+                    "enum": [
+                        "scoring_accuracy",
+                        "scoring_f1",
+                        "scoring_log_likelihood",
+                        "scoring_precision",
+                        "scoring_recall",
+                        "scoring_roc_auc",
+                        "scoring_hit_rate",
+                        "scoring_map",
+                        "scoring_neg_coverage",
+                        "scoring_neg_ranking_loss"
+                    ],
+                    "title": "Target Metric",
+                    "type": "string"
+                },
+                "metrics": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "scoring_accuracy",
+                                    "scoring_f1",
+                                    "scoring_log_likelihood",
+                                    "scoring_precision",
+                                    "scoring_recall",
+                                    "scoring_roc_auc",
+                                    "scoring_hit_rate",
+                                    "scoring_map",
+                                    "scoring_neg_coverage",
+                                    "scoring_neg_ranking_loss"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Metrics"
+                },
+                "search_space": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/DNNCScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/KNNScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/LinearScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/DescriptionScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/RerankScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/SklearnScorerInitModel"
+                            },
+                            {
+                                "$ref": "#/$defs/MLKnnScorerInitModel"
+                            }
+                        ]
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "target_metric",
+                "search_space"
+            ],
+            "title": "ScoringNodeValidator",
+            "type": "object"
+        },
+        "SklearnScorerInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "sklearn",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "clf_name": {
+                    "default": [
+                        "LogisticRegression"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "Clf Name",
+                    "type": "array"
+                },
+                "clf_args": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Clf Args",
+                    "type": "array"
+                },
+                "embedder_name": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Embedder Name",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "SklearnScorerInitModel",
+            "type": "object"
+        },
+        "ThresholdDecisionInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "threshold",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "thresh": {
+                    "default": [
+                        0.5
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "items": {
+                                    "type": "number"
+                                },
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "title": "Thresh",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "ThresholdDecisionInitModel",
+            "type": "object"
+        },
+        "TunableDecisionInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "tunable",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "n_trials": {
+                    "default": [
+                        320
+                    ],
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "N Trials",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "TunableDecisionInitModel",
+            "type": "object"
+        }
+    },
+    "description": "Optimizer configuration.",
+    "items": {
+        "anyOf": [
+            {
+                "$ref": "#/$defs/RegexNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/EmbeddingNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/ScoringNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/DecisionNodeValidator"
+            }
+        ]
+    },
+    "title": "OptimizationConfig",
+    "type": "array"
+}

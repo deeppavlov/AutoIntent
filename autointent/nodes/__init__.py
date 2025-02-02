@@ -3,6 +3,7 @@
 from ._inference_node import InferenceNode
 from ._nodes_info import DecisionNodeInfo, EmbeddingNodeInfo, NodeInfo, RegExpNodeInfo, ScoringNodeInfo
 from ._optimization import NodeOptimizer
+from .schemes import OptimizationConfig
 
 __all__ = [
     "DecisionNodeInfo",
@@ -10,6 +11,7 @@ __all__ = [
     "InferenceNode",
     "NodeInfo",
     "NodeOptimizer",
+    "OptimizationConfig",
     "RegExpNodeInfo",
     "ScoringNodeInfo",
 ]

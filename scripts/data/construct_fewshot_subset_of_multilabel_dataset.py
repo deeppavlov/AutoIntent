@@ -5,7 +5,7 @@ from collections import defaultdict
 from random import seed, shuffle
 
 
-def main():
+def main() -> None:
     parser = ArgumentParser()
     parser.add_argument("--input-path", type=str, required=True)
     parser.add_argument("--output-path", type=str, required=True)
@@ -30,7 +30,7 @@ def main():
     json.dump(res, open(args.output_path, "w"), indent=4, ensure_ascii=False)
 
 
-def update_counter(counter: defaultdict, labels: list[int]):
+def update_counter(counter: defaultdict, labels: list[int]) -> None:
     for lab in labels:
         counter[lab] += 1
 

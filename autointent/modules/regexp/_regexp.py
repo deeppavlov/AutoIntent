@@ -26,6 +26,8 @@ class RegexPatternsCompiled(TypedDict):
 class RegExp(Module):
     """Regular expressions based intent detection module."""
 
+    name = "regexp"
+
     @classmethod
     def from_context(cls, context: Context) -> "RegExp":
         """Initialize from context."""
@@ -108,11 +110,7 @@ class RegExp(Module):
             matches["partial_matches"].extend(intent_matches["partial_matches"])
         return list(prediction), matches
 
-    def score(
-        self,
-        context: Context,
-        split: Literal["validation", "test"],
-    ) -> dict[str, float | str]:
+    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
@@ -128,7 +126,8 @@ class RegExp(Module):
         if assets["test_matches"] is None:
             msg = "no matches found"
             raise ValueError(msg)
-        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), REGEXP_METRICS)
+        chosen_metrics = {name: fn for name, fn in REGEXP_METRICS.items() if name in metrics}
+        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), chosen_metrics)
 
     def clear_cache(self) -> None:
         """Clear cache."""
