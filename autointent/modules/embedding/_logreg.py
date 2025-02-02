@@ -152,7 +152,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
         return self.score_metrics((labels, probas), chosen_metrics)
 
-    def get_assets(self) -> RetrieverArtifact:
+    def get_artifact(self, context: Context) -> RetrieverArtifact:
         """
         Get the classifier artifacts for this module.
 

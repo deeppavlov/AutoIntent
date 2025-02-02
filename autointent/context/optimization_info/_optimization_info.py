@@ -74,7 +74,6 @@ class OptimizationInfo:
         module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
-        artifact: Artifact,
         module_dump_dir: str | None,
         module: "Module | None" = None,
     ) -> None:
@@ -103,13 +102,11 @@ class OptimizationInfo:
         if module:
             self.modules.add_module(node_type, module)
 
-        self.artifacts.add_artifact(node_type, artifact)
-
     def _get_metrics_values(self, node_type: str) -> list[float]:
         """Retrieve all metric values for a specific node type."""
         return [trial.metric_value for trial in self.trials.get_trials(node_type)]
 
-    def _get_best_trial_idx(self, node_type: str) -> int | None:
+    def get_best_trial_idx(self, node_type: str) -> int | None:
         """
         Retrieve the index of the best trial for a node type.
 
@@ -133,7 +130,7 @@ class OptimizationInfo:
         :return: The best artifact for the node type.
         :raises ValueError: If no best trial exists for the node type.
         """
-        best_idx = self._get_best_trial_idx(node_type)
+        best_idx = self.get_best_trial_idx(node_type)
         if best_idx is None:
             msg = f"No best trial for {node_type}"
             raise ValueError(msg)
@@ -194,7 +191,7 @@ class OptimizationInfo:
 
         :return: List of `InferenceNodeConfig` objects for inference nodes.
         """
-        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NodeType]
+        trial_ids = [self.get_best_trial_idx(node_type) for node_type in NodeType]
         res = []
         for idx, node_type in zip(trial_ids, NodeType, strict=True):
             if idx is None:
@@ -216,7 +213,7 @@ class OptimizationInfo:
         :param node_type: Type of the node.
         :return: The best module, or None if no best trial exists.
         """
-        idx = self._get_best_trial_idx(node_type)
+        idx = self.get_best_trial_idx(node_type)
         if idx is not None:
             return self.modules.get(node_type)[idx]
         return None

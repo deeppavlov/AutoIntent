@@ -133,7 +133,7 @@ class RegExp(Module):
         """Clear cache."""
         del self.regexp_patterns
 
-    def get_assets(self) -> Artifact:
+    def get_artifact(self) -> Artifact:
         """Get assets."""
         return Artifact()
 

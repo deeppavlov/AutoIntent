@@ -1,9 +1,9 @@
 from autointent.modules.embedding import LogregAimedEmbedding
 
 
-def test_get_assets_returns_correct_artifact_for_logreg():
+def test_get_artifact_returns_correct_artifact_for_logreg():
     module = LogregAimedEmbedding(embedder_name="sergeyzh/rubert-tiny-turbo")
-    artifact = module.get_assets()
+    artifact = module.get_artifact()
     assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"
 
 

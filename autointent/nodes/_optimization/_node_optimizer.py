@@ -51,7 +51,7 @@ class NodeOptimizer:
         :param context: Context
         """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
-
+        scored_modules = []
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space.pop("module_name")
 
@@ -62,7 +62,10 @@ class NodeOptimizer:
                 context.callback_handler.start_module(
                     module_name=module_name, num=j_combination, module_kwargs=module_kwargs
                 )
-                module = self.node_info.modules_available[module_name].from_context(context, **module_kwargs)
+                module_type = self.node_info.modules_available[module_name]
+                module = module_type.from_context(context, **module_kwargs)
+
+                scored_modules.append((module_type, module_kwargs))
 
                 embedder_name = module.get_embedder_name()
                 if embedder_name is not None:
@@ -92,7 +95,6 @@ class NodeOptimizer:
                     module_kwargs,
                     metric_value,
                     self.target_metric,
-                    module.get_assets(),  # retriever name / scores / predictions
                     module_dump_dir,
                     module=module if not context.is_ram_to_clear() else None,
                 )
@@ -102,7 +104,14 @@ class NodeOptimizer:
                     gc.collect()
                     torch.cuda.empty_cache()
 
-        self._logger.info("%s node optimization is finished!", self.node_info.node_type)
+        self._logger.info("%s node optimization is finished! saving best assets", self.node_info.node_type)
+        # TODO refactor the following code (via implementing `autointent.load_module(path)` utility)
+        trial_idx = context.optimization_info.get_best_trial_idx(self.node_type)
+        trial = context.optimization_info.trials.get_trial(self.node_type, trial_idx)
+        module_type, module_kwargs = scored_modules[trial_idx]
+        best_module: Module = module_type(**module_kwargs)
+        best_module.load(trial.module_dump_dir)
+        context.optimization_info.artifacts.add_artifact(self.node_type, best_module.get_artifact(context))
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
         """

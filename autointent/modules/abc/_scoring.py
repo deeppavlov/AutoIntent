@@ -41,24 +41,24 @@ class ScoringModule(Module, ABC):
 
         scores = self.predict(utterances)
 
-        self._train_scores = self.predict(context.data_handler.train_utterances(1))
-        self._validation_scores = self.predict(context.data_handler.validation_utterances(1))
-        self._test_scores = self.predict(context.data_handler.test_utterances())
-
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
         return self.score_metrics((labels, scores), chosen_metrics)
 
-    def get_assets(self) -> ScorerArtifact:
+    def get_artifact(self, context: Context) -> ScorerArtifact:
         """
         Retrieve assets generated during scoring.
 
         :return: ScorerArtifact containing test, validation and test scores.
         """
+        train_scores = self.predict(context.data_handler.train_utterances(1))
+        validation_scores = self.predict(context.data_handler.validation_utterances(1))
+        test_scores = self.predict(context.data_handler.test_utterances())
+
         return ScorerArtifact(
-            train_scores=self._train_scores,
-            validation_scores=self._validation_scores,
-            test_scores=self._test_scores,
+            train_scores=train_scores,
+            validation_scores=validation_scores,
+            test_scores=test_scores,
         )
 
     @abstractmethod

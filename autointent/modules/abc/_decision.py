@@ -49,13 +49,14 @@ class DecisionModule(Module, ABC):
         :return: Computed metrics value for the test set or error code of metrics
         """
         labels, scores = get_decision_evaluation_data(context, split)
-        self._decisions = self.predict(scores)
+        decisions = self.predict(scores)
         chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
-        return self.score_metrics((labels, self._decisions), chosen_metrics)
+        return self.score_metrics((labels, decisions), chosen_metrics)
 
-    def get_assets(self) -> DecisionArtifact:
+    def get_artifact(self, context: Context) -> DecisionArtifact:
         """Return useful assets that represent intermediate data into context."""
-        return DecisionArtifact(labels=self._decisions)
+        _, scores = get_decision_evaluation_data(context, split="test")
+        return DecisionArtifact(labels=self.predict(scores))
 
     def clear_cache(self) -> None:
         """Clear cache."""

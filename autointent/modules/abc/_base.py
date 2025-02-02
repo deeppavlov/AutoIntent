@@ -44,7 +44,7 @@ class Module(ABC):
         """
 
     @abstractmethod
-    def get_assets(self) -> Artifact:
+    def get_artifact(self, context: Context) -> Artifact:
         """Return useful assets that represent intermediate data into context."""
 
     @abstractmethod
