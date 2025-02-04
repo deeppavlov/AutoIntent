@@ -138,7 +138,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
         context.configure_cross_encoder(self.cross_encoder_config)
-
+        self.validate_modules(dataset)
         self._fit(context)
 
         if context.is_ram_to_clear():
@@ -159,6 +159,16 @@ class Pipeline:
         context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
+
+    def validate_modules(self, dataset: Dataset) -> None:
+        """
+        Validate modules with dataset.
+
+        :param dataset: dataset to validate with
+        """
+        for node in self.nodes.values():
+            if isinstance(node, NodeOptimizer):
+                node.validate_nodes_with_dataset(dataset)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":

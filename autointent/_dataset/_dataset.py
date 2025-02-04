@@ -146,6 +146,7 @@ class Dataset(dict[str, HFDataset]):
         Push dataset splits to a Hugging Face repository.
 
         :param repo_id: ID of the Hugging Face repository.
+        :param private: Whether the repository is private
         """
         for split_name, split in self.items():
             split.push_to_hub(repo_id, split=split_name, private=private)

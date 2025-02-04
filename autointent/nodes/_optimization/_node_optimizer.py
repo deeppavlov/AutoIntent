@@ -9,6 +9,7 @@ from typing import Any
 
 import torch
 
+from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType
 from autointent.modules.abc import Module
@@ -31,7 +32,7 @@ class NodeOptimizer:
 
         :param node_type: Node type
         :param search_space: Search space for the optimization
-        :param metric: Metric to optimize.
+        :param metrics: Metrics to optimize.
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
@@ -41,7 +42,7 @@ class NodeOptimizer:
         if self.target_metric not in self.metrics:
             self.metrics.append(self.target_metric)
 
-        self.modules_search_spaces = search_space  # TODO search space validation
+        self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     def fit(self, context: Context) -> None:
@@ -143,3 +144,25 @@ class NodeOptimizer:
             self._logger.error(msg)
             raise ValueError(msg)
         module.fit(*args)  # type: ignore[arg-type]
+
+    def validate_nodes_with_dataset(self, dataset: Dataset) -> None:
+        """
+        Validate nodes with dataset.
+
+        :param dataset: Dataset to use
+        """
+        is_multilabel = dataset.multilabel
+
+        for search_space in deepcopy(self.modules_search_spaces):
+            module_name = search_space.pop("module_name")
+            module = self.node_info.modules_available[module_name]
+            # todo add check for oos
+
+            if is_multilabel and not module.supports_multilabel:
+                msg = f"Module '{module_name}' does not support multilabel datasets."
+                self._logger.error(msg)
+                raise ValueError(msg)
+            if not is_multilabel and not module.supports_multiclass:
+                msg = f"Module '{module_name}' does not support multiclass datasets."
+                self._logger.error(msg)
+                raise ValueError(msg)
