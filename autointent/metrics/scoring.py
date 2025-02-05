@@ -2,7 +2,7 @@
 
 import logging
 from functools import wraps
-from typing import Any, Protocol
+from typing import Protocol
 
 import numpy as np
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
@@ -34,10 +34,10 @@ def ignore_oos(func: ScoringMetricFn) -> ScoringMetricFn:
     """Ignore OOS in metrics calculation (decorator)."""
 
     @wraps(func)
-    def wrapper(labels: list[Any | None], scores: list[Any]) -> float:
+    def wrapper(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
         labels_filtered = [lab for lab in labels if lab is not None]
         scores_filtered = [score for score, lab in zip(scores, labels, strict=True) if lab is not None]
-        return func(labels_filtered, scores_filtered)
+        return func(labels_filtered, scores_filtered)  # type: ignore[arg-type]
 
     return wrapper
 

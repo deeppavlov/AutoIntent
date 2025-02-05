@@ -114,14 +114,14 @@ def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFn:
     """Ignore OOS in metrics calculation (decorator)."""
 
     @wraps(func)
-    def wrapper(query_labels: list[Any | None], candidates_labels: list[Any]) -> float:
+    def wrapper(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE) -> float:
         query_labels_filtered = [lab for lab in query_labels if lab is not None]
         candidates_labels_filtered = [
             cand for cand, lab in zip(candidates_labels, query_labels, strict=True) if lab is not None
         ]
-        return func(query_labels_filtered, candidates_labels_filtered)
+        return func(query_labels_filtered, candidates_labels_filtered)  # type: ignore[arg-type]
 
-    return wrapper
+    return wrapper  # type: ignore[return-value]
 
 
 @ignore_oos
