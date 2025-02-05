@@ -121,7 +121,7 @@ def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFn:
         ]
         return func(query_labels_filtered, candidates_labels_filtered, k)  # type: ignore[arg-type]
 
-    return wrapper  # type: ignore[return-value]
+    return wrapper
 
 
 @ignore_oos
