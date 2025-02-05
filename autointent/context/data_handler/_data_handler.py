@@ -249,9 +249,11 @@ class DataHandler:  # TODO rename to Validator
         )
 
     def _split_cv(self, random_seed: int) -> None:
-        self.dataset[Split.TRAIN] = concatenate_datasets(
-            [self.dataset[split_name] for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]]
-        )
+        extra_splits = [split_name for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]]
+        if extra_splits:
+            self.dataset[Split.TRAIN] = concatenate_datasets(
+                [self.dataset.pop(split_name) for split_name in extra_splits]
+            )
 
         if Split.TEST not in self.dataset:
             self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
