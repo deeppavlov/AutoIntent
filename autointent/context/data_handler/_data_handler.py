@@ -168,9 +168,7 @@ class DataHandler:  # TODO rename to Validator
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def validation_iterator(
-        self
-    ) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
+    def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         if self.scheme == "ho":
             msg = "Cannot call cross-validation on hold-out DataHandler"
             raise RuntimeError(msg)
@@ -183,9 +181,7 @@ class DataHandler:  # TODO rename to Validator
             train_labels = [lab for i_fold in train_folds for lab in self.train_labels(i_fold)]
 
             # filter out all OOS samples from train
-            train_utterances = [
-                ut for ut, lab in zip(train_utterances, train_labels, strict=True) if lab is not None
-            ]
+            train_utterances = [ut for ut, lab in zip(train_utterances, train_labels, strict=True) if lab is not None]
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
@@ -251,6 +247,26 @@ class DataHandler:  # TODO rename to Validator
             random_seed=random_seed,
             allow_oos_in_train=True,  # both test and validation splits can contain OOS
         )
+
+    def _split_cv(self, random_seed: int) -> None:
+        self.dataset[Split.TRAIN] = concatenate_datasets([
+            self.dataset[split_name] for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]
+        ])
+
+        if Split.TEST not in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
+                self.dataset, split=Split.TRAIN, test_size=0.2, random_seed=random_seed, allow_oos_in_train=True
+            )
+
+        for j in range(self.n_folds - 1):
+            self.dataset[Split.TRAIN], self.dataset[f"{Split.TRAIN}_{j}"] = split_dataset(
+                self.dataset,
+                split=Split.TRAIN,
+                test_size=1 / (self.n_folds - j),
+                random_seed=random_seed,
+                allow_oos_in_train=True,
+            )
+        self.dataset[f"{Split.TRAIN}_{self.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
 
     def _split_validation_from_train(self, random_seed: int) -> None:
         if Split.TRAIN in self.dataset:
