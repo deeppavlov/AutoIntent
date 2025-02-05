@@ -3,7 +3,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
@@ -49,19 +48,13 @@ class ScoringModule(Module, ABC):
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
 
-        metrics_values = {name: [] for name in chosen_metrics}
-        all_val_scores = []
-        for train_utterances, train_labels, val_utterances, val_labels in context.data_handler.validation_iterator():
-            self.fit(train_utterances, train_labels)
-            val_scores = self.predict(val_utterances)
-            for name, fn in chosen_metrics.items():
-                metrics_values[name].append(fn(val_labels, val_scores))
-            all_val_scores.append(val_scores)
+        metrics_calculated, all_val_scores = self.score_metrics_cv(
+            chosen_metrics, context.data_handler.validation_iterator()
+        )
 
-        # save all predictions unbinded to preserve folding
         self._artifact = ScorerArtifact(folded_scores=all_val_scores)
 
-        return {name: np.mean(values_list) for name, values_list in metrics_values.items()}
+        return metrics_calculated
 
     def get_assets(self) -> ScorerArtifact:
         """

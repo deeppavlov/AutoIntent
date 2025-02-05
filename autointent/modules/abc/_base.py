@@ -2,9 +2,11 @@
 
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import numpy.typing as npt
 
 from autointent._dump_tools import Dumper
@@ -106,7 +108,7 @@ class Module(ABC):
         return None
 
     @staticmethod
-    def score_metrics(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:
+    def score_metrics_ho(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:
         """
         Score metrics on the test set.
 
@@ -118,6 +120,22 @@ class Module(ABC):
         for metric_name, metric_fn in metrics_dict.items():
             metrics[metric_name] = metric_fn(*params)
         return metrics
+
+    def score_metrics_cv(
+        self, metrics_dict: dict[str, Any], cv_iterator: Iterable[tuple[list, list, list, list]]
+    ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
+        metrics_values = {name: [] for name in metrics_dict}
+        all_val_preds = []
+
+        for train_utterances, train_labels, val_utterances, val_labels in cv_iterator:
+            self.fit(train_utterances, train_labels)
+            val_preds = self.predict(val_utterances)
+            for name, fn in metrics_dict.items():
+                metrics_values[name].append(fn(val_labels, val_preds))
+            all_val_preds.append(val_preds)
+
+        metrics = {name: np.mean(values_list) for name, values_list in metrics_values.items()}
+        return metrics, all_val_preds
 
     def _validate_multilabel(self, data_is_multilabel: bool) -> None:
         if data_is_multilabel and not self.supports_multilabel:
