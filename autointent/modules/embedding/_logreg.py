@@ -134,14 +134,17 @@ class LogregAimedEmbedding(EmbeddingModule):
         :param context: The context containing test data and labels.
         :return: Computed metrics value for the test set or error code of metrics
         """
-        utterances = context.data_handler.validation_utterances(0)
-        labels = context.data_handler.validation_labels(0)
+        train_utterances, train_labels = self.get_train_data(context)
+        self.fit(train_utterances, train_labels)
 
-        probas = self.predict(utterances)
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+
+        probas = self.predict(val_utterances)
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
 
-        return self.score_metrics((labels, probas), chosen_metrics)
+        return self.score_metrics_ho((val_labels, probas), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """

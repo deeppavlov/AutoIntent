@@ -114,13 +114,16 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         :param context: The context containing test data and labels.
         :return: Computed metrics value for the test set or error code of metrics
         """
-        utterances = context.data_handler.validation_utterances(0)
-        labels = context.data_handler.validation_labels(0)
-        predictions = self.predict(utterances)
+        train_utterances, train_labels = self.get_train_data(context)
+        self.fit(train_utterances, train_labels)
+
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+        predictions = self.predict(val_utterances)
 
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
-        return self.score_metrics_ho((labels, predictions), chosen_metrics)
+        return self.score_metrics_ho((val_labels, predictions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS

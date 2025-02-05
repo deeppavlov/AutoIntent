@@ -48,11 +48,14 @@ class DecisionModule(Module, ABC):
         :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        labels, scores = get_decision_evaluation_data(context, "validation")
-        decisions = self.predict(scores)
+        train_scores, train_labels = self.get_train_data(context)
+        self.fit(train_scores, train_labels, context.data_handler.tags)
+
+        val_labels, val_scores = get_decision_evaluation_data(context, "validation")
+        decisions = self.predict(val_scores)
         chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
         self._artifact = DecisionArtifact(labels=decisions)
-        return self.score_metrics((labels, decisions), chosen_metrics)
+        return self.score_metrics_ho((val_labels, decisions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """

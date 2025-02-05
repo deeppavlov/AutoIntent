@@ -23,10 +23,13 @@ class ScoringModule(Module, ABC):
     supports_oos = False
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        utterances = context.data_handler.validation_utterances(0)
-        labels = context.data_handler.validation_labels(0)
+        train_utterances, train_labels = self.get_train_data(context)
+        self.fit(train_utterances, train_labels)
 
-        scores = self.predict(utterances)
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+
+        scores = self.predict(val_utterances)
 
         self._artifact = ScorerArtifact(
             train_scores=self.predict(context.data_handler.train_utterances(1)),
@@ -35,7 +38,7 @@ class ScoringModule(Module, ABC):
 
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
-        return self.score_metrics((labels, scores), chosen_metrics)
+        return self.score_metrics_ho((val_labels, scores), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
