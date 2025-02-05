@@ -192,3 +192,31 @@ def test_cv_folding(dataset):
     for split_name in dataset:
         assert len(dataset[split_name]) == desired_specs[split_name]["total"]
         assert count_oos(dataset[split_name]) == desired_specs[split_name]["oos"]
+
+
+def count_oos_labels(split):
+    return sum(sample is None for sample in split)
+
+def test_cv_iterator(dataset):
+    dh = DataHandler(dataset, scheme="cv", n_folds=3)
+
+    desired_specs = [{
+        "train": {"total": 21, "oos": 0},
+        "val": {"total": 16, "oos": 5},
+    },
+    {
+        "train": {"total": 21, "oos": 0},
+        "val": {"total": 16, "oos": 5},
+    },
+    {
+        "train": {"total": 22, "oos": 0},
+        "val": {"total": 16, "oos": 6},
+    },
+    ]
+
+    for i, (x_train, y_train, x_val, y_val) in enumerate(dh.validation_iterator()):
+        specs = desired_specs[i]
+        assert len(x_train) == len(y_train) == specs["train"]["total"]
+        assert count_oos_labels(y_train) == specs["train"]["oos"]
+        assert len(x_val) == len(y_val) == specs["val"]["total"]
+        assert count_oos_labels(y_val) == specs["val"]["oos"]
