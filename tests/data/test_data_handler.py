@@ -173,3 +173,22 @@ def test_dataset_validation(mapping):
 def test_intents_validation(mapping):
     with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
+
+
+def count_oos(split):
+    return len(split.filter(lambda sample: sample["label"] is None))
+
+
+def test_cv_folding(dataset):
+    DataHandler(dataset, scheme="cv", n_folds=3)
+
+    desired_specs = {
+        "test": {"total": 12, "oos": 4},
+        "train_0": {"total": 16, "oos": 5},
+        "train_1": {"total": 16, "oos": 5},
+        "train_2": {"total": 16, "oos": 6},
+    }
+
+    for split_name in dataset:
+        assert len(dataset[split_name]) == desired_specs[split_name]["total"]
+        assert count_oos(dataset[split_name]) == desired_specs[split_name]["oos"]
