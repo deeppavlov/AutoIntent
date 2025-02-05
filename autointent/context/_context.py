@@ -81,9 +81,7 @@ class Context:
         :param config: Configuration for the data handling process.
         """
         self.data_handler = DataHandler(
-            dataset=load_dataset(config.train_path),
-            random_seed=self.seed,
-            scheme=config.scheme
+            dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
         )
 
     def set_dataset(self, dataset: Dataset, scheme: Literal["ho", "cv"]) -> None:

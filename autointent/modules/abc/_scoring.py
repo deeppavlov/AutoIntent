@@ -27,8 +27,7 @@ class ScoringModule(Module, ABC):
         self,
         utterances: list[str],
         labels: ListOfLabels,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
         train_utterances, train_labels = self.get_train_data(context)

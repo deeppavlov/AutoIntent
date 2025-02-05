@@ -30,17 +30,13 @@ class ScoringMetricFn(Protocol):
         ...
 
 
-
-
 def ignore_oos(func: ScoringMetricFn) -> ScoringMetricFn:
     """Ignore OOS in metrics calculation (decorator)."""
 
     @wraps(func)
     def wrapper(labels: list[Any | None], scores: list[Any]) -> float:
         labels_filtered = [lab for lab in labels if lab is not None]
-        scores_filtered = [
-            score for score, lab in zip(scores, labels, strict=True) if lab is not None
-        ]
+        scores_filtered = [score for score, lab in zip(scores, labels, strict=True) if lab is not None]
         return func(labels_filtered, scores_filtered)
 
     return wrapper
