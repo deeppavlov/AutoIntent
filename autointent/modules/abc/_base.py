@@ -51,12 +51,10 @@ class Module(ABC):
         raise RuntimeError(msg)
 
     @abstractmethod
-    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        ...
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]: ...
 
     @abstractmethod
-    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        ...
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]: ...
 
     @abstractmethod
     def get_assets(self) -> Artifact:
