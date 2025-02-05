@@ -51,7 +51,7 @@ class ScoringModule(Module, ABC):
 
         metrics_values = {name: [] for name in chosen_metrics}
         all_val_scores = []
-        for train_utterances, train_labels, val_utterances, val_labels in context.data_handler.validation_iterator(0):
+        for train_utterances, train_labels, val_utterances, val_labels in context.data_handler.validation_iterator():
             self.fit(train_utterances, train_labels)
             val_scores = self.predict(val_utterances)
             for name, fn in chosen_metrics.items():
@@ -59,7 +59,7 @@ class ScoringModule(Module, ABC):
             all_val_scores.append(val_scores)
 
         # save all predictions unbinded to preserve folding
-        self._artifact = ScorerArtifact(validation_scores=all_val_scores)
+        self._artifact = ScorerArtifact(folded_scores=all_val_scores)
 
         return {name: np.mean(values_list) for name, values_list in metrics_values.items()}
 
