@@ -197,21 +197,23 @@ def test_cv_folding(dataset):
 def count_oos_labels(split):
     return sum(sample is None for sample in split)
 
+
 def test_cv_iterator(dataset):
     dh = DataHandler(dataset, scheme="cv", n_folds=3)
 
-    desired_specs = [{
-        "train": {"total": 21, "oos": 0},
-        "val": {"total": 16, "oos": 5},
-    },
-    {
-        "train": {"total": 21, "oos": 0},
-        "val": {"total": 16, "oos": 5},
-    },
-    {
-        "train": {"total": 22, "oos": 0},
-        "val": {"total": 16, "oos": 6},
-    },
+    desired_specs = [
+        {
+            "train": {"total": 21, "oos": 0},
+            "val": {"total": 16, "oos": 5},
+        },
+        {
+            "train": {"total": 21, "oos": 0},
+            "val": {"total": 16, "oos": 5},
+        },
+        {
+            "train": {"total": 22, "oos": 0},
+            "val": {"total": 16, "oos": 6},
+        },
     ]
 
     for i, (x_train, y_train, x_val, y_val) in enumerate(dh.validation_iterator()):

@@ -92,11 +92,11 @@ def test_mrr(query_labels, candidates_labels, k, ground_truth):
 
 
 @pytest.mark.parametrize(
-        ("query_labels", "candidates_labels", "ground_truth"),
-        [
-            ([0,1,2,3], [[0,1,2], [0,1,2], [0,1,2], [0,1,2]], 0.75),
-            ([0,1,2,None], [[0,1,2], [0,1,2], [0,1,2], [0,1,2]], 1),
-        ]
+    ("query_labels", "candidates_labels", "ground_truth"),
+    [
+        ([0, 1, 2, 3], [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]], 0.75),
+        ([0, 1, 2, None], [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]], 1),
+    ],
 )
 def test_oos_ignoring(query_labels, candidates_labels, ground_truth):
     assert ground_truth == retrieval_hit_rate(query_labels, candidates_labels)
