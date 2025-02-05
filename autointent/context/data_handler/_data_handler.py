@@ -32,7 +32,7 @@ class DataHandler:  # TODO rename to Validator
     def __init__(
         self,
         dataset: Dataset,
-        scheme: Literal["cv", "ho"],
+        scheme: Literal["cv", "ho"] = "ho",
         split_train: bool = True,
         random_seed: int = 0,
         n_folds: int = 3,

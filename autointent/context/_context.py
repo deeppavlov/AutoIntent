@@ -84,7 +84,7 @@ class Context:
             dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
         )
 
-    def set_dataset(self, dataset: Dataset, scheme: Literal["ho", "cv"]) -> None:
+    def set_dataset(self, dataset: Dataset, scheme: Literal["ho", "cv"] = "ho") -> None:
         """
         Set the datasets for training, validation and testing.
 
