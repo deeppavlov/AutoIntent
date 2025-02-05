@@ -137,7 +137,7 @@ class Context:
         # self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
-        self.data_handler.dump(logs_dir / "dataset.json")
+        self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 
