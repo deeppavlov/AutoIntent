@@ -49,9 +49,10 @@ class DecisionModule(Module, ABC):
         :return: Computed metrics value for the test set or error code of metrics
         """
         labels, scores = get_decision_evaluation_data(context, "validation")
-        self._decisions = self.predict(scores)
+        decisions = self.predict(scores)
         chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
-        return self.score_metrics((labels, self._decisions), chosen_metrics)
+        self._artifact = DecisionArtifact(labels=decisions)
+        return self.score_metrics((labels, decisions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
@@ -61,14 +62,34 @@ class DecisionModule(Module, ABC):
         :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        labels, scores = get_decision_evaluation_data(context, "validation")
-        self._decisions = self.predict(scores)
+        labels = context.data_handler.train_labels_folded()
+        scores = context.optimization_info.get_best_folded_scores()
+
+        if scores is None:
+            msg = "No folded scores are found."
+            raise RuntimeError(msg)
+
         chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS_MULTICLASS.items() if name in metrics}
-        return self.score_metrics((labels, self._decisions), chosen_metrics)
+        metrics_values = {name: [] for name in chosen_metrics}
+        all_val_decisions = []
+        for j in range(context.data_handler.n_folds):
+            val_labels = labels[j]
+            val_scores = scores[j]
+            train_folds = [i for i in range(context.data_handler.n_folds) if i != j]
+            train_labels = [ut for i_fold in train_folds for ut in labels[i_fold]]
+            train_scores = [ut for i_fold in train_folds for ut in scores[i_fold]]
+            self.fit(train_scores, train_labels, context.data_handler.tags)
+            val_decisions = self.predict(val_scores)
+            for name, fn in chosen_metrics.items():
+                metrics_values[name].append(fn(val_labels, val_decisions))
+            all_val_decisions.append(val_decisions)
+
+        self._artifact = DecisionArtifact(labels=[pred for pred_list in all_val_decisions for pred in pred_list])
+        return {name: np.mean(values_list) for name, values_list in metrics_values.items()}
 
     def get_assets(self) -> DecisionArtifact:
         """Return useful assets that represent intermediate data into context."""
-        return DecisionArtifact(labels=self._decisions)
+        return self._artifact
 
     def clear_cache(self) -> None:
         """Clear cache."""
@@ -80,7 +101,7 @@ class DecisionModule(Module, ABC):
         if self._n_classes != scores.shape[1]:
             msg = (
                 "There is a mismatch between provided labels and scores. "
-                f"Labels contains {self._n_classes} classes, but scores contain "
+                f"Labels contain {self._n_classes} classes, but scores contain "
                 f"probabilities for {scores.shape[1]} classes."
             )
             raise ValueError(msg)
@@ -92,7 +113,7 @@ class DecisionModule(Module, ABC):
 
 def get_decision_evaluation_data(
     context: Context,
-    split: Literal["train", "validation", "test"], # TODO add index to handle both ho and cv
+    split: Literal["train", "validation"],
 ) -> tuple[ListOfGenericLabels, npt.NDArray[np.float64]]:
     """
     Get decision evaluation data.
@@ -107,11 +128,8 @@ def get_decision_evaluation_data(
     elif split == "validation":
         labels = context.data_handler.validation_labels(1)
         scores = context.optimization_info.get_best_validation_scores()
-    elif split == "test":
-        labels = context.data_handler.test_labels()
-        scores = context.optimization_info.get_best_test_scores()
     else:
-        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation', or 'test'."
+        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation'."
         raise ValueError(message)
 
     if scores is None:

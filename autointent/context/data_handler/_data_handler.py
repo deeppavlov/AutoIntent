@@ -110,6 +110,9 @@ class DataHandler:  # TODO rename to Validator
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
+    def train_labels_folded(self) -> list[ListOfGenericLabels]:
+        return [self.train_labels(j) for j in range(self.n_folds)]
+
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
         Retrieve validation utterances from the dataset.
