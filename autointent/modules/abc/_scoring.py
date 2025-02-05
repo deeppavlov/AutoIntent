@@ -22,6 +22,14 @@ class ScoringModule(Module, ABC):
 
     supports_oos = False
 
+    @abstractmethod
+    def fit(
+        self,
+        utterances: list[str],
+        labels: ListOfLabels,
+    ) -> None:
+        ...
+
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
         train_utterances, train_labels = self.get_train_data(context)
         self.fit(train_utterances, train_labels)
@@ -68,7 +76,7 @@ class ScoringModule(Module, ABC):
         return self._artifact
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
-        return (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))
+        return (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[return-value]
 
     @abstractmethod
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

@@ -12,7 +12,7 @@ import numpy.typing as npt
 from autointent._dump_tools import Dumper
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
-from autointent.custom_types import ListOfGenericLabels
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 from autointent.exceptions import WrongClassificationError
 
 logger = logging.getLogger(__name__)
@@ -133,20 +133,22 @@ class Module(ABC):
         return metrics
 
     def score_metrics_cv(
-        self, metrics_dict: dict[str, Any], cv_iterator: Iterable[tuple[list, list, list, list]]
+        self,
+        metrics_dict: dict[str, Any],
+        cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
     ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
-        metrics_values = {name: [] for name in metrics_dict}
+        metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []
 
         for train_utterances, train_labels, val_utterances, val_labels in cv_iterator:
-            self.fit(train_utterances, train_labels)
+            self.fit(train_utterances, train_labels)  # type: ignore[arg-type]
             val_preds = self.predict(val_utterances)
             for name, fn in metrics_dict.items():
                 metrics_values[name].append(fn(val_labels, val_preds))
             all_val_preds.append(val_preds)
 
-        metrics = {name: np.mean(values_list) for name, values_list in metrics_values.items()}
-        return metrics, all_val_preds
+        metrics = {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
+        return metrics, all_val_preds  # type: ignore[return-value]
 
     def _validate_multilabel(self, data_is_multilabel: bool) -> None:
         if data_is_multilabel and not self.supports_multilabel:

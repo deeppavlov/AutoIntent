@@ -9,7 +9,7 @@ from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import ListOfGenericLabels, Split
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split
 
 from ._stratification import split_dataset
 
@@ -169,7 +169,7 @@ class DataHandler:  # TODO rename to Validator
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def validation_iterator(self) -> Generator[tuple[list, list, list, list]]:
+    def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         if self.scheme == "ho":
             msg = "Cannot call cross-validation on hold-out DataHandler"
             raise RuntimeError(msg)
@@ -180,7 +180,7 @@ class DataHandler:  # TODO rename to Validator
             train_folds = [i for i in range(self.n_folds) if i != j]
             train_utterances = [ut for i_fold in train_folds for ut in self.train_utterances(i_fold)]
             train_labels = [ut for i_fold in train_folds for ut in self.train_labels(i_fold)]
-            yield train_utterances, train_labels, val_utterances, val_labels
+            yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
         msg = "something's wrong"
         raise RuntimeError(msg)

@@ -1,6 +1,7 @@
 """Configuration for the optimization process."""
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -12,6 +13,8 @@ class DataConfig(BaseModel):
 
     train_path: str | Path
     """Path to the training data. Can be local path or HF repo."""
+    scheme: Literal["ho", "cv"]
+    """Hold-out or cross-validation."""
 
 
 class TaskConfig(BaseModel):

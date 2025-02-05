@@ -148,7 +148,7 @@ class DescriptionScorer(ScoringModule):
         self._embedder.clear_ram()
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
-        return (
+        return (  # type: ignore[return-value]
             context.data_handler.train_utterances(0),
             context.data_handler.train_labels(0),
             context.data_handler.intent_descriptions,

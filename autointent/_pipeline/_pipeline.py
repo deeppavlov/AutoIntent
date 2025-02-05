@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import yaml
@@ -122,7 +122,7 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset) -> Context:
+    def fit(self, dataset: Dataset, scheme: Literal["ho", "cv"] = "ho") -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -134,7 +134,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         context = Context()
-        context.set_dataset(dataset)
+        context.set_dataset(dataset, scheme)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
         context.configure_cross_encoder(self.cross_encoder_config)

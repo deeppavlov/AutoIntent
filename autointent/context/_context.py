@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 
@@ -83,9 +83,10 @@ class Context:
         self.data_handler = DataHandler(
             dataset=load_dataset(config.train_path),
             random_seed=self.seed,
+            scheme=config.scheme
         )
 
-    def set_dataset(self, dataset: Dataset) -> None:
+    def set_dataset(self, dataset: Dataset, scheme: Literal["ho", "cv"]) -> None:
         """
         Set the datasets for training, validation and testing.
 
@@ -94,6 +95,7 @@ class Context:
         self.data_handler = DataHandler(
             dataset=dataset,
             random_seed=self.seed,
+            scheme=scheme,
         )
 
     def get_inference_config(self) -> dict[str, Any]:

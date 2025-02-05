@@ -11,4 +11,4 @@ class EmbeddingModule(Module, ABC):
     """Base class for embedding modules."""
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
-        return (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))
+        return (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[return-value]
