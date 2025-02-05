@@ -169,7 +169,9 @@ class DataHandler:  # TODO rename to Validator
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
+    def validation_iterator(
+        self
+    ) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         if self.scheme == "ho":
             msg = "Cannot call cross-validation on hold-out DataHandler"
             raise RuntimeError(msg)
@@ -179,11 +181,14 @@ class DataHandler:  # TODO rename to Validator
             val_labels = self.train_labels(j)
             train_folds = [i for i in range(self.n_folds) if i != j]
             train_utterances = [ut for i_fold in train_folds for ut in self.train_utterances(i_fold)]
-            train_labels = [ut for i_fold in train_folds for ut in self.train_labels(i_fold)]
-            yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
+            train_labels = [lab for i_fold in train_folds for lab in self.train_labels(i_fold)]
 
-        msg = "something's wrong"
-        raise RuntimeError(msg)
+            # filter out all OOS samples from train
+            train_utterances = [
+                ut for ut, lab in zip(train_utterances, train_labels, strict=True) if lab is not None
+            ]
+            train_labels = [lab for lab in train_labels if lab is not None]
+            yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
     def dump(self, filepath: str | Path) -> None:
         """
