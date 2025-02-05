@@ -2,7 +2,6 @@
 
 import logging
 from collections.abc import Generator
-from pathlib import Path
 from typing import Literal, TypedDict, cast
 
 from datasets import concatenate_datasets
@@ -189,14 +188,6 @@ class DataHandler:  # TODO rename to Validator
             ]
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
-
-    def dump(self, filepath: str | Path) -> None:
-        """
-        Save the dataset splits and intents to a JSON file.
-
-        :param filepath: The path to the file where the JSON data will be saved.
-        """
-        self.dataset.to_json(filepath)
 
     def _split_ho(self, random_seed: int, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
