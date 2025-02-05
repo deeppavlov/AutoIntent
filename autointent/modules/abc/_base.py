@@ -35,8 +35,7 @@ class Module(ABC):
         :param kwargs: Kwargs to fit
         """
 
-    @abstractmethod
-    def score(self, context: Context, test: bool, metrics: list[str]) -> dict[str, float]:
+    def score(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
         Calculate metric on test set and return metric value.
 
@@ -44,6 +43,20 @@ class Module(ABC):
         :param split: Split to score on
         :return: Computed metrics value for the test set or error code of metrics
         """
+        if context.data_handler.scheme == "ho":
+            return self.score_ho(context, metrics)
+        if context.data_handler.scheme == "cv":
+            return self.score_cv(context, metrics)
+        msg = "Something's wrong with validation schemas"
+        raise RuntimeError(msg)
+
+    @abstractmethod
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        ...
+
+    @abstractmethod
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        ...
 
     @abstractmethod
     def get_assets(self) -> Artifact:
