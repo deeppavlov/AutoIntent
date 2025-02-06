@@ -96,6 +96,9 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        if hasattr(self, "_vector_index"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(

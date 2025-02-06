@@ -127,6 +127,9 @@ class LinearScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
+        if hasattr(self, "_clf"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         embedder = Embedder(

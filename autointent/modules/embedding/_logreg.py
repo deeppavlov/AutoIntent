@@ -96,7 +96,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         )
 
     def clear_cache(self) -> None:
-        pass
+        self._embedder.clear_ram()
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
@@ -105,6 +105,9 @@ class LogregAimedEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        if hasattr(self, "_embedder"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._embedder = Embedder(

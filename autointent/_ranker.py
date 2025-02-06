@@ -272,3 +272,8 @@ class Ranker:
             metadata: CrossEncoderMetadata = json.load(file)
 
         return cls(**metadata, classifier_head=clf)
+
+    def clear_ram(self) -> None:
+        self.cross_encoder.cpu()
+        del self.cross_encoder
+        torch.cuda.empty_cache()
