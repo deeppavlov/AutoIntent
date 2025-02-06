@@ -31,7 +31,7 @@ def test_cv(dataset, task_type):
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
 
-    context = pipeline_optimizer.fit(dataset, scheme="cv")
+    context = pipeline_optimizer.fit(dataset, scheme="cv", refit_after=True)
     context.dump()
 
     assert os.listdir(pipeline_optimizer.logging_config.dump_dir)

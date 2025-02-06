@@ -122,7 +122,7 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, scheme: Literal["ho", "cv"] = "ho") -> Context:
+    def fit(self, dataset: Dataset, scheme: Literal["ho", "cv"] = "ho", refit_after: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -149,6 +149,9 @@ class Pipeline:
             nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
 
         self.nodes = {node.node_type: node for node in nodes_list}
+
+        if refit_after:
+            self._refit(context)
 
         predictions = self.predict(context.data_handler.test_utterances())
         for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
@@ -209,6 +212,27 @@ class Pipeline:
 
         scores = scoring_module.predict(utterances)
         return decision_module.predict(scores)
+
+    def _refit(self, context: Context) -> None:
+        """
+        Fit pipeline of already selected modules with all train data.
+
+        :param utterances: list of utterances
+        :return: list of predicted labels
+        """
+        if not self._is_inference():
+            msg = "Pipeline in optimization mode cannot perform inference"
+            raise RuntimeError(msg)
+
+        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+
+        context.data_handler.prepare_for_refit()
+
+        scoring_module.fit(context.data_handler.train_utterances(0), context.data_handler.train_labels(0))
+        scores = scoring_module.predict(context.data_handler.train_utterances(1))
+
+        decision_module.fit(scores, context.data_handler.train_labels(1))
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """
