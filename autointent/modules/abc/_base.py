@@ -136,12 +136,13 @@ class Module(ABC):
         self,
         metrics_dict: dict[str, Any],
         cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
+        **fit_kwargs: dict[str, Any],
     ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
         metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []
 
         for train_utterances, train_labels, val_utterances, val_labels in cv_iterator:
-            self.fit(train_utterances, train_labels)  # type: ignore[arg-type]
+            self.fit(train_utterances, train_labels, **fit_kwargs)  # type: ignore[arg-type]
             val_preds = self.predict(val_utterances)
             for name, fn in metrics_dict.items():
                 metrics_values[name].append(fn(val_labels, val_preds))
