@@ -50,7 +50,7 @@ class UtteranceGenerator:
         split_name: str = Split.TRAIN,
         n_generations: int = 5,
         update_split: bool = True,
-        batch_size: int | None = None
+        batch_size: int = 4
     ) -> list[Sample]:
         """
         Augment some split of dataset.
@@ -59,7 +59,7 @@ class UtteranceGenerator:
         :param split_name: Dataset split (default is TRAIN)
         :param n_generations: Number of utterances to generate per intent
         :param update_split: Whether to update the dataset split
-        :param batch_size: Batch size for async generation (None means all at once)
+        :param batch_size: Batch size for async generation
         :return: List of generated samples
         """
         if self.async_mode:
@@ -87,7 +87,7 @@ class UtteranceGenerator:
         split_name: str = Split.TRAIN,
         n_generations: int = 5,
         update_split: bool = True,
-        batch_size: int | None = None
+        batch_size: int = 4
     ) -> list[Sample]:
         """
         Augment some split of dataset asynchronously in batches.
@@ -96,23 +96,18 @@ class UtteranceGenerator:
         :param split_name: Dataset split (default is TRAIN)
         :param n_generations: Number of utterances to generate per intent
         :param update_split: Whether to update the dataset split
-        :param batch_size: Batch size for async generation (None means all at once)
+        :param batch_size: Batch size for async generation
         :return: List of generated samples
         """
         original_split = dataset[split_name]
         new_samples = []
 
-        if not batch_size:
-            tasks = [self._call_async(intent_data=intent, n_generations=n_generations) for intent in dataset.intents]
-            results = await asyncio.gather(*tasks)
-
-        else:
-            results = []
-            for start_idx in range(0, len(dataset.intents), batch_size):
-                batch_intents = dataset.intents[start_idx:start_idx + batch_size]
-                tasks = [self._call_async(intent_data=intent, n_generations=n_generations) for intent in batch_intents]
-                batch_results = await asyncio.gather(*tasks)
-                results.extend(batch_results)
+        results = []
+        for start_idx in range(0, len(dataset.intents), batch_size):
+            batch_intents = dataset.intents[start_idx:start_idx + batch_size]
+            tasks = [self._call_async(intent_data=intent, n_generations=n_generations) for intent in batch_intents]
+            batch_results = await asyncio.gather(*tasks)
+            results.extend(batch_results)
 
         for i, generated_utterances in enumerate(results):
             intent = dataset.intents[i]
