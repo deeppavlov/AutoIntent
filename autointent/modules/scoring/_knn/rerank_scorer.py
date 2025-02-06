@@ -139,10 +139,11 @@ class RerankScorer(KNNScorer):
         )
         self._scorer.fit(utterances, labels)
 
-        super().fit(utterances, labels)
+        super().fit(utterances, labels, clear_cache=False)
 
     def clear_cache(self) -> None:
         self._scorer.clear_ram()
+        super().clear_cache()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """

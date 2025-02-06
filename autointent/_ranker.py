@@ -3,6 +3,7 @@
 Can be used to rank retrieved sentences by meaning closeness to provided utterance.
 """
 
+import gc
 import itertools as it
 import json
 import logging
@@ -274,6 +275,7 @@ class Ranker:
         return cls(**metadata, classifier_head=clf)
 
     def clear_ram(self) -> None:
-        self.cross_encoder.cpu()
+        self.cross_encoder.model.cpu()
         del self.cross_encoder
+        gc.collect()
         torch.cuda.empty_cache()
