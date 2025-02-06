@@ -1,4 +1,5 @@
 """Basic generation of new utterances from existing ones."""
+
 import asyncio
 from collections.abc import Callable
 
@@ -22,10 +23,7 @@ class UtteranceGenerator:
     """
 
     def __init__(
-        self,
-        generator: Generator,
-        prompt_maker: Callable[[Intent, int], list[Message]],
-        async_mode: bool = False
+        self, generator: Generator, prompt_maker: Callable[[Intent, int], list[Message]], async_mode: bool = False
     ) -> None:
         """Initialize."""
         self.generator = generator
@@ -50,7 +48,7 @@ class UtteranceGenerator:
         split_name: str = Split.TRAIN,
         n_generations: int = 5,
         update_split: bool = True,
-        batch_size: int = 4
+        batch_size: int = 4,
     ) -> list[Sample]:
         """
         Augment some split of dataset.
@@ -87,7 +85,7 @@ class UtteranceGenerator:
         split_name: str = Split.TRAIN,
         n_generations: int = 5,
         update_split: bool = True,
-        batch_size: int = 4
+        batch_size: int = 4,
     ) -> list[Sample]:
         """
         Augment some split of dataset asynchronously in batches.
@@ -104,7 +102,7 @@ class UtteranceGenerator:
 
         results = []
         for start_idx in range(0, len(dataset.intents), batch_size):
-            batch_intents = dataset.intents[start_idx:start_idx + batch_size]
+            batch_intents = dataset.intents[start_idx : start_idx + batch_size]
             tasks = [self._call_async(intent_data=intent, n_generations=n_generations) for intent in batch_intents]
             batch_results = await asyncio.gather(*tasks)
             results.extend(batch_results)
@@ -130,4 +128,4 @@ def _extract_utterances(response_text: str) -> list[str]:
     """
     raw_utterances = response_text.split("\n")
     # remove enumeration
-    return [ut[ut.find(" ") + 1:] if " " in ut else ut for ut in raw_utterances]
+    return [ut[ut.find(" ") + 1 :] if " " in ut else ut for ut in raw_utterances]

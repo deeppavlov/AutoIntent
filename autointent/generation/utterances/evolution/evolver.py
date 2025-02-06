@@ -31,7 +31,7 @@ class UtteranceEvolver:
         generator: Generator,
         prompt_makers: Sequence[Callable[[str, Intent], list[Message]]],
         seed: int = 0,
-        async_mode: bool = False
+        async_mode: bool = False,
     ) -> None:
         """Initialize."""
         self.generator = generator
@@ -66,7 +66,7 @@ class UtteranceEvolver:
         split_name: str = Split.TRAIN,
         n_evolutions: int = 1,
         update_split: bool = True,
-        batch_size: int = 4
+        batch_size: int = 4,
     ) -> list[Sample]:
         """
         Augment some split of dataset.
@@ -80,7 +80,7 @@ class UtteranceEvolver:
                     split_name=split_name,
                     n_evolutions=n_evolutions,
                     update_split=update_split,
-                    batch_size=batch_size
+                    batch_size=batch_size,
                 )
             )
 
@@ -107,35 +107,27 @@ class UtteranceEvolver:
         split_name: str = Split.TRAIN,
         n_evolutions: int = 1,
         update_split: bool = True,
-        batch_size: int = 4
+        batch_size: int = 4,
     ) -> list[Sample]:
         original_split = dataset[split_name]
         new_samples = []
 
-        total_samples = len(original_split)
-        for start_idx in range(0, total_samples, batch_size):
-            batch = original_split[start_idx : start_idx + batch_size]
-            tasks = []
-            for utterance, label in zip(
-                batch[Dataset.utterance_feature],
-                batch[Dataset.label_feature],
-                strict=False
-            ):
-                intent_data = next(intent for intent in dataset.intents if intent.id == label)
-                tasks.append(
-                    self._call_async(utterance=utterance, intent_data=intent_data, n_evolutions=n_evolutions)
-                )
+        tasks = []
+        labels = []
+        for sample in original_split:
+            utterance = sample[Dataset.utterance_feature]
+            label = sample[Dataset.label_feature]
+            intent_data = next(intent for intent in dataset.intents if intent.id == label)
+            for _ in range(n_evolutions):
+                tasks.append(self._evolve_async(utterance, intent_data))
+                labels.append(intent_data.id)
 
-            batch_results = await asyncio.gather(*tasks)
-
-            for i, generated_utterances in enumerate(batch_results):
-                intent_data = next(
-                    intent for intent in dataset.intents if intent.id == batch[Dataset.label_feature][i]
-                )
-                new_samples.extend(
-                    [{Dataset.label_feature: intent_data.id, Dataset.utterance_feature: ut}
-                        for ut in generated_utterances]
-                )
+        for start_idx in range(0, len(tasks), batch_size):
+            batch_tasks = tasks[start_idx : start_idx + batch_size]
+            batch_labels = labels[start_idx : start_idx + batch_size]
+            batch_results = await asyncio.gather(*batch_tasks)
+            for result, intent_id in zip(batch_results, batch_labels, strict=False):
+                new_samples.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: result})
 
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
