@@ -132,11 +132,11 @@ class Module(ABC):
             metrics[metric_name] = metric_fn(*params)
         return metrics
 
-    def score_metrics_cv(
+    def score_metrics_cv(  # type: ignore[no-untyped-def]
         self,
         metrics_dict: dict[str, Any],
         cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
-        **fit_kwargs: dict[str, Any],
+        **fit_kwargs,  # noqa: ANN003
     ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
         metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []
