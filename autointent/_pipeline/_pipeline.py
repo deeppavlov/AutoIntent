@@ -229,7 +229,7 @@ class Pipeline:
 
         context.data_handler.prepare_for_refit()
 
-        scoring_module.fit(context.data_handler.train_utterances(0), context.data_handler.train_labels(0))
+        scoring_module.fit(context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[arg-type]
         scores = scoring_module.predict(context.data_handler.train_utterances(1))
 
         decision_module.fit(scores, context.data_handler.train_labels(1))
