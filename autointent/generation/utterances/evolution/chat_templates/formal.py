@@ -1,4 +1,4 @@
-"""Chat template for evolution augmentation via abstractization."""
+"""Chat template for formal tone augmentation."""
 
 from typing import ClassVar
 
@@ -8,8 +8,8 @@ from autointent.schemas import Intent
 from .base import EvolutionChatTemplate
 
 
-class AbstractEvolution(EvolutionChatTemplate):
-    """Chat template for evolution augmentation via abstraction."""
+class FormalEvolution(EvolutionChatTemplate):
+    """Chat template for formal tone augmentation."""
 
     _messages: ClassVar[list[Message]] = [
         Message(
@@ -17,28 +17,31 @@ class AbstractEvolution(EvolutionChatTemplate):
             content=(
                 "I want you to act as a rewriter. "
                 "You will be provided with an utterance and the topic (name of intent class) of the utterance. "
-                "You need to complicate the utterance using the following method:\n"
-                "1. Rewrite the utterance by removing specific inquiries or replacing with more generic.\n"
-                "2. Rewritten utterance should be concise and understandable by humans.\n"
-                "3. Rewritten utterance must be fully answerable.\n"
-                "4. Rewritten utterance should not contain more than 10 words.\n\n"
+                "You need to rewrite the utterance in a more formal tone using the following method:\n"
+                "1. Rewrite the utterance in a more formal tone.\n"
+                "2. Use polite and professional language while maintaining clarity.\n"
+                "3. The rewritten utterance should be grammatically correct and complete.\n"
+                "4. Keep the rewritten utterance within 15 words.\n\n"
                 "Intent name: Reserve Restaurant"
                 "Utterance: I want to reserve a table for 4 persons at 9 pm."
             ),
         ),
-        Message(role=Role.ASSISTANT, content="Please, reserve a table for me."),
+        Message(role=Role.ASSISTANT, content="I would like to make a reservation for four guests at 9 pm."),
         Message(
-            role=Role.USER,
+            role=Role.ASSISTANT,
             content=(
                 "Intent name: requesting technical support\n"
                 "Utterance: My Lenovo laptop is constantly rebooting and overheating."
             ),
         ),
-        Message(role=Role.ASSISTANT, content="I'm having trouble with my laptop."),
+        Message(
+            role=Role.ASSISTANT,
+            content="My Lenovo laptop frequently restarts and experiences overheating issues. Kindly assist.",
+        ),
     ]
 
     def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Make chat to complete."""
+        """Generate chat for formal tone adaptation."""
         return [
             *self._messages,
             Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),

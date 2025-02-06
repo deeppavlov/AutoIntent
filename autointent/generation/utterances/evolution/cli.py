@@ -7,7 +7,16 @@ from autointent import load_dataset
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
-from .chat_templates import AbstractEvolution, ConcreteEvolution, EvolutionChatTemplate, ReasoningEvolution
+from .chat_templates import (
+    AbstractEvolution,
+    ConcreteEvolution,
+    EvolutionChatTemplate,
+    FormalEvolution,
+    FunnyEvolution,
+    GoofyEvolution,
+    InformalEvolution,
+    ReasoningEvolution,
+)
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
@@ -40,7 +49,12 @@ def main() -> None:
     parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
     parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
     parser.add_argument("--abstract", action="store_true", help="Whether to use `Abstract` evolution")
+    parser.add_argument("--formal", action="store_true", help="Whether to use `Formal` evolution")
+    parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
+    parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
+    parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
     parser.add_argument("--seed", type=int, default=0)
+
     args = parser.parse_args()
 
     evolutions: list[EvolutionChatTemplate] = []
@@ -50,6 +64,18 @@ def main() -> None:
         evolutions.append(ConcreteEvolution())
     if args.abstract:
         evolutions.append(AbstractEvolution())
+    if args.formal:
+        evolutions.append(FormalEvolution())
+    if args.funny:
+        evolutions.append(FunnyEvolution())
+    if args.goofy:
+        evolutions.append(GoofyEvolution())
+    if args.informal:
+        evolutions.append(InformalEvolution())
+
+    if not evolutions:
+        logger.warning("No evolutions selected. Exiting.")
+        return
 
     dataset = load_dataset(args.input_path)
     n_before = len(dataset[args.split])

@@ -29,7 +29,10 @@ class ConcreteEvolution(EvolutionChatTemplate):
         Message(role=Role.ASSISTANT, content="I want to reserve a table for 4 persons at 9 pm."),
         Message(
             role=Role.USER,
-            content=("Intent name: requesting technical support\n" "Utterance: I'm having trouble with my laptop."),
+            content=(
+                "Intent name: requesting technical support\n"
+                "Utterance: I'm having trouble with my laptop."
+            ),
         ),
         Message(role=Role.ASSISTANT, content="My laptop is constantly rebooting and overheating."),
     ]
