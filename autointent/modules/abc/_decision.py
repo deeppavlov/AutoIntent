@@ -80,7 +80,7 @@ class DecisionModule(Module, ABC):
             val_scores = scores[j]
             train_folds = [i for i in range(context.data_handler.n_folds) if i != j]
             train_labels = [ut for i_fold in train_folds for ut in labels[i_fold]]
-            train_scores = [ut for i_fold in train_folds for ut in scores[i_fold]]
+            train_scores = np.array([sc for i_fold in train_folds for sc in scores[i_fold]])
             self.fit(train_scores, train_labels, context.data_handler.tags)  # type: ignore[arg-type]
             val_decisions = self.predict(val_scores)
             for name, fn in chosen_metrics.items():
