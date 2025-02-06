@@ -441,24 +441,26 @@
                     "title": "Module Name",
                     "type": "string"
                 },
-                "cv": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "Cv",
-                    "type": "array"
-                },
                 "embedder_name": {
                     "items": {
                         "type": "string"
                     },
                     "title": "Embedder Name",
                     "type": "array"
+                },
+                "cv": {
+                    "default": [
+                        3
+                    ],
+                    "items": {
+                        "type": "integer"
+                    },
+                    "title": "Cv",
+                    "type": "array"
                 }
             },
             "required": [
                 "module_name",
-                "cv",
                 "embedder_name"
             ],
             "title": "LogregAimedEmbeddingInitModel",
