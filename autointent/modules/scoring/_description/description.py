@@ -8,7 +8,9 @@ from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
+from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import ScoringModule
 
 
@@ -153,3 +155,31 @@ class DescriptionScorer(ScoringModule):
             context.data_handler.train_labels(0),
             context.data_handler.intent_descriptions,
         )
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+
+        all_val_scores = []
+        metrics_values: dict[str, list[float]] = {name: [] for name in chosen_metrics}
+        for j in range(context.data_handler.n_folds):
+            val_labels = context.data_handler.train_labels(j)
+            val_utterances = context.data_handler.train_utterances(j)
+
+            train_folds = [i for i in range(context.data_handler.n_folds) if i != j]
+            train_labels = [lab for i_fold in train_folds for lab in context.data_handler.train_labels(i_fold)]
+            train_utterances = [ut for i_fold in train_folds for ut in context.data_handler.train_utterances(i_fold)]
+
+            # filter out all OOS samples from train
+            train_utterances = [ut for ut, lab in zip(train_utterances, train_labels, strict=True) if lab is not None]
+            train_labels = [lab for lab in train_labels if lab is not None]
+
+            self.fit(train_utterances, train_labels, context.data_handler.intent_descriptions)  # type: ignore[arg-type]
+
+            val_scores = self.predict(val_utterances)
+            for name, fn in chosen_metrics.items():
+                metrics_values[name].append(fn(val_labels, val_scores))
+            all_val_scores.append(val_scores)
+
+        self._artifact = ScorerArtifact(folded_scores=all_val_scores)
+        return {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
