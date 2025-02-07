@@ -70,7 +70,7 @@ class LogregAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        cv: int,
+        cv: int = 3,
         embedder_config: EmbedderConfig | str,
     ) -> "LogregAimedEmbedding":
         """
