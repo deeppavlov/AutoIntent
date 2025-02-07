@@ -5,9 +5,6 @@ on:
     branches:
       - dev
 
-permissions:
-  contents: write
-
 jobs:
   generate-schema:
     runs-on: ubuntu-latest
@@ -15,8 +12,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        ref: ${{ github.head_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -25,23 +20,17 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install .
+        pip install .
 
     - name: Generate JSON Schema
-      run: python scripts/generate_json_schema_config.py
-
-    - name: Check for changes
-      id: check_changes
       run: |
-        git diff --exit-code docs/optimizer_config.schema.json || echo "changed=true" >> $GITHUB_ENV
+        python scripts/generate_json_schema_config.py
 
-    - name: Commit and push changes
-      if: env.changed == 'true'
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+    - name: Check for changes in JSON Schema
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add docs/optimizer_config.schema.json
-        git commit -m "Update optimizer_config.schema.json"
-        git push
+        if ! git diff --quiet docs/optimizer_config.schema.json; then
+          echo "Error: docs/optimizer_config.schema.json has been modified after running the generator script."
+          exit 1
+        else
+          echo "No changes detected in docs/optimizer_config.schema.json."
+        fi
