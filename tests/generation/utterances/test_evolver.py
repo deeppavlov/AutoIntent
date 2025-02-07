@@ -33,6 +33,7 @@ def test_on_dataset(dataset):
     assert n_before + len(new_samples) == n_after
     assert len(new_samples) == n_before
 
+
 def test_on_dataset_evolver_async(dataset):
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "LLM answer"
