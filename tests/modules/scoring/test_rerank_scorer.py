@@ -10,10 +10,9 @@ def test_base_rerank_scorer(dataset):
     scorer = RerankScorer(
         k=3,
         weights="distance",
-        embedder_name="sergeyzh/rubert-tiny-turbo",
+        embedder_config="sergeyzh/rubert-tiny-turbo",
         m=2,
-        cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-        embedder_device="cpu",
+        cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
     )
 
     test_data = [

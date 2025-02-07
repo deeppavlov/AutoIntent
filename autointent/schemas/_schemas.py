@@ -116,3 +116,33 @@ class Intent(BaseModel):
     regexp_full_match: list[str] = []
     regexp_partial_match: list[str] = []
     description: str | None = None
+
+
+class ModelConfig(BaseModel):
+    # device: str | None = None
+    batch_size: int = 32
+    max_length: int | None = None
+    # use_cache: bool = True
+
+
+class LLMConfig(ModelConfig):
+    temperature: float | None = None
+    base_url: str | None = None
+    token: str | None
+    extra_body: dict[str, Any] | None = None
+
+
+class STModelConfig(ModelConfig):
+    model_name: str
+    device: str | None = None
+    use_cache: bool = True
+
+
+class EmbedderConfig(STModelConfig):
+    # todo does we need query_instruction and passage_instruction?
+    query_instruction: str | None = None
+    passage_instruction: str | None = None
+
+
+class CrossEncoderConfig(STModelConfig):
+    train_head: bool = False

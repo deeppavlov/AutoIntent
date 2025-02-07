@@ -3,9 +3,9 @@
   search_space:
     - module_name: retrieval
       k: [10]
-      embedder_name:
-        - sentence-transformers/all-MiniLM-L6-v2
-        - avsolatorio/GIST-small-Embedding-v0
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+        - model_name: avsolatorio/GIST-small-Embedding-v0
 - node_type: scoring
   target_metric: scoring_roc_auc
   search_space:
@@ -14,7 +14,7 @@
       weights: [uniform, distance, closest]
     - module_name: linear
     - module_name: dnnc
-      cross_encoder_name:
+      cross_encoder_config:
         - cross-encoder/ms-marco-MiniLM-L-6-v2
         - avsolatorio/GIST-small-Embedding-v0
       k: [1, 3]

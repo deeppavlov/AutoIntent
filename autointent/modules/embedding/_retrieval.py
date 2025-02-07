@@ -7,6 +7,7 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
+from autointent.schemas._schemas import EmbedderConfig
 
 
 class RetrievalAimedEmbedding(EmbeddingModule):
@@ -44,51 +45,39 @@ class RetrievalAimedEmbedding(EmbeddingModule):
     def __init__(
         self,
         k: int,
-        embedder_name: str,
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
+        embedder_config: EmbedderConfig | str,
     ) -> None:
         """
         Initialize the RetrievalAimedEmbedding.
 
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_name: Name of the embedder used for creating embeddings.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param batch_size: Batch size for embedding generation.
-        :param max_length: Maximum sequence length for embeddings. None if not set.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
+        :param embedder_config: Name of the embedder used for creating embeddings.
         """
         self.k = k
-        self.embedder_name = embedder_name
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
+        if isinstance(embedder_config, dict):
+            embedder_config = EmbedderConfig(**embedder_config)
+        if isinstance(embedder_config, str):
+            embedder_config = EmbedderConfig(model_name=embedder_config)
+        self.embedder_config = embedder_config
 
     @classmethod
     def from_context(
         cls,
         context: Context,
         k: int,
-        embedder_name: str,
+        embedder_config: EmbedderConfig,
     ) -> "RetrievalAimedEmbedding":
         """
         Create an instance using a Context object.
 
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_name: Name of the embedder to use.
+        :param embedder_config: Name of the embedder to use.
         :return: Initialized RetrievalAimedEmbedding instance.
         """
         return cls(
             k=k,
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -101,11 +90,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
+            self.embedder_config,
         )
         self._vector_index.add(utterances, labels)
 
@@ -138,7 +123,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
 
         :return: A RetrieverArtifact object containing embedder information.
         """
-        return RetrieverArtifact(embedder_name=self.embedder_name)
+        return RetrieverArtifact(config=self.embedder_config)
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""

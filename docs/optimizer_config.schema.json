@@ -48,6 +48,58 @@
             "title": "ArgmaxDecisionInitModel",
             "type": "object"
         },
+        "CrossEncoderConfig": {
+            "properties": {
+                "batch_size": {
+                    "default": 32,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_length": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Max Length"
+                },
+                "model_name": {
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Device"
+                },
+                "use_cache": {
+                    "default": true,
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "train_head": {
+                    "default": false,
+                    "title": "Train Head",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "model_name"
+            ],
+            "title": "CrossEncoderConfig",
+            "type": "object"
+        },
         "DNNCScorerInitModel": {
             "properties": {
                 "module_name": {
@@ -55,11 +107,18 @@
                     "title": "Module Name",
                     "type": "string"
                 },
-                "cross_encoder_name": {
+                "cross_encoder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/CrossEncoderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Cross Encoder Name",
+                    "title": "Cross Encoder Config",
                     "type": "array"
                 },
                 "k": {
@@ -69,12 +128,15 @@
                     "title": "K",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -83,23 +145,13 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
-                    "type": "array"
-                },
-                "train_head": {
-                    "default": [
-                        false
-                    ],
-                    "items": {
-                        "type": "boolean"
-                    },
-                    "title": "Train Head",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
             "required": [
                 "module_name",
-                "cross_encoder_name",
+                "cross_encoder_config",
                 "k"
             ],
             "title": "DNNCScorerInitModel",
@@ -190,21 +242,21 @@
                     "title": "Temperature",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
                             {
-                                "type": "string"
+                                "$ref": "#/$defs/EmbedderConfig"
                             },
                             {
                                 "type": "null"
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -213,6 +265,77 @@
                 "temperature"
             ],
             "title": "DescriptionScorerInitModel",
+            "type": "object"
+        },
+        "EmbedderConfig": {
+            "properties": {
+                "batch_size": {
+                    "default": 32,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_length": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Max Length"
+                },
+                "model_name": {
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Device"
+                },
+                "use_cache": {
+                    "default": true,
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "query_instruction": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Query Instruction"
+                },
+                "passage_instruction": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Passage Instruction"
+                }
+            },
+            "required": [
+                "model_name"
+            ],
+            "title": "EmbedderConfig",
             "type": "object"
         },
         "EmbeddingNodeValidator": {
@@ -377,12 +500,15 @@
                     "title": "Weights",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -391,7 +517,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -410,12 +536,15 @@
                     "title": "Module Name",
                     "type": "string"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -424,7 +553,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -448,18 +577,25 @@
                     "title": "Cv",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
             "required": [
                 "module_name",
                 "cv",
-                "embedder_name"
+                "embedder_config"
             ],
             "title": "LogregAimedEmbeddingInitModel",
             "type": "object"
@@ -498,12 +634,15 @@
                     "title": "Ignore First Neighbours",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -512,7 +651,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -715,18 +854,18 @@
                     "title": "K",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "items": {
-                        "type": "string"
+                        "$ref": "#/$defs/EmbedderConfig"
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
             "required": [
                 "module_name",
                 "k",
-                "embedder_name"
+                "embedder_config"
             ],
             "title": "RetrievalAimedEmbeddingInitModel",
             "type": "object"
@@ -852,12 +991,15 @@
                     "title": "Clf Args",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -866,7 +1008,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },

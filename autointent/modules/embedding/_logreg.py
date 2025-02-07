@@ -13,6 +13,7 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
+from autointent.schemas._schemas import EmbedderConfig
 
 
 class LogregAimedEmbedding(EmbeddingModule):
@@ -49,28 +50,20 @@ class LogregAimedEmbedding(EmbeddingModule):
 
     def __init__(
         self,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str,
         cv: int = 3,
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the LogregAimedEmbedding.
 
+        :param embedder_config: Name of the embedder used for creating embeddings.
         :param cv: the number of folds used in LogisticRegressionCV
-        :param embedder_name: Name of the embedder used for creating embeddings.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_batch_size: Batch size for embedding generation.
-        :param embedder_max_length: Maximum sequence length for embeddings. None if not set.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.embedder_name = embedder_name
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
+        if isinstance(embedder_config, dict):
+            embedder_config = EmbedderConfig(**embedder_config)
+        elif isinstance(embedder_config, str):
+            embedder_config = EmbedderConfig(model_name=embedder_config)
+        self.embedder_config = embedder_config
         self.cv = cv
 
     @classmethod
@@ -78,23 +71,19 @@ class LogregAimedEmbedding(EmbeddingModule):
         cls,
         context: Context,
         cv: int,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str,
     ) -> "LogregAimedEmbedding":
         """
         Create a LogregAimedEmbedding instance using a Context object.
 
-        :param cv: the number of folds used in LogisticRegressionCV
         :param context: The context containing configurations and utilities.
-        :param embedder_name: Name of the embedder to use.
+        :param cv: the number of folds used in LogisticRegressionCV
+        :param embedder_config: Name of the embedder to use.
         :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(
             cv=cv,
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
         )
 
     def clear_cache(self) -> None:
@@ -110,11 +99,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         self._validate_task(labels)
 
         self._embedder = Embedder(
-            device=self.embedder_device,
-            model_name_or_path=self.embedder_name,
-            batch_size=self.embedder_batch_size,
-            max_length=self.embedder_max_length,
-            use_cache=self.embedder_use_cache,
+            self.embedder_config,
         )
         embeddings = self._embedder.embed(utterances)
 
@@ -158,7 +143,7 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         :return: A RetrieverArtifact object containing embedder information.
         """
-        return RetrieverArtifact(embedder_name=self.embedder_name)
+        return RetrieverArtifact(config=self.embedder_config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         embeddings = self._embedder.embed(utterances)

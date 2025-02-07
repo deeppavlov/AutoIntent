@@ -8,6 +8,7 @@ from numpy.typing import NDArray
 from autointent import Context, VectorIndex
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
+from autointent.schemas._schemas import EmbedderConfig
 
 
 class MLKnnScorer(ScoringModule):
@@ -58,34 +59,26 @@ class MLKnnScorer(ScoringModule):
     def __init__(
         self,
         k: int,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the MLKnnScorer.
 
         :param k: Number of nearest neighbors to consider.
-        :param embedder_name: Name of the embedder used for vectorization.
+        :param embedder_config: Config of the embedder used for vectorization.
         :param s: Smoothing parameter for probability calculations, defaults to 1.0.
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.k = k
-        self.embedder_name = embedder_name
+        if isinstance(embedder_config, dict):
+            embedder_config = EmbedderConfig(**embedder_config)
+        if isinstance(embedder_config, str):
+            embedder_config = EmbedderConfig(model_name=embedder_config)
+        self.embedder_config = embedder_config
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -94,7 +87,7 @@ class MLKnnScorer(ScoringModule):
         k: int,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
-        embedder_name: str | None = None,
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> "MLKnnScorer":
         """
         Create an MLKnnScorer instance using a Context object.
@@ -103,21 +96,17 @@ class MLKnnScorer(ScoringModule):
         :param k: Number of nearest neighbors to consider.
         :param s: Smoothing parameter for probability calculations, defaults to 1.0.
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized MLKnnScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.optimization_info.get_best_embedder()
 
         return cls(
             k=k,
-            embedder_name=embedder_name,
+            embedder_config=embedder_config,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
         )
 
     def get_embedder_name(self) -> str:
@@ -126,7 +115,7 @@ class MLKnnScorer(ScoringModule):
 
         :return: Embedder name.
         """
-        return self.embedder_name
+        return self.embedder_config.model_name
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
@@ -140,11 +129,13 @@ class MLKnnScorer(ScoringModule):
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
+            EmbedderConfig(
+                model_name=self.embedder_config.model_name,
+                device=self.embedder_config.device,
+                batch_size=self.embedder_config.batch_size,
+                max_length=self.embedder_config.max_length,
+                use_cache=self.embedder_config.use_cache,
+            ),
         )
         self._vector_index.add(utterances, labels)
 

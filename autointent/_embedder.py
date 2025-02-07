@@ -17,6 +17,7 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
 from ._hash import Hasher
+from .schemas._schemas import EmbedderConfig
 
 
 def get_embeddings_path(filename: str) -> Path:
@@ -40,7 +41,7 @@ class EmbedderDumpMetadata(TypedDict):
 
     model_name_or_path: str
     """Name of the hugging face model or a local path to sentence transformers dump."""
-    device: str
+    device: str | None
     """Torch notation for CPU or CUDA."""
     batch_size: int
     """Batch size used for embedding calculations."""
@@ -61,30 +62,19 @@ class Embedder:
     metadata_dict_name: str = "metadata.json"
     dump_dir: Path | None = None
 
-    def __init__(
-        self,
-        model_name_or_path: str | Path,
-        device: str = "cpu",
-        batch_size: int = 32,
-        max_length: int | None = None,
-        use_cache: bool = True,
-    ) -> None:
+    def __init__(self, embedder_config: EmbedderConfig) -> None:
         """
         Initialize the Embedder.
 
-        :param model_name_or_path: Path to a local model directory or a Hugging Face model name.
-        :param device: Device to run the model on (e.g., "cpu", "cuda").
-        :param batch_size: Batch size for embedding calculations.
-        :param max_length: Maximum sequence length for the embedding model.
-        :param use_cache: Flag indicating whether to cache intermediate embeddings.
+        :param embedder_config: Path to a local model directory or a Hugging Face model name.
         """
-        self.model_name = model_name_or_path
-        self.device = device
-        self.batch_size = batch_size
-        self.max_length = max_length
-        self.use_cache = use_cache
+        self.model_name = embedder_config.model_name
+        self.device = embedder_config.device
+        self.batch_size = embedder_config.batch_size
+        self.max_length = embedder_config.max_length
+        self.use_cache = embedder_config.use_cache
 
-        self.embedding_model = SentenceTransformer(str(model_name_or_path), device=device)
+        self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
 
         self.logger = logging.getLogger(__name__)
 
@@ -132,9 +122,7 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     @classmethod
-    def load(
-        cls, path: Path | str, batch_size: int | None = None, use_cache: bool | None = None, device: str | None = None
-    ) -> "Embedder":
+    def load(cls, path: Path | str) -> "Embedder":
         """
         Load the embedding model and metadata from disk.
 
@@ -144,11 +132,13 @@ class Embedder:
             metadata: EmbedderDumpMetadata = json.load(file)
 
         return cls(
-            model_name_or_path=metadata["model_name_or_path"],
-            device=device or metadata["device"],
-            batch_size=batch_size or metadata["batch_size"],
-            max_length=metadata["max_length"],
-            use_cache=use_cache or metadata["use_cache"],
+            EmbedderConfig(
+                model_name=metadata["model_name_or_path"],
+                device=metadata["device"],
+                batch_size=metadata["batch_size"],
+                max_length=metadata["max_length"],
+                use_cache=metadata["use_cache"],
+            )
         )
 
     def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
@@ -189,4 +179,4 @@ class Embedder:
             embeddings_path.parent.mkdir(parents=True, exist_ok=True)
             np.save(embeddings_path, embeddings)
 
-        return embeddings
+        return embeddings  # type: ignore[return-value]

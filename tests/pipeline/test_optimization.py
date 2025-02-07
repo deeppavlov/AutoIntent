@@ -5,7 +5,6 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import (
-    EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
@@ -26,7 +25,6 @@ def test_no_context_optimization(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -47,7 +45,6 @@ def test_save_db(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -68,7 +65,6 @@ def test_dump_modules(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
