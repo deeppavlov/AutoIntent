@@ -70,8 +70,8 @@ class LogregAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        cv: int = 3,
         embedder_config: EmbedderConfig | str,
+        cv: int = 3,
     ) -> "LogregAimedEmbedding":
         """
         Create a LogregAimedEmbedding instance using a Context object.

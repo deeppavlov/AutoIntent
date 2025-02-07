@@ -11,13 +11,13 @@ from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
     DataConfig,
-    LoggingConfig, VectorIndexConfig,
+    LoggingConfig,
+    VectorIndexConfig,
 )
 
 from ._utils import NumpyEncoder, load_dataset
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from ..schemas._schemas import EmbedderConfig
 
 
 class Context:

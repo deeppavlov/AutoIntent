@@ -147,7 +147,9 @@ class Ranker:
         if not self.train_classifier:
             return np.array(
                 self.cross_encoder.predict(
-                    pairs, batch_size=self.cross_encoder_config.batch_size, activation_fct=nn.Sigmoid()  # type: ignore[arg-type]
+                    pairs,  # type: ignore[arg-type]
+                    batch_size=self.cross_encoder_config.batch_size,
+                    activation_fct=nn.Sigmoid(),
                 )
             )
 

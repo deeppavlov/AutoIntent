@@ -2,8 +2,6 @@ import pytest
 
 from autointent import Context, Dataset
 from autointent.configs import (
-    CrossEncoderConfig,
-    EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
