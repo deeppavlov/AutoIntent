@@ -29,7 +29,7 @@ def get_embedding_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "embedder_name": [
+                "embedder_config": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
                 "module_name": "retrieval",
