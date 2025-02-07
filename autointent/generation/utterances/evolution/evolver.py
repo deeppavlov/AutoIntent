@@ -46,7 +46,7 @@ class UtteranceEvolver:
         return self.generator.get_chat_completion(chat)
 
     async def _evolve_async(self, utterance: str, intent_data: Intent) -> str:
-        """Apply evolutions single time asynchronously."""
+        """Apply evolutions a single time (asynchronously)."""
         maker = random.choice(self.prompt_makers)
         chat = maker(utterance, intent_data)
         return await self.generator.get_chat_completion_async(chat)
@@ -54,11 +54,6 @@ class UtteranceEvolver:
     def __call__(self, utterance: str, intent_data: Intent, n_evolutions: int = 1) -> list[str]:
         """Apply evolutions multiple times (synchronously)."""
         return [self._evolve(utterance, intent_data) for _ in range(n_evolutions)]
-
-    async def _call_async(self, utterance: str, intent_data: Intent, n_evolutions: int = 1) -> list[str]:
-        """Apply evolutions multiple times asynchronously."""
-        tasks = [self._evolve_async(utterance, intent_data) for _ in range(n_evolutions)]
-        return await asyncio.gather(*tasks)
 
     def augment(
         self,
