@@ -315,10 +315,8 @@ class DataHandler:  # TODO rename to Validator
         if self.scheme == "ho":
             return
 
-        train_folds = [split_name for split_name in self.dataset if split_name.startswith("train")]
-        self.dataset[Split.TRAIN] = concatenate_datasets([self.dataset[name] for name in train_folds])
-        for name in train_folds:
-            self.dataset.pop(name)
+        train_folds = [split_name for split_name in self.dataset if split_name.startswith(Split.TRAIN)]
+        self.dataset[Split.TRAIN] = concatenate_datasets([self.dataset.pop(name) for name in train_folds])
 
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,
