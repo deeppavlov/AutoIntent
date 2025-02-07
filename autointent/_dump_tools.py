@@ -6,6 +6,7 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
+from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
@@ -65,6 +66,8 @@ class Dumper:
                 joblib.dump(val, path / Dumper.estimators / key)
             elif isinstance(val, Ranker):
                 val.save(str(path / Dumper.cross_encoders / key))
+            elif isinstance(val, BaseModel):
+                simple_attrs[f"base_model_{key}"] = val.model_dump()
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
