@@ -111,7 +111,7 @@ class Ranker:
         """
         Initialize the Ranker.
 
-        :param cross_encoder_config: The cross-encoder hugging face model name to use.
+        :param cross_encoder_config: Config of the cross-encoder hugging face model name to use.
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """

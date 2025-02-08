@@ -51,7 +51,7 @@ class SklearnScorer(ScoringModule):
         """
         Initialize the SklearnScorer.
 
-        :param embedder_config: Name of the embedder model.
+        :param embedder_config: Config of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
         """
@@ -78,7 +78,7 @@ class SklearnScorer(ScoringModule):
         :param context: Context containing configurations and utilities.
         :param clf_name: Name of the sklearn classifier to use.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param embedder_config: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized SklearnScorer instance.
         """
         if embedder_config is None:

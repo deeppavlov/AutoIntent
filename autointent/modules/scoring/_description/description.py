@@ -41,7 +41,7 @@ class DescriptionScorer(ScoringModule):
         """
         Initialize the DescriptionScorer.
 
-        :param embedder_config: Name of the embedder model.
+        :param embedder_config: Config of the embedder model.
         :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
         """
         self.temperature = temperature
@@ -64,7 +64,7 @@ class DescriptionScorer(ScoringModule):
 
         :param context: Context containing configurations and utilities.
         :param temperature: Temperature parameter for scaling logits.
-        :param embedder_config: Name of the embedder model. If None, the best embedder is used.
+        :param embedder_config: Config of the embedder model. If None, the best embedder is used.
         :return: Initialized DescriptionScorer instance.
         """
         if embedder_config is None:

@@ -37,13 +37,13 @@ class RerankScorer(KNNScorer):
         """
         Initialize the RerankScorer.
 
-        :param embedder_config: Name of the embedder used for vectorization.
+        :param embedder_config: Config of the embedder used for vectorization.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy:
-            - "uniform" (or False): Equal weight for all neighbors.
-            - "distance" (or True): Weight inversely proportional to distance.
+            - "uniform": Equal weight for all neighbors.
+            - "distance": Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
-        :param cross_encoder_config: Name of the cross-encoder model used for re-ranking.
+        :param cross_encoder_config: Config of the cross-encoder model used for re-ranking.
         :param m: Number of top-ranked neighbors to consider, or None to use k.
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
         """
@@ -79,8 +79,9 @@ class RerankScorer(KNNScorer):
         :param context: Context object containing optimization information and vector index client.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy.
-        :param cross_encoder_config: Name of the cross-encoder model used for re-ranking.
-        :param embedder_config: Name of the embedder used for vectorization, or None to use the best existing embedder.
+        :param cross_encoder_config: Config of the cross-encoder model used for re-ranking.
+        :param embedder_config: Config of the embedder used for vectorization,
+            or None to use the best existing embedder.
         :param m: Number of top-ranked neighbors to consider, or None to use k.
         :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
         :return: An instance of RerankScorer.

@@ -64,11 +64,11 @@ class KNNScorer(ScoringModule):
         """
         Initialize the KNNScorer.
 
-        :param embedder_config: Name of the embedder used for vectorization.
+        :param embedder_config: Config of the embedder used for vectorization.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy:
-            - "uniform" (or False): Equal weight for all neighbors.
-            - "distance" (or True): Weight inversely proportional to distance.
+            - "uniform": Equal weight for all neighbors.
+            - "distance": Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
         """
         if isinstance(embedder_config, dict):
@@ -94,7 +94,7 @@ class KNNScorer(ScoringModule):
         :param context: Context containing configurations and utilities.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy for scoring.
-        :param embedder_config: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized KNNScorer instance.
         """
         if embedder_config is None:

@@ -51,7 +51,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         Initialize the RetrievalAimedEmbedding.
 
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Name of the embedder used for creating embeddings.
+        :param embedder_config: Config of the embedder used for creating embeddings.
         """
         self.k = k
         if isinstance(embedder_config, dict):
@@ -72,7 +72,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
 
         :param context: The context containing configurations and utilities.
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Name of the embedder to use.
+        :param embedder_config: Config of the embedder to use.
         :return: Initialized RetrievalAimedEmbedding instance.
         """
         return cls(

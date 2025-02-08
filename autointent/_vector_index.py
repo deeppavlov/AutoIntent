@@ -47,7 +47,7 @@ class VectorIndex:
         """
         Initialize the vector index.
 
-        :param embedder_config: Name of the embedding model to use.
+        :param embedder_config: Config of the embedding model to use.
         """
         self.embedder = Embedder(embedder_config)
 

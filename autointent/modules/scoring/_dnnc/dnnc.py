@@ -83,8 +83,8 @@ class DNNCScorer(ScoringModule):
         """
         Initialize the DNNCScorer.
 
-        :param cross_encoder_config: Name of the cross-encoder model.
-        :param embedder_config: Name of the embedder model.
+        :param cross_encoder_config: Config of the cross-encoder model.
+        :param embedder_config: Config of the embedder model.
         :param k: Number of nearest neighbors to retrieve.
         """
         if isinstance(cross_encoder_config, dict):
@@ -112,9 +112,9 @@ class DNNCScorer(ScoringModule):
         Create a DNNCScorer instance using a Context object.
 
         :param context: Context containing configurations and utilities.
-        :param cross_encoder_config: Name of the cross-encoder model.
+        :param cross_encoder_config: Config of the cross-encoder model.
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Name of the embedder model, or None to use the best embedder.
+        :param embedder_config: Config of the embedder model, or None to use the best embedder.
         :return: Initialized DNNCScorer instance.
         """
         if embedder_config is None:

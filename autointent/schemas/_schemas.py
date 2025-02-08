@@ -119,30 +119,40 @@ class Intent(BaseModel):
 
 
 class ModelConfig(BaseModel):
-    # device: str | None = None
     batch_size: int = 32
+    """Batch size for model inference."""
     max_length: int | None = None
-    # use_cache: bool = True
+    """Maximum length of input sequences."""
 
 
 class LLMConfig(ModelConfig):
     temperature: float | None = None
+    """Temperature for sampling from the model."""
     base_url: str | None = None
+    """Base URL for the model API."""
     token: str | None
+    """API token for the model."""
     extra_body: dict[str, Any] | None = None
+    """Extra body for the model API."""
 
 
 class STModelConfig(ModelConfig):
     model_name: str
+    """Name of the hugging face model."""
     device: str | None = None
+    """Torch notation for CPU or CUDA."""
     use_cache: bool = True
+    """Whether to use embeddings caching."""
 
 
 class EmbedderConfig(STModelConfig):
     # todo does we need query_instruction and passage_instruction?
     query_instruction: str | None = None
+    """Instruction for query."""
     passage_instruction: str | None = None
+    """Instruction for passage."""
 
 
 class CrossEncoderConfig(STModelConfig):
     train_head: bool = False
+    """Whether to train the head of the model."""

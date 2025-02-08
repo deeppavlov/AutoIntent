@@ -56,7 +56,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         """
         Initialize the LogregAimedEmbedding.
 
-        :param embedder_config: Name of the embedder used for creating embeddings.
+        :param embedder_config: Config of the embedder used for creating embeddings.
         :param cv: the number of folds used in LogisticRegressionCV
         """
         if isinstance(embedder_config, dict):
@@ -78,7 +78,7 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         :param context: The context containing configurations and utilities.
         :param cv: the number of folds used in LogisticRegressionCV
-        :param embedder_config: Name of the embedder to use.
+        :param embedder_config: Config of the embedder to use.
         :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(

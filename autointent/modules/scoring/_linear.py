@@ -61,7 +61,7 @@ class LinearScorer(ScoringModule):
         """
         Initialize the LinearScorer.
 
-        :param embedder_config: Name of the embedder model.
+        :param embedder_config: Config of the embedder model.
         :param cv: Number of cross-validation folds, defaults to 3.
         :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
         :param seed: Random seed for reproducibility, defaults to 0.
@@ -86,7 +86,7 @@ class LinearScorer(ScoringModule):
         Create a LinearScorer instance using a Context object.
 
         :param context: Context containing configurations and utilities.
-        :param embedder_config: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized LinearScorer instance.
         """
         if embedder_config is None:

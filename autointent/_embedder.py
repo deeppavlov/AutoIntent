@@ -66,7 +66,7 @@ class Embedder:
         """
         Initialize the Embedder.
 
-        :param embedder_config: Path to a local model directory or a Hugging Face model name.
+        :param embedder_config: Config of embedder.
         """
         self.model_name = embedder_config.model_name
         self.device = embedder_config.device
