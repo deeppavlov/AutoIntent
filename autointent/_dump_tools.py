@@ -65,8 +65,6 @@ class Dumper:
                 joblib.dump(val, path / Dumper.estimators / key)
             elif isinstance(val, Ranker):
                 val.save(str(path / Dumper.cross_encoders / key))
-            # elif isinstance(val, BaseModel):
-            #     simple_attrs[f"base_model_{key}"] = val.model_dump()
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)

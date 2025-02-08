@@ -130,62 +130,6 @@ class Context:
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
 
-    # def get_device(self) -> str:
-    #     """
-    #     Get the embedder device used by the vector index client.
-    #
-    #     :return: Device name.
-    #     """
-    #     return self.embedder_config.device
-    #
-    # def get_cross_encoder_device(self) -> str:
-    #     """
-    #     Get the cross encoder device used by default during optimization.
-    #
-    #     :return: Device name.
-    #     """
-    #     return self.cross_encoder_config.device
-    #
-    # def get_batch_size(self) -> int:
-    #     """
-    #     Get the batch size used by the embedder.
-    #
-    #     :return: Batch size.
-    #     """
-    #     return self.embedder_config.batch_size
-    #
-    # def get_cross_encoder_batch_size(self) -> int:
-    #     """
-    #     Get the batch size used by the cross encoder by default during optimization.
-    #
-    #     :return: Batch size.
-    #     """
-    #     return self.cross_encoder_config.batch_size
-    #
-    # def get_max_length(self) -> int | None:
-    #     """
-    #     Get the maximum sequence length for embeddings.
-    #
-    #     :return: Maximum length or None if not set.
-    #     """
-    #     return self.embedder_config.max_length
-    #
-    # def get_cross_encoder_max_length(self) -> int | None:
-    #     """
-    #     Get the maximum sequence length for embeddings.
-    #
-    #     :return: Maximum length or None if not set.
-    #     """
-    #     return self.cross_encoder_config.max_length
-    #
-    # def get_use_cache(self) -> bool:
-    #     """
-    #     Check if caching is enabled for the embedder.
-    #
-    #     :return: True if caching is enabled, False otherwise.
-    #     """
-    #     return self.embedder_config.use_cache
-
     def get_dump_dir(self) -> Path | None:
         """
         Get the directory for saving dumped modules.

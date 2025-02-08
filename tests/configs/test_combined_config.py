@@ -18,11 +18,10 @@ def valid_optimizer_config():
                 {
                     "module_name": "dnnc",
                     "cross_encoder_config": [
-                        "cross-encoder/ms-marco-MiniLM-L-6-v2",
-                        "avsolatorio/GIST-small-Embedding-v0",
+                        {"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": True},
+                        {"model_name": "avsolatorio/GIST-small-Embedding-v0", "train_head": False},
                     ],
                     "k": [1, 3],
-                    # "train_head": [False, True],
                 }
             ],
         },
