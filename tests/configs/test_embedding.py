@@ -12,8 +12,12 @@ def valid_embedding_config():
             "node_type": "embedding",
             "target_metric": "retrieval_mrr",
             "search_space": [
-                {"module_name": "logreg_embedding", "embedder_name": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
-                {"module_name": "retrieval", "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]},
+                {"module_name": "logreg_embedding", "embedder_config": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
+                {
+                    "module_name": "retrieval",
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "k": [5, 10],
+                },
             ],
         }
     ]

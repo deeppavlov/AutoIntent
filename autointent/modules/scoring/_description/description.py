@@ -81,7 +81,7 @@ class DescriptionScorer(ScoringModule):
 
         :return: Embedder name.
         """
-        return self.embedder_config.model_name
+        return self.embedder_config
 
     def fit(
         self,

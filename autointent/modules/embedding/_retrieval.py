@@ -65,7 +65,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         cls,
         context: Context,
         k: int,
-        embedder_config: EmbedderConfig,
+        embedder_config: EmbedderConfig | str,
     ) -> "RetrievalAimedEmbedding":
         """
         Create an instance using a Context object.

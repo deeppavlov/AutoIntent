@@ -4,7 +4,7 @@ from autointent.modules.embedding import LogregAimedEmbedding
 def test_get_assets_returns_correct_artifact_for_logreg():
     module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
     artifact = module.get_assets()
-    assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"
+    assert artifact.config.model_name == "sergeyzh/rubert-tiny-turbo"
 
 
 def test_fit_trains_model():
