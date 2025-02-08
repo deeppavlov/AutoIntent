@@ -96,7 +96,7 @@ class LinearScorer(ScoringModule):
             embedder_config=embedder_config,
         )
 
-    def get_embedder_name(self) -> str:
+    def get_embedder_name(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 

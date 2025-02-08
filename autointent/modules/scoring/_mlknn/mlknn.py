@@ -109,7 +109,7 @@ class MLKnnScorer(ScoringModule):
             ignore_first_neighbours=ignore_first_neighbours,
         )
 
-    def get_embedder_name(self) -> str:
+    def get_embedder_name(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 

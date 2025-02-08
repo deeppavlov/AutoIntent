@@ -33,7 +33,10 @@ def valid_optimizer_config():
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2", "avsolatorio/GIST-small-Embedding-v0"],
+                    "embedder_config": [
+                        "sentence-transformers/all-MiniLM-L6-v2",
+                        "avsolatorio/GIST-small-Embedding-v0",
+                    ],
                 }
             ],
         },
