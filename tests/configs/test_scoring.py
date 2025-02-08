@@ -14,7 +14,7 @@ def valid_scoring_config():
             "search_space": [
                 {
                     "module_name": "dnnc",
-                    "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                    "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
                     "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5, 10],
                     "train_head": [False, True],
@@ -40,8 +40,8 @@ def valid_scoring_config():
                 },
                 {
                     "module_name": "rerank",
-                    "embedder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5],
                     "weights": ["distance"],
                     "rank_threshold_cutoff": [None, 3],

@@ -30,7 +30,7 @@ def test_valid_embedding_config(valid_embedding_config):
     assert config[0].target_metric == "retrieval_mrr"
     assert isinstance(config[0].search_space, list)
     assert config[0].search_space[0].module_name == "logreg_embedding"
-    assert "embedder_name" in config[0].search_space[0].model_dump()
+    assert "embedder_config" in config[0].search_space[0].model_dump()
 
 
 def test_invalid_embedding_config_missing_field():

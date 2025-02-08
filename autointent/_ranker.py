@@ -115,6 +115,10 @@ class Ranker:
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
+        if isinstance(cross_encoder_config, dict):
+            cross_encoder_config = CrossEncoderConfig(**cross_encoder_config)
+        if isinstance(cross_encoder_config, str):
+            cross_encoder_config = CrossEncoderConfig(model_name=cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
             cross_encoder_config.model_name,
             trust_remote_code=True,

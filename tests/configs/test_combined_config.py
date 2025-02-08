@@ -17,12 +17,12 @@ def valid_optimizer_config():
             "search_space": [
                 {
                     "module_name": "dnnc",
-                    "cross_encoder_name": [
+                    "cross_encoder_config": [
                         "cross-encoder/ms-marco-MiniLM-L-6-v2",
                         "avsolatorio/GIST-small-Embedding-v0",
                     ],
                     "k": [1, 3],
-                    "train_head": [False, True],
+                    # "train_head": [False, True],
                 }
             ],
         },
@@ -33,7 +33,7 @@ def valid_optimizer_config():
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2", "avsolatorio/GIST-small-Embedding-v0"],
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2", "avsolatorio/GIST-small-Embedding-v0"],
                 }
             ],
         },

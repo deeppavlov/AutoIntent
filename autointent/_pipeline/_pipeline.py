@@ -130,6 +130,7 @@ class Pipeline:
         context = Context()
         context.set_dataset(dataset)
         context.configure_logging(self.logging_config)
+        context.configure_vector_index(self.vector_index_config)
 
         self._fit(context)
 
