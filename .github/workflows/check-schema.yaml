@@ -1,4 +1,4 @@
-name: Generate JSON Schema
+name: Check JSON Schema
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
 
     - name: Generate JSON Schema
       run: |
-        python scripts/generate_json_schema_config.py
+        make schema
 
     - name: Check for changes in JSON Schema
       run: |
