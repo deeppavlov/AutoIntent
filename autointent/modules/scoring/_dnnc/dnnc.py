@@ -50,7 +50,7 @@ class DNNCScorer(ScoringModule):
         labels = [0, 1]
         scorer = DNNCScorer(
             cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
         scorer.fit(utterances, labels)

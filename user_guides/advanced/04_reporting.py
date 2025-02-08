@@ -14,7 +14,7 @@ search_space = [
             {
                 "module_name": "retrieval",
                 "k": [10],
-                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0", "sergeyzh/rubert-tiny-turbo"],
+                "embedder_config": ["avsolatorio/GIST-small-Embedding-v0", "sergeyzh/rubert-tiny-turbo"],
             }
         ],
     },

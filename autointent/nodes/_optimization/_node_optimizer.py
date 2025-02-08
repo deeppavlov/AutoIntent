@@ -64,9 +64,9 @@ class NodeOptimizer:
                 )
                 module = self.node_info.modules_available[module_name].from_context(context, **module_kwargs)
 
-                embedder_name = module.get_embedder_name()
-                if embedder_name is not None:
-                    module_kwargs["embedder_config"] = embedder_name
+                embedder_config = module.get_embedder_name()
+                if embedder_config is not None:
+                    module_kwargs["embedder_config"] = embedder_config
 
                 self._logger.debug("optimizing %s module...", module_name)
                 self.module_fit(module, context)

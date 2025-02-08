@@ -30,7 +30,7 @@ class MLKnnScorer(ScoringModule):
         labels = [[1,0], [0,1]]
         scorer = MLKnnScorer(
             k=5,
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
         )
         scorer.fit(utterances, labels)
         test_utterances = ["Hi!", "What's up?"]

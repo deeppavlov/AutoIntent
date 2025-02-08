@@ -24,7 +24,7 @@ search_space = [
                 "module_name": "knn",
                 "k": [1],
                 "weights": ["uniform"],
-                "embedder_name": ["avsolatorio/GIST-small-Embedding-v0"],
+                "embedder_config": ["avsolatorio/GIST-small-Embedding-v0"],
             },
         ],
     },

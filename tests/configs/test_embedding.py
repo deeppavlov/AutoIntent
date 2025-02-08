@@ -40,7 +40,7 @@ def test_invalid_embedding_config_missing_field():
             "node_type": "embedding",
             # Missing "target_metric"
             "search_space": [
-                {"module_name": "retrieval", "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]}
+                {"module_name": "retrieval", "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]}
             ],
         }
     ]
@@ -58,7 +58,7 @@ def test_invalid_embedding_config_wrong_type():
             "search_space": [
                 {
                     "module_name": "logreg_embedding",
-                    "embedder_name": "not_a_list",  # Should be a list of strings
+                    "embedder_config": "not_a_list",  # Should be a list of strings
                     "cv": ["wrong_type"],  # Should be a list of integers
                 }
             ],

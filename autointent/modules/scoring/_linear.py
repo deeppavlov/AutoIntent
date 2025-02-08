@@ -28,7 +28,7 @@ class LinearScorer(ScoringModule):
 
         from autointent.modules import LinearScorer
         scorer = LinearScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo", cv=2
+            embedder_config="sergeyzh/rubert-tiny-turbo", cv=2
         )
         utterances = ["hello", "goodbye", "allo", "sayonara"]
         labels = [0, 1, 0, 1]

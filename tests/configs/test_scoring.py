@@ -88,7 +88,7 @@ def test_invalid_scoring_config_wrong_type():
         "search_space": [
             {
                 "module_name": "knn",
-                "embedder_name": "should_be_list",  # Should be a list of strings
+                "embedder_config": "should_be_list",  # Should be a list of strings
                 "k": "not_an_int_list",  # Should be a list of integers
                 "weights": ["uniform", "distance"],
             }

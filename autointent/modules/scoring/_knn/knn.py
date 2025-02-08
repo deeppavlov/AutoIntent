@@ -33,7 +33,7 @@ class KNNScorer(ScoringModule):
         utterances = ["hello", "how are you?"]
         labels = [0, 1]
         scorer = KNNScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
         scorer.fit(utterances, labels)

@@ -30,7 +30,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         labels = [0, 1, 1]
         retrieval = RetrievalAimedEmbedding(
             k=2,
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
         )
         retrieval.fit(utterances, labels)
 
