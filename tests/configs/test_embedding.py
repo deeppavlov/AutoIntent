@@ -40,7 +40,11 @@ def test_invalid_embedding_config_missing_field():
             "node_type": "embedding",
             # Missing "target_metric"
             "search_space": [
-                {"module_name": "retrieval", "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"], "k": [5, 10]}
+                {
+                    "module_name": "retrieval",
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "k": [5, 10],
+                }
             ],
         }
     ]
