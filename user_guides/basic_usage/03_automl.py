@@ -60,35 +60,6 @@ custom_pipeline = Pipeline.from_search_space(search_space)
 """
 See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
 """
-
-# %% [markdown]
-"""
-## Embedder Settings
-
-%mddoclink(class,,Embedder) is one of the key components of AutoIntent. It affects both the quality of the resulting classifier and the efficiency of the auto configuration process.
-
-To select embedding models for your optimization, you need to customize search space (%mddoclink(notebook,advanced.02_search_space_configuration)). Here, we will observe settings affecting efficiency.
-
-Several options are customizable via %mddoclink(class,configs,EmbedderConfig). Defaults are the following:
-"""
-
-# %%
-from autointent.configs import EmbedderConfig
-
-embedder_config = EmbedderConfig(
-    batch_size=32,
-    max_length=None,
-    use_cache=False,
-)
-
-# %% [markdown]
-"""
-To set selected settings, method %mddoclink(method,Pipeline,set_config) is provided:
-"""
-
-# %%
-custom_pipeline.set_config(embedder_config)
-
 # %% [markdown]
 """
 ## Vector Index Settings
@@ -134,7 +105,7 @@ custom_pipeline.set_config(logging_config)
 
 # %%
 from autointent import Dataset, Pipeline
-from autointent.configs import EmbedderConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import LoggingConfig, VectorIndexConfig
 from autointent.utils import load_default_search_space
 
 # load data
@@ -147,11 +118,9 @@ search_space = load_default_search_space(multilabel=False)
 custom_pipeline = Pipeline.from_search_space(search_space)
 
 # custom settings
-embedder_config = EmbedderConfig()
 vector_index_config = VectorIndexConfig()
 logging_config = LoggingConfig()
 
-custom_pipeline.set_config(embedder_config)
 custom_pipeline.set_config(vector_index_config)
 custom_pipeline.set_config(logging_config)
 
