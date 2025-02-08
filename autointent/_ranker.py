@@ -122,7 +122,7 @@ class Ranker:
         self.cross_encoder = st.CrossEncoder(
             cross_encoder_config.model_name,
             trust_remote_code=True,
-            device=cross_encoder_config.device,  # type: ignore[arg-type]
+            device=cross_encoder_config.device,
             max_length=cross_encoder_config.max_length,  # type: ignore[arg-type]
         )
         self.train_classifier = False
@@ -151,14 +151,14 @@ class Ranker:
         if not self.train_classifier:
             return np.array(
                 self.cross_encoder.predict(
-                    pairs,  # type: ignore[arg-type]
+                    pairs,
                     batch_size=self.cross_encoder_config.batch_size,
                     activation_fct=nn.Sigmoid(),
                 )
             )
 
         # put the data through, features will be taken in the hook
-        self.cross_encoder.predict(pairs, batch_size=self.cross_encoder_config.batch_size)  # type: ignore[arg-type]
+        self.cross_encoder.predict(pairs, batch_size=self.cross_encoder_config.batch_size)
 
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()

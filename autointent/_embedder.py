@@ -179,4 +179,4 @@ class Embedder:
             embeddings_path.parent.mkdir(parents=True, exist_ok=True)
             np.save(embeddings_path, embeddings)
 
-        return embeddings  # type: ignore[return-value]
+        return embeddings
