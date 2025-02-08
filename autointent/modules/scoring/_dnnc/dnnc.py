@@ -76,8 +76,8 @@ class DNNCScorer(ScoringModule):
 
     def __init__(
         self,
-        cross_encoder_config: CrossEncoderConfig | str,
-        embedder_config: EmbedderConfig | str,
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: int,
     ) -> None:
         """

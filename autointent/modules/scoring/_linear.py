@@ -53,7 +53,7 @@ class LinearScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         cv: int = 3,
         n_jobs: int | None = None,
         seed: int = 0,

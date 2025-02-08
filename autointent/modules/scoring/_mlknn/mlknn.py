@@ -59,7 +59,7 @@ class MLKnnScorer(ScoringModule):
     def __init__(
         self,
         k: int,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
     ) -> None:

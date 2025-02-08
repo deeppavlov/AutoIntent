@@ -1,6 +1,6 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
-from typing import Literal
+from typing import Any, Literal
 
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
@@ -17,7 +17,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its retrieval quality as a sort of proxy metric.
 
-    :ivar vector_index: The vector index used for nearest neighbor retrieval.
+    :ivar _vector_index: The vector index used for nearest neighbor retrieval.
     :ivar name: Name of the module, defaults to "retrieval".
 
     Examples
@@ -45,7 +45,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
     def __init__(
         self,
         k: int,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
     ) -> None:
         """
         Initialize the RetrievalAimedEmbedding.

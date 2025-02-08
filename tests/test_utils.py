@@ -1,6 +1,5 @@
 import pytest
 
-from autointent import Pipeline
 from autointent.nodes import OptimizationConfig
 from autointent.utils import load_default_search_space
 

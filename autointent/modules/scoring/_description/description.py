@@ -20,7 +20,7 @@ class DescriptionScorer(ScoringModule):
     DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
     between the two, using either cosine similarity and softmax.
 
-    :ivar embedder: The embedder used to generate embeddings for utterances and descriptions.
+    :ivar _embedder: The embedder used to generate embeddings for utterances and descriptions.
     :ivar name: Name of the scorer, defaults to "description".
 
     """
@@ -35,7 +35,7 @@ class DescriptionScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         temperature: float = 1.0,
     ) -> None:
         """

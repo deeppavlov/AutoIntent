@@ -57,7 +57,7 @@ class KNNScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: int,
         weights: WEIGHT_TYPES = "distance",
     ) -> None:

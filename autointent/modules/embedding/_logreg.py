@@ -1,6 +1,6 @@
 """LogregAimedEmbedding class for a proxy optimzation of embedding."""
 
-from typing import Literal
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -50,7 +50,7 @@ class LogregAimedEmbedding(EmbeddingModule):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         cv: int = 3,
     ) -> None:
         """

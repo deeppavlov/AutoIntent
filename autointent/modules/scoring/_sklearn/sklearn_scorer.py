@@ -44,7 +44,7 @@ class SklearnScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         clf_name: str,
         clf_args: dict[str, Any] | None = None,
     ) -> None:

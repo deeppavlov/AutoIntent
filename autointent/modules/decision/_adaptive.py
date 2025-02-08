@@ -26,8 +26,7 @@ class AdaptiveDecision(DecisionModule):
     The AdaptiveDecision calculates optimal thresholds based on the given
     scores and labels, ensuring the best performance on multi-label data.
 
-    :ivar metadata_dict_name: Filename for saving metadata to disk.
-    :ivar n_classes: Number of classes in the dataset.
+    :ivar _n_classes: Number of classes in the dataset.
     :ivar _r: Scaling factor for thresholds.
     :ivar tags: List of Tag objects for mutually exclusive classes.
     :ivar name: Name of the predictor, defaults to "adaptive".
