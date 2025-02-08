@@ -69,7 +69,7 @@ class UtteranceEvolver:
         Note that for now it supports only single-label datasets.
         """
         if self.async_mode:
-            return asyncio.get_event_loop().run_until_complete(
+            return asyncio.run(
                 self._augment_async(
                     dataset=dataset,
                     split_name=split_name,

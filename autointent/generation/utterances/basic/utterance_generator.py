@@ -61,9 +61,7 @@ class UtteranceGenerator:
         :return: List of generated samples
         """
         if self.async_mode:
-            return asyncio.get_event_loop().run_until_complete(
-                self._augment_async(dataset, split_name, n_generations, update_split, batch_size)
-            )
+            return asyncio.run(self._augment_async(dataset, split_name, n_generations, update_split, batch_size))
 
         original_split = dataset[split_name]
         new_samples = []
