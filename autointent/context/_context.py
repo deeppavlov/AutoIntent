@@ -85,7 +85,7 @@ class Context:
             dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
         )
 
-    def set_dataset(self, dataset: Dataset, scheme: ValidationType = "ho") -> None:
+    def set_dataset(self, dataset: Dataset, scheme: ValidationType = "ho", n_folds: int = 3) -> None:
         """
         Set the datasets for training, validation and testing.
 
@@ -95,6 +95,7 @@ class Context:
             dataset=dataset,
             random_seed=self.seed,
             scheme=scheme,
+            n_folds=n_folds,
         )
 
     def get_inference_config(self) -> dict[str, Any]:

@@ -16,6 +16,8 @@ class DataConfig(BaseModel):
     """Path to the training data. Can be local path or HF repo."""
     scheme: ValidationType
     """Hold-out or cross-validation."""
+    n_folds: int = 3
+    """Number of folds in cross-validation."""
 
 
 class TaskConfig(BaseModel):

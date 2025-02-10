@@ -122,7 +122,9 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, scheme: ValidationType = "ho", refit_after: bool = False) -> Context:
+    def fit(
+        self, dataset: Dataset, scheme: ValidationType = "ho", n_folds: int = 3, refit_after: bool = False
+    ) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -134,7 +136,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         context = Context()
-        context.set_dataset(dataset, scheme)
+        context.set_dataset(dataset, scheme, n_folds)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
         context.configure_cross_encoder(self.cross_encoder_config)
