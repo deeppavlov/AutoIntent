@@ -3,14 +3,14 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType
+from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -122,7 +122,7 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset, scheme: Literal["ho", "cv"] = "ho", refit_after: bool = False) -> Context:
+    def fit(self, dataset: Dataset, scheme: ValidationType = "ho", refit_after: bool = False) -> Context:
         """
         Optimize the pipeline from dataset.
 

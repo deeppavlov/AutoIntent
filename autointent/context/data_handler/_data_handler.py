@@ -2,13 +2,13 @@
 
 import logging
 from collections.abc import Generator
-from typing import Literal, TypedDict, cast
+from typing import TypedDict, cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split, ValidationType
 
 from ._stratification import split_dataset
 
@@ -32,7 +32,7 @@ class DataHandler:  # TODO rename to Validator
     def __init__(
         self,
         dataset: Dataset,
-        scheme: Literal["cv", "ho"] = "ho",
+        scheme: ValidationType = "ho",
         split_train: bool = True,
         random_seed: int = 0,
         n_folds: int = 3,

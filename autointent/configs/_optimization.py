@@ -1,9 +1,10 @@
 """Configuration for the optimization process."""
 
 from pathlib import Path
-from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from autointent.custom_types import ValidationType
 
 from ._name import get_run_name
 
@@ -13,7 +14,7 @@ class DataConfig(BaseModel):
 
     train_path: str | Path
     """Path to the training data. Can be local path or HF repo."""
-    scheme: Literal["ho", "cv"]
+    scheme: ValidationType
     """Hold-out or cross-validation."""
 
 
