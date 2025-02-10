@@ -217,7 +217,7 @@ class Pipeline:
         """
         Fit pipeline of already selected modules with all train data.
 
-        :param utterances: list of utterances
+        :param context: context object to take data from
         :return: list of predicted labels
         """
         if not self._is_inference():
