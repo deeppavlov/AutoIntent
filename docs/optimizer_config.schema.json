@@ -536,69 +536,6 @@
             "title": "NodeType",
             "type": "string"
         },
-        "RegExpInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "regexp",
-                    "title": "Module Name",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "RegExpInitModel",
-            "type": "object"
-        },
-        "RegexNodeValidator": {
-            "description": "Search space configuration for the Regexp node.",
-            "properties": {
-                "node_type": {
-                    "$ref": "#/$defs/NodeType",
-                    "default": "regexp"
-                },
-                "target_metric": {
-                    "enum": [
-                        "regexp_partial_accuracy",
-                        "regexp_partial_precision"
-                    ],
-                    "title": "Target Metric",
-                    "type": "string"
-                },
-                "metrics": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "enum": [
-                                    "regexp_partial_accuracy",
-                                    "regexp_partial_precision"
-                                ],
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Metrics"
-                },
-                "search_space": {
-                    "items": {
-                        "$ref": "#/$defs/RegExpInitModel"
-                    },
-                    "title": "Search Space",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "target_metric",
-                "search_space"
-            ],
-            "title": "RegexNodeValidator",
-            "type": "object"
-        },
         "RerankScorerInitModel": {
             "properties": {
                 "module_name": {
@@ -940,9 +877,6 @@
     "description": "Optimizer configuration.",
     "items": {
         "anyOf": [
-            {
-                "$ref": "#/$defs/RegexNodeValidator"
-            },
             {
                 "$ref": "#/$defs/EmbeddingNodeValidator"
             },
