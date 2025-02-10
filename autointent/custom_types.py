@@ -72,3 +72,4 @@ class Split:
 
 
 ValidationType = Literal["ho", "cv"]
+TuningType = Literal["brute", "bayes"]
