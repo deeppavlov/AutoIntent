@@ -10,7 +10,7 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationType
+from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -123,7 +123,7 @@ class Pipeline:
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
     def fit(
-        self, dataset: Dataset, scheme: ValidationType = "ho", n_folds: int = 3, refit_after: bool = False
+        self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3, refit_after: bool = False
     ) -> Context:
         """
         Optimize the pipeline from dataset.

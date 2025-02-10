@@ -71,4 +71,4 @@ class Split:
     INTENTS = "intents"
 
 
-ValidationType = Literal["ho", "cv"]
+ValidationScheme = Literal["ho", "cv"]

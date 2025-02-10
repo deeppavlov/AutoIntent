@@ -16,7 +16,7 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
 )
-from autointent.custom_types import ValidationType
+from autointent.custom_types import ValidationScheme
 
 from ._utils import NumpyEncoder, load_dataset
 from .data_handler import DataHandler
@@ -85,7 +85,7 @@ class Context:
             dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
         )
 
-    def set_dataset(self, dataset: Dataset, scheme: ValidationType = "ho", n_folds: int = 3) -> None:
+    def set_dataset(self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3) -> None:
         """
         Set the datasets for training, validation and testing.
 
