@@ -75,8 +75,8 @@ class LogregAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        cv: int,
         embedder_name: str,
+        cv: int = 3,
     ) -> "LogregAimedEmbedding":
         """
         Create a LogregAimedEmbedding instance using a Context object.
@@ -87,8 +87,8 @@ class LogregAimedEmbedding(EmbeddingModule):
         :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(
-            cv=cv,
             embedder_name=embedder_name,
+            cv=cv,
             embedder_device=context.get_device(),
             embedder_batch_size=context.get_batch_size(),
             embedder_max_length=context.get_max_length(),
