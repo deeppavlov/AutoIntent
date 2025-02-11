@@ -18,10 +18,6 @@ from autointent.custom_types import NodeType, TuningType
 from autointent.nodes._nodes_info import NODES_INFO
 
 
-class ParamSpaceCat(TypedDict):
-    choices: list[Any]
-
-
 class ParamSpaceInt(TypedDict, total=False):
     low: int
     high: int
@@ -38,7 +34,7 @@ class ParamSpaceFloat(TypedDict, total=False):
 
 class ParamSpace(TypedDict):
     type: Literal["cat", "int", "float"]
-    content: ParamSpaceCat | ParamSpaceInt | ParamSpaceFloat
+    content: ParamSpaceInt | ParamSpaceFloat
 
 
 class NodeOptimizer:
@@ -199,8 +195,6 @@ class NodeOptimizer:
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif param_space["type"] == "cat":
-                res[param_name] = trial.suggest_categorical(param_name, **param_space["content"])
             elif param_space["type"] == "int":
                 res[param_name] = trial.suggest_int(param_name, **param_space["content"])
             elif param_space["type"] == "float":
