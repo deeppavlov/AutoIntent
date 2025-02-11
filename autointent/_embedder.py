@@ -17,7 +17,7 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
 from ._hash import Hasher
-from .schemas._schemas import EmbedderConfig
+from .schemas._schemas import EmbedderConfig, TaskTypeEnum
 
 
 def get_embeddings_path(filename: str) -> Path:
@@ -73,8 +73,11 @@ class Embedder:
         self.batch_size = embedder_config.batch_size
         self.max_length = embedder_config.max_length
         self.use_cache = embedder_config.use_cache
+        self.embedding_config = embedder_config
 
-        self.embedding_model = SentenceTransformer(self.model_name, device=self.device)
+        self.embedding_model = SentenceTransformer(
+            self.model_name, device=self.device, prompts=embedder_config.get_prompt_config()
+        )
 
         self.logger = logging.getLogger(__name__)
 
@@ -141,11 +144,12 @@ class Embedder:
             )
         )
 
-    def embed(self, utterances: list[str]) -> npt.NDArray[np.float32]:
+    def embed(self, utterances: list[str], task_type: TaskTypeEnum | None = None) -> npt.NDArray[np.float32]:
         """
         Calculate embeddings for a list of utterances.
 
         :param utterances: List of input texts to calculate embeddings for.
+        :param task_type: Type of task for which embeddings are calculated.
         :return: A numpy array of embeddings.
         """
         if self.use_cache:
@@ -173,6 +177,7 @@ class Embedder:
             convert_to_numpy=True,
             batch_size=self.batch_size,
             normalize_embeddings=True,
+            prompt_name=self.embedding_config.get_prompt_type(task_type),
         )
 
         if self.use_cache:

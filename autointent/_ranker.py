@@ -116,21 +116,20 @@ class Ranker:
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
-        cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
-            cross_encoder_config.model_name,
+            self.cross_encoder_config.model_name,
             trust_remote_code=True,
-            device=cross_encoder_config.device,
-            max_length=cross_encoder_config.max_length,  # type: ignore[arg-type]
+            device=self.cross_encoder_config.device,
+            max_length=self.cross_encoder_config.max_length,  # type: ignore[arg-type]
         )
         self.train_classifier = False
         self._clf = classifier_head
-        self.cross_encoder_config = cross_encoder_config
 
-        if classifier_head is not None or cross_encoder_config.train_head:
+        if classifier_head is not None or self.cross_encoder_config.train_head:
             self.train_classifier = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
+            self._hook_handler = self.cross_encoder.model.classification.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         self._activations_list.append(input_tensor[0].cpu().numpy())

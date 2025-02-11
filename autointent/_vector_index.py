@@ -17,6 +17,7 @@ import numpy.typing as npt
 from autointent import Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.schemas import EmbedderConfig
+from autointent.schemas._schemas import TaskTypeEnum
 
 
 class VectorIndexMetadata(TypedDict):
@@ -64,7 +65,7 @@ class VectorIndex:
         :param labels: List of labels corresponding to the texts.
         """
         self.logger.debug("Adding embeddings to vector index %s", self.embedder.model_name)
-        embeddings = self.embedder.embed(texts)
+        embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
@@ -103,7 +104,7 @@ class VectorIndex:
         :param k: Number of nearest neighbors to return.
         :return: List of search results for each query.
         """
-        query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts)  # type: ignore[assignment]
+        query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts, TaskTypeEnum.query)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:

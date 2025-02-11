@@ -12,6 +12,5 @@ __all__ = [
     "LinearScorer",
     "MLKnnScorer",
     "RerankScorer",
-    "ScoringModule",
     "SklearnScorer",
 ]

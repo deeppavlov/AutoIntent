@@ -4,6 +4,7 @@ This module provides data models for utterances, intents, and tags.
 """
 
 import json
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -155,18 +156,79 @@ class STModelConfig(ModelConfig):
         :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
         """
         if isinstance(values, BaseModel):
-            return values
+            return values  # type: ignore[return-value]
         if isinstance(values, str):
             return cls(model_name=values)
         return cls(**values)
 
 
+class TaskTypeEnum(Enum):
+    """Enum for different types of prompts."""
+
+    default = "default"
+    classification = "classification"
+    cluster = "cluster"
+    query = "query"
+    passage = "passage"
+    sts = "sts"
+
+
 class EmbedderConfig(STModelConfig):
-    # todo does we need query_instruction and passage_instruction?
-    query_instruction: str | None = None
-    """Instruction for query."""
-    passage_instruction: str | None = None
-    """Instruction for passage."""
+    default_prompt: str | None = None
+    """Default prompt for the model. This is used when no task specific prompt is not provided."""
+    classifier_prompt: str | None = None
+    """Prompt for classifier."""
+    cluster_prompt: str | None = None
+    """Prompt for clustering."""
+    sts_prompt: str | None = None
+    """Prompt for finding most similar sentences."""
+    query_prompt: str | None = None
+    """Prompt for query."""
+    passage_prompt: str | None = None
+    """Prompt for passage."""
+
+    def get_prompt_config(self) -> dict[str, str] | None:
+        """Get the prompt config for the given prompt type.
+
+        :return: The prompt config for the given prompt type.
+        """
+        prompts = {}
+        if self.default_prompt:
+            prompts[TaskTypeEnum.default.value] = self.default_prompt
+        if self.classifier_prompt:
+            prompts[TaskTypeEnum.classification.value] = self.classifier_prompt
+        if self.cluster_prompt:
+            prompts[TaskTypeEnum.cluster.value] = self.cluster_prompt
+        if self.query_prompt:
+            prompts[TaskTypeEnum.query.value] = self.query_prompt
+        if self.passage_prompt:
+            prompts[TaskTypeEnum.passage.value] = self.passage_prompt
+        if self.sts_prompt:
+            prompts[TaskTypeEnum.sts.value] = self.sts_prompt
+        return prompts if len(prompts) > 0 else None
+
+    def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+        """Get the prompt type for the given task type.
+
+        :param prompt_type: Task type for which to get the prompt.
+
+        :return: The prompt for the given task type.
+        """
+        if prompt_type is None:
+            return self.default_prompt
+        if prompt_type == TaskTypeEnum.classification:
+            return self.classifier_prompt
+        if prompt_type == TaskTypeEnum.cluster:
+            return self.cluster_prompt
+        if prompt_type == TaskTypeEnum.query:
+            return self.query_prompt
+        if prompt_type == TaskTypeEnum.passage:
+            return self.passage_prompt
+        if prompt_type == TaskTypeEnum.sts:
+            return self.sts_prompt
+        if prompt_type == TaskTypeEnum.default:
+            return self.default_prompt
+        return None
 
     use_cache: bool = True
     """Whether to use embeddings caching."""

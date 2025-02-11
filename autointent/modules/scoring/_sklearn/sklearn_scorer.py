@@ -11,7 +11,7 @@ from typing_extensions import Self
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -111,7 +111,7 @@ class SklearnScorer(ScoringModule):
                 use_cache=self.embedder_config.use_cache,
             )
         )
-        features = embedder.embed(utterances)
+        features = embedder.embed(utterances, TaskTypeEnum.classification)
         if AVAILABLE_CLASSIFIERS.get(self.clf_name):
             base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
@@ -133,7 +133,7 @@ class SklearnScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Array of predicted probabilities for each class.
         """
-        features = self._embedder.embed(utterances)
+        features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]

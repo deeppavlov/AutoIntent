@@ -13,6 +13,7 @@ from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import ScoringModule
 from autointent.schemas import EmbedderConfig
+from autointent.schemas._schemas import TaskTypeEnum
 
 
 class DescriptionScorer(ScoringModule):
@@ -94,8 +95,7 @@ class DescriptionScorer(ScoringModule):
         :param descriptions: List of intent descriptions.
         :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
         """
-        if hasattr(self, "_embedder"):
-            self._embedder.clear_ram()
+        self._embedder.clear_ram()
 
         self._validate_task(labels)
 
@@ -106,11 +106,9 @@ class DescriptionScorer(ScoringModule):
             )
             raise ValueError(error_text)
 
-        embedder = Embedder(
-            self.embedder_config,
-        )
+        embedder = Embedder(self.embedder_config)
 
-        self._description_vectors = embedder.embed(descriptions)
+        self._description_vectors = embedder.embed(descriptions, TaskTypeEnum.sts)
         self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
@@ -120,7 +118,7 @@ class DescriptionScorer(ScoringModule):
         :param utterances: List of utterances to score.
         :return: Array of probabilities for each utterance.
         """
-        utterance_vectors = self._embedder.embed(utterances)
+        utterance_vectors = self._embedder.embed(utterances, TaskTypeEnum.sts)
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
 
         if self._multilabel:

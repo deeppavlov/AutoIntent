@@ -11,6 +11,7 @@ from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
 from autointent.schemas import EmbedderConfig
+from autointent.schemas._schemas import TaskTypeEnum
 
 
 class LinearScorer(ScoringModule):
@@ -119,7 +120,7 @@ class LinearScorer(ScoringModule):
         embedder = Embedder(
             self.embedder_config,
         )
-        features = embedder.embed(utterances)
+        features = embedder.embed(utterances, TaskTypeEnum.classification)
 
         if self._multilabel:
             base_clf = LogisticRegression()
@@ -139,7 +140,7 @@ class LinearScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Array of predicted probabilities for each class.
         """
-        features = self._embedder.embed(utterances)
+        features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]

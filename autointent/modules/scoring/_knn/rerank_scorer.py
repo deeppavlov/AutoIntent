@@ -53,7 +53,7 @@ class RerankScorer(KNNScorer):
             weights=weights,
         )
 
-        self.cross_encoder_config = CrossEncoderConfig.from_serializable(cross_encoder_config)
+        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
 
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff

@@ -14,6 +14,7 @@ from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
 from autointent.schemas import EmbedderConfig
+from autointent.schemas._schemas import TaskTypeEnum
 
 
 class LogregAimedEmbedding(EmbeddingModule):
@@ -59,11 +60,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         :param embedder_config: Config of the embedder used for creating embeddings.
         :param cv: the number of folds used in LogisticRegressionCV
         """
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        elif isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.cv = cv
 
     @classmethod
@@ -104,7 +101,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         self._embedder = Embedder(
             self.embedder_config,
         )
-        embeddings = self._embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
 
         if self._multilabel:
             self._label_encoder = None
@@ -158,7 +155,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         return RetrieverArtifact(config=self.embedder_config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        embeddings = self._embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._classifier.predict_proba(embeddings)
 
         if self._multilabel:
