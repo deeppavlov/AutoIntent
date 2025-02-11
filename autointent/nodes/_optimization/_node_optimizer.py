@@ -17,9 +17,24 @@ from autointent.custom_types import NodeType, TuningType
 from autointent.nodes._nodes_info import NODES_INFO
 
 
+class ParamSpaceCat(TypedDict):
+    choices: list[Any]
+
+class ParamSpaceInt(TypedDict, total=False):
+    low: int
+    high: int
+    step: int
+    log: bool
+
+class ParamSpaceFloat(TypedDict, total=False):
+    low: float
+    high: float
+    step: float
+    log: bool
+
 class ParamSpace(TypedDict):
     type: Literal["cat", "int", "float"]
-    content: list[Any]
+    content: ParamSpaceCat | ParamSpaceInt | ParamSpaceFloat
 
 
 class NodeOptimizer:
@@ -126,7 +141,9 @@ class NodeOptimizer:
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
             study.optimize(obj, n_trials=n_trials)
 
-    def objective(self, trial: Trial, module_name: str, search_space: dict[str, ParamSpace], context: Context) -> float:
+    def objective(
+        self, trial: Trial, module_name: str, search_space: dict[str, ParamSpace | list[Any]], context: Context
+    ) -> float:
         config = self.suggest(trial, search_space)
 
         self._logger.debug("initializing %s module...", module_name)
@@ -173,17 +190,17 @@ class NodeOptimizer:
 
         return target_metric
 
-    def suggest(self, trial: Trial, search_space: dict[str, ParamSpace]) -> dict[str, Any]:
-        res = {}
+    def suggest(self, trial: Trial, search_space: dict[str, ParamSpace | list[Any]]) -> dict[str, Any]:
+        res: dict[str, Any] = {}
         for param_name, param_space in search_space.items():
-            if param_space["type"] == "cat":
-                res[param_name] = trial.suggest_categorical(param_name, choices=param_space["content"])
+            if isinstance(param_space, list):
+                res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
+            elif param_space["type"] == "cat":
+                res[param_name] = trial.suggest_categorical(param_name, **param_space["content"])
             elif param_space["type"] == "int":
-                low, high, step, log = param_space["content"]
-                res[param_name] = trial.suggest_int(param_name, low=low, high=high, step=step, log=log)
+                res[param_name] = trial.suggest_int(param_name, **param_space["content"])
             elif param_space["type"] == "float":
-                low, high, step, log = param_space["content"]
-                res[param_name] = trial.suggest_float(param_name, low=low, high=high, step=step, log=log)
+                res[param_name] = trial.suggest_float(param_name, **param_space["content"])
             else:
                 msg = f"Unsupported type of param search space: {param_space['type']}"
                 raise RuntimeError(msg)
