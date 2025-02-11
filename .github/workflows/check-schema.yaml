@@ -1,0 +1,36 @@
+name: Check JSON Schema
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  generate-schema:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install .
+
+    - name: Generate JSON Schema
+      run: |
+        python -m scripts.generate_json_schema_config
+
+    - name: Check for changes in JSON Schema
+      run: |
+        if ! git diff --quiet docs/optimizer_config.schema.json; then
+          echo "Error: docs/optimizer_config.schema.json has been modified after running the generator script."
+          exit 1
+        else
+          echo "No changes detected in docs/optimizer_config.schema.json."
+        fi

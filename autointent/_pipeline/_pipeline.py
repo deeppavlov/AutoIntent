@@ -10,7 +10,7 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationType
+from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -123,7 +123,7 @@ class Pipeline:
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
     def fit(
-        self, dataset: Dataset, scheme: ValidationType = "ho", n_folds: int = 3, refit_after: bool = False
+        self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3, refit_after: bool = False
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -140,7 +140,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
         context.configure_cross_encoder(self.cross_encoder_config)
-
+        self.validate_modules(dataset)
         self._fit(context)
 
         if context.is_ram_to_clear():
@@ -164,6 +164,16 @@ class Pipeline:
         context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
+
+    def validate_modules(self, dataset: Dataset) -> None:
+        """
+        Validate modules with dataset.
+
+        :param dataset: dataset to validate with
+        """
+        for node in self.nodes.values():
+            if isinstance(node, NodeOptimizer):
+                node.validate_nodes_with_dataset(dataset)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":

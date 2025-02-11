@@ -48,5 +48,9 @@ clean-docs:
 	rm -rf docs/source/autoapi
 	rm -rf docs/source/user_guides
 
+.PHONY: schema
+schema:
+	$(poetry) python -m scripts.generate_json_schema_config
+
 .PHONY: all
 all: lint

@@ -8,7 +8,7 @@ from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split, ValidationType
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split, ValidationScheme
 
 from ._stratification import split_dataset
 
@@ -32,7 +32,7 @@ class DataHandler:  # TODO rename to Validator
     def __init__(
         self,
         dataset: Dataset,
-        scheme: ValidationType = "ho",
+        scheme: ValidationScheme = "ho",
         split_train: bool = True,
         random_seed: int = 0,
         n_folds: int = 3,
