@@ -1,6 +1,6 @@
 """LogregAimedEmbedding class for a proxy optimzation of embedding."""
 
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray

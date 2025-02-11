@@ -1,6 +1,6 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
-from typing import Any, Literal
+from typing import Any
 
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact

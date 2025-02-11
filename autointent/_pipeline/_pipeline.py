@@ -10,8 +10,6 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
