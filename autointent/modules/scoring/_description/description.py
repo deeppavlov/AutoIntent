@@ -95,7 +95,8 @@ class DescriptionScorer(ScoringModule):
         :param descriptions: List of intent descriptions.
         :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
         """
-        self._embedder.clear_ram()
+        if hasattr(self, "_embedder"):
+            self._embedder.clear_ram()
 
         self._validate_task(labels)
 

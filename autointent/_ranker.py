@@ -129,7 +129,7 @@ class Ranker:
         if classifier_head is not None or self.cross_encoder_config.train_head:
             self.train_classifier = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classification.register_forward_hook(self._classifier_hook)
+            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         self._activations_list.append(input_tensor[0].cpu().numpy())

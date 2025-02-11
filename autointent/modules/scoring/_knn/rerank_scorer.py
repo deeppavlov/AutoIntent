@@ -101,7 +101,6 @@ class RerankScorer(KNNScorer):
         :param utterances: List of utterances to fit the scorer.
         :param labels: List of labels corresponding to the utterances.
         """
-        self._scorer = Ranker(self.cross_encoder_config)
         if hasattr(self, "_scorer"):
             self.clear_cache()
 
