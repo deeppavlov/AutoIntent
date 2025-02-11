@@ -9,7 +9,9 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import (
+    AnyHttpUrl,
     BaseModel,
+    Field,
     NonNegativeFloat,
     PositiveInt,
     model_validator,
@@ -126,28 +128,20 @@ class Intent(BaseModel):
 
 
 class ModelConfig(BaseModel):
-    batch_size: PositiveInt = 32
-    """Batch size for model inference."""
-    max_length: PositiveInt | None = None
-    """Maximum length of input sequences."""
+    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
+    max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
 
 class LLMConfig(ModelConfig):
-    temperature: NonNegativeFloat | None = None
-    """Temperature for sampling from the model."""
-    base_url: str | None = None
-    """Base URL for the model API."""
-    token: str | None
-    """API token for the model."""
-    extra_body: dict[str, Any] | None = None
-    """Extra body for the model API."""
+    temperature: NonNegativeFloat | None = Field(None, description="Temperature for sampling from the model.")
+    base_url: AnyHttpUrl | None = Field(..., description="Base URL for the model API.")
+    token: str | None = Field(..., description="API token for the model.")
+    extra_body: dict[str, Any] | None = Field(None, description="Extra body for the model API.")
 
 
 class STModelConfig(ModelConfig):
-    model_name: str
-    """Name of the hugging face model."""
-    device: str | None = None
-    """Torch notation for CPU or CUDA."""
+    model_name: str = Field(..., description="Name of the hugging face model.")
+    device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel) -> Self:
@@ -174,18 +168,14 @@ class TaskTypeEnum(Enum):
 
 
 class EmbedderConfig(STModelConfig):
-    default_prompt: str | None = None
-    """Default prompt for the model. This is used when no task specific prompt is not provided."""
-    classifier_prompt: str | None = None
-    """Prompt for classifier."""
-    cluster_prompt: str | None = None
-    """Prompt for clustering."""
-    sts_prompt: str | None = None
-    """Prompt for finding most similar sentences."""
-    query_prompt: str | None = None
-    """Prompt for query."""
-    passage_prompt: str | None = None
-    """Prompt for passage."""
+    default_prompt: str | None = Field(
+        None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
+    )
+    classifier_prompt: str | None = Field(None, description="Prompt for classifier.")
+    cluster_prompt: str | None = Field(None, description="Prompt for clustering.")
+    sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
+    query_prompt: str | None = Field(None, description="Prompt for query.")
+    passage_prompt: str | None = Field(None, description="Prompt for passage.")
 
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.
@@ -230,10 +220,10 @@ class EmbedderConfig(STModelConfig):
             return self.default_prompt
         return None
 
-    use_cache: bool = True
-    """Whether to use embeddings caching."""
+    use_cache: bool = Field(False, description="Whether to use embeddings caching.")
 
 
 class CrossEncoderConfig(STModelConfig):
-    train_head: bool = False
-    """Whether to train the head of the model."""
+    train_head: bool = Field(
+        False, description="Whether to train the head of the model. If False, LogReg will be trained."
+    )

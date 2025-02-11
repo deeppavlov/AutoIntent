@@ -52,12 +52,15 @@
             "properties": {
                 "batch_size": {
                     "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
                 },
                 "max_length": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -65,9 +68,11 @@
                         }
                     ],
                     "default": null,
+                    "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
                 },
@@ -81,15 +86,12 @@
                         }
                     ],
                     "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
-                },
-                "use_cache": {
-                    "default": true,
-                    "title": "Use Cache",
-                    "type": "boolean"
                 },
                 "train_head": {
                     "default": false,
+                    "description": "Whether to train the head of the model. If False, LogReg will be trained.",
                     "title": "Train Head",
                     "type": "boolean"
                 }
@@ -274,12 +276,15 @@
             "properties": {
                 "batch_size": {
                     "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
                 },
                 "max_length": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -287,9 +292,11 @@
                         }
                     ],
                     "default": null,
+                    "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
                 },
@@ -303,36 +310,92 @@
                         }
                     ],
                     "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
                 },
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classifier_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classifier Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
                 "use_cache": {
-                    "default": true,
+                    "default": false,
+                    "description": "Whether to use embeddings caching.",
                     "title": "Use Cache",
                     "type": "boolean"
-                },
-                "query_instruction": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Query Instruction"
-                },
-                "passage_instruction": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Passage Instruction"
                 }
             },
             "required": [
