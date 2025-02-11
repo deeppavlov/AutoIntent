@@ -21,7 +21,7 @@ from .chat_templates import (
     ReasoningEvolution,
 )
 
-logging.basicConfig(level="INFO")
+# logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 SEARCH_SPACE = [
@@ -48,14 +48,20 @@ SEARCH_SPACE = [
         "node_type": "decision",
         "target_metric": "decision_accuracy",
         "search_space": [
-            {"module_name": "argmax"},
+            {"module_name": "tunable"},
         ],
     },
 ]
 
 
 def _optimize_n_evolutions(
-    input_path: str, max_n_evolutions: int, evolutions: list, seed: int, split_train: str, async_mode: bool
+    input_path: str,
+    max_n_evolutions: int,
+    evolutions: list,
+    seed: int,
+    split_train: str,
+    async_mode: bool,
+    batch_size: int,
 ) -> tuple[Dataset, int]:
     emb_config = EmbedderConfig(batch_size=16, device="cuda")
 
@@ -63,17 +69,21 @@ def _optimize_n_evolutions(
     best_n = 0
     dataset = load_dataset(input_path)
     merge_dataset = load_dataset(input_path)
+    k = 0.9
 
     for n in range(max_n_evolutions):
         generator = UtteranceEvolver(Generator(), evolutions, seed, async_mode)
-        new_samples_dataset = generator.augment(dataset, split_name=split_train, n_evolutions=1, update_split=False)
-        merge_dataset[split_train] = concatenate_datasets(merge_dataset[split_train], new_samples_dataset)
+        new_samples_dataset = generator.augment(
+            dataset, split_name=split_train, n_evolutions=1, update_split=False, batch_size=batch_size
+        )
+        merge_dataset[split_train] = concatenate_datasets([merge_dataset[split_train], new_samples_dataset])
 
         pipeline_optimizer = Pipeline.from_search_space(SEARCH_SPACE)
         pipeline_optimizer.set_config(emb_config)
         ctx = pipeline_optimizer.fit(merge_dataset)
         results = ctx.optimization_info.dump_evaluation_results()
-        decision_metric = results["metrics"]["decision"]
+        decision_metric = results["metrics"]["decision"][0] - k
+        k -= 0.1
 
         if decision_metric > best_result:
             best_result = decision_metric
@@ -81,18 +91,18 @@ def _optimize_n_evolutions(
         else:
             break
 
-    logger.info("# optimal n evolutions: %s", n)
-    return dataset, best_n
+    logger.info("# optimal n evolutions: %s", best_n)
+    return dataset
 
 
 def _generate_fixed_evolutions(
-    input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str, async_mode: bool
+    input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str, async_mode: bool, batch_size: int
 ) -> Dataset:
     dataset = load_dataset(input_path)
     n_before = len(dataset[split])
 
     generator = UtteranceEvolver(Generator(), evolutions, seed, async_mode)
-    new_samples = generator.augment(dataset, split_name=split, n_evolutions=n_evolutions)
+    new_samples = generator.augment(dataset, split_name=split, n_evolutions=n_evolutions, batch_size=batch_size)
     n_after = len(dataset[split])
 
     logger.info("# samples before %s", n_before)
@@ -135,6 +145,7 @@ def _parse_args() -> Namespace:
     parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
     parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--batch-size", type=int, default=4)
 
     return parser.parse_args()
 
@@ -165,7 +176,9 @@ def main() -> None:
     if args.decide_for_me:
         process_func = _optimize_n_evolutions
 
-    dataset = process_func(args.input_path, args.n_evolutions, evolutions, args.seed, args.split, args.async_mode)
+    dataset = process_func(
+        args.input_path, args.n_evolutions, evolutions, args.seed, args.split, args.async_mode, args.batch_size
+    )
     dataset.to_json(args.output_path)
 
     if args.output_repo is not None:

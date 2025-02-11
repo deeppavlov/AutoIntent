@@ -90,11 +90,11 @@ class UtteranceEvolver:
                 [{Dataset.label_feature: intent_data.id, Dataset.utterance_feature: ut} for ut in generated_utterances]
             )
 
+        generated_split = HFDataset.from_list(new_samples)
         if update_split:
-            generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
-        return [Sample(**sample) for sample in new_samples]
+        return generated_split
 
     async def _augment_async(
         self,
@@ -124,8 +124,8 @@ class UtteranceEvolver:
             for result, intent_id in zip(batch_results, batch_labels, strict=False):
                 new_samples.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: result})
 
+        generated_split = HFDataset.from_list(new_samples)
         if update_split:
-            generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
-        return [Sample(**sample) for sample in new_samples]
+        return generated_split
