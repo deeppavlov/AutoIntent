@@ -1,7 +1,9 @@
 """CLI for evolutionary augmenter."""
 
 import logging
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
+
+from datasets import concatenate_datasets
 
 from autointent import Dataset, Pipeline, load_dataset
 from autointent.configs import EmbedderConfig
@@ -52,21 +54,28 @@ SEARCH_SPACE = [
 ]
 
 
-def optimize_n_evolutions(
-    input_path: str, max_n_evolutions: int, evolutions: list, seed: int, split: str
+def _optimize_n_evolutions(
+    input_path: str,
+    max_n_evolutions: int,
+    evolutions: list,
+    seed: int,
+    split_train: str,
 ) -> tuple[Dataset, int]:
     emb_config = EmbedderConfig(batch_size=16, device="cuda")
 
     best_result = 0
     best_n = 0
+    dataset = load_dataset(input_path)
+    merge_dataset = load_dataset(input_path)
+
     for n in range(max_n_evolutions):
-        dataset = load_dataset(input_path)
         generator = UtteranceEvolver(Generator(), evolutions, seed)
-        generator.augment(dataset, split_name=split, n_evolutions=n)
+        new_samples_dataset = generator.augment(dataset, split_name=split_train, n_evolutions=1, update_split=False)
+        merge_dataset[split_train] = concatenate_datasets(merge_dataset[split_train], new_samples_dataset)
 
         pipeline_optimizer = Pipeline.from_search_space(SEARCH_SPACE)
         pipeline_optimizer.set_config(emb_config)
-        ctx = pipeline_optimizer.fit(dataset)
+        ctx = pipeline_optimizer.fit(merge_dataset)
         results = ctx.optimization_info.dump_evaluation_results()
         decision_metric = results["metrics"]["decision"]
 
@@ -75,11 +84,27 @@ def optimize_n_evolutions(
             best_n = n
         else:
             break
+
+    logger.info("# optimal n evolutions: %s", n)
     return dataset, best_n
 
 
-def main() -> None:
-    """CLI endpoint."""
+def _generate_fixed_evolutions(input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str) -> Dataset:
+    dataset = load_dataset(input_path)
+    n_before = len(dataset[split])
+
+    generator = UtteranceEvolver(Generator(), evolutions, seed)
+    new_samples = generator.augment(dataset, split_name=split, n_evolutions=n_evolutions)
+    n_after = len(dataset[split])
+
+    logger.info("# samples before %s", n_before)
+    logger.info("# samples generated %s", len(new_samples))
+    logger.info("# samples after %s", n_after)
+
+    return dataset
+
+
+def _parse_args() -> Namespace:
     parser = ArgumentParser()
     parser.add_argument(
         "--input-path",
@@ -112,43 +137,36 @@ def main() -> None:
     parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
     parser.add_argument("--seed", type=int, default=0)
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main() -> None:
+    """CLI endpoint."""
+    mapping = {
+        "reasoning": ReasoningEvolution,
+        "concretizing": ConcreteEvolution,
+        "abstract": AbstractEvolution,
+        "formal": FormalEvolution,
+        "funny": FunnyEvolution,
+        "goofy": GoofyEvolution,
+        "informal": InformalEvolution,
+    }
+    args = _parse_args()
     evolutions: list[EvolutionChatTemplate] = []
-    if args.reasoning:
-        evolutions.append(ReasoningEvolution())
-    if args.concretizing:
-        evolutions.append(ConcreteEvolution())
-    if args.abstract:
-        evolutions.append(AbstractEvolution())
-    if args.formal:
-        evolutions.append(FormalEvolution())
-    if args.funny:
-        evolutions.append(FunnyEvolution())
-    if args.goofy:
-        evolutions.append(GoofyEvolution())
-    if args.informal:
-        evolutions.append(InformalEvolution())
+
+    for arg_name, evolution_cls in mapping.items():
+        if getattr(args, arg_name):
+            evolutions.append(evolution_cls())
 
     if not evolutions:
         logger.warning("No evolutions selected. Exiting.")
         return
 
+    process_func = _generate_fixed_evolutions
     if args.decide_for_me:
-        dataset, n = optimize_n_evolutions(args.input_path, args.n_evolutions, evolutions, args.seed, args.split)
-        logger.info("# optimal n evolutions: %s", n)
-    else:
-        dataset = load_dataset(args.input_path)
-        n_before = len(dataset[args.split])
+        process_func = _optimize_n_evolutions
 
-        generator = UtteranceEvolver(Generator(), evolutions, args.seed)
-        new_samples = generator.augment(dataset, split_name=args.split, n_evolutions=args.n_evolutions)
-        n_after = len(dataset[args.split])
-
-        logger.info("# samples before %s", n_before)
-        logger.info("# samples generated %s", len(new_samples))
-        logger.info("# samples after %s", n_after)
-
+    dataset = process_func(args.input_path, args.n_evolutions, evolutions, args.seed, args.split)
     dataset.to_json(args.output_path)
 
     if args.output_repo is not None:
