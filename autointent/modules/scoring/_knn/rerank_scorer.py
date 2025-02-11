@@ -53,11 +53,7 @@ class RerankScorer(KNNScorer):
             weights=weights,
         )
 
-        if isinstance(cross_encoder_config, dict):
-            cross_encoder_config = CrossEncoderConfig(**cross_encoder_config)
-        if isinstance(cross_encoder_config, str):
-            cross_encoder_config = CrossEncoderConfig(model_name=cross_encoder_config)
-        self.cross_encoder_config = cross_encoder_config
+        self.cross_encoder_config = CrossEncoderConfig.from_serializable(cross_encoder_config)
 
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff
@@ -110,11 +106,7 @@ class RerankScorer(KNNScorer):
             self.clear_cache()
 
         self._scorer = Ranker(
-            self.cross_encoder_name,
-            device=self.cross_encoder_device,
-            max_length=self.cross_encoder_max_length,
-            batch_size=self.cross_encoder_batch_size,
-            train_classifier=self.train_head,
+            self.cross_encoder_config,
         )
         self._scorer.fit(utterances, labels)
 
