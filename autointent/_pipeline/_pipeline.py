@@ -11,6 +11,8 @@ import yaml
 from autointent import Context, Dataset
 from autointent.configs import InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import ListOfGenericLabels, NodeType
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -116,7 +118,9 @@ class Pipeline:
         """
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
-    def fit(self, dataset: Dataset) -> Context:
+    def fit(
+        self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3, refit_after: bool = False
+    ) -> Context:
         """
         Optimize the pipeline from dataset.
 
@@ -128,10 +132,13 @@ class Pipeline:
             raise RuntimeError(msg)
 
         context = Context()
-        context.set_dataset(dataset)
+        context.set_dataset(dataset, scheme, n_folds)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config)
 
+        context.configure_vector_index(self.vector_index_config, self.embedder_config)
+        context.configure_cross_encoder(self.cross_encoder_config)
+        self.validate_modules(dataset)
         self._fit(context)
 
         if context.is_ram_to_clear():
@@ -143,6 +150,9 @@ class Pipeline:
 
         self.nodes = {node.node_type: node for node in nodes_list}
 
+        if refit_after:
+            self._refit(context)
+
         predictions = self.predict(context.data_handler.test_utterances())
         for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
@@ -152,6 +162,16 @@ class Pipeline:
         context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
+
+    def validate_modules(self, dataset: Dataset) -> None:
+        """
+        Validate modules with dataset.
+
+        :param dataset: dataset to validate with
+        """
+        for node in self.nodes.values():
+            if isinstance(node, NodeOptimizer):
+                node.validate_nodes_with_dataset(dataset)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":
@@ -202,6 +222,27 @@ class Pipeline:
 
         scores = scoring_module.predict(utterances)
         return decision_module.predict(scores)
+
+    def _refit(self, context: Context) -> None:
+        """
+        Fit pipeline of already selected modules with all train data.
+
+        :param context: context object to take data from
+        :return: list of predicted labels
+        """
+        if not self._is_inference():
+            msg = "Pipeline in optimization mode cannot perform inference"
+            raise RuntimeError(msg)
+
+        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+
+        context.data_handler.prepare_for_refit()
+
+        scoring_module.fit(*scoring_module.get_train_data(context))
+        scores = scoring_module.predict(context.data_handler.train_utterances(1))
+
+        decision_module.fit(scores, context.data_handler.train_labels(1), context.data_handler.tags)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """

@@ -1,6 +1,7 @@
 """Scoring metrics for multiclass and multilabel classification tasks."""
 
 import logging
+from functools import wraps
 from typing import Protocol
 
 import numpy as np
@@ -29,6 +30,19 @@ class ScoringMetricFn(Protocol):
         ...
 
 
+def ignore_oos(func: ScoringMetricFn) -> ScoringMetricFn:
+    """Ignore OOS in metrics calculation (decorator)."""
+
+    @wraps(func)
+    def wrapper(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+        labels_filtered = [lab for lab in labels if lab is not None]
+        scores_filtered = [score for score, lab in zip(scores, labels, strict=True) if lab is not None]
+        return func(labels_filtered, scores_filtered)  # type: ignore[arg-type]
+
+    return wrapper
+
+
+@ignore_oos
 def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE, eps: float = 1e-10) -> float:
     r"""
     Supports multiclass and multilabel cases.
@@ -75,6 +89,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
     return round(float(res), 6)
 
 
+@ignore_oos
 def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Supports multiclass and multilabel cases.
@@ -126,6 +141,7 @@ def _calculate_decision_metric(
     return res
 
 
+@ignore_oos
 def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate accuracy for multiclass and multilabel classification.
@@ -140,6 +156,7 @@ def scoring_accuracy(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
     return _calculate_decision_metric(decision_accuracy, labels, scores)
 
 
+@ignore_oos
 def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate the F1 score for multiclass and multilabel classification.
@@ -154,6 +171,7 @@ def scoring_f1(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     return _calculate_decision_metric(decision_f1, labels, scores)
 
 
+@ignore_oos
 def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate precision for multiclass and multilabel classification.
@@ -168,6 +186,7 @@ def scoring_precision(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> f
     return _calculate_decision_metric(decision_precision, labels, scores)
 
 
+@ignore_oos
 def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate recall for multiclass and multilabel classification.
@@ -182,6 +201,7 @@ def scoring_recall(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> floa
     return _calculate_decision_metric(decision_recall, labels, scores)
 
 
+@ignore_oos
 def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate the hit rate for multilabel classification.
@@ -210,6 +230,7 @@ def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
     return float(np.mean(is_in))
 
 
+@ignore_oos
 def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     Supports multilabel classification.
@@ -246,6 +267,7 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
     return float(1 - (coverage_error(labels, scores) - 1) / (n_classes - 1))
 
 
+@ignore_oos
 def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     """
     Supports multilabel.
@@ -262,6 +284,7 @@ def scoring_neg_ranking_loss(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYP
     return float(-label_ranking_loss(labels, scores))
 
 
+@ignore_oos
 def scoring_map(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
     r"""
     Calculate the mean average precision (MAP) score for multilabel classification.

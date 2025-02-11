@@ -1,5 +1,6 @@
 """Retrieval metrics."""
 
+from functools import wraps
 from typing import Any, Protocol
 
 import numpy as np
@@ -109,6 +110,21 @@ def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64]
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
+def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFn:
+    """Ignore OOS in metrics calculation (decorator)."""
+
+    @wraps(func)
+    def wrapper(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
+        query_labels_filtered = [lab for lab in query_labels if lab is not None]
+        candidates_labels_filtered = [
+            cand for cand, lab in zip(candidates_labels, query_labels, strict=True) if lab is not None
+        ]
+        return func(query_labels_filtered, candidates_labels_filtered, k)  # type: ignore[arg-type]
+
+    return wrapper
+
+
+@ignore_oos
 def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
     r"""
     Calculate the mean average precision at position k.
@@ -180,6 +196,7 @@ def _average_precision_intersecting(
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
+@ignore_oos
 def retrieval_map_intersecting(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -215,6 +232,7 @@ def retrieval_map_intersecting(
     return sum(ap_list) / len(ap_list)
 
 
+@ignore_oos
 def retrieval_map_macro(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -235,47 +253,7 @@ def retrieval_map_macro(
     return _macrofy(retrieval_map, query_labels, candidates_labels, k)
 
 
-def _retrieval_map_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
-    r"""
-    Calculate mean average precision at position k.
-
-    The mean average precision (MAP) at position :math:`k` is calculated as follows:
-
-    .. math::
-
-        \text{AP}_q = \frac{1}{|R_q|} \sum_{i=1}^{k} P_q(i) \cdot \mathbb{1}(y_{\text{true},q} = y_{\text{pred},i})
-
-        \text{MAP}@k = \frac{1}{|Q|} \sum_{q=1}^{Q} \text{AP}_q
-
-    where:
-    - :math:`\text{AP}_q` is the average precision for query :math:`q`,
-    - :math:`P_q(i)` is the precision at the :math:`i`-th position for query :math:`q`,
-    - :math:`\mathbb{1}(y_{\text{true},q} = y_{\text{pred},i})` is the indicator function that equals
-    1 if the true label of the query matches the predicted label at position :math:`i` and 0 otherwise,
-    - :math:`|R_q|` is the total number of relevant items for query :math:`q`,
-    - :math:`|Q|` is the total number of queries.
-
-    :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
-    :param k: Number of top items to consider for each query
-    :return: Score of the retrieval metric
-    """  # noqa: E501
-    query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
-    candidates_labels_ = candidates_labels_[:, :k]
-    relevance_mask = candidates_labels_ == query_label_[:, None]
-    cumulative_relevant = np.cumsum(relevance_mask, axis=1)
-    precision_at_k = cumulative_relevant * relevance_mask / np.arange(1, k + 1)
-    sum_precision = np.sum(precision_at_k, axis=1)
-    num_relevant = np.sum(relevance_mask, axis=1)
-    average_precision = np.divide(
-        sum_precision,
-        num_relevant,
-        out=np.zeros_like(sum_precision),
-        where=num_relevant != 0,
-    )
-    return np.mean(average_precision)  # type: ignore[no-any-return]
-
-
+@ignore_oos
 def retrieval_hit_rate(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -315,6 +293,7 @@ def retrieval_hit_rate(
     return float(hit_count / num_queries)
 
 
+@ignore_oos
 def retrieval_hit_rate_intersecting(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -360,6 +339,7 @@ def retrieval_hit_rate_intersecting(
     return float(hit_count / num_queries)
 
 
+@ignore_oos
 def retrieval_hit_rate_macro(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -380,34 +360,7 @@ def retrieval_hit_rate_macro(
     return _macrofy(retrieval_hit_rate, query_labels, candidates_labels, k)
 
 
-def _retrieval_hit_rate_numpy(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int) -> float:
-    r"""
-    Calculate the hit rate at position k.
-
-    The hit rate is calculated as:
-
-    .. math::
-
-        \text{Hit Rate} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{query},i} \in y_{\text{candidates},i}^{(1:k)})}{N}
-
-    where:
-    - :math:`N` is the total number of queries,
-    - :math:`y_{\text{query},i}` is the true label for the :math:`i`-th query,
-    - :math:`y_{\text{candidates},i}^{(1:k)}` is the set of top-k predicted labels for the :math:`i`-th query,
-    - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
-    is true and 0 otherwise.
-
-    :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model (from most to least relevant)
-    :param k: Number of top items to consider for each query
-    :return: Score of the retrieval metric
-    """  # noqa: E501
-    query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
-    truncated_candidates = candidates_labels_[:, :k]
-    hit_mask = np.isin(query_label_[:, None], truncated_candidates).any(axis=1)
-    return hit_mask.mean()  # type: ignore[no-any-return]
-
-
+@ignore_oos
 def retrieval_precision(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -449,6 +402,7 @@ def retrieval_precision(
     return float(total_precision / num_queries)
 
 
+@ignore_oos
 def retrieval_precision_intersecting(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -496,6 +450,7 @@ def retrieval_precision_intersecting(
     return float(total_precision / num_queries)
 
 
+@ignore_oos
 def retrieval_precision_macro(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -514,41 +469,6 @@ def retrieval_precision_macro(
     :return: Score of the retrieval metric
     """
     return _macrofy(retrieval_precision, query_labels, candidates_labels, k)
-
-
-def _retrieval_precision_numpy(
-    query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None
-) -> float:
-    r"""
-    Calculate the precision at position k.
-
-    Precision at position :math:`k` is calculated as:
-
-    .. math::
-
-        \text{Precision@k} = \frac{1}{N} \sum_{i=1}^N \frac{\sum_{j=1}^k
-        \mathbb{1}(y_{\text{query},i} = y_{\text{candidates},i,j})}{k}
-
-    where:
-    - :math:`N` is the total number of queries,
-    - :math:`y_{\text{query},i}` is the true label for the :math:`i`-th query,
-    - :math:`y_{\text{candidates},i,j}` is the :math:`j`-th predicted label for the :math:`i`-th query,
-    - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the
-    condition is true and 0 otherwise,
-    - :math:`k` is the number of top candidates considered.
-
-    :param query_labels: For each query, this list contains its class labels
-    :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
-     (from most to least relevant)
-    :param k: Number of top items to consider for each query
-    :return: Score of the retrieval metric
-    """
-    query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
-    top_k_candidates = candidates_labels_[:, :k]
-    matches = (top_k_candidates == query_label_[:, None]).astype(int)
-    relevant_counts = np.sum(matches, axis=1)
-    precision_at_k = relevant_counts / k
-    return np.mean(precision_at_k)  # type: ignore[no-any-return]
 
 
 def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
@@ -597,6 +517,7 @@ def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     return _dcg(ideal_scores, k)
 
 
+@ignore_oos
 def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
     r"""
     Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k.
@@ -632,6 +553,7 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
     return float(np.mean(ndcg_scores))
 
 
+@ignore_oos
 def retrieval_ndcg_intersecting(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -674,6 +596,7 @@ def retrieval_ndcg_intersecting(
     return np.mean(ndcg_scores)  # type: ignore[return-value]
 
 
+@ignore_oos
 def retrieval_ndcg_macro(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -692,6 +615,7 @@ def retrieval_ndcg_macro(
     return _macrofy(retrieval_ndcg, query_labels, candidates_labels, k)
 
 
+@ignore_oos
 def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
     r"""
     Calculate the Mean Reciprocal Rank (MRR) at position k.
@@ -726,6 +650,7 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
     return float(mrr_sum / num_queries)
 
 
+@ignore_oos
 def retrieval_mrr_intersecting(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,
@@ -766,6 +691,7 @@ def retrieval_mrr_intersecting(
     return float(mrr_sum / num_queries)
 
 
+@ignore_oos
 def retrieval_mrr_macro(
     query_labels: LABELS_VALUE_TYPE,
     candidates_labels: CANDIDATE_TYPE,

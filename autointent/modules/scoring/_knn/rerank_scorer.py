@@ -106,9 +106,23 @@ class RerankScorer(KNNScorer):
         :param labels: List of labels corresponding to the utterances.
         """
         self._scorer = Ranker(self.cross_encoder_config)
+        if hasattr(self, "_scorer"):
+            self.clear_cache()
+
+        self._scorer = Ranker(
+            self.cross_encoder_name,
+            device=self.cross_encoder_device,
+            max_length=self.cross_encoder_max_length,
+            batch_size=self.cross_encoder_batch_size,
+            train_classifier=self.train_head,
+        )
         self._scorer.fit(utterances, labels)
 
-        super().fit(utterances, labels)
+        super().fit(utterances, labels, clear_cache=False)
+
+    def clear_cache(self) -> None:
+        self._scorer.clear_ram()
+        super().clear_cache()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """

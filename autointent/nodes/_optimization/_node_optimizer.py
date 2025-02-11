@@ -9,10 +9,9 @@ from typing import Any
 
 import torch
 
+from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType
-from autointent.modules.abc import Module
-from autointent.modules.abc._decision import get_decision_evaluation_data
 from autointent.nodes._nodes_info import NODES_INFO
 
 
@@ -31,7 +30,7 @@ class NodeOptimizer:
 
         :param node_type: Node type
         :param search_space: Search space for the optimization
-        :param metric: Metric to optimize.
+        :param metrics: Metrics to optimize.
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
@@ -41,7 +40,7 @@ class NodeOptimizer:
         if self.target_metric not in self.metrics:
             self.metrics.append(self.target_metric)
 
-        self.modules_search_spaces = search_space  # TODO search space validation
+        self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     def fit(self, context: Context) -> None:
@@ -68,11 +67,8 @@ class NodeOptimizer:
                 if embedder_config is not None:
                     module_kwargs["embedder_config"] = embedder_config
 
-                self._logger.debug("optimizing %s module...", module_name)
-                self.module_fit(module, context)
-
                 self._logger.debug("scoring %s module...", module_name)
-                metrics_score = module.score(context, "validation", self.metrics)
+                metrics_score = module.score(context, metrics=self.metrics)
                 metric_value = metrics_score[self.target_metric]
 
                 context.callback_handler.log_metrics(metrics_score)
@@ -117,29 +113,24 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def module_fit(self, module: Module, context: Context) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset) -> None:
         """
-        Fit the module.
+        Validate nodes with dataset.
 
-        :param module: Module to fit
-        :param context: Context to use
+        :param dataset: Dataset to use
         """
-        if self.node_info.node_type in ["embedding", "scoring"]:
-            if module.__class__.__name__ == "DescriptionScorer":
-                args = (
-                    context.data_handler.train_utterances(0),
-                    context.data_handler.train_labels(0),
-                    context.data_handler.intent_descriptions,
-                )
-            else:
-                args = (context.data_handler.train_utterances(0), context.data_handler.train_labels(0))  # type: ignore[assignment]
-        elif self.node_info.node_type == "decision":
-            labels, scores = get_decision_evaluation_data(context, "train")
-            args = (scores, labels, context.data_handler.tags)  # type: ignore[assignment]
-        elif self.node_info.node_type == "regexp":
-            args = ()  # type: ignore[assignment]
-        else:
-            msg = "something's wrong"
-            self._logger.error(msg)
-            raise ValueError(msg)
-        module.fit(*args)  # type: ignore[arg-type]
+        is_multilabel = dataset.multilabel
+
+        for search_space in deepcopy(self.modules_search_spaces):
+            module_name = search_space.pop("module_name")
+            module = self.node_info.modules_available[module_name]
+            # todo add check for oos
+
+            if is_multilabel and not module.supports_multilabel:
+                msg = f"Module '{module_name}' does not support multilabel datasets."
+                self._logger.error(msg)
+                raise ValueError(msg)
+            if not is_multilabel and not module.supports_multiclass:
+                msg = f"Module '{module_name}' does not support multiclass datasets."
+                self._logger.error(msg)
+                raise ValueError(msg)

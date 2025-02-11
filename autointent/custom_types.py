@@ -69,3 +69,6 @@ class Split:
     VALIDATION = "validation"
     TEST = "test"
     INTENTS = "intents"
+
+
+ValidationScheme = Literal["ho", "cv"]

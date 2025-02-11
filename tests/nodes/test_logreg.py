@@ -24,7 +24,7 @@ def test_embedding_multiclass():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        scores = node.module.score(context, "validation", [metric])
+        scores = node.module.score(context, [metric])
         assert isinstance(scores, dict)
         node.module.clear_cache()
         gc.collect()
@@ -44,7 +44,7 @@ def test_embedding_multilabel():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        scores = node.module.score(context, "validation", [metric])
+        scores = node.module.score(context, [metric])
         assert isinstance(scores, dict)
         node.module.clear_cache()
         gc.collect()
