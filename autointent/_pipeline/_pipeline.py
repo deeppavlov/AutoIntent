@@ -10,7 +10,7 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
+from autointent.custom_types import ListOfGenericLabels, NodeType, TuningType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -93,7 +93,7 @@ class Pipeline:
         """
         return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 
-    def _fit(self, context: Context) -> None:
+    def _fit(self, context: Context, tuning: TuningType = "brute") -> None:
         """
         Optimize the pipeline.
 
@@ -108,7 +108,7 @@ class Pipeline:
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
             if node_optimizer is not None:
-                node_optimizer.fit(context)  # type: ignore[union-attr]
+                node_optimizer.fit(context, tuning)  # type: ignore[union-attr]
         if not context.vector_index_config.save_db:
             self._logger.info("removing vector database from file system...")
             # TODO clear cache from appdirs
@@ -123,7 +123,12 @@ class Pipeline:
         return isinstance(self.nodes[NodeType.scoring], InferenceNode)
 
     def fit(
-        self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3, refit_after: bool = False
+        self,
+        dataset: Dataset,
+        scheme: ValidationScheme = "ho",
+        n_folds: int = 3,
+        refit_after: bool = False,
+        tuning: TuningType = "brute",
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -141,7 +146,7 @@ class Pipeline:
         context.configure_vector_index(self.vector_index_config, self.embedder_config)
         context.configure_cross_encoder(self.cross_encoder_config)
         self.validate_modules(dataset)
-        self._fit(context)
+        self._fit(context, tuning)
 
         if context.is_ram_to_clear():
             nodes_configs = context.optimization_info.get_inference_nodes_config()
