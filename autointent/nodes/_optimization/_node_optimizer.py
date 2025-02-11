@@ -202,8 +202,8 @@ class NodeOptimizer:
             elif param_space["type"] == "float":
                 res[param_name] = trial.suggest_float(param_name, **param_space["content"])
             else:
-                msg = f"Unsupported type of param search space: {param_space['type']}"
-                raise RuntimeError(msg)
+                msg = f"Unsupported type of param search space: {param_space}"
+                raise TypeError(msg)
         return res
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
