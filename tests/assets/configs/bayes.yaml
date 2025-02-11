@@ -12,9 +12,10 @@
     - module_name: knn
       k:
         type: "int"
-        low: 5
-        high: 10
-        step: 1
+        content:
+          low: 5
+          high: 10
+          step: 1
       weights: [uniform, distance, closest]
     - module_name: linear
 - node_type: decision
@@ -23,8 +24,9 @@
     - module_name: threshold
       thresh:
         type: float
-        low: 0.1
-        high: 0.9
+        content:
+          low: 0.1
+          high: 0.9
     - module_name: tunable
     - module_name: argmax
     - module_name: jinoos

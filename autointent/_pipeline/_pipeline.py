@@ -77,7 +77,7 @@ class Pipeline:
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
-        validated_search_space = OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
+        validated_search_space = search_space  # OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
         nodes = [NodeOptimizer(**node) for node in validated_search_space]
         return cls(nodes=nodes, seed=seed)
 

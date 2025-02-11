@@ -19,9 +19,9 @@ def test_bayes(dataset):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cuda"))
+    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    pipeline_optimizer.fit(dataset, scheme="cv", refit_after=True)
+    pipeline_optimizer.fit(dataset, scheme="cv", refit_after=True, tuning="bayes")
 
 
 @pytest.mark.parametrize(
