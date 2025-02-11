@@ -13,7 +13,6 @@ from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNode
 from autointent.custom_types import ListOfGenericLabels, NodeType, TuningType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
-from autointent.nodes.schemes import OptimizationConfig
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
