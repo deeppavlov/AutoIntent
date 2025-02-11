@@ -12,7 +12,7 @@ from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 
 class DescriptionScorer(ScoringModule):
@@ -47,12 +47,7 @@ class DescriptionScorer(ScoringModule):
         :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
         """
         self.temperature = temperature
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
 
     @classmethod
     def from_context(
@@ -77,7 +72,7 @@ class DescriptionScorer(ScoringModule):
             embedder_config=embedder_config,
         )
 
-    def get_embedder_name(self) -> EmbedderConfig:
+    def get_embedder_config(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 
@@ -129,10 +124,10 @@ class DescriptionScorer(ScoringModule):
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
 
         if self._multilabel:
-            probabilites = scipy.special.expit(similarities / self.temperature)
+            probabilities = scipy.special.expit(similarities / self.temperature)
         else:
-            probabilites = scipy.special.softmax(similarities / self.temperature, axis=1)
-        return probabilites  # type: ignore[no-any-return]
+            probabilities = scipy.special.softmax(similarities / self.temperature, axis=1)
+        return probabilities  # type: ignore[no-any-return]
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
@@ -150,7 +145,7 @@ class DescriptionScorer(ScoringModule):
         Evaluate the scorer on a test set and compute the specified metric.
 
         :param context: Context containing test set and other data.
-        :param split: Target split
+        :param metrics: List of metric names to compute.
         :return: Computed metrics value for the test set or error code of metrics
         """
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS

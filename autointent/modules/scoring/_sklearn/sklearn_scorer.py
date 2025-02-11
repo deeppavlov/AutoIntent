@@ -11,7 +11,7 @@ from typing_extensions import Self
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -55,12 +55,7 @@ class SklearnScorer(ScoringModule):
         :param clf_name: Name of the sklearn classifier to use.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
         """
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
         self.clf_args = clf_args or {}
 

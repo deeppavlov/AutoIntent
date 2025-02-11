@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from autointent import Context, VectorIndex
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 
 class MLKnnScorer(ScoringModule):
@@ -72,11 +72,7 @@ class MLKnnScorer(ScoringModule):
         :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
         """
         self.k = k
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
 
@@ -109,7 +105,7 @@ class MLKnnScorer(ScoringModule):
             ignore_first_neighbours=ignore_first_neighbours,
         )
 
-    def get_embedder_name(self) -> EmbedderConfig:
+    def get_embedder_config(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 

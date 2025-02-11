@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
 from autointent.custom_types import ListOfLabelsWithOOS, NodeType
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 
 class Artifact(BaseModel):

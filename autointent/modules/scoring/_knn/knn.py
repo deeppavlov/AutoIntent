@@ -8,7 +8,7 @@ import numpy.typing as npt
 from autointent import Context, VectorIndex
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 from .weighting import apply_weights
 
@@ -71,12 +71,7 @@ class KNNScorer(ScoringModule):
             - "distance": Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
         """
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
 
@@ -106,13 +101,13 @@ class KNNScorer(ScoringModule):
             weights=weights,
         )
 
-    def get_embedder_name(self) -> str:
+    def get_embedder_config(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 
         :return: Embedder name.
         """
-        return self.embedder_config.model_name
+        return self.embedder_config
 
     def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
         """

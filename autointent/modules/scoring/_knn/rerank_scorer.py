@@ -7,7 +7,7 @@ import numpy.typing as npt
 
 from autointent import Context, Ranker
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
-from autointent.schemas._schemas import CrossEncoderConfig, EmbedderConfig
+from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 from .knn import KNNScorer
 

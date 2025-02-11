@@ -7,7 +7,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, model_validator
+from pydantic import (
+    BaseModel,
+    NonNegativeFloat,
+    PositiveInt,
+    model_validator,
+)
+from typing_extensions import Self
 
 from autointent.custom_types import LabelWithOOS
 
@@ -119,14 +125,14 @@ class Intent(BaseModel):
 
 
 class ModelConfig(BaseModel):
-    batch_size: int = 32
+    batch_size: PositiveInt = 32
     """Batch size for model inference."""
-    max_length: int | None = None
+    max_length: PositiveInt | None = None
     """Maximum length of input sequences."""
 
 
 class LLMConfig(ModelConfig):
-    temperature: float | None = None
+    temperature: NonNegativeFloat | None = None
     """Temperature for sampling from the model."""
     base_url: str | None = None
     """Base URL for the model API."""
@@ -141,8 +147,18 @@ class STModelConfig(ModelConfig):
     """Name of the hugging face model."""
     device: str | None = None
     """Torch notation for CPU or CUDA."""
-    use_cache: bool = True
-    """Whether to use embeddings caching."""
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel) -> Self:
+        """Validate the model configuration.
+
+        :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
+        """
+        if isinstance(values, BaseModel):
+            return values
+        if isinstance(values, str):
+            return cls(model_name=values)
+        return cls(**values)
 
 
 class EmbedderConfig(STModelConfig):
@@ -151,6 +167,9 @@ class EmbedderConfig(STModelConfig):
     """Instruction for query."""
     passage_instruction: str | None = None
     """Instruction for passage."""
+
+    use_cache: bool = True
+    """Whether to use embeddings caching."""
 
 
 class CrossEncoderConfig(STModelConfig):

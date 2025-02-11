@@ -10,7 +10,7 @@ import numpy.typing as npt
 from autointent import Context, Ranker, VectorIndex
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import CrossEncoderConfig, EmbedderConfig
+from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -87,17 +87,8 @@ class DNNCScorer(ScoringModule):
         :param embedder_config: Config of the embedder model.
         :param k: Number of nearest neighbors to retrieve.
         """
-        if isinstance(cross_encoder_config, dict):
-            cross_encoder_config = CrossEncoderConfig(**cross_encoder_config)
-        if isinstance(cross_encoder_config, str):
-            cross_encoder_config = CrossEncoderConfig(model_name=cross_encoder_config)
-        self.cross_encoder_config = cross_encoder_config
-
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-        self.embedder_config = embedder_config
+        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
 
     @classmethod

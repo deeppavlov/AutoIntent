@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 

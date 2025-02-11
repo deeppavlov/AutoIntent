@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import VectorIndex
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 
 @pytest.fixture

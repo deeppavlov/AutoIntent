@@ -14,6 +14,7 @@ from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 from autointent.exceptions import WrongClassificationError
+from autointent.schemas import EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -114,8 +115,12 @@ class Module(ABC):
         :param kwargs: Additional kwargs.
         """
 
-    def get_embedder_name(self) -> str | None:
-        """Experimental method."""
+    def get_embedder_config(self) -> EmbedderConfig | None:
+        """
+        Get the config of the embedder.
+
+        :return: Embedder config.
+        """
         return None
 
     @staticmethod

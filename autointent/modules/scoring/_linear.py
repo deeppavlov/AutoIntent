@@ -10,7 +10,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
-from autointent.schemas._schemas import EmbedderConfig
+from autointent.schemas import EmbedderConfig
 
 
 class LinearScorer(ScoringModule):
@@ -69,12 +69,7 @@ class LinearScorer(ScoringModule):
         self.cv = cv
         self.n_jobs = n_jobs
         self.seed = seed
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
-
-        self.embedder_config = embedder_config
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
 
     @classmethod
     def from_context(
@@ -96,7 +91,7 @@ class LinearScorer(ScoringModule):
             embedder_config=embedder_config,
         )
 
-    def get_embedder_name(self) -> EmbedderConfig:
+    def get_embedder_config(self) -> EmbedderConfig:
         """
         Get the name of the embedder.
 
