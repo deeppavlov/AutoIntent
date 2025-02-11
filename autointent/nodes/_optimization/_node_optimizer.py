@@ -20,17 +20,20 @@ from autointent.nodes._nodes_info import NODES_INFO
 class ParamSpaceCat(TypedDict):
     choices: list[Any]
 
+
 class ParamSpaceInt(TypedDict, total=False):
     low: int
     high: int
     step: int
     log: bool
 
+
 class ParamSpaceFloat(TypedDict, total=False):
     low: float
     high: float
     step: float
     log: bool
+
 
 class ParamSpace(TypedDict):
     type: Literal["cat", "int", "float"]
