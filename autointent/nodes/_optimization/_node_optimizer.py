@@ -133,8 +133,8 @@ class NodeOptimizer:
                     torch.cuda.empty_cache()
 
     def _fit_bayes(self, context: Context, seed: int = 42, n_trials: int = 10) -> None:
-        self._counter = 0
         for search_space in deepcopy(self.modules_search_spaces):
+            self._counter = 0
             study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=seed))
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             module_name = search_space.pop("module_name")
