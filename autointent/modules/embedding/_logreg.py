@@ -1,7 +1,5 @@
 """LogregAimedEmbedding class for a proxy optimzation of embedding."""
 
-from typing import Literal
-
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -98,7 +96,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         )
 
     def clear_cache(self) -> None:
-        pass
+        self._embedder.clear_ram()
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """
@@ -107,6 +105,9 @@ class LogregAimedEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        if hasattr(self, "_embedder"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._embedder = Embedder(
@@ -129,28 +130,37 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         self._classifier.fit(embeddings, labels)
 
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 
         :param context: The context containing test data and labels.
-        :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        if split == "validation":
-            utterances = context.data_handler.validation_utterances(0)
-            labels = context.data_handler.validation_labels(0)
-        elif split == "test":
-            utterances = context.data_handler.test_utterances()
-            labels = context.data_handler.test_labels()
-        else:
-            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
-            raise ValueError(message)
+        train_utterances, train_labels = self.get_train_data(context)
+        self.fit(train_utterances, train_labels)
 
-        probas = self.predict(utterances)
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+
+        probas = self.predict(val_utterances)
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
-        return self.score_metrics((labels, probas), chosen_metrics)
+
+        return self.score_metrics_ho((val_labels, probas), chosen_metrics)
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """
+        Evaluate the embedding model using a specified metric function.
+
+        :param context: The context containing test data and labels.
+        :return: Computed metrics value for the test set or error code of metrics
+        """
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+
+        metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
+        return metrics_calculated
 
     def get_assets(self) -> RetrieverArtifact:
         """

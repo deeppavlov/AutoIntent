@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -36,3 +36,30 @@ def test_get_chat_completion(mock_openai_client):
 
     assert response == "Test response"
     mock_openai_client.return_value.chat.completions.create.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_chat_completion_async():
+    test_messages = [Message(role="user", content="Hello, how are you?")]
+
+    mock_response = MagicMock()
+    mock_response.choices = [MagicMock(message=MagicMock(content="I'm fine, thank you!"))]
+
+    with patch("openai.AsyncOpenAI") as mock_async_openai:
+        mock_instance = mock_async_openai.return_value
+        mock_instance.chat.completions.create = AsyncMock(return_value=mock_response)
+
+        generator = Generator()
+
+        result = await generator.get_chat_completion_async(test_messages)
+
+        assert result == "I'm fine, thank you!"
+
+        mock_instance.chat.completions.create.assert_awaited_once_with(
+            messages=test_messages,
+            model=generator.model_name,
+            max_tokens=150,
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )

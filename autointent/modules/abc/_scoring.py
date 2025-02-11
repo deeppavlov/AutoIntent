@@ -1,12 +1,13 @@
 """Base class for scoring modules."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Literal
+from typing import Any
 
 import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import Module
 
@@ -21,7 +22,31 @@ class ScoringModule(Module, ABC):
 
     supports_oos = False
 
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
+    @abstractmethod
+    def fit(
+        self,
+        utterances: list[str],
+        labels: ListOfLabels,
+    ) -> None: ...
+
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        self.fit(*self.get_train_data(context))
+
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+
+        scores = self.predict(val_utterances)
+
+        self._artifact = ScorerArtifact(
+            train_scores=self.predict(context.data_handler.train_utterances(1)),
+            validation_scores=self.predict(context.data_handler.validation_utterances(1)),
+        )
+
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+        return self.score_metrics_ho((val_labels, scores), chosen_metrics)
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the scorer on a test set and compute the specified metric.
 
@@ -29,25 +54,16 @@ class ScoringModule(Module, ABC):
         :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        if split == "validation":
-            utterances = context.data_handler.validation_utterances(0)
-            labels = context.data_handler.validation_labels(0)
-        elif split == "test":
-            utterances = context.data_handler.test_utterances()
-            labels = context.data_handler.test_labels()
-        else:
-            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
-            raise ValueError(message)
-
-        scores = self.predict(utterances)
-
-        self._train_scores = self.predict(context.data_handler.train_utterances(1))
-        self._validation_scores = self.predict(context.data_handler.validation_utterances(1))
-        self._test_scores = self.predict(context.data_handler.test_utterances())
-
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
-        return self.score_metrics((labels, scores), chosen_metrics)
+
+        metrics_calculated, all_val_scores = self.score_metrics_cv(
+            chosen_metrics, context.data_handler.validation_iterator()
+        )
+
+        self._artifact = ScorerArtifact(folded_scores=all_val_scores)
+
+        return metrics_calculated
 
     def get_assets(self) -> ScorerArtifact:
         """
@@ -55,11 +71,10 @@ class ScoringModule(Module, ABC):
 
         :return: ScorerArtifact containing test, validation and test scores.
         """
-        return ScorerArtifact(
-            train_scores=self._train_scores,
-            validation_scores=self._validation_scores,
-            test_scores=self._test_scores,
-        )
+        return self._artifact
+
+    def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
+        return context.data_handler.train_utterances(0), context.data_handler.train_labels(0)  # type: ignore[return-value]
 
     @abstractmethod
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

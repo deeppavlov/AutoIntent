@@ -36,8 +36,7 @@ class GoofyEvolution(EvolutionChatTemplate):
             ),
         ),
         Message(
-            role=Role.ASSISTANT,
-            content="My laptop's having an existential crisis—keeps rebooting and melting. Help!"
+            role=Role.ASSISTANT, content="My laptop's having an existential crisis—keeps rebooting and melting. Help!"
         ),
     ]
 

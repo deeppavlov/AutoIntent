@@ -173,3 +173,52 @@ def test_dataset_validation(mapping):
 def test_intents_validation(mapping):
     with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
+
+
+def count_oos(split):
+    return len(split.filter(lambda sample: sample["label"] is None))
+
+
+def test_cv_folding(dataset):
+    DataHandler(dataset, scheme="cv", n_folds=3)
+
+    desired_specs = {
+        "test": {"total": 12, "oos": 4},
+        "train_0": {"total": 16, "oos": 5},
+        "train_1": {"total": 16, "oos": 5},
+        "train_2": {"total": 16, "oos": 6},
+    }
+
+    for split_name in dataset:
+        assert len(dataset[split_name]) == desired_specs[split_name]["total"]
+        assert count_oos(dataset[split_name]) == desired_specs[split_name]["oos"]
+
+
+def count_oos_labels(split):
+    return sum(sample is None for sample in split)
+
+
+def test_cv_iterator(dataset):
+    dh = DataHandler(dataset, scheme="cv", n_folds=3)
+
+    desired_specs = [
+        {
+            "train": {"total": 21, "oos": 0},
+            "val": {"total": 16, "oos": 5},
+        },
+        {
+            "train": {"total": 21, "oos": 0},
+            "val": {"total": 16, "oos": 5},
+        },
+        {
+            "train": {"total": 22, "oos": 0},
+            "val": {"total": 16, "oos": 6},
+        },
+    ]
+
+    for i, (x_train, y_train, x_val, y_val) in enumerate(dh.validation_iterator()):
+        specs = desired_specs[i]
+        assert len(x_train) == len(y_train) == specs["train"]["total"]
+        assert count_oos_labels(y_train) == specs["train"]["oos"]
+        assert len(x_val) == len(y_val) == specs["val"]["total"]
+        assert count_oos_labels(y_val) == specs["val"]["oos"]

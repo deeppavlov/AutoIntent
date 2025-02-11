@@ -124,7 +124,7 @@ class KNNScorer(ScoringModule):
         """
         return self.embedder_name
 
-    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
         """
         Fit the scorer by training or loading the vector index.
 
@@ -132,6 +132,9 @@ class KNNScorer(ScoringModule):
         :param labels: List of labels corresponding to the utterances.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
+        if hasattr(self, "_vector_index") and clear_cache:
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(

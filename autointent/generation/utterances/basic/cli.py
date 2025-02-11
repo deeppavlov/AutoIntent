@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
-    """ClI endpoint."""
+    """CLI endpoint."""
     parser = ArgumentParser()
     parser.add_argument(
         "--input-path",
@@ -48,11 +48,12 @@ def main() -> None:
         default=5,
         help="Number of utterances to use as an example for augmentation",
     )
+    parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     args = parser.parse_args()
 
     dataset = load_dataset(args.input_path)
     template = SynthesizerChatTemplate(dataset, args.split, max_sample_utterances=args.n_sample_utterances)
-    generator = UtteranceGenerator(Generator(), template)
+    generator = UtteranceGenerator(Generator(), template, async_mode=args.async_mode)
 
     n_before = len(dataset[args.split])
     new_samples = generator.augment(dataset, split_name=args.split, n_generations=args.n_generations)

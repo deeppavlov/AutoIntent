@@ -42,6 +42,9 @@ class ScorerArtifact(Artifact):
     train_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for train utterances")
     validation_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for validation utterances")
     test_scores: NDArray[np.float64] | None = Field(None, description="Scorer outputs for test utterances")
+    folded_scores: list[NDArray[np.float64]] | None = Field(
+        None, description="Scores for each fold from cross-validation"
+    )
 
 
 class DecisionArtifact(Artifact):

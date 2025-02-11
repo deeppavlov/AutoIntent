@@ -16,6 +16,7 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
 )
+from autointent.custom_types import ValidationScheme
 
 from ._utils import NumpyEncoder, load_dataset
 from .data_handler import DataHandler
@@ -81,11 +82,10 @@ class Context:
         :param config: Configuration for the data handling process.
         """
         self.data_handler = DataHandler(
-            dataset=load_dataset(config.train_path),
-            random_seed=self.seed,
+            dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
         )
 
-    def set_dataset(self, dataset: Dataset) -> None:
+    def set_dataset(self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3) -> None:
         """
         Set the datasets for training, validation and testing.
 
@@ -94,6 +94,8 @@ class Context:
         self.data_handler = DataHandler(
             dataset=dataset,
             random_seed=self.seed,
+            scheme=scheme,
+            n_folds=n_folds,
         )
 
     def get_inference_config(self) -> dict[str, Any]:
@@ -137,7 +139,7 @@ class Context:
         # self._logger.info(make_report(optimization_results, nodes=nodes))
 
         # dump train and test data splits
-        self.data_handler.dump(logs_dir / "dataset.json")
+        self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 

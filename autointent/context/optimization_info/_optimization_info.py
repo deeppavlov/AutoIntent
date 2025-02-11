@@ -166,6 +166,15 @@ class OptimizationInfo:
         best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.validation_scores
 
+    def get_best_folded_scores(self) -> list[NDArray[np.float64]] | None:
+        """
+        Retrieve the validation scores from the best scorer node.
+
+        :return: Validation scores as a numpy array.
+        """
+        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        return best_scorer_artifact.folded_scores
+
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
         """
         Retrieve the test scores from the best scorer node.

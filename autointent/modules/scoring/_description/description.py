@@ -8,7 +8,9 @@ from numpy.typing import NDArray
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
+from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import ScoringModule
 
 
@@ -107,6 +109,9 @@ class DescriptionScorer(ScoringModule):
         :param descriptions: List of intent descriptions.
         :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
         """
+        if hasattr(self, "_embedder"):
+            self._embedder.clear_ram()
+
         self._validate_task(labels)
 
         if any(description is None for description in descriptions):
@@ -146,3 +151,31 @@ class DescriptionScorer(ScoringModule):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         self._embedder.clear_ram()
+
+    def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
+        return (  # type: ignore[return-value]
+            context.data_handler.train_utterances(0),
+            context.data_handler.train_labels(0),
+            context.data_handler.intent_descriptions,
+        )
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """
+        Evaluate the scorer on a test set and compute the specified metric.
+
+        :param context: Context containing test set and other data.
+        :param split: Target split
+        :return: Computed metrics value for the test set or error code of metrics
+        """
+        metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+
+        metrics_calculated, all_val_scores = self.score_metrics_cv(
+            chosen_metrics,
+            context.data_handler.validation_iterator(),
+            descriptions=context.data_handler.intent_descriptions,
+        )
+
+        self._artifact = ScorerArtifact(folded_scores=all_val_scores)
+
+        return metrics_calculated

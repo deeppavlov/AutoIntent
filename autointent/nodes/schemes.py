@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from autointent.custom_types import NodeType
 from autointent.modules.abc import Module
-from autointent.nodes import DecisionNodeInfo, EmbeddingNodeInfo, RegExpNodeInfo, ScoringNodeInfo
+from autointent.nodes import DecisionNodeInfo, EmbeddingNodeInfo, ScoringNodeInfo
 
 
 def generate_models_and_union_type_for_classes(
@@ -91,22 +91,7 @@ class ScoringNodeValidator(BaseModel):
     search_space: list[ScoringSearchSpaceType]
 
 
-RegexpSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes(  # type: ignore[valid-type]
-    list(RegExpNodeInfo.modules_available.values())
-)
-RegexpMetrics: TypeAlias = Literal[tuple(RegExpNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
-
-
-class RegexNodeValidator(BaseModel):
-    """Search space configuration for the Regexp node."""
-
-    node_type: NodeType = NodeType.regexp
-    target_metric: RegexpMetrics
-    metrics: list[RegexpMetrics] | None = None
-    search_space: list[RegexpSearchSpaceType]
-
-
-SearchSpaceTypes: TypeAlias = RegexNodeValidator | EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator
+SearchSpaceTypes: TypeAlias = EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator
 
 
 class OptimizationConfig(RootModel[list[SearchSpaceTypes]]):

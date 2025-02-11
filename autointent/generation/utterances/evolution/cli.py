@@ -55,11 +55,7 @@ SEARCH_SPACE = [
 
 
 def _optimize_n_evolutions(
-    input_path: str,
-    max_n_evolutions: int,
-    evolutions: list,
-    seed: int,
-    split_train: str,
+    input_path: str, max_n_evolutions: int, evolutions: list, seed: int, split_train: str, async_mode: bool
 ) -> tuple[Dataset, int]:
     emb_config = EmbedderConfig(batch_size=16, device="cuda")
 
@@ -69,7 +65,7 @@ def _optimize_n_evolutions(
     merge_dataset = load_dataset(input_path)
 
     for n in range(max_n_evolutions):
-        generator = UtteranceEvolver(Generator(), evolutions, seed)
+        generator = UtteranceEvolver(Generator(), evolutions, seed, async_mode)
         new_samples_dataset = generator.augment(dataset, split_name=split_train, n_evolutions=1, update_split=False)
         merge_dataset[split_train] = concatenate_datasets(merge_dataset[split_train], new_samples_dataset)
 
@@ -89,11 +85,13 @@ def _optimize_n_evolutions(
     return dataset, best_n
 
 
-def _generate_fixed_evolutions(input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str) -> Dataset:
+def _generate_fixed_evolutions(
+    input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str, async_mode: bool
+) -> Dataset:
     dataset = load_dataset(input_path)
     n_before = len(dataset[split])
 
-    generator = UtteranceEvolver(Generator(), evolutions, seed)
+    generator = UtteranceEvolver(Generator(), evolutions, seed, async_mode)
     new_samples = generator.augment(dataset, split_name=split, n_evolutions=n_evolutions)
     n_after = len(dataset[split])
 
@@ -135,6 +133,7 @@ def _parse_args() -> Namespace:
     parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
     parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
     parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
+    parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     parser.add_argument("--seed", type=int, default=0)
 
     return parser.parse_args()
@@ -166,7 +165,7 @@ def main() -> None:
     if args.decide_for_me:
         process_func = _optimize_n_evolutions
 
-    dataset = process_func(args.input_path, args.n_evolutions, evolutions, args.seed, args.split)
+    dataset = process_func(args.input_path, args.n_evolutions, evolutions, args.seed, args.split, args.async_mode)
     dataset.to_json(args.output_path)
 
     if args.output_repo is not None:

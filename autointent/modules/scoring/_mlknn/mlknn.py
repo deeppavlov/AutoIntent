@@ -137,6 +137,9 @@ class MLKnnScorer(ScoringModule):
         :raises TypeError: If the labels are not multi-label.
         :raises ValueError: If the vector index mismatches the provided utterances.
         """
+        if hasattr(self, "_vector_index"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(

@@ -1,7 +1,5 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
-from typing import Literal
-
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
@@ -98,6 +96,9 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         :param utterances: List of text data to index.
         :param labels: List of corresponding labels for the utterances.
         """
+        if hasattr(self, "_vector_index"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(
@@ -109,28 +110,30 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         )
         self._vector_index.add(utterances, labels)
 
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """
         Evaluate the embedding model using a specified metric function.
 
         :param context: The context containing test data and labels.
-        :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        if split == "validation":
-            utterances = context.data_handler.validation_utterances(0)
-            labels = context.data_handler.validation_labels(0)
-        elif split == "test":
-            utterances = context.data_handler.test_utterances()
-            labels = context.data_handler.test_labels()
-        else:
-            message = f"Invalid split '{split}' provided. Expected one of 'validation', or 'test'."
-            raise ValueError(message)
-        predictions, _, _ = self._vector_index.query(utterances, self.k)
+        train_utterances, train_labels = self.get_train_data(context)
+        self.fit(train_utterances, train_labels)
+
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+        predictions = self.predict(val_utterances)
 
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
-        return self.score_metrics((labels, predictions), chosen_metrics)
+        return self.score_metrics_ho((val_labels, predictions), chosen_metrics)
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
+        chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
+
+        metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
+        return metrics_calculated
 
     def get_assets(self) -> RetrieverArtifact:
         """
@@ -144,17 +147,12 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         """Clear cached data in memory used by the vector index."""
         self._vector_index.clear_ram()
 
-    def predict(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+    def predict(self, utterances: list[str]) -> list[ListOfLabels]:
         """
         Predict the nearest neighbors for a list of utterances.
 
         :param utterances: List of utterances for which nearest neighbors are to be retrieved.
-        :return: A tuple containing:
-            - labels: List of retrieved labels for each utterance.
-            - distances: List of distances to the nearest neighbors.
-            - texts: List of retrieved text data corresponding to the neighbors.
+        :return: List of labels for each retrieved utterance.
         """
-        return self._vector_index.query(
-            utterances,
-            self.k,
-        )
+        predictions, _, _ = self._vector_index.query(utterances, self.k)
+        return predictions

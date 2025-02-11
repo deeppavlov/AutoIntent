@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from autointent.custom_types import ValidationScheme
+
 from ._name import get_run_name
 
 
@@ -12,6 +14,10 @@ class DataConfig(BaseModel):
 
     train_path: str | Path
     """Path to the training data. Can be local path or HF repo."""
+    scheme: ValidationScheme
+    """Hold-out or cross-validation."""
+    n_folds: int = 3
+    """Number of folds in cross-validation."""
 
 
 class TaskConfig(BaseModel):

@@ -1,14 +1,14 @@
 """Data Handler file."""
 
 import logging
-from pathlib import Path
+from collections.abc import Generator
 from typing import TypedDict, cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import ListOfGenericLabels, Split
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split, ValidationScheme
 
 from ._stratification import split_dataset
 
@@ -26,10 +26,17 @@ class RegexPatterns(TypedDict):
     """Partial match regex patterns."""
 
 
-class DataHandler:
+class DataHandler:  # TODO rename to Validator
     """Data handler class."""
 
-    def __init__(self, dataset: Dataset, random_seed: int = 0, split_train: bool = True) -> None:
+    def __init__(
+        self,
+        dataset: Dataset,
+        scheme: ValidationScheme = "ho",
+        split_train: bool = True,
+        random_seed: int = 0,
+        n_folds: int = 3,
+    ) -> None:
         """
         Initialize the data handler.
 
@@ -39,12 +46,18 @@ class DataHandler:
                             threshold search).
         """
         set_seed(random_seed)
+        self.random_seed = random_seed
 
         self.dataset = dataset
 
         self.n_classes = self.dataset.n_classes
+        self.scheme = scheme
+        self.n_folds = n_folds
 
-        self._split(random_seed, split_train)
+        if scheme == "ho":
+            self._split_ho(split_train)
+        elif scheme == "cv":
+            self._split_cv()
 
         self.regexp_patterns = [
             RegexPatterns(
@@ -96,6 +109,9 @@ class DataHandler:
         """
         split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
+
+    def train_labels_folded(self) -> list[ListOfGenericLabels]:
+        return [self.train_labels(j) for j in range(self.n_folds)]
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -153,28 +169,37 @@ class DataHandler:
         split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def dump(self, filepath: str | Path) -> None:
-        """
-        Save the dataset splits and intents to a JSON file.
+    def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
+        if self.scheme == "ho":
+            msg = "Cannot call cross-validation on hold-out DataHandler"
+            raise RuntimeError(msg)
 
-        :param filepath: The path to the file where the JSON data will be saved.
-        """
-        self.dataset.to_json(filepath)
+        for j in range(self.n_folds):
+            val_utterances = self.train_utterances(j)
+            val_labels = self.train_labels(j)
+            train_folds = [i for i in range(self.n_folds) if i != j]
+            train_utterances = [ut for i_fold in train_folds for ut in self.train_utterances(i_fold)]
+            train_labels = [lab for i_fold in train_folds for lab in self.train_labels(i_fold)]
 
-    def _split(self, random_seed: int, split_train: bool) -> None:
+            # filter out all OOS samples from train
+            train_utterances = [ut for ut, lab in zip(train_utterances, train_labels, strict=True) if lab is not None]
+            train_labels = [lab for lab in train_labels if lab is not None]
+            yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
+
+    def _split_ho(self, split_train: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
         if split_train and Split.TRAIN in self.dataset:
-            self._split_train(random_seed)
+            self._split_train()
 
         if Split.TEST not in self.dataset:
             test_size = 0.1 if has_validation_split else 0.2
-            self._split_test(test_size, random_seed)
+            self._split_test(test_size)
 
         if not has_validation_split:
-            self._split_validation_from_train(random_seed)
+            self._split_validation_from_train()
         elif Split.VALIDATION in self.dataset:
-            self._split_validation(random_seed)
+            self._split_validation()
 
         for split in self.dataset:
             n_classes_split = self.dataset.get_n_classes(split)
@@ -185,7 +210,7 @@ class DataHandler:
                 )
                 raise ValueError(message)
 
-    def _split_train(self, random_seed: int) -> None:
+    def _split_train(self) -> None:
         """
         Split on two sets.
 
@@ -195,12 +220,12 @@ class DataHandler:
             self.dataset,
             split=Split.TRAIN,
             test_size=0.5,
-            random_seed=random_seed,
+            random_seed=self.random_seed,
             allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
 
-    def _split_validation(self, random_seed: int) -> None:
+    def _split_validation(self) -> None:
         """
         Split on two sets.
 
@@ -210,27 +235,49 @@ class DataHandler:
             self.dataset,
             split=Split.VALIDATION,
             test_size=0.5,
-            random_seed=random_seed,
+            random_seed=self.random_seed,
             allow_oos_in_train=False,  # only val data for decision node should contain OOS
         )
         self.dataset.pop(Split.VALIDATION)
 
-    def _split_validation_from_test(self, random_seed: int) -> None:
+    def _split_validation_from_test(self) -> None:
         self.dataset[Split.TEST], self.dataset[Split.VALIDATION] = split_dataset(
             self.dataset,
             split=Split.TEST,
             test_size=0.5,
-            random_seed=random_seed,
+            random_seed=self.random_seed,
             allow_oos_in_train=True,  # both test and validation splits can contain OOS
         )
 
-    def _split_validation_from_train(self, random_seed: int) -> None:
+    def _split_cv(self) -> None:
+        extra_splits = [split_name for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]]
+        if extra_splits:
+            self.dataset[Split.TRAIN] = concatenate_datasets(
+                [self.dataset.pop(split_name) for split_name in extra_splits]
+            )
+
+        if Split.TEST not in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
+                self.dataset, split=Split.TRAIN, test_size=0.2, random_seed=self.random_seed, allow_oos_in_train=True
+            )
+
+        for j in range(self.n_folds - 1):
+            self.dataset[Split.TRAIN], self.dataset[f"{Split.TRAIN}_{j}"] = split_dataset(
+                self.dataset,
+                split=Split.TRAIN,
+                test_size=1 / (self.n_folds - j),
+                random_seed=self.random_seed,
+                allow_oos_in_train=True,
+            )
+        self.dataset[f"{Split.TRAIN}_{self.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
+
+    def _split_validation_from_train(self) -> None:
         if Split.TRAIN in self.dataset:
             self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = split_dataset(
                 self.dataset,
                 split=Split.TRAIN,
                 test_size=0.2,
-                random_seed=random_seed,
+                random_seed=self.random_seed,
                 allow_oos_in_train=True,
             )
         else:
@@ -239,23 +286,23 @@ class DataHandler:
                     self.dataset,
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=0.2,
-                    random_seed=random_seed,
+                    random_seed=self.random_seed,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
 
-    def _split_test(self, test_size: float, random_seed: int) -> None:
+    def _split_test(self, test_size: float) -> None:
         """Obtain test set from train."""
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(
             self.dataset,
             split=f"{Split.TRAIN}_0",
             test_size=test_size,
-            random_seed=random_seed,
+            random_seed=self.random_seed,
         )
         self.dataset[f"{Split.TRAIN}_1"], self.dataset[f"{Split.TEST}_1"] = split_dataset(
             self.dataset,
             split=f"{Split.TRAIN}_1",
             test_size=test_size,
-            random_seed=random_seed,
+            random_seed=self.random_seed,
             allow_oos_in_train=True,
         )
         self.dataset[Split.TEST] = concatenate_datasets(
@@ -263,3 +310,20 @@ class DataHandler:
         )
         self.dataset.pop(f"{Split.TEST}_0")
         self.dataset.pop(f"{Split.TEST}_1")
+
+    def prepare_for_refit(self) -> None:
+        if self.scheme == "ho":
+            return
+
+        train_folds = [split_name for split_name in self.dataset if split_name.startswith(Split.TRAIN)]
+        self.dataset[Split.TRAIN] = concatenate_datasets([self.dataset.pop(name) for name in train_folds])
+
+        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
+            self.dataset,
+            split=Split.TRAIN,
+            test_size=0.5,
+            random_seed=self.random_seed,
+            allow_oos_in_train=False,
+        )
+
+        self.dataset.pop(Split.TRAIN)
