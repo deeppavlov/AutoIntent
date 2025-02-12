@@ -80,7 +80,7 @@ def generate_models_and_union_type_for_classes(
             field = Field(default=[param.default]) if param.default is not inspect.Parameter.empty else Field(...)
             search_type = get_optuna_class(param_type)
             if search_type is None:
-                fields[param_name] = (list[param_type], field)  # type: ignore[assignment]
+                fields[param_name] = (list[param_type], field)
             else:
                 fields[param_name] = (list[param_type] | search_type, field)
 
