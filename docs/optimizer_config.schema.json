@@ -10,6 +10,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -28,6 +29,8 @@
                         "anyOf": [
                             {
                                 "items": {
+                                    "maximum": 1.0,
+                                    "minimum": 0.0,
                                     "type": "number"
                                 },
                                 "type": "array"
@@ -57,6 +60,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -84,6 +88,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -105,6 +110,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -232,6 +238,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -246,6 +253,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0.0,
                                 "type": "number"
                             },
                             "type": "array"
@@ -393,6 +401,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -411,6 +420,8 @@
                         "anyOf": [
                             {
                                 "items": {
+                                    "maximum": 1.0,
+                                    "minimum": 0.0,
                                     "type": "number"
                                 },
                                 "type": "array"
@@ -440,6 +451,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -454,6 +466,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -512,6 +525,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -556,6 +570,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -577,6 +592,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -608,6 +624,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -622,6 +639,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -636,6 +654,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0.0,
                                 "type": "number"
                             },
                             "type": "array"
@@ -653,6 +672,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -776,6 +796,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -847,38 +868,52 @@
                     "type": "array"
                 },
                 "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "M",
-                    "type": "array"
+                    "title": "M"
                 },
                 "rank_threshold_cutoff": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Rank Threshold Cutoff",
-                    "type": "array"
+                    "title": "Rank Threshold Cutoff"
                 }
             },
             "required": [
@@ -900,6 +935,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -914,6 +950,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
@@ -1037,6 +1074,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -1108,6 +1146,7 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
                             "type": "integer"
                         },
                         {
@@ -1119,24 +1158,35 @@
                     "title": "N Trials"
                 },
                 "thresh": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "maximum": 1.0,
+                                        "minimum": 0.0,
+                                        "type": "number"
+                                    },
+                                    {
+                                        "items": {
+                                            "maximum": 1.0,
+                                            "minimum": 0.0,
+                                            "type": "number"
+                                        },
+                                        "type": "array"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
                     "default": [
                         0.5
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "items": {
-                                    "type": "number"
-                                },
-                                "type": "array"
-                            }
-                        ]
-                    },
-                    "title": "Thresh",
-                    "type": "array"
+                    "title": "Thresh"
                 }
             },
             "required": [
@@ -1156,6 +1206,7 @@
                     "anyOf": [
                         {
                             "items": {
+                                "exclusiveMinimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
