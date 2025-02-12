@@ -5,11 +5,12 @@ import logging
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
 import optuna
 import torch
 from optuna.trial import Trial
+from pydantic import BaseModel, Field
 
 from autointent import Dataset
 from autointent.context import Context
@@ -17,18 +18,18 @@ from autointent.custom_types import NodeType, SamplerType
 from autointent.nodes._nodes_info import NODES_INFO
 
 
-class ParamSpaceInt(TypedDict, total=False):
-    low: int
-    high: int
-    step: int
-    log: bool
+class ParamSpaceInt(BaseModel):
+    low: int = Field(..., description="Low boundary of the search space.")
+    high: int = Field(..., description="High boundary of the search space.")
+    step: int = Field(1, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
-class ParamSpaceFloat(TypedDict, total=False):
-    low: float
-    high: float
-    step: float
-    log: bool
+class ParamSpaceFloat(BaseModel):
+    low: float = Field(..., description="Low boundary of the search space.")
+    high: float = Field(..., description="High boundary of the search space.")
+    step: float = Field(0.1, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
 class NodeOptimizer:
@@ -152,10 +153,14 @@ class NodeOptimizer:
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif all(isinstance(v, int) for v in param_space.values()):
-                res[param_name] = trial.suggest_int(param_name, **param_space)
-            elif all(isinstance(v, float) for v in param_space.values()):
-                res[param_name] = trial.suggest_float(param_name, **param_space)
+            elif isinstance(param_space, ParamSpaceInt):
+                res[param_name] = trial.suggest_int(
+                    param_name, low=param_space.low, high=param_space.high, step=param_space.step, log=param_space.log
+                )
+            elif isinstance(param_space, ParamSpaceFloat):
+                res[param_name] = trial.suggest_float(
+                    param_name, low=param_space.low, high=param_space.high, step=param_space.step, log=param_space.log
+                )
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)

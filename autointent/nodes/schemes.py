@@ -2,13 +2,30 @@
 
 import inspect
 from collections.abc import Iterator
-from typing import Any, Literal, TypeAlias, Union, get_type_hints
+from typing import Annotated, Any, Literal, TypeAlias, Union, get_args, get_origin, get_type_hints
 
 from pydantic import BaseModel, Field, RootModel
 
 from autointent.custom_types import NodeType
 from autointent.modules.abc import Module
 from autointent.nodes import DecisionNodeInfo, EmbeddingNodeInfo, ScoringNodeInfo
+from autointent.nodes._optimization._node_optimizer import ParamSpaceFloat, ParamSpaceInt
+
+
+def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] | None:
+    """
+    Get the Optuna class for the given parameter type.
+
+    :param param_type: Parameter type
+    :return: Optuna search space class
+    """
+    is_type_annotated = get_origin(param_type) is Annotated
+    base_type = get_args(param_type)[0] if is_type_annotated else param_type
+    if base_type is int:
+        return ParamSpaceInt
+    if base_type is float:
+        return ParamSpaceFloat
+    return None
 
 
 def generate_models_and_union_type_for_classes(
@@ -22,7 +39,10 @@ def generate_models_and_union_type_for_classes(
         globalns = getattr(cls.from_context, "__globals__", {})
         type_hints = get_type_hints(cls.from_context, globalns, None)  # Resolve forward refs
 
-        fields = {"module_name": (Literal[cls.name], Field(...))}
+        fields = {
+            "module_name": (Literal[cls.name], Field(...)),
+            "n_trials": (int | None, Field(None, description="Number of trials")),
+        }
 
         for param_name, param in init_signature.parameters.items():
             if param_name in ("self", "cls", "context"):
@@ -30,8 +50,11 @@ def generate_models_and_union_type_for_classes(
 
             param_type: TypeAlias = type_hints.get(param_name, Any)  # type: ignore[valid-type]  # noqa: PYI042
             field = Field(default=[param.default]) if param.default is not inspect.Parameter.empty else Field(...)
-
-            fields[param_name] = (list[param_type], field)  # type: ignore[assignment]
+            search_type = get_optuna_class(param_type)
+            if search_type is None:
+                fields[param_name] = (list[param_type], field)  # type: ignore[assignment]
+            else:
+                fields[param_name] = (list[param_type] | search_type, field)
 
         model_name = f"{cls.__name__}InitModel"
         models[cls.__name__] = type(

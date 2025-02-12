@@ -1,5 +1,7 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
+from pydantic import PositiveInt
+
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
@@ -41,7 +43,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
 
     def __init__(
         self,
-        k: int,
+        k: PositiveInt,
         embedder_name: str,
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
@@ -69,7 +71,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        k: int,
+        k: PositiveInt,
         embedder_name: str,
     ) -> "RetrievalAimedEmbedding":
         """

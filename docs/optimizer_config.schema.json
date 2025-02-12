@@ -7,6 +7,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "search_space": {
                     "default": [
                         null
@@ -40,6 +53,19 @@
                     "const": "argmax",
                     "title": "Module Name",
                     "type": "string"
+                },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
                 }
             },
             "required": [
@@ -55,6 +81,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "cross_encoder_name": {
                     "items": {
                         "type": "string"
@@ -63,11 +102,18 @@
                     "type": "array"
                 },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "embedder_name": {
                     "default": [
@@ -183,12 +229,32 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "temperature": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "title": "Temperature",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
+                    "title": "Temperature"
                 },
                 "embedder_name": {
                     "default": [
@@ -324,6 +390,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "search_space": {
                     "default": [
                         null
@@ -358,12 +437,32 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "weights": {
                     "items": {
@@ -410,6 +509,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "embedder_name": {
                     "default": [
                         null
@@ -441,6 +553,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "embedder_name": {
                     "items": {
                         "type": "string"
@@ -449,14 +574,21 @@
                     "type": "array"
                 },
                 "cv": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         3
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "Cv",
-                    "type": "array"
+                    "title": "Cv"
                 }
             },
             "required": [
@@ -473,32 +605,66 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "s": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
                     "default": [
                         1.0
                     ],
-                    "items": {
-                        "type": "number"
-                    },
-                    "title": "S",
-                    "type": "array"
+                    "title": "S"
                 },
                 "ignore_first_neighbours": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         0
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "Ignore First Neighbours",
-                    "type": "array"
+                    "title": "Ignore First Neighbours"
                 },
                 "embedder_name": {
                     "default": [
@@ -536,6 +702,70 @@
             "title": "NodeType",
             "type": "string"
         },
+        "ParamSpaceFloat": {
+            "properties": {
+                "low": {
+                    "description": "Low boundary of the search space.",
+                    "title": "Low",
+                    "type": "number"
+                },
+                "high": {
+                    "description": "High boundary of the search space.",
+                    "title": "High",
+                    "type": "number"
+                },
+                "step": {
+                    "default": 0.1,
+                    "description": "Step of the search space.",
+                    "title": "Step",
+                    "type": "number"
+                },
+                "log": {
+                    "default": false,
+                    "description": "Whether to use a logarithmic scale.",
+                    "title": "Log",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "low",
+                "high"
+            ],
+            "title": "ParamSpaceFloat",
+            "type": "object"
+        },
+        "ParamSpaceInt": {
+            "properties": {
+                "low": {
+                    "description": "Low boundary of the search space.",
+                    "title": "Low",
+                    "type": "integer"
+                },
+                "high": {
+                    "description": "High boundary of the search space.",
+                    "title": "High",
+                    "type": "integer"
+                },
+                "step": {
+                    "default": 1,
+                    "description": "Step of the search space.",
+                    "title": "Step",
+                    "type": "integer"
+                },
+                "log": {
+                    "default": false,
+                    "description": "Whether to use a logarithmic scale.",
+                    "title": "Log",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "low",
+                "high"
+            ],
+            "title": "ParamSpaceInt",
+            "type": "object"
+        },
         "RerankScorerInitModel": {
             "properties": {
                 "module_name": {
@@ -543,12 +773,32 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "weights": {
                     "items": {
@@ -647,12 +897,32 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "embedder_name": {
                     "items": {
@@ -764,6 +1034,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "clf_name": {
                     "default": [
                         "LogisticRegression"
@@ -822,6 +1105,19 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "thresh": {
                     "default": [
                         0.5
@@ -857,14 +1153,21 @@
                     "type": "string"
                 },
                 "n_trials": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         320
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "N Trials",
-                    "type": "array"
+                    "title": "N Trials"
                 }
             },
             "required": [

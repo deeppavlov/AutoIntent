@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
@@ -57,7 +58,7 @@ class KNNScorer(ScoringModule):
     def __init__(
         self,
         embedder_name: str,
-        k: int,
+        k: PositiveInt,
         weights: WEIGHT_TYPES = "distance",
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
@@ -90,7 +91,7 @@ class KNNScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        k: int,
+        k: PositiveInt,
         weights: WEIGHT_TYPES,
         embedder_name: str | None = None,
     ) -> "KNNScorer":

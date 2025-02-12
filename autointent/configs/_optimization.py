@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt
 
 from autointent.custom_types import SamplerType, ValidationScheme
 
@@ -16,7 +16,7 @@ class DataConfig(BaseModel):
     """Path to the training data. Can be local path or HF repo."""
     scheme: ValidationScheme
     """Hold-out or cross-validation."""
-    n_folds: int = 3
+    n_folds: PositiveInt = 3
     """Number of folds in cross-validation."""
 
 
