@@ -5,7 +5,7 @@ import logging
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
-from typing import Any, Literal, TypedDict
+from typing import Any, TypedDict
 
 import optuna
 import torch
@@ -29,11 +29,6 @@ class ParamSpaceFloat(TypedDict, total=False):
     high: float
     step: float
     log: bool
-
-
-class ParamSpace(TypedDict):
-    type: Literal["cat", "int", "float"]
-    content: ParamSpaceInt | ParamSpaceFloat
 
 
 class NodeOptimizer:
@@ -74,28 +69,35 @@ class NodeOptimizer:
 
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter = 0
+            module_name = search_space.pop("module_name")
+            n_trials = None
+            if "n_trials" in search_space:
+                n_trials = search_space.pop("n_trials")
             if tuning == "bayes":
                 sampler = optuna.samplers.TPESampler(seed=context.seed)
-                n_trials = 10
+                n_trials = n_trials or 10
             elif tuning == "brute":
                 sampler = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
                 n_trials = None
             elif tuning == "random":
                 sampler = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
-                n_trials = 10
+                n_trials = n_trials or 10
             else:
                 msg = f"Unexpected sampler: {tuning}"
                 raise ValueError(msg)
             study = optuna.create_study(direction="maximize", sampler=sampler)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
-            module_name = search_space.pop("module_name")
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
             study.optimize(obj, n_trials=n_trials)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def objective(
-        self, trial: Trial, module_name: str, search_space: dict[str, ParamSpace | list[Any]], context: Context
+        self,
+        trial: Trial,
+        module_name: str,
+        search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]],
+        context: Context,
     ) -> float:
         config = self.suggest(trial, search_space)
 
@@ -143,15 +145,17 @@ class NodeOptimizer:
 
         return target_metric
 
-    def suggest(self, trial: Trial, search_space: dict[str, ParamSpace | list[Any]]) -> dict[str, Any]:
+    def suggest(
+        self, trial: Trial, search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]]
+    ) -> dict[str, Any]:
         res: dict[str, Any] = {}
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif param_space["type"] == "int":
-                res[param_name] = trial.suggest_int(param_name, **param_space["content"])
-            elif param_space["type"] == "float":
-                res[param_name] = trial.suggest_float(param_name, **param_space["content"])
+            elif all(isinstance(v, int) for v in param_space.values()):
+                res[param_name] = trial.suggest_int(param_name, **param_space)
+            elif all(isinstance(v, float) for v in param_space.values()):
+                res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
