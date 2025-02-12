@@ -2,6 +2,8 @@
 
 import logging
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
+from typing import Any
 
 from datasets import concatenate_datasets
 
@@ -21,7 +23,7 @@ from .chat_templates import (
     ReasoningEvolution,
 )
 
-# logging.basicConfig(level="INFO")
+logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 SEARCH_SPACE = [
@@ -54,6 +56,12 @@ SEARCH_SPACE = [
 ]
 
 
+def _choose_search_space(search_space: str | None) -> list[dict[str, Any]] | Path | str:
+    if search_space is None:
+        return SEARCH_SPACE
+    return search_space
+
+
 def _optimize_n_evolutions(
     input_path: str,
     max_n_evolutions: int,
@@ -62,14 +70,14 @@ def _optimize_n_evolutions(
     split_train: str,
     async_mode: bool,
     batch_size: int,
-) -> tuple[Dataset, int]:
+    search_space: list[dict[str, Any]] | Path | str,
+) -> Dataset:
     emb_config = EmbedderConfig(batch_size=16, device="cuda")
 
     best_result = 0
     best_n = 0
     dataset = load_dataset(input_path)
     merge_dataset = load_dataset(input_path)
-    k = 0.9
 
     for n in range(max_n_evolutions):
         generator = UtteranceEvolver(Generator(), evolutions, seed, async_mode)
@@ -78,12 +86,11 @@ def _optimize_n_evolutions(
         )
         merge_dataset[split_train] = concatenate_datasets([merge_dataset[split_train], new_samples_dataset])
 
-        pipeline_optimizer = Pipeline.from_search_space(SEARCH_SPACE)
+        pipeline_optimizer = Pipeline.from_search_space(search_space)
         pipeline_optimizer.set_config(emb_config)
         ctx = pipeline_optimizer.fit(merge_dataset)
         results = ctx.optimization_info.dump_evaluation_results()
-        decision_metric = results["metrics"]["decision"][0] - k
-        k -= 0.1
+        decision_metric = results["metrics"]["decision"][0]
 
         if decision_metric > best_result:
             best_result = decision_metric
@@ -96,7 +103,15 @@ def _optimize_n_evolutions(
 
 
 def _generate_fixed_evolutions(
-    input_path: str, n_evolutions: int, evolutions: list, seed: int, split: str, async_mode: bool, batch_size: int
+    input_path: str,
+    n_evolutions: int,
+    evolutions: list,
+    seed: int,
+    split: str,
+    async_mode: bool,
+    batch_size: int,
+    *args,
+    **kwargs,
 ) -> Dataset:
     dataset = load_dataset(input_path)
     n_before = len(dataset[split])
@@ -146,6 +161,7 @@ def _parse_args() -> Namespace:
     parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=4)
+    parser.add_argument("--search-space", type=str, default=None)
 
     return parser.parse_args()
 
@@ -172,12 +188,21 @@ def main() -> None:
         logger.warning("No evolutions selected. Exiting.")
         return
 
+    search_space = _choose_search_space(args.search_space)
+
     process_func = _generate_fixed_evolutions
     if args.decide_for_me:
         process_func = _optimize_n_evolutions
 
     dataset = process_func(
-        args.input_path, args.n_evolutions, evolutions, args.seed, args.split, args.async_mode, args.batch_size
+        args.input_path,
+        args.n_evolutions,
+        evolutions,
+        args.seed,
+        args.split,
+        args.async_mode,
+        args.batch_size,
+        search_space,
     )
     dataset.to_json(args.output_path)
 
