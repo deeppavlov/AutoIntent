@@ -1,7 +1,6 @@
 """Node optimizer."""
 
 import gc
-import itertools as it
 import logging
 from copy import deepcopy
 from functools import partial
@@ -73,73 +72,27 @@ class NodeOptimizer:
         """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
-        if tuning == "brute":
-            self._fit_brute(context)
-        elif tuning == "bayes":
-            self._fit_bayes(context)
-        else:
-            msg = f"Unexepected tuning type: {tuning}"
-            raise ValueError(msg)
-
-        self._logger.info("%s node optimization is finished!", self.node_info.node_type)
-
-    def _fit_brute(self, context: Context) -> None:
-        for search_space in deepcopy(self.modules_search_spaces):
-            module_name = search_space.pop("module_name")
-
-            for j_combination, params_combination in enumerate(it.product(*search_space.values())):
-                module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
-
-                self._logger.debug("initializing %s module...", module_name)
-                module = self.node_info.modules_available[module_name].from_context(context, **module_kwargs)
-
-                embedder_name = module.get_embedder_name()
-                if embedder_name is not None:
-                    module_kwargs["embedder_name"] = embedder_name
-
-                context.callback_handler.start_module(
-                    module_name=module_name, num=j_combination, module_kwargs=module_kwargs
-                )
-
-                self._logger.debug("scoring %s module...", module_name)
-                metrics_score = module.score(context, metrics=self.metrics)
-                metric_value = metrics_score[self.target_metric]
-
-                context.callback_handler.log_metrics(metrics_score)
-                context.callback_handler.end_module()
-
-                dump_dir = context.get_dump_dir()
-
-                if dump_dir is not None:
-                    module_dump_dir = self.get_module_dump_dir(dump_dir, module_name, j_combination)
-                    module.dump(module_dump_dir)
-                else:
-                    module_dump_dir = None
-
-                context.optimization_info.log_module_optimization(
-                    self.node_info.node_type,
-                    module_name,
-                    module_kwargs,
-                    metric_value,
-                    self.target_metric,
-                    module.get_assets(),  # retriever name / scores / predictions
-                    module_dump_dir,
-                    module=module if not context.is_ram_to_clear() else None,
-                )
-
-                if context.is_ram_to_clear():
-                    module.clear_cache()
-                    gc.collect()
-                    torch.cuda.empty_cache()
-
-    def _fit_bayes(self, context: Context, seed: int = 42, n_trials: int = 10) -> None:
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter = 0
-            study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler(seed=seed))
+            if tuning == "bayes":
+                sampler = optuna.samplers.TPESampler(seed=context.seed)
+                n_trials = 10
+            elif tuning == "brute":
+                sampler = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
+                n_trials = None
+            elif tuning == "random":
+                sampler = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
+                n_trials = 10
+            else:
+                msg = f"Unexpected sampler: {tuning}"
+                raise ValueError(msg)
+            study = optuna.create_study(direction="maximize", sampler=sampler)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             module_name = search_space.pop("module_name")
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
             study.optimize(obj, n_trials=n_trials)
+
+        self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def objective(
         self, trial: Trial, module_name: str, search_space: dict[str, ParamSpace | list[Any]], context: Context

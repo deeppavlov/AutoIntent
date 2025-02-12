@@ -71,5 +71,5 @@ class Split:
     INTENTS = "intents"
 
 
-TuningType = Literal["brute", "bayes"]
+TuningType = Literal["brute", "bayes", "random"]
 ValidationScheme = Literal["ho", "cv"]
