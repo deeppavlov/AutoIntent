@@ -13,7 +13,7 @@ from optuna.trial import Trial
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, TuningType
+from autointent.custom_types import NodeType, SamplerType
 from autointent.nodes._nodes_info import NODES_INFO
 
 
@@ -59,7 +59,7 @@ class NodeOptimizer:
         self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
-    def fit(self, context: Context, tuning: TuningType = "brute") -> None:
+    def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
         Fit the node optimizer.
 
@@ -73,19 +73,19 @@ class NodeOptimizer:
             n_trials = None
             if "n_trials" in search_space:
                 n_trials = search_space.pop("n_trials")
-            if tuning == "bayes":
-                sampler = optuna.samplers.TPESampler(seed=context.seed)
+            if sampler == "tpe":
+                sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
                 n_trials = n_trials or 10
-            elif tuning == "brute":
-                sampler = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
+            elif sampler == "brute":
+                sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
                 n_trials = None
-            elif tuning == "random":
-                sampler = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
+            elif sampler == "random":
+                sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
                 n_trials = n_trials or 10
             else:
-                msg = f"Unexpected sampler: {tuning}"
+                msg = f"Unexpected sampler: {sampler}"
                 raise ValueError(msg)
-            study = optuna.create_study(direction="maximize", sampler=sampler)
+            study = optuna.create_study(direction="maximize", sampler=sampler_instance)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
             study.optimize(obj, n_trials=n_trials)

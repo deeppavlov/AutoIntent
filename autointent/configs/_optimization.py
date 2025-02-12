@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from autointent.custom_types import TuningType, ValidationScheme
+from autointent.custom_types import SamplerType, ValidationScheme
 
 from ._name import get_run_name
 
@@ -25,7 +25,7 @@ class TaskConfig(BaseModel):
 
     search_space_path: Path | None = None
     """Path to the search space configuration file. If None, the default search space will be used"""
-    sampler: TuningType = "brute"
+    sampler: SamplerType = "brute"
 
 
 class LoggingConfig(BaseModel):

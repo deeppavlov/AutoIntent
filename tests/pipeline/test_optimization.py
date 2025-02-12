@@ -12,12 +12,12 @@ from tests.conftest import get_search_space, setup_environment
 
 
 @pytest.mark.parametrize(
-    "tuning",
-    ["bayes", "random"],
+    "sampler",
+    ["tpe", "random"],
 )
-def test_bayes(dataset, tuning):
+def test_bayes(dataset, sampler):
     project_dir = setup_environment()
-    search_space = get_search_space("bayes")
+    search_space = get_search_space("optuna")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
@@ -25,7 +25,7 @@ def test_bayes(dataset, tuning):
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    pipeline_optimizer.fit(dataset, scheme="ho", refit_after=False, tuning=tuning)
+    pipeline_optimizer.fit(dataset, scheme="ho", refit_after=False, sampler=sampler)
 
 
 @pytest.mark.parametrize(

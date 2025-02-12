@@ -27,7 +27,7 @@ def dataset_unsplitted():
     return Dataset.from_json(path)
 
 
-TaskType = Literal["multiclass", "multilabel", "description", "bayes"]
+TaskType = Literal["multiclass", "multilabel", "description", "optuna"]
 
 
 def get_search_space_path(task_type: TaskType):
