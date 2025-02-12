@@ -11,7 +11,11 @@ from autointent.configs import (
 from tests.conftest import get_search_space, setup_environment
 
 
-def test_bayes(dataset):
+@pytest.mark.parametrize(
+    "tuning",
+    ["bayes", "random"],
+)
+def test_bayes(dataset, tuning):
     project_dir = setup_environment()
     search_space = get_search_space("bayes")
 
@@ -21,7 +25,7 @@ def test_bayes(dataset):
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
-    pipeline_optimizer.fit(dataset, scheme="cv", refit_after=True, tuning="bayes")
+    pipeline_optimizer.fit(dataset, scheme="ho", refit_after=False, tuning=tuning)
 
 
 @pytest.mark.parametrize(
