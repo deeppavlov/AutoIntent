@@ -16,8 +16,7 @@ import numpy.typing as npt
 
 from autointent import Embedder
 from autointent.custom_types import ListOfLabels
-from autointent.schemas import EmbedderConfig
-from autointent.schemas._schemas import TaskTypeEnum
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class VectorIndexMetadata(TypedDict):
