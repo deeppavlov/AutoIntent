@@ -3,10 +3,9 @@
 import logging
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from datasets import concatenate_datasets
-from datasets import Dataset as HFDataset
 
 from autointent import Dataset, Pipeline, load_dataset
 from autointent.configs import EmbedderConfig
@@ -70,7 +69,7 @@ def _optimize_n_evolutions(
     max_n_evolutions: int,
     split_train: str,
     batch_size: int,
-    search_space: Optional[str],
+    search_space: str | None,
 ) -> Dataset:
     emb_config = EmbedderConfig(batch_size=16, device="cuda")
     search_space = _choose_search_space(search_space)
@@ -99,6 +98,7 @@ def _optimize_n_evolutions(
 
     logger.info("# optimal n evolutions: %s", best_n)
     return dataset
+
 
 def _parse_args() -> Namespace:
     parser = ArgumentParser()
@@ -161,7 +161,6 @@ def main() -> None:
         logger.warning("No evolutions selected. Exiting.")
         return
 
-
     generator = UtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
     dataset = load_dataset(args.input_path)
 
@@ -177,14 +176,16 @@ def main() -> None:
         )
     else:
         n_before = len(dataset[args.split])
-    
-        new_samples = generator.augment(dataset, split_name=args.split, n_evolutions=args.n_evolutions, batch_size=args.batch_size)
+
+        new_samples = generator.augment(
+            dataset, split_name=args.split, n_evolutions=args.n_evolutions, batch_size=args.batch_size
+        )
         n_after = len(dataset[args.split])
-    
+
         logger.info("# samples before %s", n_before)
         logger.info("# samples generated %s", len(new_samples))
         logger.info("# samples after %s", n_after)
-        
+
     dataset.to_json(args.output_path)
 
     if args.output_repo is not None:
