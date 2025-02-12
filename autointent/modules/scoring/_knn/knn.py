@@ -101,13 +101,13 @@ class KNNScorer(ScoringModule):
             weights=weights,
         )
 
-    def get_embedder_config(self) -> EmbedderConfig:
+    def get_embedder_config(self) -> dict[str, Any]:
         """
         Get the name of the embedder.
 
         :return: Embedder name.
         """
-        return self.embedder_config
+        return self.embedder_config.model_dump()
 
     def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
         """

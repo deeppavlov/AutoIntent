@@ -72,13 +72,13 @@ class DescriptionScorer(ScoringModule):
             embedder_config=embedder_config,
         )
 
-    def get_embedder_config(self) -> EmbedderConfig:
+    def get_embedder_config(self) -> dict[str, Any]:
         """
         Get the name of the embedder.
 
         :return: Embedder name.
         """
-        return self.embedder_config
+        return self.embedder_config.model_dump()
 
     def fit(
         self,
