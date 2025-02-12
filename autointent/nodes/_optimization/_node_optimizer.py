@@ -146,21 +146,25 @@ class NodeOptimizer:
 
         return target_metric
 
-    def suggest(
-        self, trial: Trial, search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]]
-    ) -> dict[str, Any]:
+    def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
         res: dict[str, Any] = {}
+
+        def is_valid_param_space(
+            param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
+        ) -> bool:
+            try:
+                space_type(**param_space)
+                return True  # noqa: TRY300
+            except ValueError:
+                return False
+
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif isinstance(param_space, ParamSpaceInt):
-                res[param_name] = trial.suggest_int(
-                    param_name, low=param_space.low, high=param_space.high, step=param_space.step, log=param_space.log
-                )
-            elif isinstance(param_space, ParamSpaceFloat):
-                res[param_name] = trial.suggest_float(
-                    param_name, low=param_space.low, high=param_space.high, step=param_space.step, log=param_space.log
-                )
+            elif is_valid_param_space(param_space, ParamSpaceInt):
+                res[param_name] = trial.suggest_int(param_name, **param_space)
+            elif is_valid_param_space(param_space, ParamSpaceFloat):
+                res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
