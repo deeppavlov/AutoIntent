@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import PositiveFloat, PositiveInt
+from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.custom_types import ListOfLabels
@@ -94,7 +94,7 @@ class MLKnnScorer(ScoringModule):
         context: Context,
         k: PositiveInt,
         s: PositiveFloat = 1.0,
-        ignore_first_neighbours: PositiveInt = 0,
+        ignore_first_neighbours: NonNegativeInt = 0,
         embedder_name: str | None = None,
     ) -> "MLKnnScorer":
         """

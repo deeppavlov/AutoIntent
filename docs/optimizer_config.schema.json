@@ -672,7 +672,7 @@
                     "anyOf": [
                         {
                             "items": {
-                                "exclusiveMinimum": 0,
+                                "minimum": 0,
                                 "type": "integer"
                             },
                             "type": "array"
