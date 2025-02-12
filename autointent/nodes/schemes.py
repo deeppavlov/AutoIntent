@@ -63,8 +63,6 @@ def generate_models_and_union_type_for_classes(
     models: dict[str, type[BaseModel]] = {}
 
     for cls in classes:
-        if cls.name == "threshold":
-            pass
         init_signature = inspect.signature(cls.from_context)
         globalns = getattr(cls.from_context, "__globals__", {})
         type_hints = get_type_hints(cls.from_context, globalns, None, include_extras=True)  # Resolve forward refs
