@@ -14,7 +14,7 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset, Pipeline
 from autointent.custom_types import Split
-from autointent.generation.utterances import UtteranceEvolver
+from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent
