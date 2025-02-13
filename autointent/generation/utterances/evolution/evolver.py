@@ -15,7 +15,7 @@ from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.schemas import Message
-from autointent.schemas import Intent, Sample
+from autointent.schemas import Intent
 
 
 class UtteranceEvolver:
@@ -62,7 +62,7 @@ class UtteranceEvolver:
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
-    ) -> list[Sample]:
+    ) -> HFDataset:
         """
         Augment some split of dataset.
 
@@ -103,7 +103,7 @@ class UtteranceEvolver:
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
-    ) -> list[Sample]:
+    ) -> HFDataset:
         original_split = dataset[split_name]
         new_samples = []
 
