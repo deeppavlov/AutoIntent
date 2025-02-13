@@ -114,8 +114,12 @@ class Module(ABC):
         :param kwargs: Additional kwargs.
         """
 
-    def get_embedder_name(self) -> str | None:
-        """Experimental method."""
+    def get_embedder_config(self) -> dict[str, Any] | None:
+        """
+        Get the config of the embedder.
+
+        :return: Embedder config.
+        """
         return None
 
     @staticmethod

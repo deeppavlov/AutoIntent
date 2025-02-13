@@ -10,9 +10,7 @@ import yaml
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
-    CrossEncoderConfig,
     DataConfig,
-    EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
@@ -54,26 +52,13 @@ class Context:
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
-    def configure_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:
+    def configure_vector_index(self, config: VectorIndexConfig) -> None:
         """
         Configure the vector index client and embedder.
 
         :param config: Configuration for the vector index.
-        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
         """
         self.vector_index_config = config
-        if embedder_config is None:
-            embedder_config = EmbedderConfig()
-        self.embedder_config = embedder_config
-
-    def configure_cross_encoder(self, config: CrossEncoderConfig) -> None:
-        """
-        Configure the vector index client and embedder.
-
-        :param config: Configuration for the vector index.
-        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
-        """
-        self.cross_encoder_config = config
 
     def configure_data(self, config: DataConfig) -> None:
         """
@@ -107,7 +92,6 @@ class Context:
         nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
         return {
             "metadata": {
-                "embedder_device": self.get_device(),
                 "multilabel": self.is_multilabel(),
                 "n_classes": self.get_n_classes(),
                 "seed": self.seed,
@@ -147,62 +131,6 @@ class Context:
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
-
-    def get_device(self) -> str:
-        """
-        Get the embedder device used by the vector index client.
-
-        :return: Device name.
-        """
-        return self.embedder_config.device
-
-    def get_cross_encoder_device(self) -> str:
-        """
-        Get the cross encoder device used by default during optimization.
-
-        :return: Device name.
-        """
-        return self.cross_encoder_config.device
-
-    def get_batch_size(self) -> int:
-        """
-        Get the batch size used by the embedder.
-
-        :return: Batch size.
-        """
-        return self.embedder_config.batch_size
-
-    def get_cross_encoder_batch_size(self) -> int:
-        """
-        Get the batch size used by the cross encoder by default during optimization.
-
-        :return: Batch size.
-        """
-        return self.cross_encoder_config.batch_size
-
-    def get_max_length(self) -> int | None:
-        """
-        Get the maximum sequence length for embeddings.
-
-        :return: Maximum length or None if not set.
-        """
-        return self.embedder_config.max_length
-
-    def get_cross_encoder_max_length(self) -> int | None:
-        """
-        Get the maximum sequence length for embeddings.
-
-        :return: Maximum length or None if not set.
-        """
-        return self.cross_encoder_config.max_length
-
-    def get_use_cache(self) -> bool:
-        """
-        Check if caching is enabled for the embedder.
-
-        :return: True if caching is enabled, False otherwise.
-        """
-        return self.embedder_config.use_cache
 
     def get_dump_dir(self) -> Path | None:
         """

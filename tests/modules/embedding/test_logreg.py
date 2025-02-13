@@ -2,13 +2,13 @@ from autointent.modules.embedding import LogregAimedEmbedding
 
 
 def test_get_assets_returns_correct_artifact_for_logreg():
-    module = LogregAimedEmbedding(embedder_name="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
     artifact = module.get_assets()
-    assert artifact.embedder_name == "sergeyzh/rubert-tiny-turbo"
+    assert artifact.config.model_name == "sergeyzh/rubert-tiny-turbo"
 
 
 def test_fit_trains_model():
-    module = LogregAimedEmbedding(embedder_name="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -20,7 +20,7 @@ def test_fit_trains_model():
 
 
 def test_predict_evaluates_model():
-    module = LogregAimedEmbedding(embedder_name="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]

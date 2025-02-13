@@ -7,7 +7,7 @@ from autointent.modules.scoring import MLKnnScorer
 def test_base_mlknn(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
-    scorer = MLKnnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=3, embedder_device="cpu")
+    scorer = MLKnnScorer(embedder_config="sergeyzh/rubert-tiny-turbo", k=3)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [

@@ -10,6 +10,7 @@ import numpy.typing as npt
 from autointent import Context, Ranker, VectorIndex
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
+from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +49,8 @@ class DNNCScorer(ScoringModule):
         utterances = ["what is your name?", "how are you?"]
         labels = [0, 1]
         scorer = DNNCScorer(
-            cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
         scorer.fit(utterances, labels)
@@ -73,80 +74,47 @@ class DNNCScorer(ScoringModule):
     supports_multilabel = False
     supports_multiclass = True
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
-        cross_encoder_name: str,
-        embedder_name: str,
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: int,
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
-        cross_encoder_device: str = "cpu",
-        cross_encoder_batch_size: int = 32,
-        cross_encoder_max_length: int | None = None,
-        train_head: bool = False,
     ) -> None:
         """
         Initialize the DNNCScorer.
 
-        :param cross_encoder_name: Name of the cross-encoder model.
-        :param embedder_name: Name of the embedder model.
+        :param cross_encoder_config: Config of the cross-encoder model.
+        :param embedder_config: Config of the embedder model.
         :param k: Number of nearest neighbors to retrieve.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param train_head: Whether to train a logistic regression head, defaults to False.
-        :param batch_size: Batch size for processing text pairs, defaults to 32.
-        :param max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.cross_encoder_name = cross_encoder_name
-        self.embedder_name = embedder_name
+        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
-
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
-
-        self.cross_encoder_device = cross_encoder_device
-        self.cross_encoder_batch_size = cross_encoder_batch_size
-        self.cross_encoder_max_length = cross_encoder_max_length
-        self.train_head = train_head
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        cross_encoder_name: str,
+        cross_encoder_config: CrossEncoderConfig | str,
         k: int,
-        embedder_name: str | None = None,
-        train_head: bool = False,
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":
         """
         Create a DNNCScorer instance using a Context object.
 
         :param context: Context containing configurations and utilities.
-        :param cross_encoder_name: Name of the cross-encoder model.
+        :param cross_encoder_config: Config of the cross-encoder model.
         :param k: Number of nearest neighbors to retrieve.
-        :param embedder_name: Name of the embedder model, or None to use the best embedder.
-        :param train_head: Whether to train a logistic regression head, defaults to False.
+        :param embedder_config: Config of the embedder model, or None to use the best embedder.
         :return: Initialized DNNCScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.optimization_info.get_best_embedder()
 
         return cls(
             k=k,
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
-            cross_encoder_name=cross_encoder_name,
-            cross_encoder_device=context.get_cross_encoder_device(),
-            cross_encoder_batch_size=context.get_cross_encoder_batch_size(),
-            cross_encoder_max_length=context.get_cross_encoder_max_length(),
-            train_head=train_head,
+            embedder_config=embedder_config,
+            cross_encoder_config=cross_encoder_config,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -162,18 +130,10 @@ class DNNCScorer(ScoringModule):
 
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
-        )
+        self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
-        self._cross_encoder = Ranker(
-            self.cross_encoder_name, train_classifier=self.train_head, device=self.cross_encoder_device
-        )
+        self._cross_encoder = Ranker(self.cross_encoder_config)
         self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

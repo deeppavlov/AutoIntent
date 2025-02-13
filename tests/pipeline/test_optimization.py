@@ -5,7 +5,6 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import (
-    EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
@@ -26,7 +25,6 @@ def test_cv(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -48,8 +46,7 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
-    pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
+    pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -70,7 +67,6 @@ def test_dump_modules(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(EmbedderConfig(batch_size=16, max_length=32, device="cpu"))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()

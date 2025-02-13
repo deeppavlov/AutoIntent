@@ -1,5 +1,7 @@
 """LogregAimedEmbedding class for a proxy optimzation of embedding."""
 
+from typing import Any
+
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -11,6 +13,7 @@ from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import EmbeddingModule
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class LogregAimedEmbedding(EmbeddingModule):
@@ -32,7 +35,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         utterances = ["bye", "how are you?", "good morning"]
         labels = [0, 1, 1]
         retrieval = LogregAimedEmbedding(
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             cv=2
         )
         retrieval.fit(utterances, labels)
@@ -47,52 +50,36 @@ class LogregAimedEmbedding(EmbeddingModule):
 
     def __init__(
         self,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         cv: int = 3,
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the LogregAimedEmbedding.
 
+        :param embedder_config: Config of the embedder used for creating embeddings.
         :param cv: the number of folds used in LogisticRegressionCV
-        :param embedder_name: Name of the embedder used for creating embeddings.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_batch_size: Batch size for embedding generation.
-        :param embedder_max_length: Maximum sequence length for embeddings. None if not set.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.embedder_name = embedder_name
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.cv = cv
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str,
         cv: int = 3,
     ) -> "LogregAimedEmbedding":
         """
         Create a LogregAimedEmbedding instance using a Context object.
 
-        :param cv: the number of folds used in LogisticRegressionCV
         :param context: The context containing configurations and utilities.
-        :param embedder_name: Name of the embedder to use.
+        :param cv: the number of folds used in LogisticRegressionCV
+        :param embedder_config: Config of the embedder to use.
         :return: Initialized LogregAimedEmbedding instance.
         """
         return cls(
-            embedder_name=embedder_name,
             cv=cv,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
         )
 
     def clear_cache(self) -> None:
@@ -111,13 +98,9 @@ class LogregAimedEmbedding(EmbeddingModule):
         self._validate_task(labels)
 
         self._embedder = Embedder(
-            device=self.embedder_device,
-            model_name_or_path=self.embedder_name,
-            batch_size=self.embedder_batch_size,
-            max_length=self.embedder_max_length,
-            use_cache=self.embedder_use_cache,
+            self.embedder_config,
         )
-        embeddings = self._embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
 
         if self._multilabel:
             self._label_encoder = None
@@ -168,10 +151,10 @@ class LogregAimedEmbedding(EmbeddingModule):
 
         :return: A RetrieverArtifact object containing embedder information.
         """
-        return RetrieverArtifact(embedder_name=self.embedder_name)
+        return RetrieverArtifact(config=self.embedder_config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        embeddings = self._embedder.embed(utterances)
+        embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._classifier.predict_proba(embeddings)
 
         if self._multilabel:

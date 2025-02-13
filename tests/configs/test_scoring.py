@@ -14,41 +14,41 @@ def valid_scoring_config():
             "search_space": [
                 {
                     "module_name": "dnnc",
-                    "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5, 10],
                     "train_head": [False, True],
                 },
                 {
                     "module_name": "knn",
-                    "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
                     "k": [5, 10],
                     "weights": ["uniform", "distance"],
                 },
-                {"module_name": "linear", "embedder_name": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
+                {"module_name": "linear", "embedder_config": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
                 {
                     "module_name": "mlknn",
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5, 10],
                     "s": [1.0, 0.5],
                     "ignore_first_neighbours": [0, 1],
                 },
                 {
                     "module_name": "description",
-                    "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
                     "temperature": [0.5, 1.0],
                 },
                 {
                     "module_name": "rerank",
-                    "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5],
                     "weights": ["distance"],
                     "rank_threshold_cutoff": [None, 3],
                 },
                 {
                     "module_name": "sklearn",
-                    "embedder_name": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
                     "clf_name": ["LogisticRegression"],
                     "clf_args": [{"C": 1.0}, {"C": 0.5}],
                 },
@@ -88,7 +88,7 @@ def test_invalid_scoring_config_wrong_type():
         "search_space": [
             {
                 "module_name": "knn",
-                "embedder_name": "should_be_list",  # Should be a list of strings
+                "embedder_config": "should_be_list",  # Should be a list of strings
                 "k": "not_an_int_list",  # Should be a list of integers
                 "weights": ["uniform", "distance"],
             }

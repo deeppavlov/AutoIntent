@@ -10,6 +10,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class LinearScorer(ScoringModule):
@@ -27,7 +28,7 @@ class LinearScorer(ScoringModule):
 
         from autointent.modules import LinearScorer
         scorer = LinearScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo", cv=2
+            embedder_config="sergeyzh/rubert-tiny-turbo", cv=2
         )
         utterances = ["hello", "goodbye", "allo", "sayonara"]
         labels = [0, 1, 0, 1]
@@ -52,68 +53,51 @@ class LinearScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         cv: int = 3,
         n_jobs: int | None = None,
-        embedder_device: str = "cpu",
         seed: int = 0,
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the LinearScorer.
 
-        :param embedder_name: Name of the embedder model.
+        :param embedder_config: Config of the embedder model.
         :param cv: Number of cross-validation folds, defaults to 3.
         :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
         :param seed: Random seed for reproducibility, defaults to 0.
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
         self.cv = cv
         self.n_jobs = n_jobs
-        self.embedder_device = embedder_device
         self.seed = seed
-        self.embedder_name = embedder_name
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        embedder_name: str | None = None,
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> "LinearScorer":
         """
         Create a LinearScorer instance using a Context object.
 
         :param context: Context containing configurations and utilities.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized LinearScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.optimization_info.get_best_embedder()
 
         return cls(
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            seed=context.seed,
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
         )
 
-    def get_embedder_name(self) -> str:
+    def get_embedder_config(self) -> dict[str, Any]:
         """
         Get the name of the embedder.
 
         :return: Embedder name.
         """
-        return self.embedder_name
+        return self.embedder_config.model_dump()
 
     def fit(
         self,
@@ -133,13 +117,9 @@ class LinearScorer(ScoringModule):
         self._validate_task(labels)
 
         embedder = Embedder(
-            device=self.embedder_device,
-            model_name_or_path=self.embedder_name,
-            batch_size=self.embedder_batch_size,
-            max_length=self.embedder_max_length,
-            use_cache=self.embedder_use_cache,
+            self.embedder_config,
         )
-        features = embedder.embed(utterances)
+        features = embedder.embed(utterances, TaskTypeEnum.classification)
 
         if self._multilabel:
             base_clf = LogisticRegression()
@@ -159,7 +139,7 @@ class LinearScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Array of predicted probabilities for each class.
         """
-        features = self._embedder.embed(utterances)
+        features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]

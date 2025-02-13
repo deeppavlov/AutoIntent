@@ -2,8 +2,6 @@ import pytest
 
 from autointent import Context, Dataset
 from autointent.configs import (
-    CrossEncoderConfig,
-    EmbedderConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
@@ -31,7 +29,7 @@ def get_embedding_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "embedder_name": [
+                "embedder_config": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                 ],
                 "module_name": "retrieval",
@@ -83,6 +81,5 @@ def get_context(multilabel):
         dataset = dataset.to_multilabel()
     res.set_dataset(dataset)
     res.configure_logging(LoggingConfig(project_dir=project_dir, dump_modules=True))
-    res.configure_vector_index(VectorIndexConfig(), EmbedderConfig(device="cpu"))
-    res.configure_cross_encoder(CrossEncoderConfig())
+    res.configure_vector_index(VectorIndexConfig())
     return res

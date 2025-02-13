@@ -8,6 +8,7 @@ import numpy.typing as npt
 from autointent import Context, VectorIndex
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 from autointent.modules.abc import ScoringModule
+from autointent.schemas import EmbedderConfig
 
 from .weighting import apply_weights
 
@@ -32,7 +33,7 @@ class KNNScorer(ScoringModule):
         utterances = ["hello", "how are you?"]
         labels = [0, 1]
         scorer = KNNScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
         scorer.fit(utterances, labels)
@@ -56,35 +57,23 @@ class KNNScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: int,
         weights: WEIGHT_TYPES = "distance",
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
     ) -> None:
         """
         Initialize the KNNScorer.
 
-        :param embedder_name: Name of the embedder used for vectorization.
+        :param embedder_config: Config of the embedder used for vectorization.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy:
-            - "uniform" (or False): Equal weight for all neighbors.
-            - "distance" (or True): Weight inversely proportional to distance.
+            - "uniform": Equal weight for all neighbors.
+            - "distance": Weight inversely proportional to distance.
             - "closest": Only the closest neighbor of each class is weighted.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.embedder_name = embedder_name
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -92,7 +81,7 @@ class KNNScorer(ScoringModule):
         context: Context,
         k: int,
         weights: WEIGHT_TYPES,
-        embedder_name: str | None = None,
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
         """
         Create a KNNScorer instance using a Context object.
@@ -100,29 +89,25 @@ class KNNScorer(ScoringModule):
         :param context: Context containing configurations and utilities.
         :param k: Number of closest neighbors to consider during inference.
         :param weights: Weighting strategy for scoring.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized KNNScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.optimization_info.get_best_embedder()
 
         return cls(
-            embedder_name=embedder_name,
+            embedder_config=embedder_config,
             k=k,
             weights=weights,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
         )
 
-    def get_embedder_name(self) -> str:
+    def get_embedder_config(self) -> dict[str, Any]:
         """
         Get the name of the embedder.
 
         :return: Embedder name.
         """
-        return self.embedder_name
+        return self.embedder_config.model_dump()
 
     def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
         """
@@ -137,13 +122,7 @@ class KNNScorer(ScoringModule):
 
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
-        )
+        self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

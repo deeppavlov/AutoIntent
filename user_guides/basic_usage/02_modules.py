@@ -22,7 +22,7 @@ Firstly, you need to initialize module:
 from autointent.modules.scoring import KNNScorer
 
 scorer = KNNScorer(
-    embedder_name="sergeyzh/rubert-tiny-turbo",
+    embedder_config="sergeyzh/rubert-tiny-turbo",
     k=5,
 )
 
@@ -85,7 +85,7 @@ To restore, initialize module with the same hyperparams and use load method:
 
 # %%
 loaded_scorer = KNNScorer(
-    embedder_name="sergeyzh/rubert-tiny-turbo",
+    embedder_config="sergeyzh/rubert-tiny-turbo",
     k=5,
 )
 loaded_scorer.load(pathdir)

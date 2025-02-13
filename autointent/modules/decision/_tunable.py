@@ -26,8 +26,7 @@ class TunableDecision(DecisionModule):
     score distributions and supports out-of-scope (OOS) detection.
 
     :ivar name: Name of the predictor, defaults to "tunable".
-    :ivar multilabel: Whether the task is multi-label classification.
-    :ivar n_classes: Number of classes determined during fitting.
+    :ivar _n_classes: Number of classes determined during fitting.
     :ivar tags: Tags for predictions, if any.
 
     Examples

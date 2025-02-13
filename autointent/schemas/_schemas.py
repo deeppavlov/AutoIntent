@@ -4,10 +4,19 @@ This module provides data models for utterances, intents, and tags.
 """
 
 import json
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, model_validator
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    Field,
+    NonNegativeFloat,
+    PositiveInt,
+    model_validator,
+)
+from typing_extensions import Self
 
 from autointent.custom_types import LabelWithOOS
 
@@ -116,3 +125,105 @@ class Intent(BaseModel):
     regexp_full_match: list[str] = []
     regexp_partial_match: list[str] = []
     description: str | None = None
+
+
+class ModelConfig(BaseModel):
+    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
+    max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
+
+
+class LLMConfig(ModelConfig):
+    temperature: NonNegativeFloat | None = Field(None, description="Temperature for sampling from the model.")
+    base_url: AnyHttpUrl | None = Field(..., description="Base URL for the model API.")
+    token: str | None = Field(..., description="API token for the model.")
+    extra_body: dict[str, Any] | None = Field(None, description="Extra body for the model API.")
+
+
+class STModelConfig(ModelConfig):
+    model_name: str = Field(..., description="Name of the hugging face model.")
+    device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel) -> Self:
+        """Validate the model configuration.
+
+        :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
+        """
+        if isinstance(values, BaseModel):
+            return values  # type: ignore[return-value]
+        if isinstance(values, str):
+            return cls(model_name=values)
+        return cls(**values)
+
+
+class TaskTypeEnum(Enum):
+    """Enum for different types of prompts."""
+
+    default = "default"
+    classification = "classification"
+    cluster = "cluster"
+    query = "query"
+    passage = "passage"
+    sts = "sts"
+
+
+class EmbedderConfig(STModelConfig):
+    default_prompt: str | None = Field(
+        None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
+    )
+    classifier_prompt: str | None = Field(None, description="Prompt for classifier.")
+    cluster_prompt: str | None = Field(None, description="Prompt for clustering.")
+    sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
+    query_prompt: str | None = Field(None, description="Prompt for query.")
+    passage_prompt: str | None = Field(None, description="Prompt for passage.")
+
+    def get_prompt_config(self) -> dict[str, str] | None:
+        """Get the prompt config for the given prompt type.
+
+        :return: The prompt config for the given prompt type.
+        """
+        prompts = {}
+        if self.default_prompt:
+            prompts[TaskTypeEnum.default.value] = self.default_prompt
+        if self.classifier_prompt:
+            prompts[TaskTypeEnum.classification.value] = self.classifier_prompt
+        if self.cluster_prompt:
+            prompts[TaskTypeEnum.cluster.value] = self.cluster_prompt
+        if self.query_prompt:
+            prompts[TaskTypeEnum.query.value] = self.query_prompt
+        if self.passage_prompt:
+            prompts[TaskTypeEnum.passage.value] = self.passage_prompt
+        if self.sts_prompt:
+            prompts[TaskTypeEnum.sts.value] = self.sts_prompt
+        return prompts if len(prompts) > 0 else None
+
+    def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+        """Get the prompt type for the given task type.
+
+        :param prompt_type: Task type for which to get the prompt.
+
+        :return: The prompt for the given task type.
+        """
+        if prompt_type is None:
+            return self.default_prompt
+        if prompt_type == TaskTypeEnum.classification:
+            return self.classifier_prompt
+        if prompt_type == TaskTypeEnum.cluster:
+            return self.cluster_prompt
+        if prompt_type == TaskTypeEnum.query:
+            return self.query_prompt
+        if prompt_type == TaskTypeEnum.passage:
+            return self.passage_prompt
+        if prompt_type == TaskTypeEnum.sts:
+            return self.sts_prompt
+        if prompt_type == TaskTypeEnum.default:
+            return self.default_prompt
+        return None
+
+    use_cache: bool = Field(False, description="Whether to use embeddings caching.")
+
+
+class CrossEncoderConfig(STModelConfig):
+    train_head: bool = Field(
+        False, description="Whether to train the head of the model. If False, LogReg will be trained."
+    )

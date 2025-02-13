@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
@@ -18,7 +19,7 @@ class DummyCallback(OptimizerCallback):
         self.history.append(("start_run", kwargs))
 
     def start_module(self, **kwargs: dict[str, Any]) -> None:
-        self.history.append(("start_module", kwargs))
+        self.history.append(("start_module", deepcopy(kwargs)))
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("log_value", kwargs))
@@ -52,7 +53,7 @@ def test_pipeline_callbacks(dataset):
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 }
             ],
         },
@@ -98,88 +99,39 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 5},
                 "module_name": "retrieval",
                 "num": 0,
-                "module_kwargs": {"k": 5, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "retrieval_hit_rate": 1.0,
-                }
-            },
-        ),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
             {
+                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 10},
                 "module_name": "retrieval",
                 "num": 1,
-                "module_kwargs": {"k": 10, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "retrieval_hit_rate": 1.0,
-                }
-            },
-        ),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
-            {
-                "module_name": "knn",
-                "num": 0,
-                "module_kwargs": {"k": 1, "weights": "uniform", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
-            },
+            {"module_kwargs": {"embedder_config": None, "k": 1, "weights": "uniform"}, "module_name": "knn", "num": 0},
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 1.0,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
-            {
-                "module_name": "knn",
-                "num": 1,
-                "module_kwargs": {"k": 1, "weights": "distance", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
-            },
+            {"module_kwargs": {"embedder_config": None, "k": 1, "weights": "distance"}, "module_name": "knn", "num": 1},
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 1.0,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
         ("end_module", {}),
-        (
-            "start_module",
-            {"module_name": "linear", "num": 0, "module_kwargs": {"embedder_name": "sergeyzh/rubert-tiny-turbo"}},
-        ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 0.75,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("start_module", {"module_kwargs": {"embedder_config": None}, "module_name": "linear", "num": 0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
         ("end_module", {}),
-        ("start_module", {"module_name": "threshold", "num": 0, "module_kwargs": {"thresh": 0.5}}),
+        ("start_module", {"module_kwargs": {"thresh": 0.5}, "module_name": "threshold", "num": 0}),
         (
             "log_metric",
             {
@@ -193,7 +145,7 @@ def test_pipeline_callbacks(dataset):
             },
         ),
         ("end_module", {}),
-        ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
+        ("start_module", {"module_kwargs": {}, "module_name": "argmax", "num": 0}),
         (
             "log_metric",
             {

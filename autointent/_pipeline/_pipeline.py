@@ -9,7 +9,7 @@ import numpy as np
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import ListOfGenericLabels, NodeType, ValidationScheme
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
@@ -43,13 +43,11 @@ class Pipeline:
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
             self.vector_index_config = VectorIndexConfig()
-            self.embedder_config = EmbedderConfig()
-            self.cross_encoder_config = CrossEncoderConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | EmbedderConfig | CrossEncoderConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -59,10 +57,6 @@ class Pipeline:
             self.logging_config = config
         elif isinstance(config, VectorIndexConfig):
             self.vector_index_config = config
-        elif isinstance(config, EmbedderConfig):
-            self.embedder_config = config
-        elif isinstance(config, CrossEncoderConfig):
-            self.cross_encoder_config = config
         else:
             msg = "unknown config type"
             raise TypeError(msg)
@@ -138,8 +132,8 @@ class Pipeline:
         context = Context()
         context.set_dataset(dataset, scheme, n_folds)
         context.configure_logging(self.logging_config)
-        context.configure_vector_index(self.vector_index_config, self.embedder_config)
-        context.configure_cross_encoder(self.cross_encoder_config)
+        context.configure_vector_index(self.vector_index_config)
+
         self.validate_modules(dataset)
         self._fit(context)
 
