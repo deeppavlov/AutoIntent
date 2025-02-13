@@ -13,7 +13,6 @@ from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset, Pipeline
-from autointent.configs import EmbedderConfig
 from autointent.custom_types import Split
 from autointent.generation.utterances import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
@@ -83,8 +82,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
         Note that for now it supports only single-label datasets.
         """
-        emb_config = EmbedderConfig(batch_size=16, device="cuda")
-
         best_result = 0
         merge_dataset = copy.deepcopy(dataset)
 
@@ -95,7 +92,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
 
             pipeline_optimizer = Pipeline.from_search_space(self.search_space)
-            pipeline_optimizer.set_config(emb_config)
             ctx = pipeline_optimizer.fit(merge_dataset)
             results = ctx.optimization_info.dump_evaluation_results()
             decision_metric = results["metrics"]["decision"][0]
