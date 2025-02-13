@@ -2,14 +2,9 @@
 
 import logging
 from argparse import ArgumentParser, Namespace
-from pathlib import Path
-from typing import Any
 
-from datasets import concatenate_datasets
-
-from autointent import Dataset, Pipeline, load_dataset
-from autointent.configs import EmbedderConfig
-from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
+from autointent import load_dataset
+from autointent.generation.utterances.evolution import IncrementalUtteranceEvolver, UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
 
 from .chat_templates import (
@@ -25,79 +20,6 @@ from .chat_templates import (
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
-
-SEARCH_SPACE = [
-    {
-        "node_type": "embedding",
-        "target_metric": "retrieval_hit_rate",
-        "search_space": [
-            {
-                "module_name": "retrieval",
-                "k": [5],
-                "embedder_name": [
-                    "sentence-transformers/all-MiniLM-L6-v2",
-                ],
-            }
-        ],
-    },
-    {
-        "node_type": "scoring",
-        "target_metric": "scoring_roc_auc",
-        "metrics": ["scoring_accuracy"],
-        "search_space": [{"module_name": "linear"}],
-    },
-    {
-        "node_type": "decision",
-        "target_metric": "decision_accuracy",
-        "search_space": [
-            {"module_name": "tunable"},
-        ],
-    },
-]
-
-
-def _choose_search_space(search_space: str | None) -> list[dict[str, Any]] | Path | str:
-    if search_space is None:
-        return SEARCH_SPACE
-    return search_space
-
-
-def _optimize_n_evolutions(
-    generator: Generator,
-    input_path: str,
-    dataset: Dataset,
-    max_n_evolutions: int,
-    split_train: str,
-    batch_size: int,
-    search_space: str | None,
-) -> Dataset:
-    emb_config = EmbedderConfig(batch_size=16, device="cuda")
-    search_space = _choose_search_space(search_space)
-
-    best_result = 0
-    best_n = 0
-    merge_dataset = load_dataset(input_path)
-
-    for n in range(max_n_evolutions):
-        new_samples_dataset = generator.augment(
-            dataset, split_name=split_train, n_evolutions=1, update_split=False, batch_size=batch_size
-        )
-        merge_dataset[split_train] = concatenate_datasets([merge_dataset[split_train], new_samples_dataset])
-
-        pipeline_optimizer = Pipeline.from_search_space(search_space)
-        pipeline_optimizer.set_config(emb_config)
-        ctx = pipeline_optimizer.fit(merge_dataset)
-        results = ctx.optimization_info.dump_evaluation_results()
-        decision_metric = results["metrics"]["decision"][0]
-
-        if decision_metric > best_result:
-            best_result = decision_metric
-            best_n = n
-        else:
-            break
-
-    logger.info("# optimal n evolutions: %s", best_n)
-    return dataset
 
 
 def _parse_args() -> Namespace:
@@ -161,30 +83,22 @@ def main() -> None:
         logger.warning("No evolutions selected. Exiting.")
         return
 
-    generator = UtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
+    if args.decide_for_me:
+        utterance_evolver = UtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
+    else:
+        utterance_evolver = IncrementalUtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
     dataset = load_dataset(args.input_path)
 
-    if args.decide_for_me:
-        dataset = _optimize_n_evolutions(
-            generator,
-            args.input_path,
-            dataset,
-            args.n_evolutions,
-            args.split,
-            args.batch_size,
-            args.search_space,
-        )
-    else:
-        n_before = len(dataset[args.split])
+    n_before = len(dataset[args.split])
 
-        new_samples = generator.augment(
-            dataset, split_name=args.split, n_evolutions=args.n_evolutions, batch_size=args.batch_size
-        )
-        n_after = len(dataset[args.split])
+    new_samples = utterance_evolver.augment(
+        dataset, split_name=args.split, n_evolutions=args.n_evolutions, batch_size=args.batch_size
+    )
+    n_after = len(dataset[args.split])
 
-        logger.info("# samples before %s", n_before)
-        logger.info("# samples generated %s", len(new_samples))
-        logger.info("# samples after %s", n_after)
+    logger.info("# samples before %s", n_before)
+    logger.info("# samples generated %s", len(new_samples))
+    logger.info("# samples after %s", n_after)
 
     dataset.to_json(args.output_path)
 

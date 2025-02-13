@@ -9,6 +9,7 @@ from .chat_templates import (
     ReasoningEvolution,
 )
 from .evolver import UtteranceEvolver
+from .incremental_evolver import IncrementalUtteranceEvolver
 
 __all__ = [
     "AbstractEvolution",
@@ -17,6 +18,7 @@ __all__ = [
     "FormalEvolution",
     "FunnyEvolution",
     "GoofyEvolution",
+    "IncrementalUtteranceEvolver",
     "InformalEvolution",
     "ReasoningEvolution",
     "UtteranceEvolver",
