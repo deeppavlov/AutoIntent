@@ -10,7 +10,6 @@ from autointent.generation.utterances.generator import Generator
 from .chat_templates import (
     AbstractEvolution,
     ConcreteEvolution,
-    EvolutionChatTemplate,
     FormalEvolution,
     FunnyEvolution,
     GoofyEvolution,
@@ -73,7 +72,7 @@ def main() -> None:
         "informal": InformalEvolution,
     }
     args = _parse_args()
-    evolutions: list[EvolutionChatTemplate] = []
+    evolutions = []
 
     for arg_name, evolution_cls in mapping.items():
         if getattr(args, arg_name):
