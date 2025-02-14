@@ -3,7 +3,7 @@
   search_space:
     - module_name: retrieval
       k: [10]
-      embedder_name:
+      embedder_config:
         - sentence-transformers/all-MiniLM-L6-v2
         - avsolatorio/GIST-small-Embedding-v0
 - node_type: scoring

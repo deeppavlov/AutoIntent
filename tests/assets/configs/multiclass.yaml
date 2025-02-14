@@ -20,7 +20,7 @@
         - avsolatorio/GIST-small-Embedding-v0
       k: [1, 3]
     - module_name: sklearn
-      embedder_name:
+      embedder_config:
         - sergeyzh/rubert-tiny-turbo
       clf_name:
         - LogisticRegression
