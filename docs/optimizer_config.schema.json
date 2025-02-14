@@ -940,10 +940,17 @@
                     "type": "number"
                 },
                 "step": {
-                    "default": 0.1,
+                    "anyOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
                     "description": "Step of the search space.",
-                    "title": "Step",
-                    "type": "number"
+                    "title": "Step"
                 },
                 "log": {
                     "default": false,
@@ -1073,52 +1080,38 @@
                     "type": "array"
                 },
                 "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "M"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "M",
+                    "type": "array"
                 },
                 "rank_threshold_cutoff": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "Rank Threshold Cutoff"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Rank Threshold Cutoff",
+                    "type": "array"
                 }
             },
             "required": [
