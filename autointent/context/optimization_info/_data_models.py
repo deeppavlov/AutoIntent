@@ -11,6 +11,7 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
 from autointent.custom_types import ListOfLabelsWithOOS, NodeType
+from autointent.schemas import EmbedderConfig
 
 
 class Artifact(BaseModel):
@@ -28,7 +29,7 @@ class RetrieverArtifact(Artifact):
     Name of the embedding model chosen after embedding optimization.
     """
 
-    embedder_name: str
+    config: EmbedderConfig
 
 
 class ScorerArtifact(Artifact):

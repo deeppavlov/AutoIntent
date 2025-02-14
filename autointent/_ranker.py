@@ -20,6 +20,7 @@ from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
 from autointent.custom_types import ListOfLabels
+from autointent.schemas import CrossEncoderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 class CrossEncoderMetadata(TypedDict):
     model_name: str
     train_classifier: bool
-    device: str
+    device: str | None
     max_length: int | None
     batch_size: int
 
@@ -105,32 +106,27 @@ class Ranker:
 
     def __init__(
         self,
-        model_name: str,
-        device: str = "cpu",
-        train_classifier: bool = False,
-        batch_size: int = 326,
-        max_length: int | None = None,
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
         classifier_head: LogisticRegressionCV | None = None,
     ) -> None:
         """
         Initialize the Ranker.
 
-        :param model: The cross-encoder hugging face model name to use.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param train_classifier: Whether to train a custom classifier, defaults to False.
-        :param batch_size: Batch size for processing text pairs, defaults to 326.
+        :param cross_encoder_config: Config of the cross-encoder hugging face model name to use.
         :param max_length (int, optional): Max length for input sequences for the cross encoder.
         :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
         """
-        self.model_name = model_name
-        self.device = device
-        self.cross_encoder = st.CrossEncoder(model_name, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
+        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.cross_encoder = st.CrossEncoder(
+            self.cross_encoder_config.model_name,
+            trust_remote_code=True,
+            device=self.cross_encoder_config.device,
+            max_length=self.cross_encoder_config.max_length,  # type: ignore[arg-type]
+        )
         self.train_classifier = False
-        self.batch_size = batch_size
-        self.max_length = max_length
         self._clf = classifier_head
 
-        if classifier_head is not None or train_classifier:
+        if classifier_head is not None or self.cross_encoder_config.train_head:
             self.train_classifier = True
             self._activations_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
@@ -150,10 +146,16 @@ class Ranker:
         :return: Numpy array of extracted features.
         """
         if not self.train_classifier:
-            return np.array(self.cross_encoder.predict(pairs, batch_size=self.batch_size, activation_fct=nn.Sigmoid()))
+            return np.array(
+                self.cross_encoder.predict(
+                    pairs,
+                    batch_size=self.cross_encoder_config.batch_size,
+                    activation_fct=nn.Sigmoid(),
+                )
+            )
 
         # put the data through, features will be taken in the hook
-        self.cross_encoder.predict(pairs, batch_size=self.batch_size)
+        self.cross_encoder.predict(pairs, batch_size=self.cross_encoder_config.batch_size)
 
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
@@ -223,8 +225,8 @@ class Ranker:
         Rank documents according to meaning closeness to the query.
 
         :param query: The reference document.
-        :query_docs: List of documents to rank
-        :top_k: how many document to return
+        :param query_docs: List of documents to rank
+        :param top_k: how many document to return
         :return: array of dictionaries of ranked items.
         """
         query_doc_pairs = [(query, doc) for doc in query_docs]
@@ -247,11 +249,11 @@ class Ranker:
         dump_dir.mkdir(parents=True)
 
         metadata = CrossEncoderMetadata(
-            model_name=self.model_name,
+            model_name=self.cross_encoder_config.model_name,
             train_classifier=self.train_classifier,
-            device=self.device,
-            max_length=self.max_length,
-            batch_size=self.batch_size,
+            device=self.cross_encoder_config.device,
+            max_length=self.cross_encoder_config.max_length,
+            batch_size=self.cross_encoder_config.batch_size,
         )
 
         with (dump_dir / self.metadata_file_name).open("w") as file:
@@ -272,7 +274,16 @@ class Ranker:
         with (path / cls.metadata_file_name).open() as file:
             metadata: CrossEncoderMetadata = json.load(file)
 
-        return cls(**metadata, classifier_head=clf)
+        return cls(
+            CrossEncoderConfig(
+                model_name=metadata["model_name"],
+                device=metadata["device"],
+                max_length=metadata["max_length"],
+                batch_size=metadata["batch_size"],
+                train_head=metadata["train_classifier"],
+            ),
+            classifier_head=clf,
+        )
 
     def clear_ram(self) -> None:
         self.cross_encoder.model.cpu()

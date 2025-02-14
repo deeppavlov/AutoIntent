@@ -4,7 +4,7 @@
   search_space:
     - module_name: retrieval
       k: [10]
-      embedder_name:
+      embedder_config:
         - deepvk/USER-bge-m3
 - node_type: scoring
   target_metric: scoring_roc_auc

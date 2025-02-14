@@ -23,7 +23,7 @@ class JinoosDecision(DecisionModule):
 
     :ivar thresh: The optimized threshold value for OOS detection.
     :ivar name: Name of the predictor, defaults to "adaptive".
-    :ivar n_classes: Number of classes determined during fitting.
+    :ivar _n_classes: Number of classes determined during fitting.
 
     Examples
     --------

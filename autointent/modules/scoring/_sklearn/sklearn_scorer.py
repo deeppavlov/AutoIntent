@@ -11,6 +11,7 @@ from typing_extensions import Self
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import ScoringModule
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -43,32 +44,20 @@ class SklearnScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_name: str,
+        embedder_config: EmbedderConfig | str | dict[str, Any],
         clf_name: str,
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_device: str = "cpu",
-        embedder_use_cache: bool = True,
         clf_args: dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize the SklearnScorer.
 
-        :param embedder_name: Name of the embedder model.
+        :param embedder_config: Config of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
         """
-        self.embedder_name = embedder_name
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
         self.clf_args = clf_args or {}
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_device = embedder_device
-        self.embedder_use_cache = embedder_use_cache
 
     @classmethod
     def from_context(
@@ -76,7 +65,7 @@ class SklearnScorer(ScoringModule):
         context: Context,
         clf_name: str = LogisticRegression.__name__,
         clf_args: dict[str, Any] | None = None,
-        embedder_name: str | None = None,
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> Self:
         """
         Create a SklearnScorer instance using a Context object.
@@ -84,18 +73,14 @@ class SklearnScorer(ScoringModule):
         :param context: Context containing configurations and utilities.
         :param clf_name: Name of the sklearn classifier to use.
         :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
+        :param embedder_config: Config of the embedder, or None to use the best embedder.
         :return: Initialized SklearnScorer instance.
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.optimization_info.get_best_embedder()
 
         return cls(
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
             clf_name=clf_name,
             clf_args=clf_args,
         )
@@ -118,13 +103,15 @@ class SklearnScorer(ScoringModule):
         self._validate_task(labels)
 
         embedder = Embedder(
-            device=self.embedder_device,
-            model_name_or_path=self.embedder_name,
-            batch_size=self.embedder_batch_size,
-            max_length=self.embedder_max_length,
-            use_cache=self.embedder_use_cache,
+            EmbedderConfig(
+                model_name=self.embedder_config.model_name,
+                device=self.embedder_config.device,
+                batch_size=self.embedder_config.batch_size,
+                max_length=self.embedder_config.max_length,
+                use_cache=self.embedder_config.use_cache,
+            )
         )
-        features = embedder.embed(utterances)
+        features = embedder.embed(utterances, TaskTypeEnum.classification)
         if AVAILABLE_CLASSIFIERS.get(self.clf_name):
             base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
         else:
@@ -146,7 +133,7 @@ class SklearnScorer(ScoringModule):
         :param utterances: List of query utterances.
         :return: Array of predicted probabilities for each class.
         """
-        features = self._embedder.embed(utterances)
+        features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]

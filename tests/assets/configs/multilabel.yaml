@@ -3,9 +3,9 @@
   search_space:
     - module_name: logreg_embedding
       cv: [2]
-      embedder_name:
-        - sentence-transformers/all-MiniLM-L6-v2
-        - avsolatorio/GIST-small-Embedding-v0
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+        - model_name: avsolatorio/GIST-small-Embedding-v0
 - node_type: scoring
   target_metric: scoring_roc_auc
   search_space:
@@ -16,8 +16,8 @@
     - module_name: mlknn
       k: [5]
     - module_name: sklearn
-      embedder_name:
-      - sergeyzh/rubert-tiny-turbo
+      embedder_config:
+      - model_name: sergeyzh/rubert-tiny-turbo
       clf_name:
        - LogisticRegression
        - RandomForestClassifier
@@ -25,8 +25,8 @@
       k: [ 5, 10 ]
       weights: [ uniform, distance, closest ]
       m: [ 2, 3 ]
-      cross_encoder_name:
-        - cross-encoder/ms-marco-MiniLM-L-6-v2
+      cross_encoder_config:
+        - model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
 - node_type: decision
   target_metric: decision_accuracy
   search_space:

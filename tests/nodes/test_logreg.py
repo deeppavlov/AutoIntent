@@ -61,7 +61,7 @@ def get_embedding_optimizer(multilabel: bool):
         "search_space": [
             {
                 "cv": [2],
-                "embedder_name": [
+                "embedder_config": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],

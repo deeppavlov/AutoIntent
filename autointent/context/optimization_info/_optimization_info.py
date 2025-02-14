@@ -13,6 +13,7 @@ from numpy.typing import NDArray
 
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
+from autointent.schemas import EmbedderConfig
 
 from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 
@@ -139,14 +140,14 @@ class OptimizationInfo:
             raise ValueError(msg)
         return self.artifacts.get_best_artifact(node_type, best_idx)
 
-    def get_best_embedder(self) -> str:
+    def get_best_embedder(self) -> EmbedderConfig:
         """
         Retrieve the name of the best embedder from the retriever node.
 
         :return: Name of the best embedder.
         """
         best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
-        return best_retriever_artifact.embedder_name
+        return best_retriever_artifact.config
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:
         """

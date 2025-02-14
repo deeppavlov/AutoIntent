@@ -3,8 +3,9 @@
   search_space:
     - module_name: retrieval
       k: [10]
-      embedder_name:
-        - sentence-transformers/all-MiniLM-L6-v2
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+          device: cpu
 - node_type: scoring
   target_metric: scoring_roc_auc
   search_space:

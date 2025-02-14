@@ -105,9 +105,9 @@ class NodeOptimizer:
         self._logger.debug("initializing %s module...", module_name)
         module = self.node_info.modules_available[module_name].from_context(context, **config)
 
-        embedder_name = module.get_embedder_name()
-        if embedder_name is not None:
-            config["embedder_name"] = embedder_name
+        embedder_config = module.get_embedder_config()
+        if embedder_config is not None:
+            config["embedder_config"] = embedder_config
 
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 

@@ -7,7 +7,7 @@ from autointent.modules import SklearnScorer
 def test_base_sklearn(dataset):
     data_handler = DataHandler(dataset)
 
-    scorer = SklearnScorer(embedder_name="sergeyzh/rubert-tiny-turbo", clf_name="LogisticRegression")
+    scorer = SklearnScorer(embedder_config="sergeyzh/rubert-tiny-turbo", clf_name="LogisticRegression")
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     test_data = [

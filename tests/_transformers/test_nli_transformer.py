@@ -13,7 +13,7 @@ def data_handler():
 
 
 def test_nli_transformer_predict_without_trained_head(data_handler):
-    model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
+    model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": True})
     with pytest.raises(ValueError, match="Classifier is not trained yet"):
         model.predict(data_handler.train_utterances(0))
 
@@ -48,7 +48,7 @@ def check_ranking(ranked, labels):
 
 
 def test_nli_transformer_predict_with_train_head(data_handler):
-    model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu", train_classifier=True)
+    model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": True})
     texts = data_handler.train_utterances(0)
     labels = data_handler.train_labels(0)
     model.fit(texts, labels)
@@ -60,7 +60,7 @@ def test_nli_transformer_predict_with_train_head(data_handler):
 
 
 def test_nli_transformer_predict_default(data_handler):
-    model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
+    model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": False})
     texts = data_handler.train_utterances(0)
     labels = data_handler.train_labels(0)
     predicted = model.predict(build_pairs(texts))
@@ -71,7 +71,7 @@ def test_nli_transformer_predict_default(data_handler):
 
 
 def test_nli_transformer_predict_default_with_fit(data_handler):
-    model = Ranker(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2", device="cpu")
+    model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": False})
     texts = data_handler.train_utterances(0)
     labels = data_handler.train_labels(0)
     model.fit(texts, labels)

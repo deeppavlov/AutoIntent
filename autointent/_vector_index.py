@@ -16,11 +16,12 @@ import numpy.typing as npt
 
 from autointent import Embedder
 from autointent.custom_types import ListOfLabels
+from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class VectorIndexMetadata(TypedDict):
     embedder_model_name: str
-    embedder_device: str
+    embedder_device: str | None
     embedder_batch_size: int
     embedder_max_length: int | None
     embedder_use_cache: bool
@@ -42,31 +43,13 @@ class VectorIndex:
     _data_file = "data.json"
     _meta_data_file = "metadata.json"
 
-    def __init__(
-        self,
-        embedder_model_name: str,
-        embedder_device: str,
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
-    ) -> None:
+    def __init__(self, embedder_config: EmbedderConfig) -> None:
         """
         Initialize the vector index.
 
-        :param embedder_model_name: Name of the embedding model to use.
-        :param embedder_device: Device for running the embedding model (e.g., "cpu", "cuda").
-        :param embedder_batch_size: Batch size for the embedder.
-        :param embedder_max_length: Maximum sequence length for the embedder.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
+        :param embedder_config: Config of the embedding model to use.
         """
-        self.embedder = Embedder(
-            model_name_or_path=embedder_model_name,
-            batch_size=embedder_batch_size,
-            device=embedder_device,
-            max_length=embedder_max_length,
-            use_cache=embedder_use_cache,
-        )
-        self.embedder_device = embedder_device
+        self.embedder = Embedder(embedder_config)
 
         self.labels: ListOfLabels = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
@@ -81,7 +64,7 @@ class VectorIndex:
         :param labels: List of labels corresponding to the texts.
         """
         self.logger.debug("Adding embeddings to vector index %s", self.embedder.model_name)
-        embeddings = self.embedder.embed(texts)
+        embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
             self.index = faiss.IndexFlatIP(embeddings.shape[1])
@@ -120,7 +103,7 @@ class VectorIndex:
         :param k: Number of nearest neighbors to return.
         :return: List of search results for each query.
         """
-        query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts)  # type: ignore[assignment]
+        query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts, TaskTypeEnum.query)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
@@ -233,11 +216,13 @@ class VectorIndex:
             metadata: VectorIndexMetadata = json.load(file)
 
         instance = cls(
-            embedder_model_name=metadata["embedder_model_name"],
-            embedder_device=embedder_device or metadata["embedder_device"],
-            embedder_batch_size=embedder_batch_size or metadata["embedder_batch_size"],
-            embedder_max_length=metadata["embedder_max_length"],
-            embedder_use_cache=embedder_use_cache or metadata["embedder_use_cache"],
+            EmbedderConfig(
+                model_name=metadata["embedder_model_name"],
+                device=embedder_device or metadata["embedder_device"],
+                batch_size=embedder_batch_size or metadata["embedder_batch_size"],
+                max_length=metadata["embedder_max_length"],
+                use_cache=embedder_use_cache or metadata["embedder_use_cache"],
+            )
         )
 
         with (dir_path / cls._data_file).open() as file:

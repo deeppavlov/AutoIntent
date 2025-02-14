@@ -78,6 +78,60 @@
             "title": "ArgmaxDecisionInitModel",
             "type": "object"
         },
+        "CrossEncoderConfig": {
+            "properties": {
+                "batch_size": {
+                    "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_length": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum length of input sequences.",
+                    "title": "Max Length"
+                },
+                "model_name": {
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
+                    "title": "Device"
+                },
+                "train_head": {
+                    "default": false,
+                    "description": "Whether to train the head of the model. If False, LogReg will be trained.",
+                    "title": "Train Head",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "model_name"
+            ],
+            "title": "CrossEncoderConfig",
+            "type": "object"
+        },
         "DNNCScorerInitModel": {
             "properties": {
                 "module_name": {
@@ -99,11 +153,18 @@
                     "description": "Number of trials",
                     "title": "N Trials"
                 },
-                "cross_encoder_name": {
+                "cross_encoder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/CrossEncoderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Cross Encoder Name",
+                    "title": "Cross Encoder Config",
                     "type": "array"
                 },
                 "k": {
@@ -121,12 +182,15 @@
                     ],
                     "title": "K"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -135,23 +199,13 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
-                    "type": "array"
-                },
-                "train_head": {
-                    "default": [
-                        false
-                    ],
-                    "items": {
-                        "type": "boolean"
-                    },
-                    "title": "Train Head",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
             "required": [
                 "module_name",
-                "cross_encoder_name",
+                "cross_encoder_config",
                 "k"
             ],
             "title": "DNNCScorerInitModel",
@@ -264,12 +318,15 @@
                     ],
                     "title": "Temperature"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -278,7 +335,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -287,6 +344,138 @@
                 "temperature"
             ],
             "title": "DescriptionScorerInitModel",
+            "type": "object"
+        },
+        "EmbedderConfig": {
+            "properties": {
+                "batch_size": {
+                    "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_length": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum length of input sequences.",
+                    "title": "Max Length"
+                },
+                "model_name": {
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
+                    "title": "Device"
+                },
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classifier_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classifier Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": false,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "model_name"
+            ],
+            "title": "EmbedderConfig",
             "type": "object"
         },
         "EmbeddingNodeValidator": {
@@ -489,12 +678,15 @@
                     "title": "Weights",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -503,7 +695,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -536,12 +728,15 @@
                     "description": "Number of trials",
                     "title": "N Trials"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -550,7 +745,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -581,11 +776,18 @@
                     "description": "Number of trials",
                     "title": "N Trials"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 },
                 "cv": {
@@ -609,7 +811,7 @@
             },
             "required": [
                 "module_name",
-                "embedder_name"
+                "embedder_config"
             ],
             "title": "LogregAimedEmbeddingInitModel",
             "type": "object"
@@ -686,12 +888,15 @@
                     ],
                     "title": "Ignore First Neighbours"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -700,7 +905,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
@@ -833,29 +1038,29 @@
                     "title": "Weights",
                     "type": "array"
                 },
-                "cross_encoder_name": {
+                "cross_encoder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/CrossEncoderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Cross Encoder Name",
+                    "title": "Cross Encoder Config",
                     "type": "array"
                 },
-                "train_head": {
-                    "default": [
-                        false
-                    ],
-                    "items": {
-                        "type": "boolean"
-                    },
-                    "title": "Train Head",
-                    "type": "array"
-                },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -864,7 +1069,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 },
                 "m": {
@@ -920,7 +1125,7 @@
                 "module_name",
                 "k",
                 "weights",
-                "cross_encoder_name"
+                "cross_encoder_config"
             ],
             "title": "RerankScorerInitModel",
             "type": "object"
@@ -961,18 +1166,25 @@
                     ],
                     "title": "K"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "items": {
-                        "type": "string"
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },
             "required": [
                 "module_name",
                 "k",
-                "embedder_name"
+                "embedder_config"
             ],
             "title": "RetrievalAimedEmbeddingInitModel",
             "type": "object"
@@ -1112,12 +1324,15 @@
                     "title": "Clf Args",
                     "type": "array"
                 },
-                "embedder_name": {
+                "embedder_config": {
                     "default": [
                         null
                     ],
                     "items": {
                         "anyOf": [
+                            {
+                                "$ref": "#/$defs/EmbedderConfig"
+                            },
                             {
                                 "type": "string"
                             },
@@ -1126,7 +1341,7 @@
                             }
                         ]
                     },
-                    "title": "Embedder Name",
+                    "title": "Embedder Config",
                     "type": "array"
                 }
             },

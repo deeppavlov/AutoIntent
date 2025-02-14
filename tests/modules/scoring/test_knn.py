@@ -7,7 +7,7 @@ from autointent.modules import KNNScorer
 def test_base_knn(dataset):
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", embedder_name="sergeyzh/rubert-tiny-turbo", embedder_device="cpu")
+    scorer = KNNScorer(k=3, weights="distance", embedder_config="sergeyzh/rubert-tiny-turbo")
 
     test_data = [
         "why is there a hold on my american saving bank account",
