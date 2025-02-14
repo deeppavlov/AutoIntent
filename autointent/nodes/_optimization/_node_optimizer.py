@@ -28,7 +28,7 @@ class ParamSpaceInt(BaseModel):
 class ParamSpaceFloat(BaseModel):
     low: float = Field(..., description="Low boundary of the search space.")
     high: float = Field(..., description="High boundary of the search space.")
-    step: float = Field(0.1, description="Step of the search space.")
+    step: float | None = Field(None, description="Step of the search space.")
     log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
