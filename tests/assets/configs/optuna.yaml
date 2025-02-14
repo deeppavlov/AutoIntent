@@ -24,6 +24,5 @@
       thresh:
         low: 0.1
         high: 0.9
-    - module_name: tunable
     - module_name: argmax
     - module_name: jinoos
