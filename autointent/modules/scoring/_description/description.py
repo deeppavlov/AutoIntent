@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 import scipy
 from numpy.typing import NDArray
+from pydantic import PositiveFloat
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
@@ -37,7 +38,7 @@ class DescriptionScorer(ScoringModule):
     def __init__(
         self,
         embedder_name: str,
-        temperature: float = 1.0,
+        temperature: PositiveFloat = 1.0,
         embedder_device: str = "cpu",
         embedder_batch_size: int = 32,
         embedder_max_length: int | None = None,
@@ -64,7 +65,7 @@ class DescriptionScorer(ScoringModule):
     def from_context(
         cls,
         context: Context,
-        temperature: float,
+        temperature: PositiveFloat,
         embedder_name: str | None = None,
     ) -> "DescriptionScorer":
         """

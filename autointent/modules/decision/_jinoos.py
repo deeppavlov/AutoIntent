@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
@@ -55,7 +55,7 @@ class JinoosDecision(DecisionModule):
 
     def __init__(
         self,
-        search_space: list[float] | None = None,
+        search_space: list[FloatFromZeroToOne] | None = None,
     ) -> None:
         """
         Initialize Jinoos predictor.
@@ -65,7 +65,7 @@ class JinoosDecision(DecisionModule):
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "JinoosDecision":
+    def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> "JinoosDecision":
         """
         Initialize from context.
 
