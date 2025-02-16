@@ -75,6 +75,7 @@ class OptimizationInfo:
         module_params: dict[str, Any],
         metric_value: float,
         metric_name: str,
+        metrics: dict[str, float],
         artifact: Artifact,
         module_dump_dir: str | None,
         module: "Module | None" = None,
@@ -97,6 +98,7 @@ class OptimizationInfo:
             metric_value=metric_value,
             module_params=module_params,
             module_dump_dir=module_dump_dir,
+            metrics=metrics,
         )
         self.trials.add_trial(node_type, trial)
         self._logger.debug("module %s fitted and saved to optimization info", module_name, extra=trial.model_dump())

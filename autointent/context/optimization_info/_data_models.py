@@ -130,6 +130,7 @@ class Trial(BaseModel):
     """Value of the evaluation metric for this trial."""
     module_dump_dir: str | None
     """Directory where the module is dumped."""
+    metrics: dict[str, float]
 
 
 class Trials(BaseModel):

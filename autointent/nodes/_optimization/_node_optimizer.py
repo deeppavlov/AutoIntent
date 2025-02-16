@@ -132,6 +132,7 @@ class NodeOptimizer:
             config,
             target_metric,
             self.target_metric,
+            all_metrics,
             module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
