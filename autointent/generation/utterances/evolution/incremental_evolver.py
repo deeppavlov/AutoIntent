@@ -21,29 +21,21 @@ from autointent.schemas import Intent
 
 SEARCH_SPACE = [
     {
-        "node_type": "embedding",
-        "target_metric": "retrieval_hit_rate",
-        "search_space": [
-            {
-                "module_name": "retrieval",
-                "k": [5],
-                "embedder_name": [
-                    "sentence-transformers/all-MiniLM-L6-v2",
-                ],
-            }
-        ],
-    },
-    {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",
         "metrics": ["scoring_accuracy"],
-        "search_space": [{"module_name": "linear"}],
+        "search_space": [
+            {
+                "module_name": "linear",
+                "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+            }
+        ],
     },
     {
         "node_type": "decision",
         "target_metric": "decision_accuracy",
         "search_space": [
-            {"module_name": "tunable"},
+            {"module_name": "argmax"},
         ],
     },
 ]
@@ -84,12 +76,14 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         """
         best_result = 0
         merge_dataset = copy.deepcopy(dataset)
+        generated_samples = []
 
         for _ in range(n_evolutions):
             new_samples_dataset = super().augment(
                 dataset, split_name=split_name, n_evolutions=1, update_split=False, batch_size=batch_size
             )
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
+            generated_samples.append(new_samples_dataset)
 
             pipeline_optimizer = Pipeline.from_search_space(self.search_space)
             ctx = pipeline_optimizer.fit(merge_dataset)
@@ -102,6 +96,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
                 break
 
         if update_split:
-            dataset[split_name] = concatenate_datasets([merge_dataset[split_name], dataset[split_name]])
+            dataset[split_name] = merge_dataset[split_name]
 
-        return merge_dataset[split_name]
+        return concatenate_datasets(generated_samples)

@@ -76,16 +76,16 @@ def main() -> None:
 
     for arg_name, evolution_cls in mapping.items():
         if getattr(args, arg_name):
-            evolutions.append(evolution_cls())
+            evolutions.append(evolution_cls())  # type: ignore[abstract]
 
     if not evolutions:
         logger.warning("No evolutions selected. Exiting.")
         return
 
     if args.decide_for_me:
-        utterance_evolver = UtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
-    else:
         utterance_evolver = IncrementalUtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
+    else:
+        utterance_evolver = UtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
     dataset = load_dataset(args.input_path)
 
     n_before = len(dataset[args.split])
