@@ -5,7 +5,9 @@ the AutoIntent framework for improved type safety and clarity.
 """
 
 from enum import Enum
-from typing import Literal, TypeAlias
+from typing import Annotated, Literal, TypeAlias
+
+from annotated_types import Interval
 
 
 class LogLevel(Enum):
@@ -71,4 +73,9 @@ class Split:
     INTENTS = "intents"
 
 
+SamplerType = Literal["brute", "tpe", "random"]
 ValidationScheme = Literal["ho", "cv"]
+
+
+FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
+"""Float value between 0 and 1, inclusive."""

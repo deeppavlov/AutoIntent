@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
 from autointent.modules.abc import DecisionModule
@@ -58,7 +58,7 @@ class AdaptiveDecision(DecisionModule):
     supports_oos = False
     name = "adaptive"
 
-    def __init__(self, search_space: list[float] | None = None) -> None:
+    def __init__(self, search_space: list[FloatFromZeroToOne] | None = None) -> None:
         """
         Initialize the AdaptiveDecision.
 
@@ -68,7 +68,7 @@ class AdaptiveDecision(DecisionModule):
         self.search_space = search_space if search_space is not None else default_search_space
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[float] | None = None) -> "AdaptiveDecision":
+    def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> "AdaptiveDecision":
         """
         Create an AdaptiveDecision instance using a Context object.
 

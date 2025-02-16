@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from pydantic import PositiveInt
+
 from autointent import Context, VectorIndex
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
@@ -44,7 +46,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
 
     def __init__(
         self,
-        k: int,
+        k: PositiveInt,
         embedder_config: EmbedderConfig | str | dict[str, Any],
     ) -> None:
         """
@@ -64,7 +66,7 @@ class RetrievalAimedEmbedding(EmbeddingModule):
     def from_context(
         cls,
         context: Context,
-        k: int,
+        k: PositiveInt,
         embedder_config: EmbedderConfig | str,
     ) -> "RetrievalAimedEmbedding":
         """

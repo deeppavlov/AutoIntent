@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt
 
-from autointent.custom_types import ValidationScheme
+from autointent.custom_types import SamplerType, ValidationScheme
 
 from ._name import get_run_name
 
@@ -16,7 +16,7 @@ class DataConfig(BaseModel):
     """Path to the training data. Can be local path or HF repo."""
     scheme: ValidationScheme
     """Hold-out or cross-validation."""
-    n_folds: int = 3
+    n_folds: PositiveInt = 3
     """Number of folds in cross-validation."""
 
 
@@ -25,6 +25,7 @@ class TaskConfig(BaseModel):
 
     search_space_path: Path | None = None
     """Path to the search space configuration file. If None, the default search space will be used"""
+    sampler: SamplerType = "brute"
 
 
 class LoggingConfig(BaseModel):

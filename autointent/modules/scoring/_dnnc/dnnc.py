@@ -6,6 +6,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
 from autointent.custom_types import ListOfLabels
@@ -76,9 +77,9 @@ class DNNCScorer(ScoringModule):
 
     def __init__(
         self,
+        k: PositiveInt,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
         embedder_config: EmbedderConfig | str | dict[str, Any],
-        k: int,
     ) -> None:
         """
         Initialize the DNNCScorer.
@@ -96,7 +97,7 @@ class DNNCScorer(ScoringModule):
         cls,
         context: Context,
         cross_encoder_config: CrossEncoderConfig | str,
-        k: int,
+        k: PositiveInt,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":
         """

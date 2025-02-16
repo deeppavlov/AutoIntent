@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
+from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -51,7 +52,7 @@ class LogregAimedEmbedding(EmbeddingModule):
     def __init__(
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any],
-        cv: int = 3,
+        cv: PositiveInt = 3,
     ) -> None:
         """
         Initialize the LogregAimedEmbedding.
@@ -67,7 +68,7 @@ class LogregAimedEmbedding(EmbeddingModule):
         cls,
         context: Context,
         embedder_config: EmbedderConfig | str,
-        cv: int = 3,
+        cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":
         """
         Create a LogregAimedEmbedding instance using a Context object.

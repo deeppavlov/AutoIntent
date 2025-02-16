@@ -1,0 +1,28 @@
+- node_type: embedding
+  target_metric: retrieval_hit_rate
+  search_space:
+    - module_name: retrieval
+      k: [10]
+      embedder_config:
+        - sentence-transformers/all-MiniLM-L6-v2
+        - avsolatorio/GIST-small-Embedding-v0
+- node_type: scoring
+  target_metric: scoring_roc_auc
+  search_space:
+    - module_name: knn
+      n_trials: 3
+      k:
+        low: 5
+        high: 10
+        step: 1
+      weights: [uniform, distance, closest]
+    - module_name: linear
+- node_type: decision
+  target_metric: decision_accuracy
+  search_space:
+    - module_name: threshold
+      thresh:
+        low: 0.1
+        high: 0.9
+    - module_name: argmax
+    - module_name: jinoos

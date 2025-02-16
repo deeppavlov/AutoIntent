@@ -7,6 +7,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "search_space": {
                     "default": [
                         null
@@ -15,6 +29,8 @@
                         "anyOf": [
                             {
                                 "items": {
+                                    "maximum": 1.0,
+                                    "minimum": 0.0,
                                     "type": "number"
                                 },
                                 "type": "array"
@@ -40,6 +56,20 @@
                     "const": "argmax",
                     "title": "Module Name",
                     "type": "string"
+                },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
                 }
             },
             "required": [
@@ -109,6 +139,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "cross_encoder_config": {
                     "items": {
                         "anyOf": [
@@ -124,11 +168,19 @@
                     "type": "array"
                 },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "embedder_config": {
                     "default": [
@@ -237,12 +289,34 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "temperature": {
-                    "items": {
-                        "type": "number"
-                    },
-                    "title": "Temperature",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0.0,
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
+                    "title": "Temperature"
                 },
                 "embedder_config": {
                     "default": [
@@ -513,6 +587,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "search_space": {
                     "default": [
                         null
@@ -521,6 +609,8 @@
                         "anyOf": [
                             {
                                 "items": {
+                                    "maximum": 1.0,
+                                    "minimum": 0.0,
                                     "type": "number"
                                 },
                                 "type": "array"
@@ -547,12 +637,34 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "weights": {
                     "items": {
@@ -602,6 +714,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "embedder_config": {
                     "default": [
                         null
@@ -636,6 +762,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "embedder_config": {
                     "items": {
                         "anyOf": [
@@ -651,14 +791,22 @@
                     "type": "array"
                 },
                 "cv": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         3
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "Cv",
-                    "type": "array"
+                    "title": "Cv"
                 }
             },
             "required": [
@@ -675,32 +823,70 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "s": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0.0,
+                                "type": "number"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
                     "default": [
                         1.0
                     ],
-                    "items": {
-                        "type": "number"
-                    },
-                    "title": "S",
-                    "type": "array"
+                    "title": "S"
                 },
                 "ignore_first_neighbours": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "minimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         0
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "Ignore First Neighbours",
-                    "type": "array"
+                    "title": "Ignore First Neighbours"
                 },
                 "embedder_config": {
                     "default": [
@@ -741,6 +927,77 @@
             "title": "NodeType",
             "type": "string"
         },
+        "ParamSpaceFloat": {
+            "properties": {
+                "low": {
+                    "description": "Low boundary of the search space.",
+                    "title": "Low",
+                    "type": "number"
+                },
+                "high": {
+                    "description": "High boundary of the search space.",
+                    "title": "High",
+                    "type": "number"
+                },
+                "step": {
+                    "anyOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Step of the search space.",
+                    "title": "Step"
+                },
+                "log": {
+                    "default": false,
+                    "description": "Whether to use a logarithmic scale.",
+                    "title": "Log",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "low",
+                "high"
+            ],
+            "title": "ParamSpaceFloat",
+            "type": "object"
+        },
+        "ParamSpaceInt": {
+            "properties": {
+                "low": {
+                    "description": "Low boundary of the search space.",
+                    "title": "Low",
+                    "type": "integer"
+                },
+                "high": {
+                    "description": "High boundary of the search space.",
+                    "title": "High",
+                    "type": "integer"
+                },
+                "step": {
+                    "default": 1,
+                    "description": "Step of the search space.",
+                    "title": "Step",
+                    "type": "integer"
+                },
+                "log": {
+                    "default": false,
+                    "description": "Whether to use a logarithmic scale.",
+                    "title": "Log",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "low",
+                "high"
+            ],
+            "title": "ParamSpaceInt",
+            "type": "object"
+        },
         "RerankScorerInitModel": {
             "properties": {
                 "module_name": {
@@ -748,12 +1005,33 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "weights": {
                     "items": {
@@ -802,38 +1080,52 @@
                     "type": "array"
                 },
                 "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "M",
-                    "type": "array"
+                    "title": "M"
                 },
                 "rank_threshold_cutoff": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Rank Threshold Cutoff",
-                    "type": "array"
+                    "title": "Rank Threshold Cutoff"
                 }
             },
             "required": [
@@ -852,12 +1144,34 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "k": {
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "K",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "title": "K"
                 },
                 "embedder_config": {
                     "items": {
@@ -976,6 +1290,20 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "clf_name": {
                     "default": [
                         "LogisticRegression"
@@ -1037,25 +1365,50 @@
                     "title": "Module Name",
                     "type": "string"
                 },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
                 "thresh": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "maximum": 1.0,
+                                        "minimum": 0.0,
+                                        "type": "number"
+                                    },
+                                    {
+                                        "items": {
+                                            "maximum": 1.0,
+                                            "minimum": 0.0,
+                                            "type": "number"
+                                        },
+                                        "type": "array"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceFloat"
+                        }
+                    ],
                     "default": [
                         0.5
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "number"
-                            },
-                            {
-                                "items": {
-                                    "type": "number"
-                                },
-                                "type": "array"
-                            }
-                        ]
-                    },
-                    "title": "Thresh",
-                    "type": "array"
+                    "title": "Thresh"
                 }
             },
             "required": [
@@ -1072,14 +1425,22 @@
                     "type": "string"
                 },
                 "n_trials": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "exclusiveMinimum": 0,
+                                "type": "integer"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         320
                     ],
-                    "items": {
-                        "type": "integer"
-                    },
-                    "title": "N Trials",
-                    "type": "array"
+                    "title": "N Trials"
                 }
             },
             "required": [

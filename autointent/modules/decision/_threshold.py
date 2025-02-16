@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels, MultiLabel
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
@@ -75,7 +75,7 @@ class ThresholdDecision(DecisionModule):
 
     def __init__(
         self,
-        thresh: float | list[float],
+        thresh: FloatFromZeroToOne | list[FloatFromZeroToOne],
     ) -> None:
         """
         Initialize threshold predictor.
@@ -85,7 +85,9 @@ class ThresholdDecision(DecisionModule):
         self.thresh = thresh if isinstance(thresh, float) else np.array(thresh)
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | list[float] = 0.5) -> "ThresholdDecision":
+    def from_context(
+        cls, context: Context, thresh: FloatFromZeroToOne | list[FloatFromZeroToOne] = 0.5
+    ) -> "ThresholdDecision":
         """
         Initialize from context.
 

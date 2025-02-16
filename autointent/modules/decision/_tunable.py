@@ -6,6 +6,7 @@ import numpy as np
 import numpy.typing as npt
 import optuna
 from optuna.trial import Trial
+from pydantic import PositiveInt
 
 from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
@@ -76,7 +77,7 @@ class TunableDecision(DecisionModule):
 
     def __init__(
         self,
-        n_trials: int = 320,
+        n_trials: PositiveInt = 320,
         seed: int = 0,
         tags: list[Tag] | None = None,
     ) -> None:
@@ -92,7 +93,7 @@ class TunableDecision(DecisionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: int = 320) -> "TunableDecision":
+    def from_context(cls, context: Context, n_trials: PositiveInt = 320) -> "TunableDecision":
         """
         Initialize from context.
 

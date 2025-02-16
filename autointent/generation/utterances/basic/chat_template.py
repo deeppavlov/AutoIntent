@@ -18,10 +18,62 @@ class BaseSynthesizer(ABC):
         """Generate examples for this intent."""
 
 
-class SynthesizerChatTemplate(BaseSynthesizer):
+class BaseSynthesizerChatTemplate(BaseSynthesizer):
+    """Base chat template for generating additional examples for a given intent."""
+
+    _MESSAGES_TEMPLATE: ClassVar[list[Message]] = []
+    _INTENT_NAME_LABEL: ClassVar[str] = "Intent name"
+    _EXAMPLE_UTTERANCES_LABEL: ClassVar[str] = "Example Utterances"
+    _GENERATE_INSTRUCTION: ClassVar[str] = "Please generate {n_examples} more examples for the provided intent class.\n"
+
+    def __init__(
+        self,
+        dataset: Dataset,
+        split: str,
+        extra_instructions: str | None = None,
+        max_sample_utterances: int | None = None,
+    ) -> None:
+        """Initialize the chat template with dataset, split, and optional instructions."""
+        if extra_instructions is None:
+            extra_instructions = ""
+
+        self._messages = deepcopy(self._MESSAGES_TEMPLATE)
+
+        if self._messages:
+            self._messages[0]["content"] = self._messages[0]["content"].format(extra_instructions=extra_instructions)
+
+        self.dataset = dataset
+        self.split = split
+        self.max_sample_utterances = max_sample_utterances
+
+    def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
+        """Generate a list of messages to request additional examples for the given intent."""
+        filtered_split = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] == intent_data.id)
+        sample_utterances = filtered_split[Dataset.utterance_feature]
+
+        if self.max_sample_utterances is not None and len(sample_utterances) > self.max_sample_utterances:
+            sample_utterances = random.sample(sample_utterances, k=self.max_sample_utterances)
+
+        return [
+            *self._messages,
+            self._create_final_message(intent_data, n_examples, sample_utterances),
+        ]
+
+    def _create_final_message(self, intent_data: Intent, n_examples: int, sample_utterances: list[str]) -> Message:
+        content = f"{self._INTENT_NAME_LABEL}: {intent_data.name}\n\n" f"{self._EXAMPLE_UTTERANCES_LABEL}:\n"
+
+        if sample_utterances:
+            numbered_utterances = "\n".join(f"{i+1}. {utt}" for i, utt in enumerate(sample_utterances))
+            content += numbered_utterances + "\n\n"
+
+        content += self._GENERATE_INSTRUCTION.format(n_examples=n_examples)
+        return Message(role=Role.USER, content=content)
+
+
+class SynthesizerChatTemplate(BaseSynthesizerChatTemplate):
     """Chat template for generating additional examples for a given intent class."""
 
-    __messages: ClassVar[list[Message]] = [
+    _MESSAGES_TEMPLATE: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,
             content=(
@@ -97,38 +149,81 @@ class SynthesizerChatTemplate(BaseSynthesizer):
         ),
     ]
 
-    def __init__(
-        self,
-        dataset: Dataset,
-        split: str,
-        extra_instructions: str | None = None,
-        max_sample_utterances: int | None = None,
-    ) -> None:
-        """Initialize."""
-        if extra_instructions is None:
-            extra_instructions = ""
 
-        self._messages = deepcopy(self.__messages)
+class SynthesizerChatTemplateRussian(BaseSynthesizerChatTemplate):
+    """Russian language template for generating additional intent examples."""
 
-        msg = self._messages[0]
-        msg["content"] = msg["content"].format(extra_instructions=extra_instructions)
-
-        self.dataset = dataset
-        self.split = split
-        self.max_sample_utterances = max_sample_utterances
-
-    def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
-        """Generate additional examples for the provided intent class."""
-        filtered_split = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] == intent_data.id)
-        sample_utterances = filtered_split[Dataset.utterance_feature]
-        if self.max_sample_utterances is not None:
-            sample_utterances = random.sample(sample_utterances, k=self.max_sample_utterances)
-        return [
-            *self._messages,
-            Message(
-                role=Role.USER,
-                content=f"Intent name: {intent_data.name}\n\n"
-                f"Example Utterances:\n{sample_utterances}\n\n"
-                f"Please generate {n_examples} more examples for the provided intent class.\n",
+    _MESSAGES_TEMPLATE: ClassVar[list[Message]] = [
+        Message(
+            role=Role.USER,
+            content=(
+                "Вам будет предоставлен набор примеров высказываний и название общей темы (интент). "
+                "Ваша задача - сгенерировать дополнительные примеры, соответствующие этому интенту.\n\n"
+                "Правила:\n"
+                "- Можно менять значения слотов в похожих высказываниях\n"
+                "- Можно создавать совершенно другие формулировки для того же интента\n"
+                "- Если название интента отсутствует, определите его из примеров\n"
+                "- Если примеры отсутствуют, используйте только название интента\n"
+                "{extra_instructions}\n\n"
+                "Название интента: заказ_пиццы\n\n"
+                "Примеры высказываний:\n"
+                "1. Хочу заказать большую пиццу с пепперони\n"
+                "2. Можно среднюю пиццу с сыром и оливками?\n"
+                "3. Привезите маленькую вегетарианскую пиццу по моему адресу\n\n"
+                "Пожалуйста, сгенерируй еще 3 примера для этого интента."
             ),
-        ]
+        ),
+        Message(
+            role=Role.ASSISTANT,
+            content=(
+                "1. Мне нужна большая пицца Маргарита\n"
+                "2. Можно гавайскую пиццу среднего размера с дополнительным ананасом?\n"
+                "3. Доставьте маленькую пиццу с курицей барбекю на дом"
+            ),
+        ),
+        Message(
+            role=Role.USER,
+            content=(
+                "Название интента: бронирование_отеля\n\n"
+                "Примеры высказываний:\n"
+                "1. Нужно забронировать номер в Москве на две ночи\n\n"
+                "Пожалуйста, сгенерируй еще 2 примера для этого интента."
+            ),
+        ),
+        Message(
+            role=Role.ASSISTANT,
+            content=("1. Забронируйте люкс в Санкт-Петербурге на выходные\n" "2. Ищу номер с видом на море в Сочи"),
+        ),
+        Message(
+            role=Role.USER,
+            content=(
+                "Название интента:\n\n"
+                "Примеры высказываний:\n"
+                "1. Какая сегодня погода?\n\n"
+                "Пожалуйста, сгенерируй еще 2 примера для этого интента."
+            ),
+        ),
+        Message(
+            role=Role.ASSISTANT,
+            content=("1. Какой прогноз на завтра?\n" "2. Будет ли дождь в субботу?"),
+        ),
+        Message(
+            role=Role.USER,
+            content=(
+                "Название интента: запись_на_прием\n\n"
+                "Примеры высказываний:\n\n"
+                "Пожалуйста, сгенерируй еще 3 примера для этого интента."
+            ),
+        ),
+        Message(
+            role=Role.ASSISTANT,
+            content=(
+                "1. Нужно записаться к врачу на следующую неделю\n"
+                "2. Хочу назначить встречу с парикмахером на пятницу\n"
+                "3. Свободно ли время в пятницу утром для визита?"
+            ),
+        ),
+    ]
+    _INTENT_NAME_LABEL = "Название интента"
+    _EXAMPLE_UTTERANCES_LABEL = "Примеры высказываний"
+    _GENERATE_INSTRUCTION = "Пожалуйста, сгенерируй {n_examples} дополнительных примеров для этого интента.\n"

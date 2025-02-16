@@ -116,6 +116,7 @@ ignore = [
     "ISC001",  # implicit string concatenation
     "ERA001",  # commented code
     "FBT",     # boolean trap
+    "RUF001",  # ambiguous unicode character
 ]
 
 [tool.ruff.lint.per-file-ignores]

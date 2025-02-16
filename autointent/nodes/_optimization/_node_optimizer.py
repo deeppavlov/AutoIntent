@@ -1,18 +1,35 @@
 """Node optimizer."""
 
 import gc
-import itertools as it
 import logging
 from copy import deepcopy
+from functools import partial
 from pathlib import Path
 from typing import Any
 
+import optuna
 import torch
+from optuna.trial import Trial
+from pydantic import BaseModel, Field
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType
+from autointent.custom_types import NodeType, SamplerType
 from autointent.nodes._nodes_info import NODES_INFO
+
+
+class ParamSpaceInt(BaseModel):
+    low: int = Field(..., description="Low boundary of the search space.")
+    high: int = Field(..., description="High boundary of the search space.")
+    step: int = Field(1, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")
+
+
+class ParamSpaceFloat(BaseModel):
+    low: float = Field(..., description="Low boundary of the search space.")
+    high: float = Field(..., description="High boundary of the search space.")
+    step: float | None = Field(None, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
 class NodeOptimizer:
@@ -43,7 +60,7 @@ class NodeOptimizer:
         self.modules_search_spaces = search_space
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
-    def fit(self, context: Context) -> None:
+    def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
         Fit the node optimizer.
 
@@ -52,53 +69,106 @@ class NodeOptimizer:
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
+            self._counter = 0
             module_name = search_space.pop("module_name")
-
-            for j_combination, params_combination in enumerate(it.product(*search_space.values())):
-                module_kwargs = dict(zip(search_space.keys(), params_combination, strict=False))
-
-                self._logger.debug("initializing %s module...", module_name)
-                context.callback_handler.start_module(
-                    module_name=module_name, num=j_combination, module_kwargs=module_kwargs
-                )
-                module = self.node_info.modules_available[module_name].from_context(context, **module_kwargs)
-
-                embedder_config = module.get_embedder_config()
-                if embedder_config is not None:
-                    module_kwargs["embedder_config"] = embedder_config
-
-                self._logger.debug("scoring %s module...", module_name)
-                metrics_score = module.score(context, metrics=self.metrics)
-                metric_value = metrics_score[self.target_metric]
-
-                context.callback_handler.log_metrics(metrics_score)
-                context.callback_handler.end_module()
-
-                dump_dir = context.get_dump_dir()
-
-                if dump_dir is not None:
-                    module_dump_dir = self.get_module_dump_dir(dump_dir, module_name, j_combination)
-                    module.dump(module_dump_dir)
-                else:
-                    module_dump_dir = None
-
-                context.optimization_info.log_module_optimization(
-                    self.node_info.node_type,
-                    module_name,
-                    module_kwargs,
-                    metric_value,
-                    self.target_metric,
-                    module.get_assets(),  # retriever name / scores / predictions
-                    module_dump_dir,
-                    module=module if not context.is_ram_to_clear() else None,
-                )
-
-                if context.is_ram_to_clear():
-                    module.clear_cache()
-                    gc.collect()
-                    torch.cuda.empty_cache()
+            n_trials = None
+            if "n_trials" in search_space:
+                n_trials = search_space.pop("n_trials")
+            if sampler == "tpe":
+                sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
+                n_trials = n_trials or 10
+            elif sampler == "brute":
+                sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
+                n_trials = None
+            elif sampler == "random":
+                sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
+                n_trials = n_trials or 10
+            else:
+                msg = f"Unexpected sampler: {sampler}"
+                raise ValueError(msg)
+            study = optuna.create_study(direction="maximize", sampler=sampler_instance)
+            optuna.logging.set_verbosity(optuna.logging.WARNING)
+            obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
+            study.optimize(obj, n_trials=n_trials)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
+
+    def objective(
+        self,
+        trial: Trial,
+        module_name: str,
+        search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]],
+        context: Context,
+    ) -> float:
+        config = self.suggest(trial, search_space)
+
+        self._logger.debug("initializing %s module...", module_name)
+        module = self.node_info.modules_available[module_name].from_context(context, **config)
+
+        embedder_config = module.get_embedder_config()
+        if embedder_config is not None:
+            config["embedder_config"] = embedder_config
+
+        context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
+
+        self._logger.debug("scoring %s module...", module_name)
+        all_metrics = module.score(context, metrics=self.metrics)
+        target_metric = all_metrics[self.target_metric]
+
+        context.callback_handler.log_metrics(all_metrics)
+        context.callback_handler.end_module()
+
+        dump_dir = context.get_dump_dir()
+
+        if dump_dir is not None:
+            module_dump_dir = self.get_module_dump_dir(dump_dir, module_name, self._counter)
+            module.dump(module_dump_dir)
+        else:
+            module_dump_dir = None
+
+        context.optimization_info.log_module_optimization(
+            self.node_info.node_type,
+            module_name,
+            config,
+            target_metric,
+            self.target_metric,
+            module.get_assets(),  # retriever name / scores / predictions
+            module_dump_dir,
+            module=module if not context.is_ram_to_clear() else None,
+        )
+
+        if context.is_ram_to_clear():
+            module.clear_cache()
+            gc.collect()
+            torch.cuda.empty_cache()
+
+        self._counter += 1
+
+        return target_metric
+
+    def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
+        res: dict[str, Any] = {}
+
+        def is_valid_param_space(
+            param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
+        ) -> bool:
+            try:
+                space_type(**param_space)
+                return True  # noqa: TRY300
+            except ValueError:
+                return False
+
+        for param_name, param_space in search_space.items():
+            if isinstance(param_space, list):
+                res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
+            elif is_valid_param_space(param_space, ParamSpaceInt):
+                res[param_name] = trial.suggest_int(param_name, **param_space)
+            elif is_valid_param_space(param_space, ParamSpaceFloat):
+                res[param_name] = trial.suggest_float(param_name, **param_space)
+            else:
+                msg = f"Unsupported type of param search space: {param_space}"
+                raise TypeError(msg)
+        return res
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
         """

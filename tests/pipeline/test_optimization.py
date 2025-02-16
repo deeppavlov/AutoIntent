@@ -1,5 +1,4 @@
 import os
-from typing import Literal
 
 import pytest
 
@@ -10,7 +9,21 @@ from autointent.configs import (
 )
 from tests.conftest import get_search_space, setup_environment
 
-TaskType = Literal["multiclass", "multilabel", "description"]
+
+@pytest.mark.parametrize(
+    "sampler",
+    ["tpe", "random"],
+)
+def test_bayes(dataset, sampler):
+    project_dir = setup_environment()
+    search_space = get_search_space("optuna")
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(VectorIndexConfig())
+
+    pipeline_optimizer.fit(dataset, scheme="ho", refit_after=False, sampler=sampler)
 
 
 @pytest.mark.parametrize(
