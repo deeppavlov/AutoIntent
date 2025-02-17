@@ -30,15 +30,18 @@ jobs:
         python -m scripts.generate_json_schema_config
 
     - name: Check for changes in JSON Schema
+      id: check_changes
       run: |
-        if ! git diff docs/optimizer_config.schema.json; then
-          echo "Error: docs/optimizer_config.schema.json has been modified after running the generator script."
+        if git diff --quiet docs/optimizer_config.schema.json; then
+          echo "No changes detected."
+          echo "changed=false" >> $GITHUB_ENV
         else
-          echo "No changes detected in docs/optimizer_config.schema.json."
-          exit 0
+          echo "Changes detected."
+          echo "changed=true" >> $GITHUB_ENV
         fi
 
     - name: Commit and push changes
+      if: env.changed == 'true'
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
