@@ -98,7 +98,7 @@ class TunableDecision(DecisionModule):
 
     @classmethod
     def from_context(
-        cls, context: Context, target_metric: MetricType, n_optuna_trials: PositiveInt = 320
+        cls, context: Context, target_metric: MetricType = "decision_accuracy", n_optuna_trials: PositiveInt = 320
     ) -> "TunableDecision":
         """
         Initialize from context.
