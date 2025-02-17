@@ -1,6 +1,6 @@
 """Tunable predictor module."""
 
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -16,6 +16,8 @@ from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
+
+MetricType = Literal["decision_accuracy", "decision_f1", "decision_roc_auc", "decision_precision", "decision_recall"]
 
 
 class TunableDecision(DecisionModule):
@@ -77,7 +79,7 @@ class TunableDecision(DecisionModule):
 
     def __init__(
         self,
-        target_metric: str = "decision_accuracy",
+        target_metric: MetricType = "decision_accuracy",
         n_optuna_trials: PositiveInt = 320,
         seed: int = 0,
         tags: list[Tag] | None = None,
@@ -95,14 +97,21 @@ class TunableDecision(DecisionModule):
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_optuna_trials: PositiveInt = 320) -> "TunableDecision":
+    def from_context(
+        cls, context: Context, target_metric: MetricType, n_optuna_trials: PositiveInt = 320
+    ) -> "TunableDecision":
         """
         Initialize from context.
 
         :param context: Context
         :param n_trials: Number of trials
         """
-        return cls(n_optuna_trials=n_optuna_trials, seed=context.seed, tags=context.data_handler.tags)
+        return cls(
+            target_metric=target_metric,
+            n_optuna_trials=n_optuna_trials,
+            seed=context.seed,
+            tags=context.data_handler.tags,
+        )
 
     def fit(
         self,
