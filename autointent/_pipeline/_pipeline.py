@@ -11,7 +11,7 @@ import yaml
 from autointent import Context, Dataset
 from autointent.configs import InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType, ValidationScheme
-from autointent.metrics import PREDICTION_METRICS_MULTILABEL
+from autointent.metrics import PREDICTION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
 from autointent.utils import load_default_search_space, load_search_space
@@ -155,7 +155,7 @@ class Pipeline:
             self._refit(context)
 
         predictions = self.predict(context.data_handler.test_utterances())
-        for metric_name, metric in PREDICTION_METRICS_MULTILABEL.items():
+        for metric_name, metric in PREDICTION_METRICS.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
                 context.data_handler.test_labels(),
                 predictions,
