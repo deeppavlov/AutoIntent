@@ -126,9 +126,7 @@ class Regex(BaseRegex):
         """
         chosen_metrics = {name: fn for name, fn in REGEX_METRICS.items() if name in metrics}
 
-        metrics_calculated, _ = self.score_metrics_cv(
-            chosen_metrics, context.data_handler.validation_iterator()
-        )
+        metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
 
         return metrics_calculated
 
