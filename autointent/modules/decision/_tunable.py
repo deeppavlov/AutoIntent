@@ -1,6 +1,6 @@
 """Tunable predictor module."""
 
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -11,11 +11,13 @@ from pydantic import PositiveInt
 from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.metrics import decision_f1
+from autointent.metrics import PREDICTION_METRICS, DecisionMetricFn
 from autointent.modules.abc import DecisionModule
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
+
+MetricType = Literal["decision_accuracy", "decision_f1", "decision_roc_auc", "decision_precision", "decision_recall"]
 
 
 class TunableDecision(DecisionModule):
@@ -40,7 +42,7 @@ class TunableDecision(DecisionModule):
         from autointent.modules import TunableDecision
         scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
         labels = [1, 0, 1]
-        predictor = TunableDecision(n_trials=100, seed=42)
+        predictor = TunableDecision(n_optuna_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
         predictions = predictor.predict(test_scores)
@@ -55,7 +57,7 @@ class TunableDecision(DecisionModule):
     .. testcode::
 
         labels = [[1, 0], [0, 1], [1, 1]]
-        predictor = TunableDecision(n_trials=100, seed=42)
+        predictor = TunableDecision(n_optuna_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
         predictions = predictor.predict(test_scores)
@@ -63,7 +65,7 @@ class TunableDecision(DecisionModule):
 
     .. testoutput::
 
-        [[1, 1], [1, 1]]
+        [[1, 0], [1, 0]]
 
     """
 
@@ -77,7 +79,8 @@ class TunableDecision(DecisionModule):
 
     def __init__(
         self,
-        n_trials: PositiveInt = 320,
+        target_metric: MetricType = "decision_accuracy",
+        n_optuna_trials: PositiveInt = 320,
         seed: int = 0,
         tags: list[Tag] | None = None,
     ) -> None:
@@ -88,19 +91,27 @@ class TunableDecision(DecisionModule):
         :param seed: Seed
         :param tags: Tags
         """
-        self.n_trials = n_trials
+        self.target_metric = target_metric
+        self.n_optuna_trials = n_optuna_trials
         self.seed = seed
         self.tags = tags
 
     @classmethod
-    def from_context(cls, context: Context, n_trials: PositiveInt = 320) -> "TunableDecision":
+    def from_context(
+        cls, context: Context, target_metric: MetricType = "decision_accuracy", n_optuna_trials: PositiveInt = 320
+    ) -> "TunableDecision":
         """
         Initialize from context.
 
         :param context: Context
         :param n_trials: Number of trials
         """
-        return cls(n_trials=n_trials, seed=context.seed, tags=context.data_handler.tags)
+        return cls(
+            target_metric=target_metric,
+            n_optuna_trials=n_optuna_trials,
+            seed=context.seed,
+            tags=context.data_handler.tags,
+        )
 
     def fit(
         self,
@@ -121,8 +132,10 @@ class TunableDecision(DecisionModule):
         self.tags = tags
         self._validate_task(scores, labels)
 
+        metric_fn = PREDICTION_METRICS[self.target_metric]
+
         thresh_optimizer = ThreshOptimizer(
-            n_classes=self._n_classes, multilabel=self._multilabel, n_trials=self.n_trials
+            metric_fn, n_classes=self._n_classes, multilabel=self._multilabel, n_trials=self.n_optuna_trials
         )
 
         thresh_optimizer.fit(
@@ -150,7 +163,9 @@ class TunableDecision(DecisionModule):
 class ThreshOptimizer:
     """Threshold optimizer."""
 
-    def __init__(self, n_classes: int, multilabel: bool, n_trials: int | None = None) -> None:
+    def __init__(
+        self, metric_fn: DecisionMetricFn, n_classes: int, multilabel: bool, n_trials: int | None = None
+    ) -> None:
         """
         Initialize threshold optimizer.
 
@@ -158,6 +173,7 @@ class ThreshOptimizer:
         :param multilabel: Is multilabel
         :param n_trials: Number of trials
         """
+        self.metric_fn = metric_fn
         self.n_classes = n_classes
         self.multilabel = multilabel
         self.n_trials = n_trials if n_trials is not None else n_classes * 10
@@ -173,7 +189,7 @@ class ThreshOptimizer:
             y_pred = multilabel_predict(self.probas, thresholds, self.tags)
         else:
             y_pred = multiclass_predict(self.probas, thresholds)
-        return decision_f1(self.labels, y_pred)
+        return self.metric_fn(self.labels, y_pred)
 
     def fit(
         self,

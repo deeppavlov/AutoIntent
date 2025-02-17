@@ -80,15 +80,13 @@ SCORING_METRICS_MULTILABEL: dict[str, ScoringMetricFn] = SCORING_METRICS_MULTICL
     scoring_neg_ranking_loss,
 )
 
-PREDICTION_METRICS_MULTICLASS: dict[str, DecisionMetricFn] = _funcs_to_dict(
+PREDICTION_METRICS: dict[str, DecisionMetricFn] = _funcs_to_dict(
     decision_accuracy,
     decision_f1,
     decision_precision,
     decision_recall,
     decision_roc_auc,
 )
-
-PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
 
 REGEXP_METRICS = _funcs_to_dict(regexp_partial_accuracy, regexp_partial_precision)
 

@@ -1427,6 +1427,37 @@
                 "n_trials": {
                     "anyOf": [
                         {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                },
+                "target_metric": {
+                    "default": [
+                        "decision_accuracy"
+                    ],
+                    "items": {
+                        "enum": [
+                            "decision_accuracy",
+                            "decision_f1",
+                            "decision_roc_auc",
+                            "decision_precision",
+                            "decision_recall"
+                        ],
+                        "type": "string"
+                    },
+                    "title": "Target Metric",
+                    "type": "array"
+                },
+                "n_optuna_trials": {
+                    "anyOf": [
+                        {
                             "items": {
                                 "exclusiveMinimum": 0,
                                 "type": "integer"
@@ -1440,7 +1471,7 @@
                     "default": [
                         320
                     ],
-                    "title": "N Trials"
+                    "title": "N Optuna Trials"
                 }
             },
             "required": [
