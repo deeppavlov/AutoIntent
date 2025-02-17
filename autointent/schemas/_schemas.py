@@ -128,7 +128,7 @@ class Intent(BaseModel):
 
 
 class ModelConfig(BaseModel):
-    batch_size: PositiveInt = Field(32, description="Batch size for model inference. test")
+    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
 
