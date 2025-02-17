@@ -42,7 +42,7 @@ class TunableDecision(DecisionModule):
         from autointent.modules import TunableDecision
         scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
         labels = [1, 0, 1]
-        predictor = TunableDecision(n_trials=100, seed=42)
+        predictor = TunableDecision(n_optuna_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
         predictions = predictor.predict(test_scores)
@@ -57,7 +57,7 @@ class TunableDecision(DecisionModule):
     .. testcode::
 
         labels = [[1, 0], [0, 1], [1, 1]]
-        predictor = TunableDecision(n_trials=100, seed=42)
+        predictor = TunableDecision(n_optuna_trials=100, seed=42)
         predictor.fit(scores, labels)
         test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
         predictions = predictor.predict(test_scores)
