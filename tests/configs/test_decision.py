@@ -17,7 +17,7 @@ def valid_decision_config():
                 {"module_name": "threshold", "thresh": [[0.5, 0.6]]},
                 {
                     "module_name": "tunable",
-                    "n_trials": [100],
+                    "n_optuna_trials": [100],
                 },
                 {"module_name": "adaptive", "search_space": [[0.5]]},
             ],
@@ -40,7 +40,7 @@ def test_invalid_decision_config_missing_field():
         {
             "node_type": "decision",
             # Missing "target_metric"
-            "search_space": [{"module_name": "tunable", "n_trials": [100]}],
+            "search_space": [{"module_name": "tunable", "n_optuna_trials": [100]}],
         }
     ]
 
@@ -61,7 +61,7 @@ def test_invalid_decision_config_wrong_type():
                 },
                 {
                     "module_name": "tunable",
-                    "n_trials": ["not_an_int"],  # Should be an integer
+                    "n_optuna_trials": ["not_an_int"],  # Should be an integer
                 },
             ],
         }
