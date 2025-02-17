@@ -10,13 +10,13 @@ from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
 
-class DNNCScorer(ScoringModule):
+class DNNCScorer(BaseScorer):
     r"""
     Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
 

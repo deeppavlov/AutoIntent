@@ -8,13 +8,13 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 default_search_space = np.linspace(0, 1, num=100)
 
 
-class JinoosDecision(DecisionModule):
+class JinoosDecision(BaseDecision):
     """
     Jinoos predictor module.
 

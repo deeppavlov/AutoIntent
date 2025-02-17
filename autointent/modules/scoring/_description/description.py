@@ -12,11 +12,11 @@ from autointent import Context, Embedder
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
-class DescriptionScorer(ScoringModule):
+class DescriptionScorer(BaseScorer):
     r"""
     Scoring module that scores utterances based on similarity to intent descriptions.
 

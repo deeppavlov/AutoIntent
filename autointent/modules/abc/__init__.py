@@ -1,7 +1,7 @@
-from ._base import Module
-from ._decision import DecisionModule
-from ._embedding import EmbeddingModule
-from ._regex import RegexModule
-from ._scoring import ScoringModule
+from ._base import BaseModule
+from ._decision import BaseDecision
+from ._embedding import BaseEmbedding
+from ._regex import BaseRegex
+from ._scoring import BaseScorer
 
-__all__ = ["DecisionModule", "EmbeddingModule", "Module", "RegexModule", "ScoringModule"]
+__all__ = ["BaseDecision", "BaseEmbedding", "BaseModule", "BaseRegex", "BaseScorer"]

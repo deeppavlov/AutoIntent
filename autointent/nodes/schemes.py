@@ -7,7 +7,7 @@ from typing import Annotated, Any, Literal, TypeAlias, Union, get_args, get_orig
 from pydantic import BaseModel, Field, PositiveInt, RootModel
 
 from autointent.custom_types import NodeType
-from autointent.modules.abc import Module
+from autointent.modules.abc import BaseModule
 from autointent.nodes._optimization._node_optimizer import ParamSpaceFloat, ParamSpaceInt
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
@@ -57,7 +57,7 @@ def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] 
 
 
 def generate_models_and_union_type_for_classes(
-    classes: list[type[Module]],
+    classes: list[type[BaseModule]],
 ) -> type[BaseModel]:
     """Dynamically generates Pydantic models for class constructors and creates a union type."""
     models: dict[str, type[BaseModel]] = {}

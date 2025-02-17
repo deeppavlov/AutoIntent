@@ -8,7 +8,7 @@ from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
 from autointent.metrics import REGEX_METRICS
-from autointent.modules.abc import RegexModule
+from autointent.modules.abc import BaseRegex
 from autointent.schemas import Intent
 
 
@@ -23,7 +23,7 @@ class RegexPatternsCompiled(TypedDict):
     """Compiled regex patterns for partial match."""
 
 
-class Regex(RegexModule):
+class Regex(BaseRegex):
     """Regular expressions based intent detection module."""
 
     name = "regex"

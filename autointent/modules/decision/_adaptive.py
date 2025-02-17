@@ -10,7 +10,7 @@ from autointent import Context
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 from ._utils import apply_tags
@@ -19,7 +19,7 @@ default_search_space = np.linspace(0, 1, num=10)
 logger = logging.getLogger(__name__)
 
 
-class AdaptiveDecision(DecisionModule):
+class AdaptiveDecision(BaseDecision):
     """
     Decision for multi-label classification using adaptive thresholds.
 

@@ -10,11 +10,11 @@ from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import ListOfGenericLabels
 from autointent.metrics import PREDICTION_METRICS_MULTICLASS
-from autointent.modules.abc import Module
+from autointent.modules.abc import BaseModule
 from autointent.schemas import Tag
 
 
-class DecisionModule(Module, ABC):
+class BaseDecision(BaseModule, ABC):
     """Base class for decision modules."""
 
     @abstractmethod

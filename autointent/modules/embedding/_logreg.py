@@ -13,11 +13,11 @@ from autointent import Context, Embedder
 from autointent.context.optimization_info import RetrieverArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import EmbeddingModule
+from autointent.modules.abc import BaseEmbedding
 from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
-class LogregAimedEmbedding(EmbeddingModule):
+class LogregAimedEmbedding(BaseEmbedding):
     r"""
     Module for configuring embeddings optimized for linear classification.
 

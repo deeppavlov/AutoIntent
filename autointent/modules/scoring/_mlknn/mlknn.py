@@ -8,11 +8,11 @@ from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import EmbedderConfig
 
 
-class MLKnnScorer(ScoringModule):
+class MLKnnScorer(BaseScorer):
     """
     Multi-label k-nearest neighbors (ML-KNN) scorer.
 

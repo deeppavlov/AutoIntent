@@ -12,13 +12,13 @@ from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
 
 
-class TunableDecision(DecisionModule):
+class TunableDecision(BaseDecision):
     """
     Tunable predictor module.
 

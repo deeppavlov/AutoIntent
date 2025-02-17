@@ -6,7 +6,7 @@ from typing import ClassVar
 from autointent.custom_types import NodeType
 from autointent.metrics import PREDICTION_METRICS_MULTICLASS, PREDICTION_METRICS_MULTILABEL, DecisionMetricFn
 from autointent.modules import PREDICTION_MODULES_MULTICLASS, PREDICTION_MODULES_MULTILABEL
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 
 from ._base import NodeInfo
 
@@ -18,7 +18,7 @@ class DecisionNodeInfo(NodeInfo):
         PREDICTION_METRICS_MULTICLASS | PREDICTION_METRICS_MULTILABEL
     )
 
-    modules_available: ClassVar[dict[str, type[DecisionModule]]] = (
+    modules_available: ClassVar[dict[str, type[BaseDecision]]] = (
         PREDICTION_MODULES_MULTICLASS | PREDICTION_MODULES_MULTILABEL
     )
 

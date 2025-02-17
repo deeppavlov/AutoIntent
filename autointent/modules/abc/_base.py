@@ -18,7 +18,7 @@ from autointent.exceptions import WrongClassificationError
 logger = logging.getLogger(__name__)
 
 
-class Module(ABC):
+class BaseModule(ABC):
     """Base module."""
 
     supports_oos: bool
@@ -106,7 +106,7 @@ class Module(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "Module":
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "BaseModule":
         """
         Initialize self from context.
 

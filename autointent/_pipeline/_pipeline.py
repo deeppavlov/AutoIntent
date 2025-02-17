@@ -19,7 +19,7 @@ from autointent.utils import load_default_search_space, load_search_space
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
-    from autointent.modules.abc import DecisionModule, ScoringModule
+    from autointent.modules.abc import BaseDecision, BaseScorer
 
 
 class Pipeline:
@@ -218,8 +218,8 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
-        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+        scoring_module: BaseScorer = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: BaseDecision = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
 
         scores = scoring_module.predict(utterances)
         return decision_module.predict(scores)
@@ -235,8 +235,8 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
-        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+        scoring_module: BaseScorer = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: BaseDecision = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
 
         context.data_handler.prepare_for_refit()
 

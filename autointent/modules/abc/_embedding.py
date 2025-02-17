@@ -4,10 +4,10 @@ from abc import ABC
 
 from autointent import Context
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import Module
+from autointent.modules.abc import BaseModule
 
 
-class EmbeddingModule(Module, ABC):
+class BaseEmbedding(BaseModule, ABC):
     """Base class for embedding modules."""
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
