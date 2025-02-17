@@ -38,7 +38,7 @@ async def create_intent_description(
     client: AsyncOpenAI,
     intent_name: str | None,
     utterances: list[str],
-    regexp_patterns: list[str],
+    regex_patterns: list[str],
     prompt: PromptDescription,
     model_name: str,
 ) -> str:
@@ -48,7 +48,7 @@ async def create_intent_description(
     :param client: The OpenAI client instance used to communicate with the model.
     :param intent_name: The name of the intent to describe. If None, an empty string will be used.
     :param utterances: A list of example utterances related to the intent.
-    :param regexp_patterns: A list of regular expression patterns associated with the intent.
+    :param regex_patterns: A list of regular expression patterns associated with the intent.
 
     :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
                                     and {user_utterances} to format the content sent to the model.
@@ -58,12 +58,12 @@ async def create_intent_description(
     """
     intent_name = intent_name if intent_name is not None else ""
     utterances = random.sample(utterances, min(5, len(utterances)))
-    regexp_patterns = random.sample(regexp_patterns, min(3, len(regexp_patterns)))
+    regex_patterns = random.sample(regex_patterns, min(3, len(regex_patterns)))
 
     content = prompt.text.format(
         intent_name=intent_name,
         user_utterances="\n".join(utterances),
-        regexp_patterns="\n".join(regexp_patterns),
+        regex_patterns="\n".join(regex_patterns),
     )
     chat_completion = await client.chat.completions.create(
         messages=[{"role": "user", "content": content}],
@@ -102,13 +102,13 @@ async def generate_intent_descriptions(
         if intent.description is not None:
             continue
         utterances = intent_utterances.get(intent.id, [])
-        regexp_patterns = intent.regexp_full_match + intent.regexp_partial_match
+        regex_patterns = intent.regex_full_match + intent.regex_partial_match
         task = asyncio.create_task(
             create_intent_description(
                 client=client,
                 intent_name=intent.name,
                 utterances=utterances,
-                regexp_patterns=regexp_patterns,
+                regex_patterns=regex_patterns,
                 prompt=prompt,
                 model_name=model_name,
             ),

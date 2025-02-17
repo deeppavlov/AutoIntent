@@ -11,8 +11,8 @@ from pydantic import PositiveInt
 from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.metrics import PREDICTION_METRICS, DecisionMetricFn
-from autointent.modules.abc import DecisionModule
+from autointent.metrics import DECISION_METRICS, DecisionMetricFn
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
@@ -20,7 +20,7 @@ from ._threshold import multiclass_predict, multilabel_predict
 MetricType = Literal["decision_accuracy", "decision_f1", "decision_roc_auc", "decision_precision", "decision_recall"]
 
 
-class TunableDecision(DecisionModule):
+class TunableDecision(BaseDecision):
     """
     Tunable predictor module.
 
@@ -132,7 +132,7 @@ class TunableDecision(DecisionModule):
         self.tags = tags
         self._validate_task(scores, labels)
 
-        metric_fn = PREDICTION_METRICS[self.target_metric]
+        metric_fn = DECISION_METRICS[self.target_metric]
 
         thresh_optimizer = ThreshOptimizer(
             metric_fn, n_classes=self._n_classes, multilabel=self._multilabel, n_trials=self.n_optuna_trials

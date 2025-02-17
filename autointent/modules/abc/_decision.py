@@ -9,12 +9,12 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import ListOfGenericLabels
-from autointent.metrics import PREDICTION_METRICS
-from autointent.modules.abc import Module
+from autointent.metrics import DECISION_METRICS
+from autointent.modules.abc import BaseModule
 from autointent.schemas import Tag
 
 
-class DecisionModule(Module, ABC):
+class BaseDecision(BaseModule, ABC):
     """Base class for decision modules."""
 
     @abstractmethod
@@ -53,7 +53,7 @@ class DecisionModule(Module, ABC):
 
         val_labels, val_scores = get_decision_evaluation_data(context, "validation")
         decisions = self.predict(val_scores)
-        chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS.items() if name in metrics}
+        chosen_metrics = {name: fn for name, fn in DECISION_METRICS.items() if name in metrics}
         self._artifact = DecisionArtifact(labels=decisions)
         return self.score_metrics_ho((val_labels, decisions), chosen_metrics)
 
@@ -72,7 +72,7 @@ class DecisionModule(Module, ABC):
             msg = "No folded scores are found."
             raise RuntimeError(msg)
 
-        chosen_metrics = {name: fn for name, fn in PREDICTION_METRICS.items() if name in metrics}
+        chosen_metrics = {name: fn for name, fn in DECISION_METRICS.items() if name in metrics}
         metrics_values: dict[str, list[float]] = {name: [] for name in chosen_metrics}
         all_val_decisions = []
         for j in range(context.data_handler.n_folds):

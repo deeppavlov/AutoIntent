@@ -5,14 +5,14 @@ from typing import Any
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
-from autointent.context.optimization_info import RetrieverArtifact
+from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
-from autointent.modules.abc import EmbeddingModule
+from autointent.modules.abc import BaseEmbedding
 from autointent.schemas import EmbedderConfig
 
 
-class RetrievalAimedEmbedding(EmbeddingModule):
+class RetrievalAimedEmbedding(BaseEmbedding):
     r"""
     Module for configuring embeddings optimized for retrieval tasks.
 
@@ -124,13 +124,13 @@ class RetrievalAimedEmbedding(EmbeddingModule):
         metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
         return metrics_calculated
 
-    def get_assets(self) -> RetrieverArtifact:
+    def get_assets(self) -> EmbeddingArtifact:
         """
         Get the retriever artifacts for this module.
 
-        :return: A RetrieverArtifact object containing embedder information.
+        :return: A EmbeddingArtifact object containing embedder information.
         """
-        return RetrieverArtifact(config=self.embedder_config)
+        return EmbeddingArtifact(config=self.embedder_config)
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""

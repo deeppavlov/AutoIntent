@@ -9,13 +9,13 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 logger = logging.getLogger(__name__)
 
 
-class ArgmaxDecision(DecisionModule):
+class ArgmaxDecision(BaseDecision):
     """
     Argmax decision module.
 

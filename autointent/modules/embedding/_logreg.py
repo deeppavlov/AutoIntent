@@ -10,14 +10,14 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
-from autointent.context.optimization_info import RetrieverArtifact
+from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import EmbeddingModule
+from autointent.modules.abc import BaseEmbedding
 from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
-class LogregAimedEmbedding(EmbeddingModule):
+class LogregAimedEmbedding(BaseEmbedding):
     r"""
     Module for configuring embeddings optimized for linear classification.
 
@@ -146,13 +146,13 @@ class LogregAimedEmbedding(EmbeddingModule):
         metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
         return metrics_calculated
 
-    def get_assets(self) -> RetrieverArtifact:
+    def get_assets(self) -> EmbeddingArtifact:
         """
         Get the classifier artifacts for this module.
 
-        :return: A RetrieverArtifact object containing embedder information.
+        :return: A EmbeddingArtifact object containing embedder information.
         """
-        return RetrieverArtifact(config=self.embedder_config)
+        return EmbeddingArtifact(config=self.embedder_config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)

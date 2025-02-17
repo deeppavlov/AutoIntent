@@ -122,8 +122,8 @@ class Intent(BaseModel):
     id: int
     name: str | None = None
     tags: list[str] = []
-    regexp_full_match: list[str] = []
-    regexp_partial_match: list[str] = []
+    regex_full_match: list[str] = []
+    regex_partial_match: list[str] = []
     description: str | None = None
 
 

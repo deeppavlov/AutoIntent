@@ -8,13 +8,13 @@ from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import EmbedderConfig
 
 from .weighting import apply_weights
 
 
-class KNNScorer(ScoringModule):
+class KNNScorer(BaseScorer):
     """
     K-nearest neighbors (KNN) scorer for intent classification.
 

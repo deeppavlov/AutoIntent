@@ -5,7 +5,7 @@ from typing import ClassVar
 
 from autointent.custom_types import NodeType
 from autointent.metrics import METRIC_FN
-from autointent.modules.abc import Module
+from autointent.modules.abc import BaseModule
 
 
 class NodeInfo:
@@ -13,7 +13,7 @@ class NodeInfo:
 
     metrics_available: ClassVar[Mapping[str, METRIC_FN]]
     """Available metrics for the node."""
-    modules_available: ClassVar[Mapping[str, type[Module]]]
+    modules_available: ClassVar[Mapping[str, type[BaseModule]]]
     """Available modules for the node."""
     node_type: NodeType
     """Node type."""

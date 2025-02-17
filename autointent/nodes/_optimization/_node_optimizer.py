@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType
-from autointent.nodes._nodes_info import NODES_INFO
+from autointent.nodes.info import NODES_INFO
 
 
 class ParamSpaceInt(BaseModel):

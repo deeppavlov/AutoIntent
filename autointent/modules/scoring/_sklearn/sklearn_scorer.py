@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ AVAILABLE_CLASSIFIERS = {
 }
 
 
-class SklearnScorer(ScoringModule):
+class SklearnScorer(BaseScorer):
     """
     Scoring module for classification using sklearn classifiers with implemented predict_proba() method.
 

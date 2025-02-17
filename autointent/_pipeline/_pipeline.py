@@ -11,7 +11,7 @@ import yaml
 from autointent import Context, Dataset
 from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
 from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
-from autointent.metrics import PREDICTION_METRICS
+from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
 from autointent.utils import load_default_search_space, load_search_space
@@ -19,7 +19,7 @@ from autointent.utils import load_default_search_space, load_search_space
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
-    from autointent.modules.abc import DecisionModule, ScoringModule
+    from autointent.modules.abc import BaseDecision, BaseScorer
 
 
 class Pipeline:
@@ -156,7 +156,7 @@ class Pipeline:
             self._refit(context)
 
         predictions = self.predict(context.data_handler.test_utterances())
-        for metric_name, metric in PREDICTION_METRICS.items():
+        for metric_name, metric in DECISION_METRICS.items():
             context.optimization_info.pipeline_metrics[metric_name] = metric(
                 context.data_handler.test_labels(),
                 predictions,
@@ -219,8 +219,8 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
-        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+        scoring_module: BaseScorer = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: BaseDecision = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
 
         scores = scoring_module.predict(utterances)
         return decision_module.predict(scores)
@@ -236,8 +236,8 @@ class Pipeline:
             msg = "Pipeline in optimization mode cannot perform inference"
             raise RuntimeError(msg)
 
-        scoring_module: ScoringModule = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
-        decision_module: DecisionModule = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
+        scoring_module: BaseScorer = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
+        decision_module: BaseDecision = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
 
         context.data_handler.prepare_for_refit()
 
@@ -259,9 +259,9 @@ class Pipeline:
 
         scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)  # type: ignore[union-attr]
         predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr,arg-type]
-        regexp_predictions, regexp_predictions_metadata = None, None
-        if NodeType.regexp in self.nodes:
-            regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(  # type: ignore[union-attr]
+        regex_predictions, regex_predictions_metadata = None, None
+        if NodeType.regex in self.nodes:
+            regex_predictions, regex_predictions_metadata = self.nodes[NodeType.regex].module.predict_with_metadata(  # type: ignore[union-attr]
                 utterances,
             )
 
@@ -270,9 +270,9 @@ class Pipeline:
             output = InferencePipelineUtteranceOutput(
                 utterance=utterance,
                 prediction=predictions[idx],
-                regexp_prediction=regexp_predictions[idx] if regexp_predictions is not None else None,
-                regexp_prediction_metadata=regexp_predictions_metadata[idx]
-                if regexp_predictions_metadata is not None
+                regex_prediction=regex_predictions[idx] if regex_predictions is not None else None,
+                regex_prediction_metadata=regex_predictions_metadata[idx]
+                if regex_predictions_metadata is not None
                 else None,
                 score=scores[idx],
                 score_metadata=scores_metadata[idx] if scores_metadata is not None else None,
@@ -281,7 +281,7 @@ class Pipeline:
 
         return InferencePipelineOutput(
             predictions=predictions,
-            regexp_predictions=regexp_predictions,
+            regex_predictions=regex_predictions,
             utterances=outputs,
         )
 

@@ -9,7 +9,7 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import DecisionModule
+from autointent.modules.abc import BaseDecision
 from autointent.schemas import Tag
 
 from ._utils import apply_tags
@@ -17,7 +17,7 @@ from ._utils import apply_tags
 logger = logging.getLogger(__name__)
 
 
-class ThresholdDecision(DecisionModule):
+class ThresholdDecision(BaseDecision):
     """
     Threshold predictor module.
 

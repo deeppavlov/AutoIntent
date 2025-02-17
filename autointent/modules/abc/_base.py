@@ -18,7 +18,7 @@ from autointent.exceptions import WrongClassificationError
 logger = logging.getLogger(__name__)
 
 
-class Module(ABC):
+class BaseModule(ABC):
     """Base module."""
 
     supports_oos: bool
@@ -106,7 +106,7 @@ class Module(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "Module":
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "BaseModule":
         """
         Initialize self from context.
 
@@ -202,7 +202,3 @@ class Module(ABC):
         multilabel = isinstance(in_domain_label, list)
         n_classes = len(in_domain_label) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
         return n_classes, multilabel, contains_oos_samples
-
-    @abstractmethod
-    def get_train_data(self, context: Context) -> Any:  # noqa: ANN401
-        ...

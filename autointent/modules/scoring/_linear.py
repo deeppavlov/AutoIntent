@@ -9,11 +9,11 @@ from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.abc import BaseScorer
 from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
-class LinearScorer(ScoringModule):
+class LinearScorer(BaseScorer):
     """
     Scoring module for linear classification using logistic regression.
 

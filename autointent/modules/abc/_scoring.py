@@ -9,10 +9,10 @@ from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import Module
+from autointent.modules.abc import BaseModule
 
 
-class ScoringModule(Module, ABC):
+class BaseScorer(BaseModule, ABC):
     """
     Abstract base class for scoring modules.
 

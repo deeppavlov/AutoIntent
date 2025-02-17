@@ -919,7 +919,7 @@
         "NodeType": {
             "description": "Enumeration of node types in the AutoIntent pipeline.",
             "enum": [
-                "regexp",
+                "regex",
                 "embedding",
                 "scoring",
                 "decision"
@@ -996,6 +996,83 @@
                 "high"
             ],
             "title": "ParamSpaceInt",
+            "type": "object"
+        },
+        "RegexInitModel": {
+            "properties": {
+                "module_name": {
+                    "const": "regex",
+                    "title": "Module Name",
+                    "type": "string"
+                },
+                "n_trials": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of trials",
+                    "title": "N Trials"
+                }
+            },
+            "required": [
+                "module_name"
+            ],
+            "title": "RegexInitModel",
+            "type": "object"
+        },
+        "RegexNodeValidator": {
+            "description": "Search space configuration for the Regexp node.",
+            "properties": {
+                "node_type": {
+                    "$ref": "#/$defs/NodeType",
+                    "default": "regex"
+                },
+                "target_metric": {
+                    "enum": [
+                        "regex_partial_accuracy",
+                        "regex_partial_precision"
+                    ],
+                    "title": "Target Metric",
+                    "type": "string"
+                },
+                "metrics": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "regex_partial_accuracy",
+                                    "regex_partial_precision"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Metrics"
+                },
+                "search_space": {
+                    "items": {
+                        "$ref": "#/$defs/RegexInitModel"
+                    },
+                    "title": "Search Space",
+                    "type": "array"
+                }
+            },
+            "required": [
+                "target_metric",
+                "search_space"
+            ],
+            "title": "RegexNodeValidator",
             "type": "object"
         },
         "RerankScorerInitModel": {
@@ -1492,6 +1569,9 @@
             },
             {
                 "$ref": "#/$defs/DecisionNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/RegexNodeValidator"
             }
         ]
     },

@@ -51,7 +51,7 @@ Type alias for label representation
 class NodeType(str, Enum):
     """Enumeration of node types in the AutoIntent pipeline."""
 
-    regexp = "regexp"
+    regex = "regex"
     embedding = "embedding"
     scoring = "scoring"
     decision = "decision"

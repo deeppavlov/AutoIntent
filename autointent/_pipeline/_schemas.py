@@ -10,8 +10,8 @@ class InferencePipelineUtteranceOutput(BaseModel):
 
     utterance: str
     prediction: LabelWithOOS
-    regexp_prediction: LabelWithOOS
-    regexp_prediction_metadata: Any
+    regex_prediction: LabelWithOOS
+    regex_prediction_metadata: Any
     score: list[float]
     score_metadata: Any
 
@@ -20,5 +20,5 @@ class InferencePipelineOutput(BaseModel):
     """Output of the inference pipeline."""
 
     predictions: ListOfLabelsWithOOS
-    regexp_predictions: ListOfLabels | None = None
+    regex_predictions: ListOfLabels | None = None
     utterances: list[InferencePipelineUtteranceOutput] | None = None

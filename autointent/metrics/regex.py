@@ -1,4 +1,4 @@
-"""Regexp metrics for intent recognition."""
+"""Regex metrics for intent recognition."""
 
 from typing import Protocol
 
@@ -8,25 +8,25 @@ from ._converter import transform
 from .custom_types import LABELS_VALUE_TYPE
 
 
-class RegexpMetricFn(Protocol):
-    """Protocol for regexp metrics."""
+class RegexMetricFn(Protocol):
+    """Protocol for regex metrics."""
 
     def __call__(self, y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
         """
-        Calculate regexp metric.
+        Calculate regex metric.
 
         :param y_true: True values of labels
         :param y_pred: Predicted values of labels
-        :return: Score of the regexp metric
+        :return: Score of the regex metric
         """
         ...
 
 
-def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def regex_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate regexp partial accuracy.
+    Calculate regex partial accuracy.
 
-    The regexp partial accuracy is calculated as:
+    The regex partial accuracy is calculated as:
 
     .. math::
 
@@ -41,7 +41,7 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the regexp metric
+    :return: Score of the regex metric
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
     correct = np.mean([true in pred for true, pred in zip(y_true_, y_pred_, strict=True)])
@@ -51,11 +51,11 @@ def regexp_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
     return float(correct / total)
 
 
-def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
+def regex_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE) -> float:
     r"""
-    Calculate regexp partial precision.
+    Calculate regex partial precision.
 
-    The regexp partial precision is calculated as:
+    The regex partial precision is calculated as:
 
     .. math::
 
@@ -72,7 +72,7 @@ def regexp_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYP
 
     :param y_true: True values of labels
     :param y_pred: Predicted values of labels
-    :return: Score of the regexp metric
+    :return: Score of the regex metric
     """
     y_true_, y_pred_ = transform(y_true, y_pred)
 

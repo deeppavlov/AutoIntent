@@ -20,9 +20,9 @@ class RegexPatterns(TypedDict):
 
     id: int
     """Intent class id."""
-    regexp_full_match: list[str]
+    regex_full_match: list[str]
     """Full match regex patterns."""
-    regexp_partial_match: list[str]
+    regex_partial_match: list[str]
     """Partial match regex patterns."""
 
 
@@ -59,11 +59,11 @@ class DataHandler:  # TODO rename to Validator
         elif scheme == "cv":
             self._split_cv()
 
-        self.regexp_patterns = [
+        self.regex_patterns = [
             RegexPatterns(
                 id=intent.id,
-                regexp_full_match=intent.regexp_full_match,
-                regexp_partial_match=intent.regexp_partial_match,
+                regex_full_match=intent.regex_full_match,
+                regex_partial_match=intent.regex_partial_match,
             )
             for intent in self.dataset.intents
         ]

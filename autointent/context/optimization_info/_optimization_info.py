@@ -15,31 +15,31 @@ from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 from autointent.schemas import EmbedderConfig
 
-from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 
 if TYPE_CHECKING:
-    from autointent.modules.abc import Module
+    from autointent.modules.abc import BaseModule
 
 
 @dataclass
 class ModulesList:
     """Container for managing lists of modules for each node type."""
 
-    regexp: list["Module"] = field(default_factory=list)
-    embedding: list["Module"] = field(default_factory=list)
-    scoring: list["Module"] = field(default_factory=list)
-    decision: list["Module"] = field(default_factory=list)
+    regex: list["BaseModule"] = field(default_factory=list)
+    embedding: list["BaseModule"] = field(default_factory=list)
+    scoring: list["BaseModule"] = field(default_factory=list)
+    decision: list["BaseModule"] = field(default_factory=list)
 
-    def get(self, node_type: str) -> list["Module"]:
+    def get(self, node_type: str) -> list["BaseModule"]:
         """
         Retrieve the list of modules for a specific node type.
 
-        :param node_type: The type of node (e.g., "regexp", "embedding").
+        :param node_type: The type of node (e.g., "regex", "embedding").
         :return: List of modules for the specified node type.
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]
 
-    def add_module(self, node_type: str, module: "Module") -> None:
+    def add_module(self, node_type: str, module: "BaseModule") -> None:
         """
         Add a module to the list for a specific node type.
 
@@ -77,7 +77,7 @@ class OptimizationInfo:
         metric_name: str,
         artifact: Artifact,
         module_dump_dir: str | None,
-        module: "Module | None" = None,
+        module: "BaseModule | None" = None,
     ) -> None:
         """
         Log optimization results for a module.
@@ -126,7 +126,7 @@ class OptimizationInfo:
         self._trials_best_ids.set_best_trial_idx(node_type, best_idx)
         return best_idx
 
-    def _get_best_artifact(self, node_type: str) -> RetrieverArtifact | ScorerArtifact | Artifact:
+    def _get_best_artifact(self, node_type: str) -> EmbeddingArtifact | ScorerArtifact | Artifact:
         """
         Retrieve the best artifact for a specific node type.
 
@@ -146,7 +146,7 @@ class OptimizationInfo:
 
         :return: Name of the best embedder.
         """
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
+        best_retriever_artifact: EmbeddingArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
         return best_retriever_artifact.config
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:
@@ -219,7 +219,7 @@ class OptimizationInfo:
             res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
         return res  # type: ignore[return-value]
 
-    def _get_best_module(self, node_type: str) -> "Module | None":
+    def _get_best_module(self, node_type: str) -> "BaseModule | None":
         """
         Retrieve the best module for a specific node type.
 
@@ -231,7 +231,7 @@ class OptimizationInfo:
             return self.modules.get(node_type)[idx]
         return None
 
-    def get_best_modules(self) -> dict[NodeType, "Module"]:
+    def get_best_modules(self) -> dict[NodeType, "BaseModule"]:
         """
         Retrieve the best modules for all node types.
 

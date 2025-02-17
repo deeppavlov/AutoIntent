@@ -21,7 +21,7 @@ user utterances:
 Please help me with my card. It won't activate.
 I tried but am unable to activate my card.
 I want to start using my card.
-regexp patterns:
+regex patterns:
 (activate.*card)|(start.*using.*card)
 description:
 User wants to activate his card.
@@ -30,7 +30,7 @@ name:
 beneficiary_not_allowed
 user utterances:
 
-regexp patterns:
+regex patterns:
 (not.*allowed.*beneficiary)|(cannot.*add.*beneficiary)
 description:
 User wants to know why his beneficiary is not allowed.
@@ -41,7 +41,7 @@ user utterances:
 как оформить отпуск
 в какие даты надо оформить отпуск
 как запланировать отпуск
-regexp patterns:
+regex patterns:
 
 description:
 Пользователь спрашивает про оформление отпуска.
@@ -50,8 +50,8 @@ name:
 {intent_name}
 user utterances:
 {user_utterances}
-regexp patterns:
-{regexp_patterns}
+regex patterns:
+{regex_patterns}
 description:
 
 """
