@@ -33,3 +33,4 @@
     - module_name: threshold
       thresh: [0.5, [0.5, 0.5, 0.5, 0.5]]
     - module_name: adaptive
+    - module_name: tunable

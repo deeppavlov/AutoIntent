@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import ClassVar
 
 from autointent.custom_types import NodeType
-from autointent.metrics import DECISION_METRICS_MULTICLASS, DECISION_METRICS_MULTILABEL, DecisionMetricFn
+from autointent.metrics import DECISION_METRICS, DecisionMetricFn
 from autointent.modules import DECISION_MODULES_MULTICLASS, DECISION_MODULES_MULTILABEL
 from autointent.modules.abc import BaseDecision
 
@@ -14,9 +14,7 @@ from ._base import NodeInfo
 class DecisionNodeInfo(NodeInfo):
     """Prediction node info."""
 
-    metrics_available: ClassVar[Mapping[str, DecisionMetricFn]] = (
-        DECISION_METRICS_MULTICLASS | DECISION_METRICS_MULTILABEL
-    )
+    metrics_available: ClassVar[Mapping[str, DecisionMetricFn]] = DECISION_METRICS
 
     modules_available: ClassVar[dict[str, type[BaseDecision]]] = (
         DECISION_MODULES_MULTICLASS | DECISION_MODULES_MULTILABEL
