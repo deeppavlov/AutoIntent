@@ -9,8 +9,8 @@ import numpy as np
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType, ValidationScheme
+from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
 from autointent.metrics import PREDICTION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -43,11 +43,12 @@ class Pipeline:
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
             self.vector_index_config = VectorIndexConfig()
+            self.data_config = DataConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -57,6 +58,8 @@ class Pipeline:
             self.logging_config = config
         elif isinstance(config, VectorIndexConfig):
             self.vector_index_config = config
+        elif isinstance(config, DataConfig):
+            self.data_config = config
         else:
             msg = "unknown config type"
             raise TypeError(msg)
@@ -119,8 +122,6 @@ class Pipeline:
     def fit(
         self,
         dataset: Dataset,
-        scheme: ValidationScheme = "ho",
-        n_folds: int = 3,
         refit_after: bool = False,
         sampler: SamplerType = "brute",
     ) -> Context:
@@ -135,7 +136,7 @@ class Pipeline:
             raise RuntimeError(msg)
 
         context = Context()
-        context.set_dataset(dataset, scheme, n_folds)
+        context.set_dataset(dataset, self.data_config)
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config)
 

@@ -12,12 +12,12 @@ from ._name import get_run_name
 class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
 
-    train_path: str | Path
-    """Path to the training data. Can be local path or HF repo."""
-    scheme: ValidationScheme
+    scheme: ValidationScheme = "ho"
     """Hold-out or cross-validation."""
     n_folds: PositiveInt = 3
     """Number of folds in cross-validation."""
+    separate_nodes: bool = True
+    """Whether to use separate data for decision node."""
 
 
 class TaskConfig(BaseModel):

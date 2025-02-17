@@ -14,9 +14,8 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
 )
-from autointent.custom_types import ValidationScheme
 
-from ._utils import NumpyEncoder, load_dataset
+from ._utils import NumpyEncoder
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 
@@ -60,28 +59,13 @@ class Context:
         """
         self.vector_index_config = config
 
-    def configure_data(self, config: DataConfig) -> None:
-        """
-        Configure data handling.
-
-        :param config: Configuration for the data handling process.
-        """
-        self.data_handler = DataHandler(
-            dataset=load_dataset(config.train_path), random_seed=self.seed, scheme=config.scheme
-        )
-
-    def set_dataset(self, dataset: Dataset, scheme: ValidationScheme = "ho", n_folds: int = 3) -> None:
+    def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
         """
         Set the datasets for training, validation and testing.
 
         :param dataset: Dataset.
         """
-        self.data_handler = DataHandler(
-            dataset=dataset,
-            random_seed=self.seed,
-            scheme=scheme,
-            n_folds=n_folds,
-        )
+        self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, **config.model_dump())
 
     def get_inference_config(self) -> dict[str, Any]:
         """
