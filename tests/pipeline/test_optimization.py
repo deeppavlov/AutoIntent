@@ -3,11 +3,21 @@ import os
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import (
-    LoggingConfig,
-    VectorIndexConfig,
-)
+from autointent.configs import DataConfig, LoggingConfig, VectorIndexConfig
 from tests.conftest import get_search_space, setup_environment
+
+
+def test_no_node_separation(dataset):
+    project_dir = setup_environment()
+    search_space = get_search_space("light")
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(VectorIndexConfig())
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=False))
+
+    pipeline_optimizer.fit(dataset, refit_after=False)
 
 
 @pytest.mark.parametrize(
@@ -22,8 +32,9 @@ def test_bayes(dataset, sampler):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
 
-    pipeline_optimizer.fit(dataset, scheme="ho", refit_after=False, sampler=sampler)
+    pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
 
 
 @pytest.mark.parametrize(
@@ -38,11 +49,12 @@ def test_cv(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(VectorIndexConfig())
+    pipeline_optimizer.set_config(DataConfig(scheme="cv", separate_nodes=True))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
 
-    context = pipeline_optimizer.fit(dataset, scheme="cv", refit_after=True)
+    context = pipeline_optimizer.fit(dataset, refit_after=True)
     context.dump()
 
     assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
@@ -60,6 +72,7 @@ def test_no_context_optimization(dataset, task_type):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
     pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()

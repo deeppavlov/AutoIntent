@@ -1,0 +1,15 @@
+- node_type: embedding
+  target_metric: retrieval_hit_rate
+  search_space:
+    - module_name: retrieval
+      k: [10]
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+- node_type: scoring
+  target_metric: scoring_roc_auc
+  search_space:
+    - module_name: linear
+- node_type: decision
+  target_metric: decision_accuracy
+  search_space:
+    - module_name: argmax
