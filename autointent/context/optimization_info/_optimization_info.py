@@ -15,7 +15,7 @@ from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 from autointent.schemas import EmbedderConfig
 
-from ._data_models import Artifact, Artifacts, RetrieverArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 
 if TYPE_CHECKING:
     from autointent.modules.abc import BaseModule
@@ -126,7 +126,7 @@ class OptimizationInfo:
         self._trials_best_ids.set_best_trial_idx(node_type, best_idx)
         return best_idx
 
-    def _get_best_artifact(self, node_type: str) -> RetrieverArtifact | ScorerArtifact | Artifact:
+    def _get_best_artifact(self, node_type: str) -> EmbeddingArtifact | ScorerArtifact | Artifact:
         """
         Retrieve the best artifact for a specific node type.
 
@@ -146,7 +146,7 @@ class OptimizationInfo:
 
         :return: Name of the best embedder.
         """
-        best_retriever_artifact: RetrieverArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
+        best_retriever_artifact: EmbeddingArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
         return best_retriever_artifact.config
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:

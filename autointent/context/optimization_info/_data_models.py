@@ -22,7 +22,7 @@ class RegexArtifact(Artifact):
     """Artifact containing results from the regex node."""
 
 
-class RetrieverArtifact(Artifact):
+class EmbeddingArtifact(Artifact):
     """
     Artifact containing details from the embedding node.
 
@@ -84,7 +84,7 @@ class Artifacts(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     regex: list[RegexArtifact] = []
-    embedding: list[RetrieverArtifact] = []
+    embedding: list[EmbeddingArtifact] = []
     scoring: list[ScorerArtifact] = []
     decision: list[DecisionArtifact] = []
 
