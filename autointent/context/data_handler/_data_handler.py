@@ -33,7 +33,7 @@ class DataHandler:  # TODO rename to Validator
         self,
         dataset: Dataset,
         scheme: ValidationScheme = "ho",
-        split_train: bool = True,
+        separate_nodes: bool = True,
         random_seed: int = 0,
         n_folds: int = 3,
     ) -> None:
@@ -42,7 +42,7 @@ class DataHandler:  # TODO rename to Validator
 
         :param dataset: Training dataset.
         :param random_seed: Seed for random number generation.
-        :param split_train: Perform or not splitting of train (default to split to be used in scoring and
+        :param separate_nodes: Perform or not splitting of train (default to split to be used in scoring and
                             threshold search).
         """
         set_seed(random_seed)
@@ -55,7 +55,7 @@ class DataHandler:  # TODO rename to Validator
         self.n_folds = n_folds
 
         if scheme == "ho":
-            self._split_ho(split_train)
+            self._split_ho(separate_nodes)
         elif scheme == "cv":
             self._split_cv()
 
@@ -82,6 +82,15 @@ class DataHandler:  # TODO rename to Validator
         """
         return self.dataset.multilabel
 
+    def _choose_split(self, split_name: str, idx: int | None = None) -> str:
+        if idx is not None:
+            split = f"{split_name}_{idx}"
+            if split not in self.dataset:
+                split = split_name
+        else:
+            split = split_name
+        return split
+
     def train_utterances(self, idx: int | None = None) -> list[str]:
         """
         Retrieve training utterances from the dataset.
@@ -93,7 +102,7 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific training split.
         :return: List of training utterances.
         """
-        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        split = self._choose_split(Split.TRAIN, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
     def train_labels(self, idx: int | None = None) -> ListOfGenericLabels:
@@ -107,7 +116,7 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific training split.
         :return: List of training labels.
         """
-        split = f"{Split.TRAIN}_{idx}" if idx is not None else Split.TRAIN
+        split = self._choose_split(Split.TRAIN, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def train_labels_folded(self) -> list[ListOfGenericLabels]:
@@ -124,7 +133,7 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific validation split.
         :return: List of validation utterances.
         """
-        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        split = self._choose_split(Split.VALIDATION, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
     def validation_labels(self, idx: int | None = None) -> ListOfGenericLabels:
@@ -138,10 +147,10 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific validation split.
         :return: List of validation labels.
         """
-        split = f"{Split.VALIDATION}_{idx}" if idx is not None else Split.VALIDATION
+        split = self._choose_split(Split.VALIDATION, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def test_utterances(self, idx: int | None = None) -> list[str]:
+    def test_utterances(self) -> list[str]:
         """
         Retrieve test utterances from the dataset.
 
@@ -152,10 +161,9 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific test split.
         :return: List of test utterances.
         """
-        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
-        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
+        return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
 
-    def test_labels(self, idx: int | None = None) -> ListOfGenericLabels:
+    def test_labels(self) -> ListOfGenericLabels:
         """
         Retrieve test labels from the dataset.
 
@@ -166,8 +174,7 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific test split.
         :return: List of test labels.
         """
-        split = f"{Split.TEST}_{idx}" if idx is not None else Split.TEST
-        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
+        return cast(ListOfGenericLabels, self.dataset[Split.TEST][self.dataset.label_feature])
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         if self.scheme == "ho":
@@ -186,27 +193,20 @@ class DataHandler:  # TODO rename to Validator
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
-    def _split_ho(self, split_train: bool) -> None:
+    def _split_ho(self, separate_nodes: bool) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
-        if split_train and Split.TRAIN in self.dataset:
+        if separate_nodes and Split.TRAIN in self.dataset:
             self._split_train()
-
-        if Split.TEST not in self.dataset:
-            test_size = 0.1 if has_validation_split else 0.2
-            self._split_test(test_size)
 
         if not has_validation_split:
             self._split_validation_from_train()
-        elif Split.VALIDATION in self.dataset:
-            self._split_validation()
 
         for split in self.dataset:
-            n_classes_split = self.dataset.get_n_classes(split)
-            if n_classes_split != self.n_classes:
+            n_classes_in_split = self.dataset.get_n_classes(split)
+            if n_classes_in_split != self.n_classes:
                 message = (
-                    f"Number of classes in split '{split}' doesn't match initial number of classes "
-                    f"({n_classes_split} != {self.n_classes})"
+                    f"{n_classes_in_split=} for '{split=}' doesn't match initial number of classes ({self.n_classes})"
                 )
                 raise ValueError(message)
 
@@ -224,30 +224,6 @@ class DataHandler:  # TODO rename to Validator
             allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
-
-    def _split_validation(self) -> None:
-        """
-        Split on two sets.
-
-        One is for scoring node optimizaton, one is for decision node.
-        """
-        self.dataset[f"{Split.VALIDATION}_0"], self.dataset[f"{Split.VALIDATION}_1"] = split_dataset(
-            self.dataset,
-            split=Split.VALIDATION,
-            test_size=0.5,
-            random_seed=self.random_seed,
-            allow_oos_in_train=False,  # only val data for decision node should contain OOS
-        )
-        self.dataset.pop(Split.VALIDATION)
-
-    def _split_validation_from_test(self) -> None:
-        self.dataset[Split.TEST], self.dataset[Split.VALIDATION] = split_dataset(
-            self.dataset,
-            split=Split.TEST,
-            test_size=0.5,
-            random_seed=self.random_seed,
-            allow_oos_in_train=True,  # both test and validation splits can contain OOS
-        )
 
     def _split_cv(self) -> None:
         extra_splits = [split_name for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]]
@@ -289,27 +265,6 @@ class DataHandler:  # TODO rename to Validator
                     random_seed=self.random_seed,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
-
-    def _split_test(self, test_size: float) -> None:
-        """Obtain test set from train."""
-        self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TEST}_0"] = split_dataset(
-            self.dataset,
-            split=f"{Split.TRAIN}_0",
-            test_size=test_size,
-            random_seed=self.random_seed,
-        )
-        self.dataset[f"{Split.TRAIN}_1"], self.dataset[f"{Split.TEST}_1"] = split_dataset(
-            self.dataset,
-            split=f"{Split.TRAIN}_1",
-            test_size=test_size,
-            random_seed=self.random_seed,
-            allow_oos_in_train=True,
-        )
-        self.dataset[Split.TEST] = concatenate_datasets(
-            [self.dataset[f"{Split.TEST}_0"], self.dataset[f"{Split.TEST}_1"]],
-        )
-        self.dataset.pop(f"{Split.TEST}_0")
-        self.dataset.pop(f"{Split.TEST}_1")
 
     def prepare_for_refit(self) -> None:
         if self.scheme == "ho":
