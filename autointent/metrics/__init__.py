@@ -1,4 +1,4 @@
-"""All the metrics for regexp, retrieval, scoring and decision nodes."""
+"""All the metrics for regex, retrieval, scoring and decision nodes."""
 
 from autointent._utils import _funcs_to_dict
 
@@ -10,7 +10,7 @@ from .decision import (
     decision_recall,
     decision_roc_auc,
 )
-from .regexp import RegexpMetricFn, regexp_partial_accuracy, regexp_partial_precision
+from .regex import RegexMetricFn, regex_partial_accuracy, regex_partial_precision
 from .retrieval import (
     RetrievalMetricFn,
     retrieval_hit_rate,
@@ -90,14 +90,14 @@ PREDICTION_METRICS_MULTICLASS: dict[str, DecisionMetricFn] = _funcs_to_dict(
 
 PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
 
-REGEXP_METRICS = _funcs_to_dict(regexp_partial_accuracy, regexp_partial_precision)
+REGEXP_METRICS = _funcs_to_dict(regex_partial_accuracy, regex_partial_precision)
 
-METRIC_FN = DecisionMetricFn | RegexpMetricFn | RetrievalMetricFn | ScoringMetricFn
+METRIC_FN = DecisionMetricFn | RegexMetricFn | RetrievalMetricFn | ScoringMetricFn
 
 __all__ = [
     "METRIC_FN",
     "DecisionMetricFn",
-    "RegexpMetricFn",
+    "RegexMetricFn",
     "RetrievalMetricFn",
     "ScoringMetricFn",
     "decision_accuracy",
@@ -105,8 +105,8 @@ __all__ = [
     "decision_precision",
     "decision_recall",
     "decision_roc_auc",
-    "regexp_partial_accuracy",
-    "regexp_partial_precision",
+    "regex_partial_accuracy",
+    "regex_partial_precision",
     "retrieval_hit_rate",
     "retrieval_hit_rate_intersecting",
     "retrieval_hit_rate_macro",

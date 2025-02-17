@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 class ModulesList:
     """Container for managing lists of modules for each node type."""
 
-    regexp: list["Module"] = field(default_factory=list)
+    regex: list["Module"] = field(default_factory=list)
     embedding: list["Module"] = field(default_factory=list)
     scoring: list["Module"] = field(default_factory=list)
     decision: list["Module"] = field(default_factory=list)
@@ -34,7 +34,7 @@ class ModulesList:
         """
         Retrieve the list of modules for a specific node type.
 
-        :param node_type: The type of node (e.g., "regexp", "embedding").
+        :param node_type: The type of node (e.g., "regex", "embedding").
         :return: List of modules for the specified node type.
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]

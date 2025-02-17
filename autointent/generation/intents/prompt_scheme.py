@@ -14,7 +14,7 @@ class PromptDescription(BaseModel):
     Should include placeholders for {intent_name} and {user_utterances}.
     - `{intent_name}` will be replaced with the name of the intent.
     - `{user_utterances}` will be replaced with the user utterances related to the intent.
-    - (optionally) `{regexp_patterns}` will be replaced with the regular expressions that match user utterances.
+    - (optionally) `{regex_patterns}` will be replaced with the regular expressions that match user utterances.
     """
 
     @classmethod

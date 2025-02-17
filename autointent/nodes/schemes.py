@@ -8,8 +8,8 @@ from pydantic import BaseModel, Field, PositiveInt, RootModel
 
 from autointent.custom_types import NodeType
 from autointent.modules.abc import Module
-from autointent.nodes import DecisionNodeInfo, EmbeddingNodeInfo, ScoringNodeInfo
 from autointent.nodes._optimization._node_optimizer import ParamSpaceFloat, ParamSpaceInt
+from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
 
 def unwrap_annotated(tp: type) -> type:
@@ -142,7 +142,22 @@ class ScoringNodeValidator(BaseModel):
     search_space: list[ScoringSearchSpaceType]
 
 
-SearchSpaceTypes: TypeAlias = EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator
+RegexpSearchSpaceType: TypeAlias = generate_models_and_union_type_for_classes(  # type: ignore[valid-type]
+    list(RegexNodeInfo.modules_available.values())
+)
+RegexpMetrics: TypeAlias = Literal[tuple(RegexNodeInfo.metrics_available.keys())]  # type: ignore[valid-type]
+
+
+class RegexNodeValidator(BaseModel):
+    """Search space configuration for the Regexp node."""
+
+    node_type: NodeType = NodeType.regex
+    target_metric: RegexpMetrics
+    metrics: list[RegexpMetrics] | None = None
+    search_space: list[RegexpSearchSpaceType]
+
+
+SearchSpaceTypes: TypeAlias = EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator | RegexNodeValidator
 
 
 class OptimizationConfig(RootModel[list[SearchSpaceTypes]]):

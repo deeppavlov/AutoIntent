@@ -93,8 +93,8 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
             "id": 0,
             "name": "greeting",
             "tags": ["conversation_start"],
-            "regexp_partial_match": ["\bhello\b"],
-            "regexp_full_match": ["^hello$"],
+            "regex_partial_match": ["\bhello\b"],
+            "regex_full_match": ["^hello$"],
             "description": "User wants to initiate a conversation with a greeting."
         },
         "...",
@@ -104,7 +104,7 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
 
 - `name`: A human-readable representation of the intent.
 - `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(class,schemas,Tag).
-- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(class,modules.regexp,RegExp) module to predict intents based on provided patterns.
+- `regex_partial_match` and `regex_full_match`: Used by the %mddoclink(class,modules.regex,RegExp) module to predict intents based on provided patterns.
 - `description`: Used by the %mddoclink(class,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
 
 All fields in the `intents` list are optional except for `id`.

@@ -2,7 +2,7 @@
 
 from typing import TypeVar
 
-from .abc import DecisionModule, EmbeddingModule, Module, ScoringModule
+from .abc import DecisionModule, EmbeddingModule, Module, RegexModule, ScoringModule
 from .decision import (
     AdaptiveDecision,
     ArgmaxDecision,
@@ -11,6 +11,7 @@ from .decision import (
     TunableDecision,
 )
 from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
+from .regex import Regex
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, SklearnScorer
 
 T = TypeVar("T", bound=Module)
@@ -19,6 +20,8 @@ T = TypeVar("T", bound=Module)
 def _create_modules_dict(modules: list[type[T]]) -> dict[str, type[T]]:
     return {module.name: module for module in modules}
 
+
+REGEX_MODULES: dict[str, type[RegexModule]] = _create_modules_dict([Regex])
 
 RETRIEVAL_MODULES_MULTICLASS: dict[str, type[EmbeddingModule]] = _create_modules_dict(
     [RetrievalAimedEmbedding, LogregAimedEmbedding]

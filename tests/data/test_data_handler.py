@@ -29,13 +29,13 @@ def sample_multiclass_data():
         "intents": [
             {
                 "id": 0,
-                "regexp_full_match": [r"^(hello|hi)$"],
-                "regexp_partial_match": [r"(hello|hi)"],
+                "regex_full_match": [r"^(hello|hi)$"],
+                "regex_partial_match": [r"(hello|hi)"],
             },
             {
                 "id": 1,
-                "regexp_full_match": [r"^(goodbye|bye)$"],
-                "regexp_partial_match": [r"(goodbye|bye)"],
+                "regex_full_match": [r"^(goodbye|bye)$"],
+                "regex_partial_match": [r"(goodbye|bye)"],
             },
         ],
     }

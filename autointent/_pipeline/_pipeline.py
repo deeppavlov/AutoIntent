@@ -258,9 +258,9 @@ class Pipeline:
 
         scores, scores_metadata = self.nodes[NodeType.scoring].module.predict_with_metadata(utterances)  # type: ignore[union-attr]
         predictions = self.nodes[NodeType.decision].module.predict(scores)  # type: ignore[union-attr,arg-type]
-        regexp_predictions, regexp_predictions_metadata = None, None
-        if NodeType.regexp in self.nodes:
-            regexp_predictions, regexp_predictions_metadata = self.nodes[NodeType.regexp].module.predict_with_metadata(  # type: ignore[union-attr]
+        regex_predictions, regex_predictions_metadata = None, None
+        if NodeType.regex in self.nodes:
+            regex_predictions, regex_predictions_metadata = self.nodes[NodeType.regex].module.predict_with_metadata(  # type: ignore[union-attr]
                 utterances,
             )
 
@@ -269,9 +269,9 @@ class Pipeline:
             output = InferencePipelineUtteranceOutput(
                 utterance=utterance,
                 prediction=predictions[idx],
-                regexp_prediction=regexp_predictions[idx] if regexp_predictions is not None else None,
-                regexp_prediction_metadata=regexp_predictions_metadata[idx]
-                if regexp_predictions_metadata is not None
+                regex_prediction=regex_predictions[idx] if regex_predictions is not None else None,
+                regex_prediction_metadata=regex_predictions_metadata[idx]
+                if regex_predictions_metadata is not None
                 else None,
                 score=scores[idx],
                 score_metadata=scores_metadata[idx] if scores_metadata is not None else None,
@@ -280,7 +280,7 @@ class Pipeline:
 
         return InferencePipelineOutput(
             predictions=predictions,
-            regexp_predictions=regexp_predictions,
+            regex_predictions=regex_predictions,
             utterances=outputs,
         )
 
