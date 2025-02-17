@@ -202,7 +202,3 @@ class Module(ABC):
         multilabel = isinstance(in_domain_label, list)
         n_classes = len(in_domain_label) if multilabel else len(set(labels).difference([None]))  # type: ignore[arg-type]
         return n_classes, multilabel, contains_oos_samples
-
-    @abstractmethod
-    def get_train_data(self, context: Context) -> Any:  # noqa: ANN401
-        ...

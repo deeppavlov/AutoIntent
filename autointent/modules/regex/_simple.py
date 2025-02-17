@@ -1,13 +1,13 @@
 """Module for regular expressions based intent detection."""
 
 import re
-from typing import Any, Literal, TypedDict
+from typing import Any, TypedDict
 
 from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
-from autointent.metrics import REGEXP_METRICS
+from autointent.metrics import REGEX_METRICS
 from autointent.modules.abc import RegexModule
 from autointent.schemas import Intent
 
@@ -33,23 +33,19 @@ class Regex(RegexModule):
         """Initialize from context."""
         return cls()
 
-    def get_train_data(self, context: Context) -> list[Intent]:
-        return context.data_handler.dataset.intents
-
-    def fit(self, intents: list[dict[str, Any]]) -> None:
+    def fit(self, intents: list[Intent]) -> None:
         """
         Fit the model.
 
         :param intents: Intents to fit
         """
-        intents_parsed = [Intent(**dct) for dct in intents]
         self.regex_patterns = [
             RegexPatterns(
                 id=intent.id,
                 regex_full_match=intent.regex_full_match,
                 regex_partial_match=intent.regex_partial_match,
             )
-            for intent in intents_parsed
+            for intent in intents
         ]
         self._compile_regex_patterns()
 
@@ -109,24 +105,32 @@ class Regex(RegexModule):
             matches["partial_matches"].extend(intent_matches["partial_matches"])
         return list(prediction), matches
 
-    def score(self, context: Context, split: Literal["validation", "test"], metrics: list[str]) -> dict[str, float]:
-        """
-        Calculate metric on test set and return metric value.
+    def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        self.fit(context.data_handler.dataset.intents)
 
-        :param context: Context to score
-        :param split: Split to score on
+        val_utterances = context.data_handler.validation_utterances(0)
+        val_labels = context.data_handler.validation_labels(0)
+
+        pred_labels = self.predict(val_utterances)
+
+        chosen_metrics = {name: fn for name, fn in REGEX_METRICS.items() if name in metrics}
+        return self.score_metrics_ho((val_labels, pred_labels), chosen_metrics)
+
+    def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """
+        Evaluate the scorer on a test set and compute the specified metric.
+
+        :param context: Context containing test set and other data.
+        :param split: Target split
         :return: Computed metrics value for the test set or error code of metrics
         """
-        # TODO add parameter to a whole pipeline (or just to regex module):
-        # whether or not to omit utterances on next stages if they were detected with regex module
-        assets = {
-            "test_matches": list(self.predict(context.data_handler.test_utterances())),
-        }
-        if assets["test_matches"] is None:
-            msg = "no matches found"
-            raise ValueError(msg)
-        chosen_metrics = {name: fn for name, fn in REGEXP_METRICS.items() if name in metrics}
-        return self.score_metrics((context.data_handler.test_labels(), assets["test_matches"]), chosen_metrics)
+        chosen_metrics = {name: fn for name, fn in REGEX_METRICS.items() if name in metrics}
+
+        metrics_calculated, _ = self.score_metrics_cv(
+            chosen_metrics, context.data_handler.validation_iterator()
+        )
+
+        return metrics_calculated
 
     def clear_cache(self) -> None:
         """Clear cache."""

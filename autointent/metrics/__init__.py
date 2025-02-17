@@ -90,7 +90,7 @@ PREDICTION_METRICS_MULTICLASS: dict[str, DecisionMetricFn] = _funcs_to_dict(
 
 PREDICTION_METRICS_MULTILABEL = PREDICTION_METRICS_MULTICLASS
 
-REGEXP_METRICS = _funcs_to_dict(regex_partial_accuracy, regex_partial_precision)
+REGEX_METRICS = _funcs_to_dict(regex_partial_accuracy, regex_partial_precision)
 
 METRIC_FN = DecisionMetricFn | RegexMetricFn | RetrievalMetricFn | ScoringMetricFn
 
