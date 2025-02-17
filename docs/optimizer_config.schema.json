@@ -82,7 +82,7 @@
             "properties": {
                 "batch_size": {
                     "default": 32,
-                    "description": "Batch size for model inference.",
+                    "description": "Batch size for model inference. test",
                     "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
@@ -350,7 +350,7 @@
             "properties": {
                 "batch_size": {
                     "default": 32,
-                    "description": "Batch size for model inference.",
+                    "description": "Batch size for model inference. test",
                     "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
