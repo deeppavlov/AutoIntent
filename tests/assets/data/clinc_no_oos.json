@@ -1,0 +1,202 @@
+{
+    "train": [
+        {
+            "utterance": "do they take reservations at mcdonalds",
+            "label": 0
+        },
+        {
+            "utterance": "i would like an update on the progress of my credit card application",
+            "label": 3
+        },
+        {
+            "utterance": "can you tell me why is my bank account frozen",
+            "label": 1
+        },
+        {
+            "utterance": "why in the world am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "who froze my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "has my amex application gone through yet",
+            "label": 3
+        },
+        {
+            "utterance": "does michael's accept reservations",
+            "label": 0
+        },
+        {
+            "utterance": "why cannot i take any money out from my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "does cowgirl creamery in san francisco take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "why am i locked out of my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "find out if la tour d'argent in paris takes reservations",
+            "label": 0
+        },
+        {
+            "utterance": "please set two alarms, one at 12 pm and the next at 1 pm",
+            "label": 2
+        },
+        {
+            "utterance": "will i be notified when my application has been processed",
+            "label": 3
+        },
+        {
+            "utterance": "wake me up at noon tomorrow",
+            "label": 2
+        },
+        {
+            "utterance": "was my application approved or not for a credit card at chase bank",
+            "label": 3
+        },
+        {
+            "utterance": "set my alarm for getting up",
+            "label": 2
+        },
+        {
+            "utterance": "has there been any notice that my card app has been looked at",
+            "label": 3
+        },
+        {
+            "utterance": "i need you to schedule an alarm",
+            "label": 2
+        },
+        {
+            "utterance": "why am i seeing a hold on my boa account",
+            "label": 1
+        },
+        {
+            "utterance": "set up an alarm",
+            "label": 2
+        },
+        {
+            "utterance": "did my american express card application go through yet",
+            "label": 3
+        },
+        {
+            "utterance": "please create an alarm for 12 noon",
+            "label": 2
+        },
+        {
+            "utterance": "does moes in la except rerservations",
+            "label": 0
+        },
+        {
+            "utterance": "do you know whether ihop does reservations",
+            "label": 0
+        }
+    ],
+    "validation": [
+        {
+            "utterance": "how come a hold was placed on my 401k account",
+            "label": 1
+        },
+        {
+            "utterance": "what is the status of my new credit card application",
+            "label": 3
+        },
+        {
+            "utterance": "do they take reservations at carrabbas",
+            "label": 0
+        },
+        {
+            "utterance": "make an alarm for tomorrow at twilight",
+            "label": 2
+        },
+        {
+            "utterance": "where can i find out the status of my credit card application",
+            "label": 3
+        },
+        {
+            "utterance": "is it possible to make reservations with famous dave's restaurant",
+            "label": 0
+        },
+        {
+            "utterance": "what's with the block on my bank account",
+            "label": 1
+        },
+        {
+            "utterance": "set alarm for 5 am",
+            "label": 2
+        }
+    ],
+    "test": [
+        {
+            "utterance": "does pho king in ceres take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "make an alarm 6am",
+            "label": 2
+        },
+        {
+            "utterance": "i need you to set an alarm for 8am tomorrow",
+            "label": 2
+        },
+        {
+            "utterance": "does the steakhouse on main st take reservations",
+            "label": 0
+        },
+        {
+            "utterance": "has there been any changes in the status of my credit card application",
+            "label": 3
+        },
+        {
+            "utterance": "look to see if my application for the barclay's card has gone through yet",
+            "label": 3
+        },
+        {
+            "utterance": "can i talk to someone about why there is a hold on my checking account",
+            "label": 1
+        },
+        {
+            "utterance": "help me please, my account is blocked",
+            "label": 1
+        }
+    ],
+    "intents": [
+        {
+            "id": 0,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": null
+        },
+        {
+            "id": 1,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": null
+        },
+        {
+            "id": 2,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": null
+        },
+        {
+            "id": 3,
+            "name": null,
+            "tags": [],
+            "regexp_full_match": [],
+            "regexp_partial_match": [],
+            "description": null
+        }
+    ]
+}

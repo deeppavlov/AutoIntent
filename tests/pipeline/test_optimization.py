@@ -7,7 +7,7 @@ from autointent.configs import DataConfig, LoggingConfig, VectorIndexConfig
 from tests.conftest import get_search_space, setup_environment
 
 
-def test_no_node_separation(dataset):
+def test_no_node_separation(dataset_no_oos):
     project_dir = setup_environment()
     search_space = get_search_space("light")
 
@@ -17,7 +17,7 @@ def test_no_node_separation(dataset):
     pipeline_optimizer.set_config(VectorIndexConfig())
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=False))
 
-    pipeline_optimizer.fit(dataset, refit_after=False)
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
 
 @pytest.mark.parametrize(
