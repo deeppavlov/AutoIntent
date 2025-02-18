@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from .schemas import Message
 
+load_dotenv()
+
 
 class Generator:
     """Wrapper class for accessing OpenAI API."""
@@ -30,10 +32,8 @@ class Generator:
             Omit this to use AutoIntent's default parameters.
         """
         if not base_url:
-            load_dotenv()
             base_url = os.environ["OPENAI_BASE_URL"]
         if not model_name:
-            load_dotenv()
             model_name = os.environ["OPENAI_MODEL_NAME"]
         self.model_name = model_name
         self.client = openai.OpenAI(base_url=base_url)
