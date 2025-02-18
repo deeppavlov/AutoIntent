@@ -65,7 +65,7 @@ class Context:
 
         :param dataset: Dataset.
         """
-        self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, **config.model_dump())
+        self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
     def get_inference_config(self) -> dict[str, Any]:
         """

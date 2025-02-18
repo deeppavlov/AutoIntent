@@ -1,6 +1,7 @@
 import pytest
 
 from autointent import Dataset
+from autointent.configs import DataConfig
 from autointent.context.data_handler import DataHandler
 from autointent.schemas import Sample
 
@@ -180,7 +181,7 @@ def count_oos(split):
 
 
 def test_cv_folding(dataset):
-    DataHandler(dataset, scheme="cv", n_folds=3)
+    DataHandler(dataset, config=DataConfig(scheme="cv", n_folds=3))
 
     desired_specs = {
         "test": {"total": 12, "oos": 4},
@@ -199,7 +200,7 @@ def count_oos_labels(split):
 
 
 def test_cv_iterator(dataset):
-    dh = DataHandler(dataset, scheme="cv", n_folds=3)
+    dh = DataHandler(dataset, config=DataConfig(scheme="cv", n_folds=3))
 
     desired_specs = [
         {
