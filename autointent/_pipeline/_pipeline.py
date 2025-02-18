@@ -144,7 +144,9 @@ class Pipeline:
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
-            self._logger.warning("Test data is not provided")
+            self._logger.warning(
+                "Test data is not provided. Final test metrics won't be calculated after pipeline optimization."
+            )
 
         self._fit(context, sampler)
 
