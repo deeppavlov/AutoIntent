@@ -34,7 +34,8 @@ class Generator:
             base_url = os.environ["OPENAI_BASE_URL"]
         if not model_name:
             load_dotenv()
-            self.model_name = os.environ["OPENAI_MODEL_NAME"]
+            model_name = os.environ["OPENAI_MODEL_NAME"]
+        self.model_name = model_name
         self.client = openai.OpenAI(base_url=base_url)
         self.async_client = openai.AsyncOpenAI(base_url=base_url)
         self.generation_params = {
