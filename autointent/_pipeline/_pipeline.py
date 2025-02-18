@@ -141,6 +141,11 @@ class Pipeline:
         context.configure_vector_index(self.vector_index_config)
 
         self.validate_modules(dataset)
+
+        test_utterances = context.data_handler.test_utterances()
+        if test_utterances is None:
+            self._logger.warning("Test data is not provided")
+
         self._fit(context, sampler)
 
         if context.is_ram_to_clear():
@@ -153,15 +158,17 @@ class Pipeline:
         self.nodes = {node.node_type: node for node in nodes_list}
 
         if refit_after:
+            # TODO reflect this refitting in dumped version of pipeline
             self._refit(context)
 
-        predictions = self.predict(context.data_handler.test_utterances())
-        for metric_name, metric in DECISION_METRICS.items():
-            context.optimization_info.pipeline_metrics[metric_name] = metric(
-                context.data_handler.test_labels(),
-                predictions,
-            )
-        context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
+        if test_utterances is not None:
+            predictions = self.predict(test_utterances)
+            for metric_name, metric in DECISION_METRICS.items():
+                context.optimization_info.pipeline_metrics[metric_name] = metric(
+                    context.data_handler.test_labels(),
+                    predictions,
+                )
+            context.callback_handler.log_final_metrics(context.optimization_info.pipeline_metrics)
 
         return context
 

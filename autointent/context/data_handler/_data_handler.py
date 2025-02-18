@@ -150,7 +150,7 @@ class DataHandler:  # TODO rename to Validator
         split = self._choose_split(Split.VALIDATION, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
-    def test_utterances(self) -> list[str]:
+    def test_utterances(self) -> list[str] | None:
         """
         Retrieve test utterances from the dataset.
 
@@ -161,6 +161,8 @@ class DataHandler:  # TODO rename to Validator
         :param idx: Optional index for a specific test split.
         :return: List of test utterances.
         """
+        if Split.TEST not in self.dataset:
+            return None
         return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
 
     def test_labels(self) -> ListOfGenericLabels:
