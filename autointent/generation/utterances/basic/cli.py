@@ -7,7 +7,7 @@ from autointent import load_dataset
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
 
-from .chat_template import SynthesizerChatTemplate
+from .chat_templates import EnglishSynthesizerTemplate, RussianSynthesizerTemplate
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
@@ -49,10 +49,12 @@ def main() -> None:
         help="Number of utterances to use as an example for augmentation",
     )
     parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
+    parser.add_argument("--language", choices=["ru", "en"], default="en")
     args = parser.parse_args()
 
     dataset = load_dataset(args.input_path)
-    template = SynthesizerChatTemplate(dataset, args.split, max_sample_utterances=args.n_sample_utterances)
+    template_type = EnglishSynthesizerTemplate if args.language == "en" else RussianSynthesizerTemplate
+    template = template_type(dataset, args.split, max_sample_utterances=args.n_sample_utterances)
     generator = UtteranceGenerator(Generator(), template, async_mode=args.async_mode)
 
     n_before = len(dataset[args.split])
