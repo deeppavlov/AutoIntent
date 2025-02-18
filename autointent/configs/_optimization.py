@@ -2,8 +2,9 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt, field_validator
 
+from autointent._callbacks import REPORTERS_NAMES
 from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
 
 from ._name import get_run_name
@@ -57,6 +58,18 @@ class LoggingConfig(BaseModel):
         if not hasattr(self, "_dump_dir"):
             self._dump_dir = self.dirpath / "modules_dumps"
         return self._dump_dir
+
+    @field_validator("report_to")
+    @classmethod
+    def validate_report_to(cls, v: list[str] | None) -> list[str] | None:
+        """Validate the report_to field."""
+        if v is None:
+            return None
+        for reporter in v:
+            if reporter not in REPORTERS_NAMES:
+                msg = f"Reporter {reporter} is not supported. Supported reporters: {REPORTERS_NAMES}"
+                raise ValueError(msg)
+        return v
 
 
 class VectorIndexConfig(BaseModel):

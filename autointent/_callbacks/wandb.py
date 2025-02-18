@@ -79,21 +79,8 @@ class WandbCallback(OptimizerCallback):
             name="final_metrics",
             config=metrics,
         )
-        self.wandb.config.update(metrics)
-        metrics.pop("config", None)
 
-        result_dict = {}
-        for key, value in metrics.items():
-            if isinstance(value, dict):
-                for k, v in value.items():
-                    if isinstance(v, list):
-                        for i, val in enumerate(v):
-                            self.wandb.log({k: val}, step=i)
-                    else:
-                        result_dict[f"{key}_{k}"] = v
-            else:
-                result_dict[key] = value
-        self.wandb.log(result_dict)
+        self.wandb.log(metrics.get("pipeline_metrics", {}))
         self.wandb.finish()
 
     def end_module(self) -> None:

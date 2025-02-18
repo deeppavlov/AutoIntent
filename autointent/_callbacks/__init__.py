@@ -1,9 +1,13 @@
+from typing import Literal
+
 from autointent._callbacks.base import OptimizerCallback
 from autointent._callbacks.callback_handler import CallbackHandler
 from autointent._callbacks.tensorboard import TensorBoardCallback
 from autointent._callbacks.wandb import WandbCallback
 
 REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback]}
+
+REPORTERS_NAMES = list(REPORTERS.keys())
 
 
 def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
@@ -26,6 +30,7 @@ def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
 
 
 __all__ = [
+    "REPORTERS_NAMES",
     "CallbackHandler",
     "OptimizerCallback",
     "TensorBoardCallback",
