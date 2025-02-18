@@ -48,12 +48,13 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
 
     def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
         """Generate a list of messages to request additional examples for the given intent."""
+        in_domain_samples = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] is not None)
         if self.dataset.multilabel:
             filter_fn = lambda sample: sample[Dataset.label_feature][intent_data.id] == 1  # noqa: E731
         else:
             filter_fn = lambda sample: sample[Dataset.label_feature] == intent_data.id  # noqa: E731
 
-        filtered_split = self.dataset[self.split].filter(filter_fn)
+        filtered_split = in_domain_samples.filter(filter_fn)
         sample_utterances = filtered_split[Dataset.utterance_feature]
 
         if self.max_sample_utterances is not None and len(sample_utterances) > self.max_sample_utterances:
