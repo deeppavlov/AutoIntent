@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, PositiveInt
 
-from autointent.custom_types import SamplerType, ValidationScheme
+from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
 
 from ._name import get_run_name
 
@@ -16,8 +16,10 @@ class DataConfig(BaseModel):
     """Hold-out or cross-validation."""
     n_folds: PositiveInt = 3
     """Number of folds in cross-validation."""
-    separate_nodes: bool = True
-    """Whether to use separate data for decision node."""
+    validation_size: FloatFromZeroToOne = 0.2
+    """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
+    separation_ratio: FloatFromZeroToOne | None = 0.5
+    """Set to float to prevent data leak between scoring and decision nodes."""
 
 
 class TaskConfig(BaseModel):

@@ -9,7 +9,7 @@ from transformers import set_seed
 
 from autointent import Dataset
 from autointent.configs import DataConfig
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
 
 from ._stratification import split_dataset
 
@@ -41,8 +41,7 @@ class DataHandler:  # TODO rename to Validator
 
         :param dataset: Training dataset.
         :param random_seed: Seed for random number generation.
-        :param separate_nodes: Perform or not splitting of train (default to split to be used in scoring and
-                            threshold search).
+        :param config: config
         """
         set_seed(random_seed)
         self.random_seed = random_seed
@@ -53,7 +52,7 @@ class DataHandler:  # TODO rename to Validator
         self.n_classes = self.dataset.n_classes
 
         if self.config.scheme == "ho":
-            self._split_ho(self.config.separate_nodes)
+            self._split_ho(self.config.separation_ratio, self.config.validation_size)
         elif self.config.scheme == "cv":
             self._split_cv()
 
@@ -191,14 +190,14 @@ class DataHandler:  # TODO rename to Validator
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
-    def _split_ho(self, separate_nodes: bool) -> None:
+    def _split_ho(self, separation_ratio: FloatFromZeroToOne | None, validation_size: FloatFromZeroToOne) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
-        if separate_nodes and Split.TRAIN in self.dataset:
-            self._split_train()
+        if separation_ratio is not None and Split.TRAIN in self.dataset:
+            self._split_train(separation_ratio)
 
         if not has_validation_split:
-            self._split_validation_from_train()
+            self._split_validation_from_train(validation_size)
 
         for split in self.dataset:
             n_classes_in_split = self.dataset.get_n_classes(split)
@@ -208,7 +207,7 @@ class DataHandler:  # TODO rename to Validator
                 )
                 raise ValueError(message)
 
-    def _split_train(self) -> None:
+    def _split_train(self, ratio: FloatFromZeroToOne) -> None:
         """
         Split on two sets.
 
@@ -217,23 +216,17 @@ class DataHandler:  # TODO rename to Validator
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,
             split=Split.TRAIN,
-            test_size=0.5,
+            test_size=ratio,
             random_seed=self.random_seed,
             allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
 
     def _split_cv(self) -> None:
-        extra_splits = [split_name for split_name in self.dataset if split_name not in [Split.TRAIN, Split.TEST]]
-        if extra_splits:
-            self.dataset[Split.TRAIN] = concatenate_datasets(
-                [self.dataset.pop(split_name) for split_name in extra_splits]
-            )
-
-        if Split.TEST not in self.dataset:
-            self.dataset[Split.TRAIN], self.dataset[Split.TEST] = split_dataset(
-                self.dataset, split=Split.TRAIN, test_size=0.2, random_seed=self.random_seed, allow_oos_in_train=True
-            )
+        extra_splits = [split_name for split_name in self.dataset if split_name != Split.TEST]
+        self.dataset[Split.TRAIN] = concatenate_datasets(
+            [self.dataset.pop(split_name) for split_name in extra_splits]
+        )
 
         for j in range(self.config.n_folds - 1):
             self.dataset[Split.TRAIN], self.dataset[f"{Split.TRAIN}_{j}"] = split_dataset(
@@ -245,12 +238,12 @@ class DataHandler:  # TODO rename to Validator
             )
         self.dataset[f"{Split.TRAIN}_{self.config.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
 
-    def _split_validation_from_train(self) -> None:
+    def _split_validation_from_train(self, size: float) -> None:
         if Split.TRAIN in self.dataset:
             self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = split_dataset(
                 self.dataset,
                 split=Split.TRAIN,
-                test_size=0.2,
+                test_size=size,
                 random_seed=self.random_seed,
                 allow_oos_in_train=True,
             )
@@ -259,7 +252,7 @@ class DataHandler:  # TODO rename to Validator
                 self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = split_dataset(
                     self.dataset,
                     split=f"{Split.TRAIN}_{idx}",
-                    test_size=0.2,
+                    test_size=size,
                     random_seed=self.random_seed,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
@@ -274,7 +267,7 @@ class DataHandler:  # TODO rename to Validator
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,
             split=Split.TRAIN,
-            test_size=0.5,
+            test_size=self.config.separation_ratio or 0.5,
             random_seed=self.random_seed,
             allow_oos_in_train=False,
         )
