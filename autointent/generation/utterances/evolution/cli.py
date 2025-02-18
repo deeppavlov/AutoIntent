@@ -82,6 +82,7 @@ def main() -> None:
         logger.warning("No evolutions selected. Exiting.")
         return
 
+    utterance_evolver: UtteranceEvolver
     if args.decide_for_me:
         utterance_evolver = IncrementalUtteranceEvolver(Generator(), evolutions, args.seed, args.async_mode)
     else:
