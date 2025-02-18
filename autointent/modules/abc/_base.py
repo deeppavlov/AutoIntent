@@ -43,9 +43,9 @@ class BaseModule(ABC):
         :param split: Split to score on
         :return: Computed metrics value for the test set or error code of metrics
         """
-        if context.data_handler.scheme == "ho":
+        if context.data_handler.config.scheme == "ho":
             return self.score_ho(context, metrics)
-        if context.data_handler.scheme == "cv":
+        if context.data_handler.config.scheme == "cv":
             return self.score_cv(context, metrics)
         msg = "Something's wrong with validation schemas"
         raise RuntimeError(msg)

@@ -75,10 +75,10 @@ class BaseDecision(BaseModule, ABC):
         chosen_metrics = {name: fn for name, fn in DECISION_METRICS.items() if name in metrics}
         metrics_values: dict[str, list[float]] = {name: [] for name in chosen_metrics}
         all_val_decisions = []
-        for j in range(context.data_handler.n_folds):
+        for j in range(context.data_handler.config.n_folds):
             val_labels = labels[j]
             val_scores = scores[j]
-            train_folds = [i for i in range(context.data_handler.n_folds) if i != j]
+            train_folds = [i for i in range(context.data_handler.config.n_folds) if i != j]
             train_labels = [ut for i_fold in train_folds for ut in labels[i_fold]]
             train_scores = np.array([sc for i_fold in train_folds for sc in scores[i_fold]])
             self.fit(train_scores, train_labels, context.data_handler.tags)  # type: ignore[arg-type]

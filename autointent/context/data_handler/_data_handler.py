@@ -8,7 +8,8 @@ from datasets import concatenate_datasets
 from transformers import set_seed
 
 from autointent import Dataset
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split, ValidationScheme
+from autointent.configs import DataConfig
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels, Split
 
 from ._stratification import split_dataset
 
@@ -32,10 +33,8 @@ class DataHandler:  # TODO rename to Validator
     def __init__(
         self,
         dataset: Dataset,
-        scheme: ValidationScheme = "ho",
-        separate_nodes: bool = True,
+        config: DataConfig | None = None,
         random_seed: int = 0,
-        n_folds: int = 3,
     ) -> None:
         """
         Initialize the data handler.
@@ -49,14 +48,13 @@ class DataHandler:  # TODO rename to Validator
         self.random_seed = random_seed
 
         self.dataset = dataset
+        self.config = config if config is not None else DataConfig()
 
         self.n_classes = self.dataset.n_classes
-        self.scheme = scheme
-        self.n_folds = n_folds
 
-        if scheme == "ho":
-            self._split_ho(separate_nodes)
-        elif scheme == "cv":
+        if self.config.scheme == "ho":
+            self._split_ho(self.config.separate_nodes)
+        elif self.config.scheme == "cv":
             self._split_cv()
 
         self.regex_patterns = [
@@ -120,7 +118,7 @@ class DataHandler:  # TODO rename to Validator
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def train_labels_folded(self) -> list[ListOfGenericLabels]:
-        return [self.train_labels(j) for j in range(self.n_folds)]
+        return [self.train_labels(j) for j in range(self.config.n_folds)]
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
         """
@@ -177,14 +175,14 @@ class DataHandler:  # TODO rename to Validator
         return cast(ListOfGenericLabels, self.dataset[Split.TEST][self.dataset.label_feature])
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
-        if self.scheme == "ho":
+        if self.config.scheme == "ho":
             msg = "Cannot call cross-validation on hold-out DataHandler"
             raise RuntimeError(msg)
 
-        for j in range(self.n_folds):
+        for j in range(self.config.n_folds):
             val_utterances = self.train_utterances(j)
             val_labels = self.train_labels(j)
-            train_folds = [i for i in range(self.n_folds) if i != j]
+            train_folds = [i for i in range(self.config.n_folds) if i != j]
             train_utterances = [ut for i_fold in train_folds for ut in self.train_utterances(i_fold)]
             train_labels = [lab for i_fold in train_folds for lab in self.train_labels(i_fold)]
 
@@ -237,15 +235,15 @@ class DataHandler:  # TODO rename to Validator
                 self.dataset, split=Split.TRAIN, test_size=0.2, random_seed=self.random_seed, allow_oos_in_train=True
             )
 
-        for j in range(self.n_folds - 1):
+        for j in range(self.config.n_folds - 1):
             self.dataset[Split.TRAIN], self.dataset[f"{Split.TRAIN}_{j}"] = split_dataset(
                 self.dataset,
                 split=Split.TRAIN,
-                test_size=1 / (self.n_folds - j),
+                test_size=1 / (self.config.n_folds - j),
                 random_seed=self.random_seed,
                 allow_oos_in_train=True,
             )
-        self.dataset[f"{Split.TRAIN}_{self.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
+        self.dataset[f"{Split.TRAIN}_{self.config.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
 
     def _split_validation_from_train(self) -> None:
         if Split.TRAIN in self.dataset:
@@ -267,7 +265,7 @@ class DataHandler:  # TODO rename to Validator
                 )
 
     def prepare_for_refit(self) -> None:
-        if self.scheme == "ho":
+        if self.config.scheme == "ho":
             return
 
         train_folds = [split_name for split_name in self.dataset if split_name.startswith(Split.TRAIN)]
