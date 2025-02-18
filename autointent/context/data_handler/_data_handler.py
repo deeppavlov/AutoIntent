@@ -224,9 +224,7 @@ class DataHandler:  # TODO rename to Validator
 
     def _split_cv(self) -> None:
         extra_splits = [split_name for split_name in self.dataset if split_name != Split.TEST]
-        self.dataset[Split.TRAIN] = concatenate_datasets(
-            [self.dataset.pop(split_name) for split_name in extra_splits]
-        )
+        self.dataset[Split.TRAIN] = concatenate_datasets([self.dataset.pop(split_name) for split_name in extra_splits])
 
         for j in range(self.config.n_folds - 1):
             self.dataset[Split.TRAIN], self.dataset[f"{Split.TRAIN}_{j}"] = split_dataset(
