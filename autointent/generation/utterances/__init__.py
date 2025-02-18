@@ -1,4 +1,4 @@
-from .basic import SynthesizerChatTemplate, UtteranceGenerator
+from .basic import EnglishSynthesizerTemplate, RussianSynthesizerTemplate, UtteranceGenerator
 from .evolution import (
     AbstractEvolution,
     ConcreteEvolution,
