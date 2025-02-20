@@ -1727,7 +1727,7 @@
             "$ref": "#/$defs/LoggingConfig",
             "default": {
                 "project_dir": "/home/runner/work/AutoIntent/AutoIntent/runs",
-                "run_name": "obnoxious_tyrannosaurus_02-20-2025_20-20-22",
+                "run_name": "inexpensive_kangaroo_02-20-2025_20-30-50",
                 "dump_modules": false,
                 "clear_ram": false,
                 "report_to": null
