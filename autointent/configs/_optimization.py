@@ -34,6 +34,8 @@ class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
     _run_name = get_run_name()
+    _dirpath: Path | None = None
+    _dump_dir: Path | None = None
 
     project_dir: Path | str | None = Field(None, description="Path to the directory with different runs.")
     """Path to the directory with different runs."""
@@ -51,25 +53,22 @@ class LoggingConfig(BaseModel):
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
-        if self.project_dir is None:
-            project_dir = Path.cwd() / "runs"
-        else:
-            project_dir = self.project_dir
-
-        if not hasattr(self, "_dirpath"):
-            self._dirpath = Path(project_dir) / self.get_run_name()
+        if self._dirpath is None:
+            project_dir = Path.cwd() / "runs" if self.project_dir is None else Path(self.project_dir)
+            self._dirpath = project_dir / self.get_run_name()
         return self._dirpath
 
     @property
     def dump_dir(self) -> Path:
         """Path to the directory where the modules will be dumped."""
-        if not hasattr(self, "_dump_dir"):
+        if self._dump_dir is None:
             self._dump_dir = self.dirpath / "modules_dumps"
         return self._dump_dir
 
     def get_run_name(self) -> str:
-        """Get the run name."""
-        return self.run_name or self._run_name
+        if self._run_name is None:
+            self._run_name = self.run_name if self.run_name is not None else get_run_name()
+        return self._run_name
 
 
 class VectorIndexConfig(BaseModel):
