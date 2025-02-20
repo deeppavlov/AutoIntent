@@ -1726,8 +1726,8 @@
         "logging_config": {
             "$ref": "#/$defs/LoggingConfig",
             "default": {
-                "project_dir": "/home/samoed/Desktop/AutoIntent/scripts/runs",
-                "run_name": "naughty_cricket_02-20-2025_22-28-12",
+                "project_dir": "/home/runner/work/AutoIntent/AutoIntent/runs",
+                "run_name": "obnoxious_tyrannosaurus_02-20-2025_20-20-22",
                 "dump_modules": false,
                 "clear_ram": false,
                 "report_to": null
