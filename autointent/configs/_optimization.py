@@ -13,35 +13,37 @@ from ._name import get_run_name
 class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
 
-    scheme: ValidationScheme = "ho"
+    scheme: ValidationScheme = Field("ho", description="Validation scheme to use.")
     """Hold-out or cross-validation."""
-    n_folds: PositiveInt = 3
+    n_folds: PositiveInt = Field(3, description="Number of folds in cross-validation.")
     """Number of folds in cross-validation."""
-    validation_size: FloatFromZeroToOne = 0.2
+    validation_size: FloatFromZeroToOne = Field(0.2, description="Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).")
     """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
-    separation_ratio: FloatFromZeroToOne | None = 0.5
+    separation_ratio: FloatFromZeroToOne | None = Field(0.5, description="Set to float to prevent data leak between scoring and decision nodes.")
     """Set to float to prevent data leak between scoring and decision nodes."""
 
 
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
-    project_dir: Path | str = Field(default_factory=lambda: Path.cwd() / "runs")
+    project_dir: Path | str | None = Field(None, description="Path to the directory with different runs.")
     """Path to the directory with different runs."""
-    run_name: str = Field(default_factory=get_run_name)
+    run_name: str | None = Field(None, description="Name of the run. If None, a random name will be generated.")
     """Name of the run. If None, a random name will be generated"""
-    dump_modules: bool = False
+    dump_modules: bool = Field(False, description="Whether to dump the modules or not")
     """Whether to dump the modules or not"""
-    clear_ram: bool = False
+    clear_ram: bool = Field(False, description="Whether to clear the RAM after dumping the modules")
     """Whether to clear the RAM after dumping the modules"""
-    report_to: list[REPORTERS_NAMES] | None = None  # type: ignore[valid-type]
+    report_to: list[REPORTERS_NAMES] | None = Field(None, description="List of callbacks to report to. If None, no callbacks will be used")  # type: ignore[valid-type]
     """List of callbacks to report to. If None, no callbacks will be used"""
 
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
+        run_name = self.run_name or get_run_name()
+        project_dir = self.project_dir or Path.cwd() / "runs"
         if not hasattr(self, "_dirpath"):
-            self._dirpath = Path(self.project_dir) / self.run_name
+            self._dirpath = Path(project_dir) / run_name
         return self._dirpath
 
     @property
@@ -55,5 +57,5 @@ class LoggingConfig(BaseModel):
 class VectorIndexConfig(BaseModel):
     """Configuration for the vector index."""
 
-    save_db: bool = False
+    save_db: bool = Field(False, description="Whether to save the vector index database or not")
     """Whether to save the vector index database or not"""
