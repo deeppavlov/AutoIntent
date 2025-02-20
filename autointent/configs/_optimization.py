@@ -51,7 +51,11 @@ class LoggingConfig(BaseModel):
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
-        project_dir = self.project_dir or Path.cwd() / "runs"
+        if self.project_dir is None:
+            project_dir = Path.cwd() / "runs"
+        else:
+            project_dir = self.project_dir
+
         if not hasattr(self, "_dirpath"):
             self._dirpath = Path(project_dir) / self.get_run_name()
         return self._dirpath
