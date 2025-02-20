@@ -17,14 +17,23 @@ class DataConfig(BaseModel):
     """Hold-out or cross-validation."""
     n_folds: PositiveInt = Field(3, description="Number of folds in cross-validation.")
     """Number of folds in cross-validation."""
-    validation_size: FloatFromZeroToOne = Field(0.2, description="Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).")
+    validation_size: FloatFromZeroToOne = Field(
+        0.2,
+        description=(
+            "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."
+        ),
+    )
     """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
-    separation_ratio: FloatFromZeroToOne | None = Field(0.5, description="Set to float to prevent data leak between scoring and decision nodes.")
+    separation_ratio: FloatFromZeroToOne | None = Field(
+        0.5, description="Set to float to prevent data leak between scoring and decision nodes."
+    )
     """Set to float to prevent data leak between scoring and decision nodes."""
 
 
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
+
+    _run_name = get_run_name()
 
     project_dir: Path | str | None = Field(None, description="Path to the directory with different runs.")
     """Path to the directory with different runs."""
@@ -34,16 +43,17 @@ class LoggingConfig(BaseModel):
     """Whether to dump the modules or not"""
     clear_ram: bool = Field(False, description="Whether to clear the RAM after dumping the modules")
     """Whether to clear the RAM after dumping the modules"""
-    report_to: list[REPORTERS_NAMES] | None = Field(None, description="List of callbacks to report to. If None, no callbacks will be used")  # type: ignore[valid-type]
+    report_to: list[REPORTERS_NAMES] | None = Field(  # type: ignore[valid-type]
+        None, description="List of callbacks to report to. If None, no callbacks will be used"
+    )
     """List of callbacks to report to. If None, no callbacks will be used"""
 
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
-        run_name = self.run_name or get_run_name()
         project_dir = self.project_dir or Path.cwd() / "runs"
         if not hasattr(self, "_dirpath"):
-            self._dirpath = Path(project_dir) / run_name
+            self._dirpath = Path(project_dir) / self.get_run_name()
         return self._dirpath
 
     @property
@@ -52,6 +62,10 @@ class LoggingConfig(BaseModel):
         if not hasattr(self, "_dump_dir"):
             self._dump_dir = self.dirpath / "modules_dumps"
         return self._dump_dir
+
+    def get_run_name(self) -> str:
+        """Get the run name."""
+        return self.run_name or self._run_name
 
 
 class VectorIndexConfig(BaseModel):

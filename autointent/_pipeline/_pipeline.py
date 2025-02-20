@@ -130,7 +130,7 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         self.context.callback_handler.start_run(
-            run_name=self.context.logging_config.run_name,
+            run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
         )
         for node_type in NodeType:
