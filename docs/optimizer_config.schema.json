@@ -216,6 +216,7 @@
             "properties": {
                 "scheme": {
                     "default": "ho",
+                    "description": "Validation scheme to use.",
                     "enum": [
                         "ho",
                         "cv"
@@ -225,12 +226,14 @@
                 },
                 "n_folds": {
                     "default": 3,
+                    "description": "Number of folds in cross-validation.",
                     "exclusiveMinimum": 0,
                     "title": "N Folds",
                     "type": "integer"
                 },
                 "validation_size": {
                     "default": 0.2,
+                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Validation Size",
@@ -248,6 +251,7 @@
                         }
                     ],
                     "default": 0.5,
+                    "description": "Set to float to prevent data leak between scoring and decision nodes.",
                     "title": "Separation Ratio"
                 }
             },
@@ -815,6 +819,7 @@
                         }
                     ],
                     "default": null,
+                    "description": "Path to the directory with different runs.",
                     "title": "Project Dir"
                 },
                 "run_name": {
@@ -827,15 +832,18 @@
                         }
                     ],
                     "default": null,
+                    "description": "Name of the run. If None, a random name will be generated.",
                     "title": "Run Name"
                 },
                 "dump_modules": {
                     "default": false,
+                    "description": "Whether to dump the modules or not",
                     "title": "Dump Modules",
                     "type": "boolean"
                 },
                 "clear_ram": {
                     "default": false,
+                    "description": "Whether to clear the RAM after dumping the modules",
                     "title": "Clear Ram",
                     "type": "boolean"
                 },
@@ -856,6 +864,7 @@
                         }
                     ],
                     "default": null,
+                    "description": "List of callbacks to report to. If None, no callbacks will be used",
                     "title": "Report To"
                 }
             },
@@ -1713,6 +1722,7 @@
             "properties": {
                 "save_db": {
                     "default": false,
+                    "description": "Whether to save the vector index database or not",
                     "title": "Save Db",
                     "type": "boolean"
                 }
