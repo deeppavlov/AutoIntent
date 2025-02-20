@@ -1,0 +1,28 @@
+task_config:
+  search_space:
+    - node_type: embedding
+      target_metric: retrieval_hit_rate
+      search_space:
+        - module_name: retrieval
+          k: [10]
+          embedder_config:
+            - model_name: sentence-transformers/all-MiniLM-L6-v2
+    - node_type: scoring
+      target_metric: scoring_roc_auc
+      search_space:
+        - module_name: linear
+    - node_type: decision
+      target_metric: decision_accuracy
+      search_space:
+        - module_name: argmax
+  sampler: brute
+data_config:
+  scheme: ho
+  n_folds: 3
+  validation_size: 0.2
+  separation_ratio: null
+logging_config:
+  run_name: full_training
+vector_index_config:
+  save_db: false
+seed: 42
