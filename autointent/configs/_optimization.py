@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, PositiveInt, field_validator
+from pydantic import BaseModel, Field, PositiveInt
 
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
+from autointent.custom_types import FloatFromZeroToOne, ValidationScheme
 
 from ._name import get_run_name
 
@@ -23,18 +23,10 @@ class DataConfig(BaseModel):
     """Set to float to prevent data leak between scoring and decision nodes."""
 
 
-class TaskConfig(BaseModel):
-    """Configuration for the task to optimize."""
-
-    search_space_path: Path | None = None
-    """Path to the search space configuration file. If None, the default search space will be used"""
-    sampler: SamplerType = "brute"
-
-
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
-    project_dir: Path = Field(default_factory=lambda: Path.cwd() / "runs")
+    project_dir: Path | str = Field(default_factory=lambda: Path.cwd() / "runs")
     """Path to the directory with different runs."""
     run_name: str = Field(default_factory=get_run_name)
     """Name of the run. If None, a random name will be generated"""
@@ -42,14 +34,14 @@ class LoggingConfig(BaseModel):
     """Whether to dump the modules or not"""
     clear_ram: bool = False
     """Whether to clear the RAM after dumping the modules"""
-    report_to: list[str] | None = None
+    report_to: list[REPORTERS_NAMES] | None = None  # type: ignore[valid-type]
     """List of callbacks to report to. If None, no callbacks will be used"""
 
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
         if not hasattr(self, "_dirpath"):
-            self._dirpath = self.project_dir / self.run_name
+            self._dirpath = Path(self.project_dir) / self.run_name
         return self._dirpath
 
     @property
@@ -58,18 +50,6 @@ class LoggingConfig(BaseModel):
         if not hasattr(self, "_dump_dir"):
             self._dump_dir = self.dirpath / "modules_dumps"
         return self._dump_dir
-
-    @field_validator("report_to")
-    @classmethod
-    def validate_report_to(cls, v: list[str] | None) -> list[str] | None:
-        """Validate the report_to field."""
-        if v is None:
-            return None
-        for reporter in v:
-            if reporter not in REPORTERS_NAMES:
-                msg = f"Reporter {reporter} is not supported. Supported reporters: {REPORTERS_NAMES}"
-                raise ValueError(msg)
-        return v
 
 
 class VectorIndexConfig(BaseModel):

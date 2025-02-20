@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from autointent.nodes.schemes import OptimizationConfig
+from autointent.nodes.schemes import OptimizationSearchSpaceConfig
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def valid_decision_config():
 
 def test_valid_decision_config(valid_decision_config):
     """Test that a valid decision config passes validation."""
-    config = OptimizationConfig(valid_decision_config)
+    config = OptimizationSearchSpaceConfig(valid_decision_config)
     assert config[0].node_type == "decision"
     assert config[0].target_metric == "decision_roc_auc"
     assert isinstance(config[0].search_space, list)
@@ -45,7 +45,7 @@ def test_invalid_decision_config_missing_field():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)
 
 
 def test_invalid_decision_config_wrong_type():
@@ -68,4 +68,4 @@ def test_invalid_decision_config_wrong_type():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)

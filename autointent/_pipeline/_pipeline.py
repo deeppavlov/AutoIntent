@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
@@ -13,7 +13,7 @@ from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, V
 from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
-from autointent.nodes.schemes import OptimizationConfig
+from autointent.nodes.schemes import OptimizationConfig, OptimizationSearchSpaceConfig
 from autointent.utils import load_default_search_space, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
@@ -28,17 +28,24 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
+        sampler: SamplerType = "brute",
         seed: int = 42,
     ) -> None:
         """
         Initialize the pipeline optimizer.
 
         :param nodes: list of nodes
+        :param sampler: sampler type
         :param seed: random seed
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
         self.seed = seed
+        if sampler not in get_args(SamplerType):
+            msg = f"Sampler should be one of {get_args(SamplerType)}"
+            raise ValueError(msg)
+
+        self.sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
@@ -74,9 +81,33 @@ class Pipeline:
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
-        validated_search_space = OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
+        validated_search_space = OptimizationSearchSpaceConfig(search_space).model_dump()  # type: ignore[arg-type]
         nodes = [NodeOptimizer(**node) for node in validated_search_space]
         return cls(nodes=nodes, seed=seed)
+
+    @classmethod
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str) -> "Pipeline":
+        """
+        Create pipeline optimizer from optimization config.
+
+        :param config: Optimization config
+        :return:
+        """
+        if isinstance(config, Path | str):
+            with Path(config).open() as file:
+                loaded_config = yaml.safe_load(file)
+        else:
+            loaded_config = config
+        optimization_config = OptimizationConfig(**loaded_config)
+        pipeline = cls(
+            [NodeOptimizer(**node.model_dump()) for node in optimization_config.task_config.search_space],
+            optimization_config.task_config.sampler,
+            optimization_config.seed,
+        )
+        pipeline.set_config(optimization_config.logging_config)
+        pipeline.set_config(optimization_config.vector_index_config)
+        pipeline.set_config(optimization_config.data_config)
+        return pipeline
 
     @classmethod
     def default_optimizer(cls, multilabel: bool, seed: int = 42) -> "Pipeline":
@@ -90,7 +121,7 @@ class Pipeline:
         """
         return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 
-    def _fit(self, context: Context, sampler: SamplerType = "brute") -> None:
+    def _fit(self, context: Context, sampler: SamplerType) -> None:
         """
         Optimize the pipeline.
 
@@ -123,7 +154,7 @@ class Pipeline:
         self,
         dataset: Dataset,
         refit_after: bool = False,
-        sampler: SamplerType = "brute",
+        sampler: SamplerType | None = None,
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -147,6 +178,9 @@ class Pipeline:
             self._logger.warning(
                 "Test data is not provided. Final test metrics won't be calculated after pipeline optimization."
             )
+
+        if sampler is None:
+            sampler = self.sampler or "brute"
 
         self._fit(context, sampler)
 

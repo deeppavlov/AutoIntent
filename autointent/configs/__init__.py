@@ -4,7 +4,6 @@ from ._inference_node import InferenceNodeConfig
 from ._optimization import (
     DataConfig,
     LoggingConfig,
-    TaskConfig,
     VectorIndexConfig,
 )
 
@@ -13,6 +12,5 @@ __all__ = [
     "InferenceNodeConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
-    "TaskConfig",
     "VectorIndexConfig",
 ]

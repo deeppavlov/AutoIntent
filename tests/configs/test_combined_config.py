@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from autointent.nodes.schemes import (
-    OptimizationConfig,
+    OptimizationSearchSpaceConfig,
 )
 from tests.conftest import get_search_space
 
@@ -44,7 +44,7 @@ def valid_optimizer_config():
 
 def test_valid_optimizer_config(valid_optimizer_config):
     """Test that a valid optimizer config passes validation."""
-    config = OptimizationConfig(valid_optimizer_config)
+    config = OptimizationSearchSpaceConfig(valid_optimizer_config)
     assert config[0].node_type == "scoring"
     assert config[1].node_type == "embedding"
 
@@ -55,7 +55,7 @@ def test_valid_optimizer_config(valid_optimizer_config):
 )
 def test_optimizer_config(task_type):
     search_space = get_search_space(task_type)
-    config = OptimizationConfig(search_space)
+    config = OptimizationSearchSpaceConfig(search_space)
     assert config
 
 
@@ -72,7 +72,7 @@ def test_invalid_optimizer_config_missing_field():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)
 
 
 def test_invalid_optimizer_config_wrong_type():
@@ -93,4 +93,4 @@ def test_invalid_optimizer_config_wrong_type():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)

@@ -20,6 +20,12 @@ def test_no_node_separation(dataset_no_oos):
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
 
+def test_full_config(dataset_no_oos):
+    search_space = get_search_space("full_training")
+    pipeline_optimizer = Pipeline.from_optimization_config(search_space)
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
+
+
 @pytest.mark.parametrize(
     "sampler",
     ["tpe", "random"],
