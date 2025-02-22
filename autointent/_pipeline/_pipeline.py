@@ -10,14 +10,14 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import (
-    CrossEncoderConfig,
+    # CrossEncoderConfig,
     DataConfig,
-    EmbedderConfig,
+    # EmbedderConfig,
     InferenceNodeConfig,
     LoggingConfig,
     VectorIndexConfig,
 )
-from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
+from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
@@ -97,6 +97,13 @@ class Pipeline:
         """
         return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
 
+    # @classmethod
+    # def from_preset(
+    #     cls, multilabel: bool, seed: int, embedder_config: EmbedderConfig, cross_encoder_config: CrossEncoderConfig
+    # ) -> "Pipeline":
+    #     search_space = load_and_format_search_space(multilabel, embedder_config, cross_encoder_config)
+    #     return cls.from_search_space()
+
     def _fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
         Optimize the pipeline.
@@ -131,7 +138,7 @@ class Pipeline:
         dataset: Dataset,
         refit_after: bool = False,
         sampler: SamplerType = "brute",
-        filter_imcompatible_modules: bool = True,
+        incompatible_search_space: SearchSpaceValidationMode = "filter",
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -148,7 +155,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config)
 
-        self.validate_modules(dataset, raise_error=not filter_imcompatible_modules)
+        self.validate_modules(dataset, mode=incompatible_search_space)
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
@@ -182,7 +189,7 @@ class Pipeline:
 
         return context
 
-    def validate_modules(self, dataset: Dataset, raise_error: bool) -> None:
+    def validate_modules(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
         """
         Validate modules with dataset.
 
@@ -190,7 +197,7 @@ class Pipeline:
         """
         for node in self.nodes.values():
             if isinstance(node, NodeOptimizer):
-                node.validate_nodes_with_dataset(dataset, raise_error)
+                node.validate_nodes_with_dataset(dataset, mode)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":

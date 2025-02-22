@@ -7,15 +7,15 @@ from ._optimization import (
     TaskConfig,
     VectorIndexConfig,
 )
-from ._transformers import EmbedderConfig, CrossEncoderConfig
+from ._transformers import CrossEncoderConfig, EmbedderConfig
 
 __all__ = [
+    "CrossEncoderConfig",
     "DataConfig",
+    "EmbedderConfig",
     "InferenceNodeConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
     "TaskConfig",
     "VectorIndexConfig",
-    "EmbedderConfig",
-    "CrossEncoderConfig"
 ]

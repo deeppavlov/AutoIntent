@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, SamplerType
+from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.info import NODES_INFO
 
 
@@ -184,7 +184,7 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def validate_nodes_with_dataset(self, dataset: Dataset, raise_error: bool) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
         """
         Validate nodes with dataset.
 
@@ -200,16 +200,20 @@ class NodeOptimizer:
             # todo add check for oos
 
             if is_multilabel and not module.supports_multilabel:
-                if raise_error:
-                    msg = f"Module '{module_name}' does not support multilabel datasets."
+                msg = f"Module '{module_name}' does not support multilabel datasets."
+                if mode == "raise":
                     self._logger.error(msg)
                     raise ValueError(msg)
+                if mode == "warning":
+                    self._logger.warning(msg)
                 continue
             if not is_multilabel and not module.supports_multiclass:
-                if raise_error:
-                    msg = f"Module '{module_name}' does not support multiclass datasets."
+                msg = f"Module '{module_name}' does not support multiclass datasets."
+                if mode == "raise":
                     self._logger.error(msg)
                     raise ValueError(msg)
+                if mode == "warning":
+                    self._logger.warning(msg)
                 continue
 
             filtered_search_space.append(search_space)
