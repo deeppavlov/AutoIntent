@@ -131,6 +131,7 @@ class Pipeline:
         dataset: Dataset,
         refit_after: bool = False,
         sampler: SamplerType = "brute",
+        filter_imcompatible_modules: bool = True,
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -147,7 +148,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_vector_index(self.vector_index_config)
 
-        self.validate_modules(dataset)
+        self.validate_modules(dataset, raise_error=not filter_imcompatible_modules)
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
@@ -181,7 +182,7 @@ class Pipeline:
 
         return context
 
-    def validate_modules(self, dataset: Dataset) -> None:
+    def validate_modules(self, dataset: Dataset, raise_error: bool) -> None:
         """
         Validate modules with dataset.
 
@@ -189,7 +190,7 @@ class Pipeline:
         """
         for node in self.nodes.values():
             if isinstance(node, NodeOptimizer):
-                node.validate_nodes_with_dataset(dataset)
+                node.validate_nodes_with_dataset(dataset, raise_error)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":

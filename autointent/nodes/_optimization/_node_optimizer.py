@@ -184,7 +184,7 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def validate_nodes_with_dataset(self, dataset: Dataset) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset, raise_error: bool) -> None:
         """
         Validate nodes with dataset.
 
@@ -192,16 +192,26 @@ class NodeOptimizer:
         """
         is_multilabel = dataset.multilabel
 
+        filtered_search_space = []
+
         for search_space in deepcopy(self.modules_search_spaces):
-            module_name = search_space.pop("module_name")
+            module_name = search_space["module_name"]
             module = self.node_info.modules_available[module_name]
             # todo add check for oos
 
             if is_multilabel and not module.supports_multilabel:
-                msg = f"Module '{module_name}' does not support multilabel datasets."
-                self._logger.error(msg)
-                raise ValueError(msg)
+                if raise_error:
+                    msg = f"Module '{module_name}' does not support multilabel datasets."
+                    self._logger.error(msg)
+                    raise ValueError(msg)
+                continue
             if not is_multilabel and not module.supports_multiclass:
-                msg = f"Module '{module_name}' does not support multiclass datasets."
-                self._logger.error(msg)
-                raise ValueError(msg)
+                if raise_error:
+                    msg = f"Module '{module_name}' does not support multiclass datasets."
+                    self._logger.error(msg)
+                    raise ValueError(msg)
+                continue
+
+            filtered_search_space.append(search_space)
+
+        self.modules_search_spaces = filtered_search_space
