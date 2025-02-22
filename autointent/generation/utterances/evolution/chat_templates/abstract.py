@@ -36,10 +36,3 @@ class AbstractEvolution(EvolutionChatTemplate):
         ),
         Message(role=Role.ASSISTANT, content="I'm having trouble with my laptop."),
     ]
-
-    def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Make chat to complete."""
-        return [
-            *self._messages,
-            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
-        ]

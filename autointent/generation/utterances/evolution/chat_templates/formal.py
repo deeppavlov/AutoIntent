@@ -40,9 +40,3 @@ class FormalEvolution(EvolutionChatTemplate):
         ),
     ]
 
-    def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Generate chat for formal tone adaptation."""
-        return [
-            *self._messages,
-            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
-        ]

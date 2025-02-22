@@ -36,10 +36,3 @@ class InformalEvolution(EvolutionChatTemplate):
         ),
         Message(role=Role.ASSISTANT, content="My Lenovo keeps crashing and getting super hot. Any ideas?"),
     ]
-
-    def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Generate chat for informal tone adaptation."""
-        return [
-            *self._messages,
-            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
-        ]

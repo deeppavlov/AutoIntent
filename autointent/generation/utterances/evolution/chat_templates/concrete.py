@@ -29,14 +29,8 @@ class ConcreteEvolution(EvolutionChatTemplate):
         Message(role=Role.ASSISTANT, content="I want to reserve a table for 4 persons at 9 pm."),
         Message(
             role=Role.USER,
-            content=("Intent name: requesting technical support\n" "Utterance: I'm having trouble with my laptop."),
+            content="Intent name: requesting technical support\nUtterance: I'm having trouble with my laptop.",
         ),
         Message(role=Role.ASSISTANT, content="My laptop is constantly rebooting and overheating."),
     ]
 
-    def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Make chat to complete."""
-        return [
-            *self._messages,
-            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
-        ]
