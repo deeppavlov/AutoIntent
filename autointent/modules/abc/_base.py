@@ -47,6 +47,8 @@ class BaseModule(ABC):
             return self.score_ho(context, metrics)
         if context.data_handler.config.scheme == "cv":
             return self.score_cv(context, metrics)
+        msg = f"Unknown scheme: {context.data_handler.config.scheme}"
+        raise ValueError(msg)
 
     @abstractmethod
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]: ...

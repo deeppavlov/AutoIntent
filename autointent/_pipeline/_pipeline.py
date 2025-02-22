@@ -48,7 +48,7 @@ class Pipeline:
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig | Any) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig | Any) -> None:  # noqa: ANN401
         """
         Set configuration for the optimizer.
 

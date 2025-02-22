@@ -197,7 +197,7 @@ class EmbedderConfig(STModelConfig):
             prompts[TaskTypeEnum.sts.value] = self.sts_prompt
         return prompts if len(prompts) > 0 else None
 
-    def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+    def get_prompt_type(self, prompt_type: TaskTypeEnum | str | None) -> str | None:  # noqa: PLR0911
         """Get the prompt type for the given task type.
 
         :param prompt_type: Task type for which to get the prompt.
@@ -218,6 +218,7 @@ class EmbedderConfig(STModelConfig):
             return self.sts_prompt
         if prompt_type == TaskTypeEnum.default:
             return self.default_prompt
+        return None
 
     use_cache: bool = Field(False, description="Whether to use embeddings caching.")
 
