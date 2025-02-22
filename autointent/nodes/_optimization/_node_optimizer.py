@@ -65,11 +65,12 @@ class NodeOptimizer:
         Fit the node optimizer.
 
         :param context: Context
+        :param sampler: Sampler to use for optimization
         """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
-            self._counter = 0
+            self._counter: int = 0
             module_name = search_space.pop("module_name")
             n_trials = None
             if "n_trials" in search_space:
@@ -83,9 +84,6 @@ class NodeOptimizer:
             elif sampler == "random":
                 sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
                 n_trials = n_trials or 10
-            else:
-                msg = f"Unexpected sampler: {sampler}"
-                raise ValueError(msg)
             study = optuna.create_study(direction="maximize", sampler=sampler_instance)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)

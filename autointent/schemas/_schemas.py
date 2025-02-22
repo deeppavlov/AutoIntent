@@ -218,7 +218,6 @@ class EmbedderConfig(STModelConfig):
             return self.sts_prompt
         if prompt_type == TaskTypeEnum.default:
             return self.default_prompt
-        return None
 
     use_cache: bool = Field(False, description="Whether to use embeddings caching.")
 

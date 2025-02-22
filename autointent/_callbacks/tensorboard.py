@@ -57,16 +57,12 @@ class TensorBoardCallback(OptimizerCallback):
         for key, value in module_kwargs.items():
             self.module_writer.add_text(f"module_params/{key}", str(value))  # type: ignore[no-untyped-call]
 
-    def log_value(self, **kwargs: dict[str, Any]) -> None:
+    def log_value(self, **kwargs: dict[str, int | float | Any]) -> None:
         """
         Log data.
 
         :param kwargs: Data to log.
         """
-        if self.module_writer is None:
-            msg = "start_run must be called before log_value."
-            raise RuntimeError(msg)
-
         for key, value in kwargs.items():
             if isinstance(value, int | float):
                 self.module_writer.add_scalar(key, value)
@@ -79,10 +75,6 @@ class TensorBoardCallback(OptimizerCallback):
 
         :param metrics: Metrics to log.
         """
-        if self.module_writer is None:
-            msg = "start_run must be called before log_value."
-            raise RuntimeError(msg)
-
         for key, value in metrics.items():
             if isinstance(value, int | float):
                 self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]

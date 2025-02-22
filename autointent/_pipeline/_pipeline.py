@@ -27,7 +27,7 @@ class Pipeline:
 
     def __init__(
         self,
-        nodes: list[NodeOptimizer] | list[InferenceNode],
+        nodes: list[NodeOptimizer] | list[InferenceNode] | list[Any],
         seed: int = 42,
     ) -> None:
         """
@@ -48,7 +48,7 @@ class Pipeline:
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig | Any) -> None:
         """
         Set configuration for the optimizer.
 

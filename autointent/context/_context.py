@@ -94,10 +94,6 @@ class Context:
         optimization_results = self.optimization_info.dump_evaluation_results()
 
         logs_dir = self.logging_config.dirpath
-        if logs_dir is None:
-            msg = "something's wrong with LoggingConfig"
-            raise ValueError(msg)
-
         logs_dir.mkdir(parents=True, exist_ok=True)
 
         logs_path = logs_dir / "logs.json"

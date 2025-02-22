@@ -166,6 +166,9 @@ skip_empty = true
 python_version = "3.10"
 strict = true
 warn_redundant_casts = true
+# align with mypy 2.0 release
+warn_unreachable = true
+local_partial_types = true
 plugins = [
     "pydantic.mypy",
     "numpy.typing.mypy_plugin",
@@ -193,3 +196,10 @@ module = [
     "wandb",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "autointent._callbacks.*",
+    "autointent.modules.abc.*",
+]
+warn_unreachable = false
