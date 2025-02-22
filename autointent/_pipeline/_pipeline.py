@@ -16,11 +16,17 @@ from autointent.configs import (
     InferenceNodeConfig,
     LoggingConfig,
 )
-from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.custom_types import (
+    ListOfGenericLabels,
+    NodeType,
+    SamplerType,
+    SearchSpacePresets,
+    SearchSpaceValidationMode,
+)
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.nodes.schemes import OptimizationConfig
-from autointent.utils import load_default_search_space, load_search_space
+from autointent.utils import load_preset, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
@@ -88,23 +94,11 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def default_optimizer(cls, multilabel: bool, seed: int = 42) -> "Pipeline":
-        """
-        Create pipeline optimizer with default search space for given classification task.
-
-        :param multilabel: Whether the task multi-label, or single-label.
-        :param seed: random seed
-
-        :return: Pipeline
-        """
-        return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
-
-    # @classmethod
-    # def from_preset(
-    #     cls, multilabel: bool, seed: int, embedder_config: EmbedderConfig, cross_encoder_config: CrossEncoderConfig
-    # ) -> "Pipeline":
-    #     search_space = load_and_format_search_space(multilabel, embedder_config, cross_encoder_config)
-    #     return cls.from_search_space()
+    def from_preset(
+        cls, name: SearchSpacePresets, seed: int = 42
+    ) -> "Pipeline":
+        search_space = load_preset(name)
+        return cls.from_search_space(search_space=search_space, seed=seed)
 
     def _fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
@@ -122,9 +116,6 @@ class Pipeline:
             node_optimizer = self.nodes.get(node_type, None)
             if node_optimizer is not None:
                 node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
-        if not context.vector_index_config.save_db:
-            self._logger.info("removing vector database from file system...")
-            # TODO clear cache from appdirs
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:

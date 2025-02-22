@@ -81,3 +81,5 @@ FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
 """Float value between 0 and 1, inclusive."""
 
 SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
+
+SearchSpacePresets = Literal["light", "heavy"]
