@@ -8,13 +8,8 @@ from autointent.generation.utterances.evolution import IncrementalUtteranceEvolv
 from autointent.generation.utterances.generator import Generator
 
 from .chat_templates import (
-    AbstractEvolution,
-    ConcreteEvolution,
-    FormalEvolution,
-    FunnyEvolution,
-    GoofyEvolution,
-    InformalEvolution,
-    ReasoningEvolution,
+    EVOLUTION_MAPPING,
+    EVOLUTION_NAMES,
 )
 
 logging.basicConfig(level="INFO")
@@ -44,14 +39,8 @@ def _parse_args() -> Namespace:
     )
     parser.add_argument("--private", action="store_true", help="Publish privately if --output-repo option is used")
     parser.add_argument("--n-evolutions", type=int, default=1, help="Number of utterances to generate for each intent")
-    parser.add_argument("--decide-for-me", action="store_true")
-    parser.add_argument("--reasoning", action="store_true", help="Whether to use `Reasoning` evolution")
-    parser.add_argument("--concretizing", action="store_true", help="Whether to use `Concretizing` evolution")
-    parser.add_argument("--abstract", action="store_true", help="Whether to use `Abstract` evolution")
-    parser.add_argument("--formal", action="store_true", help="Whether to use `Formal` evolution")
-    parser.add_argument("--funny", action="store_true", help="Whether to use `Funny` evolution")
-    parser.add_argument("--goofy", action="store_true", help="Whether to use `Goofy` evolution")
-    parser.add_argument("--informal", action="store_true", help="Whether to use `Informal` evolution")
+    parser.add_argument("--decide-for-me", action="store_true", help="Enable incremental evolution")
+    parser.add_argument("--template", type=str, choices=EVOLUTION_NAMES, help="Template to use", nargs="+")
     parser.add_argument("--async-mode", action="store_true", help="Enable asynchronous generation")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=4)
@@ -62,25 +51,8 @@ def _parse_args() -> Namespace:
 
 def main() -> None:
     """CLI endpoint."""
-    mapping = {
-        "reasoning": ReasoningEvolution,
-        "concretizing": ConcreteEvolution,
-        "abstract": AbstractEvolution,
-        "formal": FormalEvolution,
-        "funny": FunnyEvolution,
-        "goofy": GoofyEvolution,
-        "informal": InformalEvolution,
-    }
     args = _parse_args()
-    evolutions = []
-
-    for arg_name, evolution_cls in mapping.items():
-        if getattr(args, arg_name):
-            evolutions.append(evolution_cls())  # type: ignore[abstract]
-
-    if not evolutions:
-        logger.warning("No evolutions selected. Exiting.")
-        return
+    evolutions = [EVOLUTION_MAPPING[template_name] for template_name in args.template]
 
     utterance_evolver: UtteranceEvolver
     if args.decide_for_me:
@@ -103,7 +75,7 @@ def main() -> None:
     dataset.to_json(args.output_path)
 
     if args.output_repo is not None:
-        dataset.push_to_hub(args.output_repo)
+        dataset.push_to_hub(args.output_repo, args.private)
 
 
 if __name__ == "__main__":

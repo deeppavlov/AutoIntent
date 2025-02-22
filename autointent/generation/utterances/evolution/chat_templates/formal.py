@@ -3,13 +3,14 @@
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
-from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
 
 
 class FormalEvolution(EvolutionChatTemplate):
     """Chat template for formal tone augmentation."""
+
+    name: str = "formal"
 
     _messages: ClassVar[list[Message]] = [
         Message(
@@ -39,4 +40,3 @@ class FormalEvolution(EvolutionChatTemplate):
             content="My Lenovo laptop frequently restarts and experiences overheating issues. Kindly assist.",
         ),
     ]
-

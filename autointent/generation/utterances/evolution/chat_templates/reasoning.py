@@ -3,13 +3,14 @@
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
-from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
 
 
 class ReasoningEvolution(EvolutionChatTemplate):
     """Chat template for evolution augmentation via reasoning."""
+
+    name = "reasoning"
 
     _messages: ClassVar[list[Message]] = [
         Message(

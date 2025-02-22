@@ -3,7 +3,6 @@
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
-from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
 
@@ -11,6 +10,7 @@ from .base import EvolutionChatTemplate
 class AbstractEvolution(EvolutionChatTemplate):
     """Chat template for evolution augmentation via abstraction."""
 
+    name = "abstract"
     _messages: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,

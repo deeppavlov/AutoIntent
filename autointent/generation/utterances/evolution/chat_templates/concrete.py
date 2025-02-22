@@ -3,13 +3,14 @@
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
-from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
 
 
 class ConcreteEvolution(EvolutionChatTemplate):
     """Chat template for evolution augmentation via concretizing."""
+
+    name = "concrete"
 
     _messages: ClassVar[list[Message]] = [
         Message(
@@ -33,4 +34,3 @@ class ConcreteEvolution(EvolutionChatTemplate):
         ),
         Message(role=Role.ASSISTANT, content="My laptop is constantly rebooting and overheating."),
     ]
-

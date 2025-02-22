@@ -1,6 +1,5 @@
 """Base class for chat templates for evolution augmentation."""
 
-from abc import ABC, abstractmethod
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
@@ -10,8 +9,8 @@ from autointent.schemas import Intent
 class EvolutionChatTemplate:
     """Base class for chat templates for evolution augmentation."""
 
-    invoke_message: Message
     _messages: ClassVar[list[Message]]
+    name: str
 
     def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
         """Make a chat to complete by LLM."""
