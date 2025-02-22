@@ -1,42 +1,47 @@
 """Module for balancing datasets through augmentation of underrepresented classes."""
 
 from collections import defaultdict
-from typing import List
+from collections.abc import Callable
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
-from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
+from autointent.generation.utterances.generator import Generator
+from autointent.generation.utterances.schemas import Message
+from autointent.schemas import Intent
 
 
 class DatasetBalancer:
     """Class for balancing dataset through example augmentation."""
 
-class DatasetBalancer:
     def __init__(
         self,
         generator: Generator,
-        evolutions: List,
-        seed: int = 42,
+        prompt_maker: Callable[[Intent, int], list[Message]],
         async_mode: bool = False,
         max_samples_per_class: int | None = None,
     ) -> None:
-        if not isinstance(generator, Generator):
-            raise TypeError("Generator must be an instance of autointent.generation.utterances.generator.Generator")
-        
-        if not isinstance(evolutions, list) or not all(callable(e) for e in evolutions):
-            raise TypeError("Evolutions must be a list of callable objects")
-        
+        """
+        Initialize the UtteranceBalancer.
+
+        Args:
+            generator (Generator): The generator object used to create utterances.
+            prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
+            seed (int, optional): The seed for random number generation. Defaults to 42.
+            async_mode (bool, optional): Whether to run the generator in asynchronous mode. Defaults to False.
+            max_samples_per_class (int | None, optional): The maximum number of samples per class. Must be a positive integer or None. Defaults to None.
+        Raises:
+            ValueError: If max_samples_per_class is not None and is less than or equal to 0.
+        """
         if max_samples_per_class is not None and max_samples_per_class <= 0:
-            raise ValueError("max_samples_per_class must be a positive integer or None")
-        
-        self.evolver = UtteranceGenerator(generator, evolutions, async_mode)
+            msg = "max_samples_per_class must be a positive integer or None"
+            raise ValueError(msg)
+
+        self.evolver = UtteranceGenerator(generator=generator, prompt_maker=prompt_maker, async_mode=async_mode)
         self.max_samples = max_samples_per_class
 
-
     def balance(
-        self, dataset: Dataset, split: str = Split.TRAIN, n_evolutions: int = 3, batch_size: int = 4
+        self, dataset: Dataset, split: str = Split.TRAIN, batch_size: int = 4
     ) -> Dataset:
         """
         Balances the specified dataset split.
@@ -54,12 +59,11 @@ class DatasetBalancer:
         class_counts = self._count_class_examples(dataset, split)
         max_count = max(class_counts.values())
         target_count = self.max_samples if self.max_samples is not None else max_count
-        print(f"Target count per class: {target_count}")  # Добавить логирование
-
+        print(f"Target count per class: {target_count}")
         for class_id, current_count in class_counts.items():
             if current_count < target_count:
                 needed = target_count - current_count
-                self._augment_class(dataset, split, class_id, needed, n_evolutions, batch_size)
+                self._augment_class(dataset, split, class_id, needed, batch_size)
 
         return dataset
 
@@ -71,13 +75,13 @@ class DatasetBalancer:
         return counts
 
     def _augment_class(
-        self, dataset: Dataset, split: str, class_id: int, needed: int, n_evolutions: int, batch_size: int
+        self, dataset: Dataset, split: str, class_id: int, needed: int, batch_size: int
     ) -> None:
         """Generate additional examples for the class."""
         print("\n📂 DATASET BEFORE AUGMENTATION:")
         self._print_dataset(dataset, split)
         intent = next(i for i in dataset.intents if i.id == class_id)
-        class_name = getattr(intent, 'name', f'class_{class_id}')  # Получаем имя класса, если доступно
+        class_name = getattr(intent, "name", f"class_{class_id}")
         print(f"\n🚀 Starting augmentation for class {class_id} ({class_name})")
         print(f"📊 Initial samples: {len([s for s in dataset[split] if s[Dataset.label_feature] == class_id])}")
         print(f"🎯 Target needed: {needed} samples")
@@ -92,7 +96,7 @@ class DatasetBalancer:
 
         while total_generated < needed:
             print(f"\n🔄 Batch generation: {per_sample_evolutions} evolutions per sample")
-            
+
             generated = self.evolver.augment(
                 dataset, split_name=split, n_generations=per_sample_evolutions, update_split=True, batch_size=batch_size
             )
@@ -101,10 +105,10 @@ class DatasetBalancer:
             print(f"✅ Generated {len(generated)} examples")
             if generated:
                 print("🔠 Example generated utterances:")
-                for i, example in enumerate(generated[:3]): 
+                for i, example in enumerate(generated[:3]):
                     utterance = getattr(example, Dataset.utterance_feature, str(example))
-                    print(f"   {i+1}. {utterance[:60]}...") 
-                    
+                    print(f"   {i+1}. {utterance[:60]}...")
+
             total_generated += len(generated)
             print(f"📈 Progress: {total_generated}/{needed} ({min(100, int(total_generated/needed*100))}%)")
 
@@ -119,7 +123,6 @@ class DatasetBalancer:
         print("\n📦 DATASET AFTER AUGMENTATION:")
         self._print_dataset(dataset, split)
         print("━" * 50)
-        
 
     def _remove_extra_samples(self, dataset: Dataset, split: str, class_id: int, extra: int) -> None:
         """Remove extra examples of the class."""
@@ -128,13 +131,14 @@ class DatasetBalancer:
 
         new_data = [s for i, s in enumerate(dataset[split]) if i not in indices_to_remove]
         dataset[split] = dataset[split].from_list(new_data)
+
     def _print_dataset(self, dataset: Dataset, split: str) -> None:
-            """Helper method to print dataset in readable format"""
-            print(f"Split: {split}")
-            print("-" * 50)
-            for i, sample in enumerate(dataset[split]):
-                label = sample[Dataset.label_feature]
-                text = sample[Dataset.utterance_feature]
-                print(f"{i+1:3d} | {label:15} | {text[:50]:<50}...")
-            print("-" * 50)
-            print(f"Total samples: {len(dataset[split])}\n")
+        """Print the dataset in a readable format."""
+        print(f"Split: {split}")
+        print("-" * 50)
+        for i, sample in enumerate(dataset[split]):
+            label = sample[Dataset.label_feature]
+            text = sample[Dataset.utterance_feature]
+            print(f"{i+1:3d} | {label:15} | {text[:50]:<50}...")
+        print("-" * 50)
+        print(f"Total samples: {len(dataset[split])}\n")
