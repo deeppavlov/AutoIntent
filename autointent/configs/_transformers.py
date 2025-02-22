@@ -15,7 +15,6 @@ class ModelConfig(BaseModel):
 
 
 class STModelConfig(ModelConfig):
-    model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
 
     @classmethod
@@ -30,7 +29,6 @@ class STModelConfig(ModelConfig):
             return cls(model_name=values)
         return cls(**values)
 
-
 class TaskTypeEnum(Enum):
     """Enum for different types of prompts."""
 
@@ -43,6 +41,7 @@ class TaskTypeEnum(Enum):
 
 
 class EmbedderConfig(STModelConfig):
+    model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
     default_prompt: str | None = Field(
         None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
     )
@@ -99,6 +98,7 @@ class EmbedderConfig(STModelConfig):
 
 
 class CrossEncoderConfig(STModelConfig):
+    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L-6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
         False, description="Whether to train the head of the model. If False, LogReg will be trained."
     )
