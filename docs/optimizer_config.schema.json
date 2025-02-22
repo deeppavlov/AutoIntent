@@ -101,11 +101,6 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
-                "model_name": {
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
-                },
                 "device": {
                     "anyOf": [
                         {
@@ -119,6 +114,12 @@
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
                 },
+                "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "train_head": {
                     "default": false,
                     "description": "Whether to train the head of the model. If False, LogReg will be trained.",
@@ -126,9 +127,6 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "CrossEncoderConfig",
             "type": "object"
         },
@@ -153,20 +151,6 @@
                     "description": "Number of trials",
                     "title": "N Trials"
                 },
-                "cross_encoder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/CrossEncoderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Cross Encoder Config",
-                    "type": "array"
-                },
                 "k": {
                     "anyOf": [
                         {
@@ -181,6 +165,26 @@
                         }
                     ],
                     "title": "K"
+                },
+                "cross_encoder_config": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/CrossEncoderConfig"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Cross Encoder Config",
+                    "type": "array"
                 },
                 "embedder_config": {
                     "default": [
@@ -205,7 +209,6 @@
             },
             "required": [
                 "module_name",
-                "cross_encoder_config",
                 "k"
             ],
             "title": "DNNCScorerInitModel",
@@ -369,11 +372,6 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
-                "model_name": {
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
-                },
                 "device": {
                     "anyOf": [
                         {
@@ -386,6 +384,12 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
+                },
+                "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -472,9 +476,6 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "EmbedderConfig",
             "type": "object"
         },
@@ -1123,6 +1124,9 @@
                     "type": "array"
                 },
                 "cross_encoder_config": {
+                    "default": [
+                        null
+                    ],
                     "items": {
                         "anyOf": [
                             {
@@ -1130,6 +1134,9 @@
                             },
                             {
                                 "type": "string"
+                            },
+                            {
+                                "type": "null"
                             }
                         ]
                     },
@@ -1208,8 +1215,7 @@
             "required": [
                 "module_name",
                 "k",
-                "weights",
-                "cross_encoder_config"
+                "weights"
             ],
             "title": "RerankScorerInitModel",
             "type": "object"
