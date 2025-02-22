@@ -11,9 +11,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import NDArray
 
-from autointent.configs import InferenceNodeConfig
+from autointent.configs import EmbedderConfig, InferenceNodeConfig
 from autointent.custom_types import NodeType
-from autointent.schemas import EmbedderConfig
 
 from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
 

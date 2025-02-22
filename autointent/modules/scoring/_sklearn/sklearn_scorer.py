@@ -9,9 +9,9 @@ from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -44,8 +44,8 @@ class SklearnScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
         clf_name: str,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         **clf_args: Any,  # noqa: ANN401
     ) -> None:
         """
@@ -77,7 +77,7 @@ class SklearnScorer(BaseScorer):
         :return: Initialized SklearnScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             embedder_config=embedder_config,

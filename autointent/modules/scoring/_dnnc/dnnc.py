@@ -9,9 +9,9 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +78,8 @@ class DNNCScorer(BaseScorer):
     def __init__(
         self,
         k: PositiveInt,
-        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize the DNNCScorer.
@@ -96,8 +96,8 @@ class DNNCScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        cross_encoder_config: CrossEncoderConfig | str,
         k: PositiveInt,
+        cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":
         """
@@ -110,7 +110,10 @@ class DNNCScorer(BaseScorer):
         :return: Initialized DNNCScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
+
+        if cross_encoder_config is None:
+            cross_encoder_config = context.resolve_ranker()
 
         return cls(
             k=k,

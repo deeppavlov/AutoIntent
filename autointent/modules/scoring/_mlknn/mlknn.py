@@ -7,9 +7,9 @@ from numpy.typing import NDArray
 from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 
 from autointent import Context, VectorIndex
+from autointent.configs import EmbedderConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig
 
 
 class MLKnnScorer(BaseScorer):
@@ -60,7 +60,7 @@ class MLKnnScorer(BaseScorer):
     def __init__(
         self,
         k: PositiveInt,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
     ) -> None:
@@ -97,7 +97,7 @@ class MLKnnScorer(BaseScorer):
         :return: Initialized MLKnnScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             k=k,

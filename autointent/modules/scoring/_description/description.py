@@ -9,11 +9,11 @@ from pydantic import PositiveFloat
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class DescriptionScorer(BaseScorer):
@@ -38,7 +38,7 @@ class DescriptionScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
     ) -> None:
         """
@@ -66,7 +66,7 @@ class DescriptionScorer(BaseScorer):
         :return: Initialized DescriptionScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             temperature=temperature,

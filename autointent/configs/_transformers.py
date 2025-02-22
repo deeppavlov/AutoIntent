@@ -18,16 +18,19 @@ class STModelConfig(ModelConfig):
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
 
     @classmethod
-    def from_search_config(cls, values: dict[str, Any] | str | BaseModel) -> Self:
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
         """Validate the model configuration.
 
         :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
         """
+        if values is None:
+            return cls()
         if isinstance(values, BaseModel):
             return values  # type: ignore[return-value]
         if isinstance(values, str):
             return cls(model_name=values)
         return cls(**values)
+
 
 class TaskTypeEnum(Enum):
     """Enum for different types of prompts."""
