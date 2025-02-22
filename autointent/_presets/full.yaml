@@ -28,11 +28,18 @@
         step: 1
       cross_encoder_config:
         - cross-encoder/ms-marco-MiniLM-L-6-v2
+        - model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
+          train_head: true
     - module_name: mlknn
       k:
         low: 1
         high: 20
         step: 1
+    - module_name: description
+      temperature:
+        low: 0.01
+        high: 10
+        log: true
 - node_type: decision
   target_metric: decision_accuracy
   search_space:

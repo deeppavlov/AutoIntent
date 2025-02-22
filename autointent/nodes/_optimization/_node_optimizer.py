@@ -199,23 +199,25 @@ class NodeOptimizer:
             module = self.node_info.modules_available[module_name]
             # todo add check for oos
 
-            if is_multilabel and not module.supports_multilabel:
-                msg = f"Module '{module_name}' does not support multilabel datasets."
-                if mode == "raise":
-                    self._logger.error(msg)
-                    raise ValueError(msg)
-                if mode == "warning":
-                    self._logger.warning(msg)
-                continue
-            if not is_multilabel and not module.supports_multiclass:
-                msg = f"Module '{module_name}' does not support multiclass datasets."
-                if mode == "raise":
-                    self._logger.error(msg)
-                    raise ValueError(msg)
-                if mode == "warning":
-                    self._logger.warning(msg)
-                continue
+            messages = []
 
-            filtered_search_space.append(search_space)
+            if module_name == "description" and not dataset.has_descriptions:
+                messages.append("DescriptionScorer cannot be used without intents descriptions.")
+
+            if is_multilabel and not module.supports_multilabel:
+                messages.append(f"Module '{module_name}' does not support multilabel datasets.")
+
+            if not is_multilabel and not module.supports_multiclass:
+                messages.append(f"Module '{module_name}' does not support multiclass datasets.")
+
+            if len(messages) > 0:
+                msg = "\n".join(messages)
+                if mode == "raise":
+                    self._logger.error(msg)
+                    raise ValueError(msg)
+                if mode == "warning":
+                    self._logger.warning(msg)
+            else:
+                filtered_search_space.append(search_space)
 
         self.modules_search_spaces = filtered_search_space
