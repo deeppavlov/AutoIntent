@@ -46,7 +46,7 @@ class SklearnScorer(BaseScorer):
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any],
         clf_name: str,
-        clf_args: dict[str, Any] | None = None,
+        **clf_args: Any,  # noqa: ANN401
     ) -> None:
         """
         Initialize the SklearnScorer.
@@ -57,7 +57,7 @@ class SklearnScorer(BaseScorer):
         """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
-        self.clf_args = clf_args or {}
+        self.clf_args = clf_args
 
     @classmethod
     def from_context(
