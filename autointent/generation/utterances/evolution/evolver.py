@@ -13,6 +13,7 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation.utterances import EvolutionChatTemplate
 from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent
@@ -29,7 +30,7 @@ class UtteranceEvolver:
     def __init__(
         self,
         generator: Generator,
-        prompt_makers: Sequence[Callable[[str, Intent], list[Message]]],
+        prompt_makers: Sequence[EvolutionChatTemplate],
         seed: int = 0,
         async_mode: bool = False,
     ) -> None:

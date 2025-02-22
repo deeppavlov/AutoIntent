@@ -70,7 +70,7 @@ class EnglishSynthesizerTemplate(BaseSynthesizerTemplate):
         ),
         Message(
             role=Role.ASSISTANT,
-            content=("1. Can you tell me the forecast for tomorrow?\n" "2. Is it going to rain this weekend?"),
+            content="1. Can you tell me the forecast for tomorrow?\n2. Is it going to rain this weekend?",
         ),
         Message(
             role=Role.USER,

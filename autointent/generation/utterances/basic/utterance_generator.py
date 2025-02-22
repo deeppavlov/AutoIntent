@@ -8,6 +8,7 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation.utterances.basic.chat_templates import BaseSynthesizerTemplate
 from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent, Sample
@@ -23,7 +24,7 @@ class UtteranceGenerator:
     """
 
     def __init__(
-        self, generator: Generator, prompt_maker: Callable[[Intent, int], list[Message]], async_mode: bool = False
+        self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False
     ) -> None:
         """Initialize."""
         self.generator = generator
