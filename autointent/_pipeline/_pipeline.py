@@ -94,9 +94,7 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def from_preset(
-        cls, name: SearchSpacePresets, seed: int = 42
-    ) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePresets, seed: int = 42) -> "Pipeline":
         search_space = load_preset(name)
         return cls.from_search_space(search_space=search_space, seed=seed)
 
