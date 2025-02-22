@@ -66,10 +66,10 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
         ]
 
     def _create_final_message(self, intent_data: Intent, n_examples: int, sample_utterances: list[str]) -> Message:
-        content = f"{self._INTENT_NAME_LABEL}: {intent_data.name}\n\n" f"{self._EXAMPLE_UTTERANCES_LABEL}:\n"
+        content = f"{self._INTENT_NAME_LABEL}: {intent_data.name}\n\n{self._EXAMPLE_UTTERANCES_LABEL}:\n"
 
         if sample_utterances:
-            numbered_utterances = "\n".join(f"{i+1}. {utt}" for i, utt in enumerate(sample_utterances))
+            numbered_utterances = "\n".join(f"{i + 1}. {utt}" for i, utt in enumerate(sample_utterances))
             content += numbered_utterances + "\n\n"
 
         content += self._GENERATE_INSTRUCTION.format(n_examples=n_examples)

@@ -6,7 +6,7 @@ Deeply inspired by DeepEval evolutions.
 
 import asyncio
 import random
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
@@ -15,7 +15,6 @@ from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances import EvolutionChatTemplate
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent
 
 

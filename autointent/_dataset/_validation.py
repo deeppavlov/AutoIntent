@@ -101,7 +101,7 @@ class DatasetReader(BaseModel):
             )
             raise ValueError(message)
         if not n_classes[0]:
-            message = "Number of classes is zero or undefined. " "Ensure at least one class is present in the splits."
+            message = "Number of classes is zero or undefined. Ensure at least one class is present in the splits."
             raise ValueError(message)
         return n_classes[0]
 
@@ -120,8 +120,7 @@ class DatasetReader(BaseModel):
         intent_ids = [intent.id for intent in self.intents]
         if intent_ids != list(range(len(self.intents))):
             message = (
-                f"Invalid intent IDs. Expected sequential IDs from 0 to {len(self.intents) - 1}, "
-                f"but got {intent_ids}."
+                f"Invalid intent IDs. Expected sequential IDs from 0 to {len(self.intents) - 1}, but got {intent_ids}."
             )
             raise ValueError(message)
         return self

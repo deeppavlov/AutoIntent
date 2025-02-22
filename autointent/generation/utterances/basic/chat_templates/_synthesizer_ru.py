@@ -53,7 +53,7 @@ class RussianSynthesizerTemplate(BaseSynthesizerTemplate):
         ),
         Message(
             role=Role.ASSISTANT,
-            content=("1. Забронируйте люкс в Санкт-Петербурге на выходные\n" "2. Ищу номер с видом на море в Сочи"),
+            content=("1. Забронируйте люкс в Санкт-Петербурге на выходные\n2. Ищу номер с видом на море в Сочи"),
         ),
         Message(
             role=Role.USER,
@@ -66,7 +66,7 @@ class RussianSynthesizerTemplate(BaseSynthesizerTemplate):
         ),
         Message(
             role=Role.ASSISTANT,
-            content=("1. Какой прогноз на завтра?\n" "2. Будет ли дождь в субботу?"),
+            content=("1. Какой прогноз на завтра?\n2. Будет ли дождь в субботу?"),
         ),
         Message(
             role=Role.USER,

@@ -9,7 +9,7 @@ from .reasoning import ReasoningEvolution
 
 EVOLUTION_NAMES = [evolution.name for evolution in EvolutionChatTemplate.__subclasses__()]
 
-EVOLUTION_MAPPING = {evolution.name: evolution for evolution in EvolutionChatTemplate.__subclasses__()}
+EVOLUTION_MAPPING = {evolution.name: evolution() for evolution in EvolutionChatTemplate.__subclasses__()}
 
 __all__ = [
     "EVOLUTION_MAPPING",

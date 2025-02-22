@@ -5,7 +5,7 @@ Deeply inspired by DeepEval evolutions.
 """
 
 import copy
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -17,8 +17,6 @@ from autointent.custom_types import Split
 from autointent.generation.utterances import EvolutionChatTemplate
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
-from autointent.schemas import Intent
 
 SEARCH_SPACE = [
     {
