@@ -10,12 +10,11 @@ import yaml
 
 from autointent import Context, Dataset
 from autointent.configs import (
-    # CrossEncoderConfig,
+    CrossEncoderConfig,
     DataConfig,
-    # EmbedderConfig,
+    EmbedderConfig,
     InferenceNodeConfig,
     LoggingConfig,
-    VectorIndexConfig,
 )
 from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.metrics import DECISION_METRICS
@@ -49,13 +48,14 @@ class Pipeline:
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
-            self.vector_index_config = VectorIndexConfig()
+            self.embedder_config = EmbedderConfig()
+            self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
         elif not isinstance(nodes[0], InferenceNode):
             msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
             raise TypeError(msg)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:
+    def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -63,8 +63,10 @@ class Pipeline:
         """
         if isinstance(config, LoggingConfig):
             self.logging_config = config
-        elif isinstance(config, VectorIndexConfig):
-            self.vector_index_config = config
+        elif isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
         elif isinstance(config, DataConfig):
             self.data_config = config
         else:
@@ -153,7 +155,8 @@ class Pipeline:
         context = Context()
         context.set_dataset(dataset, self.data_config)
         context.configure_logging(self.logging_config)
-        context.configure_vector_index(self.vector_index_config)
+        context.configure_transformer(self.embedder_config)
+        context.configure_transformer(self.cross_encoder_config)
 
         self.validate_modules(dataset, mode=incompatible_search_space)
 
