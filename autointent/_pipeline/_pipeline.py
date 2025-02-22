@@ -9,7 +9,14 @@ import numpy as np
 import yaml
 
 from autointent import Context, Dataset
-from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import (
+    CrossEncoderConfig,
+    DataConfig,
+    EmbedderConfig,
+    InferenceNodeConfig,
+    LoggingConfig,
+    VectorIndexConfig,
+)
 from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer

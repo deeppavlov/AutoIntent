@@ -7,6 +7,7 @@ from ._optimization import (
     TaskConfig,
     VectorIndexConfig,
 )
+from ._transformers import EmbedderConfig, CrossEncoderConfig
 
 __all__ = [
     "DataConfig",
@@ -15,4 +16,6 @@ __all__ = [
     "LoggingConfig",
     "TaskConfig",
     "VectorIndexConfig",
+    "EmbedderConfig",
+    "CrossEncoderConfig"
 ]
