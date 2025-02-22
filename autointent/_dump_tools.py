@@ -12,7 +12,8 @@ from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
-from autointent.schemas import CrossEncoderConfig, EmbedderConfig, TagsList
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 

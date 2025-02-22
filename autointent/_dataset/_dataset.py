@@ -204,7 +204,7 @@ class Dataset(dict[str, HFDataset]):
             sample["label"] = ohe_vector
         return sample
 
-    def validate_descriptions(self) -> bool:
+    def validate_descriptions(self) -> None:
         has_any = any(intent.description is not None for intent in self.intents)
         has_all = all(intent.description is not None for intent in self.intents)
 
