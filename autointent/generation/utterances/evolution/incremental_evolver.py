@@ -67,6 +67,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
+        sequential: bool = False,
     ) -> HFDataset:
         """
         Augment some split of dataset.
@@ -79,7 +80,12 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
         for _ in range(n_evolutions):
             new_samples_dataset = super().augment(
-                dataset, split_name=split_name, n_evolutions=1, update_split=False, batch_size=batch_size
+                dataset,
+                split_name=split_name,
+                n_evolutions=1,
+                update_split=False,
+                batch_size=batch_size,
+                sequential=sequential,
             )
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
             generated_samples.append(new_samples_dataset)

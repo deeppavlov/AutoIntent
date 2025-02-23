@@ -45,6 +45,14 @@ def _parse_args() -> Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--search-space", type=str, default=None)
+    parser.add_argument(
+        "--sequential",
+        action="store_true",
+        help=(
+            "Use sequential evolution. When this option is enabled, solutions "
+            "will evolve one after another, instead of using a parallel approach."
+        ),
+    )
 
     return parser.parse_args()
 
@@ -64,7 +72,11 @@ def main() -> None:
     n_before = len(dataset[args.split])
 
     new_samples = utterance_evolver.augment(
-        dataset, split_name=args.split, n_evolutions=args.n_evolutions, batch_size=args.batch_size
+        dataset,
+        split_name=args.split,
+        n_evolutions=args.n_evolutions,
+        batch_size=args.batch_size,
+        sequential=args.sequential,
     )
     n_after = len(dataset[args.split])
 

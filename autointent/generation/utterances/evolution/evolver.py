@@ -51,9 +51,21 @@ class UtteranceEvolver:
         chat = maker(utterance, intent_data)
         return await self.generator.get_chat_completion_async(chat)
 
-    def __call__(self, utterance: str, intent_data: Intent, n_evolutions: int = 1) -> list[str]:
+    def __call__(
+        self, utterance: str, intent_data: Intent, n_evolutions: int = 1, sequential: bool = False
+    ) -> list[str]:
         """Apply evolutions multiple times (synchronously)."""
-        return [self._evolve(utterance, intent_data) for _ in range(n_evolutions)]
+        current_utterance = utterance
+        generated_utterances = []
+
+        for _ in range(n_evolutions):
+            gen_utt = self._evolve(current_utterance, intent_data)
+            generated_utterances.append(gen_utt)
+
+            if sequential:
+                current_utterance = gen_utt
+
+        return generated_utterances
 
     def augment(
         self,
@@ -62,6 +74,7 @@ class UtteranceEvolver:
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
+        sequential: bool = False,
     ) -> HFDataset:
         """
         Augment some split of dataset.
@@ -69,6 +82,10 @@ class UtteranceEvolver:
         Note that for now it supports only single-label datasets.
         """
         if self.async_mode:
+            if sequential:
+                error = "Sequential and async modes are not compatible"
+                raise ValueError(error)
+
             return asyncio.run(
                 self._augment_async(
                     dataset=dataset,
@@ -85,7 +102,9 @@ class UtteranceEvolver:
             utterance = sample[Dataset.utterance_feature]
             label = sample[Dataset.label_feature]
             intent_data = next(intent for intent in dataset.intents if intent.id == label)
-            generated_utterances = self(utterance=utterance, intent_data=intent_data, n_evolutions=n_evolutions)
+            generated_utterances = self(
+                utterance=utterance, intent_data=intent_data, n_evolutions=n_evolutions, sequential=sequential
+            )
             new_samples.extend(
                 [{Dataset.label_feature: intent_data.id, Dataset.utterance_feature: ut} for ut in generated_utterances]
             )
