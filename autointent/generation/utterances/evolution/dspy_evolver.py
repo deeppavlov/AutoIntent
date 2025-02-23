@@ -46,17 +46,17 @@ class TextAugmentSignature(dspy.Signature):
     )
 
 
-# Define a DSPy module that implements text augmentation.
-class TextAugmenter(dspy.Module):
-    def __init__(self) -> None:
-        # Here, we use a ChainOfThought module with the defined signature.
-        # The module is responsible for "thinking through" and generating multiple text variants.
-        super().__init__()
-        self.generator = dspy.ChainOfThought("text, n_examples -> augmented_texts")
-
-    def forward(self, text: str, n_examples: int) -> dspy.Prediction:
-        # Invoke the underlying generator with the input text and desired number of examples.
-        return self.generator(text=text, n_examples=n_examples)
+# # Define a DSPy module that implements text augmentation.
+# class TextAugmenter(dspy.Module):
+#     def __init__(self) -> None:
+#         # Here, we use a ChainOfThought module with the defined signature.
+#         # The module is responsible for "thinking through" and generating multiple text variants.
+#         super().__init__()
+#         self.generator = dspy.ChainOfThought("text, n_examples -> augmented_texts")
+#
+#     def forward(self, text: str, n_examples: int) -> dspy.Prediction:
+#         # Invoke the underlying generator with the input text and desired number of examples.
+#         return self.generator(text=text, n_examples=n_examples)
 
 
 class DSPYIncrementalUtteranceEvolver:
@@ -72,13 +72,14 @@ class DSPYIncrementalUtteranceEvolver:
         random.seed(seed)
 
         turbo = dspy.LM(
-            'openai/mistralai/mistral-small-24b-instruct-2501:free',
-            api_base="https://openrouter.ai/api/v1",
-            api_key="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",
+            'openai/model_name',
+            api_base="http://...",
+            api_key="test",
             model_type='text'
         )
         dspy.settings.configure(lm=turbo)
-        self.module = TextAugmenter()
+        # self.generator = dspy.ChainOfThought("text, n_examples -> augmented_texts: list[str]")
+        self.generator = dspy.ChainOfThought("text -> augmented_texts: list[str]")
 
     def _choose_search_space(self, search_space: str | None) -> list[dict[str, Any]] | Path | str:
         if search_space is None:
@@ -104,33 +105,36 @@ class DSPYIncrementalUtteranceEvolver:
         dspy_dataset = [
             dspy.Example(
                 text=sample[Dataset.utterance_feature],
-                n_examples=1,
-                augmented_texts=[sample[Dataset.utterance_feature]]  # Use original as reference
-            ).with_inputs("text", "n_examples")
+                # n_examples=1,
+                augmented_texts=sample[Dataset.utterance_feature]  # Use original as reference
+            ).with_inputs(
+                "text",
+                # "n_examples"
+            )
             for sample in original_split
         ]
 
         for _ in range(n_evolutions):
             # Optimize prompts using DSPy
-            evaluate = dspy.Evaluate(
-                devset=dspy_dataset,
-                metric=SemanticF1,
-                num_threads=batch_size,
-                display_progress=True,
-            )
-            optimizer = dspy.MIPROv2(
-                metric=SemanticF1,
-                auto="medium",
-                num_threads=batch_size,
-                log_dir="logs"
-            )
-            optimized_module = optimizer.compile(
-                self.module,
-                trainset=dspy_dataset,
-                requires_permission_to_run=False,
-                max_bootstrapped_demos=4,
-                max_labeled_demos=4
-            )
+            # evaluate = dspy.Evaluate(
+            #     devset=dspy_dataset,
+            #     metric=SemanticF1,
+            #     num_threads=batch_size,
+            #     display_progress=True,
+            # )
+            # optimizer = dspy.MIPROv2(
+            #     metric=SemanticF1,
+            #     auto="medium",
+            #     num_threads=batch_size,
+            #     log_dir="logs"
+            # )
+            # optimized_module = optimizer.compile(
+            #     self.generator,
+            #     trainset=dspy_dataset,
+            #     requires_permission_to_run=False,
+            #     max_bootstrapped_demos=4,
+            #     max_labeled_demos=4
+            # )
             # evaluate(optimized_module)
 
             # Generate new samples
@@ -138,7 +142,7 @@ class DSPYIncrementalUtteranceEvolver:
             for sample in original_split:
                 utterance = sample[Dataset.utterance_feature]
                 label = sample[Dataset.label_feature]
-                prediction = optimized_module(text=utterance, n_examples=1)
+                prediction = self.generator(text=utterance)
                 new_samples.extend([{
                     Dataset.label_feature: label,
                     Dataset.utterance_feature: ut
