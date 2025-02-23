@@ -100,6 +100,14 @@ ipykernel = "^6.29.5"
 tensorboardx = "^2.6.2.2"
 sphinx-multiversion = "^0.2.4"
 
+[tool.poetry.group.dspy]
+optional = true
+
+
+[tool.poetry.group.dspy.dependencies]
+dspy = "^2.6.5"
+
+
 [tool.ruff]
 line-length = 120
 indent-width = 4
