@@ -23,13 +23,11 @@ def _create_modules_dict(modules: list[type[T]]) -> dict[str, type[T]]:
 
 REGEX_MODULES: dict[str, type[BaseRegex]] = _create_modules_dict([Regex])
 
-EMBEDDING_MODULES_MULTICLASS: dict[str, type[BaseEmbedding]] = _create_modules_dict(
+EMBEDDING_MODULES: dict[str, type[BaseEmbedding]] = _create_modules_dict(
     [RetrievalAimedEmbedding, LogregAimedEmbedding]
 )
 
-EMBEDDING_MODULES_MULTILABEL: dict[str, type[BaseEmbedding]] = EMBEDDING_MODULES_MULTICLASS
-
-SCORING_MODULES_MULTICLASS: dict[str, type[BaseScorer]] = _create_modules_dict(
+SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
         DNNCScorer,
         KNNScorer,
@@ -37,24 +35,13 @@ SCORING_MODULES_MULTICLASS: dict[str, type[BaseScorer]] = _create_modules_dict(
         DescriptionScorer,
         RerankScorer,
         SklearnScorer,
+        MLKnnScorer,
     ]
 )
 
-SCORING_MODULES_MULTILABEL: dict[str, type[BaseScorer]] = _create_modules_dict(
-    [
-        MLKnnScorer,
-        LinearScorer,
-        DescriptionScorer,
-        SklearnScorer,
-    ],
+DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
+    [ArgmaxDecision, JinoosDecision, ThresholdDecision, TunableDecision, AdaptiveDecision],
 )
 
-DECISION_MODULES_MULTICLASS: dict[str, type[BaseDecision]] = _create_modules_dict(
-    [ArgmaxDecision, JinoosDecision, ThresholdDecision, TunableDecision],
-)
-
-DECISION_MODULES_MULTILABEL: dict[str, type[BaseDecision]] = _create_modules_dict(
-    [AdaptiveDecision, ThresholdDecision, TunableDecision],
-)
 
 __all__ = []  # type: ignore[var-annotated]
