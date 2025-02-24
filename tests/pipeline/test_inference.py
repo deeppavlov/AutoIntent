@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import LoggingConfig, VectorIndexConfig
+from autointent.configs import LoggingConfig
 from tests.conftest import get_search_space, setup_environment
 
 
@@ -16,7 +16,6 @@ def test_inference_config(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -46,7 +45,6 @@ def test_inference_context(dataset, task_type):
     pipeline = Pipeline.from_search_space(search_space)
 
     pipeline.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
-    pipeline.set_config(VectorIndexConfig(save_db=True))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()

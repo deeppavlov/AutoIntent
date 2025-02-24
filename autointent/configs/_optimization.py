@@ -70,10 +70,3 @@ class LoggingConfig(BaseModel):
                 msg = f"Reporter {reporter} is not supported. Supported reporters: {REPORTERS_NAMES}"
                 raise ValueError(msg)
         return v
-
-
-class VectorIndexConfig(BaseModel):
-    """Configuration for the vector index."""
-
-    save_db: bool = False
-    """Whether to save the vector index database or not"""

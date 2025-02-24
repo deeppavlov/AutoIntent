@@ -60,29 +60,6 @@ custom_pipeline = Pipeline.from_search_space(search_space)
 """
 See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
 """
-# %% [markdown]
-"""
-## Vector Index Settings
-
-%mddoclink(class,,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
-
-Default options are the following:
-"""
-
-# %%
-from autointent.configs import VectorIndexConfig
-
-vector_index_config = VectorIndexConfig(save_db=False)
-
-# %% [markdown]
-"""
-- `save_db=False` tells AutoIntent to clear all the files after auto configuration is finished
-
-These settings can be applied in a familiar way:
-"""
-
-# %%
-custom_pipeline.set_config(vector_index_config)
 
 # %% [markdown]
 """
@@ -105,7 +82,7 @@ custom_pipeline.set_config(logging_config)
 
 # %%
 from autointent import Dataset, Pipeline
-from autointent.configs import LoggingConfig, VectorIndexConfig
+from autointent.configs import LoggingConfig
 from autointent.utils import load_default_search_space
 
 # load data
@@ -118,10 +95,8 @@ search_space = load_default_search_space(multilabel=False)
 custom_pipeline = Pipeline.from_search_space(search_space)
 
 # custom settings
-vector_index_config = VectorIndexConfig()
 logging_config = LoggingConfig()
 
-custom_pipeline.set_config(vector_index_config)
 custom_pipeline.set_config(logging_config)
 
 # start auto-configuration

@@ -5,7 +5,6 @@ from ._optimization import (
     DataConfig,
     LoggingConfig,
     TaskConfig,
-    VectorIndexConfig,
 )
 from ._transformers import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum
 
@@ -18,5 +17,4 @@ __all__ = [
     "LoggingConfig",
     "TaskConfig",
     "TaskTypeEnum",
-    "VectorIndexConfig",
 ]
