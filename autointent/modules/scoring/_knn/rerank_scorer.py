@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 
 from autointent import Context, Ranker
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
@@ -64,9 +65,9 @@ class RerankScorer(KNNScorer):
         context: Context,
         k: int,
         weights: WEIGHT_TYPES = "distance",
+        m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
-        m: int | None = None,
         rank_threshold_cutoff: int | None = None,
     ) -> "RerankScorer":
         """

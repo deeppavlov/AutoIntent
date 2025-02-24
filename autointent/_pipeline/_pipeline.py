@@ -100,23 +100,28 @@ class Pipeline:
 
     @classmethod
     def from_preset(cls, name: SearchSpacePresets, seed: int = 42) -> "Pipeline":
-        search_space = load_preset(name)
-        return cls.from_search_space(search_space=search_space, seed=seed)
+        optimization_config = load_preset(name)
+        config = OptimizationConfig(seed=seed, **optimization_config)
+        return cls.from_optimization_config(config=config)
 
     @classmethod
-    def from_optimization_config(cls, config: dict[str, Any] | Path | str) -> "Pipeline":
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
         """
         Create pipeline optimizer from optimization config.
 
         :param config: Optimization config
         :return:
         """
-        if isinstance(config, Path | str):
-            with Path(config).open() as file:
-                loaded_config = yaml.safe_load(file)
+        if isinstance(config, OptimizationConfig):
+            optimization_config = config
         else:
-            loaded_config = config
-        optimization_config = OptimizationConfig(**loaded_config)
+            if isinstance(config, Path | str):
+                with Path(config).open() as file:
+                    dict_params = yaml.safe_load(file)
+            elif isinstance(config, dict):
+                dict_params = config
+            optimization_config = OptimizationConfig(**dict_params)
+
         pipeline = cls(
             [NodeOptimizer(**node.model_dump()) for node in optimization_config.search_space],
             optimization_config.sampler,
@@ -124,6 +129,8 @@ class Pipeline:
         )
         pipeline.set_config(optimization_config.logging_config)
         pipeline.set_config(optimization_config.data_config)
+        pipeline.set_config(optimization_config.embedder_config)
+        pipeline.set_config(optimization_config.cross_encoder_config)
         return pipeline
 
     def _fit(self, context: Context, sampler: SamplerType) -> None:

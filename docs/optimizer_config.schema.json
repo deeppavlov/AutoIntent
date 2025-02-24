@@ -1265,6 +1265,31 @@
                     "title": "Weights",
                     "type": "array"
                 },
+                "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "exclusiveMinimum": 0,
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "default": [
+                        null
+                    ],
+                    "title": "M"
+                },
                 "cross_encoder_config": {
                     "default": [
                         null
@@ -1305,53 +1330,22 @@
                     "title": "Embedder Config",
                     "type": "array"
                 },
-                "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        null
-                    ],
-                    "title": "M"
-                },
                 "rank_threshold_cutoff": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "Rank Threshold Cutoff"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Rank Threshold Cutoff",
+                    "type": "array"
                 }
             },
             "required": [
@@ -1714,6 +1708,32 @@
                 "dump_modules": false,
                 "clear_ram": false,
                 "report_to": null
+            }
+        },
+        "embedder_config": {
+            "$ref": "#/$defs/EmbedderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "device": null,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+                "default_prompt": null,
+                "classifier_prompt": null,
+                "cluster_prompt": null,
+                "sts_prompt": null,
+                "query_prompt": null,
+                "passage_prompt": null,
+                "use_cache": false
+            }
+        },
+        "cross_encoder_config": {
+            "$ref": "#/$defs/CrossEncoderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "device": null,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "train_head": false
             }
         },
         "sampler": {

@@ -1128,6 +1128,31 @@
                     "title": "Weights",
                     "type": "array"
                 },
+                "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "exclusiveMinimum": 0,
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "default": [
+                        null
+                    ],
+                    "title": "M"
+                },
                 "cross_encoder_config": {
                     "default": [
                         null
@@ -1166,23 +1191,6 @@
                         ]
                     },
                     "title": "Embedder Config",
-                    "type": "array"
-                },
-                "m": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "M",
                     "type": "array"
                 },
                 "rank_threshold_cutoff": {

@@ -82,4 +82,4 @@ FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
 
 SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 
-SearchSpacePresets = Literal["light", "heavy"]
+SearchSpacePresets = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]

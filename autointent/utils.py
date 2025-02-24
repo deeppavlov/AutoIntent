@@ -20,11 +20,12 @@ def load_search_space(path: Path | str) -> list[dict[str, Any]]:
         return yaml.safe_load(file)  # type: ignore[no-any-return]
 
 
-def load_preset(name: SearchSpacePresets) -> list[dict[str, Any]]:
+def load_preset(name: SearchSpacePresets) -> dict[str, Any]:
     """
     Load one of preset search spaces.
 
     :param name: name of a presets.
     """
     path = ires.files("autointent._presets").joinpath(name + ".yaml")
-    return load_search_space(path)  # type: ignore[arg-type]
+    with path.open() as file:
+        return yaml.safe_load(file)  # type: ignore[no-any-return]

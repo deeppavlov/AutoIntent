@@ -1,4 +1,3 @@
-# TODO add sklearn RandomForestClassifier
 search_space:
   - node_type: scoring
     target_metric: scoring_roc_auc
@@ -43,4 +42,4 @@ search_space:
       - module_name: jinoos
       - module_name: tunable
       - module_name: adaptive
-sampler: tpe
+sampler: random
