@@ -5,7 +5,7 @@ import numpy as np
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
-from autointent.configs import DataConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import DataConfig, LoggingConfig
 from tests.conftest import setup_environment
 
 
@@ -83,7 +83,6 @@ def test_pipeline_callbacks(dataset):
     ]
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     context = Context()
-    context.configure_vector_index(VectorIndexConfig(save_db=True))
     context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
     context.set_dataset(dataset, DataConfig(scheme="ho", separate_nodes=True))
