@@ -1,15 +1,14 @@
 """Basic generation of new utterances from existing ones."""
 
 import asyncio
-from collections.abc import Callable
 
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation.utterances.basic.chat_templates import BaseSynthesizerTemplate
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent, Sample
 
 
@@ -22,9 +21,7 @@ class UtteranceGenerator:
     punctuation, and length of the desired generations.
     """
 
-    def __init__(
-        self, generator: Generator, prompt_maker: Callable[[Intent, int], list[Message]], async_mode: bool = False
-    ) -> None:
+    def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:
         """Initialize."""
         self.generator = generator
         self.prompt_maker = prompt_maker

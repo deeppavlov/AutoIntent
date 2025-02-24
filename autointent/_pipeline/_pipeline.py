@@ -3,12 +3,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
 
-from autointent import Context, Dataset
+from autointent import Context, Dataset, OptimizationConfig
 from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
@@ -39,17 +39,24 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
+        sampler: SamplerType = "brute",
         seed: int = 42,
     ) -> None:
         """
         Initialize the pipeline optimizer.
 
         :param nodes: list of nodes
+        :param sampler: sampler type
         :param seed: random seed
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
         self.seed = seed
+        if sampler not in get_args(SamplerType):
+            msg = f"Sampler should be one of {get_args(SamplerType)}"
+            raise ValueError(msg)
+
+        self.sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
@@ -96,7 +103,30 @@ class Pipeline:
         search_space = load_preset(name)
         return cls.from_search_space(search_space=search_space, seed=seed)
 
-    def _fit(self, context: Context, sampler: SamplerType = "brute") -> None:
+    @classmethod
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str) -> "Pipeline":
+        """
+        Create pipeline optimizer from optimization config.
+
+        :param config: Optimization config
+        :return:
+        """
+        if isinstance(config, Path | str):
+            with Path(config).open() as file:
+                loaded_config = yaml.safe_load(file)
+        else:
+            loaded_config = config
+        optimization_config = OptimizationConfig(**loaded_config)
+        pipeline = cls(
+            [NodeOptimizer(**node.model_dump()) for node in optimization_config.search_space],
+            optimization_config.sampler,
+            optimization_config.seed,
+        )
+        pipeline.set_config(optimization_config.logging_config)
+        pipeline.set_config(optimization_config.data_config)
+        return pipeline
+
+    def _fit(self, context: Context, sampler: SamplerType) -> None:
         """
         Optimize the pipeline.
 
@@ -105,7 +135,7 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         self.context.callback_handler.start_run(
-            run_name=self.context.logging_config.run_name,
+            run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
         )
         for node_type in NodeType:
@@ -126,7 +156,7 @@ class Pipeline:
         self,
         dataset: Dataset,
         refit_after: bool = False,
-        sampler: SamplerType = "brute",
+        sampler: SamplerType | None = None,
         incompatible_search_space: SearchSpaceValidationMode = "filter",
     ) -> Context:
         """
@@ -152,6 +182,9 @@ class Pipeline:
             self._logger.warning(
                 "Test data is not provided. Final test metrics won't be calculated after pipeline optimization."
             )
+
+        if sampler is None:
+            sampler = self.sampler or "brute"
 
         self._fit(context, sampler)
 

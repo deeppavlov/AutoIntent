@@ -236,7 +236,7 @@ class DataHandler:  # TODO rename to Validator
                 random_seed=self.random_seed,
                 allow_oos_in_train=True,
             )
-        self.dataset[f"{Split.TRAIN}_{self.config.n_folds-1}"] = self.dataset.pop(Split.TRAIN)
+        self.dataset[f"{Split.TRAIN}_{self.config.n_folds - 1}"] = self.dataset.pop(Split.TRAIN)
 
     def _split_validation_from_train(self, size: float) -> None:
         if Split.TRAIN in self.dataset:

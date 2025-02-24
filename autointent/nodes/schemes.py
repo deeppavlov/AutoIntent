@@ -160,7 +160,7 @@ class RegexNodeValidator(BaseModel):
 SearchSpaceTypes: TypeAlias = EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator | RegexNodeValidator
 
 
-class OptimizationConfig(RootModel[list[SearchSpaceTypes]]):
+class OptimizationSearchSpaceConfig(RootModel[list[SearchSpaceTypes]]):
     """Optimizer configuration."""
 
     def __iter__(

@@ -1,11 +1,7 @@
 """Dataclasses for the configuration of the :class:`autointent.Embedder` and other objects."""
 
 from ._inference_node import InferenceNodeConfig
-from ._optimization import (
-    DataConfig,
-    LoggingConfig,
-    TaskConfig,
-)
+from ._optimization import DataConfig, LoggingConfig
 from ._transformers import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum
 
 __all__ = [
@@ -15,6 +11,5 @@ __all__ = [
     "InferenceNodeConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
-    "TaskConfig",
     "TaskTypeEnum",
 ]

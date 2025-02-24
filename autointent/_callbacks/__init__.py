@@ -7,7 +7,7 @@ from autointent._callbacks.wandb import WandbCallback
 
 REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback]}
 
-REPORTERS_NAMES = list(REPORTERS.keys())
+REPORTERS_NAMES = Literal[tuple(REPORTERS.keys())]  # type: ignore[valid-type]
 
 
 def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
