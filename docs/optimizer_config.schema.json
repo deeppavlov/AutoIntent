@@ -1164,38 +1164,52 @@
                     "type": "array"
                 },
                 "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "M",
-                    "type": "array"
+                    "title": "M"
                 },
                 "rank_threshold_cutoff": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Rank Threshold Cutoff",
-                    "type": "array"
+                    "title": "Rank Threshold Cutoff"
                 }
             },
             "required": [
