@@ -16,20 +16,6 @@
         hight: 200
         step: 30
       max_features: [sqrt, log2, null]
-    - module_name: rerank
-      k:
-        low: 5
-        high: 20
-        step: 1
-      weights: [uniform, distance, closest]
-      m:
-        low: 1
-        high: 5
-        step: 1
-      cross_encoder_config:
-        - cross-encoder/ms-marco-MiniLM-L-6-v2
-        - model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
-          train_head: true
     - module_name: mlknn
       k:
         low: 1
