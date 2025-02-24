@@ -8,14 +8,6 @@
         step: 1
       weights: [uniform, distance, closest]
     - module_name: linear
-    - module_name: sklearn
-      clf_name:
-        - RandomForestClassifier
-      n_estimators:
-        low: 15
-        hight: 200
-        step: 30
-      max_features: [sqrt, log2, null]
     - module_name: mlknn
       k:
         low: 1
