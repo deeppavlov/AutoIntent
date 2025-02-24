@@ -25,7 +25,6 @@ from autointent.custom_types import (
 )
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
-from autointent.nodes.schemes import OptimizationConfig
 from autointent.utils import load_preset, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
@@ -89,8 +88,7 @@ class Pipeline:
         """
         if isinstance(search_space, Path | str):
             search_space = load_search_space(search_space)
-        validated_search_space = OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
-        nodes = [NodeOptimizer(**node) for node in validated_search_space]
+        nodes = [NodeOptimizer(**node) for node in search_space]
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
