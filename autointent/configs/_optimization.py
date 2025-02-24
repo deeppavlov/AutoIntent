@@ -33,7 +33,6 @@ class DataConfig(BaseModel):
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
-    _run_name = get_run_name()
     _dirpath: Path | None = None
     _dump_dir: Path | None = None
 
@@ -66,9 +65,9 @@ class LoggingConfig(BaseModel):
         return self._dump_dir
 
     def get_run_name(self) -> str:
-        if self._run_name is None:
-            self._run_name = self.run_name if self.run_name is not None else get_run_name()
-        return self._run_name
+        if self.run_name is None:
+            self.run_name = get_run_name()
+        return self.run_name
 
 
 class VectorIndexConfig(BaseModel):
