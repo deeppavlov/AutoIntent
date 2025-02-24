@@ -26,5 +26,5 @@ def load_preset(name: SearchSpacePresets) -> list[dict[str, Any]]:
 
     :param name: name of a presets.
     """
-    path = ires.files("autointent._presets").joinpath(name)
+    path = ires.files("autointent._presets").joinpath(name + ".yaml")
     return load_search_space(path)  # type: ignore[arg-type]
