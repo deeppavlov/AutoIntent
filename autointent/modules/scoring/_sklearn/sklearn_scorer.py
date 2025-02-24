@@ -3,7 +3,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sklearn.linear_model import LogisticRegression
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
@@ -69,7 +68,7 @@ class SklearnScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        clf_name: str = LogisticRegression.__name__,
+        clf_name: str,
         embedder_config: EmbedderConfig | str | None = None,
         **clf_args: Any,  # noqa: ANN401
     ) -> Self:
