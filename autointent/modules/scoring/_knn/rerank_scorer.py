@@ -63,7 +63,7 @@ class RerankScorer(KNNScorer):
         cls,
         context: Context,
         k: int,
-        weights: WEIGHT_TYPES,
+        weights: WEIGHT_TYPES = "distance",
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
         m: int | None = None,

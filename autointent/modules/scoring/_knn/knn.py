@@ -81,7 +81,7 @@ class KNNScorer(BaseScorer):
         cls,
         context: Context,
         k: PositiveInt,
-        weights: WEIGHT_TYPES,
+        weights: WEIGHT_TYPES = "distance",
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
         """

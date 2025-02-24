@@ -668,6 +668,9 @@
                     "title": "K"
                 },
                 "weights": {
+                    "default": [
+                        "distance"
+                    ],
                     "items": {
                         "enum": [
                             "uniform",
@@ -702,8 +705,7 @@
             },
             "required": [
                 "module_name",
-                "k",
-                "weights"
+                "k"
             ],
             "title": "KNNScorerInitModel",
             "type": "object"
@@ -1112,6 +1114,9 @@
                     "title": "K"
                 },
                 "weights": {
+                    "default": [
+                        "distance"
+                    ],
                     "items": {
                         "enum": [
                             "uniform",
@@ -1164,58 +1169,43 @@
                     "type": "array"
                 },
                 "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "M"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "M",
+                    "type": "array"
                 },
                 "rank_threshold_cutoff": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "Rank Threshold Cutoff"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Rank Threshold Cutoff",
+                    "type": "array"
                 }
             },
             "required": [
                 "module_name",
-                "k",
-                "weights"
+                "k"
             ],
             "title": "RerankScorerInitModel",
             "type": "object"
@@ -1388,9 +1378,6 @@
                     "title": "N Trials"
                 },
                 "clf_name": {
-                    "default": [
-                        "LogisticRegression"
-                    ],
                     "items": {
                         "type": "string"
                     },
@@ -1425,6 +1412,7 @@
             },
             "required": [
                 "module_name",
+                "clf_name",
                 "clf_args"
             ],
             "title": "SklearnScorerInitModel",
