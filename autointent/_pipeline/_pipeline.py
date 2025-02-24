@@ -4,6 +4,7 @@ import json
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+from typing_extensions import assert_never
 
 import numpy as np
 import yaml
@@ -27,7 +28,7 @@ class Pipeline:
 
     def __init__(
         self,
-        nodes: list[NodeOptimizer] | list[InferenceNode] | list[Any],
+        nodes: list[NodeOptimizer] | list[InferenceNode],
         seed: int = 42,
     ) -> None:
         """
@@ -45,10 +46,9 @@ class Pipeline:
             self.vector_index_config = VectorIndexConfig()
             self.data_config = DataConfig()
         elif not isinstance(nodes[0], InferenceNode):
-            msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
-            raise TypeError(msg)
+            assert_never(nodes)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig | Any) -> None:  # noqa: ANN401
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:  # noqa: ANN401
         """
         Set configuration for the optimizer.
 
@@ -61,8 +61,7 @@ class Pipeline:
         elif isinstance(config, DataConfig):
             self.data_config = config
         else:
-            msg = "unknown config type"
-            raise TypeError(msg)
+            assert_never(config)
 
     @classmethod
     def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
