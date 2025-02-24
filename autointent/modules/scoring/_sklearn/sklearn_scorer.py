@@ -57,7 +57,7 @@ class SklearnScorer(BaseScorer):
         """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
-        
+
         if AVAILABLE_CLASSIFIERS.get(self.clf_name):
             self._base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**clf_args)
         else:

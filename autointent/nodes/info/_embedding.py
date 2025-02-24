@@ -28,8 +28,6 @@ class EmbeddingNodeInfo(NodeInfo):
         | SCORING_METRICS_MULTICLASS
     )
 
-    modules_available: ClassVar[Mapping[str, type[BaseEmbedding]]] = (
-        EMBEDDING_MODULES
-    )
+    modules_available: ClassVar[Mapping[str, type[BaseEmbedding]]] = EMBEDDING_MODULES
 
     node_type = NodeType.embedding

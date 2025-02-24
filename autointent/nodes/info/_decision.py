@@ -16,8 +16,6 @@ class DecisionNodeInfo(NodeInfo):
 
     metrics_available: ClassVar[Mapping[str, DecisionMetricFn]] = DECISION_METRICS
 
-    modules_available: ClassVar[dict[str, type[BaseDecision]]] = (
-        DECISION_MODULES
-    )
+    modules_available: ClassVar[dict[str, type[BaseDecision]]] = DECISION_MODULES
 
     node_type = NodeType.decision
