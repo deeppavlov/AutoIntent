@@ -4,10 +4,10 @@ import json
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from typing_extensions import assert_never
 
 import numpy as np
 import yaml
+from typing_extensions import assert_never
 
 from autointent import Context, Dataset
 from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
@@ -48,7 +48,7 @@ class Pipeline:
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:  # noqa: ANN401
+    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:
         """
         Set configuration for the optimizer.
 
