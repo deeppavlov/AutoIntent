@@ -53,19 +53,25 @@ class SklearnScorer(BaseScorer):
 
         :param embedder_config: Config of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
-        :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
+        :param clf_args: dictionary with the chosen sklearn classifier arguments.
         """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
-        self.clf_args = clf_args
+        
+        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
+            self._base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**clf_args)
+        else:
+            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
+            logger.error(msg)
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
         clf_name: str = LogisticRegression.__name__,
-        clf_args: dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | None = None,
+        **clf_args: Any,  # noqa: ANN401
     ) -> Self:
         """
         Create a SklearnScorer instance using a Context object.
@@ -82,7 +88,7 @@ class SklearnScorer(BaseScorer):
         return cls(
             embedder_config=embedder_config,
             clf_name=clf_name,
-            clf_args=clf_args,
+            **clf_args,
         )
 
     def fit(
@@ -112,14 +118,8 @@ class SklearnScorer(BaseScorer):
             )
         )
         features = embedder.embed(utterances, TaskTypeEnum.classification)
-        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
-            base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
-        else:
-            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
-            logger.error(msg)
-            raise ValueError(msg)
 
-        clf = MultiOutputClassifier(base_clf) if self._multilabel else base_clf
+        clf = MultiOutputClassifier(self._base_clf) if self._multilabel else self._base_clf
 
         clf.fit(features, labels)
 
