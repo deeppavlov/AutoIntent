@@ -19,7 +19,7 @@
     - module_name: linear
     - module_name: sklearn
       clf_name:
-        - RandomForest
+        - RandomForestClassifier
       n_estimators:
         low: 5
         high: 10
