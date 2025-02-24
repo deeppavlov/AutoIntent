@@ -1164,52 +1164,38 @@
                     "type": "array"
                 },
                 "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "M"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "M",
+                    "type": "array"
                 },
                 "rank_threshold_cutoff": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
                     "default": [
                         null
                     ],
-                    "title": "Rank Threshold Cutoff"
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Rank Threshold Cutoff",
+                    "type": "array"
                 }
             },
             "required": [
@@ -1397,23 +1383,6 @@
                     "title": "Clf Name",
                     "type": "array"
                 },
-                "clf_args": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "object"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Clf Args",
-                    "type": "array"
-                },
                 "embedder_config": {
                     "default": [
                         null
@@ -1433,10 +1402,16 @@
                     },
                     "title": "Embedder Config",
                     "type": "array"
+                },
+                "clf_args": {
+                    "items": {},
+                    "title": "Clf Args",
+                    "type": "array"
                 }
             },
             "required": [
-                "module_name"
+                "module_name",
+                "clf_args"
             ],
             "title": "SklearnScorerInitModel",
             "type": "object"
