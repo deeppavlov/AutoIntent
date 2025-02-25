@@ -27,12 +27,11 @@ dataset["train_0"][0]
 """
 ## Search Space
 
-AutoIntent provides default search spaces for multi-label and single-label classification problems. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,default_optimizer):
+AutoIntent provides default search spaces. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,from_preset):
 """
 
 # %%
-multiclass_pipeline = Pipeline.default_optimizer(multilabel=False)
-multilabel_pipeline = Pipeline.default_optimizer(multilabel=True)
+pipeline = Pipeline.from_preset("light_extra")
 
 # %% [markdown]
 """
@@ -42,10 +41,10 @@ One can explore its contents:
 # %%
 from pprint import pprint
 
-from autointent.utils import load_default_search_space
+from autointent.utils import load_preset
 
-search_space = load_default_search_space(multilabel=True)
-pprint(search_space)
+preset = load_preset("light_extra")
+pprint(preset)
 
 # %% [markdown]
 """
@@ -53,8 +52,8 @@ Search space is allowed to customize:
 """
 
 # %%
-search_space[1]["search_space"][0]["k"] = [1, 3]
-custom_pipeline = Pipeline.from_search_space(search_space)
+preset["search_space"][1]["search_space"][0]["k"] = [1, 3]
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
@@ -83,16 +82,16 @@ custom_pipeline.set_config(logging_config)
 # %%
 from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig
-from autointent.utils import load_default_search_space
+from autointent.utils import load_preset
 
 # load data
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 
 # customize search space
-search_space = load_default_search_space(multilabel=False)
+preset = load_preset("light_extra")
 
 # make pipeline
-custom_pipeline = Pipeline.from_search_space(search_space)
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # custom settings
 logging_config = LoggingConfig()
