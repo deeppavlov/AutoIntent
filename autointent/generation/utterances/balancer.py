@@ -73,7 +73,7 @@ class DatasetBalancer:
 
     def _count_class_examples(self, dataset: Dataset, split: str) -> dict[int, int]:
         """Count the number of examples for each class."""
-        counts = defaultdict(int)
+        counts: dict[int, int] = defaultdict(int)
         for sample in dataset[split]:
             counts[sample[Dataset.label_feature]] += 1
         return counts
@@ -91,7 +91,7 @@ class DatasetBalancer:
             msg = f"No samples for class {class_id}"
             raise ValueError(msg)
 
-        generated_utterances = []
+        generated_utterances: list[str] = []
         max_attempts = 5
         attempts = 0
 
@@ -165,7 +165,7 @@ class DatasetBalancer:
         """Print the dataset in a readable format."""
         logger.debug("Split: %s", split)
 
-        class_counts = defaultdict(int)
+        class_counts: dict[int, int] = defaultdict(int)
         for sample in dataset[split]:
             class_counts[sample[Dataset.label_feature]] += 1
 

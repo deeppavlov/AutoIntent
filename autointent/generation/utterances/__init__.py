@@ -26,5 +26,5 @@ __all__ = [
     "SynthesizerChatTemplate",
     "UtteranceEvolver",
     "UtteranceGenerator",
-    "DatasetBalancer"
+    "DatasetBalancer",
 ]
