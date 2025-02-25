@@ -179,7 +179,7 @@ class Pipeline:
 
         :param dataset: dataset to validate with
         """
-        for node in self.nodes.values():
+        for node in self.nodes.values():  # type: ignore[unreachable]
             if isinstance(node, NodeOptimizer):
                 node.validate_nodes_with_dataset(dataset)
 
