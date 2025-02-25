@@ -5,7 +5,7 @@ Deeply inspired by DeepEval evolutions.
 """
 
 import copy
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -14,10 +14,9 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset, Pipeline
 from autointent.custom_types import Split
+from autointent.generation.utterances.evolution.chat_templates import EvolutionChatTemplate
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
-from autointent.schemas import Intent
 
 SEARCH_SPACE = [
     {
@@ -47,7 +46,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
     def __init__(
         self,
         generator: Generator,
-        prompt_makers: Sequence[Callable[[str, Intent], list[Message]]],
+        prompt_makers: Sequence[EvolutionChatTemplate],
         seed: int = 0,
         async_mode: bool = False,
         search_space: str | None = None,
@@ -68,6 +67,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
+        sequential: bool = False,
     ) -> HFDataset:
         """
         Augment some split of dataset.
@@ -80,7 +80,12 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
         for _ in range(n_evolutions):
             new_samples_dataset = super().augment(
-                dataset, split_name=split_name, n_evolutions=1, update_split=False, batch_size=batch_size
+                dataset,
+                split_name=split_name,
+                n_evolutions=1,
+                update_split=False,
+                batch_size=batch_size,
+                sequential=sequential,
             )
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
             generated_samples.append(new_samples_dataset)

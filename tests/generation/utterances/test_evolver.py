@@ -1,5 +1,7 @@
 from unittest.mock import AsyncMock, Mock
 
+import pytest
+
 from autointent.generation.utterances import AbstractEvolution, IncrementalUtteranceEvolver, UtteranceEvolver
 
 
@@ -22,6 +24,14 @@ def test_on_dataset_incremental(dataset):
 
     n_before = len(dataset[split_name])
     new_samples = augmenter.augment(dataset, split_name=split_name, n_evolutions=1, update_split=True)
+    n_after = len(dataset[split_name])
+
+    assert n_before + len(new_samples) == n_after
+    assert len(new_samples) == n_before
+    assert set(new_samples.column_names) == set(dataset[split_name].column_names)
+
+    n_before = len(dataset[split_name])
+    new_samples = augmenter.augment(dataset, split_name=split_name, n_evolutions=1, update_split=True, sequential=True)
     n_after = len(dataset[split_name])
 
     assert n_before + len(new_samples) == n_after
@@ -54,6 +64,11 @@ def test_on_dataset_increment_evolver_async(dataset):
     assert len(new_samples) == n_before
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
 
+    with pytest.raises(ValueError, match="Sequential and async modes are not compatible"):
+        new_samples = augmenter.augment(
+            dataset, split_name=split_name, n_evolutions=1, update_split=True, sequential=True
+        )
+
 
 def test_on_dataset_increment_evolver_async_with_batch_size(dataset):
     mock_llm = AsyncMock()
@@ -79,6 +94,11 @@ def test_on_dataset_increment_evolver_async_with_batch_size(dataset):
 
     assert len(new_samples) == len(dataset[split_name])
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
+
+    with pytest.raises(ValueError, match="Sequential and async modes are not compatible"):
+        new_samples = augmenter.augment(
+            dataset, split_name=split_name, n_evolutions=1, update_split=True, batch_size=batch_size, sequential=True
+        )
 
 
 def test_default_chat_template(dataset):
@@ -112,6 +132,14 @@ def test_on_dataset(dataset):
     assert len(new_samples) == n_before
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
 
+    n_before = len(dataset[split_name])
+    new_samples = augmenter.augment(dataset, split_name=split_name, n_evolutions=1, update_split=True, sequential=True)
+    n_after = len(dataset[split_name])
+
+    assert n_before + len(new_samples) == n_after
+    assert len(new_samples) == n_before
+    assert set(new_samples.column_names) == set(dataset[split_name].column_names)
+
 
 def test_on_dataset_evolver_async(dataset):
     mock_llm = AsyncMock()
@@ -138,6 +166,11 @@ def test_on_dataset_evolver_async(dataset):
     assert len(new_samples) == n_before
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
 
+    with pytest.raises(ValueError, match="Sequential and async modes are not compatible"):
+        new_samples = augmenter.augment(
+            dataset, split_name=split_name, n_evolutions=1, update_split=True, sequential=True
+        )
+
 
 def test_on_dataset_evolver_async_with_batch_size(dataset):
     mock_llm = AsyncMock()
@@ -163,3 +196,8 @@ def test_on_dataset_evolver_async_with_batch_size(dataset):
 
     assert len(new_samples) == len(dataset[split_name])
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
+
+    with pytest.raises(ValueError, match="Sequential and async modes are not compatible"):
+        new_samples = augmenter.augment(
+            dataset, split_name=split_name, n_evolutions=1, update_split=True, batch_size=batch_size, sequential=True
+        )

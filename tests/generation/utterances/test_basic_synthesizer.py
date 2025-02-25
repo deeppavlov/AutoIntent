@@ -1,6 +1,6 @@
 from unittest.mock import AsyncMock, Mock
 
-from autointent.generation.utterances import SynthesizerChatTemplate, UtteranceGenerator
+from autointent.generation.utterances import EnglishSynthesizerTemplate, UtteranceGenerator
 
 
 def has_unfilled_fields(template):
@@ -13,7 +13,7 @@ def has_unfilled_fields(template):
 
 
 def test_default_chat_template(dataset):
-    template = SynthesizerChatTemplate(dataset, split="train_0")
+    template = EnglishSynthesizerTemplate(dataset, split="train_0")
     prompt = template(dataset.intents[0], n_examples=1)
     for msg in prompt:
         assert not has_unfilled_fields(msg["content"])
@@ -21,7 +21,7 @@ def test_default_chat_template(dataset):
 
 
 def test_extra_instructions(dataset):
-    template = SynthesizerChatTemplate(dataset, split="train_0", extra_instructions="football")
+    template = EnglishSynthesizerTemplate(dataset, split="train_0", extra_instructions="football")
     prompt = template(dataset.intents[0], n_examples=1)[0]["content"]
     assert "extra_instructions" not in prompt
     assert "football" in prompt
@@ -33,7 +33,7 @@ def test_on_dataset(dataset):
 
     split_name = "train_0"
 
-    template = SynthesizerChatTemplate(dataset, split=split_name)
+    template = EnglishSynthesizerTemplate(dataset, split=split_name)
     augmenter = UtteranceGenerator(mock_llm, template)
 
     n_before = len(dataset[split_name])
@@ -58,7 +58,7 @@ def test_on_dataset_async(dataset):
 
     split_name = "train_0"
 
-    template = SynthesizerChatTemplate(dataset, split=split_name)
+    template = EnglishSynthesizerTemplate(dataset, split=split_name)
     augmenter = UtteranceGenerator(mock_llm, template, async_mode=True)
 
     n_before = len(dataset[split_name])
@@ -83,7 +83,7 @@ def test_on_dataset_async_with_batch_size(dataset):
 
     split_name = "train_0"
 
-    template = SynthesizerChatTemplate(dataset, split=split_name)
+    template = EnglishSynthesizerTemplate(dataset, split=split_name)
     augmenter = UtteranceGenerator(mock_llm, template, async_mode=True)
 
     batch_size = 2

@@ -211,53 +211,6 @@
             "title": "DNNCScorerInitModel",
             "type": "object"
         },
-        "DataConfig": {
-            "description": "Configuration for the data used in the optimization process.",
-            "properties": {
-                "scheme": {
-                    "default": "ho",
-                    "description": "Validation scheme to use.",
-                    "enum": [
-                        "ho",
-                        "cv"
-                    ],
-                    "title": "Scheme",
-                    "type": "string"
-                },
-                "n_folds": {
-                    "default": 3,
-                    "description": "Number of folds in cross-validation.",
-                    "exclusiveMinimum": 0,
-                    "title": "N Folds",
-                    "type": "integer"
-                },
-                "validation_size": {
-                    "default": 0.2,
-                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
-                    "maximum": 1.0,
-                    "minimum": 0.0,
-                    "title": "Validation Size",
-                    "type": "number"
-                },
-                "separation_ratio": {
-                    "anyOf": [
-                        {
-                            "maximum": 1.0,
-                            "minimum": 0.0,
-                            "type": "number"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": 0.5,
-                    "description": "Set to float to prevent data leak between scoring and decision nodes.",
-                    "title": "Separation Ratio"
-                }
-            },
-            "title": "DataConfig",
-            "type": "object"
-        },
         "DecisionNodeValidator": {
             "description": "Search space configuration for the Decision node.",
             "properties": {
@@ -802,75 +755,6 @@
             "title": "LinearScorerInitModel",
             "type": "object"
         },
-        "LoggingConfig": {
-            "description": "Configuration for the logging.",
-            "properties": {
-                "project_dir": {
-                    "anyOf": [
-                        {
-                            "format": "path",
-                            "type": "string"
-                        },
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Path to the directory with different runs.",
-                    "title": "Project Dir"
-                },
-                "run_name": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Name of the run. If None, a random name will be generated.",
-                    "title": "Run Name"
-                },
-                "dump_modules": {
-                    "default": false,
-                    "description": "Whether to dump the modules or not",
-                    "title": "Dump Modules",
-                    "type": "boolean"
-                },
-                "clear_ram": {
-                    "default": false,
-                    "description": "Whether to clear the RAM after dumping the modules",
-                    "title": "Clear Ram",
-                    "type": "boolean"
-                },
-                "report_to": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "enum": [
-                                    "wandb",
-                                    "tensorboard"
-                                ],
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "List of callbacks to report to. If None, no callbacks will be used",
-                    "title": "Report To"
-                }
-            },
-            "title": "LoggingConfig",
-            "type": "object"
-        },
         "LogregAimedEmbeddingInitModel": {
             "properties": {
                 "module_name": {
@@ -1042,27 +926,6 @@
             ],
             "title": "NodeType",
             "type": "string"
-        },
-        "OptimizationSearchSpaceConfig": {
-            "description": "Optimizer configuration.",
-            "items": {
-                "anyOf": [
-                    {
-                        "$ref": "#/$defs/EmbeddingNodeValidator"
-                    },
-                    {
-                        "$ref": "#/$defs/ScoringNodeValidator"
-                    },
-                    {
-                        "$ref": "#/$defs/DecisionNodeValidator"
-                    },
-                    {
-                        "$ref": "#/$defs/RegexNodeValidator"
-                    }
-                ]
-            },
-            "title": "OptimizationSearchSpaceConfig",
-            "type": "array"
         },
         "ParamSpaceFloat": {
             "properties": {
@@ -1572,29 +1435,6 @@
             "title": "SklearnScorerInitModel",
             "type": "object"
         },
-        "TaskConfig": {
-            "description": "Configuration for the task to optimize.",
-            "properties": {
-                "search_space": {
-                    "$ref": "#/$defs/OptimizationSearchSpaceConfig"
-                },
-                "sampler": {
-                    "default": "brute",
-                    "enum": [
-                        "brute",
-                        "tpe",
-                        "random"
-                    ],
-                    "title": "Sampler",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "search_space"
-            ],
-            "title": "TaskConfig",
-            "type": "object"
-        },
         "ThresholdDecisionInitModel": {
             "properties": {
                 "module_name": {
@@ -1716,61 +1556,25 @@
             ],
             "title": "TunableDecisionInitModel",
             "type": "object"
-        },
-        "VectorIndexConfig": {
-            "description": "Configuration for the vector index.",
-            "properties": {
-                "save_db": {
-                    "default": false,
-                    "description": "Whether to save the vector index database or not",
-                    "title": "Save Db",
-                    "type": "boolean"
-                }
+        }
+    },
+    "description": "Optimizer configuration.",
+    "items": {
+        "anyOf": [
+            {
+                "$ref": "#/$defs/EmbeddingNodeValidator"
             },
-            "title": "VectorIndexConfig",
-            "type": "object"
-        }
+            {
+                "$ref": "#/$defs/ScoringNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/DecisionNodeValidator"
+            },
+            {
+                "$ref": "#/$defs/RegexNodeValidator"
+            }
+        ]
     },
-    "description": "Configuration for the optimization process.",
-    "properties": {
-        "data_config": {
-            "$ref": "#/$defs/DataConfig",
-            "default": {
-                "scheme": "ho",
-                "n_folds": 3,
-                "validation_size": 0.2,
-                "separation_ratio": 0.5
-            }
-        },
-        "task_config": {
-            "$ref": "#/$defs/TaskConfig"
-        },
-        "logging_config": {
-            "$ref": "#/$defs/LoggingConfig",
-            "default": {
-                "project_dir": null,
-                "run_name": null,
-                "dump_modules": false,
-                "clear_ram": false,
-                "report_to": null
-            }
-        },
-        "vector_index_config": {
-            "$ref": "#/$defs/VectorIndexConfig",
-            "default": {
-                "save_db": false
-            }
-        },
-        "seed": {
-            "default": 42,
-            "exclusiveMinimum": 0,
-            "title": "Seed",
-            "type": "integer"
-        }
-    },
-    "required": [
-        "task_config"
-    ],
-    "title": "OptimizationConfig",
-    "type": "object"
+    "title": "OptimizationSearchSpaceConfig",
+    "type": "array"
 }
