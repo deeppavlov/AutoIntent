@@ -16,6 +16,7 @@ from .generator import Generator
 __all__ = [
     "AbstractEvolution",
     "ConcreteEvolution",
+    "DatasetBalancer",
     "EvolutionChatTemplate",
     "FormalEvolution",
     "FunnyEvolution",
@@ -26,5 +27,4 @@ __all__ = [
     "SynthesizerChatTemplate",
     "UtteranceEvolver",
     "UtteranceGenerator",
-    "DatasetBalancer",
 ]
