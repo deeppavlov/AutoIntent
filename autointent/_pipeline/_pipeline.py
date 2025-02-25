@@ -179,7 +179,7 @@ class Pipeline:
             )
 
         if sampler is None:
-            sampler = self.sampler or "brute"
+            sampler = self.sampler
 
         self._fit(context, sampler)
 
@@ -213,7 +213,7 @@ class Pipeline:
 
         :param dataset: dataset to validate with
         """
-        for node in self.nodes.values():  # type: ignore[unreachable]
+        for node in self.nodes.values():
             if isinstance(node, NodeOptimizer):
                 node.validate_nodes_with_dataset(dataset)
 
