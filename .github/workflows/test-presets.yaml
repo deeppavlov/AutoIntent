@@ -1,4 +1,4 @@
-name: test optimization
+name: test presets
 
 on:
   push:
