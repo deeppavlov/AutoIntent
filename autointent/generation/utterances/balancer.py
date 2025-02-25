@@ -1,5 +1,6 @@
 """Module for balancing datasets through augmentation of underrepresented classes."""
 
+import logging
 from collections import defaultdict
 from collections.abc import Callable
 
@@ -9,6 +10,8 @@ from autointent.generation.utterances.basic.utterance_generator import Utterance
 from autointent.generation.utterances.generator import Generator
 from autointent.generation.utterances.schemas import Message
 from autointent.schemas import Intent
+
+logger = logging.getLogger(__name__)
 
 
 class DatasetBalancer:
@@ -29,7 +32,8 @@ class DatasetBalancer:
             prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
             seed (int, optional): The seed for random number generation. Defaults to 42.
             async_mode (bool, optional): Whether to run the generator in asynchronous mode. Defaults to False.
-            max_samples_per_class (int | None, optional): The maximum number of samples per class. Must be a positive integer or None. Defaults to None.
+            max_samples_per_class (int | None, optional): The maximum number of samples per class.
+                Must be a positive integer or None. Defaults to None.
         Raises:
             ValueError: If max_samples_per_class is not None and is less than or equal to 0.
         """
@@ -37,12 +41,12 @@ class DatasetBalancer:
             msg = "max_samples_per_class must be a positive integer or None"
             raise ValueError(msg)
 
-        self.evolver = UtteranceGenerator(generator=generator, prompt_maker=prompt_maker, async_mode=async_mode)
+        self.utterance_generator = UtteranceGenerator(
+            generator=generator, prompt_maker=prompt_maker, async_mode=async_mode
+        )
         self.max_samples = max_samples_per_class
 
-    def balance(
-        self, dataset: Dataset, split: str = Split.TRAIN, batch_size: int = 4
-    ) -> Dataset:
+    def balance(self, dataset: Dataset, split: str = Split.TRAIN, batch_size: int = 4) -> Dataset:
         """
         Balances the specified dataset split.
 
@@ -59,7 +63,7 @@ class DatasetBalancer:
         class_counts = self._count_class_examples(dataset, split)
         max_count = max(class_counts.values())
         target_count = self.max_samples if self.max_samples is not None else max_count
-        print(f"Target count per class: {target_count}")
+        logger.debug("Target count per class: %s", target_count)
         for class_id, current_count in class_counts.items():
             if current_count < target_count:
                 needed = target_count - current_count
@@ -74,55 +78,80 @@ class DatasetBalancer:
             counts[sample[Dataset.label_feature]] += 1
         return counts
 
-    def _augment_class(
-        self, dataset: Dataset, split: str, class_id: int, needed: int, batch_size: int
-    ) -> None:
+    def _augment_class(self, dataset: Dataset, split: str, class_id: int, needed: int, batch_size: int) -> None:
         """Generate additional examples for the class."""
-        print("\n📂 DATASET BEFORE AUGMENTATION:")
-        self._print_dataset(dataset, split)
         intent = next(i for i in dataset.intents if i.id == class_id)
         class_name = getattr(intent, "name", f"class_{class_id}")
-        print(f"\n🚀 Starting augmentation for class {class_id} ({class_name})")
-        print(f"📊 Initial samples: {len([s for s in dataset[split] if s[Dataset.label_feature] == class_id])}")
-        print(f"🎯 Target needed: {needed} samples")
+        logger.debug("Starting augmentation for class %s (%s)", class_id, class_name)
+        logger.debug("Initial samples: %s", len([s for s in dataset[split] if s[Dataset.label_feature] == class_id]))
+        logger.debug("Target needed: %s samples", needed)
 
         class_samples = [s for s in dataset[split] if s[Dataset.label_feature] == class_id]
         if not class_samples:
             msg = f"No samples for class {class_id}"
             raise ValueError(msg)
 
-        per_sample_evolutions = max(1, needed // len(class_samples))
-        total_generated = 0
+        generated_utterances = []
+        max_attempts = 5
+        attempts = 0
 
-        while total_generated < needed:
-            print(f"\n🔄 Batch generation: {per_sample_evolutions} evolutions per sample")
+        while len(generated_utterances) < needed and attempts < max_attempts:
+            current_needed = needed - len(generated_utterances)
+            current_batch = min(batch_size, current_needed)
+            logger.debug("Attempt %s: Generating %s utterances for class %s", attempts + 1, current_batch, class_id)
 
-            generated = self.evolver.augment(
-                dataset, split_name=split, n_generations=per_sample_evolutions, update_split=True, batch_size=batch_size
+            new_utterances = self.utterance_generator(intent_data=intent, n_generations=current_batch)
+
+            valid_utterances = self._process_utterances(new_utterances)
+            for ut in valid_utterances:
+                if ut and isinstance(ut, str):
+                    generated_utterances.append(ut)
+                    if len(generated_utterances) >= needed:
+                        break
+
+            logger.debug("Generated %s valid utterances in this attempt", len(valid_utterances))
+            logger.debug(
+                "Progress: %s/%s (%s%%)",
+                len(generated_utterances),
+                needed,
+                min(100, int(len(generated_utterances) / needed * 100)),
             )
-            print("\n📦 DATASET AFTER EVOLVATION:")
-            self._print_dataset(dataset, split)
-            print(f"✅ Generated {len(generated)} examples")
-            if generated:
-                print("🔠 Example generated utterances:")
-                for i, example in enumerate(generated[:3]):
-                    utterance = getattr(example, Dataset.utterance_feature, str(example))
-                    print(f"   {i+1}. {utterance[:60]}...")
 
-            total_generated += len(generated)
-            print(f"📈 Progress: {total_generated}/{needed} ({min(100, int(total_generated/needed*100))}%)")
+            attempts += 1
 
-            if total_generated > needed:
-                removed = total_generated - needed
-                self._remove_extra_samples(dataset, split, class_id, removed)
-                print(f"✂️ Removed {removed} extra examples to match target")
+        if len(generated_utterances) < needed:
+            logger.debug(
+                "Warning: Could only generate %s/%s utterances after %s attempts",
+                len(generated_utterances),
+                needed,
+                max_attempts,
+            )
+
+        generated_utterances = generated_utterances[:needed]
+
+        new_samples = []
+        for utterance in generated_utterances:
+            new_sample = {Dataset.utterance_feature: utterance, Dataset.label_feature: class_id}
+            new_samples.append(new_sample)
+
+        updated_data = list(dataset[split]) + new_samples
+        dataset[split] = dataset[split].from_list(updated_data)
 
         final_count = len([s for s in dataset[split] if s[Dataset.label_feature] == class_id])
-        print(f"\n🎉 Completed augmentation for class {class_id} ({class_name})")
-        print(f"📦 Total samples after augmentation: {final_count}")
-        print("\n📦 DATASET AFTER AUGMENTATION:")
-        self._print_dataset(dataset, split)
-        print("━" * 50)
+        logger.debug("Completed augmentation for class %s (%s)", class_id, class_name)
+        logger.debug("Total samples after augmentation: %s", final_count)
+
+    def _process_utterances(self, generated: list[str]) -> list[str]:
+        """Process and clean generated utterances."""
+        processed = []
+        for ut in generated:
+            if "', '" in ut or "',\n" in ut:
+                clean_ut = ut.replace("[", "").replace("]", "").replace("'", "")
+                split_ut = [u.strip() for u in clean_ut.split(", ") if u.strip()]
+                processed.extend(split_ut)
+            else:
+                processed.append(ut.strip())
+        return processed
 
     def _remove_extra_samples(self, dataset: Dataset, split: str, class_id: int, extra: int) -> None:
         """Remove extra examples of the class."""
@@ -134,11 +163,14 @@ class DatasetBalancer:
 
     def _print_dataset(self, dataset: Dataset, split: str) -> None:
         """Print the dataset in a readable format."""
-        print(f"Split: {split}")
-        print("-" * 50)
-        for i, sample in enumerate(dataset[split]):
-            label = sample[Dataset.label_feature]
-            text = sample[Dataset.utterance_feature]
-            print(f"{i+1:3d} | {label:15} | {text[:50]:<50}...")
-        print("-" * 50)
-        print(f"Total samples: {len(dataset[split])}\n")
+        logger.debug("Split: %s", split)
+
+        class_counts = defaultdict(int)
+        for sample in dataset[split]:
+            class_counts[sample[Dataset.label_feature]] += 1
+
+        for class_id, count in sorted(class_counts.items()):
+            intent = next((i.name for i in dataset.intents if i.id == class_id), f"Class {class_id}")
+            logger.debug("Class %s (%s): %s samples", class_id, intent, count)
+
+        logger.debug("Total samples: %s", len(dataset[split]))

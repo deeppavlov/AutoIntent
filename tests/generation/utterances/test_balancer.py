@@ -1,15 +1,16 @@
+import logging
 import os
 from collections import defaultdict
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances import DatasetBalancer, Generator
 from autointent.generation.utterances.basic.chat_template import SynthesizerChatTemplate
-from autointent.schemas import Sample
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -41,27 +42,18 @@ def unbalanced_dataset():
 
 def test_balancer(unbalanced_dataset, mock_generator, mock_prompt_maker):
     balancer = DatasetBalancer(generator=mock_generator, prompt_maker=mock_prompt_maker)
-    print("\nBefore balancing:")
+    logger.info("Before balancing:")
     for sample in unbalanced_dataset[Split.TRAIN]:
-        print(f"Utterance: {sample['utterance']}, Label: {sample['label']}")
+        logger.info("Utterance: %s, Label: %s", sample["utterance"], sample["label"])
 
-    with patch.object(balancer.evolver, "augment") as mock_augment:
-
-        def augment_side_effect(dataset, split_name, n_generations, update_split, batch_size):
-            new_sample = {"utterance": "generated_utterance", "label": 1}
-            if update_split:
-                current_data = dataset[split_name].to_list()
-                current_data.append(new_sample)
-                dataset[split_name] = HFDataset.from_list(current_data)
-            return [Sample(**new_sample)]
-
-        mock_augment.side_effect = augment_side_effect
+    with patch.object(balancer.utterance_generator, "__call__") as mock_call:
+        mock_call.return_value = ["generated_utterance"]
 
         balanced = balancer.balance(unbalanced_dataset)
 
-    print("\nAfter balancing:")
+    logger.info("After balancing:")
     for sample in balanced[Split.TRAIN]:
-        print(f"Utterance: {sample['utterance']}, Label: {sample['label']}")
+        logger.info("Utterance: %s, Label: %s", sample["utterance"], sample["label"])
 
     labels = [s["label"] for s in balanced[Split.TRAIN]]
     assert labels.count(0) == 2, "Class 0 should not change"
@@ -89,20 +81,20 @@ def test_real_balancer():
     evolutions = template
     balancer = DatasetBalancer(generator=generator, prompt_maker=evolutions, max_samples_per_class=3, async_mode=False)
 
-    print("\nStarting balance process...")
+    logger.info("Starting balance process...")
     balanced = balancer.balance(dataset)
 
     class_counts = defaultdict(int)
     for sample in balanced[Split.TRAIN]:
         class_counts[sample["label"]] += 1
 
-    print("\nBalancing results:")
-    print(f"Class 0 count: {class_counts[0]}")
-    print(f"Class 1 count: {class_counts[1]}")
-    print("\nGenerated examples:")
+    logger.info("Balancing results:")
+    logger.info("Class 0 count: %s", class_counts[0])
+    logger.info("Class 1 count: %s", class_counts[1])
+    logger.info("Generated examples:")
     for sample in balanced[Split.TRAIN]:
         if sample["utterance"] not in {s["utterance"] for s in test_data["train"]}:
-            print(f"[Class {sample['label']}]: {sample['utterance']}")
+            logger.info("[Class %s]: %s", sample["label"], sample["utterance"])
 
     assert class_counts[0] == 3, "Class 0 should have 3 examples"
     assert class_counts[1] == 3, "Class 1 should have 3 examples"
