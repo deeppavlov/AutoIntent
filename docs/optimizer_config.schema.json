@@ -101,6 +101,12 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
+                "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "device": {
                     "anyOf": [
                         {
@@ -113,12 +119,6 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
-                },
-                "model_name": {
-                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
                 },
                 "train_head": {
                     "default": false,
@@ -419,6 +419,12 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
+                "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "device": {
                     "anyOf": [
                         {
@@ -431,12 +437,6 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
-                },
-                "model_name": {
-                    "default": "sentence-transformers/all-MiniLM-L6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -1557,7 +1557,19 @@
                     "type": "array"
                 },
                 "clf_args": {
-                    "items": {},
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ]
+                    },
                     "title": "Clf Args",
                     "type": "array"
                 }
@@ -1722,8 +1734,8 @@
             "default": {
                 "batch_size": 32,
                 "max_length": null,
-                "device": null,
                 "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+                "device": null,
                 "default_prompt": null,
                 "classifier_prompt": null,
                 "cluster_prompt": null,
@@ -1738,8 +1750,8 @@
             "default": {
                 "batch_size": 32,
                 "max_length": null,
-                "device": null,
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "device": null,
                 "train_head": false
             }
         },
