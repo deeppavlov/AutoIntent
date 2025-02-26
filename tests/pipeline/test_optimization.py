@@ -22,7 +22,7 @@ def test_no_node_separation(dataset_no_oos):
 
 def test_full_config(dataset_no_oos):
     config_path = ires.files("tests.assets.configs").joinpath("full_training.yaml")
-    pipeline_optimizer = Pipeline.from_search_space(config_path)
+    pipeline_optimizer = Pipeline.from_optimization_config(config_path)
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
 

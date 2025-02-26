@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
-from typing_extensions import assert_never
 
 from autointent import Context, Dataset, OptimizationConfig
 from autointent.configs import (
@@ -94,7 +93,7 @@ class Pipeline:
         :param search_space: Dictionary config
         :param seed: random seed
         """
-        if isinstance(search_space, Path | str):
+        if not isinstance(search_space, list):
             search_space = load_search_space(search_space)
         nodes = [NodeOptimizer(**node) for node in search_space]
         return cls(nodes=nodes, seed=seed)
@@ -116,13 +115,11 @@ class Pipeline:
         if isinstance(config, OptimizationConfig):
             optimization_config = config
         else:
-            if isinstance(config, Path | str):
-                with Path(config).open() as file:
-                    dict_params = yaml.safe_load(file)
-            elif isinstance(config, dict):
+            if isinstance(config, dict):
                 dict_params = config
             else:
-                assert_never(config)
+                with Path(config).open() as file:
+                    dict_params = yaml.safe_load(file)
             optimization_config = OptimizationConfig(**dict_params)
 
         pipeline = cls(
