@@ -196,7 +196,7 @@ class RegexNodeValidator(BaseModel):
     search_space: list[RegexpSearchSpaceType]
 
 
-SearchSpaceTypes: TypeAlias = EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator | RegexNodeValidator
+SearchSpaceTypes: TypeAlias = ScoringNodeValidator | EmbeddingNodeValidator | DecisionNodeValidator | RegexNodeValidator
 
 
 class OptimizationSearchSpaceConfig(RootModel[list[SearchSpaceTypes]]):

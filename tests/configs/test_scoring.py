@@ -17,7 +17,6 @@ def valid_scoring_config():
                     "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
                     "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                     "k": [5, 10],
-                    "train_head": [False, True],
                 },
                 {
                     "module_name": "knn",
@@ -25,7 +24,7 @@ def valid_scoring_config():
                     "k": [5, 10],
                     "weights": ["uniform", "distance"],
                 },
-                {"module_name": "linear", "embedder_config": ["sergeyzh/rubert-tiny-turbo"], "cv": [3, 5]},
+                {"module_name": "linear", "embedder_config": ["sergeyzh/rubert-tiny-turbo"]},
                 {
                     "module_name": "mlknn",
                     "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
@@ -46,12 +45,14 @@ def valid_scoring_config():
                     "weights": ["distance"],
                     "rank_threshold_cutoff": [None, 3],
                 },
-                # {
-                #     "module_name": "sklearn",
-                #     "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
-                #     "clf_name": ["LogisticRegression"],
-                #     "clf_args": [{"C": 1.0}, {"C": 0.5}],
-                # },
+                {
+                    "module_name": "sklearn",
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "clf_name": ["LogisticRegression"],
+                    "clf_args": {
+                        "C": [1.0, 0.5],
+                    },
+                },
             ],
         }
     ]

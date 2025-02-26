@@ -45,7 +45,7 @@ class SklearnScorer(BaseScorer):
 
     def __init__(
         self,
-        clf_name: str,
+        clf_name: Literal[AVAILABLE_CLASSIFIERS_NAMES],  # type: ignore[valid-type]
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         **clf_args: dict[str, Any],
     ) -> None:

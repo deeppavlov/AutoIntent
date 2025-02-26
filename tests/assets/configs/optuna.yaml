@@ -20,9 +20,10 @@
     - module_name: sklearn
       clf_name:
         - RandomForestClassifier
-      n_estimators:
-        low: 5
-        high: 10
+      clf_args:
+        n_estimators:
+          low: 5
+          high: 10
 - node_type: decision
   target_metric: decision_accuracy
   search_space:
