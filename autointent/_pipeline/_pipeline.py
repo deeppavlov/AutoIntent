@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
+from typing_extensions import assert_never
 
 from autointent import Context, Dataset, OptimizationConfig
 from autointent.configs import (
@@ -64,8 +65,7 @@ class Pipeline:
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
         elif not isinstance(nodes[0], InferenceNode):
-            msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
-            raise TypeError(msg)
+            assert_never(nodes)
 
     def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
         """
@@ -82,8 +82,7 @@ class Pipeline:
         elif isinstance(config, DataConfig):
             self.data_config = config
         else:
-            msg = "unknown config type"
-            raise TypeError(msg)
+            assert_never(config)
 
     @classmethod
     def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
@@ -191,7 +190,7 @@ class Pipeline:
             )
 
         if sampler is None:
-            sampler = self.sampler or "brute"
+            sampler = self.sampler
 
         self._fit(context, sampler)
 

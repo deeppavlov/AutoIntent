@@ -22,8 +22,6 @@ def transform(
     :param y_pred: Y_pred values
     :return:
     """
-    if isinstance(y_true, np.ndarray) and isinstance(y_pred, np.ndarray):
-        return y_true, y_pred
     y_pred_ = np.array(y_pred)
     y_true_ = np.array(y_true)
     return y_true_, y_pred_

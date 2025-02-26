@@ -6,7 +6,7 @@ from pydantic import (
     Field,
     PositiveInt,
 )
-from typing_extensions import Self
+from typing_extensions import Self, assert_never
 
 
 class ModelConfig(BaseModel):
@@ -96,7 +96,7 @@ class EmbedderConfig(STModelConfig):
             return self.sts_prompt
         if prompt_type == TaskTypeEnum.default:
             return self.default_prompt
-        return None
+        assert_never(prompt_type)
 
     use_cache: bool = Field(False, description="Whether to use embeddings caching.")
 
