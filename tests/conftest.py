@@ -33,7 +33,7 @@ def dataset_no_oos():
     return Dataset.from_json(path)
 
 
-TaskType = Literal["multiclass", "multilabel", "description", "optuna", "light", "full_training"]
+TaskType = Literal["multiclass", "multilabel", "description", "optuna", "light"]
 
 
 def get_search_space_path(task_type: TaskType):
