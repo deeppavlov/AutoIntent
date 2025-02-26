@@ -1060,10 +1060,10 @@
             "items": {
                 "anyOf": [
                     {
-                        "$ref": "#/$defs/EmbeddingNodeValidator"
+                        "$ref": "#/$defs/ScoringNodeValidator"
                     },
                     {
-                        "$ref": "#/$defs/ScoringNodeValidator"
+                        "$ref": "#/$defs/EmbeddingNodeValidator"
                     },
                     {
                         "$ref": "#/$defs/DecisionNodeValidator"
