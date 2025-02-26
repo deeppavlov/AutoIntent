@@ -97,3 +97,33 @@ def test_invalid_scoring_config_wrong_type():
 
     with pytest.raises(ValidationError):
         OptimizationSearchSpaceConfig(invalid_config)
+
+
+def test_valid_scoring_config_sklearn():
+    """Test that a valid scoring config passes validation."""
+    sklearn_scoring = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "sklearn",
+                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                    "clf_name": ["LogisticRegression"],
+                    "clf_args": {
+                        "C": {
+                            "low": 0.5,
+                            "high": 1.0,
+                        },
+                        "w": [5],
+                    },
+                },
+            ],
+        }
+    ]
+
+    config = OptimizationSearchSpaceConfig(sklearn_scoring)
+    assert config[0].node_type == "scoring"
+    assert config[0].target_metric == "scoring_roc_auc"
+    assert isinstance(config[0].search_space, list)
+    assert config[0].search_space[0].module_name == "sklearn"

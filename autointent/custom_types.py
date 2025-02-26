@@ -8,6 +8,7 @@ from enum import Enum
 from typing import Annotated, Literal, TypeAlias
 
 from annotated_types import Interval
+from pydantic import BaseModel, Field
 
 
 class LogLevel(Enum):
@@ -83,3 +84,21 @@ FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
 SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 
 SearchSpacePresets = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]
+
+
+class ParamSpaceInt(BaseModel):
+    """Param space for optimizing int parameters for Optuna."""
+
+    low: int = Field(..., description="Low boundary of the search space.")
+    high: int = Field(..., description="High boundary of the search space.")
+    step: int = Field(1, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")
+
+
+class ParamSpaceFloat(BaseModel):
+    """Param space for optimizing float parameters for Optuna."""
+
+    low: float = Field(..., description="Low boundary of the search space.")
+    high: float = Field(..., description="High boundary of the search space.")
+    step: float | None = Field(None, description="Step of the search space.")
+    log: bool = Field(False, description="Whether to use a logarithmic scale.")

@@ -10,27 +10,12 @@ from typing import Any
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field
 from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.custom_types import NodeType, ParamSpaceFloat, ParamSpaceInt, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.info import NODES_INFO
-
-
-class ParamSpaceInt(BaseModel):
-    low: int = Field(..., description="Low boundary of the search space.")
-    high: int = Field(..., description="High boundary of the search space.")
-    step: int = Field(1, description="Step of the search space.")
-    log: bool = Field(False, description="Whether to use a logarithmic scale.")
-
-
-class ParamSpaceFloat(BaseModel):
-    low: float = Field(..., description="Low boundary of the search space.")
-    high: float = Field(..., description="High boundary of the search space.")
-    step: float | None = Field(None, description="Step of the search space.")
-    log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
 class NodeOptimizer:
@@ -148,7 +133,7 @@ class NodeOptimizer:
 
         return target_metric
 
-    def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
+    def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:  # noqa: C901
         res: dict[str, Any] = {}
 
         def is_valid_param_space(
@@ -167,6 +152,20 @@ class NodeOptimizer:
                 res[param_name] = trial.suggest_int(param_name, **param_space)
             elif is_valid_param_space(param_space, ParamSpaceFloat):
                 res[param_name] = trial.suggest_float(param_name, **param_space)
+            elif isinstance(param_space, dict):
+                # sklearn_scorer clf_args
+                clf_args: dict[str, Any] = {}
+                for k, v in param_space.items():
+                    if isinstance(v, list):
+                        clf_args[k] = trial.suggest_categorical(f"{param_name}_{k}", choices=v)
+                    elif is_valid_param_space(v, ParamSpaceInt):
+                        clf_args[k] = trial.suggest_int(f"{param_name}_{k}", **v)
+                    elif is_valid_param_space(v, ParamSpaceFloat):
+                        clf_args[k] = trial.suggest_float(f"{param_name}_{k}", **v)
+                    else:
+                        msg = f"Unsupported type of param search space: {v}"
+                        raise TypeError(msg)
+                res["clf_args"] = clf_args
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)

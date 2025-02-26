@@ -42,6 +42,53 @@ def test_bayes(dataset, sampler):
     pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
 
 
+# @pytest.mark.parametrize(
+#     "clf_args",
+#     [
+#         {"C": [1.0], "tol": [0.5]},
+#         {
+#             "C": {
+#                 "low": 0.01,
+#                 "high": 10,
+#                 "step": 5,
+#             },
+#         },
+#     ],
+# )
+# def test_multiple_sklearn_scorers(dataset, clf_args):
+#     project_dir = setup_environment()
+#     search_space = [
+#         {
+#             "node_type": "scoring",
+#             "target_metric": "scoring_roc_auc",
+#             "search_space": [
+#                 {
+#                     "module_name": "sklearn",
+#                     "clf_name": ["LogisticRegression"],
+#                     "clf_args": clf_args,
+#                     "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+#                 },
+#             ],
+#         },
+#         {
+#             "node_type": "decision",
+#             "target_metric": "decision_accuracy",
+#             "search_space": [
+#                 {
+#                     "module_name": "argmax",
+#                 },
+#             ],
+#         },
+#     ]
+#
+#     pipeline_optimizer = Pipeline.from_search_space(search_space)
+#
+#     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+#     pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+#
+#     pipeline_optimizer.fit(dataset, refit_after=False)
+
+
 @pytest.mark.parametrize(
     "task_type",
     ["multiclass", "multilabel", "description"],

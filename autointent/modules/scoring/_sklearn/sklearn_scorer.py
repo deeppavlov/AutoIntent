@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -26,6 +26,8 @@ AVAILABLE_CLASSIFIERS = {
     if hasattr(class_, "predict_proba")
 }
 
+AVAILABLE_CLASSIFIERS_NAMES = tuple(AVAILABLE_CLASSIFIERS.keys())
+
 
 class SklearnScorer(BaseScorer):
     """
@@ -45,7 +47,7 @@ class SklearnScorer(BaseScorer):
         self,
         clf_name: str,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        **clf_args: Any,  # noqa: ANN401
+        **clf_args: dict[str, Any],
     ) -> None:
         """
         Initialize the SklearnScorer.
@@ -58,6 +60,9 @@ class SklearnScorer(BaseScorer):
         self.clf_name = clf_name
 
         if AVAILABLE_CLASSIFIERS.get(self.clf_name):
+            if "clf_args" in clf_args:
+                # during inference wrong save
+                clf_args = clf_args["clf_args"]
             self._base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**clf_args)
         else:
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
@@ -68,9 +73,9 @@ class SklearnScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        clf_name: str,
+        clf_name: Literal[AVAILABLE_CLASSIFIERS_NAMES],  # type: ignore[valid-type]
         embedder_config: EmbedderConfig | str | None = None,
-        **clf_args: float | str | bool,
+        clf_args: dict[str, int | float | str | bool | list[Any]] | None = None,
     ) -> Self:
         """
         Create a SklearnScorer instance using a Context object.
@@ -84,10 +89,13 @@ class SklearnScorer(BaseScorer):
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
 
+        if clf_args is None:
+            clf_args = {}
+
         return cls(
             embedder_config=embedder_config,
             clf_name=clf_name,
-            **clf_args,
+            **clf_args,  # type: ignore[arg-type]
         )
 
     def fit(

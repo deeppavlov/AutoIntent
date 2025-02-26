@@ -1,6 +1,7 @@
 {
     "$defs": {
         "AdaptiveDecisionInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "adaptive",
@@ -51,6 +52,7 @@
             "type": "object"
         },
         "ArgmaxDecisionInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "argmax",
@@ -101,6 +103,12 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
+                "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "device": {
                     "anyOf": [
                         {
@@ -114,12 +122,6 @@
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
                 },
-                "model_name": {
-                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
-                },
                 "train_head": {
                     "default": false,
                     "description": "Whether to train the head of the model. If False, LogReg will be trained.",
@@ -131,6 +133,7 @@
             "type": "object"
         },
         "DNNCScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "dnnc",
@@ -286,6 +289,7 @@
             "type": "object"
         },
         "DescriptionScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "description",
@@ -372,6 +376,12 @@
                     "description": "Maximum length of input sequences.",
                     "title": "Max Length"
                 },
+                "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "device": {
                     "anyOf": [
                         {
@@ -384,12 +394,6 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
-                },
-                "model_name": {
-                    "default": "sentence-transformers/all-MiniLM-L6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -582,6 +586,7 @@
             "type": "object"
         },
         "JinoosDecisionInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "jinoos",
@@ -632,6 +637,7 @@
             "type": "object"
         },
         "KNNScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "knn",
@@ -711,6 +717,7 @@
             "type": "object"
         },
         "LinearScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "linear",
@@ -759,6 +766,7 @@
             "type": "object"
         },
         "LogregAimedEmbeddingInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "logreg_embedding",
@@ -820,6 +828,7 @@
             "type": "object"
         },
         "MLKnnScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "mlknn",
@@ -931,6 +940,7 @@
             "type": "string"
         },
         "ParamSpaceFloat": {
+            "description": "Param space for optimizing float parameters for Optuna.",
             "properties": {
                 "low": {
                     "description": "Low boundary of the search space.",
@@ -970,6 +980,7 @@
             "type": "object"
         },
         "ParamSpaceInt": {
+            "description": "Param space for optimizing int parameters for Optuna.",
             "properties": {
                 "low": {
                     "description": "Low boundary of the search space.",
@@ -1002,6 +1013,7 @@
             "type": "object"
         },
         "RegexInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "regex",
@@ -1079,6 +1091,7 @@
             "type": "object"
         },
         "RerankScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "rerank",
@@ -1194,21 +1207,28 @@
                     "type": "array"
                 },
                 "rank_threshold_cutoff": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
                     "default": [
                         null
                     ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "integer"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Rank Threshold Cutoff",
-                    "type": "array"
+                    "title": "Rank Threshold Cutoff"
                 }
             },
             "required": [
@@ -1219,6 +1239,7 @@
             "type": "object"
         },
         "RetrievalAimedEmbeddingInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "retrieval",
@@ -1365,6 +1386,7 @@
             "type": "object"
         },
         "SklearnScorerInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "sklearn",
@@ -1387,6 +1409,45 @@
                 },
                 "clf_name": {
                     "items": {
+                        "enum": [
+                            "AdaBoostClassifier",
+                            "BaggingClassifier",
+                            "BernoulliNB",
+                            "CalibratedClassifierCV",
+                            "CategoricalNB",
+                            "ClassifierChain",
+                            "ComplementNB",
+                            "DecisionTreeClassifier",
+                            "DummyClassifier",
+                            "ExtraTreeClassifier",
+                            "ExtraTreesClassifier",
+                            "FixedThresholdClassifier",
+                            "GaussianNB",
+                            "GaussianProcessClassifier",
+                            "GradientBoostingClassifier",
+                            "HistGradientBoostingClassifier",
+                            "KNeighborsClassifier",
+                            "LabelPropagation",
+                            "LabelSpreading",
+                            "LinearDiscriminantAnalysis",
+                            "LogisticRegression",
+                            "LogisticRegressionCV",
+                            "MLPClassifier",
+                            "MultiOutputClassifier",
+                            "MultinomialNB",
+                            "NearestCentroid",
+                            "NuSVC",
+                            "OneVsRestClassifier",
+                            "QuadraticDiscriminantAnalysis",
+                            "RadiusNeighborsClassifier",
+                            "RandomForestClassifier",
+                            "SGDClassifier",
+                            "SVC",
+                            "SelfTrainingClassifier",
+                            "StackingClassifier",
+                            "TunedThresholdClassifierCV",
+                            "VotingClassifier"
+                        ],
                         "type": "string"
                     },
                     "title": "Clf Name",
@@ -1413,20 +1474,70 @@
                     "type": "array"
                 },
                 "clf_args": {
-                    "items": {},
-                    "title": "Clf Args",
-                    "type": "array"
+                    "anyOf": [
+                        {
+                            "additionalProperties": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/ParamSpaceInt"
+                                    },
+                                    {
+                                        "items": {
+                                            "type": "number"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "$ref": "#/$defs/ParamSpaceFloat"
+                                    },
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "items": {
+                                            "type": "boolean"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "items": {
+                                            "items": {},
+                                            "type": "array"
+                                        },
+                                        "type": "array"
+                                    }
+                                ]
+                            },
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": [
+                        null
+                    ],
+                    "title": "Clf Args"
                 }
             },
             "required": [
                 "module_name",
-                "clf_name",
-                "clf_args"
+                "clf_name"
             ],
             "title": "SklearnScorerInitModel",
             "type": "object"
         },
         "ThresholdDecisionInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "threshold",
@@ -1486,6 +1597,7 @@
             "type": "object"
         },
         "TunableDecisionInitModel": {
+            "additionalProperties": false,
             "properties": {
                 "module_name": {
                     "const": "tunable",

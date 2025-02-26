@@ -1,14 +1,16 @@
 """Schemes."""
 
+import functools
 import inspect
+import operator
 from collections.abc import Iterator
+from types import NoneType, UnionType
 from typing import Annotated, Any, Literal, TypeAlias, Union, get_args, get_origin, get_type_hints
 
-from pydantic import BaseModel, Field, PositiveInt, RootModel
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, RootModel
 
-from autointent.custom_types import NodeType
+from autointent.custom_types import NodeType, ParamSpaceFloat, ParamSpaceInt
 from autointent.modules.abc import BaseModule
-from autointent.nodes._optimization._node_optimizer import ParamSpaceFloat, ParamSpaceInt
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
 
@@ -26,17 +28,26 @@ def type_matches(target: type, tp: type) -> bool:
     """
     Recursively check if the target type is present in the given type.
 
-    This function handles union types by unwrapping Annotated types where necessary.
+    This function handles union types and generic types (e.g. dict[...] by checking
+    their origin) after unwrapping Annotated types.
 
-    :param target: Target type
-    :param tp: Given type
-    :return: If the target type is present in the given type
+    :param target: Target type to check for.
+    :param tp: Given type which may be a union, generic, or annotated type.
+    :return: True if the target type is present in the given type.
     """
     origin = get_origin(tp)
-
-    if origin is Union:  # float | list[float]
+    if origin is Union:
         return any(type_matches(target, arg) for arg in get_args(tp))
-    return unwrap_annotated(tp) is target
+
+    # Unwrap Annotated types, if any.
+    unwrapped = unwrap_annotated(tp)
+
+    # If the unwrapped type is a generic type, check its origin.
+    generic_origin = get_origin(unwrapped)
+    if generic_origin is not None:
+        return generic_origin is target
+
+    return unwrapped is target
 
 
 def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] | None:
@@ -56,7 +67,12 @@ def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] 
     return None
 
 
-def generate_models_and_union_type_for_classes(
+def to_union(types: list[type]) -> type:
+    """Convert a tuple of types into a union type."""
+    return functools.reduce(operator.or_, types)
+
+
+def generate_models_and_union_type_for_classes(  # noqa: PLR0912, C901
     classes: list[type[BaseModule]],
 ) -> type[BaseModel]:
     """Dynamically generates Pydantic models for class constructors and creates a union type."""
@@ -70,6 +86,7 @@ def generate_models_and_union_type_for_classes(
         fields = {
             "module_name": (Literal[cls.name], Field(...)),
             "n_trials": (PositiveInt | None, Field(None, description="Number of trials")),
+            "model_config": (ConfigDict, ConfigDict(extra="forbid")),
         }
 
         for param_name, param in init_signature.parameters.items():
@@ -78,11 +95,33 @@ def generate_models_and_union_type_for_classes(
 
             param_type: TypeAlias = type_hints.get(param_name, Any)  # type: ignore[valid-type]  # noqa: PYI042
             field = Field(default=[param.default]) if param.default is not inspect.Parameter.empty else Field(...)
-            search_type = get_optuna_class(param_type)
-            if search_type is None:
-                fields[param_name] = (list[param_type], field)
+            if not type_matches(dict, param_type):
+                search_type = get_optuna_class(param_type)
+                if search_type is None:
+                    fields[param_name] = (list[param_type], field)
+                else:
+                    fields[param_name] = (list[param_type] | search_type, field)
             else:
-                fields[param_name] = (list[param_type] | search_type, field)
+                dict_key_type, dict_values_types = get_args(param_type)
+                is_optional = False
+                if dict_values_types is NoneType:  # if dict is optional
+                    is_optional = True
+                    dict_key_type, dict_values_types = get_args(dict_key_type)
+                if get_origin(dict_values_types) is UnionType:
+                    filed_types: list[type[Any]] = []
+                    for value in get_args(dict_values_types):
+                        filed_types.append(list[value])  # type: ignore[valid-type]
+                        search_type = get_optuna_class(value)
+                        if search_type is not None:
+                            filed_types.append(search_type)
+                    filed_type = to_union(filed_types)
+                else:
+                    filed_type = dict_values_types
+
+                if is_optional:
+                    fields[param_name] = (dict[dict_key_type, filed_type] | None, field)  # type: ignore[valid-type]
+                else:
+                    fields[param_name] = (dict[dict_key_type, filed_type], field)  # type: ignore[valid-type]
 
         model_name = f"{cls.__name__}InitModel"
         models[cls.__name__] = type(
