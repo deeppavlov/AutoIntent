@@ -1616,22 +1616,22 @@
                             "additionalProperties": {
                                 "anyOf": [
                                     {
+                                        "$ref": "#/$defs/ParamSpaceInt"
+                                    },
+                                    {
                                         "items": {
                                             "type": "integer"
                                         },
                                         "type": "array"
                                     },
                                     {
-                                        "$ref": "#/$defs/ParamSpaceInt"
+                                        "$ref": "#/$defs/ParamSpaceFloat"
                                     },
                                     {
                                         "items": {
                                             "type": "number"
                                         },
                                         "type": "array"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/ParamSpaceFloat"
                                     },
                                     {
                                         "items": {

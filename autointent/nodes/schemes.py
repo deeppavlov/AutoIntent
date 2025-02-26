@@ -110,10 +110,10 @@ def generate_models_and_union_type_for_classes(  # noqa: PLR0912, C901
                 if get_origin(dict_values_types) is UnionType:
                     filed_types: list[type[Any]] = []
                     for value in get_args(dict_values_types):
-                        filed_types.append(list[value])  # type: ignore[valid-type]
                         search_type = get_optuna_class(value)
                         if search_type is not None:
                             filed_types.append(search_type)
+                        filed_types.append(list[value])  # type: ignore[valid-type]
                     filed_type = to_union(filed_types)
                 else:
                     filed_type = dict_values_types

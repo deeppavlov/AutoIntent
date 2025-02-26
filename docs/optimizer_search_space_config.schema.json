@@ -1479,22 +1479,22 @@
                             "additionalProperties": {
                                 "anyOf": [
                                     {
+                                        "$ref": "#/$defs/ParamSpaceInt"
+                                    },
+                                    {
                                         "items": {
                                             "type": "integer"
                                         },
                                         "type": "array"
                                     },
                                     {
-                                        "$ref": "#/$defs/ParamSpaceInt"
+                                        "$ref": "#/$defs/ParamSpaceFloat"
                                     },
                                     {
                                         "items": {
                                             "type": "number"
                                         },
                                         "type": "array"
-                                    },
-                                    {
-                                        "$ref": "#/$defs/ParamSpaceFloat"
                                     },
                                     {
                                         "items": {
@@ -1665,10 +1665,10 @@
     "items": {
         "anyOf": [
             {
-                "$ref": "#/$defs/EmbeddingNodeValidator"
+                "$ref": "#/$defs/ScoringNodeValidator"
             },
             {
-                "$ref": "#/$defs/ScoringNodeValidator"
+                "$ref": "#/$defs/EmbeddingNodeValidator"
             },
             {
                 "$ref": "#/$defs/DecisionNodeValidator"
