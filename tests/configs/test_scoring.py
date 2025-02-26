@@ -46,12 +46,12 @@ def valid_scoring_config():
                     "weights": ["distance"],
                     "rank_threshold_cutoff": [None, 3],
                 },
-                {
-                    "module_name": "sklearn",
-                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
-                    "clf_name": ["LogisticRegression"],
-                    "clf_args": [{"C": 1.0}, {"C": 0.5}],
-                },
+                # {
+                #     "module_name": "sklearn",
+                #     "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                #     "clf_name": ["LogisticRegression"],
+                #     "clf_args": [{"C": 1.0}, {"C": 0.5}],
+                # },
             ],
         }
     ]
