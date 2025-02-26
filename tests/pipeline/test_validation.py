@@ -35,6 +35,7 @@ def test_validate_search_space_multilabel(dataset):
     with pytest.raises(ValueError, match="Module 'argmax' does not support multilabel datasets."):
         pipeline_optimizer.validate_modules(dataset, mode="raise")
 
+
 # for now validation for sklearn scorer doesn't work
 @pytest.mark.xfail
 @pytest.mark.parametrize("search_space", get_args(TaskType))
