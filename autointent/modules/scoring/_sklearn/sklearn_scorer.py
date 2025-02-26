@@ -70,7 +70,7 @@ class SklearnScorer(BaseScorer):
         context: Context,
         clf_name: str,
         embedder_config: EmbedderConfig | str | None = None,
-        **clf_args: Any,  # noqa: ANN401
+        **clf_args: float | str | bool,
     ) -> Self:
         """
         Create a SklearnScorer instance using a Context object.

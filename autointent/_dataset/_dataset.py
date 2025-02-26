@@ -53,7 +53,7 @@ class Dataset(dict[str, HFDataset]):
 
         self.intents = intents
 
-        self.validate_descriptions()
+        self.has_descriptions = self.validate_descriptions()
 
     @property
     def multilabel(self) -> bool:
@@ -204,7 +204,12 @@ class Dataset(dict[str, HFDataset]):
             sample["label"] = ohe_vector
         return sample
 
-    def validate_descriptions(self) -> None:
+    def validate_descriptions(self) -> bool:
+        """
+        Check whether the dataset contains text descriptions for each intent.
+
+        :return: True if all intents have description field
+        """
         has_any = any(intent.description is not None for intent in self.intents)
         has_all = all(intent.description is not None for intent in self.intents)
 
@@ -212,4 +217,4 @@ class Dataset(dict[str, HFDataset]):
             msg = "Some intents have text descriptions, but some of them not."
             logger.warning(msg)
 
-        self.has_descriptions = has_all
+        return has_all

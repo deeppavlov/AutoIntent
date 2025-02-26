@@ -15,6 +15,7 @@ class ModelConfig(BaseModel):
 
 
 class STModelConfig(ModelConfig):
+    model_name: str
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
 
     @classmethod
@@ -24,7 +25,7 @@ class STModelConfig(ModelConfig):
         :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
         """
         if values is None:
-            return cls()
+            return cls()  # type: ignore[call-arg]
         if isinstance(values, BaseModel):
             return values  # type: ignore[return-value]
         if isinstance(values, str):

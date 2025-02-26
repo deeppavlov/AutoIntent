@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
+from typing_extensions import assert_never
 
 from autointent import Context, Dataset, OptimizationConfig
 from autointent.configs import (
@@ -120,6 +121,8 @@ class Pipeline:
                     dict_params = yaml.safe_load(file)
             elif isinstance(config, dict):
                 dict_params = config
+            else:
+                assert_never(config)
             optimization_config = OptimizationConfig(**dict_params)
 
         pipeline = cls(

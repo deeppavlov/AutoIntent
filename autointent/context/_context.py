@@ -173,5 +173,5 @@ class Context:
     def resolve_ranker(self) -> CrossEncoderConfig:
         if hasattr(self, "cross_encoder_config"):
             return self.cross_encoder_config
-        msg = "Cross-encoder could't be resolved. " "Set default config with Context.configure_transformer."
+        msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."
         raise RuntimeError(msg)
