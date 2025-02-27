@@ -156,26 +156,26 @@ class NodeOptimizer:
     def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
         res: dict[str, Any] = {}
 
-        def is_valid_param_space(
-            param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
-        ) -> bool:
-            try:
-                space_type(**param_space)
-                return True  # noqa: TRY300
-            except ValueError:
-                return False
-
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif is_valid_param_space(param_space, ParamSpaceInt):
+            elif self._is_valid_param_space(param_space, ParamSpaceInt):
                 res[param_name] = trial.suggest_int(param_name, **param_space)
-            elif is_valid_param_space(param_space, ParamSpaceFloat):
+            elif self._is_valid_param_space(param_space, ParamSpaceFloat):
                 res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
         return res
+
+    def _is_valid_param_space(
+        self, param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
+    ) -> bool:
+        try:
+            space_type(**param_space)
+            return True  # noqa: TRY300
+        except ValueError:
+            return False
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
         """
@@ -229,16 +229,12 @@ class NodeOptimizer:
         self.modules_search_spaces = filtered_search_space
 
     def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
-        """
-        Check if search space is configured correctly.
+        """Check if search space is configured correctly."""
+        for module_search_space in search_space:
+            module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
-        :raises: ValueError
-        """
-        for module_search_space in deepcopy(search_space):
-            module_name = module_search_space.pop("module_name")
-
-            for params_combination in enumerate(it.product(*module_search_space.values())):
-                module_kwargs = dict(zip(module_search_space.keys(), params_combination, strict=False))
+            for params_combination in enumerate(it.product(*module_search_space_no_optuna.values())):
+                module_kwargs = dict(zip(module_search_space_no_optuna.keys(), params_combination, strict=False))
 
                 self._logger.debug("validating %s module...", module_name, extra=params_combination)
                 module = self.node_info.modules_available[module_name](**module_kwargs)
@@ -246,3 +242,19 @@ class NodeOptimizer:
 
                 del module
                 gc.collect()
+
+    def _reformat_search_space(self, module_search_space: dict[str, Any]) -> tuple[dict[str, Any], str]:
+        """Remove optuna notation from search space."""
+        res = {}
+        module_name = module_search_space.pop("module_name")
+
+        for param_name, param_space in module_search_space.items():
+            if self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+                param_space, ParamSpaceFloat
+            ):
+                res[param_name] = [param_space["low"], param_space["high"]]
+            else:
+                msg = f"Unsupported type of param search space: {param_space}"
+                raise TypeError(msg)
+
+        return res, module_name
