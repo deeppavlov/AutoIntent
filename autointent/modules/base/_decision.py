@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import assert_never
 
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
@@ -171,8 +172,7 @@ def get_decision_evaluation_data(
         labels = context.data_handler.validation_labels(1)
         scores = context.optimization_info.get_best_validation_scores()
     else:
-        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation'."
-        raise ValueError(message)
+        assert_never(split)
 
     if scores is None:
         message = f"No '{split}' scores found in the optimization info"

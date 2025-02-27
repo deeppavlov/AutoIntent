@@ -1,8 +1,4 @@
-"""Pipeline optimizer module.
-
-This module defines the Pipeline class, which is responsible for optimizing and managing a pipeline of inference nodes.
-It provides functionality for configuration, optimization, validation, and inference.
-"""
+"""Pipeline optimizer."""
 
 import json
 import logging
@@ -13,20 +9,24 @@ import numpy as np
 import yaml
 from typing_extensions import assert_never
 
-from autointent import Context, Dataset
+from autointent import Context, Dataset, OptimizationConfig
 from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
+    InferenceNodeConfig,
     LoggingConfig,
 )
 from autointent.custom_types import (
     ListOfGenericLabels,
     NodeType,
     SamplerType,
+    SearchSpacePresets,
     SearchSpaceValidationMode,
 )
+from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
+from autointent.utils import load_preset, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
@@ -35,16 +35,7 @@ if TYPE_CHECKING:
 
 
 class Pipeline:
-    """Pipeline optimizer for managing and optimizing inference nodes.
-
-    This class is responsible for initializing and optimizing a sequence of nodes that perform inference tasks.
-    It supports loading configurations, validating data, and making predictions.
-
-    Attributes:
-        nodes: Dictionary of node types mapped to their respective objects.
-        sampler: Sampling method used for optimization.
-        seed: Random seed for reproducibility.
-    """
+    """Pipeline optimizer class."""
 
     def __init__(
         self,
@@ -55,12 +46,9 @@ class Pipeline:
         """Initialize the pipeline optimizer.
 
         Args:
-            nodes: List of nodes to be optimized or used for inference.
-            sampler: Sampling strategy for optimization. Defaults to "brute".
-            seed: Random seed for reproducibility. Defaults to 42.
-
-        Raises:
-            ValueError: If the provided sampler type is invalid.
+            nodes: List of nodes.
+            sampler: Sampler type.
+            seed: Random seed.
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
@@ -80,7 +68,7 @@ class Pipeline:
             assert_never(nodes)
 
     def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
-        """Set configuration for the pipeline.
+        """Set the configuration for the pipeline.
 
         Args:
             config: Configuration object.
@@ -96,14 +84,103 @@ class Pipeline:
         else:
             assert_never(config)
 
-    def fit(self, dataset: Dataset) -> Context:
-        """Optimize the pipeline using a dataset.
+    @classmethod
+    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
+        """Search space to pipeline optimizer.
 
         Args:
-            dataset: The dataset used for optimization.
+            search_space: Search space.
+            seed: Random seed.
 
         Returns:
-            Context: The resulting context after optimization.
+            Pipeline optimizer.
+        """
+        if not isinstance(search_space, list):
+            search_space = load_search_space(search_space)
+        nodes = [NodeOptimizer(**node) for node in search_space]
+        return cls(nodes=nodes, seed=seed)
+
+    @classmethod
+    def from_preset(cls, name: SearchSpacePresets, seed: int = 42) -> "Pipeline":
+        optimization_config = load_preset(name)
+        config = OptimizationConfig(seed=seed, **optimization_config)
+        return cls.from_optimization_config(config=config)
+
+    @classmethod
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
+        """Create pipeline optimizer from optimization config.
+
+        :param config: Optimization config
+        :return:
+        """
+        if isinstance(config, OptimizationConfig):
+            optimization_config = config
+        else:
+            if isinstance(config, dict):
+                dict_params = config
+            else:
+                with Path(config).open() as file:
+                    dict_params = yaml.safe_load(file)
+            optimization_config = OptimizationConfig(**dict_params)
+
+        pipeline = cls(
+            [NodeOptimizer(**node.model_dump()) for node in optimization_config.search_space],
+            optimization_config.sampler,
+            optimization_config.seed,
+        )
+        pipeline.set_config(optimization_config.logging_config)
+        pipeline.set_config(optimization_config.data_config)
+        pipeline.set_config(optimization_config.embedder_config)
+        pipeline.set_config(optimization_config.cross_encoder_config)
+        return pipeline
+
+    def _fit(self, context: Context, sampler: SamplerType) -> None:
+        """Optimize the pipeline.
+
+        Args:
+            context: Context object.
+            sampler: Sampler type.
+        """
+        self.context = context
+        self._logger.info("starting pipeline optimization...")
+        self.context.callback_handler.start_run(
+            run_name=self.context.logging_config.get_run_name(),
+            dirpath=self.context.logging_config.dirpath,
+        )
+        for node_type in NodeType:
+            node_optimizer = self.nodes.get(node_type, None)
+            if node_optimizer is not None:
+                node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
+        self.context.callback_handler.end_run()
+
+    def _is_inference(self) -> bool:
+        """Check the mode in which pipeline is.
+
+        Returns:
+            True if pipeline is in inference mode, False otherwise.
+        """
+        return isinstance(self.nodes[NodeType.scoring], InferenceNode)
+
+    def fit(
+        self,
+        dataset: Dataset,
+        refit_after: bool = False,
+        sampler: SamplerType | None = None,
+        incompatible_search_space: SearchSpaceValidationMode = "filter",
+    ) -> Context:
+        """Optimize the pipeline from dataset.
+
+        Args:
+            dataset: Dataset for optimization.
+            refit_after: Whether to refit after optimization.
+            sampler: Sampler type to use.
+            incompatible_search_space: How to handle incompatible search space.
+
+        Returns:
+            Context object.
+
+        Raises:
+            RuntimeError: If pipeline is in inference mode.
         """
         if self._is_inference():
             msg = "Pipeline in inference mode cannot be fitted"
@@ -115,53 +192,103 @@ class Pipeline:
         context.configure_transformer(self.embedder_config)
         context.configure_transformer(self.cross_encoder_config)
 
-        self._fit(context, self.sampler)
+        self.validate_modules(dataset, mode=incompatible_search_space)
+
+        test_utterances = context.data_handler.test_utterances()
+        if test_utterances is None:
+            self._logger.warning(
+                "Test data is not provided. Final test metrics won't be calculated after pipeline optimization."
+            )
+
+        if sampler is None:
+            sampler = self.sampler
+
+        self._fit(context, sampler)
+
+        if context.is_ram_to_clear():
+            nodes_configs = context.optimization_info.get_inference_nodes_config()
+            nodes_list = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
+        else:
+            modules_dict = context.optimization_info.get_best_modules()
+            nodes_list = [InferenceNode(module, node_type) for node_type, module in modules_dict.items()]
+
+        self.nodes = {node.node_type: node for node in nodes_list}
+
+        if refit_after:
+            # TODO reflect this refitting in dumped version of pipeline
+            self._refit(context)
+
+        if test_utterances is not None:
+            predictions = self.predict(test_utterances)
+            for metric_name, metric in DECISION_METRICS.items():
+                context.optimization_info.pipeline_metrics[metric_name] = metric(
+                    context.data_handler.test_labels(),
+                    predictions,
+                )
+            context.callback_handler.log_final_metrics(context.optimization_info.dump_evaluation_results())
+
         return context
 
     def validate_modules(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
-        """Validate nodes against a dataset.
+        """Validate modules with dataset.
 
         Args:
-            dataset: Dataset used for validation.
+            dataset: Dataset for validation.
             mode: Validation mode.
         """
         for node in self.nodes.values():
             if isinstance(node, NodeOptimizer):
                 node.validate_nodes_with_dataset(dataset, mode)
 
-    def _is_inference(self) -> bool:
-        """Check whether the pipeline is in inference mode.
+    @classmethod
+    def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":
+        """Create inference pipeline from dictionary config.
+
+        Args:
+            nodes_configs: list of config for nodes
 
         Returns:
-            True if pipeline is in inference mode, otherwise False.
+            Inference pipeline
         """
-        return isinstance(self.nodes[NodeType.scoring], InferenceNode)
+        return cls.from_config([InferenceNodeConfig(**cfg) for cfg in nodes_configs])
+
+    @classmethod
+    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> "Pipeline":
+        """Create inference pipeline from config.
+
+        Args:
+            nodes_configs: list of config for nodes
+
+        Returns:
+            Inference pipeline
+        """
+        nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
+        return cls(nodes)
 
     @classmethod
     def load(cls, path: str | Path) -> "Pipeline":
-        """Load a pipeline from a given directory.
+        """Load pipeline in inference mode.
+
+        This method loads fitted modules and tuned hyperparameters.
 
         Args:
-            path: Path to the directory containing the pipeline configuration.
+            path: Path to load
 
         Returns:
-            Loaded pipeline instance.
+            Inference pipeline
         """
         with (Path(path) / "inference_config.yaml").open() as file:
             inference_dict_config = yaml.safe_load(file)
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
     def predict(self, utterances: list[str]) -> ListOfGenericLabels:
-        """Predict labels for a list of utterances.
+        """Predict the labels for the utterances.
 
         Args:
-            utterances: List of utterances to predict labels for.
+            utterances: list of utterances
 
         Returns:
-            ListOfGenericLabels: Predicted labels for the utterances.
-
-        Raises:
-            RuntimeError: If the pipeline is not in inference mode.
+            list of predicted labels
         """
         if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
@@ -177,7 +304,10 @@ class Pipeline:
         """Fit pipeline of already selected modules with all train data.
 
         Args:
-            context: context object to take data from
+            context: Context object.
+
+        Raises:
+            RuntimeError: If pipeline is in optimization mode.
         """
         if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
@@ -198,12 +328,8 @@ class Pipeline:
 
         Args:
             utterances: list of utterances
-
         Returns:
-            InferencePipelineOutput: prediction output
-
-        Raises:
-            RuntimeError: If the pipeline is not in inference mode.
+            Inference pipeline output
         """
         if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
@@ -242,11 +368,11 @@ def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     """Generate a report from optimization logs.
 
     Args:
-        logs: Dictionary containing optimization logs.
+        logs: Logs dictionary.
         nodes: List of node types.
 
     Returns:
-        Formatted report string.
+        String report.
     """
     ids = [np.argmax(logs["metrics"][node]) for node in nodes]
     configs = []

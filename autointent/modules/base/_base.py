@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import assert_never
 
 from autointent._dump_tools import Dumper
 from autointent.context import Context
@@ -59,8 +60,7 @@ class BaseModule(ABC):
             return self.score_ho(context, metrics)
         if context.data_handler.config.scheme == "cv":
             return self.score_cv(context, metrics)
-        msg = f"Unknown scheme: {context.data_handler.config.scheme}"
-        raise ValueError(msg)
+        assert_never(context.data_handler.config.scheme)
 
     @abstractmethod
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]: ...
