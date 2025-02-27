@@ -7,7 +7,7 @@ from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation.utterances.basic.chat_templates._base import BaseChatTemplate
+from autointent.generation.utterances.basic.chat_templates._base import BaseSynthesizerTemplate
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
 
@@ -20,7 +20,7 @@ class DatasetBalancer:
     def __init__(
         self,
         generator: Generator,
-        prompt_maker: BaseChatTemplate,
+        prompt_maker: BaseSynthesizerTemplate,
         async_mode: bool = False,
         max_samples_per_class: int | None = None,
     ) -> None:
