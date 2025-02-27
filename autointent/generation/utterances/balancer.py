@@ -2,14 +2,14 @@
 
 import logging
 from collections import defaultdict
-from collections.abc import Callable
+
+from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation.utterances.basic.chat_template import BaseSynthesizer
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
-from autointent.schemas import Intent
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class DatasetBalancer:
     def __init__(
         self,
         generator: Generator,
-        prompt_maker: Callable[[Intent, int], list[Message]],
+        prompt_maker: BaseSynthesizer,
         async_mode: bool = False,
         max_samples_per_class: int | None = None,
     ) -> None:
@@ -135,7 +135,7 @@ class DatasetBalancer:
             new_samples.append(new_sample)
 
         updated_data = list(dataset[split]) + new_samples
-        dataset[split] = dataset[split].from_list(updated_data)
+        dataset[split] = HFDataset.from_list(updated_data)
 
         final_count = len([s for s in dataset[split] if s[Dataset.label_feature] == class_id])
         logger.debug("Completed augmentation for class %s (%s)", class_id, class_name)
@@ -152,25 +152,3 @@ class DatasetBalancer:
             else:
                 processed.append(ut.strip())
         return processed
-
-    def _remove_extra_samples(self, dataset: Dataset, split: str, class_id: int, extra: int) -> None:
-        """Remove extra examples of the class."""
-        class_indices = [i for i, s in enumerate(dataset[split]) if s[Dataset.label_feature] == class_id]
-        indices_to_remove = class_indices[-extra:]
-
-        new_data = [s for i, s in enumerate(dataset[split]) if i not in indices_to_remove]
-        dataset[split] = dataset[split].from_list(new_data)
-
-    def _print_dataset(self, dataset: Dataset, split: str) -> None:
-        """Print the dataset in a readable format."""
-        logger.debug("Split: %s", split)
-
-        class_counts: dict[int, int] = defaultdict(int)
-        for sample in dataset[split]:
-            class_counts[sample[Dataset.label_feature]] += 1
-
-        for class_id, count in sorted(class_counts.items()):
-            intent = next((i.name for i in dataset.intents if i.id == class_id), f"Class {class_id}")
-            logger.debug("Class %s (%s): %s samples", class_id, intent, count)
-
-        logger.debug("Total samples: %s", len(dataset[split]))
