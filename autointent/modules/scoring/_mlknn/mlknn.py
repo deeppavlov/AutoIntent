@@ -26,6 +26,7 @@ class MLKnnScorer(BaseScorer):
 
     .. testcode::
 
+        import numpy as np
         from autointent.modules.scoring import MLKnnScorer
         utterances = ["what is your name?", "how are you?"]
         labels = [[1,0], [0,1]]
@@ -36,7 +37,8 @@ class MLKnnScorer(BaseScorer):
         scorer.fit(utterances, labels)
         test_utterances = ["Hi!", "What's up?"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)  # Outputs predicted probabilities for each label
+        with np.printoptions(precision=4):
+            print(probabilities)  # Outputs predicted probabilities for each label
 
     .. testoutput::
 

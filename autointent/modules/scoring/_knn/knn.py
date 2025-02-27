@@ -30,6 +30,7 @@ class KNNScorer(BaseScorer):
 
     .. testcode::
 
+        import numpy as np
         from autointent.modules.scoring import KNNScorer
         utterances = ["hello", "how are you?"]
         labels = [0, 1]
@@ -40,12 +41,13 @@ class KNNScorer(BaseScorer):
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "what's up?"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)  # Outputs predicted class probabilities for the utterances
+        with np.printoptions(precision=4):
+            print(probabilities)  # Outputs predicted class probabilities for the utterances
 
     .. testoutput::
 
-        [[0.67297815 0.32702185]
-         [0.44031667 0.55968333]]
+        [[0.673  0.327 ]
+         [0.4403 0.5597]]
 
     """
 
