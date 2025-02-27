@@ -21,6 +21,6 @@ search_space:
         thresh:
           low: 0.1
           high: 0.9
-          n_trials: 10
+        n_trials: 10
       - module_name: argmax
 sampler: random
