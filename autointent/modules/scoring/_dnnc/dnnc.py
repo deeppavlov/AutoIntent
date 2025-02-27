@@ -92,6 +92,10 @@ class DNNCScorer(BaseScorer):
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
 
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `DNNCScorer` must be a positive int"
+            raise ValueError(msg)
+
     @classmethod
     def from_context(
         cls,

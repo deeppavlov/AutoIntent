@@ -77,6 +77,14 @@ class MLKnnScorer(BaseScorer):
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
 
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `MLKnnScorer` must be a positive int"
+            raise ValueError(msg)
+
+        if not isinstance(self.s, float | int):
+            msg = "`s` argument of `MLKnnScorer` must be a float"
+            raise TypeError(msg)
+
     @classmethod
     def from_context(
         cls,

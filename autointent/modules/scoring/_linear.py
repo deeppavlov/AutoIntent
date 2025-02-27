@@ -55,7 +55,6 @@ class LinearScorer(BaseScorer):
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         cv: int = 3,
-        n_jobs: int | None = None,
         seed: int = 0,
     ) -> None:
         """
@@ -67,9 +66,12 @@ class LinearScorer(BaseScorer):
         :param seed: Random seed for reproducibility, defaults to 0.
         """
         self.cv = cv
-        self.n_jobs = n_jobs
         self.seed = seed
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+
+        if self.cv < 0 or not isinstance(self.cv, int):
+            msg = "`cv` argument of `LinearScorer` must be a positive int"
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
@@ -125,7 +127,7 @@ class LinearScorer(BaseScorer):
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=self.seed)
+            clf = LogisticRegressionCV(cv=self.cv, random_state=self.seed)
 
         clf.fit(features, labels)
 

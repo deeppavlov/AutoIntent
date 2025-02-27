@@ -59,6 +59,16 @@ class RerankScorer(KNNScorer):
         self.m = k if m is None else m
         self.rank_threshold_cutoff = rank_threshold_cutoff
 
+        if self.m < 0 or not isinstance(self.m, int):
+            msg = "`m` argument of `RerankScorer` must be a positive int"
+            raise ValueError(msg)
+
+        if self.rank_threshold_cutoff is not None and (
+            self.rank_threshold_cutoff < 0 or not isinstance(self.rank_threshold_cutoff, int)
+        ):
+            msg = "`rank_threshold_cutoff` argument of `RerankScorer` must be a positive int or None"
+            raise ValueError(msg)
+
     @classmethod
     def from_context(
         cls,

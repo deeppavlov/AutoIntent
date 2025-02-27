@@ -50,6 +50,10 @@ class DescriptionScorer(BaseScorer):
         self.temperature = temperature
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
 
+        if self.temperature < 0 or not isinstance(self.temperature, float | int):
+            msg = "`temperature` argument of `DescriptionScorer` must be a positive float"
+            raise ValueError(msg)
+
     @classmethod
     def from_context(
         cls,

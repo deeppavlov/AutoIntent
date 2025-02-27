@@ -57,8 +57,9 @@ class SklearnScorer(BaseScorer):
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
 
-        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
-            self._base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**clf_args)
+        clf_type = AVAILABLE_CLASSIFIERS.get(self.clf_name, None)
+        if clf_type:
+            self._base_clf = clf_type(**clf_args)
         else:
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
             logger.error(msg)
