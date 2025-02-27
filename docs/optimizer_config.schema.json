@@ -1068,14 +1068,15 @@
             "type": "array"
         },
         "ParamSpaceFloat": {
+            "description": "Float parameter search space configuration.",
             "properties": {
                 "low": {
-                    "description": "Low boundary of the search space.",
+                    "description": "Lower boundary of the search space.",
                     "title": "Low",
                     "type": "number"
                 },
                 "high": {
-                    "description": "High boundary of the search space.",
+                    "description": "Upper boundary of the search space.",
                     "title": "High",
                     "type": "number"
                 },
@@ -1089,12 +1090,12 @@
                         }
                     ],
                     "default": null,
-                    "description": "Step of the search space.",
+                    "description": "Step size for the search space (if applicable).",
                     "title": "Step"
                 },
                 "log": {
                     "default": false,
-                    "description": "Whether to use a logarithmic scale.",
+                    "description": "Indicates whether to use a logarithmic scale.",
                     "title": "Log",
                     "type": "boolean"
                 }
@@ -1107,26 +1108,27 @@
             "type": "object"
         },
         "ParamSpaceInt": {
+            "description": "Integer parameter search space configuration.",
             "properties": {
                 "low": {
-                    "description": "Low boundary of the search space.",
+                    "description": "Lower boundary of the search space.",
                     "title": "Low",
                     "type": "integer"
                 },
                 "high": {
-                    "description": "High boundary of the search space.",
+                    "description": "Upper boundary of the search space.",
                     "title": "High",
                     "type": "integer"
                 },
                 "step": {
                     "default": 1,
-                    "description": "Step of the search space.",
+                    "description": "Step size for the search space.",
                     "title": "Step",
                     "type": "integer"
                 },
                 "log": {
                     "default": false,
-                    "description": "Whether to use a logarithmic scale.",
+                    "description": "Indicates whether to use a logarithmic scale.",
                     "title": "Log",
                     "type": "boolean"
                 }
