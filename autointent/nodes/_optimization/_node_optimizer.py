@@ -1,6 +1,7 @@
 """Node optimizer."""
 
 import gc
+import itertools as it
 import logging
 from copy import deepcopy
 from functools import partial
@@ -33,6 +34,9 @@ class ParamSpaceFloat(BaseModel):
     log: bool = Field(False, description="Whether to use a logarithmic scale.")
 
 
+logger = logging.getLogger(__name__)
+
+
 class NodeOptimizer:
     """Node optimizer class."""
 
@@ -58,8 +62,9 @@ class NodeOptimizer:
         if self.target_metric not in self.metrics:
             self.metrics.append(self.target_metric)
 
+        self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
-        self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
+        self._logger = logger
 
     def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
@@ -222,3 +227,22 @@ class NodeOptimizer:
                 filtered_search_space.append(search_space)
 
         self.modules_search_spaces = filtered_search_space
+
+    def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
+        """
+        Check if search space is configured correctly.
+
+        :raises: ValueError
+        """
+        for module_search_space in deepcopy(search_space):
+            module_name = module_search_space.pop("module_name")
+
+            for params_combination in enumerate(it.product(*module_search_space.values())):
+                module_kwargs = dict(zip(module_search_space.keys(), params_combination, strict=False))
+
+                self._logger.debug("validating %s module...", module_name, extra=params_combination)
+                module = self.node_info.modules_available[module_name](**module_kwargs)
+                self._logger.debug("%s is ok", module_name)
+
+                del module
+                gc.collect()
