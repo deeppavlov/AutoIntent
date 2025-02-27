@@ -2,7 +2,7 @@
 
 from typing import TypeVar
 
-from .abc import BaseDecision, BaseEmbedding, BaseModule, BaseRegex, BaseScorer
+from .base import BaseDecision, BaseEmbedding, BaseModule, BaseRegex, BaseScorer
 from .decision import (
     AdaptiveDecision,
     ArgmaxDecision,

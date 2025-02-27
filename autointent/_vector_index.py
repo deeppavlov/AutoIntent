@@ -33,8 +33,7 @@ class VectorIndexData(TypedDict):
 
 
 class VectorIndex:
-    """
-    A class for managing a vector index using FAISS and embedding models.
+    """A class for managing a vector index using FAISS and embedding models.
 
     This class allows adding, querying, and managing embeddings and their associated
     labels for efficient nearest neighbor search.
@@ -44,10 +43,10 @@ class VectorIndex:
     _meta_data_file = "metadata.json"
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
-        """
-        Initialize the vector index.
+        """Initialize the VectorIndex with an embedding model.
 
-        :param embedder_config: Config of the embedding model to use.
+        Args:
+            embedder_config: Configuration for the embedding model.
         """
         self.embedder = Embedder(embedder_config)
 
@@ -57,11 +56,11 @@ class VectorIndex:
         self.logger = logging.getLogger(__name__)
 
     def add(self, texts: list[str], labels: ListOfLabels) -> None:
-        """
-        Add texts and their corresponding labels to the index.
+        """Add texts and their corresponding labels to the index.
 
-        :param texts: List of input texts.
-        :param labels: List of labels corresponding to the texts.
+        Args:
+            texts: List of input texts.
+            labels: List of labels corresponding to the texts.
         """
         self.logger.debug("Adding embeddings to vector index %s", self.embedder.model_name)
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
@@ -73,10 +72,10 @@ class VectorIndex:
         self.texts.extend(texts)
 
     def is_empty(self) -> bool:
-        """
-        Check if the index is empty.
+        """Check if the index is empty.
 
-        :return: True if the index contains no embeddings, False otherwise.
+        Returns:
+            True if the index contains no embeddings, False otherwise.
         """
         return len(self.labels) == 0
 
@@ -96,24 +95,27 @@ class VectorIndex:
         self.texts = []
 
     def _search_by_text(self, texts: list[str], k: int) -> list[list[dict[str, Any]]]:
-        """
-        Search the index using text queries.
+        """Search the index using text queries.
 
-        :param texts: List of input texts to search for.
-        :param k: Number of nearest neighbors to return.
-        :return: List of search results for each query.
+        Args:
+            texts: List of input texts to search for.
+            k: Number of nearest neighbors to return.
+
+        Returns:
+            List of search results for each query.
         """
         query_embedding: npt.NDArray[np.float64] = self.embedder.embed(texts, TaskTypeEnum.query)  # type: ignore[assignment]
         return self._search_by_embedding(query_embedding, k)
 
     def _search_by_embedding(self, embedding: npt.NDArray[Any], k: int) -> list[list[dict[str, Any]]]:
-        """
-        Search the index using embedding vectors.
+        """Search the index using embedding vectors.
 
-        :param embedding: 2D array of shape (n_queries, dim_size) representing query embeddings.
-        :param k: Number of nearest neighbors to return.
-        :return: List of search results for each query.
-        :raises ValueError: If the embedding array is not 2D.
+        Args:
+            embedding: 2D array of shape (n_queries, dim_size) representing query embeddings.
+            k: Number of nearest neighbors to return.
+
+        Returns:
+            List of search results for each query.
         """
         if embedding.ndim != 2:  # noqa: PLR2004
             msg = "`embedding` should be a 2D array of shape (n_queries, dim_size)"
@@ -132,11 +134,13 @@ class VectorIndex:
         return results
 
     def get_all_embeddings(self) -> npt.NDArray[Any]:
-        """
-        Retrieve all embeddings stored in the index.
+        """Retrieve all embeddings stored in the index.
 
-        :return: Array of all embeddings.
-        :raises ValueError: If the index has not been created yet.
+        Returns:
+            Array of all embeddings.
+
+        Raises:
+            ValueError: If the index has not been created yet.
         """
         if not hasattr(self, "index"):
             msg = "Index is not created yet"
@@ -144,10 +148,10 @@ class VectorIndex:
         return self.index.reconstruct_n(0, self.index.ntotal)  # type: ignore[no-any-return]
 
     def get_all_labels(self) -> ListOfLabels:
-        """
-        Retrieve all labels stored in the index.
+        """Retrieve all labels stored in the index.
 
-        :return: List of all labels.
+        Returns:
+            List of all labels.
         """
         return self.labels
 
@@ -156,15 +160,17 @@ class VectorIndex:
         queries: list[str] | npt.NDArray[np.float32],
         k: int,
     ) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
-        """
-        Query the index to retrieve nearest neighbors.
+        """Query the index to retrieve nearest neighbors.
 
-        :param queries: List of text queries or embedding vectors.
-        :param k: Number of nearest neighbors to return for each query.
-        :return: A tuple containing:
-                 - `labels`: List of retrieved labels for each query.
-                 - `distances`: Corresponding distances for each neighbor.
-                 - `texts`: Corresponding texts for each neighbor.
+        Args:
+            queries: List of text queries or embedding vectors.
+            k: Number of nearest neighbors to return for each query.
+
+        Returns:
+            A tuple containing:
+                - `labels`: List of retrieved labels for each query.
+                - `distances`: Corresponding distances for each neighbor.
+                - `texts`: Corresponding texts for each neighbor.
         """
         func = self._search_by_text if isinstance(queries[0], str) else self._search_by_embedding
         all_results = func(queries, k)  # type: ignore[arg-type]
@@ -176,10 +182,10 @@ class VectorIndex:
         return all_labels, all_distances, all_texts
 
     def dump(self, dir_path: Path) -> None:
-        """
-        Save the index and associated data to disk.
+        """Save the index and associated data to disk.
 
-        :param dir_path: Directory path to save the data.
+        Args:
+            dir_path: Directory path where the data will be stored.
         """
         dir_path.mkdir(parents=True, exist_ok=True)
         self.dump_dir = dir_path
@@ -207,10 +213,16 @@ class VectorIndex:
         embedder_batch_size: int | None = None,
         embedder_use_cache: bool | None = None,
     ) -> "VectorIndex":
-        """
-        Load the index and associated data from disk.
+        """Load the index and associated data from disk.
 
-        :param dir_path: Directory path where the data is stored.
+        Args:
+            dir_path: Directory path where the data is stored.
+            embedder_device: Device for the embedding model.
+            embedder_batch_size: Batch size for the embedding model.
+            embedder_use_cache: Whether to use caching for the embedding model.
+
+        Returns:
+            VectorIndex instance with loaded data.
         """
         with (dir_path / cls._meta_data_file).open() as file:
             metadata: VectorIndexMetadata = json.load(file)

@@ -9,12 +9,11 @@ from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import BaseModule
+from autointent.modules.base import BaseModule
 
 
 class BaseScorer(BaseModule, ABC):
-    """
-    Abstract base class for scoring modules.
+    """Abstract base class for scoring modules.
 
     Scoring modules predict scores for utterances and evaluate their performance
     using a scoring metric.
@@ -27,9 +26,25 @@ class BaseScorer(BaseModule, ABC):
         self,
         utterances: list[str],
         labels: ListOfLabels,
-    ) -> None: ...
+    ) -> None:
+        """Fit the scoring module to the training data.
+
+        Args:
+            utterances: List of training utterances.
+            labels: List of training labels.
+        """
+        ...
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """Evaluate the scorer on a test set and compute the specified metric.
+
+        Args:
+            context: Context containing test set and other data.
+            metrics: List of metrics to compute.
+
+        Returns:
+            Computed metrics value for the test set or error code of metrics.
+        """
         self.fit(*self.get_train_data(context))
 
         val_utterances = context.data_handler.validation_utterances(0)
@@ -47,12 +62,15 @@ class BaseScorer(BaseModule, ABC):
         return self.score_metrics_ho((val_labels, scores), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the scorer on a test set and compute the specified metric.
+        """Evaluate the scorer on a test set and compute the specified metric.
 
-        :param context: Context containing test set and other data.
-        :param split: Target split
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing test set and other data.
+            metrics: List of metrics to compute.
+
+        Returns:
+            Computed metrics value for the test set or error code of metrics.
+
         """
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
@@ -66,21 +84,31 @@ class BaseScorer(BaseModule, ABC):
         return metrics_calculated
 
     def get_assets(self) -> ScorerArtifact:
-        """
-        Retrieve assets generated during scoring.
+        """Retrieve assets generated during scoring.
 
-        :return: ScorerArtifact containing test, validation and test scores.
+        Returns:
+            ScorerArtifact containing test, validation and test scores.
         """
         return self._artifact
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels]:
+        """Get train data.
+
+        Args:
+            context: Context to get train data from
+
+        Returns:
+            Tuple of train utterances and train labels
+        """
         return context.data_handler.train_utterances(0), context.data_handler.train_labels(0)  # type: ignore[return-value]
 
     @abstractmethod
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Predict scores for a list of utterances.
+        """Predict scores for a list of utterances.
 
-        :param utterances: List of utterances to score.
-        :return: Array of predicted scores.
+        Args:
+            utterances: List of utterances to score.
+
+        Returns:
+            Array of predicted scores.
         """

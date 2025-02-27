@@ -2,7 +2,7 @@
 
 from abc import ABC
 
-from autointent.modules.abc import BaseModule
+from autointent.modules.base import BaseModule
 
 
 class BaseRegex(BaseModule, ABC):

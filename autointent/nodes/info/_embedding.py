@@ -13,7 +13,7 @@ from autointent.metrics import (
     ScoringMetricFn,
 )
 from autointent.modules import EMBEDDING_MODULES
-from autointent.modules.abc import BaseEmbedding
+from autointent.modules.base import BaseEmbedding
 
 from ._base import NodeInfo
 

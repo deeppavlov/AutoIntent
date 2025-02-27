@@ -24,7 +24,6 @@ __all__ = [
     "IncrementalUtteranceEvolver",
     "InformalEvolution",
     "ReasoningEvolution",
-    "SynthesizerChatTemplate",
     "UtteranceEvolver",
     "UtteranceGenerator",
 ]

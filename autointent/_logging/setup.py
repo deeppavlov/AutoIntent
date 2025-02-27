@@ -9,15 +9,15 @@ from autointent.custom_types import LogLevel
 
 
 def setup_logging(level: LogLevel | str, log_filename: Path | str | None = None) -> None:
-    """
-    Set stdout and file handlers for logging autointent internal actions.
+    """Set stdout and file handlers for logging autointent internal actions.
 
     The first parameter affects the logs to the standard output stream. The second parameter is optional.
     If it is specified, then the "DEBUG" messages are logged to the file,
     regardless of what is specified by the first parameter.
 
-    :param level: one of "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
-    :param log_to_filepath: specify location of logfile, omit extension as suffix ``.log.jsonl`` will be appended.
+    Args:
+        level: one of "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+        log_filename: specify location of logfile, omit extension as suffix ``.log.jsonl`` will be appended.
     """
     config_file = ires.files("autointent._logging").joinpath("config.yaml")
     with config_file.open() as f_in:

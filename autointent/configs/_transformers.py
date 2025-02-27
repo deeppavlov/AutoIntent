@@ -22,7 +22,11 @@ class STModelConfig(ModelConfig):
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
         """Validate the model configuration.
 
-        :param values: Model configuration values. If a string is provided, it is converted to a dictionary.
+        Args:
+            values: Model configuration values. If a string is provided, it is converted to a dictionary.
+
+        Returns:
+            Model configuration.
         """
         if values is None:
             return cls()  # type: ignore[call-arg]
@@ -58,7 +62,8 @@ class EmbedderConfig(STModelConfig):
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.
 
-        :return: The prompt config for the given prompt type.
+        Returns:
+            The prompt config for the given prompt type.
         """
         prompts = {}
         if self.default_prompt:
@@ -78,9 +83,11 @@ class EmbedderConfig(STModelConfig):
     def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
         """Get the prompt type for the given task type.
 
-        :param prompt_type: Task type for which to get the prompt.
+        Args:
+            prompt_type: Task type for which to get the prompt.
 
-        :return: The prompt for the given task type.
+        Returns:
+            The prompt for the given task type.
         """
         if prompt_type is None:
             return self.default_prompt

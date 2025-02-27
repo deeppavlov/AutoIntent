@@ -58,13 +58,13 @@ class NodeType(str, Enum):
 
 
 class Split:
-    """
-    Constants representing dataset splits.
+    """Enumeration of data splits in the AutoIntent framework.
 
-    :cvar str TRAIN: Training split.
-    :cvar str VALIDATION: Validation split.
-    :cvar str TEST: Testing split.
-    :cvar str INTENTS: Intents split.
+    Attributes:
+        TRAIN: Represents the training data split.
+        VALIDATION: Represents the validation data split.
+        TEST: Represents the test data split.
+        INTENTS: Represents the intents data split.
     """
 
     TRAIN = "train"

@@ -18,8 +18,7 @@ from autointent.custom_types import LabelType
 
 
 class StratifiedSplitter:
-    """
-    A class for stratified splitting of datasets.
+    """A class for stratified splitting of datasets.
 
     This class provides methods to split a dataset into training and testing subsets
     while preserving the distribution of target labels. It supports both single-label
@@ -33,13 +32,13 @@ class StratifiedSplitter:
         random_seed: int,
         shuffle: bool = True,
     ) -> None:
-        """
-        Initialize the StratifiedSplitter.
+        """Initialize the StratifiedSplitter.
 
-        :param test_size: Proportion of the dataset to include in the test split.
-        :param label_feature: Name of the feature containing labels for stratification.
-        :param random_seed: Seed for random number generation to ensure reproducibility.
-        :param shuffle: Whether to shuffle the data before splitting. Defaults to True.
+        Args:
+            test_size: Proportion of the dataset to include in the test split.
+            label_feature: Name of the feature containing labels for stratification.
+            random_seed: Seed for random number generation to ensure reproducibility.
+            shuffle: Whether to shuffle the data before splitting.
         """
         self.test_size = test_size
         self.label_feature = label_feature
@@ -49,13 +48,18 @@ class StratifiedSplitter:
     def __call__(
         self, dataset: HFDataset, multilabel: bool, allow_oos_in_train: bool | None = None
     ) -> tuple[HFDataset, HFDataset]:
-        """
-        Split the dataset into training and testing subsets.
+        """Split the dataset into training and testing subsets.
 
-        :param dataset: The input dataset to be split.
-        :param multilabel: Whether the dataset is multi-label.
-        :param allow_oos_in_train: Set to True if you want to see out-of-scope utterances in train split.
-        :return: A tuple containing the training and testing datasets.
+        Args:
+            dataset: The input dataset to be split.
+            multilabel: Whether the dataset is multi-label.
+            allow_oos_in_train: Set to True if you want to see out-of-scope utterances in train split.
+
+        Returns:
+            A tuple containing the training and testing datasets.
+
+        Raises:
+            ValueError: If OOS samples are present but allow_oos_in_train is not specified.
         """
         if not self._has_oos_samples(dataset):
             return self._split_without_oos(dataset, multilabel, self.test_size)
@@ -69,15 +73,42 @@ class StratifiedSplitter:
         return splitter(dataset, multilabel)
 
     def _has_oos_samples(self, dataset: HFDataset) -> bool:
+        """Check if the dataset contains out-of-scope samples.
+
+        Args:
+            dataset: The dataset to check.
+
+        Returns:
+            True if the dataset contains OOS samples, False otherwise.
+        """
         oos_samples = dataset.filter(lambda sample: sample[self.label_feature] is None)
         return len(oos_samples) > 0
 
     def _split_without_oos(self, dataset: HFDataset, multilabel: bool, test_size: float) -> tuple[HFDataset, HFDataset]:
+        """Split dataset that doesn't contain OOS samples.
+
+        Args:
+            dataset: Dataset to split.
+            multilabel: Whether the dataset is multi-label.
+            test_size: Proportion of the dataset to include in the test split.
+
+        Returns:
+            A tuple containing training and testing datasets.
+        """
         splitter = self._split_multilabel if multilabel else self._split_multiclass
         splits = splitter(dataset, test_size)
         return dataset.select(splits[0]), dataset.select(splits[1])
 
     def _split_multiclass(self, dataset: HFDataset, test_size: float) -> Sequence[npt.NDArray[np.int_]]:
+        """Split multiclass dataset.
+
+        Args:
+            dataset: Dataset to split.
+            test_size: Proportion of the dataset to include in the test split.
+
+        Returns:
+            A sequence containing indices for train and test splits.
+        """
         return train_test_split(  # type: ignore[no-any-return]
             np.arange(len(dataset)),
             test_size=test_size,
@@ -87,6 +118,15 @@ class StratifiedSplitter:
         )
 
     def _split_multilabel(self, dataset: HFDataset, test_size: float) -> Sequence[npt.NDArray[np.int_]]:
+        """Split multilabel dataset.
+
+        Args:
+            dataset: Dataset to split.
+            test_size: Proportion of the dataset to include in the test split.
+
+        Returns:
+            A sequence containing indices for train and test splits.
+        """
         splitter = IterativeStratification(
             n_splits=2,
             order=2,
@@ -95,11 +135,18 @@ class StratifiedSplitter:
         return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
 
     def _split_allow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
-        """
-        Proportionally distribute OOS samples between two splits.
+        """Proportionally distribute OOS samples between two splits.
 
-        Internally, this method creates a dataset copy with some integer assigned as OOS class id.
-        With OOS samples treated as a separate class we obtain proportional distribution of them between two splits.
+        Internally creates a dataset copy with some integer assigned as OOS class id.
+        With OOS samples treated as a separate class we obtain proportional distribution
+        of them between two splits.
+
+        Args:
+            dataset: Dataset to split.
+            multilabel: Whether the dataset is multi-label.
+
+        Returns:
+            A tuple containing training and testing datasets.
         """
         # add oos as a class
         if multilabel:
@@ -126,30 +173,62 @@ class StratifiedSplitter:
     def _map_label(
         self, sample: dict[str, str | LabelType], old: LabelType, new: LabelType
     ) -> dict[str, str | LabelType]:
+        """Map labels from old value to new value.
+
+        Args:
+            sample: Sample containing the label to map.
+            old: Old label value.
+            new: New label value.
+
+        Returns:
+            Sample with mapped label.
+        """
         if sample[self.label_feature] == old:
             sample[self.label_feature] = new
         return sample
 
     def _add_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
-        """Add OOS as a class for multi-label case."""
+        """Add OOS as a class for multi-label case.
+
+        Args:
+            sample: Sample to modify.
+            n_classes: Number of classes in the dataset.
+
+        Returns:
+            Sample with added OOS label.
+        """
         if sample[self.label_feature] is None:
             sample[self.label_feature] = [0] * n_classes
         sample[self.label_feature] += [1]  # type: ignore[operator]
         return sample
 
     def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
-        """Remove OOS as a class for multi-label case."""
+        """Remove OOS as a class for multi-label case.
+
+        Args:
+            sample: Sample to modify.
+            n_classes: Number of classes in the dataset.
+
+        Returns:
+            Sample with removed OOS label.
+        """
         sample[self.label_feature] = sample[self.label_feature][:-1]  # type: ignore[index]
         if sample[self.label_feature] == [0] * n_classes:
             sample[self.label_feature] = None  # type: ignore[assignment]
         return sample
 
     def _split_disallow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
-        """
-        Move all OOS samples to test split.
+        """Move all OOS samples to test split.
 
         This method preserves the defined test_size proportion so you won't get unexpectedly
         large test set even you have lots of OOS samples.
+
+        Args:
+            dataset: Dataset to split.
+            multilabel: Whether the dataset is multi-label.
+
+        Returns:
+            A tuple containing training and testing datasets.
         """
         in_domain_dataset, out_of_domain_dataset = self._separate_oos(dataset)
         adjusted_test_size = self._get_adjusted_test_size(len(dataset), len(out_of_domain_dataset))
@@ -158,6 +237,14 @@ class StratifiedSplitter:
         return train, test
 
     def _separate_oos(self, dataset: HFDataset) -> tuple[HFDataset, HFDataset]:
+        """Separate OOS samples from in-domain samples.
+
+        Args:
+            dataset: Dataset to separate.
+
+        Returns:
+            A tuple containing in-domain and out-of-domain datasets.
+        """
         in_domain_ids = []
         out_of_domain_ids = []
         for i, sample in enumerate(dataset):
@@ -168,11 +255,17 @@ class StratifiedSplitter:
         return dataset.select(in_domain_ids), dataset.select(out_of_domain_ids)
 
     def _get_adjusted_test_size(self, n: int, k: int) -> float:
-        """
-        Calculate effective test_size in order to preserve original proportion.
+        """Calculate effective test_size to preserve original proportion.
 
-        :param n: size of original dataset (both with in-domain and out-of-domain samples)
-        :param k: number of out-of-domain samples within the dataset
+        Args:
+            n: Size of original dataset (both with in-domain and out-of-domain samples).
+            k: Number of out-of-domain samples within the dataset.
+
+        Returns:
+            Adjusted test size.
+
+        Raises:
+            ValueError: If dataset contains too many OOS samples.
         """
         if k == 0:
             return self.test_size
@@ -193,22 +286,17 @@ def split_dataset(
     random_seed: int,
     allow_oos_in_train: bool | None = None,
 ) -> tuple[HFDataset, HFDataset]:
-    """
-    Split a Dataset object into training and testing subsets.
+    """Split a Dataset object into training and testing subsets.
 
-    This function uses the StratifiedSplitter to perform stratified splitting
-    while preserving the distribution of labels.
+    Args:
+        dataset: The dataset to split, which must include training data.
+        split: The specific data split to divide.
+        test_size: Proportion of the dataset to include in the test split.
+        random_seed: Seed for random number generation.
+        allow_oos_in_train: Whether to allow OOS samples in train split.
 
-    :param dataset: The dataset to be split, which must include training data.
-    :param split: The specific data split to be divided, e.g., "train" or
-        another split within the dataset.
-    :param test_size: Proportion of the dataset to include in the test split.
-        Should be a float value between 0.0 and 1.0, where 0.0
-        means no data will be assigned to the test set, and 1.0
-        means all data will be assigned to the test set. For example,
-        a value of 0.2 indicates 20% of the data will be used for testing.
-    :param random_seed: Seed for random number generation to ensure reproducibility.
-    :return: A tuple containing two subsets of the selected split.
+    Returns:
+        A tuple containing two subsets of the selected split.
     """
     splitter = StratifiedSplitter(
         test_size=test_size,

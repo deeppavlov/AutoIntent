@@ -1,5 +1,4 @@
-"""
-Evolutionary strategy to augmenting utterances.
+"""Evolutionary strategy to augmenting utterances.
 
 Deeply inspired by DeepEval evolutions.
 """
@@ -19,8 +18,7 @@ from autointent.schemas import Intent
 
 
 class UtteranceEvolver:
-    """
-    Evolutionary strategy to augmenting utterances.
+    """Evolutionary strategy to augmenting utterances.
 
     Deeply inspired by DeepEval evolutions. This method takes single utterance and prompts LLM
     to change it in a specific way.
@@ -33,20 +31,43 @@ class UtteranceEvolver:
         seed: int = 0,
         async_mode: bool = False,
     ) -> None:
-        """Initialize."""
+        """Initialize the UtteranceEvolver.
+
+        Args:
+            generator: Generator instance for generating utterances.
+            prompt_makers: List of prompt makers for generating prompts.
+            seed: Random seed for reproducibility.
+            async_mode: Whether to use asynchronous mode for generation.
+        """
         self.generator = generator
         self.prompt_makers = prompt_makers
         self.async_mode = async_mode
         random.seed(seed)
 
     def _evolve(self, utterance: str, intent_data: Intent) -> str:
-        """Apply evolutions single time synchronously."""
+        """Apply evolutions a single time.
+
+        Args:
+            utterance: Utterance to be evolved.
+            intent_data: Intent data for which to evolve the utterance.
+
+        Returns:
+            Evolved utterance.
+        """
         maker = random.choice(self.prompt_makers)
         chat = maker(utterance, intent_data)
         return self.generator.get_chat_completion(chat)
 
     async def _evolve_async(self, utterance: str, intent_data: Intent) -> str:
-        """Apply evolutions a single time (asynchronously)."""
+        """Apply evolutions a single time asynchronously.
+
+        Args:
+            utterance: Utterance to be evolved.
+            intent_data: Intent data for which to evolve the utterance.
+
+        Returns:
+            Evolved utterance.
+        """
         maker = random.choice(self.prompt_makers)
         chat = maker(utterance, intent_data)
         return await self.generator.get_chat_completion_async(chat)
@@ -54,7 +75,17 @@ class UtteranceEvolver:
     def __call__(
         self, utterance: str, intent_data: Intent, n_evolutions: int = 1, sequential: bool = False
     ) -> list[str]:
-        """Apply evolutions multiple times (synchronously)."""
+        """Apply evolutions to the utterance.
+
+        Args:
+            utterance: Utterance to be evolved.
+            intent_data: Intent data for which to evolve the utterance.
+            n_evolutions: Number of evolutions to apply.
+            sequential: Whether to apply evolutions sequentially.
+
+        Returns:
+            List of evolved utterances.
+        """
         current_utterance = utterance
         generated_utterances = []
 
@@ -76,10 +107,18 @@ class UtteranceEvolver:
         batch_size: int = 4,
         sequential: bool = False,
     ) -> HFDataset:
-        """
-        Augment some split of dataset.
+        """Augment some split of dataset.
 
-        Note that for now it supports only single-label datasets.
+        Args:
+            dataset: Dataset object.
+            split_name: Dataset split (default is TRAIN).
+            n_evolutions: Number of evolutions to apply.
+            update_split: Whether to update the dataset split.
+            batch_size: Batch size for async generation.
+            sequential: Whether to apply evolutions sequentially.
+
+        Returns:
+            List of generated samples.
         """
         if self.async_mode:
             if sequential:
@@ -123,6 +162,18 @@ class UtteranceEvolver:
         update_split: bool = True,
         batch_size: int = 4,
     ) -> HFDataset:
+        """Augment some split of dataset asynchronously.
+
+        Args:
+            dataset: Dataset object.
+            split_name: Dataset split (default is TRAIN).
+            n_evolutions: Number of evolutions to apply.
+            update_split: Whether to update the dataset split.
+            batch_size: Batch size for async generation.
+
+        Returns:
+            List of generated samples.
+        """
         original_split = dataset[split_name]
         new_samples = []
 

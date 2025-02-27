@@ -1,4 +1,9 @@
-"""Description generation for intents using OpenAI models."""
+"""Module for generating intent descriptions using OpenAI models.
+
+This module provides functionality to generate descriptions for intents using OpenAI's
+language models. It includes utilities for grouping utterances, creating descriptions
+for individual intents, and enhancing datasets with generated descriptions.
+"""
 
 import asyncio
 import random
@@ -12,19 +17,20 @@ from autointent.schemas import Intent, Sample
 
 
 def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:
-    """
-    Group samples by their labels.
+    """Group utterances from samples by their corresponding labels.
 
-    :param samples: List of samples with `label` and `utterance` attributes.
+    Args:
+        samples: List of samples, each containing a label and utterance.
 
-    :returns: A dictionary where labels map to lists of utterances.
+    Returns:
+        Dictionary mapping label IDs to lists of utterances.
     """
     label_mapping = defaultdict(list)
 
     for sample in samples:
         match sample.label:
             case list():
-                # parse one hot encoding
+                # Handle one-hot encoding
                 for class_id, label in enumerate(sample.label):
                     if label:
                         label_mapping[class_id].append(sample.utterance)
@@ -42,19 +48,22 @@ async def create_intent_description(
     prompt: PromptDescription,
     model_name: str,
 ) -> str:
-    """
-    Generate a description for a specific intent using an OpenAI model.
+    """Generate a description for a specific intent using an OpenAI model.
 
-    :param client: The OpenAI client instance used to communicate with the model.
-    :param intent_name: The name of the intent to describe. If None, an empty string will be used.
-    :param utterances: A list of example utterances related to the intent.
-    :param regex_patterns: A list of regular expression patterns associated with the intent.
+    Args:
+        client: OpenAI client instance for model communication.
+        intent_name: Name of the intent to describe (empty string if None).
+        utterances: Example utterances related to the intent.
+        regex_patterns: Regular expression patterns associated with the intent.
+        prompt: Template for model prompt with placeholders for intent_name,
+               user_utterances, and regex_patterns.
+        model_name: Identifier of the OpenAI model to use.
 
-    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
-                                    and {user_utterances} to format the content sent to the model.
-    :param model_name: The identifier of the OpenAI model to use for generating the description.
+    Returns:
+        Generated description of the intent.
 
-    :returns: The generated description of the intent.
+    Raises:
+        TypeError: If the model response is not a string.
     """
     intent_name = intent_name if intent_name is not None else ""
     utterances = random.sample(utterances, min(5, len(utterances)))
@@ -85,17 +94,18 @@ async def generate_intent_descriptions(
     prompt: PromptDescription,
     model_name: str,
 ) -> list[Intent]:
-    """
-    Generate descriptions for a list of intents using an OpenAI model.
+    """Generate descriptions for multiple intents using an OpenAI model.
 
-    :param client: The OpenAI client used to generate the descriptions.
-    :param intent_utterances: A dictionary mapping intent IDs to their corresponding utterances.
-    :param intents: A list of intents to generate descriptions for.
-    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
-                                      and {user_utterances} to format the content sent to the model.
-    :param model_name: The name of the OpenAI model to use for generating descriptions.
+    Args:
+        client: OpenAI client for generating descriptions.
+        intent_utterances: Dictionary mapping intent IDs to utterances.
+        intents: List of intents needing descriptions.
+        prompt: Template for model prompt with placeholders for intent_name,
+               user_utterances, and regex_patterns.
+        model_name: Name of the OpenAI model to use.
 
-    :returns: The list of intents with updated descriptions.
+    Returns:
+        List of intents with updated descriptions.
     """
     tasks = []
     for intent in intents:
@@ -127,16 +137,17 @@ def enhance_dataset_with_descriptions(
     prompt: PromptDescription,
     model_name: str = "gpt-4o-mini",
 ) -> Dataset:
-    """
-    Enhances a dataset by generating descriptions for intents using an OpenAI model.
+    """Enhance a dataset by adding generated descriptions to its intents.
 
-    :param dataset: The dataset containing utterances and intents that require descriptions.
-    :param client: The OpenAI client used to generate the descriptions.
-    :param prompt: A string template for the prompt, which must include placeholders for {intent_name}
-                                      and {user_utterances} to format the content sent to the model.
-    :param model_name: The OpenAI model to use for generating descriptions.
+    Args:
+        dataset: Dataset containing utterances and intents needing descriptions.
+        client: OpenAI client for generating descriptions.
+        prompt: Template for model prompt with placeholders for intent_name,
+               user_utterances, and regex_patterns.
+        model_name: OpenAI model identifier for generating descriptions.
 
-    :returns: The dataset with intents enhanced by generated descriptions.
+    Returns:
+        Dataset with enhanced intent descriptions.
     """
     samples = []
     for split in dataset.values():

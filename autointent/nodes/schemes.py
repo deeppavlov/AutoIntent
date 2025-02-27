@@ -7,30 +7,33 @@ from typing import Annotated, Any, Literal, TypeAlias, Union, get_args, get_orig
 from pydantic import BaseModel, Field, PositiveInt, RootModel
 
 from autointent.custom_types import NodeType
-from autointent.modules.abc import BaseModule
+from autointent.modules.base import BaseModule
 from autointent.nodes._optimization._node_optimizer import ParamSpaceFloat, ParamSpaceInt
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
 
 def unwrap_annotated(tp: type) -> type:
-    """
-    Unwrap the Annotated type to get the actual type.
+    """Unwrap the Annotated type to get the actual type.
 
-    :param tp: Type to unwrap
-    :return: Unwrapped type
+    Args:
+        tp: Type to unwrap
+
+    Returns:
+        Unwrapped type
     """
     return get_args(tp)[0] if get_origin(tp) is Annotated else tp
 
 
 def type_matches(target: type, tp: type) -> bool:
-    """
-    Recursively check if the target type is present in the given type.
+    """Recursively check if the target type is present in the given type.
 
     This function handles union types by unwrapping Annotated types where necessary.
 
-    :param target: Target type
-    :param tp: Given type
-    :return: If the target type is present in the given type
+    Args:
+        target: Target type
+        tp: Given type
+    Returns:
+        If the target type is present in the given type
     """
     origin = get_origin(tp)
 
@@ -40,14 +43,16 @@ def type_matches(target: type, tp: type) -> bool:
 
 
 def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] | None:
-    """
-    Get the Optuna class for the given parameter type.
+    """Get the Optuna class for the given parameter type.
 
     If the (possibly annotated or union) type includes int or float, this function
     returns the corresponding search space class.
 
-    :param param_type: Parameter type (could be a union, annotated type, or container)
-    :return: ParamSpaceInt if the type matches int, ParamSpaceFloat if it matches float, else None.
+    Args:
+        param_type: Parameter type (could be a union, annotated type, or container)
+
+    Returns:
+        ParamSpaceInt if the type matches int, ParamSpaceFloat if it matches float, else None.
     """
     if type_matches(int, param_type):
         return ParamSpaceInt
@@ -59,7 +64,14 @@ def get_optuna_class(param_type: type) -> type[ParamSpaceInt | ParamSpaceFloat] 
 def generate_models_and_union_type_for_classes(
     classes: list[type[BaseModule]],
 ) -> type[BaseModel]:
-    """Dynamically generates Pydantic models for class constructors and creates a union type."""
+    """Generate Pydantic models for class constructors and create a union type.
+
+    Args:
+        classes: List of classes to generate models for
+
+    Returns:
+        Union of generated Pydantic models
+    """
     models: dict[str, type[BaseModel]] = {}
 
     for cls in classes:
@@ -170,8 +182,7 @@ class OptimizationSearchSpaceConfig(RootModel[list[SearchSpaceTypes]]):
         return iter(self.root)
 
     def __getitem__(self, item: int) -> SearchSpaceTypes:
-        """
-        To get item directly from the root.
+        """To get item directly from the root.
 
         :param item: Index
 

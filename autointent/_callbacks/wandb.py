@@ -6,17 +6,25 @@ from autointent._callbacks.base import OptimizerCallback
 
 
 class WandbCallback(OptimizerCallback):
-    """
-    Wandb callback.
+    """Wandb callback for logging the optimization process to Weights & Biases (W&B).
 
-    This callback logs the optimization process to W&B.
-    To specify the project name, set the `WANDB_PROJECT` environment variable. Default is `autointent`.
+    This callback integrates with W&B to track training runs, log metrics, and store
+    configurations.
+
+    To specify the project name, set the `WANDB_PROJECT` environment variable. If not set,
+    it defaults to `autointent`.
     """
 
     name = "wandb"
 
     def __init__(self) -> None:
-        """Initialize the callback."""
+        """Initializes the Wandb callback.
+
+        Ensures that `wandb` is installed before using this callback.
+
+        Raises:
+            ImportError: If `wandb` is not installed.
+        """
         try:
             import wandb
         except ImportError:
@@ -26,23 +34,29 @@ class WandbCallback(OptimizerCallback):
         self.wandb = wandb
 
     def start_run(self, run_name: str, dirpath: Path) -> None:
-        """
-        Start a new run.
+        """Starts a new W&B run.
 
-        :param run_name: Name of the run.
-        :param dirpath: Path to the directory where the logs will be saved. (Not used for this callback)
+        Initializes the project name and run group. The directory path argument is not
+        used in this callback.
+
+        Args:
+            run_name: Name of the run (used as a W&B group).
+            dirpath: Path to store logs (not utilized in W&B logging).
         """
         self.project_name = os.getenv("WANDB_PROJECT", "autointent")
         self.group = run_name
         self.dirpath = dirpath
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
-        """
-        Start a new module.
+        """Starts a new module within the W&B logging system.
 
-        :param module_name: Name of the module.
-        :param num: Number of the module.
-        :param module_kwargs: Module parameters.
+        This initializes a W&B run with the specified module name, unique identifier,
+        and configuration parameters.
+
+        Args:
+            module_name: The name of the module being logged.
+            num: A numerical identifier for the module instance.
+            module_kwargs: Dictionary containing module parameters.
         """
         self.wandb.init(
             project=self.project_name,
@@ -52,26 +66,30 @@ class WandbCallback(OptimizerCallback):
         )
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
-        """
-        Log data.
+        """Logs scalar or textual values to W&B.
 
-        :param kwargs: Data to log.
+        This function logs the provided key-value pairs to W&B.
+
+        Args:
+            **kwargs: Key-value pairs of data to log.
         """
         self.wandb.log(kwargs)
 
     def log_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log metrics during training.
+        """Logs training metrics to W&B.
 
-        :param metrics: Metrics to log.
+        Args:
+            metrics: A dictionary containing metric names and values.
         """
         self.wandb.log(metrics)
 
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log final metrics.
+        """Logs final evaluation metrics to W&B.
 
-        :param metrics: Final metrics.
+        A new W&B run named `final_metrics` is created to store the final performance metrics.
+
+        Args:
+            metrics: A dictionary of final performance metrics.
         """
         self.wandb.init(
             project=self.project_name,
@@ -84,8 +102,14 @@ class WandbCallback(OptimizerCallback):
         self.wandb.finish()
 
     def end_module(self) -> None:
-        """End a module."""
+        """Ends the current W&B module.
+
+        This closes the W&B run associated with the current module.
+        """
         self.wandb.finish()
 
     def end_run(self) -> None:
-        pass
+        """Ends the W&B run.
+
+        This method is currently a placeholder and does not perform additional operations.
+        """

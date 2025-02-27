@@ -1,4 +1,4 @@
-"""Utility functions and custom exceptions for handling multilabel predictions and errors."""
+"""Utility functions for handling multilabel predictions."""
 
 from typing import Any
 
@@ -9,17 +9,30 @@ from autointent.schemas import Tag
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:
-    """
-    Adjust multilabel predictions based on intent class tags.
+    """Adjust multilabel predictions based on intent class tags.
 
     If some intent classes share a common tag (i.e., they are mutually exclusive) and are assigned
     to the same sample, this function retains only the class with the highest score among those
     with the shared tag.
 
-    :param labels: Array of shape (n_samples, n_classes) with binary labels (0 or 1).
-    :param scores: Array of shape (n_samples, n_classes) with float values (0 to 1).
-    :param tags: List of `Tag` objects, where each tag specifies mutually exclusive intent IDs.
-    :return: Adjusted array of shape (n_samples, n_classes) with binary labels.
+    Args:
+        labels: Array of shape (n_samples, n_classes) with binary labels (0 or 1)
+        scores: Array of shape (n_samples, n_classes) with float values (0 to 1)
+        tags: List of Tag objects, where each tag specifies mutually exclusive intent IDs
+
+    Returns:
+        Array of shape (n_samples, n_classes) with adjusted binary labels
+
+    Examples:
+        >>> import numpy as np
+        >>> from autointent.schemas import Tag
+        >>> labels = np.array([[1, 1, 0], [1, 1, 1]])
+        >>> scores = np.array([[0.8, 0.6, 0.3], [0.7, 0.9, 0.5]])
+        >>> tags = [Tag(name="group1", intent_ids=[0, 1])]
+        >>> adjusted = apply_tags(labels, scores, tags)
+        >>> print(adjusted)
+        [[1 0 0]
+         [0 1 1]]
     """
     labels = labels.copy()
 

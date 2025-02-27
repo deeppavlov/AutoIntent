@@ -6,7 +6,7 @@ from typing import ClassVar
 from autointent.custom_types import NodeType
 from autointent.metrics import REGEX_METRICS
 from autointent.metrics.regex import RegexMetricFn
-from autointent.modules.abc import BaseRegex
+from autointent.modules.base import BaseRegex
 from autointent.modules.regex import Regex
 
 from ._base import NodeInfo

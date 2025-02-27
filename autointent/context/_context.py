@@ -17,11 +17,15 @@ from .optimization_info import OptimizationInfo
 
 
 class Context:
-    """
-    Context manager for configuring and managing data handling, vector indexing, and optimization.
+    """Context manager for configuring and managing data handling, vector indexing, and optimization.
 
     This class provides methods to set up logging, configure data and vector index components,
     manage datasets, and retrieve various configurations for inference and optimization.
+
+    Attributes:
+        data_handler: Handler for managing datasets.
+        optimization_info: Container for optimization information.
+        callback_handler: Handler for managing callbacks.
     """
 
     data_handler: DataHandler
@@ -29,29 +33,29 @@ class Context:
     callback_handler = CallbackHandler()
 
     def __init__(self, seed: int = 42) -> None:
-        """
-        Initialize the Context object with a specified random seed.
+        """Initialize the Context object.
 
-        :param seed: Random seed for reproducibility, defaults to 42.
+        Args:
+            seed: Random seed for reproducibility.
         """
         self.seed = seed
         self._logger = logging.getLogger(__name__)
 
     def configure_logging(self, config: LoggingConfig) -> None:
-        """
-        Configure logging settings.
+        """Configure logging settings.
 
-        :param config: Logging configuration settings.
+        Args:
+            config: Logging configuration settings.
         """
         self.logging_config = config
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
     def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig) -> None:
-        """
-        Configure the vector index client and embedder.
+        """Configure the vector index client and embedder.
 
-        :param config: Configuration for the vector index.
+        Args:
+            config: Configuration for the vector index.
         """
         if isinstance(config, EmbedderConfig):
             self.embedder_config = config
@@ -59,18 +63,19 @@ class Context:
             self.cross_encoder_config = config
 
     def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
-        """
-        Set the datasets for training, validation and testing.
+        """Set the datasets for training, validation and testing.
 
-        :param dataset: Dataset.
+        Args:
+            dataset: Dataset.
+            config: Data configuration settings.
         """
         self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
     def get_inference_config(self) -> dict[str, Any]:
-        """
-        Generate configuration settings for inference.
+        """Generate configuration settings for inference.
 
-        :return: Dictionary containing inference configuration.
+        Returns:
+            Dictionary containing inference configuration.
         """
         nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
         return {
@@ -83,12 +88,7 @@ class Context:
         }
 
     def dump(self) -> None:
-        """
-        Save logs, configurations, and datasets to disk.
-
-        Dumps evaluation results, training/test data splits, and inference configurations
-        to the specified logging directory.
-        """
+        """Save logs, configurations, and datasets to disk."""
         self._logger.debug("dumping logs...")
         optimization_results = self.optimization_info.dump_evaluation_results()
 
@@ -99,9 +99,6 @@ class Context:
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
 
-        # self._logger.info(make_report(optimization_results, nodes=nodes))
-
-        # dump train and test data splits
         self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
@@ -112,49 +109,57 @@ class Context:
             yaml.dump(inference_config, file)
 
     def get_dump_dir(self) -> Path | None:
-        """
-        Get the directory for saving dumped modules.
+        """Get the directory for saving dumped modules.
 
-        :return: Path to the dump directory or None if dumping is disabled.
+        Returns:
+            Path to the dump directory or None if dumping is disabled.
         """
         if self.logging_config.dump_modules:
             return self.logging_config.dump_dir
         return None
 
     def is_multilabel(self) -> bool:
-        """
-        Check if the dataset is configured for multilabel classification.
+        """Check if the dataset is configured for multilabel classification.
 
-        :return: True if multilabel classification is enabled, False otherwise.
+        Returns:
+            True if multilabel classification is enabled, False otherwise.
         """
         return self.data_handler.multilabel
 
     def get_n_classes(self) -> int:
-        """
-        Get the number of classes in the dataset.
+        """Get the number of classes in the dataset.
 
-        :return: Number of classes.
+        Returns:
+            Number of classes.
         """
         return self.data_handler.n_classes
 
     def is_ram_to_clear(self) -> bool:
-        """
-        Check if RAM clearing is enabled in the logging configuration.
+        """Check if RAM clearing is enabled in the logging configuration.
 
-        :return: True if RAM clearing is enabled, False otherwise.
+        Returns:
+            True if RAM clearing is enabled, False otherwise.
         """
         return self.logging_config.clear_ram
 
     def has_saved_modules(self) -> bool:
-        """
-        Check if any modules have been saved.
+        """Check if any modules have been saved.
 
-        :return: True if there are saved modules, False otherwise.
+        Returns:
+            True if there are saved modules, False otherwise.
         """
         node_types = ["regex", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
 
     def resolve_embedder(self) -> EmbedderConfig:
+        """Resolve the embedder configuration.
+
+        Returns:
+            The best embedder configuration or default configuration.
+
+        Raises:
+            RuntimeError: If embedder configuration cannot be resolved.
+        """
         try:
             return self.optimization_info.get_best_embedder()
         except ValueError as e:
@@ -167,6 +172,14 @@ class Context:
             raise RuntimeError(msg) from e
 
     def resolve_ranker(self) -> CrossEncoderConfig:
+        """Resolve the cross-encoder configuration.
+
+        Returns:
+            The cross-encoder configuration.
+
+        Raises:
+            RuntimeError: If cross-encoder configuration cannot be resolved.
+        """
         if hasattr(self, "cross_encoder_config"):
             return self.cross_encoder_config
         msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."

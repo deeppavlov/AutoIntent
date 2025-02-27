@@ -1,4 +1,4 @@
-"""Node optimizer."""
+"""Node optimizer for optimizing module configurations."""
 
 import gc
 import logging
@@ -20,21 +20,29 @@ from autointent.nodes.info import NODES_INFO
 
 
 class ParamSpaceInt(BaseModel):
-    low: int = Field(..., description="Low boundary of the search space.")
-    high: int = Field(..., description="High boundary of the search space.")
-    step: int = Field(1, description="Step of the search space.")
-    log: bool = Field(False, description="Whether to use a logarithmic scale.")
+    """Integer parameter search space configuration."""
+
+    low: int = Field(..., description="Lower boundary of the search space.")
+    high: int = Field(..., description="Upper boundary of the search space.")
+    step: int = Field(1, description="Step size for the search space.")
+    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
 
 class ParamSpaceFloat(BaseModel):
-    low: float = Field(..., description="Low boundary of the search space.")
-    high: float = Field(..., description="High boundary of the search space.")
-    step: float | None = Field(None, description="Step of the search space.")
-    log: bool = Field(False, description="Whether to use a logarithmic scale.")
+    """Float parameter search space configuration."""
+
+    low: float = Field(..., description="Lower boundary of the search space.")
+    high: float = Field(..., description="Upper boundary of the search space.")
+    step: float | None = Field(None, description="Step size for the search space (if applicable).")
+    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
 
 class NodeOptimizer:
-    """Node optimizer class."""
+    """Class for optimizing nodes in a computational pipeline.
+
+    This class is responsible for optimizing different modules within a node
+    using various search strategies and logging the results.
+    """
 
     def __init__(
         self,
@@ -43,12 +51,13 @@ class NodeOptimizer:
         target_metric: str,
         metrics: list[str] | None = None,
     ) -> None:
-        """
-        Initialize the node optimizer.
+        """Initializes the node optimizer.
 
-        :param node_type: Node type
-        :param search_space: Search space for the optimization
-        :param metrics: Metrics to optimize.
+        Args:
+            node_type: The type of node being optimized.
+            search_space: A list of dictionaries defining the search space.
+            target_metric: The primary metric to optimize.
+            metrics: Additional metrics to track during optimization.
         """
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
@@ -62,20 +71,22 @@ class NodeOptimizer:
         self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
-        """
-        Fit the node optimizer.
+        """Performs the optimization process for the node.
 
-        :param context: Context
-        :param sampler: Sampler to use for optimization
+        Args:
+            context: The optimization context containing relevant data.
+            sampler: The sampling strategy used for optimization.
+
+        Raises:
+            AssertionError: If an invalid sampler type is provided.
         """
-        self._logger.info("starting %s node optimization...", self.node_info.node_type)
+        self._logger.info("Starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter: int = 0
             module_name = search_space.pop("module_name")
-            n_trials = None
-            if "n_trials" in search_space:
-                n_trials = search_space.pop("n_trials")
+            n_trials = search_space.pop("n_trials", None)
+
             if sampler == "tpe":
                 sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
                 n_trials = n_trials or 10
@@ -87,6 +98,7 @@ class NodeOptimizer:
                 n_trials = n_trials or 10
             else:
                 assert_never(sampler)
+
             study = optuna.create_study(direction="maximize", sampler=sampler_instance)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
@@ -101,9 +113,20 @@ class NodeOptimizer:
         search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]],
         context: Context,
     ) -> float:
+        """Defines the objective function for optimization.
+
+        Args:
+            trial: The Optuna trial instance.
+            module_name: The name of the module being optimized.
+            search_space: The parameter search space.
+            context: The execution context.
+
+        Returns:
+            The value of the target metric for the given trial.
+        """
         config = self.suggest(trial, search_space)
 
-        self._logger.debug("initializing %s module...", module_name)
+        self._logger.debug("Initializing %s module...", module_name)
         module = self.node_info.modules_available[module_name].from_context(context, **config)
 
         embedder_config = module.get_embedder_config()
@@ -112,7 +135,7 @@ class NodeOptimizer:
 
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 
-        self._logger.debug("scoring %s module...", module_name)
+        self._logger.debug("Scoring %s module...", module_name)
         all_metrics = module.score(context, metrics=self.metrics)
         target_metric = all_metrics[self.target_metric]
 
@@ -145,10 +168,21 @@ class NodeOptimizer:
             torch.cuda.empty_cache()
 
         self._counter += 1
-
         return target_metric
 
     def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
+        """Suggests parameter values based on the search space.
+
+        Args:
+            trial: The Optuna trial instance.
+            search_space: A dictionary defining the parameter search space.
+
+        Returns:
+            A dictionary containing the suggested parameter values.
+
+        Raises:
+            TypeError: If an unsupported parameter search space type is encountered.
+        """
         res: dict[str, Any] = {}
 
         def is_valid_param_space(
@@ -173,23 +207,29 @@ class NodeOptimizer:
         return res
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
-        """
-        Get module dump directory.
+        """Creates and returns the path to the module dump directory.
 
-        :param dump_dir: The base directory where the module dump directories will be created.
-        :param module_name: The type of the module being optimized.
-        :param j_combination: The index of the parameter combination being used.
-        :return: The path to the module dump directory as a string.
+        Args:
+            dump_dir: The base directory for storing module dumps.
+            module_name: The name of the module being optimized.
+            j_combination: The combination index for the parameters.
+
+        Returns:
+            The path to the module dump directory.
         """
         dump_dir_ = dump_dir / self.node_info.node_type / module_name / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
     def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
-        """
-        Validate nodes with dataset.
+        """Validates nodes against the dataset.
 
-        :param dataset: Dataset to use
+        Args:
+            dataset: The dataset used for validation.
+            mode: The validation mode ("raise" or "warning").
+
+        Raises:
+            ValueError: If validation fails and `mode` is set to "raise".
         """
         is_multilabel = dataset.multilabel
 

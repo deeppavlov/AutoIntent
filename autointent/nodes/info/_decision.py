@@ -6,7 +6,7 @@ from typing import ClassVar
 from autointent.custom_types import NodeType
 from autointent.metrics import DECISION_METRICS, DecisionMetricFn
 from autointent.modules import DECISION_MODULES
-from autointent.modules.abc import BaseDecision
+from autointent.modules.base import BaseDecision
 
 from ._base import NodeInfo
 
