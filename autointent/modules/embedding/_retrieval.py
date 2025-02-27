@@ -46,8 +46,8 @@ class RetrievalAimedEmbedding(BaseEmbedding):
 
     def __init__(
         self,
-        k: PositiveInt,
         embedder_config: EmbedderConfig | str | dict[str, Any],
+        k: PositiveInt = 10,
     ) -> None:
         """
         Initialize the RetrievalAimedEmbedding.
@@ -56,18 +56,19 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         :param embedder_config: Config of the embedder used for creating embeddings.
         """
         self.k = k
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
+        embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.embedder_config = embedder_config
+
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `RetrievalAimedEmbedding` must be a positive int"
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
         embedder_config: EmbedderConfig | str,
+        k: PositiveInt = 10,
     ) -> "RetrievalAimedEmbedding":
         """
         Create an instance using a Context object.

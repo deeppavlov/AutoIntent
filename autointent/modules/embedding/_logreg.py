@@ -63,6 +63,10 @@ class LogregAimedEmbedding(BaseEmbedding):
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.cv = cv
 
+        if self.cv < 0 or not isinstance(self.cv, int):
+            msg = "`cv` argument of `LogregAimedEmbedding` must be a positive int"
+            raise ValueError(msg)
+
     @classmethod
     def from_context(
         cls,
