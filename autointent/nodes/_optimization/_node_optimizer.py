@@ -54,6 +54,7 @@ class NodeOptimizer:
         :param search_space: Search space for the optimization
         :param metrics: Metrics to optimize.
         """
+        self._logger = logger
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
@@ -64,7 +65,6 @@ class NodeOptimizer:
 
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
-        self._logger = logger
 
     def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """
@@ -233,7 +233,7 @@ class NodeOptimizer:
         for module_search_space in search_space:
             module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
-            for params_combination in enumerate(it.product(*module_search_space_no_optuna.values())):
+            for params_combination in it.product(*module_search_space_no_optuna.values()):
                 module_kwargs = dict(zip(module_search_space_no_optuna.keys(), params_combination, strict=False))
 
                 self._logger.debug("validating %s module...", module_name, extra=module_kwargs)
@@ -249,7 +249,11 @@ class NodeOptimizer:
         module_name = module_search_space.pop("module_name")
 
         for param_name, param_space in module_search_space.items():
-            if self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+            if param_name == "n_trials":
+                continue
+            if isinstance(param_space, list):
+                res[param_name] = param_space
+            elif self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
                 param_space, ParamSpaceFloat
             ):
                 res[param_name] = [param_space["low"], param_space["high"]]
