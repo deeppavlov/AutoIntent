@@ -52,7 +52,7 @@ Search space is allowed to customize:
 """
 
 # %%
-preset["search_space"][1]["search_space"][0]["k"] = [1, 3]
+preset["search_space"][0]["search_space"][0]["k"] = [1, 3]
 custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
