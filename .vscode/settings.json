@@ -3,4 +3,10 @@
     "python.analysis.extraPaths": [
         "./docs/source"
     ],
+    "yaml.schemas": {
+        "./docs/optimizer_config.schema.json": [
+            "*.yaml",
+            "!*/.github/*/*.yaml"
+        ]
+    }
 }
