@@ -122,7 +122,7 @@ class Pipeline:
             optimization_config = OptimizationConfig(**dict_params)
 
         pipeline = cls(
-            [NodeOptimizer(**node.model_dump()) for node in optimization_config.search_space],
+            [NodeOptimizer(**node) for node in optimization_config.search_space],
             optimization_config.sampler,
             optimization_config.seed,
         )
