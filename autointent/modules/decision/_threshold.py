@@ -83,12 +83,11 @@ class ThresholdDecision(BaseDecision):
         :param thresh: Threshold for the scores, shape (n_classes,) or float
         """
         val_error = False
+        self.thresh = thresh if isinstance(thresh, float) else np.array(thresh)
         if isinstance(thresh, float):
-            self.thresh = thresh
-            val_error = val_error or self.thresh < 0 or self.thresh > 1
+            val_error = val_error or thresh < 0 or thresh > 1
         else:
-            self.thresh = np.array(thresh)
-            val_error = val_error or any(val < 0 or val > 1 for val in self.thresh)
+            val_error = val_error or any(val < 0 or val > 1 for val in thresh)
 
         if val_error:
             msg = "`thresh` arg of `ThresholdDecision` must contain a float from zero to one (or list of floats)."

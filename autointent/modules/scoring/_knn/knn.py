@@ -80,7 +80,7 @@ class KNNScorer(BaseScorer):
             msg = "`k` argument of `KNNScorer` must be a positive int"
             raise ValueError(msg)
 
-        if not isinstance(weights, WEIGHT_TYPES):
+        if weights not in get_args(WEIGHT_TYPES):
             msg = f"`weights` argument of `KNNScorer` must be a literal from a list: {get_args(WEIGHT_TYPES)}"
             raise TypeError(msg)
 

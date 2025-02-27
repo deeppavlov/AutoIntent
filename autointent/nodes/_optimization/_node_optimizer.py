@@ -236,7 +236,7 @@ class NodeOptimizer:
             for params_combination in enumerate(it.product(*module_search_space_no_optuna.values())):
                 module_kwargs = dict(zip(module_search_space_no_optuna.keys(), params_combination, strict=False))
 
-                self._logger.debug("validating %s module...", module_name, extra=params_combination)
+                self._logger.debug("validating %s module...", module_name, extra=module_kwargs)
                 module = self.node_info.modules_available[module_name](**module_kwargs)
                 self._logger.debug("%s is ok", module_name)
 

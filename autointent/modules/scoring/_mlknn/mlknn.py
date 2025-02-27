@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
+from typing_extensions import assert_never
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
@@ -82,8 +83,7 @@ class MLKnnScorer(BaseScorer):
             raise ValueError(msg)
 
         if not isinstance(self.s, float | int):
-            msg = "`s` argument of `MLKnnScorer` must be a float"
-            raise TypeError(msg)
+            assert_never(self.s)
 
     @classmethod
     def from_context(

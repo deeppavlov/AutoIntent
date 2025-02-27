@@ -1,6 +1,6 @@
 """Tunable predictor module."""
 
-from typing import Any, Literal
+from typing import Any, Literal, get_args
 
 import numpy as np
 import numpy.typing as npt
@@ -100,7 +100,7 @@ class TunableDecision(BaseDecision):
             msg = "Unsupported value for `n_optuna_trial` of `TunableDecision` module"
             raise ValueError(msg)
 
-        if not isinstance(self.target_metric, MetricType):
+        if self.target_metric not in get_args(MetricType):
             msg = "Unsupported value for `target_metric` of `TunableDecision` module"
             raise TypeError(msg)
 
