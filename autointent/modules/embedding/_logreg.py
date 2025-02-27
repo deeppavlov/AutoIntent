@@ -10,11 +10,11 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.abc import BaseEmbedding
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class LogregAimedEmbedding(BaseEmbedding):

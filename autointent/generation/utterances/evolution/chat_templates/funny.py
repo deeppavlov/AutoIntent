@@ -3,7 +3,6 @@
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
-from autointent.schemas import Intent
 
 from .base import EvolutionChatTemplate
 
@@ -11,6 +10,7 @@ from .base import EvolutionChatTemplate
 class FunnyEvolution(EvolutionChatTemplate):
     """Chat template for humorous tone augmentation."""
 
+    name: str = "funny"
     _messages: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,
@@ -37,10 +37,3 @@ class FunnyEvolution(EvolutionChatTemplate):
         ),
         Message(role=Role.ASSISTANT, content="My Lenovo thinks it's a phoenix—keeps dying and rising in flames."),
     ]
-
-    def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Generate chat for humorous tone adaptation."""
-        return [
-            *self._messages,
-            Message(role=Role.USER, content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}"),
-        ]

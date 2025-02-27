@@ -1,6 +1,7 @@
 """File with Dataset definition."""
 
 import json
+import logging
 from collections import defaultdict
 from functools import cached_property
 from pathlib import Path
@@ -11,6 +12,8 @@ from datasets import Sequence, get_dataset_config_names, load_dataset
 
 from autointent.custom_types import LabelWithOOS, Split
 from autointent.schemas import Intent, Tag
+
+logger = logging.getLogger(__name__)
 
 
 class Sample(TypedDict):
@@ -36,6 +39,7 @@ class Dataset(dict[str, HFDataset]):
 
     label_feature = "label"
     utterance_feature = "utterance"
+    has_descriptions: bool
 
     def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
         """
@@ -48,6 +52,8 @@ class Dataset(dict[str, HFDataset]):
         super().__init__(*args, **kwargs)
 
         self.intents = intents
+
+        self.has_descriptions = self.validate_descriptions()
 
     @property
     def multilabel(self) -> bool:
@@ -197,3 +203,18 @@ class Dataset(dict[str, HFDataset]):
             ohe_vector[sample["label"]] = 1
             sample["label"] = ohe_vector
         return sample
+
+    def validate_descriptions(self) -> bool:
+        """
+        Check whether the dataset contains text descriptions for each intent.
+
+        :return: True if all intents have description field
+        """
+        has_any = any(intent.description is not None for intent in self.intents)
+        has_all = all(intent.description is not None for intent in self.intents)
+
+        if has_any and not has_all:
+            msg = "Some intents have text descriptions, but some of them not."
+            logger.warning(msg)
+
+        return has_all

@@ -19,8 +19,8 @@ import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
+from autointent.configs import CrossEncoderConfig
 from autointent.custom_types import ListOfLabels
-from autointent.schemas import CrossEncoderConfig
 
 logger = logging.getLogger(__name__)
 

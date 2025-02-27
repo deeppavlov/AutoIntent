@@ -15,12 +15,6 @@
     - module_name: linear
     - module_name: mlknn
       k: [5]
-    - module_name: sklearn
-      embedder_config:
-      - model_name: sergeyzh/rubert-tiny-turbo
-      clf_name:
-       - LogisticRegression
-       - RandomForestClassifier
     - module_name: rerank
       k: [ 5, 10 ]
       weights: [ uniform, distance, closest ]

@@ -17,7 +17,7 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
 from ._hash import Hasher
-from .schemas import EmbedderConfig, TaskTypeEnum
+from .configs import EmbedderConfig, TaskTypeEnum
 
 
 def get_embeddings_path(filename: str) -> Path:

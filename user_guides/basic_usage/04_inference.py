@@ -47,19 +47,7 @@ pipeline.predict(["hello, world!"])
 """
 There are several caveats.
 
-1. **Save vector databse.**
-
-When customizing configuration of pipeline optimization, you need to ensure that the option `save_db` of %mddoclink(class,configs,VectorIndexConfig) is set to `True`:
-"""
-# %%
-from autointent.configs import VectorIndexConfig
-
-# isn't compatible with "right-after-optimization" inference
-vector_index_config = VectorIndexConfig(save_db=False)
-
-# %% [markdown]
-"""
-2. **RAM usage.**
+**RAM usage.**
 
 You can optimize RAM usage by saving all modules to file system. Just set the following options:
 """
@@ -78,12 +66,11 @@ Firstly, your auto-configuration run should dump modules into file system:
 
 # %%
 from autointent import Dataset, Pipeline
-from autointent.configs import LoggingConfig, VectorIndexConfig
+from autointent.configs import LoggingConfig
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 pipeline = Pipeline.from_search_space(search_space)
 pipeline.set_config(LoggingConfig(dump_modules=True, clear_ram=True))
-pipeline.set_config(VectorIndexConfig(save_db=True))
 
 # %% [markdown]
 """

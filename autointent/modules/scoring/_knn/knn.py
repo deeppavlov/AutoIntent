@@ -7,9 +7,9 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
+from autointent.configs import EmbedderConfig
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig
 
 from .weighting import apply_weights
 
@@ -58,8 +58,8 @@ class KNNScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: PositiveInt,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         weights: WEIGHT_TYPES = "distance",
     ) -> None:
         """
@@ -81,7 +81,7 @@ class KNNScorer(BaseScorer):
         cls,
         context: Context,
         k: PositiveInt,
-        weights: WEIGHT_TYPES,
+        weights: WEIGHT_TYPES = "distance",
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
         """
@@ -94,7 +94,7 @@ class KNNScorer(BaseScorer):
         :return: Initialized KNNScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             embedder_config=embedder_config,

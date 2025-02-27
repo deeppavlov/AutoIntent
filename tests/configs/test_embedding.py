@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from autointent.nodes import OptimizationConfig
+from autointent.nodes import OptimizationSearchSpaceConfig
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ def valid_embedding_config():
 
 def test_valid_embedding_config(valid_embedding_config):
     """Test that a valid embedding config passes validation."""
-    config = OptimizationConfig(valid_embedding_config)
+    config = OptimizationSearchSpaceConfig(valid_embedding_config)
     assert config[0].node_type == "embedding"
     assert config[0].target_metric == "retrieval_mrr"
     assert isinstance(config[0].search_space, list)
@@ -50,7 +50,7 @@ def test_invalid_embedding_config_missing_field():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)
 
 
 def test_invalid_embedding_config_wrong_type():
@@ -70,4 +70,4 @@ def test_invalid_embedding_config_wrong_type():
     ]
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)

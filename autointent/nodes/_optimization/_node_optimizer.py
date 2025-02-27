@@ -11,10 +11,11 @@ import optuna
 import torch
 from optuna.trial import Trial
 from pydantic import BaseModel, Field
+from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, SamplerType
+from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.info import NODES_INFO
 
 
@@ -65,11 +66,12 @@ class NodeOptimizer:
         Fit the node optimizer.
 
         :param context: Context
+        :param sampler: Sampler to use for optimization
         """
         self._logger.info("starting %s node optimization...", self.node_info.node_type)
 
         for search_space in deepcopy(self.modules_search_spaces):
-            self._counter = 0
+            self._counter: int = 0
             module_name = search_space.pop("module_name")
             n_trials = None
             if "n_trials" in search_space:
@@ -84,8 +86,7 @@ class NodeOptimizer:
                 sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
                 n_trials = n_trials or 10
             else:
-                msg = f"Unexpected sampler: {sampler}"
-                raise ValueError(msg)
+                assert_never(sampler)
             study = optuna.create_study(direction="maximize", sampler=sampler_instance)
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
@@ -184,7 +185,7 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def validate_nodes_with_dataset(self, dataset: Dataset) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
         """
         Validate nodes with dataset.
 
@@ -192,16 +193,32 @@ class NodeOptimizer:
         """
         is_multilabel = dataset.multilabel
 
+        filtered_search_space = []
+
         for search_space in deepcopy(self.modules_search_spaces):
-            module_name = search_space.pop("module_name")
+            module_name = search_space["module_name"]
             module = self.node_info.modules_available[module_name]
             # todo add check for oos
 
+            messages = []
+
+            if module_name == "description" and not dataset.has_descriptions:
+                messages.append("DescriptionScorer cannot be used without intents descriptions.")
+
             if is_multilabel and not module.supports_multilabel:
-                msg = f"Module '{module_name}' does not support multilabel datasets."
-                self._logger.error(msg)
-                raise ValueError(msg)
+                messages.append(f"Module '{module_name}' does not support multilabel datasets.")
+
             if not is_multilabel and not module.supports_multiclass:
-                msg = f"Module '{module_name}' does not support multiclass datasets."
-                self._logger.error(msg)
-                raise ValueError(msg)
+                messages.append(f"Module '{module_name}' does not support multiclass datasets.")
+
+            if len(messages) > 0:
+                msg = "\n".join(messages)
+                if mode == "raise":
+                    self._logger.error(msg)
+                    raise ValueError(msg)
+                if mode == "warning":
+                    self._logger.warning(msg)
+            else:
+                filtered_search_space.append(search_space)
+
+        self.modules_search_spaces = filtered_search_space

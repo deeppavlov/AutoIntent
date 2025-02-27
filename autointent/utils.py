@@ -6,17 +6,7 @@ from typing import Any
 
 import yaml
 
-
-def load_default_search_space(multilabel: bool) -> list[dict[str, Any]]:
-    """
-    Load configuration from the given path or load default configuration.
-
-    :param multilabel: Whether to use multilabel or not
-    :return:
-    """
-    config_name = "default-multilabel-config.yaml" if multilabel else "default-multiclass-config.yaml"
-    path = ires.files("autointent._datafiles").joinpath(config_name)
-    return load_search_space(path)  # type: ignore[arg-type]
+from autointent.custom_types import SearchSpacePresets
 
 
 def load_search_space(path: Path | str) -> list[dict[str, Any]]:
@@ -27,4 +17,15 @@ def load_search_space(path: Path | str) -> list[dict[str, Any]]:
     :return:
     """
     with Path(path).open() as file:
+        return yaml.safe_load(file)  # type: ignore[no-any-return]
+
+
+def load_preset(name: SearchSpacePresets) -> dict[str, Any]:
+    """
+    Load one of preset search spaces.
+
+    :param name: name of a presets.
+    """
+    path = ires.files("autointent._presets").joinpath(name + ".yaml")
+    with path.open() as file:
         return yaml.safe_load(file)  # type: ignore[no-any-return]

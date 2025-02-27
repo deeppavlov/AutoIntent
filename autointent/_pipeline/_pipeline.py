@@ -3,18 +3,30 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
+from typing_extensions import assert_never
 
-from autointent import Context, Dataset
-from autointent.configs import DataConfig, InferenceNodeConfig, LoggingConfig, VectorIndexConfig
-from autointent.custom_types import ListOfGenericLabels, NodeType, SamplerType
+from autointent import Context, Dataset, OptimizationConfig
+from autointent.configs import (
+    CrossEncoderConfig,
+    DataConfig,
+    EmbedderConfig,
+    InferenceNodeConfig,
+    LoggingConfig,
+)
+from autointent.custom_types import (
+    ListOfGenericLabels,
+    NodeType,
+    SamplerType,
+    SearchSpacePresets,
+    SearchSpaceValidationMode,
+)
 from autointent.metrics import DECISION_METRICS
 from autointent.nodes import InferenceNode, NodeOptimizer
-from autointent.nodes.schemes import OptimizationConfig
-from autointent.utils import load_default_search_space, load_search_space
+from autointent.utils import load_preset, load_search_space
 
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
@@ -28,27 +40,34 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
+        sampler: SamplerType = "brute",
         seed: int = 42,
     ) -> None:
         """
         Initialize the pipeline optimizer.
 
         :param nodes: list of nodes
+        :param sampler: sampler type
         :param seed: random seed
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
         self.seed = seed
+        if sampler not in get_args(SamplerType):
+            msg = f"Sampler should be one of {get_args(SamplerType)}"
+            raise ValueError(msg)
+
+        self.sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig(dump_dir=None)
-            self.vector_index_config = VectorIndexConfig()
+            self.embedder_config = EmbedderConfig()
+            self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
         elif not isinstance(nodes[0], InferenceNode):
-            msg = "Pipeline should be initialized with list of NodeOptimizers or InferenceNodes"
-            raise TypeError(msg)
+            assert_never(nodes)
 
-    def set_config(self, config: LoggingConfig | VectorIndexConfig | DataConfig) -> None:
+    def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
         """
         Set configuration for the optimizer.
 
@@ -56,13 +75,14 @@ class Pipeline:
         """
         if isinstance(config, LoggingConfig):
             self.logging_config = config
-        elif isinstance(config, VectorIndexConfig):
-            self.vector_index_config = config
+        elif isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
         elif isinstance(config, DataConfig):
             self.data_config = config
         else:
-            msg = "unknown config type"
-            raise TypeError(msg)
+            assert_never(config)
 
     @classmethod
     def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
@@ -72,25 +92,47 @@ class Pipeline:
         :param search_space: Dictionary config
         :param seed: random seed
         """
-        if isinstance(search_space, Path | str):
+        if not isinstance(search_space, list):
             search_space = load_search_space(search_space)
-        validated_search_space = OptimizationConfig(search_space).model_dump()  # type: ignore[arg-type]
-        nodes = [NodeOptimizer(**node) for node in validated_search_space]
+        nodes = [NodeOptimizer(**node) for node in search_space]
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def default_optimizer(cls, multilabel: bool, seed: int = 42) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePresets, seed: int = 42) -> "Pipeline":
+        optimization_config = load_preset(name)
+        config = OptimizationConfig(seed=seed, **optimization_config)
+        return cls.from_optimization_config(config=config)
+
+    @classmethod
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
         """
-        Create pipeline optimizer with default search space for given classification task.
+        Create pipeline optimizer from optimization config.
 
-        :param multilabel: Whether the task multi-label, or single-label.
-        :param seed: random seed
-
-        :return: Pipeline
+        :param config: Optimization config
+        :return:
         """
-        return cls.from_search_space(search_space=load_default_search_space(multilabel), seed=seed)
+        if isinstance(config, OptimizationConfig):
+            optimization_config = config
+        else:
+            if isinstance(config, dict):
+                dict_params = config
+            else:
+                with Path(config).open() as file:
+                    dict_params = yaml.safe_load(file)
+            optimization_config = OptimizationConfig(**dict_params)
 
-    def _fit(self, context: Context, sampler: SamplerType = "brute") -> None:
+        pipeline = cls(
+            [NodeOptimizer(**node.model_dump()) for node in optimization_config.search_space],
+            optimization_config.sampler,
+            optimization_config.seed,
+        )
+        pipeline.set_config(optimization_config.logging_config)
+        pipeline.set_config(optimization_config.data_config)
+        pipeline.set_config(optimization_config.embedder_config)
+        pipeline.set_config(optimization_config.cross_encoder_config)
+        return pipeline
+
+    def _fit(self, context: Context, sampler: SamplerType) -> None:
         """
         Optimize the pipeline.
 
@@ -99,16 +141,13 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
         self.context.callback_handler.start_run(
-            run_name=self.context.logging_config.run_name,
+            run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
         )
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
             if node_optimizer is not None:
                 node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
-        if not context.vector_index_config.save_db:
-            self._logger.info("removing vector database from file system...")
-            # TODO clear cache from appdirs
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
@@ -123,7 +162,8 @@ class Pipeline:
         self,
         dataset: Dataset,
         refit_after: bool = False,
-        sampler: SamplerType = "brute",
+        sampler: SamplerType | None = None,
+        incompatible_search_space: SearchSpaceValidationMode = "filter",
     ) -> Context:
         """
         Optimize the pipeline from dataset.
@@ -138,15 +178,19 @@ class Pipeline:
         context = Context()
         context.set_dataset(dataset, self.data_config)
         context.configure_logging(self.logging_config)
-        context.configure_vector_index(self.vector_index_config)
+        context.configure_transformer(self.embedder_config)
+        context.configure_transformer(self.cross_encoder_config)
 
-        self.validate_modules(dataset)
+        self.validate_modules(dataset, mode=incompatible_search_space)
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
             self._logger.warning(
                 "Test data is not provided. Final test metrics won't be calculated after pipeline optimization."
             )
+
+        if sampler is None:
+            sampler = self.sampler
 
         self._fit(context, sampler)
 
@@ -174,7 +218,7 @@ class Pipeline:
 
         return context
 
-    def validate_modules(self, dataset: Dataset) -> None:
+    def validate_modules(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
         """
         Validate modules with dataset.
 
@@ -182,7 +226,7 @@ class Pipeline:
         """
         for node in self.nodes.values():
             if isinstance(node, NodeOptimizer):
-                node.validate_nodes_with_dataset(dataset)
+                node.validate_nodes_with_dataset(dataset, mode)
 
     @classmethod
     def from_dict_config(cls, nodes_configs: list[dict[str, Any]]) -> "Pipeline":

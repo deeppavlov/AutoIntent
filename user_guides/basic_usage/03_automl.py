@@ -27,12 +27,11 @@ dataset["train_0"][0]
 """
 ## Search Space
 
-AutoIntent provides default search spaces for multi-label and single-label classification problems. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,default_optimizer):
+AutoIntent provides default search spaces. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,from_preset):
 """
 
 # %%
-multiclass_pipeline = Pipeline.default_optimizer(multilabel=False)
-multilabel_pipeline = Pipeline.default_optimizer(multilabel=True)
+pipeline = Pipeline.from_preset("light_extra")
 
 # %% [markdown]
 """
@@ -42,10 +41,10 @@ One can explore its contents:
 # %%
 from pprint import pprint
 
-from autointent.utils import load_default_search_space
+from autointent.utils import load_preset
 
-search_space = load_default_search_space(multilabel=True)
-pprint(search_space)
+preset = load_preset("light_extra")
+pprint(preset)
 
 # %% [markdown]
 """
@@ -53,36 +52,13 @@ Search space is allowed to customize:
 """
 
 # %%
-search_space[1]["search_space"][0]["k"] = [1, 3]
-custom_pipeline = Pipeline.from_search_space(search_space)
+preset["search_space"][1]["search_space"][0]["k"] = [1, 3]
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
 See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
 """
-# %% [markdown]
-"""
-## Vector Index Settings
-
-%mddoclink(class,,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
-
-Default options are the following:
-"""
-
-# %%
-from autointent.configs import VectorIndexConfig
-
-vector_index_config = VectorIndexConfig(save_db=False)
-
-# %% [markdown]
-"""
-- `save_db=False` tells AutoIntent to clear all the files after auto configuration is finished
-
-These settings can be applied in a familiar way:
-"""
-
-# %%
-custom_pipeline.set_config(vector_index_config)
 
 # %% [markdown]
 """
@@ -105,23 +81,21 @@ custom_pipeline.set_config(logging_config)
 
 # %%
 from autointent import Dataset, Pipeline
-from autointent.configs import LoggingConfig, VectorIndexConfig
-from autointent.utils import load_default_search_space
+from autointent.configs import LoggingConfig
+from autointent.utils import load_preset
 
 # load data
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 
 # customize search space
-search_space = load_default_search_space(multilabel=False)
+preset = load_preset("light_extra")
 
 # make pipeline
-custom_pipeline = Pipeline.from_search_space(search_space)
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # custom settings
-vector_index_config = VectorIndexConfig()
 logging_config = LoggingConfig()
 
-custom_pipeline.set_config(vector_index_config)
 custom_pipeline.set_config(logging_config)
 
 # start auto-configuration

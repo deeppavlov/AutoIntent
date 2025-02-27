@@ -75,7 +75,7 @@ class ThresholdDecision(BaseDecision):
 
     def __init__(
         self,
-        thresh: FloatFromZeroToOne | list[FloatFromZeroToOne],
+        thresh: FloatFromZeroToOne | list[FloatFromZeroToOne] = 0.5,
     ) -> None:
         """
         Initialize threshold predictor.

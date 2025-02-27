@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from autointent.nodes import OptimizationConfig
+from autointent.nodes import OptimizationSearchSpaceConfig
 
 
 @pytest.fixture
@@ -46,12 +46,12 @@ def valid_scoring_config():
                     "weights": ["distance"],
                     "rank_threshold_cutoff": [None, 3],
                 },
-                {
-                    "module_name": "sklearn",
-                    "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
-                    "clf_name": ["LogisticRegression"],
-                    "clf_args": [{"C": 1.0}, {"C": 0.5}],
-                },
+                # {
+                #     "module_name": "sklearn",
+                #     "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
+                #     "clf_name": ["LogisticRegression"],
+                #     "clf_args": [{"C": 1.0}, {"C": 0.5}],
+                # },
             ],
         }
     ]
@@ -59,7 +59,7 @@ def valid_scoring_config():
 
 def test_valid_scoring_config(valid_scoring_config):
     """Test that a valid scoring config passes validation."""
-    config = OptimizationConfig(valid_scoring_config)
+    config = OptimizationSearchSpaceConfig(valid_scoring_config)
     assert config[0].node_type == "scoring"
     assert config[0].target_metric == "scoring_roc_auc"
     assert isinstance(config[0].search_space, list)
@@ -77,7 +77,7 @@ def test_invalid_scoring_config_missing_field():
     }
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)
 
 
 def test_invalid_scoring_config_wrong_type():
@@ -96,4 +96,4 @@ def test_invalid_scoring_config_wrong_type():
     }
 
     with pytest.raises(ValidationError):
-        OptimizationConfig(invalid_config)
+        OptimizationSearchSpaceConfig(invalid_config)

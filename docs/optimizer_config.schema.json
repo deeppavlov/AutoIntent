@@ -102,6 +102,7 @@
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                     "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
@@ -126,9 +127,6 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "CrossEncoderConfig",
             "type": "object"
         },
@@ -153,20 +151,6 @@
                     "description": "Number of trials",
                     "title": "N Trials"
                 },
-                "cross_encoder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/CrossEncoderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Cross Encoder Config",
-                    "type": "array"
-                },
                 "k": {
                     "anyOf": [
                         {
@@ -181,6 +165,26 @@
                         }
                     ],
                     "title": "K"
+                },
+                "cross_encoder_config": {
+                    "default": [
+                        null
+                    ],
+                    "items": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/$defs/CrossEncoderConfig"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "title": "Cross Encoder Config",
+                    "type": "array"
                 },
                 "embedder_config": {
                     "default": [
@@ -205,10 +209,56 @@
             },
             "required": [
                 "module_name",
-                "cross_encoder_config",
                 "k"
             ],
             "title": "DNNCScorerInitModel",
+            "type": "object"
+        },
+        "DataConfig": {
+            "description": "Configuration for the data used in the optimization process.",
+            "properties": {
+                "scheme": {
+                    "default": "ho",
+                    "description": "Validation scheme to use.",
+                    "enum": [
+                        "ho",
+                        "cv"
+                    ],
+                    "title": "Scheme",
+                    "type": "string"
+                },
+                "n_folds": {
+                    "default": 3,
+                    "description": "Number of folds in cross-validation.",
+                    "exclusiveMinimum": 0,
+                    "title": "N Folds",
+                    "type": "integer"
+                },
+                "validation_size": {
+                    "default": 0.2,
+                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Validation Size",
+                    "type": "number"
+                },
+                "separation_ratio": {
+                    "anyOf": [
+                        {
+                            "maximum": 1.0,
+                            "minimum": 0.0,
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": 0.5,
+                    "description": "Set to float to prevent data leak between scoring and decision nodes.",
+                    "title": "Separation Ratio"
+                }
+            },
+            "title": "DataConfig",
             "type": "object"
         },
         "DecisionNodeValidator": {
@@ -370,6 +420,7 @@
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
                     "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
@@ -472,9 +523,6 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "EmbedderConfig",
             "type": "object"
         },
@@ -667,6 +715,9 @@
                     "title": "K"
                 },
                 "weights": {
+                    "default": [
+                        "distance"
+                    ],
                     "items": {
                         "enum": [
                             "uniform",
@@ -701,8 +752,7 @@
             },
             "required": [
                 "module_name",
-                "k",
-                "weights"
+                "k"
             ],
             "title": "KNNScorerInitModel",
             "type": "object"
@@ -753,6 +803,75 @@
                 "module_name"
             ],
             "title": "LinearScorerInitModel",
+            "type": "object"
+        },
+        "LoggingConfig": {
+            "description": "Configuration for the logging.",
+            "properties": {
+                "project_dir": {
+                    "anyOf": [
+                        {
+                            "format": "path",
+                            "type": "string"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Path to the directory with different runs.",
+                    "title": "Project Dir"
+                },
+                "run_name": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Name of the run. If None, a random name will be generated.",
+                    "title": "Run Name"
+                },
+                "dump_modules": {
+                    "default": false,
+                    "description": "Whether to dump the modules or not",
+                    "title": "Dump Modules",
+                    "type": "boolean"
+                },
+                "clear_ram": {
+                    "default": false,
+                    "description": "Whether to clear the RAM after dumping the modules",
+                    "title": "Clear Ram",
+                    "type": "boolean"
+                },
+                "report_to": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "enum": [
+                                    "wandb",
+                                    "tensorboard"
+                                ],
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "List of callbacks to report to. If None, no callbacks will be used",
+                    "title": "Report To"
+                }
+            },
+            "title": "LoggingConfig",
             "type": "object"
         },
         "LogregAimedEmbeddingInitModel": {
@@ -926,6 +1045,27 @@
             ],
             "title": "NodeType",
             "type": "string"
+        },
+        "OptimizationSearchSpaceConfig": {
+            "description": "Optimizer configuration.",
+            "items": {
+                "anyOf": [
+                    {
+                        "$ref": "#/$defs/EmbeddingNodeValidator"
+                    },
+                    {
+                        "$ref": "#/$defs/ScoringNodeValidator"
+                    },
+                    {
+                        "$ref": "#/$defs/DecisionNodeValidator"
+                    },
+                    {
+                        "$ref": "#/$defs/RegexNodeValidator"
+                    }
+                ]
+            },
+            "title": "OptimizationSearchSpaceConfig",
+            "type": "array"
         },
         "ParamSpaceFloat": {
             "properties": {
@@ -1111,6 +1251,9 @@
                     "title": "K"
                 },
                 "weights": {
+                    "default": [
+                        "distance"
+                    ],
                     "items": {
                         "enum": [
                             "uniform",
@@ -1122,7 +1265,35 @@
                     "title": "Weights",
                     "type": "array"
                 },
+                "m": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "exclusiveMinimum": 0,
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "$ref": "#/$defs/ParamSpaceInt"
+                        }
+                    ],
+                    "default": [
+                        null
+                    ],
+                    "title": "M"
+                },
                 "cross_encoder_config": {
+                    "default": [
+                        null
+                    ],
                     "items": {
                         "anyOf": [
                             {
@@ -1130,6 +1301,9 @@
                             },
                             {
                                 "type": "string"
+                            },
+                            {
+                                "type": "null"
                             }
                         ]
                     },
@@ -1155,30 +1329,6 @@
                     },
                     "title": "Embedder Config",
                     "type": "array"
-                },
-                "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        null
-                    ],
-                    "title": "M"
                 },
                 "rank_threshold_cutoff": {
                     "anyOf": [
@@ -1207,9 +1357,7 @@
             },
             "required": [
                 "module_name",
-                "k",
-                "weights",
-                "cross_encoder_config"
+                "k"
             ],
             "title": "RerankScorerInitModel",
             "type": "object"
@@ -1382,30 +1530,10 @@
                     "title": "N Trials"
                 },
                 "clf_name": {
-                    "default": [
-                        "LogisticRegression"
-                    ],
                     "items": {
                         "type": "string"
                     },
                     "title": "Clf Name",
-                    "type": "array"
-                },
-                "clf_args": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "object"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Clf Args",
                     "type": "array"
                 },
                 "embedder_config": {
@@ -1427,10 +1555,29 @@
                     },
                     "title": "Embedder Config",
                     "type": "array"
+                },
+                "clf_args": {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ]
+                    },
+                    "title": "Clf Args",
+                    "type": "array"
                 }
             },
             "required": [
-                "module_name"
+                "module_name",
+                "clf_name",
+                "clf_args"
             ],
             "title": "SklearnScorerInitModel",
             "type": "object"
@@ -1558,23 +1705,76 @@
             "type": "object"
         }
     },
-    "description": "Optimizer configuration.",
-    "items": {
-        "anyOf": [
-            {
-                "$ref": "#/$defs/EmbeddingNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/ScoringNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/DecisionNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/RegexNodeValidator"
+    "description": "Configuration for the optimization process.",
+    "properties": {
+        "data_config": {
+            "$ref": "#/$defs/DataConfig",
+            "default": {
+                "scheme": "ho",
+                "n_folds": 3,
+                "validation_size": 0.2,
+                "separation_ratio": 0.5
             }
-        ]
+        },
+        "search_space": {
+            "$ref": "#/$defs/OptimizationSearchSpaceConfig"
+        },
+        "logging_config": {
+            "$ref": "#/$defs/LoggingConfig",
+            "default": {
+                "project_dir": null,
+                "run_name": null,
+                "dump_modules": false,
+                "clear_ram": false,
+                "report_to": null
+            }
+        },
+        "embedder_config": {
+            "$ref": "#/$defs/EmbedderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+                "device": null,
+                "default_prompt": null,
+                "classifier_prompt": null,
+                "cluster_prompt": null,
+                "sts_prompt": null,
+                "query_prompt": null,
+                "passage_prompt": null,
+                "use_cache": false
+            }
+        },
+        "cross_encoder_config": {
+            "$ref": "#/$defs/CrossEncoderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "device": null,
+                "train_head": false
+            }
+        },
+        "sampler": {
+            "default": "brute",
+            "enum": [
+                "brute",
+                "tpe",
+                "random"
+            ],
+            "title": "Sampler",
+            "type": "string"
+        },
+        "seed": {
+            "default": 42,
+            "exclusiveMinimum": 0,
+            "title": "Seed",
+            "type": "integer"
+        }
     },
+    "required": [
+        "search_space"
+    ],
     "title": "OptimizationConfig",
-    "type": "array"
+    "type": "object"
 }

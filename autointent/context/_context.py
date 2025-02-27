@@ -9,11 +9,7 @@ import yaml
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import (
-    DataConfig,
-    LoggingConfig,
-    VectorIndexConfig,
-)
+from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
 
 from ._utils import NumpyEncoder
 from .data_handler import DataHandler
@@ -51,13 +47,16 @@ class Context:
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
-    def configure_vector_index(self, config: VectorIndexConfig) -> None:
+    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig) -> None:
         """
         Configure the vector index client and embedder.
 
         :param config: Configuration for the vector index.
         """
-        self.vector_index_config = config
+        if isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
 
     def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
         """
@@ -94,10 +93,6 @@ class Context:
         optimization_results = self.optimization_info.dump_evaluation_results()
 
         logs_dir = self.logging_config.dirpath
-        if logs_dir is None:
-            msg = "something's wrong with LoggingConfig"
-            raise ValueError(msg)
-
         logs_dir.mkdir(parents=True, exist_ok=True)
 
         logs_path = logs_dir / "logs.json"
@@ -158,3 +153,21 @@ class Context:
         """
         node_types = ["regex", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
+
+    def resolve_embedder(self) -> EmbedderConfig:
+        try:
+            return self.optimization_info.get_best_embedder()
+        except ValueError as e:
+            if hasattr(self, "embedder_config"):
+                return self.embedder_config
+            msg = (
+                "Embedder could't be resolved. Either include embedding node into the "
+                "search space or set default config with Context.configure_transformer."
+            )
+            raise RuntimeError(msg) from e
+
+    def resolve_ranker(self) -> CrossEncoderConfig:
+        if hasattr(self, "cross_encoder_config"):
+            return self.cross_encoder_config
+        msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."
+        raise RuntimeError(msg)

@@ -4,10 +4,11 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 
 from autointent import Context, Ranker
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
-from autointent.schemas import CrossEncoderConfig, EmbedderConfig
 
 from .knn import KNNScorer
 
@@ -27,12 +28,12 @@ class RerankScorer(KNNScorer):
 
     def __init__(
         self,
-        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
-        embedder_config: EmbedderConfig | str | dict[str, Any],
         k: int,
         weights: WEIGHT_TYPES,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize the RerankScorer.
@@ -63,10 +64,10 @@ class RerankScorer(KNNScorer):
         cls,
         context: Context,
         k: int,
-        weights: WEIGHT_TYPES,
-        cross_encoder_config: CrossEncoderConfig | str,
+        weights: WEIGHT_TYPES = "distance",
+        m: PositiveInt | None = None,
+        cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
-        m: int | None = None,
         rank_threshold_cutoff: int | None = None,
     ) -> "RerankScorer":
         """
@@ -83,7 +84,10 @@ class RerankScorer(KNNScorer):
         :return: An instance of RerankScorer.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
+
+        if cross_encoder_config is None:
+            cross_encoder_config = context.resolve_ranker()
 
         return cls(
             k=k,

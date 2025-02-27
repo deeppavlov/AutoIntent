@@ -3,15 +3,14 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sklearn.linear_model import LogisticRegression
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -44,28 +43,34 @@ class SklearnScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
         clf_name: str,
-        clf_args: dict[str, Any] | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        **clf_args: Any,  # noqa: ANN401
     ) -> None:
         """
         Initialize the SklearnScorer.
 
         :param embedder_config: Config of the embedder model.
         :param clf_name: Name of the sklearn classifier to use.
-        :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
+        :param clf_args: dictionary with the chosen sklearn classifier arguments.
         """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
-        self.clf_args = clf_args or {}
+
+        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
+            self._base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**clf_args)
+        else:
+            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
+            logger.error(msg)
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        clf_name: str = LogisticRegression.__name__,
-        clf_args: dict[str, Any] | None = None,
+        clf_name: str,
         embedder_config: EmbedderConfig | str | None = None,
+        **clf_args: float | str | bool,
     ) -> Self:
         """
         Create a SklearnScorer instance using a Context object.
@@ -77,12 +82,12 @@ class SklearnScorer(BaseScorer):
         :return: Initialized SklearnScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             embedder_config=embedder_config,
             clf_name=clf_name,
-            clf_args=clf_args,
+            **clf_args,
         )
 
     def fit(
@@ -112,14 +117,8 @@ class SklearnScorer(BaseScorer):
             )
         )
         features = embedder.embed(utterances, TaskTypeEnum.classification)
-        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
-            base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
-        else:
-            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
-            logger.error(msg)
-            raise ValueError(msg)
 
-        clf = MultiOutputClassifier(base_clf) if self._multilabel else base_clf
+        clf = MultiOutputClassifier(self._base_clf) if self._multilabel else self._base_clf
 
         clf.fit(features, labels)
 

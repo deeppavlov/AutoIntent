@@ -8,9 +8,9 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.custom_types import ListOfLabels
 from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
 
 
 class LinearScorer(BaseScorer):
@@ -53,7 +53,7 @@ class LinearScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         cv: int = 3,
         n_jobs: int | None = None,
         seed: int = 0,
@@ -85,7 +85,7 @@ class LinearScorer(BaseScorer):
         :return: Initialized LinearScorer instance.
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             embedder_config=embedder_config,

@@ -79,3 +79,7 @@ ValidationScheme = Literal["ho", "cv"]
 
 FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
 """Float value between 0 and 1, inclusive."""
+
+SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
+
+SearchSpacePresets = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]

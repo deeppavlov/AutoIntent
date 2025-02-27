@@ -10,8 +10,8 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
+from autointent.configs import EmbedderConfig
 from autointent.custom_types import ListOfLabelsWithOOS, NodeType
-from autointent.schemas import EmbedderConfig
 
 
 class Artifact(BaseModel):
