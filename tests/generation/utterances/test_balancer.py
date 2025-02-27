@@ -8,7 +8,7 @@ import pytest
 from autointent import Dataset
 from autointent.custom_types import Split
 from autointent.generation.utterances import DatasetBalancer, Generator
-from autointent.generation.utterances.basic.chat_template import SynthesizerChatTemplate
+from autointent.generation.utterances.basic.chat_templates._synthesizer_en import EnglishSynthesizerTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ def test_real_balancer():
         ],
     }
     dataset = Dataset.from_dict(test_data)
-    template = SynthesizerChatTemplate(dataset, split="train")
+    template = EnglishSynthesizerTemplate(dataset, split="train")
     generator = Generator()
     evolutions = template
     balancer = DatasetBalancer(generator=generator, prompt_maker=evolutions, max_samples_per_class=3, async_mode=False)
