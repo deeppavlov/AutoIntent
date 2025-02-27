@@ -96,6 +96,14 @@ class TunableDecision(BaseDecision):
         self.seed = seed
         self.tags = tags
 
+        if self.n_optuna_trials < 0 or not isinstance(self.n_optuna_trials, int):
+            msg = "Unsupported value for `n_optuna_trial` of `TunableDecision` module"
+            raise ValueError(msg)
+
+        if not isinstance(self.target_metric, MetricType):
+            msg = "Unsupported value for `target_metric` of `TunableDecision` module"
+            raise TypeError(msg)
+
     @classmethod
     def from_context(
         cls, context: Context, target_metric: MetricType = "decision_accuracy", n_optuna_trials: PositiveInt = 320
