@@ -249,7 +249,12 @@ class Pipeline:
         return cls(nodes)
 
     @classmethod
-    def load(cls, path: str | Path) -> "Pipeline":
+    def load(
+        cls,
+        path: str | Path,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> "Pipeline":
         """
         Load pipeline in inference mode.
 
@@ -259,6 +264,11 @@ class Pipeline:
         """
         with (Path(path) / "inference_config.yaml").open() as file:
             inference_dict_config = yaml.safe_load(file)
+        for node_config in inference_dict_config["nodes_config"]:
+            if embedder_config is not None:
+                node_config["embedder_config"] = embedder_config.model_dump()
+            if cross_encoder_config is not None:
+                node_config["cross_encoder_config"] = cross_encoder_config.model_dump()
         return cls.from_dict_config(inference_dict_config["nodes_configs"])
 
     def predict(self, utterances: list[str]) -> ListOfGenericLabels:

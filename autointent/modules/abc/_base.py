@@ -10,6 +10,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent._dump_tools import Dumper
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import ListOfGenericLabels, ListOfLabels
@@ -72,13 +73,18 @@ class BaseModule(ABC):
         """
         Dumper.dump(self, Path(path))
 
-    def load(self, path: str) -> None:
+    def load(
+        self,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> None:
         """
         Load data from dump.
 
         :param path: Path to load
         """
-        Dumper.load(self, Path(path))
+        Dumper.load(self, Path(path), embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
 
     @abstractmethod
     def predict(

@@ -39,7 +39,7 @@ def get_embeddings_path(filename: str) -> Path:
 class EmbedderDumpMetadata(TypedDict):
     """Metadata for saving and loading an Embedder instance."""
 
-    model_name_or_path: str
+    model_name: str
     """Name of the hugging face model or a local path to sentence transformers dump."""
     device: str | None
     """Torch notation for CPU or CUDA."""
@@ -114,7 +114,7 @@ class Embedder:
         """
         self.dump_dir = path
         metadata = EmbedderDumpMetadata(
-            model_name_or_path=str(self.model_name),
+            model_name=str(self.model_name),
             device=self.device,
             batch_size=self.batch_size,
             max_length=self.max_length,
@@ -125,7 +125,7 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     @classmethod
-    def load(cls, path: Path | str) -> "Embedder":
+    def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
         """
         Load the embedding model and metadata from disk.
 
@@ -134,15 +134,12 @@ class Embedder:
         with (Path(path) / cls.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
 
-        return cls(
-            EmbedderConfig(
-                model_name=metadata["model_name_or_path"],
-                device=metadata["device"],
-                batch_size=metadata["batch_size"],
-                max_length=metadata["max_length"],
-                use_cache=metadata["use_cache"],
-            )
-        )
+        if override_config is not None:
+            kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
+        else:
+            kwargs = metadata
+
+        return cls(EmbedderConfig(**kwargs))
 
     def embed(self, utterances: list[str], task_type: TaskTypeEnum | None = None) -> npt.NDArray[np.float32]:
         """

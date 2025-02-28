@@ -262,7 +262,7 @@ class Ranker:
         joblib.dump(self._clf, dump_dir / self.classifier_file_name)
 
     @classmethod
-    def load(cls, path: Path) -> "Ranker":
+    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> "Ranker":
         """
         Load the model and classifier from disk.
 
@@ -274,14 +274,13 @@ class Ranker:
         with (path / cls.metadata_file_name).open() as file:
             metadata: CrossEncoderMetadata = json.load(file)
 
+        if override_config is not None:
+            kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
+        else:
+            kwargs = metadata
+
         return cls(
-            CrossEncoderConfig(
-                model_name=metadata["model_name"],
-                device=metadata["device"],
-                max_length=metadata["max_length"],
-                batch_size=metadata["batch_size"],
-                train_head=metadata["train_classifier"],
-            ),
+            CrossEncoderConfig(**kwargs),
             classifier_head=clf,
         )
 
