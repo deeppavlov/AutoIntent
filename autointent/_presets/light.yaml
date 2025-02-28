@@ -13,7 +13,6 @@ search_space:
         k:
           low: 1
           high: 20
-          step: 1
         n_trials: 10
   - node_type: decision
     target_metric: decision_accuracy
@@ -22,6 +21,6 @@ search_space:
         thresh:
           low: 0.1
           high: 0.9
-          step: 0.1
+        n_trials: 10
       - module_name: argmax
 sampler: tpe

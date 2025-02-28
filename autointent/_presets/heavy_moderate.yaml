@@ -13,7 +13,6 @@ search_space:
         k:
           low: 1
           high: 20
-          step: 1
         n_trials: 10
       - module_name: description
         temperature:
