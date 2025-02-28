@@ -263,13 +263,16 @@ class Pipeline:
         :return: initialized pipeline, ready for inference
         """
         with (Path(path) / "inference_config.yaml").open() as file:
-            inference_dict_config = yaml.safe_load(file)
-        for node_config in inference_dict_config["nodes_config"]:
-            if embedder_config is not None:
-                node_config["embedder_config"] = embedder_config.model_dump()
-            if cross_encoder_config is not None:
-                node_config["cross_encoder_config"] = cross_encoder_config.model_dump()
-        return cls.from_dict_config(inference_dict_config["nodes_configs"])
+            inference_dict_config: dict[str, Any] = yaml.safe_load(file)
+
+        inference_config = [
+            InferenceNodeConfig(
+                **node_config, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config
+            )
+            for node_config in inference_dict_config["nodes_configs"]
+        ]
+
+        return cls.from_config(inference_config)
 
     def predict(self, utterances: list[str]) -> ListOfGenericLabels:
         """
