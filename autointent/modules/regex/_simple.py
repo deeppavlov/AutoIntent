@@ -8,36 +8,53 @@ from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType
 from autointent.metrics import REGEX_METRICS
-from autointent.modules.abc import BaseRegex
+from autointent.modules.base import BaseRegex
 from autointent.schemas import Intent
 
 
 class RegexPatternsCompiled(TypedDict):
-    """Compiled regex patterns."""
+    """Compiled regex patterns.
+
+    Attributes:
+        id: Intent ID
+        regex_full_match: Compiled regex patterns for full match
+        regex_partial_match: Compiled regex patterns for partial match
+    """
 
     id: int
-    """Intent ID."""
     regex_full_match: list[re.Pattern[str]]
-    """Compiled regex patterns for full match."""
     regex_partial_match: list[re.Pattern[str]]
-    """Compiled regex patterns for partial match."""
 
 
 class Regex(BaseRegex):
-    """Regular expressions based intent detection module."""
+    """Regular expressions based intent detection module.
+
+    A module that uses regular expressions to detect intents in text utterances.
+    Supports both full and partial pattern matching.
+
+    Attributes:
+        name: Name of the module, defaults to "regex"
+    """
 
     name = "regex"
 
     @classmethod
     def from_context(cls, context: Context) -> "Regex":
-        """Initialize from context."""
+        """Initialize from context.
+
+        Args:
+            context: Context object containing configuration
+
+        Returns:
+            Initialized Regex instance
+        """
         return cls()
 
     def fit(self, intents: list[Intent]) -> None:
-        """
-        Fit the model.
+        """Fit the model with intent patterns.
 
-        :param intents: Intents to fit
+        Args:
+            intents: List of intents to fit the model with
         """
         self.regex_patterns = [
             RegexPatterns(
@@ -50,10 +67,13 @@ class Regex(BaseRegex):
         self._compile_regex_patterns()
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
-        """
-        Predict intents for utterances.
+        """Predict intents for given utterances.
 
-        :param utterances: Utterances to predict
+        Args:
+            utterances: List of utterances to predict intents for
+
+        Returns:
+            List of predicted intent labels
         """
         return [self._predict_single(utterance)[0] for utterance in utterances]
 
@@ -61,10 +81,15 @@ class Regex(BaseRegex):
         self,
         utterances: list[str],
     ) -> tuple[list[LabelType], list[dict[str, Any]] | None]:
-        """
-        Predict intents for utterances with metadata.
+        """Predict intents for utterances with pattern matching metadata.
 
-        :param utterances: Utterances to predict
+        Args:
+            utterances: List of utterances to predict intents for
+
+        Returns:
+            Tuple containing:
+                - List of predicted intent labels
+                - List of pattern matching metadata for each utterance
         """
         predictions, metadata = [], []
         for utterance in utterances:
@@ -74,11 +99,14 @@ class Regex(BaseRegex):
         return predictions, metadata
 
     def _match(self, utterance: str, intent_record: RegexPatternsCompiled) -> dict[str, list[str]]:
-        """
-        Match utterance with intent record.
+        """Match utterance with intent record patterns.
 
-        :param utterance: Utterance to match
-        :param intent_record: Intent record to match
+        Args:
+            utterance: Utterance to match
+            intent_record: Intent record containing patterns to match against
+
+        Returns:
+            Dictionary containing matched full and partial patterns
         """
         full_matches = [
             pattern.pattern for pattern in intent_record["regex_full_match"] if pattern.fullmatch(utterance) is not None
@@ -89,12 +117,16 @@ class Regex(BaseRegex):
         return {"full_matches": full_matches, "partial_matches": partial_matches}
 
     def _predict_single(self, utterance: str) -> tuple[LabelType, dict[str, list[str]]]:
-        """
-        Predict intent for a single utterance.
+        """Predict intent for a single utterance.
 
-        :param utterance: Utterance to predict
+        Args:
+            utterance: Utterance to predict intent for
+
+        Returns:
+            Tuple containing:
+                - Predicted intent labels
+                - Dictionary of matched patterns
         """
-        # todo test this
         prediction = set()
         matches: dict[str, list[str]] = {"full_matches": [], "partial_matches": []}
         for intent_record in self.regex_patterns_compiled:
@@ -106,6 +138,15 @@ class Regex(BaseRegex):
         return list(prediction), matches
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """Score the model using holdout validation.
+
+        Args:
+            context: Context containing validation data
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values
+        """
         self.fit(context.data_handler.dataset.intents)
 
         val_utterances = context.data_handler.validation_utterances(0)
@@ -117,12 +158,14 @@ class Regex(BaseRegex):
         return self.score_metrics_ho((val_labels, pred_labels), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the scorer on a test set and compute the specified metric.
+        """Score the model using cross-validation.
 
-        :param context: Context containing test set and other data.
-        :param split: Target split
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing validation data
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values
         """
         chosen_metrics = {name: fn for name, fn in REGEX_METRICS.items() if name in metrics}
 
@@ -131,15 +174,19 @@ class Regex(BaseRegex):
         return metrics_calculated
 
     def clear_cache(self) -> None:
-        """Clear cache."""
+        """Clear cached regex patterns."""
         del self.regex_patterns
 
     def get_assets(self) -> Artifact:
-        """Get assets."""
+        """Get model assets.
+
+        Returns:
+            Empty Artifact object
+        """
         return Artifact()
 
     def _compile_regex_patterns(self) -> None:
-        """Compile regex patterns."""
+        """Compile regex patterns with case-insensitive flag."""
         self.regex_patterns_compiled = [
             RegexPatternsCompiled(
                 id=regex_patterns["id"],

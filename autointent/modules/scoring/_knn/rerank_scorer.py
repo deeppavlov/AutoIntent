@@ -14,13 +14,13 @@ from .knn import KNNScorer
 
 
 class RerankScorer(KNNScorer):
-    """
-    Re-ranking scorer using a cross-encoder for intent classification.
+    """Re-ranking scorer using a cross-encoder for intent classification.
 
     This module uses a cross-encoder to re-rank the nearest neighbors retrieved by a KNN scorer.
 
-    :ivar name: Name of the scorer, defaults to "rerank".
-    :ivar _scorer: Ranker instance for re-ranking.
+    Attributes:
+        name: Name of the scorer, defaults to "rerank"
+        _scorer: Ranker instance for re-ranking
     """
 
     name = "rerank"
@@ -35,18 +35,18 @@ class RerankScorer(KNNScorer):
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
-        """
-        Initialize the RerankScorer.
+        """Initialize the RerankScorer.
 
-        :param embedder_config: Config of the embedder used for vectorization.
-        :param k: Number of closest neighbors to consider during inference.
-        :param weights: Weighting strategy:
-            - "uniform": Equal weight for all neighbors.
-            - "distance": Weight inversely proportional to distance.
-            - "closest": Only the closest neighbor of each class is weighted.
-        :param cross_encoder_config: Config of the cross-encoder model used for re-ranking.
-        :param m: Number of top-ranked neighbors to consider, or None to use k.
-        :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
+        Args:
+            embedder_config: Config of the embedder used for vectorization
+            k: Number of closest neighbors to consider during inference
+            weights: Weighting strategy:
+                - "uniform": Equal weight for all neighbors
+                - "distance": Weight inversely proportional to distance
+                - "closest": Only the closest neighbor of each class is weighted
+            cross_encoder_config: Config of the cross-encoder model used for re-ranking
+            m: Number of top-ranked neighbors to consider, or None to use k
+            rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
         """
         super().__init__(
             embedder_config=embedder_config,
@@ -80,18 +80,20 @@ class RerankScorer(KNNScorer):
         embedder_config: EmbedderConfig | str | None = None,
         rank_threshold_cutoff: int | None = None,
     ) -> "RerankScorer":
-        """
-        Create a RerankScorer instance from a given context.
+        """Create a RerankScorer instance from a given context.
 
-        :param context: Context object containing optimization information and vector index client.
-        :param k: Number of closest neighbors to consider during inference.
-        :param weights: Weighting strategy.
-        :param cross_encoder_config: Config of the cross-encoder model used for re-ranking.
-        :param embedder_config: Config of the embedder used for vectorization,
-            or None to use the best existing embedder.
-        :param m: Number of top-ranked neighbors to consider, or None to use k.
-        :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None.
-        :return: An instance of RerankScorer.
+        Args:
+            context: Context object containing optimization information and vector index client
+            k: Number of closest neighbors to consider during inference
+            weights: Weighting strategy
+            cross_encoder_config: Config of the cross-encoder model used for re-ranking
+            embedder_config: Config of the embedder used for vectorization,
+                or None to use the best existing embedder
+            m: Number of top-ranked neighbors to consider, or None to use k
+            rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
+
+        Returns:
+            An instance of RerankScorer
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -109,11 +111,11 @@ class RerankScorer(KNNScorer):
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Fit the RerankScorer with utterances and labels.
+        """Fit the RerankScorer with utterances and labels.
 
-        :param utterances: List of utterances to fit the scorer.
-        :param labels: List of labels corresponding to the utterances.
+        Args:
+            utterances: List of utterances to fit the scorer
+            labels: List of labels corresponding to the utterances
         """
         if hasattr(self, "_scorer"):
             self.clear_cache()
@@ -126,15 +128,20 @@ class RerankScorer(KNNScorer):
         super().fit(utterances, labels, clear_cache=False)
 
     def clear_cache(self) -> None:
+        """Clear cached data in memory used by the scorer and vector index."""
         self._scorer.clear_ram()
         super().clear_cache()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
-        """
-        Predict the scores and neighbors for given utterances.
+        """Predict the scores and neighbors for given utterances.
 
-        :param utterances: List of utterances to predict scores for.
-        :return: A tuple containing the scores and neighbors.
+        Args:
+            utterances: List of utterances to predict scores for
+
+        Returns:
+            Tuple containing:
+                - Array of predicted scores
+                - List of neighbor utterances
         """
         knn_labels, knn_distances, knn_neighbors = self._get_neighbours(utterances)
 

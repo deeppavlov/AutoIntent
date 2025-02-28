@@ -1,4 +1,4 @@
-"""File with Dataset definition."""
+"""Defines the Dataset class and related utilities for handling datasets."""
 
 import json
 import logging
@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 class Sample(TypedDict):
-    """
-    Typed dictionary representing a dataset sample.
+    """Represents a sample in the dataset.
 
-    :param utterance: The text of the utterance.
-    :param label: The label associated with the utterance, or None if out-of-scope.
+    Attributes:
+        utterance: The text of the utterance.
+        label: The label associated with the utterance, or None if it is out-of-scope.
     """
 
     utterance: str
@@ -29,12 +29,15 @@ class Sample(TypedDict):
 
 
 class Dataset(dict[str, HFDataset]):
-    """
-    Represents a dataset with associated metadata and utilities for processing.
+    """Represents a dataset with associated metadata and utilities for processing.
 
-    :param args: Positional arguments to initialize the dataset.
-    :param intents: List of intents associated with the dataset.
-    :param kwargs: Additional keyword arguments to initialize the dataset.
+    This class extends a dictionary where the keys represent dataset splits (e.g., 'train', 'test'),
+    and the values are Hugging Face datasets.
+
+    Attributes:
+        label_feature: The feature name corresponding to labels in the dataset.
+        utterance_feature: The feature name corresponding to utterances in the dataset.
+        has_descriptions: Whether the dataset includes descriptions for intents.
     """
 
     label_feature = "label"
@@ -42,45 +45,46 @@ class Dataset(dict[str, HFDataset]):
     has_descriptions: bool
 
     def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
-        """
-        Initialize the dataset.
+        """Initializes the dataset.
 
-        :param args: Positional arguments to initialize the dataset.
-        :param intents: List of intents associated with the dataset.
-        :param kwargs: Additional keyword arguments to initialize the dataset.
+        Args:
+            *args: Positional arguments used for dataset initialization.
+            intents: A list of intents associated with the dataset.
+            **kwargs: Additional keyword arguments used for dataset initialization.
         """
         super().__init__(*args, **kwargs)
 
         self.intents = intents
-
         self.has_descriptions = self.validate_descriptions()
 
     @property
     def multilabel(self) -> bool:
-        """
-        Check if the dataset is multilabel.
+        """Checks if the dataset is multilabel.
 
-        :return: True if the dataset is multilabel, False otherwise.
+        Returns:
+            True if the dataset supports multilabel classification, False otherwise.
         """
         split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
         return isinstance(self[split].features[self.label_feature], Sequence)
 
     @cached_property
     def n_classes(self) -> int:
-        """
-        Get the number of classes in the training split.
+        """Returns the number of classes in the dataset.
 
-        :return: Number of classes.
+        Returns:
+            The number of unique classes in the training split.
         """
         return len(self.intents)
 
     @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
-        """
-        Load a dataset from a dictionary mapping.
+        """Creates a dataset from a dictionary mapping.
 
-        :param mapping: Dictionary representing the dataset.
-        :return: Initialized Dataset object.
+        Args:
+            mapping: A dictionary representation of the dataset.
+
+        Returns:
+            A `Dataset` instance initialized from the dictionary.
         """
         from ._reader import DictReader
 
@@ -88,11 +92,13 @@ class Dataset(dict[str, HFDataset]):
 
     @classmethod
     def from_json(cls, filepath: str | Path) -> "Dataset":
-        """
-        Load a dataset from a JSON file.
+        """Loads a dataset from a JSON file.
 
-        :param filepath: Path to the JSON file.
-        :return: Initialized Dataset object.
+        Args:
+            filepath: Path to the JSON file.
+
+        Returns:
+            A `Dataset` instance initialized from the JSON file.
         """
         from ._reader import JsonReader
 
@@ -100,11 +106,13 @@ class Dataset(dict[str, HFDataset]):
 
     @classmethod
     def from_hub(cls, repo_id: str) -> "Dataset":
-        """
-        Load a dataset from a Hugging Face repository.
+        """Loads a dataset from the Hugging Face Hub.
 
-        :param repo_id: ID of the Hugging Face repository.
-        :return: Initialized Dataset object.
+        Args:
+            repo_id: The ID of the Hugging Face repository.
+
+        Returns:
+            A `Dataset` instance initialized from the Hugging Face dataset repository.
         """
         from ._reader import DictReader
 
@@ -116,30 +124,30 @@ class Dataset(dict[str, HFDataset]):
         return DictReader().read(mapping)
 
     def to_multilabel(self) -> "Dataset":
-        """
-        Convert dataset labels to multilabel format.
+        """Converts dataset labels to multilabel format.
 
-        :return: Self, with labels converted to multilabel.
+        Returns:
+            The dataset with labels converted to multilabel format.
         """
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
         return self
 
     def to_dict(self) -> dict[str, list[dict[str, Any]]]:
-        """
-        Convert the dataset splits and intents to a dictionary of lists.
+        """Converts the dataset into a dictionary format.
 
-        :return: A dictionary containing dataset splits and intents as lists of dictionaries.
+        Returns:
+            A dictionary where the keys are dataset splits and the values are lists of samples.
         """
         mapping = {split_name: split.to_list() for split_name, split in self.items()}
         mapping[Split.INTENTS] = [intent.model_dump() for intent in self.intents]
         return mapping
 
     def to_json(self, filepath: str | Path) -> None:
-        """
-        Save the dataset splits and intents to a JSON file.
+        """Saves the dataset to a JSON file.
 
-        :param filepath: The path to the file where the JSON data will be saved.
+        Args:
+            filepath: The file path where the dataset should be saved.
         """
         path = Path(filepath)
         if not path.parent.exists():
@@ -148,11 +156,11 @@ class Dataset(dict[str, HFDataset]):
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_id: str, private: bool = False) -> None:
-        """
-        Push dataset splits to a Hugging Face repository.
+        """Uploads the dataset to the Hugging Face Hub.
 
-        :param repo_id: ID of the Hugging Face repository.
-        :param private: Whether the repository is private
+        Args:
+            repo_id: The ID of the Hugging Face repository.
+            private: Whether to make the repository private.
         """
         for split_name, split in self.items():
             split.push_to_hub(repo_id, split=split_name, private=private)
@@ -162,10 +170,10 @@ class Dataset(dict[str, HFDataset]):
             intents.push_to_hub(repo_id, config_name=Split.INTENTS, split=Split.INTENTS)
 
     def get_tags(self) -> list[Tag]:
-        """
-        Extract unique tags from the dataset's intents.
+        """Extracts unique tags from the dataset's intents.
 
-        :return: List of tags with their associated intent IDs.
+        Returns:
+            A list of `Tag` objects containing unique tag names and associated intent IDs.
         """
         tag_mapping = defaultdict(list)
         for intent in self.intents:
@@ -174,11 +182,13 @@ class Dataset(dict[str, HFDataset]):
         return [Tag(name=tag, intent_ids=intent_ids) for tag, intent_ids in tag_mapping.items()]
 
     def get_n_classes(self, split: str) -> int:
-        """
-        Calculate the number of unique classes in a given split.
+        """Calculates the number of unique classes in a dataset split.
 
-        :param split: The split to analyze.
-        :return: Number of unique classes.
+        Args:
+            split: The dataset split to analyze.
+
+        Returns:
+            The number of unique classes in the split.
         """
         classes = set()
         for label in self[split][self.label_feature]:
@@ -192,11 +202,13 @@ class Dataset(dict[str, HFDataset]):
         return len(classes)
 
     def _to_multilabel(self, sample: Sample) -> Sample:
-        """
-        Convert a sample's label to multilabel format.
+        """Converts a sample's label to multilabel format.
 
-        :param sample: The sample to process.
-        :return: Sample with label in multilabel format.
+        Args:
+            sample: A sample from the dataset.
+
+        Returns:
+            The sample with its label converted to a multilabel format.
         """
         if isinstance(sample["label"], int):
             ohe_vector = [0] * self.n_classes
@@ -205,16 +217,16 @@ class Dataset(dict[str, HFDataset]):
         return sample
 
     def validate_descriptions(self) -> bool:
-        """
-        Check whether the dataset contains text descriptions for each intent.
+        """Validates whether all intents in the dataset contain descriptions.
 
-        :return: True if all intents have description field
+        Returns:
+            True if all intents have descriptions, False otherwise.
         """
         has_any = any(intent.description is not None for intent in self.intents)
         has_all = all(intent.description is not None for intent in self.intents)
 
         if has_any and not has_all:
-            msg = "Some intents have text descriptions, but some of them not."
+            msg = "Some intents have text descriptions, but some do not."
             logger.warning(msg)
 
         return has_all

@@ -13,19 +13,23 @@ from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import BaseScorer
+from autointent.modules.base import BaseScorer
 
 
 class DescriptionScorer(BaseScorer):
-    r"""
-    Scoring module that scores utterances based on similarity to intent descriptions.
+    """Scoring module that scores utterances based on similarity to intent descriptions.
 
-    DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
-    between the two, using either cosine similarity and softmax.
+    DescriptionScorer embeds both the utterances and the intent descriptions, then computes
+    a similarity score between the two, using either cosine similarity and softmax.
 
-    :ivar _embedder: The embedder used to generate embeddings for utterances and descriptions.
-    :ivar name: Name of the scorer, defaults to "description".
-
+    Attributes:
+        _embedder: The embedder used to generate embeddings for utterances and descriptions
+        name: Name of the scorer, defaults to "description"
+        _n_classes: Number of intent classes
+        _multilabel: Whether the task is multilabel
+        _description_vectors: Embedded vectors of intent descriptions
+        supports_multiclass: Whether multiclass classification is supported
+        supports_multilabel: Whether multilabel classification is supported
     """
 
     _embedder: Embedder
@@ -41,11 +45,11 @@ class DescriptionScorer(BaseScorer):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
     ) -> None:
-        """
-        Initialize the DescriptionScorer.
+        """Initialize the DescriptionScorer.
 
-        :param embedder_config: Config of the embedder model.
-        :param temperature: Temperature parameter for scaling logits, defaults to 1.0.
+        Args:
+            embedder_config: Config of the embedder model
+            temperature: Temperature parameter for scaling logits, defaults to 1.0
         """
         self.temperature = temperature
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -61,13 +65,15 @@ class DescriptionScorer(BaseScorer):
         temperature: PositiveFloat,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DescriptionScorer":
-        """
-        Create a DescriptionScorer instance using a Context object.
+        """Create a DescriptionScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param temperature: Temperature parameter for scaling logits.
-        :param embedder_config: Config of the embedder model. If None, the best embedder is used.
-        :return: Initialized DescriptionScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            temperature: Temperature parameter for scaling logits
+            embedder_config: Config of the embedder model. If None, the best embedder is used
+
+        Returns:
+            Initialized DescriptionScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -78,10 +84,10 @@ class DescriptionScorer(BaseScorer):
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
-        """
-        Get the name of the embedder.
+        """Get the name of the embedder.
 
-        :return: Embedder name.
+        Returns:
+            Embedder name
         """
         return self.embedder_config.model_dump()
 
@@ -91,13 +97,15 @@ class DescriptionScorer(BaseScorer):
         labels: ListOfLabels,
         descriptions: list[str],
     ) -> None:
-        """
-        Fit the scorer by embedding utterances and descriptions.
+        """Fit the scorer by embedding utterances and descriptions.
 
-        :param utterances: List of utterances to embed.
-        :param labels: List of labels corresponding to the utterances.
-        :param descriptions: List of intent descriptions.
-        :raises ValueError: If descriptions contain None values or embeddings mismatch utterances.
+        Args:
+            utterances: List of utterances to embed
+            labels: List of labels corresponding to the utterances
+            descriptions: List of intent descriptions
+
+        Raises:
+            ValueError: If descriptions contain None values or embeddings mismatch utterances
         """
         if hasattr(self, "_embedder"):
             self._embedder.clear_ram()
@@ -117,11 +125,13 @@ class DescriptionScorer(BaseScorer):
         self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        """
-        Predict scores for utterances based on similarity to intent descriptions.
+        """Predict scores for utterances based on similarity to intent descriptions.
 
-        :param utterances: List of utterances to score.
-        :return: Array of probabilities for each utterance.
+        Args:
+            utterances: List of utterances to score
+
+        Returns:
+            Array of probabilities for each utterance
         """
         utterance_vectors = self._embedder.embed(utterances, TaskTypeEnum.sts)
         similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
@@ -137,6 +147,14 @@ class DescriptionScorer(BaseScorer):
         self._embedder.clear_ram()
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
+        """Get training data from context.
+
+        Args:
+            context: Context containing training data
+
+        Returns:
+            Tuple containing utterances, labels, and descriptions
+        """
         return (  # type: ignore[return-value]
             context.data_handler.train_utterances(0),
             context.data_handler.train_labels(0),
@@ -144,12 +162,14 @@ class DescriptionScorer(BaseScorer):
         )
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the scorer on a test set and compute the specified metric.
+        """Evaluate the scorer on a test set and compute the specified metrics.
 
-        :param context: Context containing test set and other data.
-        :param metrics: List of metric names to compute.
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing test set and other data
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values
         """
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}

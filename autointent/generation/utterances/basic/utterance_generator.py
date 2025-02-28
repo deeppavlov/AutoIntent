@@ -13,8 +13,7 @@ from autointent.schemas import Intent, Sample
 
 
 class UtteranceGenerator:
-    """
-    Basic generation of new utterances from existing ones.
+    """Basic generation of new utterances from existing ones.
 
     This augmentation method simply prompts LLM to look at existing examples
     and generate similar. Additionally, it can consider some aspects of style,
@@ -22,19 +21,41 @@ class UtteranceGenerator:
     """
 
     def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:
-        """Initialize."""
+        """Initialize the UtteranceGenerator.
+
+        Args:
+            generator: Generator instance for generating utterances.
+            prompt_maker: Prompt maker instance for generating prompts.
+            async_mode: Whether to use asynchronous mode for generation.
+        """
         self.generator = generator
         self.prompt_maker = prompt_maker
         self.async_mode = async_mode
 
     def __call__(self, intent_data: Intent, n_generations: int) -> list[str]:
-        """Generate new utterances."""
+        """Call the generator to generate new utterances.
+
+        Args:
+            intent_data: Intent data for which to generate utterances.
+            n_generations: Number of utterances to generate.
+
+        Returns:
+            List of generated utterances.
+        """
         messages = self.prompt_maker(intent_data, n_generations)
         response_text = self.generator.get_chat_completion(messages)
         return _extract_utterances(response_text)
 
     async def _call_async(self, intent_data: Intent, n_generations: int) -> list[str]:
-        """Generate new utterances asynchronously."""
+        """Call the generator to generate new utterances asynchronously.
+
+        Args:
+            intent_data: Intent data for which to generate utterances.
+            n_generations: Number of utterances to generate.
+
+        Returns:
+            List of generated utterances.
+        """
         messages = self.prompt_maker(intent_data, n_generations)
         response_text = await self.generator.get_chat_completion_async(messages)
         return _extract_utterances(response_text)
@@ -47,15 +68,17 @@ class UtteranceGenerator:
         update_split: bool = True,
         batch_size: int = 4,
     ) -> list[Sample]:
-        """
-        Augment some split of dataset.
+        """Augment some split of dataset.
 
-        :param dataset: Dataset object
-        :param split_name: Dataset split (default is TRAIN)
-        :param n_generations: Number of utterances to generate per intent
-        :param update_split: Whether to update the dataset split
-        :param batch_size: Batch size for async generation
-        :return: List of generated samples
+        Args:
+            dataset: Dataset object.
+            split_name: Dataset split (default is TRAIN).
+            n_generations: Number of utterances to generate per intent.
+            update_split: Whether to update the dataset split.
+            batch_size: Batch size for async generation.
+
+        Returns:
+            List of generated samples.
         """
         if self.async_mode:
             return asyncio.run(self._augment_async(dataset, split_name, n_generations, update_split, batch_size))
@@ -82,15 +105,17 @@ class UtteranceGenerator:
         update_split: bool = True,
         batch_size: int = 4,
     ) -> list[Sample]:
-        """
-        Augment some split of dataset asynchronously in batches.
+        """Augment some split of dataset asynchronously.
 
-        :param dataset: Dataset object
-        :param split_name: Dataset split (default is TRAIN)
-        :param n_generations: Number of utterances to generate per intent
-        :param update_split: Whether to update the dataset split
-        :param batch_size: Batch size for async generation
-        :return: List of generated samples
+        Args:
+            dataset: Dataset object.
+            split_name: Dataset split (default is TRAIN).
+            n_generations: Number of utterances to generate per intent.
+            update_split: Whether to update the dataset split.
+            batch_size: Batch size for async generation.
+
+        Returns:
+            List of generated samples.
         """
         original_split = dataset[split_name]
         new_samples = []
@@ -116,10 +141,13 @@ class UtteranceGenerator:
 
 
 def _extract_utterances(response_text: str) -> list[str]:
-    """
-    Parse LLM output.
+    """Extract utterances from LLM output.
 
-    Inverse function to :py:func:`_format_utterances`.
+    Args:
+        response_text: Response text from LLM.
+
+    Returns:
+        List of utterances.
     """
     raw_utterances = response_text.split("\n")
     # remove enumeration

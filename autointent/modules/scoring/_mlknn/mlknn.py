@@ -10,19 +10,29 @@ from typing_extensions import assert_never
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import BaseScorer
+from autointent.modules.base import BaseScorer
 
 
 class MLKnnScorer(BaseScorer):
-    """
-    Multi-label k-nearest neighbors (ML-KNN) scorer.
+    """Multi-label k-nearest neighbors (ML-KNN) scorer.
 
     This module implements ML-KNN, a multi-label classifier that computes probabilities
     based on the k-nearest neighbors of a query instance.
 
-    :ivar name: Name of the scorer, defaults to "mlknn".
+    Attributes:
+        name: Name of the scorer, defaults to "mlknn"
+        _n_classes: Number of classes
+        _vector_index: Index for nearest neighbor search
+        _prior_prob_true: Prior probabilities for true labels
+        _prior_prob_false: Prior probabilities for false labels
+        _cond_prob_true: Conditional probabilities for true labels
+        _cond_prob_false: Conditional probabilities for false labels
+        _features: Embedded features of training data
+        _labels: Labels of training data
+        supports_multiclass: Whether multiclass classification is supported
+        supports_multilabel: Whether multilabel classification is supported
 
-    Example
+    Example:
     --------
 
     .. testcode::
@@ -65,13 +75,13 @@ class MLKnnScorer(BaseScorer):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
     ) -> None:
-        """
-        Initialize the MLKnnScorer.
+        """Initialize the MLKnnScorer.
 
-        :param k: Number of nearest neighbors to consider.
-        :param embedder_config: Config of the embedder used for vectorization.
-        :param s: Smoothing parameter for probability calculations, defaults to 1.0.
-        :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
+        Args:
+            k: Number of nearest neighbors to consider
+            embedder_config: Config of the embedder used for vectorization
+            s: Smoothing parameter for probability calculations, defaults to 1.0
+            ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
         """
         self.k = k
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -94,15 +104,17 @@ class MLKnnScorer(BaseScorer):
         ignore_first_neighbours: NonNegativeInt = 0,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "MLKnnScorer":
-        """
-        Create an MLKnnScorer instance using a Context object.
+        """Create an MLKnnScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param k: Number of nearest neighbors to consider.
-        :param s: Smoothing parameter for probability calculations, defaults to 1.0.
-        :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
-        :param embedder_config: Config of the embedder, or None to use the best embedder.
-        :return: Initialized MLKnnScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            k: Number of nearest neighbors to consider
+            s: Smoothing parameter for probability calculations, defaults to 1.0
+            ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
+            embedder_config: Config of the embedder, or None to use the best embedder
+
+        Returns:
+            Initialized MLKnnScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -115,21 +127,23 @@ class MLKnnScorer(BaseScorer):
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
-        """
-        Get the name of the embedder.
+        """Get the name of the embedder.
 
-        :return: Embedder name.
+        Returns:
+            Embedder name
         """
         return self.embedder_config.model_dump()
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Fit the scorer by training or loading the vector index and calculating probabilities.
+        """Fit the scorer by training or loading the vector index and calculating probabilities.
 
-        :param utterances: List of training utterances.
-        :param labels: List of multi-label targets for each utterance.
-        :raises TypeError: If the labels are not multi-label.
-        :raises ValueError: If the vector index mismatches the provided utterances.
+        Args:
+            utterances: List of training utterances
+            labels: List of multi-label targets for each utterance
+
+        Raises:
+            TypeError: If the labels are not multi-label
+            ValueError: If the vector index mismatches the provided utterances
         """
         if hasattr(self, "_vector_index"):
             self.clear_cache()
@@ -153,21 +167,23 @@ class MLKnnScorer(BaseScorer):
         self._cond_prob_true, self._cond_prob_false = self._compute_cond()
 
     def _compute_prior(self, y: NDArray[np.float64]) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """
-        Compute prior probabilities for each class.
+        """Compute prior probabilities for each class.
 
-        :param y: Array of labels (multi-label format).
-        :return: Tuple of prior probabilities for true and false labels.
+        Args:
+            y: Array of labels (multi-label format)
+
+        Returns:
+            Tuple of prior probabilities for true and false labels
         """
         prior_prob_true = (self.s + y.sum(axis=0)) / (self.s * 2 + y.shape[0])
         prior_prob_false = 1 - prior_prob_true
         return prior_prob_true, prior_prob_false
 
     def _compute_cond(self) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """
-        Compute conditional probabilities for neighbors.
+        """Compute conditional probabilities for neighbors.
 
-        :return: Tuple of conditional probabilities for true and false labels.
+        Returns:
+            Tuple of conditional probabilities for true and false labels
         """
         c = np.zeros((self._n_classes, self.k + 1), dtype=int)
         cn = np.zeros((self._n_classes, self.k + 1), dtype=int)
@@ -193,6 +209,16 @@ class MLKnnScorer(BaseScorer):
         self,
         queries: list[str] | NDArray[Any],
     ) -> tuple[NDArray[np.int64], list[list[str]]]:
+        """Get nearest neighbors for given queries.
+
+        Args:
+            queries: List of query utterances or embedded features
+
+        Returns:
+            Tuple containing:
+                - Array of neighbor labels
+                - List of neighbor utterances
+        """
         labels, _, neighbors = self._vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
@@ -203,31 +229,39 @@ class MLKnnScorer(BaseScorer):
         )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:
-        """
-        Predict labels for the given utterances.
+        """Predict labels for the given utterances.
 
-        :param utterances: List of query utterances.
-        :param thresh: Threshold for binary classification, defaults to 0.5.
-        :return: Predicted labels as a binary array.
+        Args:
+            utterances: List of query utterances
+            thresh: Threshold for binary classification, defaults to 0.5
+
+        Returns:
+            Predicted labels as a binary array
         """
         probas = self.predict(utterances)
         return (probas > thresh).astype(int)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
-        """
-        Predict probabilities for the given utterances.
+        """Predict probabilities for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Array of predicted probabilities for each class.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Array of predicted probabilities for each class
         """
         return self._predict(utterances)[0]
 
     def predict_with_metadata(self, utterances: list[str]) -> tuple[NDArray[Any], list[dict[str, Any]] | None]:
-        """
-        Predict probabilities along with metadata for the given utterances.
+        """Predict probabilities along with metadata for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Tuple of probabilities and metadata with neighbor information.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - Array of predicted probabilities
+                - List of metadata with neighbor information
         """
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
@@ -241,6 +275,16 @@ class MLKnnScorer(BaseScorer):
         self,
         utterances: list[str],
     ) -> tuple[NDArray[np.float64], list[list[str]]]:
+        """Predict probabilities and retrieve neighbors for the given utterances.
+
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - Array of predicted probabilities
+                - List of neighbor utterances
+        """
         result = np.zeros((len(utterances), self._n_classes), dtype=float)
         neighbors_labels, neighbors = self._get_neighbors(utterances)
 

@@ -10,7 +10,11 @@ class CallbackHandler(OptimizerCallback):
     callbacks: list[OptimizerCallback]
 
     def __init__(self, callbacks: list[type[OptimizerCallback]] | None = None) -> None:
-        """Initialize the callback handler."""
+        """Initialize the callback handler.
+
+        Args:
+            callbacks: List of callback classes.
+        """
         if not callbacks:
             self.callbacks = []
             return
@@ -18,37 +22,37 @@ class CallbackHandler(OptimizerCallback):
         self.callbacks = [cb() for cb in callbacks]
 
     def start_run(self, run_name: str, dirpath: Path) -> None:
-        """
-        Start a new run.
+        """Start a new run.
 
-        :param run_name: Name of the run.
-        :param dirpath: Path to the directory where the logs will be saved.
+        Args:
+            run_name: Name of the run.
+            dirpath: Path to the directory where the logs will be saved.
         """
         self.call_events("start_run", run_name=run_name, dirpath=dirpath)
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
-        """
-        Start a new module.
+        """Start a new module.
 
-        :param module_name: Name of the module.
-        :param num: Number of the module.
-        :param module_kwargs: Module parameters.
+        Args:
+            module_name: Name of the module.
+            num: Number of the module.
+            module_kwargs: Module parameters.
         """
         self.call_events("start_module", module_name=module_name, num=num, module_kwargs=module_kwargs)
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
-        """
-        Log data.
+        """Log data.
 
-        :param kwargs: Data to log.
+        Args:
+            kwargs: Data to log.
         """
         self.call_events("log_value", **kwargs)
 
     def log_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log metrics during training.
+        """Log metrics during training.
 
-        :param metrics: Metrics to log.
+        Args:
+            metrics: Metrics to log.
         """
         self.call_events("log_metrics", metrics=metrics)
 
@@ -61,13 +65,19 @@ class CallbackHandler(OptimizerCallback):
         self.call_events("end_run")
 
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log final metrics.
+        """Log final metrics.
 
-        :param metrics: Final metrics.
+        Args:
+            metrics: Final metrics.
         """
         self.call_events("log_final_metrics", metrics=metrics)
 
     def call_events(self, event: str, **kwargs: Any) -> None:  # noqa: ANN401
+        """Call events for all callbacks.
+
+        Args:
+            event: Event name.
+            kwargs: Event parameters.
+        """
         for callback in self.callbacks:
             getattr(callback, event)(**kwargs)

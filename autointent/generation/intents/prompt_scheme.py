@@ -20,10 +20,13 @@ class PromptDescription(BaseModel):
     @classmethod
     @field_validator("text")
     def check_valid_prompt(cls, value: str) -> str:
-        """
-        Validate the prompt description template.
+        """Validate the prompt description template.
 
-        :param value: Check the prompt description template.
+        Args:
+            value: The prompt description template.
+
+        Returns:
+            The validated prompt description template.
         """
         if value.find("{intent_name}") == -1 or value.find("{user_utterances}") == -1:
             text_error = (

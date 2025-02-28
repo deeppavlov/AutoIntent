@@ -11,11 +11,13 @@ REPORTERS_NAMES = Literal[tuple(REPORTERS.keys())]  # type: ignore[valid-type]
 
 
 def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
-    """
-    Get the list of callbacks.
+    """Get the list of callbacks.
 
-    :param reporters: List of reporters to use.
-    :return: Callback handler.
+    Args:
+        reporters: List of reporters to use.
+
+    Returns:
+        CallbackHandler: Callback handler.
     """
     if not reporters:
         return CallbackHandler()

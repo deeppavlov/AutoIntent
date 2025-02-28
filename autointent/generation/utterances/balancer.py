@@ -24,16 +24,15 @@ class DatasetBalancer:
         async_mode: bool = False,
         max_samples_per_class: int | None = None,
     ) -> None:
-        """
-        Initialize the UtteranceBalancer.
+        """Initialize the UtteranceBalancer.
 
         Args:
             generator (Generator): The generator object used to create utterances.
             prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
-            seed (int, optional): The seed for random number generation. Defaults to 42.
             async_mode (bool, optional): Whether to run the generator in asynchronous mode. Defaults to False.
             max_samples_per_class (int | None, optional): The maximum number of samples per class.
                 Must be a positive integer or None. Defaults to None.
+
         Raises:
             ValueError: If max_samples_per_class is not None and is less than or equal to 0.
         """
@@ -47,12 +46,10 @@ class DatasetBalancer:
         self.max_samples = max_samples_per_class
 
     def balance(self, dataset: Dataset, split: str = Split.TRAIN, batch_size: int = 4) -> Dataset:
-        """
-        Balances the specified dataset split.
+        """Balances the specified dataset split.
 
         :param dataset: Source dataset
         :param split: Target split for balancing
-        :param n_evolutions: Number of augmentations per example
         :param batch_size: Batch size for asynchronous processing
         :return: Balanced dataset
         """
@@ -142,7 +139,11 @@ class DatasetBalancer:
         logger.debug("Total samples after augmentation: %s", final_count)
 
     def _process_utterances(self, generated: list[str]) -> list[str]:
-        """Process and clean generated utterances."""
+        """Process and clean generated utterances.
+
+        Args:
+            generated: Generated list
+        """
         processed = []
         for ut in generated:
             if "', '" in ut or "',\n" in ut:

@@ -13,7 +13,15 @@ class EvolutionChatTemplate:
     name: str
 
     def __call__(self, utterance: str, intent_data: Intent) -> list[Message]:
-        """Make a chat to complete by LLM."""
+        """Generate a list of messages to request additional examples for the given intent.
+
+        Args:
+            utterance: Utterance to be used for generation.
+            intent_data: Intent data for which to generate examples.
+
+        Returns:
+            List of messages for the chat template.
+        """
         invoke_message = Message(
             role=Role.USER,
             content=f"Intent name: {intent_data.name or ''}\nUtterance: {utterance}",

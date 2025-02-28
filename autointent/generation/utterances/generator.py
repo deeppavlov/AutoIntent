@@ -22,14 +22,13 @@ class Generator:
     }
 
     def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
-        """
-        Initialize the wrapper for LLM.
+        """Initialize the wrapper for LLM.
 
-        :param base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
-            Omit this to infer OPENAI_BASE_URL from environment.
-        :param model_name: Name of LLM. Omit this to infer OPENAI_MODEL_NAME from environment.
-        :param generation_params: kwargs that will be sent with a request to the endpoint.
-            Omit this to use AutoIntent's default parameters.
+        Args:
+            base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
+                Omit this to infer OPENAI_BASE_URL from environment.
+            model_name: Name of LLM. Omit this to infer OPENAI_MODEL_NAME from environment.
+            **generation_params: kwargs that will be sent with a request to the endpoint.
         """
         if not base_url:
             base_url = os.environ["OPENAI_BASE_URL"]
@@ -44,7 +43,14 @@ class Generator:
         }  #  https://stackoverflow.com/a/65539348
 
     def get_chat_completion(self, messages: list[Message]) -> str:
-        """Prompt LLM and return its answer synchronously."""
+        """Prompt LLM and return its answer.
+
+        Args:
+            messages: List of messages to send to the model.
+
+        Returns:
+            Model's response.
+        """
         response = self.client.chat.completions.create(
             messages=messages,  # type: ignore[arg-type]
             model=self.model_name,
@@ -53,7 +59,14 @@ class Generator:
         return response.choices[0].message.content  # type: ignore[return-value]
 
     async def get_chat_completion_async(self, messages: list[Message]) -> str:
-        """Prompt LLM and return its answer asynchronously."""
+        """Prompt LLM and return its answer asynchronously.
+
+        Args:
+            messages: List of messages to send to the model.
+
+        Returns:
+            Model's response.
+        """
         response = await self.async_client.chat.completions.create(
             messages=messages,  # type: ignore[arg-type]
             model=self.model_name,

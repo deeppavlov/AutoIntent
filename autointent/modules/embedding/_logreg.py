@@ -1,4 +1,4 @@
-"""LogregAimedEmbedding class for a proxy optimzation of embedding."""
+"""LogregAimedEmbedding class for a proxy optimization of embedding."""
 
 from typing import Any
 
@@ -14,21 +14,24 @@ from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
-from autointent.modules.abc import BaseEmbedding
+from autointent.modules.base import BaseEmbedding
 
 
 class LogregAimedEmbedding(BaseEmbedding):
-    r"""
-    Module for configuring embeddings optimized for linear classification.
+    """Module for configuring embeddings optimized for linear classification.
 
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its logreg classification quality as a sort of proxy metric.
 
-    :ivar _classifier: The trained logistic regression model.
-    :ivar _label_encoder: Label encoder for converting labels to numerical format.
-    :ivar name: Name of the module, defaults to "logreg".
+    Attributes:
+        _classifier: The trained logistic regression model
+        _label_encoder: Label encoder for converting labels to numerical format
+        name: Name of the module, defaults to "logreg"
+        supports_multiclass: Whether the module supports multiclass classification
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_oos: Whether the module supports out-of-scope detection
 
-    Examples
+    Examples:
     --------
     .. testcode::
 
@@ -54,11 +57,11 @@ class LogregAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any],
         cv: PositiveInt = 3,
     ) -> None:
-        """
-        Initialize the LogregAimedEmbedding.
+        """Initialize the LogregAimedEmbedding.
 
-        :param embedder_config: Config of the embedder used for creating embeddings.
-        :param cv: the number of folds used in LogisticRegressionCV
+        Args:
+            embedder_config: Config of the embedder used for creating embeddings
+            cv: Number of folds used in LogisticRegressionCV
         """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.cv = cv
@@ -74,13 +77,15 @@ class LogregAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str,
         cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":
-        """
-        Create a LogregAimedEmbedding instance using a Context object.
+        """Create a LogregAimedEmbedding instance using a Context object.
 
-        :param context: The context containing configurations and utilities.
-        :param cv: the number of folds used in LogisticRegressionCV
-        :param embedder_config: Config of the embedder to use.
-        :return: Initialized LogregAimedEmbedding instance.
+        Args:
+            context: Context containing configurations and utilities
+            cv: Number of folds used in LogisticRegressionCV
+            embedder_config: Config of the embedder to use
+
+        Returns:
+            Initialized LogregAimedEmbedding instance
         """
         return cls(
             cv=cv,
@@ -88,14 +93,15 @@ class LogregAimedEmbedding(BaseEmbedding):
         )
 
     def clear_cache(self) -> None:
+        """Clear embedder from memory."""
         self._embedder.clear_ram()
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Train the logistic regression model using the provided utterances and labels.
+        """Train the logistic regression model using the provided utterances and labels.
 
-        :param utterances: List of text data to index.
-        :param labels: List of corresponding labels for the utterances.
+        Args:
+            utterances: List of text data to index
+            labels: List of corresponding labels for the utterances
         """
         if hasattr(self, "_embedder"):
             self.clear_cache()
@@ -119,11 +125,14 @@ class LogregAimedEmbedding(BaseEmbedding):
         self._classifier.fit(embeddings, labels)
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the embedding model using a specified metric function.
+        """Evaluate the embedding model using specified metric functions.
 
-        :param context: The context containing test data and labels.
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing test data and labels
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values for the test set
         """
         train_utterances, train_labels = self.get_train_data(context)
         self.fit(train_utterances, train_labels)
@@ -138,11 +147,14 @@ class LogregAimedEmbedding(BaseEmbedding):
         return self.score_metrics_ho((val_labels, probas), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the embedding model using a specified metric function.
+        """Evaluate the embedding model using specified metric functions.
 
-        :param context: The context containing test data and labels.
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing test data and labels
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values for the test set
         """
         metrics_dict = SCORING_METRICS_MULTILABEL if context.is_multilabel() else SCORING_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
@@ -151,14 +163,22 @@ class LogregAimedEmbedding(BaseEmbedding):
         return metrics_calculated
 
     def get_assets(self) -> EmbeddingArtifact:
-        """
-        Get the classifier artifacts for this module.
+        """Get the classifier artifacts for this module.
 
-        :return: A EmbeddingArtifact object containing embedder information.
+        Returns:
+            EmbeddingArtifact object containing embedder information
         """
         return EmbeddingArtifact(config=self.embedder_config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
+        """Predict probabilities for input utterances.
+
+        Args:
+            utterances: List of texts to predict probabilities for
+
+        Returns:
+            Array of predicted probabilities
+        """
         embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._classifier.predict_proba(embeddings)
 

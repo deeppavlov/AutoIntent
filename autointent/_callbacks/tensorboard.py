@@ -5,16 +5,16 @@ from autointent._callbacks.base import OptimizerCallback
 
 
 class TensorBoardCallback(OptimizerCallback):
-    """
-    TensorBoard callback.
-
-    This callback logs the optimization process to TensorBoard.
-    """
+    """TensorBoard callback for logging the optimization process."""
 
     name = "tensorboard"
 
     def __init__(self) -> None:
-        """Initialize the callback."""
+        """Initializes the TensorBoard callback.
+
+        Attempts to import `torch.utils.tensorboard` first. If unavailable, tries to import `tensorboardX`.
+        Raises an ImportError if neither are installed.
+        """
         try:
             from torch.utils.tensorboard import SummaryWriter  # type: ignore[attr-defined]
 
@@ -32,22 +32,22 @@ class TensorBoardCallback(OptimizerCallback):
                 raise ImportError(msg) from None
 
     def start_run(self, run_name: str, dirpath: Path) -> None:
-        """
-        Start a new run.
+        """Starts a new run and sets the directory for storing logs.
 
-        :param run_name: Name of the run.
-        :param dirpath: Path to the directory where the logs will be saved.
+        Args:
+            run_name: Name of the run.
+            dirpath: Path to the directory where logs will be saved.
         """
         self.run_name = run_name
         self.dirpath = dirpath
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
-        """
-        Start a new module.
+        """Starts a new module and initializes a TensorBoard writer for it.
 
-        :param module_name: Name of the module.
-        :param num: Number of the module.
-        :param module_kwargs: Module parameters.
+        Args:
+            module_name: Name of the module.
+            num: Identifier number of the module.
+            module_kwargs: Dictionary containing module parameters.
         """
         module_run_name = f"{self.run_name}_{module_name}_{num}"
         log_dir = Path(self.dirpath) / module_run_name
@@ -58,10 +58,10 @@ class TensorBoardCallback(OptimizerCallback):
             self.module_writer.add_text(f"module_params/{key}", str(value))  # type: ignore[no-untyped-call]
 
     def log_value(self, **kwargs: dict[str, int | float | Any]) -> None:
-        """
-        Log data.
+        """Logs scalar or text values.
 
-        :param kwargs: Data to log.
+        Args:
+            **kwargs: Key-value pairs of data to log. Scalars will be logged as numerical values, others as text.
         """
         for key, value in kwargs.items():
             if isinstance(value, int | float):
@@ -70,10 +70,10 @@ class TensorBoardCallback(OptimizerCallback):
                 self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
 
     def log_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log metrics during training.
+        """Logs training metrics.
 
-        :param metrics: Metrics to log.
+        Args:
+            metrics: Dictionary of metrics to log.
         """
         for key, value in metrics.items():
             if isinstance(value, int | float):
@@ -82,10 +82,13 @@ class TensorBoardCallback(OptimizerCallback):
                 self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
 
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log final metrics.
+        """Logs final metrics at the end of training.
 
-        :param metrics: Final metrics.
+        Args:
+            metrics: Dictionary of final metrics.
+
+        Raises:
+            RuntimeError: If `start_run` has not been called before logging final metrics.
         """
         if self.module_writer is None:
             msg = "start_run must be called before log_final_metrics."
@@ -101,7 +104,11 @@ class TensorBoardCallback(OptimizerCallback):
                 self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
 
     def end_module(self) -> None:
-        """End a module."""
+        """Ends the current module and closes the TensorBoard writer.
+
+        Raises:
+            RuntimeError: If `start_run` has not been called before ending the module.
+        """
         if self.module_writer is None:
             msg = "start_run must be called before end_module."
             raise RuntimeError(msg)
@@ -110,4 +117,4 @@ class TensorBoardCallback(OptimizerCallback):
         self.module_writer.close()  # type: ignore[no-untyped-call]
 
     def end_run(self) -> None:
-        pass
+        """Ends the current run. This method is currently a placeholder."""

@@ -36,6 +36,11 @@ class Dumper:
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
+        """Make subdirectories for dumping.
+
+        Args:
+            path: Path to make subdirectories in
+        """
         subdirectories = [
             path / Dumper.tags,
             path / Dumper.embedders,
@@ -49,7 +54,12 @@ class Dumper:
 
     @staticmethod
     def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901
-        """Dump modules attributes to filestystem."""
+        """Dump modules attributes to filestystem.
+
+        Args:
+            obj: Object to dump
+            path: Path to dump to
+        """
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}

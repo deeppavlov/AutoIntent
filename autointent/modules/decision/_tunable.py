@@ -12,7 +12,7 @@ from autointent.context import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import DECISION_METRICS, DecisionMetricFn
-from autointent.modules.abc import BaseDecision
+from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
@@ -21,18 +21,22 @@ MetricType = Literal["decision_accuracy", "decision_f1", "decision_roc_auc", "de
 
 
 class TunableDecision(BaseDecision):
-    """
-    Tunable predictor module.
+    """Tunable predictor module.
 
     TunableDecision uses an optimization process to find the best thresholds for predicting labels
     in single-label or multi-label classification tasks. It is designed for datasets with varying
     score distributions and supports out-of-scope (OOS) detection.
 
-    :ivar name: Name of the predictor, defaults to "tunable".
-    :ivar _n_classes: Number of classes determined during fitting.
-    :ivar tags: Tags for predictions, if any.
+    Attributes:
+        name: Name of the predictor, defaults to "tunable"
+        _n_classes: Number of classes determined during fitting
+        _multilabel: Whether the task is multilabel
+        tags: Tags for predictions (if any)
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_multiclass: Whether the module supports multiclass classification
+        supports_oos: Whether the module supports out-of-scope samples
 
-    Examples
+    Examples:
     --------
     Single-label classification
     ===========================
@@ -84,12 +88,13 @@ class TunableDecision(BaseDecision):
         seed: int = 0,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Initialize tunable predictor.
+        """Initialize tunable predictor.
 
-        :param n_trials: Number of trials
-        :param seed: Seed
-        :param tags: Tags
+        Args:
+            target_metric: Metric to optimize during threshold tuning
+            n_optuna_trials: Number of optimization trials
+            seed: Random seed for reproducibility
+            tags: Tags for predictions (if any)
         """
         self.target_metric = target_metric
         self.n_optuna_trials = n_optuna_trials
@@ -108,11 +113,15 @@ class TunableDecision(BaseDecision):
     def from_context(
         cls, context: Context, target_metric: MetricType = "decision_accuracy", n_optuna_trials: PositiveInt = 320
     ) -> "TunableDecision":
-        """
-        Initialize from context.
+        """Initialize from context.
 
-        :param context: Context
-        :param n_trials: Number of trials
+        Args:
+            context: Context containing configurations and utilities
+            target_metric: Metric to optimize during threshold tuning
+            n_optuna_trials: Number of optimization trials
+
+        Returns:
+            Initialized TunableDecision instance
         """
         return cls(
             target_metric=target_metric,
@@ -127,15 +136,15 @@ class TunableDecision(BaseDecision):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit module.
+        """Fit the predictor by optimizing thresholds.
 
-        When data doesn't contain out-of-scope utterances, using TunableDecision imposes unnecessary
-         computational overhead.
+        Note: When data doesn't contain out-of-scope utterances, using TunableDecision imposes
+        unnecessary computational overhead.
 
-        :param scores: Scores to fit
-        :param labels: Labels to fit
-        :param tags: Tags to fit
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+            labels: List of true labels
+            tags: Tags for predictions (if any)
         """
         self.tags = tags
         self._validate_task(scores, labels)
@@ -155,10 +164,16 @@ class TunableDecision(BaseDecision):
         self.thresh = thresh_optimizer.best_thresholds
 
     def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
-        """
-        Predict the best score.
+        """Predict labels using optimized thresholds.
 
-        :param scores: Scores to predict
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+
+        Returns:
+            Predicted labels (either single-label or multi-label)
+
+        Raises:
+            MismatchNumClassesError: If number of classes in scores doesn't match training data
         """
         if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
@@ -169,17 +184,18 @@ class TunableDecision(BaseDecision):
 
 
 class ThreshOptimizer:
-    """Threshold optimizer."""
+    """Threshold optimizer using Optuna for hyperparameter tuning."""
 
     def __init__(
         self, metric_fn: DecisionMetricFn, n_classes: int, multilabel: bool, n_trials: int | None = None
     ) -> None:
-        """
-        Initialize threshold optimizer.
+        """Initialize threshold optimizer.
 
-        :param n_classes: Number of classes
-        :param multilabel: Is multilabel
-        :param n_trials: Number of trials
+        Args:
+            metric_fn: Metric function for optimization
+            n_classes: Number of classes in the dataset
+            multilabel: Whether the task is multilabel
+            n_trials: Number of optimization trials (defaults to n_classes * 10)
         """
         self.metric_fn = metric_fn
         self.n_classes = n_classes
@@ -187,10 +203,13 @@ class ThreshOptimizer:
         self.n_trials = n_trials if n_trials is not None else n_classes * 10
 
     def objective(self, trial: Trial) -> float:
-        """
-        Objective function to optimize.
+        """Objective function to optimize.
 
-        :param trial: Trial
+        Args:
+            trial: Optuna trial object
+
+        Returns:
+            Metric value for the current thresholds
         """
         thresholds = np.array([trial.suggest_float(f"threshold_{i}", 0.0, 1.0) for i in range(self.n_classes)])
         if self.multilabel:
@@ -206,13 +225,13 @@ class ThreshOptimizer:
         seed: int,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit the optimizer.
+        """Fit the optimizer by finding optimal thresholds.
 
-        :param probas: Probabilities
-        :param labels: Labels
-        :param seed: Seed
-        :param tags: Tags
+        Args:
+            probas: Array of shape (n_samples, n_classes) with predicted probabilities
+            labels: List of true labels
+            seed: Random seed for reproducibility
+            tags: Tags for predictions (if any)
         """
         self.probas = probas
         self.labels = labels

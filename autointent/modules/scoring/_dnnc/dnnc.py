@@ -11,37 +11,31 @@ from pydantic import PositiveInt
 from autointent import Context, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import BaseScorer
+from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)
 
 
 class DNNCScorer(BaseScorer):
-    r"""
-    Scoring module for intent classification using a discriminative nearest neighbor classification (DNNC).
+    """Scoring module for intent classification using discriminative nearest neighbor classification.
 
     This module uses a Ranker for scoring candidate intents and can optionally
     train a logistic regression head on top of cross-encoder features.
 
-    .. code-block:: bibtex
+    Reference:
+        Zhang, J. G., Hashimoto, K., Liu, W., Wu, C. S., Wan, Y., Yu, P. S., ... & Xiong, C. (2020).
+        Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference.
+        arXiv preprint arXiv:2010.13009.
 
-        @misc{zhang2020discriminativenearestneighborfewshot,
-          title={Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference},
-          author={Jian-Guo Zhang and Kazuma Hashimoto and Wenhao Liu and Chien-Sheng Wu and Yao Wan and
-          Philip S. Yu and Richard Socher and Caiming Xiong},
-          year={2020},
-          eprint={2010.13009},
-          archivePrefix={arXiv},
-          primaryClass={cs.CL},
-          url={https://arxiv.org/abs/2010.13009},
-        }
+    Attributes:
+        _n_classes: Number of intent classes
+        _vector_index: Index for nearest neighbor search
+        _cross_encoder: Ranker model for scoring pairs
+        name: Name of the scorer, defaults to "dnnc"
+        supports_multilabel: Whether multilabel classification is supported
+        supports_multiclass: Whether multiclass classification is supported
 
-    :ivar crossencoder_subdir: Subdirectory for storing the cross-encoder model (`Ranker`).
-    :ivar model: The model used for scoring, which could be a `Ranker` or a `CrossEncoderWithLogreg`.
-    :ivar _db_dir: Path to the database directory where the vector index is stored.
-    :ivar name: Name of the scorer, defaults to "dnnc".
-
-    Examples
+    Examples:
     --------
 
     .. testcode::
@@ -81,12 +75,12 @@ class DNNCScorer(BaseScorer):
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
-        """
-        Initialize the DNNCScorer.
+        """Initialize the DNNCScorer.
 
-        :param cross_encoder_config: Config of the cross-encoder model.
-        :param embedder_config: Config of the embedder model.
-        :param k: Number of nearest neighbors to retrieve.
+        Args:
+            cross_encoder_config: Config of the cross-encoder model
+            embedder_config: Config of the embedder model
+            k: Number of nearest neighbors to retrieve
         """
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -104,14 +98,16 @@ class DNNCScorer(BaseScorer):
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":
-        """
-        Create a DNNCScorer instance using a Context object.
+        """Create a DNNCScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param cross_encoder_config: Config of the cross-encoder model.
-        :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Config of the embedder model, or None to use the best embedder.
-        :return: Initialized DNNCScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            cross_encoder_config: Config of the cross-encoder model
+            k: Number of nearest neighbors to retrieve
+            embedder_config: Config of the embedder model, or None to use the best embedder
+
+        Returns:
+            Initialized DNNCScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -126,12 +122,14 @@ class DNNCScorer(BaseScorer):
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Fit the scorer by training or loading the vector index and optionally training a logistic regression head.
+        """Fit the scorer by training or loading the vector index.
 
-        :param utterances: List of training utterances.
-        :param labels: List of labels corresponding to the utterances.
-        :raises ValueError: If the vector index mismatches the provided utterances.
+        Args:
+            utterances: List of training utterances
+            labels: List of labels corresponding to the utterances
+
+        Raises:
+            ValueError: If the vector index mismatches the provided utterances
         """
         if hasattr(self, "_vector_index"):
             self.clear_cache()
@@ -145,20 +143,26 @@ class DNNCScorer(BaseScorer):
         self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Predict class scores for the given utterances.
+        """Predict class scores for the given utterances.
 
-        :param utterances: List of utterances to score.
-        :return: Array of predicted scores.
+        Args:
+            utterances: List of utterances to score
+
+        Returns:
+            Array of predicted scores
         """
         return self._predict(utterances)[0]
 
     def predict_with_metadata(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
-        """
-        Predict class scores along with metadata for the given utterances.
+        """Predict class scores along with metadata for the given utterances.
 
-        :param utterances: List of utterances to score.
-        :return: Tuple of scores and metadata containing neighbor details and scores.
+        Args:
+            utterances: List of utterances to score
+
+        Returns:
+            Tuple containing:
+                - Array of predicted scores
+                - List of metadata with neighbor details and scores
         """
         scores, neighbors, neighbors_scores = self._predict(utterances)
         metadata = [
@@ -168,13 +172,17 @@ class DNNCScorer(BaseScorer):
         return scores, metadata
 
     def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
-        """
-        Compute cross-encoder scores for utterances against their candidate neighbors.
+        """Compute cross-encoder scores for utterances against their candidate neighbors.
 
-        :param utterances: List of query utterances.
-        :param candidates: List of candidate utterances for each query.
-        :return: List of cross-encoder scores for each query-candidate pair.
-        :raises ValueError: If the number of utterances and candidates do not match.
+        Args:
+            utterances: List of query utterances
+            candidates: List of candidate utterances for each query
+
+        Returns:
+            List of cross-encoder scores for each query-candidate pair
+
+        Raises:
+            ValueError: If the number of utterances and candidates do not match
         """
         if len(utterances) != len(candidates):
             msg = "Number of utterances doesn't match number of retrieved candidates"
@@ -197,13 +205,14 @@ class DNNCScorer(BaseScorer):
         ]
 
     def _build_result(self, scores: list[list[float]], labels: list[ListOfLabels]) -> npt.NDArray[Any]:
-        """
-        Build a result matrix with scores assigned to the best neighbor's class.
+        """Build a result matrix with scores assigned to the best neighbor's class.
 
-        :param scores: for each query utterance, cross encoder scores of its k closest utterances
-        :param labels: corresponding intent labels
+        Args:
+            scores: Cross encoder scores for each query's k closest utterances
+            labels: Corresponding intent labels
 
-        :return: (n_queries, n_classes) matrix with zeros everywhere except the class of the best neighbor utterance
+        Returns:
+            Matrix of shape (n_queries, n_classes) with zeros everywhere except the class of the best neighbor
         """
         return build_result(np.array(scores), np.array(labels), self._n_classes)
 
@@ -212,11 +221,16 @@ class DNNCScorer(BaseScorer):
         self._vector_index.clear_ram()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
-        """
-        Predict class scores for the given utterances using the vector index and cross-encoder.
+        """Predict class scores using vector index and cross-encoder.
 
-        :param utterances: List of query utterances.
-        :return: Tuple containing class scores, neighbor utterances, and neighbor scores.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - Class scores matrix
+                - List of neighbor utterances
+                - List of neighbor scores
         """
         labels, _, neighbors = self._vector_index.query(
             utterances,
@@ -229,13 +243,15 @@ class DNNCScorer(BaseScorer):
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:
-    """
-    Build a result matrix with scores assigned to the best neighbor's class.
+    """Build a result matrix with scores assigned to the best neighbor's class.
 
-    :param scores: Cross-encoder scores for each query's neighbors.
-    :param labels: Labels corresponding to each neighbor.
-    :param n_classes: Total number of classes.
-    :return: Matrix of size (n_queries, n_classes) with scores for the best class.
+    Args:
+        scores: Cross-encoder scores for each query's neighbors
+        labels: Labels corresponding to each neighbor
+        n_classes: Total number of classes
+
+    Returns:
+        Matrix of shape (n_queries, n_classes) with scores for the best class
     """
     res = np.zeros((len(scores), n_classes))
     best_neighbors = np.argmax(scores, axis=1)

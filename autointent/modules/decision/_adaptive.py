@@ -10,7 +10,7 @@ from autointent import Context
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
-from autointent.modules.abc import BaseDecision
+from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag
 
 from ._utils import apply_tags
@@ -20,18 +20,21 @@ logger = logging.getLogger(__name__)
 
 
 class AdaptiveDecision(BaseDecision):
-    """
-    Decision for multi-label classification using adaptive thresholds.
+    """Decision for multi-label classification using adaptive thresholds.
 
     The AdaptiveDecision calculates optimal thresholds based on the given
     scores and labels, ensuring the best performance on multi-label data.
 
-    :ivar _n_classes: Number of classes in the dataset.
-    :ivar _r: Scaling factor for thresholds.
-    :ivar tags: List of Tag objects for mutually exclusive classes.
-    :ivar name: Name of the predictor, defaults to "adaptive".
+    Attributes:
+        _n_classes: Number of classes in the dataset
+        _r: Scaling factor for thresholds
+        tags: List of Tag objects for mutually exclusive classes
+        name: Name of the predictor, defaults to "adaptive"
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_multiclass: Whether the module supports multiclass classification
+        supports_oos: Whether the module supports out-of-scope samples
 
-    Examples
+    Examples:
     --------
     .. testcode::
 
@@ -59,11 +62,11 @@ class AdaptiveDecision(BaseDecision):
     name = "adaptive"
 
     def __init__(self, search_space: list[FloatFromZeroToOne] | None = None) -> None:
-        """
-        Initialize the AdaptiveDecision.
+        """Initialize the AdaptiveDecision.
 
-        :param search_space: List of threshold scaling factors to search for optimal performance.
-                             Defaults to a range between 0 and 1.
+        Args:
+            search_space: List of threshold scaling factors to search for optimal performance.
+                Defaults to a range between 0 and 1
         """
         self.search_space = search_space if search_space is not None else default_search_space
 
@@ -73,12 +76,14 @@ class AdaptiveDecision(BaseDecision):
 
     @classmethod
     def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> "AdaptiveDecision":
-        """
-        Create an AdaptiveDecision instance using a Context object.
+        """Create an AdaptiveDecision instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param search_space: List of threshold scaling factors, or None for default.
-        :return: Initialized AdaptiveDecision instance.
+        Args:
+            context: Context containing configurations and utilities
+            search_space: List of threshold scaling factors, or None for default
+
+        Returns:
+            Initialized AdaptiveDecision instance
         """
         return cls(
             search_space=search_space,
@@ -90,13 +95,15 @@ class AdaptiveDecision(BaseDecision):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit the predictor by optimizing the threshold scaling factor.
+        """Fit the predictor by optimizing the threshold scaling factor.
 
-        :param scores: Array of shape (n_samples, n_classes) with predicted scores.
-        :param labels: List of true multi-label targets.
-        :param tags: List of Tag objects for mutually exclusive classes, or None.
-        :raises WrongClassificationError: If used on non-multi-label data.
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+            labels: List of true multi-label targets
+            tags: List of Tag objects for mutually exclusive classes, or None
+
+        Raises:
+            WrongClassificationError: If used on non-multi-label data
         """
         self.tags = tags
 
@@ -111,12 +118,16 @@ class AdaptiveDecision(BaseDecision):
         self._r = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> ListOfLabelsWithOOS:
-        """
-        Predict labels for the given scores.
+        """Predict labels for the given scores.
 
-        :param scores: Array of shape (n_samples, n_classes) with predicted scores.
-        :return: Array of shape (n_samples, n_classes) with predicted binary labels.
-        :raises MismatchNumClassesError: If the number of classes does not match the trained predictor.
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+
+        Returns:
+            Array of shape (n_samples, n_classes) with predicted binary labels
+
+        Raises:
+            MismatchNumClassesError: If the number of classes does not match the trained predictor
         """
         if scores.shape[1] != self._n_classes:
             raise MismatchNumClassesError
@@ -124,24 +135,28 @@ class AdaptiveDecision(BaseDecision):
 
 
 def get_adapted_threshes(r: float, scores: npt.NDArray[Any]) -> npt.NDArray[Any]:
-    """
-    Compute adaptive thresholds based on scaling factor and scores.
+    """Compute adaptive thresholds based on scaling factor and scores.
 
-    :param r: Scaling factor for thresholds.
-    :param scores: Array of shape (n_samples, n_classes) with predicted scores.
-    :return: Array of thresholds for each class and sample.
+    Args:
+        r: Scaling factor for thresholds
+        scores: Array of shape (n_samples, n_classes) with predicted scores
+
+    Returns:
+        Array of thresholds for each class and sample
     """
     return r * np.max(scores, axis=1) + (1 - r) * np.min(scores, axis=1)  # type: ignore[no-any-return]
 
 
 def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | None) -> ListOfLabelsWithOOS:
-    """
-    Predict binary labels for multi-label classification.
+    """Predict binary labels for multi-label classification.
 
-    :param scores: Array of shape (n_samples, n_classes) with predicted scores.
-    :param r: Scaling factor for thresholds.
-    :param tags: List of Tag objects for mutually exclusive classes, or None.
-    :return: Array of shape (n_samples, n_classes) with predicted binary labels.
+    Args:
+        scores: Array of shape (n_samples, n_classes) with predicted scores
+        r: Scaling factor for thresholds
+        tags: List of Tag objects for mutually exclusive classes, or None
+
+    Returns:
+        Array of shape (n_samples, n_classes) with predicted binary labels
     """
     thresh = get_adapted_threshes(r, scores)
     res = (scores >= thresh[:, None]).astype(int)
@@ -152,11 +167,13 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
 
 
 def multilabel_score(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    """
-    Calculate the weighted F1 score for multi-label classification.
+    """Calculate the weighted F1 score for multi-label classification.
 
-    :param y_true: List of true multi-label targets.
-    :param y_pred: Array of shape (n_samples, n_classes) with predicted labels.
-    :return: Weighted F1 score.
+    Args:
+        y_true: List of true multi-label targets
+        y_pred: Array of shape (n_samples, n_classes) with predicted labels
+
+    Returns:
+        Weighted F1 score
     """
     return decision_f1(y_true, y_pred)

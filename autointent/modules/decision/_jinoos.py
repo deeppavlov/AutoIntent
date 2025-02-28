@@ -8,24 +8,27 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import BaseDecision
+from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag
 
 default_search_space = np.linspace(0, 1, num=100)
 
 
 class JinoosDecision(BaseDecision):
-    """
-    Jinoos predictor module.
+    """Jinoos predictor module.
 
     JinoosDecision predicts the best scores for single-label classification tasks
     and detects out-of-scope (OOS) samples based on a threshold.
 
-    :ivar thresh: The optimized threshold value for OOS detection.
-    :ivar name: Name of the predictor, defaults to "adaptive".
-    :ivar _n_classes: Number of classes determined during fitting.
+    Attributes:
+        thresh: The optimized threshold value for OOS detection
+        name: Name of the predictor, defaults to "jinoos"
+        _n_classes: Number of classes determined during fitting
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_multiclass: Whether the module supports multiclass classification
+        supports_oos: Whether the module supports out-of-scope samples
 
-    Examples
+    Examples:
     --------
     .. testcode::
 
@@ -57,10 +60,10 @@ class JinoosDecision(BaseDecision):
         self,
         search_space: list[FloatFromZeroToOne] | None = None,
     ) -> None:
-        """
-        Initialize Jinoos predictor.
+        """Initialize Jinoos predictor.
 
-        :param search_space: Search space for threshold
+        Args:
+            search_space: List of threshold values to search through for OOS detection
         """
         self.search_space = np.array(search_space) if search_space is not None else default_search_space
 
@@ -70,11 +73,14 @@ class JinoosDecision(BaseDecision):
 
     @classmethod
     def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> "JinoosDecision":
-        """
-        Initialize from context.
+        """Initialize from context.
 
-        :param context: Context
-        :param search_space: Search space
+        Args:
+            context: Context containing configurations and utilities
+            search_space: List of threshold values to search through
+
+        Returns:
+            Initialized JinoosDecision instance
         """
         return cls(
             search_space=search_space,
@@ -86,12 +92,12 @@ class JinoosDecision(BaseDecision):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit the model.
+        """Fit the model.
 
-        :param scores: Scores to fit
-        :param labels: Labels to fit
-        :param tags: Tags to fit
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+            labels: List of true labels
+            tags: List of Tag objects for mutually exclusive classes, or None
         """
         self._validate_task(scores, labels)
 
@@ -106,10 +112,16 @@ class JinoosDecision(BaseDecision):
         self._thresh = float(self.search_space[np.argmax(metrics_list)])
 
     def predict(self, scores: npt.NDArray[Any]) -> list[int | None]:
-        """
-        Predict the best score.
+        """Predict the best score.
 
-        :param scores: Scores to predict
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+
+        Returns:
+            List of predicted class indices or None for OOS samples
+
+        Raises:
+            MismatchNumClassesError: If the number of classes does not match the trained predictor
         """
         if scores.shape[1] != self._n_classes:
             raise MismatchNumClassesError
@@ -119,18 +131,23 @@ class JinoosDecision(BaseDecision):
 
     @staticmethod
     def jinoos_score(y_true: ListOfGenericLabels, y_pred: npt.NDArray[Any]) -> float:
-        r"""
-        Calculate Jinoos score.
+        r"""Calculate Jinoos score.
+
+        The score is calculated as:
 
         .. math::
 
             \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}}
 
-        where $C_{in}$ is the number of correctly predicted in-domain labels
-         and $N_{in}$ is the total number of in-domain labels. The same for OOS samples
+        where C_in is the number of correctly predicted in-domain labels
+        and N_in is the total number of in-domain labels. The same for OOS samples.
 
-        :param y_true: True labels
-        :param y_pred: Predicted labels
+        Args:
+            y_true: True labels
+            y_pred: Predicted labels
+
+        Returns:
+            Combined accuracy score for in-domain and OOS samples
         """
         y_true_, y_pred_ = np.array(y_true), np.array(y_pred)
 
@@ -149,11 +166,15 @@ class JinoosDecision(BaseDecision):
 
 
 def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
-    """
-    Predict the best score.
+    """Predict the best score.
 
-    :param scores: Scores to predict
-    :return:
+    Args:
+        scores: Array of shape (n_samples, n_classes) with predicted scores
+
+    Returns:
+        Tuple containing:
+            - Array of predicted class indices
+            - Array of highest scores for each sample
     """
     pred_classes = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
@@ -161,15 +182,15 @@ def _predict(scores: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.int64], np
 
 
 def _detect_oos(classes: npt.NDArray[Any], scores: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
-    """
-    Detect out of scope samples.
+    """Detect out of scope samples.
 
-    OOS samples are marked with label -1.
+    Args:
+        classes: Array of predicted class indices
+        scores: Array of confidence scores
+        thresh: Threshold for OOS detection
 
-    :param classes: Classes to detect
-    :param scores: Scores to detect
-    :param thresh: Threshold to detect
-    :return:
+    Returns:
+        Array of predicted class indices with OOS samples marked as -1
     """
     classes[scores < thresh] = -1  # out of scope
     return classes
