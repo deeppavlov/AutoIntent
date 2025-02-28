@@ -1,6 +1,7 @@
 """Node optimizer for optimizing module configurations."""
 
 import gc
+import itertools as it
 import logging
 from copy import deepcopy
 from functools import partial
@@ -37,6 +38,9 @@ class ParamSpaceFloat(BaseModel):
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
 
+logger = logging.getLogger(__name__)
+
+
 class NodeOptimizer:
     """Class for optimizing nodes in a computational pipeline.
 
@@ -59,6 +63,7 @@ class NodeOptimizer:
             target_metric: The primary metric to optimize.
             metrics: Additional metrics to track during optimization.
         """
+        self._logger = logger
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
@@ -67,8 +72,8 @@ class NodeOptimizer:
         if self.target_metric not in self.metrics:
             self.metrics.append(self.target_metric)
 
+        self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
-        self._logger = logging.getLogger(__name__)  # TODO solve duplicate logging messages problem
 
     def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """Performs the optimization process for the node.
@@ -185,26 +190,26 @@ class NodeOptimizer:
         """
         res: dict[str, Any] = {}
 
-        def is_valid_param_space(
-            param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
-        ) -> bool:
-            try:
-                space_type(**param_space)
-                return True  # noqa: TRY300
-            except ValueError:
-                return False
-
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif is_valid_param_space(param_space, ParamSpaceInt):
+            elif self._is_valid_param_space(param_space, ParamSpaceInt):
                 res[param_name] = trial.suggest_int(param_name, **param_space)
-            elif is_valid_param_space(param_space, ParamSpaceFloat):
+            elif self._is_valid_param_space(param_space, ParamSpaceFloat):
                 res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
         return res
+
+    def _is_valid_param_space(
+        self, param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
+    ) -> bool:
+        try:
+            space_type(**param_space)
+            return True  # noqa: TRY300
+        except ValueError:
+            return False
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
         """Creates and returns the path to the module dump directory.
@@ -262,3 +267,38 @@ class NodeOptimizer:
                 filtered_search_space.append(search_space)
 
         self.modules_search_spaces = filtered_search_space
+
+    def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
+        """Check if search space is configured correctly."""
+        for module_search_space in search_space:
+            module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
+
+            for params_combination in it.product(*module_search_space_no_optuna.values()):
+                module_kwargs = dict(zip(module_search_space_no_optuna.keys(), params_combination, strict=False))
+
+                self._logger.debug("validating %s module...", module_name, extra=module_kwargs)
+                module = self.node_info.modules_available[module_name](**module_kwargs)
+                self._logger.debug("%s is ok", module_name)
+
+                del module
+                gc.collect()
+
+    def _reformat_search_space(self, module_search_space: dict[str, Any]) -> tuple[dict[str, Any], str]:
+        """Remove optuna notation from search space."""
+        res = {}
+        module_name = module_search_space.pop("module_name")
+
+        for param_name, param_space in module_search_space.items():
+            if param_name == "n_trials":
+                continue
+            if isinstance(param_space, list):
+                res[param_name] = param_space
+            elif self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+                param_space, ParamSpaceFloat
+            ):
+                res[param_name] = [param_space["low"], param_space["high"]]
+            else:
+                msg = f"Unsupported type of param search space: {param_space}"
+                raise TypeError(msg)
+
+        return res, module_name

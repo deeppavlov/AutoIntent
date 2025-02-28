@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
+from typing_extensions import assert_never
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
@@ -86,6 +87,13 @@ class MLKnnScorer(BaseScorer):
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
+
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `MLKnnScorer` must be a positive int"
+            raise ValueError(msg)
+
+        if not isinstance(self.s, float | int):
+            assert_never(self.s)
 
     @classmethod
     def from_context(

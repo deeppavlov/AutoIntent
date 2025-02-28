@@ -1,10 +1,6 @@
-from typing import get_args
-
 import pytest
 
 from autointent import Pipeline
-from autointent.nodes.schemes import OptimizationSearchSpaceConfig
-from tests.conftest import TaskType, get_search_space
 
 
 def test_validate_search_space_multiclass(dataset):
@@ -34,10 +30,3 @@ def test_validate_search_space_multilabel(dataset):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     with pytest.raises(ValueError, match="Module 'argmax' does not support multilabel datasets."):
         pipeline_optimizer.validate_modules(dataset, mode="raise")
-
-
-# for now validation for sklearn scorer doesn't work
-@pytest.mark.xfail
-@pytest.mark.parametrize("search_space", get_args(TaskType))
-def test_search_space(search_space):
-    OptimizationSearchSpaceConfig(get_search_space(search_space))

@@ -1,6 +1,6 @@
 """KNNScorer class for k-nearest neighbors scoring."""
 
-from typing import Any
+from typing import Any, get_args
 
 import numpy as np
 import numpy.typing as npt
@@ -77,6 +77,14 @@ class KNNScorer(BaseScorer):
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
+
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `KNNScorer` must be a positive int"
+            raise ValueError(msg)
+
+        if weights not in get_args(WEIGHT_TYPES):
+            msg = f"`weights` argument of `KNNScorer` must be a literal from a list: {get_args(WEIGHT_TYPES)}"
+            raise TypeError(msg)
 
     @classmethod
     def from_context(

@@ -1,10 +1,9 @@
-import pytest
-from pydantic import ValidationError
+from typing import get_args
 
-from autointent.nodes.schemes import (
-    OptimizationSearchSpaceConfig,
-)
-from tests.conftest import get_search_space
+import pytest
+
+from autointent.nodes import NodeOptimizer
+from tests.conftest import TaskType, get_search_space
 
 
 @pytest.fixture
@@ -44,19 +43,17 @@ def valid_optimizer_config():
 
 def test_valid_optimizer_config(valid_optimizer_config):
     """Test that a valid optimizer config passes validation."""
-    config = OptimizationSearchSpaceConfig(valid_optimizer_config)
-    assert config[0].node_type == "scoring"
-    assert config[1].node_type == "embedding"
+    for node_dict_config in valid_optimizer_config:
+        NodeOptimizer(**node_dict_config)
 
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    get_args(TaskType),
 )
 def test_optimizer_config(task_type):
-    search_space = get_search_space(task_type)
-    config = OptimizationSearchSpaceConfig(search_space)
-    assert config
+    for node_dict_config in get_search_space(task_type):
+        NodeOptimizer(**node_dict_config)
 
 
 def test_invalid_optimizer_config_missing_field():
@@ -71,8 +68,8 @@ def test_invalid_optimizer_config_missing_field():
         }
     ]
 
-    with pytest.raises(ValidationError):
-        OptimizationSearchSpaceConfig(invalid_config)
+    with pytest.raises(TypeError):
+        NodeOptimizer(**invalid_config)
 
 
 def test_invalid_optimizer_config_wrong_type():
@@ -92,5 +89,5 @@ def test_invalid_optimizer_config_wrong_type():
         }
     ]
 
-    with pytest.raises(ValidationError):
-        OptimizationSearchSpaceConfig(invalid_config)
+    with pytest.raises(TypeError):
+        NodeOptimizer(**invalid_config)
