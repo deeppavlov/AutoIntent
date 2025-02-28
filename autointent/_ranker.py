@@ -277,7 +277,7 @@ class Ranker:
         if override_config is not None:
             kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
         else:
-            kwargs = metadata
+            kwargs = metadata  # type: ignore[assignment]
 
         return cls(
             CrossEncoderConfig(**kwargs),
