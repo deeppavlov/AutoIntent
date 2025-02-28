@@ -1,3 +1,4 @@
+from .balancer import DatasetBalancer
 from .basic import EnglishSynthesizerTemplate, RussianSynthesizerTemplate, UtteranceGenerator
 from .evolution import (
     AbstractEvolution,
@@ -16,6 +17,7 @@ from .generator import Generator
 __all__ = [
     "AbstractEvolution",
     "ConcreteEvolution",
+    "DatasetBalancer",
     "EvolutionChatTemplate",
     "FormalEvolution",
     "FunnyEvolution",
