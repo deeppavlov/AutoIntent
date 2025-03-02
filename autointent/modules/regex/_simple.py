@@ -184,7 +184,7 @@ class Regex(BaseRegex):
 
         return metrics_calculated
 
-    def score_metrics_cv(  # type: ignore[no-untyped-def]
+    def score_metrics_cv(
         self,
         metrics_dict: dict[str, Any],
         cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
