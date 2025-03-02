@@ -31,14 +31,14 @@ class CrossEncoderMetadata(TypedDict):
 
     Attributes:
         model_name: Name of the model
-        train_classifier: Whether to train a classifier
+        train_head: Whether to train a classifier
         device: Device to use for inference
         max_length: Maximum sequence length
         batch_size: Batch size for inference
     """
 
     model_name: str
-    train_classifier: bool
+    train_head: bool
     device: str | None
     max_length: int | None
     batch_size: int
@@ -119,11 +119,11 @@ class Ranker:
             device=self.cross_encoder_config.device,
             max_length=self.cross_encoder_config.max_length,  # type: ignore[arg-type]
         )
-        self.train_classifier = False
+        self.train_head = False
         self._clf = classifier_head
 
         if classifier_head is not None or self.cross_encoder_config.train_head:
-            self.train_classifier = True
+            self.train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
@@ -147,7 +147,7 @@ class Ranker:
         Returns:
             Array of extracted features or predictions
         """
-        if not self.train_classifier:
+        if not self.train_head:
             return np.array(
                 self.cross_encoder.predict(
                     pairs,
@@ -189,7 +189,7 @@ class Ranker:
             utterances: List of utterances (texts)
             labels: Intent class labels corresponding to the utterances
         """
-        if not self.train_classifier:
+        if not self.train_head:
             return
 
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
@@ -207,7 +207,7 @@ class Ranker:
         Raises:
             ValueError: If classifier is not trained yet
         """
-        if self.train_classifier and self._clf is None:
+        if self.train_head and self._clf is None:
             msg = "Classifier is not trained yet"
             raise ValueError(msg)
 
@@ -254,7 +254,7 @@ class Ranker:
 
         metadata = CrossEncoderMetadata(
             model_name=self.cross_encoder_config.model_name,
-            train_classifier=self.train_classifier,
+            train_head=self.train_head,
             device=self.cross_encoder_config.device,
             max_length=self.cross_encoder_config.max_length,
             batch_size=self.cross_encoder_config.batch_size,
