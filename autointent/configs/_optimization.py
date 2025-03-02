@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.custom_types import FloatFromZeroToOne, ValidationScheme
@@ -12,7 +12,7 @@ from ._name import get_run_name
 
 class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
-
+    model_config = ConfigDict(extra="forbid")
     scheme: ValidationScheme = Field("ho", description="Validation scheme to use.")
     """Hold-out or cross-validation."""
     n_folds: PositiveInt = Field(3, description="Number of folds in cross-validation.")
@@ -32,6 +32,7 @@ class DataConfig(BaseModel):
 
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
+    model_config = ConfigDict(extra="forbid")
 
     _dirpath: Path | None = None
     _dump_dir: Path | None = None

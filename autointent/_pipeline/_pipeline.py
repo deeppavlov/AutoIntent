@@ -60,7 +60,7 @@ class Pipeline:
         self.sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
-            self.logging_config = LoggingConfig(dump_dir=None)
+            self.logging_config = LoggingConfig()
             self.embedder_config = EmbedderConfig()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()

@@ -1,15 +1,12 @@
 from enum import Enum
 from typing import Any
 
-from pydantic import (
-    BaseModel,
-    Field,
-    PositiveInt,
-)
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import Self, assert_never
 
 
 class ModelConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
