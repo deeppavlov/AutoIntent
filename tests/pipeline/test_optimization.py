@@ -8,6 +8,18 @@ from autointent.configs import DataConfig, LoggingConfig
 from tests.conftest import get_search_space, setup_environment
 
 
+def test_with_regex(dataset):
+    project_dir = setup_environment()
+    search_space = get_search_space("regex")
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
+
+    pipeline_optimizer.fit(dataset, refit_after=False)
+
+
 def test_no_node_separation(dataset_no_oos):
     project_dir = setup_environment()
     search_space = get_search_space("light")
@@ -15,7 +27,7 @@ def test_no_node_separation(dataset_no_oos):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=False))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
 
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
@@ -37,7 +49,7 @@ def test_bayes(dataset, sampler):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
 
     pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
 
@@ -53,7 +65,7 @@ def test_cv(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="cv", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="cv", separation_ratio=0.5))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -75,7 +87,7 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
