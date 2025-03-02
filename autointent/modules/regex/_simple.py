@@ -1,12 +1,16 @@
 """Module for regular expressions based intent detection."""
 
 import re
+from collections.abc import Iterable
 from typing import Any, TypedDict
+
+import numpy as np
+import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
-from autointent.custom_types import LabelType
+from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
 from autointent.metrics import REGEX_METRICS
 from autointent.modules.base import BaseRegex
 from autointent.schemas import Intent
@@ -161,7 +165,9 @@ class Regex(BaseRegex):
         return self.score_metrics_ho((val_labels, pred_labels), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """Score the model using cross-validation.
+        """Score the model in cross-validation mode.
+
+        Actually, it uses score_ho method, because there's no difference in training data for regex module.
 
         Args:
             context: Context containing validation data
@@ -172,9 +178,40 @@ class Regex(BaseRegex):
         """
         chosen_metrics = {name: fn for name, fn in REGEX_METRICS.items() if name in metrics}
 
-        metrics_calculated, _ = self.score_metrics_cv(chosen_metrics, context.data_handler.validation_iterator())
+        metrics_calculated, _ = self.score_metrics_cv(
+            chosen_metrics, context.data_handler.validation_iterator(), intents=context.data_handler.dataset.intents
+        )
 
         return metrics_calculated
+
+    def score_metrics_cv(  # type: ignore[no-untyped-def]
+        self,
+        metrics_dict: dict[str, Any],
+        cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
+        intents: list[Intent],
+    ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
+        """Score metrics using cross-validation.
+
+        Args:
+            metrics_dict: Dictionary of metrics to compute
+            cv_iterator: Cross-validation iterator
+            intents: intents from the dataset
+
+        Returns:
+            Tuple of metrics dictionary and predictions
+        """
+        metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
+        all_val_preds = []
+
+        for _, _, val_utterances, val_labels in cv_iterator:
+            self.fit(intents)
+            val_preds = self.predict(val_utterances)
+            for name, fn in metrics_dict.items():
+                metrics_values[name].append(fn(val_labels, val_preds))
+            all_val_preds.append(val_preds)
+
+        metrics = {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
+        return metrics, all_val_preds  # type: ignore[return-value]
 
     def clear_cache(self) -> None:
         """Clear cached regex patterns."""
