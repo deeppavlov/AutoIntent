@@ -36,7 +36,10 @@ class Regex(BaseRegex):
         name: Name of the module, defaults to "regex"
     """
 
-    name = "regex"
+    name = "simple"
+    supports_multiclass = True
+    supports_multilabel = True
+    supports_oos = False
 
     @classmethod
     def from_context(cls, context: Context) -> "Regex":
