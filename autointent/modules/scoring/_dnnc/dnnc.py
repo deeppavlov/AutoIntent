@@ -52,7 +52,6 @@ class DNNCScorer(BaseScorer):
 
         test_utterances = ["Hello!", "What's up?"]
         scores = scorer.predict(test_utterances)
-        print(scores)  # Outputs similarity scores for the utterances
 
     """
 
