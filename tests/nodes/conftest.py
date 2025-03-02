@@ -76,6 +76,6 @@ def get_context(multilabel):
     dataset = Dataset.from_json(get_dataset_path())
     if multilabel:
         dataset = dataset.to_multilabel()
-    res.set_dataset(dataset, DataConfig(scheme="ho", separate_nodes=True))
+    res.set_dataset(dataset, DataConfig(scheme="ho"))
     res.configure_logging(LoggingConfig(project_dir=project_dir, dump_modules=True))
     return res

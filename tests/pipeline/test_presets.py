@@ -18,6 +18,6 @@ def test_presets(dataset, preset):
         return
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho"))
 
     pipeline_optimizer.fit(dataset, refit_after=False)

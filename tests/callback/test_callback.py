@@ -85,7 +85,7 @@ def test_pipeline_callbacks(dataset):
     context = Context()
     context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
-    context.set_dataset(dataset, DataConfig(scheme="ho", separate_nodes=True))
+    context.set_dataset(dataset, DataConfig(scheme="ho"))
 
     pipeline_optimizer._fit(context, "brute")
 
