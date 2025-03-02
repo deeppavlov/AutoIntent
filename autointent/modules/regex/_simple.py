@@ -167,8 +167,6 @@ class Regex(BaseRegex):
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
         """Score the model in cross-validation mode.
 
-        Actually, it uses score_ho method, because there's no difference in training data for regex module.
-
         Args:
             context: Context containing validation data
             metrics: List of metric names to compute
@@ -203,8 +201,9 @@ class Regex(BaseRegex):
         metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []
 
+        self.fit(intents)
+
         for _, _, val_utterances, val_labels in cv_iterator:
-            self.fit(intents)
             val_preds = self.predict(val_utterances)
             for name, fn in metrics_dict.items():
                 metrics_values[name].append(fn(val_labels, val_preds))
