@@ -12,6 +12,7 @@ from ._name import get_run_name
 
 class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
+
     model_config = ConfigDict(extra="forbid")
     scheme: ValidationScheme = Field("ho", description="Validation scheme to use.")
     """Hold-out or cross-validation."""
@@ -32,6 +33,7 @@ class DataConfig(BaseModel):
 
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
+
     model_config = ConfigDict(extra="forbid")
 
     _dirpath: Path | None = None
