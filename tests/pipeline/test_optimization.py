@@ -8,16 +8,29 @@ from autointent.configs import DataConfig, LoggingConfig
 from tests.conftest import get_search_space, setup_environment
 
 
-def test_with_regex(dataset):
+@pytest.mark.parametrize(
+    ("data_config", "refit_after"),
+    [
+        (DataConfig(scheme="ho", separation_ratio=None), False),
+        (DataConfig(scheme="ho", separation_ratio=0.5), False),
+        (DataConfig(scheme="cv", separation_ratio=None), False),
+        (DataConfig(scheme="cv", separation_ratio=0.5), False),
+        (DataConfig(scheme="ho", separation_ratio=None), True),
+        (DataConfig(scheme="ho", separation_ratio=0.5), True),
+        (DataConfig(scheme="cv", separation_ratio=None), True),
+        (DataConfig(scheme="cv", separation_ratio=0.5), True),
+    ],
+)
+def test_with_regex(dataset, data_config, refit_after):
     project_dir = setup_environment()
     search_space = get_search_space("regex")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
+    pipeline_optimizer.set_config(data_config)
 
-    pipeline_optimizer.fit(dataset, refit_after=False)
+    pipeline_optimizer.fit(dataset, refit_after=refit_after)
 
 
 def test_no_node_separation(dataset_no_oos):
