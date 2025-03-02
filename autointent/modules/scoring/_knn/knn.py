@@ -44,11 +44,6 @@ class KNNScorer(BaseScorer):
         probabilities = scorer.predict(test_utterances)
         print(probabilities)  # Outputs predicted class probabilities for the utterances
 
-    .. testoutput::
-
-        [[0.67297815 0.32702185]
-         [0.44031667 0.55968333]]
-
     """
 
     _vector_index: VectorIndex

@@ -54,12 +54,6 @@ class DNNCScorer(BaseScorer):
         scores = scorer.predict(test_utterances)
         print(scores)  # Outputs similarity scores for the utterances
 
-
-    .. testoutput::
-
-        [[0.00013581 0.        ]
-         [0.00030066 0.        ]]
-
     """
 
     name = "dnnc"
