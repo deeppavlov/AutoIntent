@@ -74,7 +74,7 @@ from autointent.configs import LoggingConfig
 from pathlib import Path
 
 log_config = LoggingConfig(
-    run_name="test_tensorboard", report_to=["tensorboard"], dirpath=Path("test_tensorboard"), dump_modules=False
+    run_name="test_tensorboard", report_to=["tensorboard"], project_dir=Path("my_projects"), dump_modules=False
 )
 
 pipeline_optimizer.set_config(log_config)
