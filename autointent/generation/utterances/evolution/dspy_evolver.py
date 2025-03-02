@@ -4,6 +4,7 @@ Evolutionary strategy to augmenting utterances.
 Deeply inspired by DeepEval evolutions.
 """
 import copy
+import os
 import random
 from pathlib import Path
 from typing import Any
@@ -11,9 +12,13 @@ from typing import Any
 import dspy
 from datasets import Dataset as HFDataset, concatenate_datasets
 from dspy.evaluate import SemanticF1
+import logging
 
 from autointent import Dataset, Pipeline
 from autointent.custom_types import Split
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 SEARCH_SPACE = [
     {
@@ -59,6 +64,9 @@ class TextAugmentSignature(dspy.Signature):
 #         return self.generator(text=text, n_examples=n_examples)
 
 
+os.environ['MISTRAL_API_KEY'] = ""
+os.environ["OPENROUTER_API_KEY"] = ""
+
 class DSPYIncrementalUtteranceEvolver:
     """Incremental evolutionary strategy to augmenting utterances using DSPy."""
 
@@ -70,16 +78,15 @@ class DSPYIncrementalUtteranceEvolver:
         """Initialize."""
         self.search_space = self._choose_search_space(search_space)
         random.seed(seed)
-
+        # full list of providers
         turbo = dspy.LM(
-            'openai/model_name',
-            api_base="http://...",
-            api_key="test",
-            model_type='text'
+            ...,
+            model_type='chat'
         )
         dspy.settings.configure(lm=turbo)
         # self.generator = dspy.ChainOfThought("text, n_examples -> augmented_texts: list[str]")
-        self.generator = dspy.ChainOfThought("text -> augmented_texts: list[str]")
+        # input should be question and response is augmented. question and response required for metric
+        self.generator = dspy.ChainOfThought("question -> response: list[str]")
 
     def _choose_search_space(self, search_space: str | None) -> list[dict[str, Any]] | Path | str:
         if search_space is None:
@@ -104,49 +111,46 @@ class DSPYIncrementalUtteranceEvolver:
 
         dspy_dataset = [
             dspy.Example(
-                text=sample[Dataset.utterance_feature],
+                question=sample[Dataset.utterance_feature],
                 # n_examples=1,
-                augmented_texts=sample[Dataset.utterance_feature]  # Use original as reference
+                response=sample[Dataset.utterance_feature]  # Use original as reference
             ).with_inputs(
-                "text",
+                "question",
                 # "n_examples"
             )
             for sample in original_split
         ]
 
         for _ in range(n_evolutions):
-            # Optimize prompts using DSPy
-            # evaluate = dspy.Evaluate(
-            #     devset=dspy_dataset,
-            #     metric=SemanticF1,
-            #     num_threads=batch_size,
-            #     display_progress=True,
-            # )
-            # optimizer = dspy.MIPROv2(
-            #     metric=SemanticF1,
-            #     auto="medium",
-            #     num_threads=batch_size,
-            #     log_dir="logs"
-            # )
-            # optimized_module = optimizer.compile(
-            #     self.generator,
-            #     trainset=dspy_dataset,
-            #     requires_permission_to_run=False,
-            #     max_bootstrapped_demos=4,
-            #     max_labeled_demos=4
-            # )
-            # evaluate(optimized_module)
+            metric = SemanticF1()
 
-            # Generate new samples
+            optimizer = dspy.MIPROv2(
+                metric=metric,
+                auto="medium",
+                num_threads=batch_size,
+                log_dir="logs",
+            )
+            optimized_module = optimizer.compile(
+                self.generator,
+                trainset=dspy_dataset,
+                requires_permission_to_run=False,
+                max_bootstrapped_demos=4,
+                max_labeled_demos=4
+            )
             new_samples = []
             for sample in original_split:
                 utterance = sample[Dataset.utterance_feature]
                 label = sample[Dataset.label_feature]
-                prediction = self.generator(text=utterance)
-                new_samples.extend([{
-                    Dataset.label_feature: label,
-                    Dataset.utterance_feature: ut
-                } for ut in prediction.augmented_texts])
+                prediction = optimized_module(text=utterance)
+                new_samples.extend(
+                    [
+                        {
+                            Dataset.label_feature: label,
+                            Dataset.utterance_feature: ut
+                        }
+                        for ut in prediction.response
+                    ]
+                )
 
             new_samples_dataset = HFDataset.from_list(new_samples)
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
