@@ -1,6 +1,7 @@
 {
     "$defs": {
         "CrossEncoderConfig": {
+            "additionalProperties": false,
             "properties": {
                 "batch_size": {
                     "default": 32,
@@ -53,6 +54,7 @@
             "type": "object"
         },
         "DataConfig": {
+            "additionalProperties": false,
             "description": "Configuration for the data used in the optimization process.",
             "properties": {
                 "scheme": {
@@ -100,6 +102,7 @@
             "type": "object"
         },
         "EmbedderConfig": {
+            "additionalProperties": false,
             "properties": {
                 "batch_size": {
                     "default": 32,
@@ -230,6 +233,7 @@
             "type": "object"
         },
         "LoggingConfig": {
+            "additionalProperties": false,
             "description": "Configuration for the logging.",
             "properties": {
                 "project_dir": {
