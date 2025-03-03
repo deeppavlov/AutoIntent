@@ -29,6 +29,10 @@ class InferenceNodeConfig:
         res = asdict(self)
         if self.embedder_config is not None:
             res["embedder_config"] = self.embedder_config.model_dump()
+        else:
+            res.pop("embedder_config")
         if self.cross_encoder_config is not None:
             res["cross_encoder_config"] = self.cross_encoder_config.model_dump()
+        else:
+            res.pop("cross_encoder_config")
         return res
