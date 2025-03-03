@@ -22,7 +22,6 @@ def test_inference_from_config(dataset, task_type):
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
 
-
     # case 1: inference from file system
     context = pipeline_optimizer.fit(dataset)
     context.dump()
@@ -44,6 +43,7 @@ def test_inference_from_config(dataset, task_type):
     loaded_pipe = Pipeline.load(dump_dir)
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
+
 
 @pytest.mark.parametrize(
     "task_type",

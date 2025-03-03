@@ -85,7 +85,7 @@ class TunableDecision(BaseDecision):
         self,
         target_metric: MetricType = "decision_accuracy",
         n_optuna_trials: PositiveInt = 320,
-        seed: int = 0,
+        seed: int | None = 0,
         tags: list[Tag] | None = None,
     ) -> None:
         """Initialize tunable predictor.
@@ -222,7 +222,7 @@ class ThreshOptimizer:
         self,
         probas: npt.NDArray[Any],
         labels: ListOfGenericLabels,
-        seed: int,
+        seed: int | None,
         tags: list[Tag] | None = None,
     ) -> None:
         """Fit the optimizer by finding optimal thresholds.
