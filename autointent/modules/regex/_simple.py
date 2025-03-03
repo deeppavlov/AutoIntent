@@ -11,7 +11,6 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
 from autointent.metrics import REGEX_METRICS
@@ -67,11 +66,11 @@ class SimpleRegex(BaseRegex):
             intents: List of intents to fit the model with
         """
         regex_patterns = [
-            RegexPatterns(
-                id=intent.id,
-                regex_full_match=intent.regex_full_match,
-                regex_partial_match=intent.regex_partial_match,
-            )
+            {
+                "id": intent.id,
+                "regex_full_match": intent.regex_full_match,
+                "regex_partial_match": intent.regex_partial_match,
+            }
             for intent in intents
         ]
         self._compile_regex_patterns(regex_patterns)

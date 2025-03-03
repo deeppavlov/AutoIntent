@@ -60,15 +60,6 @@ class DataHandler:
         elif self.config.scheme == "cv":
             self._split_cv()
 
-        self.regex_patterns = [
-            RegexPatterns(
-                id=intent.id,
-                regex_full_match=intent.regex_full_match,
-                regex_partial_match=intent.regex_partial_match,
-            )
-            for intent in self.dataset.intents
-        ]
-
         self.intent_descriptions = [intent.description for intent in self.dataset.intents]
         self.tags = self.dataset.get_tags()
 
