@@ -108,7 +108,7 @@ def test_load_with_overrided_params(dataset):
     pipeline_optimizer.dump()
     del pipeline_optimizer
 
-    loaded_pipe = Pipeline.load(logging_config.dirpath)
+    loaded_pipe = Pipeline.load(logging_config.dirpath, embedder_config=EmbedderConfig(max_length=8))
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
     assert loaded_pipe.nodes[NodeType.scoring].module._embedder.max_length == 8
