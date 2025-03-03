@@ -31,7 +31,7 @@ from autointent.utils import load_preset, load_search_space
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
-    from autointent.modules.base import BaseDecision, BaseScorer
+    from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
 
 
 class Pipeline:
@@ -260,7 +260,6 @@ class Pipeline:
                 self._logger.error(msg)
                 raise RuntimeError(msg)
 
-        # TODO add regex module handling
         scoring_module: BaseScorer = self.nodes[NodeType.scoring].module  # type: ignore[assignment,union-attr]
         decision_module: BaseDecision = self.nodes[NodeType.decision].module  # type: ignore[assignment,union-attr]
 
@@ -271,6 +270,12 @@ class Pipeline:
 
         self._nodes_configs[NodeType.scoring].load_path = scoring_dump_dir
         self._nodes_configs[NodeType.decision].load_path = decision_dump_dir
+
+        if NodeType.regex in self.nodes:
+            regex_module: BaseRegex = self.nodes[NodeType.regex].module  # type: ignore[assignment,union-attr]
+            regex_dump_dir = str(path / "regex_module")
+            regex_module.dump(regex_dump_dir)
+            self._nodes_configs[NodeType.regex].load_path = regex_dump_dir
 
         inference_nodes_configs = [cfg.asdict() for cfg in self._nodes_configs.values()]
         with (path / "inference_config.yaml").open("w") as file:

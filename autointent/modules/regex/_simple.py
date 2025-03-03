@@ -1,13 +1,16 @@
 """Module for regular expressions based intent detection."""
 
+import json
 import re
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any, TypedDict
 
 import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.data_handler._data_handler import RegexPatterns
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
@@ -63,7 +66,7 @@ class SimpleRegex(BaseRegex):
         Args:
             intents: List of intents to fit the model with
         """
-        self.regex_patterns = [
+        regex_patterns = [
             RegexPatterns(
                 id=intent.id,
                 regex_full_match=intent.regex_full_match,
@@ -71,7 +74,7 @@ class SimpleRegex(BaseRegex):
             )
             for intent in intents
         ]
-        self._compile_regex_patterns()
+        self._compile_regex_patterns(regex_patterns)
 
     def predict(self, utterances: list[str]) -> list[LabelType]:
         """Predict intents for given utterances.
@@ -214,7 +217,7 @@ class SimpleRegex(BaseRegex):
 
     def clear_cache(self) -> None:
         """Clear cached regex patterns."""
-        del self.regex_patterns
+        del self.regex_patterns_compiled
 
     def get_assets(self) -> Artifact:
         """Get model assets.
@@ -224,7 +227,7 @@ class SimpleRegex(BaseRegex):
         """
         return Artifact()
 
-    def _compile_regex_patterns(self) -> None:
+    def _compile_regex_patterns(self, regex_patterns: list[dict[str, Any]]) -> None:
         """Compile regex patterns with case-insensitive flag."""
         self.regex_patterns_compiled = [
             RegexPatternsCompiled(
@@ -236,5 +239,29 @@ class SimpleRegex(BaseRegex):
                     re.compile(ptn, flags=re.IGNORECASE) for ptn in regex_patterns["regex_partial_match"]
                 ],
             )
-            for regex_patterns in self.regex_patterns
+            for regex_patterns in regex_patterns
         ]
+
+    def dump(self, path: str) -> None:
+        serialized = [
+            {
+                "id": regex_patterns["id"],
+                "regex_full_match": [pattern.pattern for pattern in regex_patterns["regex_full_match"]],
+                "regex_partial_match": [pattern.pattern for pattern in regex_patterns["regex_partial_match"]],
+            }
+            for regex_patterns in self.regex_patterns_compiled
+        ]
+
+        with (Path(path) / "regex_patterns").open("w") as file:
+            json.dump(serialized, file, indent=4, ensure_ascii=False)
+
+    def load(
+        self,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> None:
+        with (Path(path) / "regex_patterns").open() as file:
+            serialized: list[dict[str, Any]] = json.load(file)
+
+        self._compile_regex_patterns(serialized)
