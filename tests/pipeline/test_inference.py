@@ -8,7 +8,7 @@ from tests.conftest import get_search_space, setup_environment
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    ["regex", "multiclass", "multilabel", "description"],
 )
 def test_inference_from_config(dataset, task_type):
     project_dir = setup_environment()
@@ -35,6 +35,9 @@ def test_inference_from_config(dataset, task_type):
     rich_outputs = inference_pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
 
+    if task_type == "regex":
+        assert rich_outputs.regex_predictions is not None
+
     # case 3: dump and then load pipeline
     dump_dir = project_dir / "dumped_pipeline"
     pipeline_optimizer.dump(dump_dir)
@@ -47,7 +50,7 @@ def test_inference_from_config(dataset, task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    ["regex", "multiclass", "multilabel", "description"],
 )
 def test_inference_on_the_fly(dataset, task_type):
     project_dir = setup_environment()
@@ -70,6 +73,9 @@ def test_inference_on_the_fly(dataset, task_type):
     # case 2: rich inference on the fly
     rich_outputs = pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
+
+    if task_type == "regex":
+        assert rich_outputs.regex_predictions is not None
 
     # case 3: dump and then load pipeline
     pipeline.dump()
