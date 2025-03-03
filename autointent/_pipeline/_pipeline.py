@@ -224,6 +224,8 @@ class Pipeline:
             )
             return context
 
+        self.nodes = {node.node_type: node for node in nodes_list if node.node_type != NodeType.embedding}
+
         if refit_after:
             self._refit(context)
 
@@ -232,7 +234,6 @@ class Pipeline:
             for cfg in context.optimization_info.get_inference_nodes_config()
             if cfg.node_type != NodeType.embedding
         }
-        self.nodes = {node.node_type: node for node in nodes_list if node.node_type != NodeType.embedding}
         self._dump_dir = context.logging_config.dirpath
 
         if test_utterances is not None:
