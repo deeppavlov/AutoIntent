@@ -30,14 +30,14 @@ class RegexPatterns(TypedDict):
     regex_partial_match: list[str]
 
 
-class DataHandler:  # TODO rename to Validator
+class DataHandler:
     """Data handler class."""
 
     def __init__(
         self,
         dataset: Dataset,
         config: DataConfig | None = None,
-        random_seed: int = 0,
+        random_seed: int | None = 0,
     ) -> None:
         """Initialize the data handler.
 
@@ -46,7 +46,8 @@ class DataHandler:  # TODO rename to Validator
             config: Configuration object
             random_seed: Seed for random number generation.
         """
-        set_seed(random_seed)
+        if random_seed is not None:
+            set_seed(random_seed)
         self.random_seed = random_seed
 
         self.dataset = dataset

@@ -29,7 +29,7 @@ class StratifiedSplitter:
         self,
         test_size: float,
         label_feature: str,
-        random_seed: int,
+        random_seed: int | None,
         shuffle: bool = True,
     ) -> None:
         """Initialize the StratifiedSplitter.
@@ -283,7 +283,7 @@ def split_dataset(
     dataset: Dataset,
     split: str,
     test_size: float,
-    random_seed: int,
+    random_seed: int | None,
     allow_oos_in_train: bool | None = None,
 ) -> tuple[HFDataset, HFDataset]:
     """Split a Dataset object into training and testing subsets.

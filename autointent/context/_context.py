@@ -31,7 +31,7 @@ class Context:
     optimization_info: OptimizationInfo
     callback_handler = CallbackHandler()
 
-    def __init__(self, seed: int = 42) -> None:
+    def __init__(self, seed: int | None = 42) -> None:
         """Initialize the Context object.
 
         Args:

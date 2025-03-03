@@ -41,7 +41,7 @@ class Pipeline:
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
         sampler: SamplerType = "brute",
-        seed: int = 42,
+        seed: int | None = 42,
     ) -> None:
         """Initialize the pipeline optimizer.
 
@@ -85,7 +85,7 @@ class Pipeline:
             assert_never(config)
 
     @classmethod
-    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int = 42) -> "Pipeline":
+    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int | None = 42) -> "Pipeline":
         """Search space to pipeline optimizer.
 
         Args:
@@ -101,7 +101,7 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def from_preset(cls, name: SearchSpacePresets, seed: int = 42) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePresets, seed: int | None = 42) -> "Pipeline":
         optimization_config = load_preset(name)
         config = OptimizationConfig(seed=seed, **optimization_config)
         return cls.from_optimization_config(config=config)
@@ -186,7 +186,7 @@ class Pipeline:
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
 
-        context = Context()
+        context = Context(self.seed)
         context.set_dataset(dataset, self.data_config)
         context.configure_logging(self.logging_config)
         context.configure_transformer(self.embedder_config)
