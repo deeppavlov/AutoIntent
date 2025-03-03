@@ -233,7 +233,7 @@ class Pipeline:
             if cfg.node_type != NodeType.embedding
         }
         self.nodes = {node.node_type: node for node in nodes_list if node.node_type != NodeType.embedding}
-        self._dump_dir = context.logging_config.dump_dir
+        self._dump_dir = context.logging_config.dirpath
 
         if test_utterances is not None:
             predictions = self.predict(test_utterances)
