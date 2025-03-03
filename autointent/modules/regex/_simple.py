@@ -30,7 +30,7 @@ class RegexPatternsCompiled(TypedDict):
     regex_partial_match: list[re.Pattern[str]]
 
 
-class Regex(BaseRegex):
+class SimpleRegex(BaseRegex):
     """Regular expressions based intent detection module.
 
     A module that uses regular expressions to detect intents in text utterances.
@@ -46,14 +46,14 @@ class Regex(BaseRegex):
     supports_oos = False
 
     @classmethod
-    def from_context(cls, context: Context) -> "Regex":
+    def from_context(cls, context: Context) -> "SimpleRegex":
         """Initialize from context.
 
         Args:
             context: Context object containing configuration
 
         Returns:
-            Initialized Regex instance
+            Initialized SimpleRegex instance
         """
         return cls()
 

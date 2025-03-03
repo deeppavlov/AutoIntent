@@ -11,7 +11,7 @@ from .decision import (
     TunableDecision,
 )
 from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
-from .regex import Regex
+from .regex import SimpleRegex
 from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, SklearnScorer
 
 T = TypeVar("T", bound=BaseModule)
@@ -21,7 +21,7 @@ def _create_modules_dict(modules: list[type[T]]) -> dict[str, type[T]]:
     return {module.name: module for module in modules}
 
 
-REGEX_MODULES: dict[str, type[BaseRegex]] = _create_modules_dict([Regex])
+REGEX_MODULES: dict[str, type[BaseRegex]] = _create_modules_dict([SimpleRegex])
 
 EMBEDDING_MODULES: dict[str, type[BaseEmbedding]] = _create_modules_dict(
     [RetrievalAimedEmbedding, LogregAimedEmbedding]

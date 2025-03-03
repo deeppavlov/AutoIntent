@@ -1,4 +1,4 @@
-"""Regex node info."""
+"""SimpleRegex node info."""
 
 from collections.abc import Mapping
 from typing import ClassVar
@@ -13,7 +13,7 @@ from ._base import NodeInfo
 
 
 class RegexNodeInfo(NodeInfo):
-    """Regex node info."""
+    """SimpleRegex node info."""
 
     metrics_available: ClassVar[Mapping[str, RegexMetricFn]] = REGEX_METRICS
 

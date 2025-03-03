@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class RegexPatterns(TypedDict):
-    """Regex patterns for each intent class.
+    """SimpleRegex patterns for each intent class.
 
     Attributes:
         id: Intent class id.

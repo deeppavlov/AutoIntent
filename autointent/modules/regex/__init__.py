@@ -1,3 +1,3 @@
-from ._simple import Regex
+from ._simple import SimpleRegex
 
-__all__ = ["Regex"]
+__all__ = ["SimpleRegex"]

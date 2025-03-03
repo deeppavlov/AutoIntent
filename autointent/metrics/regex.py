@@ -1,4 +1,4 @@
-"""Regex metrics for intent recognition."""
+"""SimpleRegex metrics for intent recognition."""
 
 from typing import Protocol
 
