@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import Generator
-from typing import TypedDict, cast
+from typing import cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
@@ -14,20 +14,6 @@ from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, Lis
 from ._stratification import split_dataset
 
 logger = logging.getLogger(__name__)
-
-
-class RegexPatterns(TypedDict):
-    """SimpleRegex patterns for each intent class.
-
-    Attributes:
-        id: Intent class id.
-        regex_full_match: Full match regex patterns.
-        regex_partial_match: Partial match regex patterns.
-    """
-
-    id: int
-    regex_full_match: list[str]
-    regex_partial_match: list[str]
 
 
 class DataHandler:
