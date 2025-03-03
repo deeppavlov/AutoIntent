@@ -251,7 +251,9 @@ class SimpleRegex(BaseRegex):
             for regex_patterns in self.regex_patterns_compiled
         ]
 
-        with (Path(path) / "regex_patterns").open("w") as file:
+        dump_dir = Path(path)
+        dump_dir.mkdir(parents=True, exist_ok=True)
+        with (dump_dir / "regex_patterns.json").open("w") as file:
             json.dump(serialized, file, indent=4, ensure_ascii=False)
 
     def load(
@@ -260,7 +262,7 @@ class SimpleRegex(BaseRegex):
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
     ) -> None:
-        with (Path(path) / "regex_patterns").open() as file:
+        with (Path(path) / "regex_patterns.json").open() as file:
             serialized: list[dict[str, Any]] = json.load(file)
 
         self._compile_regex_patterns(serialized)
