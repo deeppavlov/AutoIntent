@@ -3,7 +3,6 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -71,22 +70,6 @@ class Context:
         """
         self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
-    def get_inference_config(self) -> dict[str, Any]:
-        """Generate configuration settings for inference.
-
-        Returns:
-            Dictionary containing inference configuration.
-        """
-        nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
-        return {
-            "metadata": {
-                "multilabel": self.is_multilabel(),
-                "n_classes": self.get_n_classes(),
-                "seed": self.seed,
-            },
-            "nodes_configs": nodes_configs,
-        }
-
     def dump(self) -> None:
         """Save logs, configurations, and datasets to disk."""
         self._logger.debug("dumping logs...")
@@ -103,7 +86,7 @@ class Context:
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 
-        inference_config = self.get_inference_config()
+        inference_config = self.optimization_info.get_inference_nodes_config(asdict=True)
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)

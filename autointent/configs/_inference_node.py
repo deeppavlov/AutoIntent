@@ -1,6 +1,6 @@
 """Configuration for the nodes."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 from autointent.custom_types import NodeType
@@ -24,3 +24,11 @@ class InferenceNodeConfig:
     """One can override presaved embedder config while loading from file system."""
     cross_encoder_config: CrossEncoderConfig | None = None
     """One can override presaved cross encoder config while loading from file system."""
+
+    def asdict(self) -> dict[str, Any]:
+        res = asdict(self)
+        if self.embedder_config is not None:
+            res["embedder_config"] = self.embedder_config.model_dump()
+        if self.cross_encoder_config is not None:
+            res["cross_encoder_config"] = self.cross_encoder_config.model_dump()
+        return res
