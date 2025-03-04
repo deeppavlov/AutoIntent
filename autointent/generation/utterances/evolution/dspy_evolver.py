@@ -123,16 +123,25 @@ class AugmentSemanticF1(dspy.Module):
             The final score or a boolean based on the threshold.
         """
         # Compute base scores using the existing semantic metric.
-        scores = self.module(question=example.question, ground_truth=example.response, system_response=pred.response)
+        scores = self.module(
+            question=example.text, ground_truth=example.augmented_text, system_response=pred.augmented_text
+        )
         base_score = f1_score(scores.precision, scores.recall)
 
         # Compute repetition penalty factor.
-        penalty = repetition_factor(example.response, pred.response)
-
+        penalty = repetition_factor(example.augmented_text, pred.augmented_text)
+        # length_penalty = len(example.augmented_text) / len(pred.augmented_text)
         # Apply penalty to the base score.
-        final_score = base_score * penalty
+        final_score = base_score * penalty  # * length_penalty
         # Return the final score, or a boolean based on the threshold if trace is provided.
         return final_score if trace is None else final_score >= self.threshold
+
+
+class AugmentationSignature(dspy.Signature):
+    """Signature for text generation for augmentation task."""
+
+    text: str = dspy.InputField(desc="Text to augment. Your task to paraphrase this text.")
+    augmented_text: str = dspy.OutputField(desc="Augmented text. This should be on same language as text")
 
 
 class DSPYIncrementalUtteranceEvolver:
@@ -176,8 +185,7 @@ class DSPYIncrementalUtteranceEvolver:
             max_tokens=max_tokens,
         )
         dspy.settings.configure(lm=llm)
-        # input should be question and response is augmented. question and response required for metric
-        self.generator = dspy.ChainOfThought("question -> response: str")
+        self.generator = dspy.ChainOfThoughtWithHint(AugmentationSignature)
 
     def augment(
         self,
@@ -223,10 +231,10 @@ class DSPYIncrementalUtteranceEvolver:
 
         dspy_dataset = [
             dspy.Example(
-                question=sample[Dataset.utterance_feature],
-                response=sample[Dataset.utterance_feature],  # Use original as reference
+                text=sample[Dataset.utterance_feature],
+                augmented_text=sample[Dataset.utterance_feature],  # Use original as reference
             ).with_inputs(
-                "question",
+                "text",
             )
             for sample in original_split
         ]
@@ -247,10 +255,8 @@ class DSPYIncrementalUtteranceEvolver:
             for sample in original_split:
                 utterance = sample[Dataset.utterance_feature]
                 label = sample[Dataset.label_feature]
-                prediction = optimized_module(question=utterance)
-                new_samples.extend(
-                    [{Dataset.label_feature: label, Dataset.utterance_feature: ut} for ut in prediction.response]
-                )
+                prediction = optimized_module(text=utterance)
+                new_samples.append({Dataset.label_feature: label, Dataset.utterance_feature: prediction.augmented_text})
 
             new_samples_dataset = HFDataset.from_list(new_samples)
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
