@@ -6,7 +6,10 @@ import random
 from collections import Counter
 from pathlib import Path
 
-import dspy
+try:
+    import dspy
+except ImportError:
+    raise ImportError("dspy is not installed. Please install it with `pip install dspy` or `pip install autointent[dspy]`.")
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 from dspy.evaluate.auto_evaluation import f1_score
