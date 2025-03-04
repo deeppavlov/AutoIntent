@@ -5,6 +5,7 @@ import logging
 import random
 from collections import Counter
 from pathlib import Path
+from typing import Any
 
 try:
     import dspy
@@ -76,15 +77,13 @@ def repetition_factor(true_text: str, augmented_text: str) -> float:
     return 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
 
 
-class SemanticRecallPrecision(dspy.Signature):
+class SemanticRecallPrecision(dspy.Signature):  # type: ignore[misc]
     """Compare a system's response to the ground truth to compute its recall and precision.
 
     If asked to reason, enumerate key ideas in each response, and whether they are present in the other response.
 
     Copied from https://github.com/stanfordnlp/dspy/blob/2957c5f998e0bc652017b6e3b1f8af34970b6f6b/dspy/evaluate/auto_evaluation.py#L4-L14
     """
-
-    # Copied from dspy
 
     question: str = dspy.InputField()
     ground_truth: str = dspy.InputField()
@@ -93,7 +92,7 @@ class SemanticRecallPrecision(dspy.Signature):
     precision: float = dspy.OutputField(desc="fraction (out of 1.0) of system response covered by the ground truth")
 
 
-class AugmentSemanticF1(dspy.Module):
+class AugmentSemanticF1(dspy.Module):  # type: ignore[misc]
     """Compare a system's response to the ground truth to compute its recall and precision.
 
     Adapted from https://dspy.ai/api/evaluation/SemanticF1/
@@ -135,10 +134,10 @@ class AugmentSemanticF1(dspy.Module):
         # Apply penalty to the base score.
         final_score = base_score * penalty  # * length_penalty
         # Return the final score, or a boolean based on the threshold if trace is provided.
-        return final_score if trace is None else final_score >= self.threshold
+        return final_score if trace is None else final_score >= self.threshold  # type: ignore[no-any-return]
 
 
-class AugmentationSignature(dspy.Signature):
+class AugmentationSignature(dspy.Signature):  # type: ignore[misc]
     """Signature for text generation for augmentation task."""
 
     text: str = dspy.InputField(desc="Text to augment. Your task to paraphrase this text.")
@@ -193,8 +192,8 @@ class DSPYIncrementalUtteranceEvolver:
         split_name: str = Split.TEST,
         n_evolutions: int = 3,
         update_split: bool = True,
-        mipro_init_params: dict | None = None,
-        mipro_compile_params: dict | None = None,
+        mipro_init_params: dict[str, Any] | None = None,
+        mipro_compile_params: dict[str, Any] | None = None,
         save_path: Path | str = "evolution_config",
     ) -> HFDataset:
         """Augment the dataset using the evolutionary strategy.
