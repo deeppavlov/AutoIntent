@@ -17,37 +17,37 @@ class OptimizerCallback(ABC):
 
     @abstractmethod
     def start_run(self, run_name: str, dirpath: Path) -> None:
-        """
-        Start a new run.
+        """Start a new run.
 
-        :param run_name: Name of the run.
-        :param dirpath: Path to the directory where the logs will be saved.
+        Args:
+            run_name: Name of the run.
+            dirpath: Path to the directory where the logs will be saved.
         """
 
     @abstractmethod
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
-        """
-        Start a new module.
+        """Start a new module.
 
-        :param module_name: Name of the module.
-        :param num: Number of the module.
-        :param module_kwargs: Module parameters.
+        Args:
+            module_name: Name of the module.
+            num: Number of the module.
+            module_kwargs: Module parameters.
         """
 
     @abstractmethod
     def log_value(self, **kwargs: dict[str, Any]) -> None:
-        """
-        Log data.
+        """Log data.
 
-        :param kwargs: Data to log.
+        Args:
+            kwargs: Data to log.
         """
 
     @abstractmethod
     def log_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log metrics during training.
+        """Log metrics during training.
 
-        :param metrics: Metrics to log.
+        Args:
+            metrics: Metrics to log.
         """
 
     @abstractmethod
@@ -60,8 +60,8 @@ class OptimizerCallback(ABC):
 
     @abstractmethod
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
-        """
-        Log final metrics.
+        """Log final metrics.
 
-        :param metrics: Final metrics.
+        Args:
+            metrics: Final metrics.
         """

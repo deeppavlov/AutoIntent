@@ -8,8 +8,10 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import assert_never
 
 from autointent._dump_tools import Dumper
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import ListOfGenericLabels, ListOfLabels
@@ -19,7 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 class BaseModule(ABC):
-    """Base module."""
+    """Base module for all modules.
+
+    Attributes:
+        supports_oos: Whether the module supports out-of-scope samples
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_multiclass: Whether the module supports multiclass classification
+        name: Name of the module
+    """
 
     supports_oos: bool
     supports_multilabel: bool
@@ -28,27 +37,31 @@ class BaseModule(ABC):
 
     @abstractmethod
     def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
-        """
-        Fit the model.
+        """Fit the model.
 
-        :param args: Args to fit
-        :param kwargs: Kwargs to fit
+        Args:
+            *args: Args to fit
+            **kwargs: Kwargs to fit
         """
 
     def score(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Calculate metric on test set and return metric value.
+        """Calculate metric on test set and return metric value.
 
-        :param context: Context to score
-        :param split: Split to score on
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context to score
+            metrics: Metrics to score
+
+        Returns:
+            Computed metrics value for the test set or error code of metrics
+
+        Raises:
+            ValueError: If unknown scheme is provided
         """
         if context.data_handler.config.scheme == "ho":
             return self.score_ho(context, metrics)
         if context.data_handler.config.scheme == "cv":
             return self.score_cv(context, metrics)
-        msg = "Something's wrong with validation schemas"
-        raise RuntimeError(msg)
+        assert_never(context.data_handler.config.scheme)
 
     @abstractmethod
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]: ...
@@ -58,37 +71,51 @@ class BaseModule(ABC):
 
     @abstractmethod
     def get_assets(self) -> Artifact:
-        """Return useful assets that represent intermediate data into context."""
+        """Return useful assets that represent intermediate data into context.
+
+        Returns:
+            Artifact containing intermediate data
+        """
 
     @abstractmethod
     def clear_cache(self) -> None:
         """Clear cache."""
 
     def dump(self, path: str) -> None:
-        """
-        Dump all data needed for inference.
+        """Dump all data needed for inference.
 
-        :param path: Path to dump
+        Args:
+            path: Path to dump
         """
         Dumper.dump(self, Path(path))
 
-    def load(self, path: str) -> None:
-        """
-        Load data from dump.
+    def load(
+        self,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> None:
+        """Load data from file system.
 
-        :param path: Path to load
+        Args:
+            path: Path to load
+            embedder_config: one can override presaved settings
+            cross_encoder_config: one can override presaved settings
         """
-        Dumper.load(self, Path(path))
+        Dumper.load(self, Path(path), embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
 
     @abstractmethod
     def predict(
         self, *args: list[str] | npt.NDArray[Any], **kwargs: dict[str, Any]
     ) -> ListOfGenericLabels | npt.NDArray[Any]:
-        """
-        Predict on the input.
+        """Predict on the input.
 
-        :param args: args to predict.
-        :param kwargs: kwargs to predict.
+        Args:
+            *args: args to predict
+            **kwargs: kwargs to predict
+
+        Returns:
+            Predictions
         """
 
     def predict_with_metadata(
@@ -96,40 +123,48 @@ class BaseModule(ABC):
         *args: list[str] | npt.NDArray[Any],
         **kwargs: dict[str, Any],
     ) -> tuple[ListOfGenericLabels | npt.NDArray[Any], list[dict[str, Any]] | None]:
-        """
-        Predict on the input with metadata.
+        """Predict on the input with metadata.
 
-        :param args: args to predict.
-        :param kwargs: kwargs to predict.
+        Args:
+            *args: args to predict
+            **kwargs: kwargs to predict
+
+        Returns:
+            Tuple of predictions and metadata
         """
         return self.predict(*args, **kwargs), None
 
     @classmethod
     @abstractmethod
     def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "BaseModule":
-        """
-        Initialize self from context.
+        """Initialize self from context.
 
-        :param context: Context to init from.
-        :param kwargs: Additional kwargs.
+        Args:
+            context: Context to init from
+            **kwargs: Additional kwargs
+
+        Returns:
+            Initialized module
         """
 
     def get_embedder_config(self) -> dict[str, Any] | None:
-        """
-        Get the config of the embedder.
+        """Get the config of the embedder.
 
-        :return: Embedder config.
+        Returns:
+            Embedder config if available, None otherwise
         """
         return None
 
     @staticmethod
     def score_metrics_ho(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:
-        """
-        Score metrics on the test set.
+        """Score metrics on the test set.
 
-        :param params: Params to score
-        :param metrics_dict:
-        :return:
+        Args:
+            params: Params to score
+            metrics_dict: Dictionary of metrics to compute
+
+        Returns:
+            Dictionary with computed metrics
         """
         metrics = {}
         for metric_name, metric_fn in metrics_dict.items():
@@ -142,6 +177,16 @@ class BaseModule(ABC):
         cv_iterator: Iterable[tuple[list[str], ListOfLabels, list[str], ListOfLabels]],
         **fit_kwargs,  # noqa: ANN003
     ) -> tuple[dict[str, float], list[ListOfGenericLabels] | list[npt.NDArray[Any]]]:
+        """Score metrics using cross-validation.
+
+        Args:
+            metrics_dict: Dictionary of metrics to compute
+            cv_iterator: Cross-validation iterator
+            **fit_kwargs: Additional arguments for fit method
+
+        Returns:
+            Tuple of metrics dictionary and predictions
+        """
         metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []
 
@@ -156,6 +201,14 @@ class BaseModule(ABC):
         return metrics, all_val_preds  # type: ignore[return-value]
 
     def _validate_multilabel(self, data_is_multilabel: bool) -> None:
+        """Validate if module supports the required classification type.
+
+        Args:
+            data_is_multilabel: Whether the data is multilabel
+
+        Raises:
+            WrongClassificationError: If module doesn't support the required classification type
+        """
         if data_is_multilabel and not self.supports_multilabel:
             msg = f'"{self.name}" module is incompatible with multi-label classifiction.'
             logger.error(msg)
@@ -166,6 +219,15 @@ class BaseModule(ABC):
             raise WrongClassificationError(msg)
 
     def _validate_oos(self, data_contains_oos: bool, raise_error: bool = True) -> None:
+        """Validate if module supports out-of-scope samples.
+
+        Args:
+            data_contains_oos: Whether data contains OOS samples
+            raise_error: Whether to raise error on validation failure
+
+        Raises:
+            ValueError: If validation fails and raise_error is True
+        """
         if data_contains_oos != self.supports_oos:
             if self.supports_oos and not data_contains_oos:
                 msg = (
@@ -183,19 +245,27 @@ class BaseModule(ABC):
             logger.warning(msg)
 
     def _validate_task(self, labels: ListOfGenericLabels) -> None:
+        """Validate task specifications.
+
+        Args:
+            labels: Training labels
+        """
         self._n_classes, self._multilabel, self._oos = self._get_task_specs(labels)
         self._validate_multilabel(self._multilabel)
         self._validate_oos(self._oos)
 
     @staticmethod
     def _get_task_specs(labels: ListOfGenericLabels) -> tuple[int, bool, bool]:
-        """
-        Infer number of classes, type of classification and whether data contains OOS samples.
+        """Infer number of classes, type of classification and whether data contains OOS samples.
 
-        :param scores: training scores
-        :param labels: training labels
-        :return: number of classes, indicator if it's a multi-label task,
-                    indicator if data contains oos samples
+        Args:
+            labels: Training labels
+
+        Returns:
+            Tuple containing:
+                - number of classes
+                - indicator if it's a multi-label task
+                - indicator if data contains oos samples
         """
         contains_oos_samples = any(label is None for label in labels)
         in_domain_label = next(lab for lab in labels if lab is not None)

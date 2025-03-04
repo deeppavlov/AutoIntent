@@ -12,21 +12,29 @@ from ._validation import DatasetReader, DatasetValidator
 
 
 class BaseReader(ABC):
-    """
-    Abstract base class for dataset readers. Defines the interface for reading datasets.
+    """Abstract base class for dataset readers.
 
-    Subclasses must implement the `_read` method to specify how the dataset is read.
+    This class defines the interface for reading datasets from various sources.
+    Subclasses must implement the `_read` method to specify how a dataset should
+    be read and processed.
 
-    :raises NotImplementedError: If `_read` is not implemented by the subclass.
+    Raises:
+        NotImplementedError: If `_read` is not implemented in a subclass.
     """
 
     def read(self, *args: Any, **kwargs: Any) -> Dataset:  # noqa: ANN401
-        """
-        Read and validate the dataset, converting it to the standard `Dataset` format.
+        """Reads and validates the dataset, converting it into a standardized `Dataset` object.
 
-        :param args: Positional arguments for the `_read` method.
-        :param kwargs: Keyword arguments for the `_read` method.
-        :return: A `Dataset` object containing the dataset splits and intents.
+        This method first calls the `_read` method (implemented by subclasses)
+        to retrieve the dataset, then validates it using `DatasetValidator`.
+        The validated dataset is converted into the standard `Dataset` format.
+
+        Args:
+            *args: Positional arguments passed to the `_read` method.
+            **kwargs: Keyword arguments passed to the `_read` method.
+
+        Returns:
+            Dataset: A standardized dataset object containing the dataset splits and intents.
         """
         dataset_reader = DatasetValidator.validate(self._read(*args, **kwargs))
         splits = dataset_reader.model_dump(exclude={"intents"}, exclude_defaults=True)
@@ -37,41 +45,55 @@ class BaseReader(ABC):
 
     @abstractmethod
     def _read(self, *args: Any, **kwargs: Any) -> DatasetReader:  # noqa: ANN401
-        """
-        Abstract method for reading a dataset.
+        """Abstract method for reading a dataset.
 
-        This must be implemented by subclasses to provide specific reading logic.
+        This method must be implemented by subclasses to define the specific logic
+        for reading datasets from different sources (e.g., dictionaries, JSON files).
 
-        :param args: Positional arguments for dataset reading.
-        :param kwargs: Keyword arguments for dataset reading.
-        :return: A `DatasetReader` instance representing the dataset.
+        Args:
+            *args: Positional arguments for dataset reading.
+            **kwargs: Keyword arguments for dataset reading.
+
+        Returns:
+            DatasetReader: A dataset representation that will be validated and processed.
         """
         ...
 
 
 class DictReader(BaseReader):
-    """Dataset reader that processes datasets provided as Python dictionaries."""
+    """Dataset reader that processes datasets provided as Python dictionaries.
+
+    This reader expects datasets in a dictionary format and validates the dataset
+    structure before converting it into a standardized `Dataset` object.
+    """
 
     def _read(self, mapping: dict[str, Any]) -> DatasetReader:
-        """
-        Read a dataset from a dictionary and validate it.
+        """Reads and validates a dataset from a dictionary.
 
-        :param mapping: A dictionary representing the dataset.
-        :return: A validated `DatasetReader` instance.
+        Args:
+            mapping: A dictionary representing the dataset.
+
+        Returns:
+            DatasetReader: A validated dataset representation.
         """
         return DatasetReader.model_validate(mapping)
 
 
 class JsonReader(BaseReader):
-    """Dataset reader that processes datasets from JSON files."""
+    """Dataset reader that loads and processes datasets from JSON files.
+
+    This reader reads datasets stored as JSON files and validates them before
+    converting them into a standardized `Dataset` object.
+    """
 
     def _read(self, filepath: str | Path) -> DatasetReader:
-        """
-        Read a dataset from a JSON file and validate it.
+        """Reads and validates a dataset from a JSON file.
 
-        :param filepath: Path to the JSON file containing the dataset.
-        :type filepath: str or Path
-        :return: A validated `DatasetReader` instance.
+        Args:
+            filepath: Path to the JSON file containing the dataset.
+
+        Returns:
+            DatasetReader: A validated dataset representation.
         """
         with Path(filepath).open() as file:
             return DatasetReader.model_validate(json.load(file))

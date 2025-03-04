@@ -19,20 +19,29 @@ class DecisionMetricFn(Protocol):
     """Protocol for decision metrics."""
 
     def __call__(self, y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-        """
-        Calculate decision metric.
+        """Calculate decision metric.
 
-        :param y_true: True values of labels
-            - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
-            - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
-        :param y_pred: Predicted values of labels. Same shape as `y_true`
-        :return: Score of the decision metric
+        Args:
+            y_true: True values of labels
+                - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
+                - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
+            y_pred: Predicted values of labels. Same shape as `y_true`
+        Returns:
+            Score of the decision metric
         """
         ...
 
 
 def handle_oos(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> tuple[ListOfLabels, ListOfLabels]:
-    """Convert labels of OOS samples to make them usable in decision metrics."""
+    """Convert labels of OOS samples to make them usable in decision metrics.
+
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Tuple of transformed true and predicted labels
+    """
     in_domain_labels = list(filter(lambda lab: lab is not None, y_true))
     if isinstance(in_domain_labels[0], list):
         func = _add_oos_multilabel
@@ -45,20 +54,37 @@ def handle_oos(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> tupl
 
 
 def _add_oos_multiclass(label: int | None, n_classes: int) -> int:
+    """Add OOS label for multiclass classification.
+
+    Args:
+        label: Original label
+        n_classes: Number of classes
+
+    Returns:
+        Transformed label
+    """
     if label is None:
         return n_classes
     return label
 
 
 def _add_oos_multilabel(label: list[int] | None, n_classes: int) -> list[int]:
+    """Add OOS label for multilabel classification.
+
+    Args:
+        label: Original label
+        n_classes: Number of classes
+
+    Returns:
+        Transformed label
+    """
     if label is None:
         return [0] * n_classes + [1]
     return [*label, 1]
 
 
 def decision_accuracy(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    r"""
-    Calculate decision accuracy. Supports both multiclass and multilabel.
+    r"""Calculate decision accuracy. Supports both multiclass and multilabel.
 
     The decision accuracy is calculated as:
 
@@ -73,17 +99,19 @@ def decision_accuracy(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) 
     - :math:`\mathbb{1}(\text{condition})` is the indicator function that equals 1 if the condition
     is true and 0 otherwise.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision accuracy
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision accuracy
     """
     y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     return float(np.mean(y_true_ == y_pred_))
 
 
 def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
-    r"""
-    Calculate roc_auc for multiclass.
+    r"""Calculate ROC AUC for multiclass.
 
     The ROC AUC score for multiclass is calculated as the mean ROC AUC score
     across all classes, where each class is treated as a binary classification task
@@ -98,9 +126,12 @@ def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[A
     - :math:`\text{ROC AUC}_k` is the ROC AUC score for the :math:`k`-th class,
     calculated by treating it as a binary classification problem (class :math:`k` vs rest).
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision roc_auc
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision ROC AUC
     """
     n_classes = len(np.unique(y_true))
     roc_auc_scores: list[float] = []
@@ -113,31 +144,35 @@ def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[A
 
 
 def _decision_roc_auc_multilabel(y_true: npt.NDArray[Any], y_pred: npt.NDArray[Any]) -> float:
-    r"""
-    Calculate roc_auc for multilabel.
+    r"""Calculate ROC AUC for multilabel.
 
     This function internally uses :func:`sklearn.metrics.roc_auc_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html>`__
     for more details.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision accuracy
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision ROC AUC
     """
     return float(roc_auc_score(y_true, y_pred, average="macro"))
 
 
 def decision_roc_auc(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    r"""
-    Calculate ROC AUC for multiclass and multilabel classification.
+    r"""Calculate ROC AUC for multiclass and multilabel classification.
 
     The ROC AUC measures the ability of a model to distinguish between classes.
     It is calculated as the area under the curve of the true positive rate (TPR)
     against the false positive rate (FPR) at various threshold settings.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision ROC AUC
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision ROC AUC
     """
     y_true_, y_pred_ = transform(*handle_oos(y_true, y_pred))
     if y_pred_.ndim == y_true_.ndim == 1:
@@ -150,45 +185,51 @@ def decision_roc_auc(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -
 
 
 def decision_precision(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    r"""
-    Calculate decision precision. Supports both multiclass and multilabel.
+    r"""Calculate decision precision. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.precision_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html>`__
     for more details.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision precision
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision precision
     """
     return float(precision_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
 def decision_recall(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    r"""
-    Calculate decision recall. Supports both multiclass and multilabel.
+    r"""Calculate decision recall. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.recall_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.recall_score.html>`__
     for more details.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision recall
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision recall
     """
     return float(recall_score(*handle_oos(y_true, y_pred), average="macro"))
 
 
 def decision_f1(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -> float:
-    r"""
-    Calculate decision f1 score. Supports both multiclass and multilabel.
+    r"""Calculate decision F1 score. Supports both multiclass and multilabel.
 
     This function internally uses :func:`sklearn.metrics.f1_score` with `average=macro`. Refer to the
     `scikit-learn documentation <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html>`__
     for more details.
 
-    :param y_true: True values of labels
-    :param y_pred: Predicted values of labels
-    :return: Score of the decision accuracy
+    Args:
+        y_true: True values of labels
+        y_pred: Predicted values of labels
+
+    Returns:
+        Score of the decision F1 score
     """
     return float(f1_score(*handle_oos(y_true, y_pred), average="macro"))

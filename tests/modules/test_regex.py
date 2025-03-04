@@ -1,6 +1,6 @@
 import pytest
 
-from autointent.modules import Regex
+from autointent.modules import SimpleRegex
 from autointent.schemas import Intent
 
 
@@ -14,7 +14,7 @@ def test_base_regex(partial_match, expected_predictions):
         Intent(id=1, name="account_blocked", regex_partial_match=[partial_match]),
     ]
 
-    matcher = Regex()
+    matcher = SimpleRegex()
     matcher.fit(train_data)
 
     test_data = [

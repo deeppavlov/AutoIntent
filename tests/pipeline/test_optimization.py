@@ -1,10 +1,36 @@
+import importlib.resources as ires
 import os
 
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import DataConfig, LoggingConfig, VectorIndexConfig
+from autointent.configs import DataConfig, LoggingConfig
 from tests.conftest import get_search_space, setup_environment
+
+
+@pytest.mark.parametrize(
+    ("data_config", "refit_after"),
+    [
+        (DataConfig(scheme="ho", separation_ratio=None), False),
+        (DataConfig(scheme="ho", separation_ratio=0.5), False),
+        (DataConfig(scheme="cv", separation_ratio=None), False),
+        (DataConfig(scheme="cv", separation_ratio=0.5), False),
+        (DataConfig(scheme="ho", separation_ratio=None), True),
+        (DataConfig(scheme="ho", separation_ratio=0.5), True),
+        (DataConfig(scheme="cv", separation_ratio=None), True),
+        (DataConfig(scheme="cv", separation_ratio=0.5), True),
+    ],
+)
+def test_with_regex(dataset, data_config, refit_after):
+    project_dir = setup_environment()
+    search_space = get_search_space("regex")
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(data_config)
+
+    pipeline_optimizer.fit(dataset, refit_after=refit_after)
 
 
 def test_no_node_separation(dataset_no_oos):
@@ -14,9 +40,14 @@ def test_no_node_separation(dataset_no_oos):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=False))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
 
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
+
+
+def test_full_config(dataset_no_oos):
+    config_path = ires.files("tests.assets.configs").joinpath("full_training.yaml")
+    pipeline_optimizer = Pipeline.from_optimization_config(config_path)
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
 
@@ -31,8 +62,7 @@ def test_bayes(dataset, sampler):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
 
     pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
 
@@ -48,8 +78,7 @@ def test_cv(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(VectorIndexConfig())
-    pipeline_optimizer.set_config(DataConfig(scheme="cv", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="cv", separation_ratio=0.5))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -71,8 +100,7 @@ def test_no_context_optimization(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
-    pipeline_optimizer.set_config(VectorIndexConfig(save_db=True))
-    pipeline_optimizer.set_config(DataConfig(scheme="ho", separate_nodes=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -92,7 +120,6 @@ def test_dump_modules(dataset, task_type):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
-    pipeline_optimizer.set_config(VectorIndexConfig())
 
     if task_type == "multilabel":
         dataset = dataset.to_multilabel()
@@ -101,32 +128,3 @@ def test_dump_modules(dataset, task_type):
     context.dump()
 
     assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
-
-
-def test_validate_search_space_multiclass(dataset):
-    search_space = [
-        {
-            "node_type": "decision",
-            "target_metric": "decision_accuracy",
-            "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "adaptive"}],
-        },
-    ]
-
-    pipeline_optimizer = Pipeline.from_search_space(search_space)
-    with pytest.raises(ValueError, match="Module 'adaptive' does not support multiclass datasets."):
-        pipeline_optimizer.validate_modules(dataset)
-
-
-def test_validate_search_space_multilabel(dataset):
-    dataset = dataset.to_multilabel()
-
-    search_space = [
-        {
-            "node_type": "decision",
-            "target_metric": "decision_accuracy",
-            "search_space": [{"module_name": "threshold", "thresh": [0.5]}, {"module_name": "argmax"}],
-        },
-    ]
-    pipeline_optimizer = Pipeline.from_search_space(search_space)
-    with pytest.raises(ValueError, match="Module 'argmax' does not support multilabel datasets."):
-        pipeline_optimizer.validate_modules(dataset)

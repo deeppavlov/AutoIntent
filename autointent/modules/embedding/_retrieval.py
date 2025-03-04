@@ -5,24 +5,27 @@ from typing import Any
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
+from autointent.configs import EmbedderConfig
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
-from autointent.modules.abc import BaseEmbedding
-from autointent.schemas import EmbedderConfig
+from autointent.modules.base import BaseEmbedding
 
 
 class RetrievalAimedEmbedding(BaseEmbedding):
-    r"""
-    Module for configuring embeddings optimized for retrieval tasks.
+    """Module for configuring embeddings optimized for retrieval tasks.
 
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its retrieval quality as a sort of proxy metric.
 
-    :ivar _vector_index: The vector index used for nearest neighbor retrieval.
-    :ivar name: Name of the module, defaults to "retrieval".
+    Attributes:
+        _vector_index: The vector index used for nearest neighbor retrieval
+        name: Name of the module, defaults to "retrieval"
+        supports_multiclass: Whether the module supports multiclass classification
+        supports_multilabel: Whether the module supports multilabel classification
+        supports_oos: Whether the module supports out-of-scope detection
 
-    Examples
+    Examples:
     --------
 
     .. testcode::
@@ -46,36 +49,39 @@ class RetrievalAimedEmbedding(BaseEmbedding):
 
     def __init__(
         self,
-        k: PositiveInt,
         embedder_config: EmbedderConfig | str | dict[str, Any],
+        k: PositiveInt = 10,
     ) -> None:
-        """
-        Initialize the RetrievalAimedEmbedding.
+        """Initialize the RetrievalAimedEmbedding.
 
-        :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Config of the embedder used for creating embeddings.
+        Args:
+            k: Number of nearest neighbors to retrieve
+            embedder_config: Config of the embedder used for creating embeddings
         """
         self.k = k
-        if isinstance(embedder_config, dict):
-            embedder_config = EmbedderConfig(**embedder_config)
-        if isinstance(embedder_config, str):
-            embedder_config = EmbedderConfig(model_name=embedder_config)
+        embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.embedder_config = embedder_config
+
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `RetrievalAimedEmbedding` must be a positive int"
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
         embedder_config: EmbedderConfig | str,
+        k: PositiveInt = 10,
     ) -> "RetrievalAimedEmbedding":
-        """
-        Create an instance using a Context object.
+        """Create an instance using a Context object.
 
-        :param context: The context containing configurations and utilities.
-        :param k: Number of nearest neighbors to retrieve.
-        :param embedder_config: Config of the embedder to use.
-        :return: Initialized RetrievalAimedEmbedding instance.
+        Args:
+            context: The context containing configurations and utilities
+            k: Number of nearest neighbors to retrieve
+            embedder_config: Config of the embedder to use
+
+        Returns:
+            Initialized RetrievalAimedEmbedding instance
         """
         return cls(
             k=k,
@@ -83,11 +89,11 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Fit the vector index using the provided utterances and labels.
+        """Fit the vector index using the provided utterances and labels.
 
-        :param utterances: List of text data to index.
-        :param labels: List of corresponding labels for the utterances.
+        Args:
+            utterances: List of text data to index
+            labels: List of corresponding labels for the utterances
         """
         if hasattr(self, "_vector_index"):
             self.clear_cache()
@@ -100,11 +106,14 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         self._vector_index.add(utterances, labels)
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Evaluate the embedding model using a specified metric function.
+        """Evaluate the embedding model using specified metric functions.
 
-        :param context: The context containing test data and labels.
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context containing test data and labels
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values for the test set
         """
         train_utterances, train_labels = self.get_train_data(context)
         self.fit(train_utterances, train_labels)
@@ -118,6 +127,15 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         return self.score_metrics_ho((val_labels, predictions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
+        """Evaluate the embedding model using specified metric functions.
+
+        Args:
+            context: Context containing test data and labels
+            metrics: List of metric names to compute
+
+        Returns:
+            Dictionary of computed metric values for the test set
+        """
         metrics_dict = RETRIEVAL_METRICS_MULTILABEL if context.is_multilabel() else RETRIEVAL_METRICS_MULTICLASS
         chosen_metrics = {name: fn for name, fn in metrics_dict.items() if name in metrics}
 
@@ -125,10 +143,10 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         return metrics_calculated
 
     def get_assets(self) -> EmbeddingArtifact:
-        """
-        Get the retriever artifacts for this module.
+        """Get the retriever artifacts for this module.
 
-        :return: A EmbeddingArtifact object containing embedder information.
+        Returns:
+            A EmbeddingArtifact object containing embedder information
         """
         return EmbeddingArtifact(config=self.embedder_config)
 
@@ -137,11 +155,13 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         self._vector_index.clear_ram()
 
     def predict(self, utterances: list[str]) -> list[ListOfLabels]:
-        """
-        Predict the nearest neighbors for a list of utterances.
+        """Predict the nearest neighbors for a list of utterances.
 
-        :param utterances: List of utterances for which nearest neighbors are to be retrieved.
-        :return: List of labels for each retrieved utterance.
+        Args:
+            utterances: List of utterances for which nearest neighbors are to be retrieved
+
+        Returns:
+            List of labels for each retrieved utterance
         """
         predictions, _, _ = self._vector_index.query(utterances, self.k)
         return predictions

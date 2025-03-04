@@ -36,7 +36,7 @@ search_space = [
     },
 ]
 
-log_config = LoggingConfig(dirpath=Path("logging_tutorial"))
+log_config = LoggingConfig(project_dir=Path("logging_tutorial"))
 pipeline_optimizer = Pipeline.from_search_space(search_space)
 pipeline_optimizer.set_config(log_config)
 

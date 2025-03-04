@@ -15,7 +15,15 @@ class BaseChatTemplate(ABC):
 
     @abstractmethod
     def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
-        """Generate examples for this intent."""
+        """Generate a list of messages to request additional examples for the given intent.
+
+        Args:
+            intent_data: Intent data for which to generate examples.
+            n_examples: Number of examples to generate.
+
+        Returns:
+            List of messages for the chat template.
+        """
 
 
 class BaseSynthesizerTemplate(BaseChatTemplate):
@@ -33,7 +41,17 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
         extra_instructions: str | None = None,
         max_sample_utterances: int | None = None,
     ) -> None:
-        """Initialize the chat template with dataset, split, and optional instructions."""
+        """Initialize the BaseSynthesizerTemplate.
+
+        Args:
+            dataset: Dataset to use for generating examples.
+            split: Dataset split to use for generating examples.
+            extra_instructions: Additional instructions for the model.
+            max_sample_utterances: Maximum number of sample utterances to include.
+
+        Raises:
+            ValueError: If the dataset is not provided.
+        """
         if extra_instructions is None:
             extra_instructions = ""
 
@@ -47,7 +65,15 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
         self.max_sample_utterances = max_sample_utterances
 
     def __call__(self, intent_data: Intent, n_examples: int) -> list[Message]:
-        """Generate a list of messages to request additional examples for the given intent."""
+        """Generate a list of messages to request additional examples for the given intent.
+
+        Args:
+            intent_data: Intent data for which to generate examples.
+            n_examples: Number of examples to generate.
+
+        Returns:
+            List of messages for the chat template.
+        """
         in_domain_samples = self.dataset[self.split].filter(lambda sample: sample[Dataset.label_feature] is not None)
         if self.dataset.multilabel:
             filter_fn = lambda sample: sample[Dataset.label_feature][intent_data.id] == 1  # noqa: E731
@@ -66,6 +92,16 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
         ]
 
     def _create_final_message(self, intent_data: Intent, n_examples: int, sample_utterances: list[str]) -> Message:
+        """Create the final message for the chat template.
+
+        Args:
+            intent_data: Intent data for which to generate examples.
+            n_examples: Number of examples to generate.
+            sample_utterances: Sample utterances to include.
+
+        Returns:
+            The final message for the chat template.
+        """
         content = f"{self._INTENT_NAME_LABEL}: {intent_data.name}\n\n{self._EXAMPLE_UTTERANCES_LABEL}:\n"
 
         if sample_utterances:

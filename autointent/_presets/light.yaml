@@ -1,0 +1,26 @@
+search_space:
+  - node_type: scoring
+    target_metric: scoring_roc_auc
+    search_space:
+      - module_name: knn
+        k:
+          low: 1
+          high: 20
+        n_trials: 15
+        weights: [uniform, distance, closest]
+      - module_name: linear
+      - module_name: mlknn
+        k:
+          low: 1
+          high: 20
+        n_trials: 10
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+        n_trials: 10
+      - module_name: argmax
+sampler: tpe

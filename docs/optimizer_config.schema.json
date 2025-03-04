@@ -1,84 +1,7 @@
 {
     "$defs": {
-        "AdaptiveDecisionInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "adaptive",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "search_space": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "items": {
-                                    "maximum": 1.0,
-                                    "minimum": 0.0,
-                                    "type": "number"
-                                },
-                                "type": "array"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Search Space",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "AdaptiveDecisionInitModel",
-            "type": "object"
-        },
-        "ArgmaxDecisionInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "argmax",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "ArgmaxDecisionInitModel",
-            "type": "object"
-        },
         "CrossEncoderConfig": {
+            "additionalProperties": false,
             "properties": {
                 "batch_size": {
                     "default": 32,
@@ -102,6 +25,7 @@
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
                     "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
@@ -126,227 +50,59 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "CrossEncoderConfig",
             "type": "object"
         },
-        "DNNCScorerInitModel": {
+        "DataConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for the data used in the optimization process.",
             "properties": {
-                "module_name": {
-                    "const": "dnnc",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "cross_encoder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/CrossEncoderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Cross Encoder Config",
-                    "type": "array"
-                },
-                "k": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "title": "K"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name",
-                "cross_encoder_config",
-                "k"
-            ],
-            "title": "DNNCScorerInitModel",
-            "type": "object"
-        },
-        "DecisionNodeValidator": {
-            "description": "Search space configuration for the Decision node.",
-            "properties": {
-                "node_type": {
-                    "$ref": "#/$defs/NodeType",
-                    "default": "decision"
-                },
-                "target_metric": {
+                "scheme": {
+                    "default": "ho",
+                    "description": "Validation scheme to use.",
                     "enum": [
-                        "decision_accuracy",
-                        "decision_f1",
-                        "decision_precision",
-                        "decision_recall",
-                        "decision_roc_auc"
+                        "ho",
+                        "cv"
                     ],
-                    "title": "Target Metric",
+                    "title": "Scheme",
                     "type": "string"
                 },
-                "metrics": {
+                "n_folds": {
+                    "default": 3,
+                    "description": "Number of folds in cross-validation.",
+                    "exclusiveMinimum": 0,
+                    "title": "N Folds",
+                    "type": "integer"
+                },
+                "validation_size": {
+                    "default": 0.2,
+                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Validation Size",
+                    "type": "number"
+                },
+                "separation_ratio": {
                     "anyOf": [
                         {
-                            "items": {
-                                "enum": [
-                                    "decision_accuracy",
-                                    "decision_f1",
-                                    "decision_precision",
-                                    "decision_recall",
-                                    "decision_roc_auc"
-                                ],
-                                "type": "string"
-                            },
-                            "type": "array"
+                            "maximum": 1.0,
+                            "minimum": 0.0,
+                            "type": "number"
                         },
                         {
                             "type": "null"
                         }
                     ],
-                    "default": null,
-                    "title": "Metrics"
-                },
-                "search_space": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/ArgmaxDecisionInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/JinoosDecisionInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/ThresholdDecisionInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/TunableDecisionInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/AdaptiveDecisionInitModel"
-                            }
-                        ]
-                    },
-                    "title": "Search Space",
-                    "type": "array"
+                    "default": 0.5,
+                    "description": "Set to float to prevent data leak between scoring and decision nodes.",
+                    "title": "Separation Ratio"
                 }
             },
-            "required": [
-                "target_metric",
-                "search_space"
-            ],
-            "title": "DecisionNodeValidator",
-            "type": "object"
-        },
-        "DescriptionScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "description",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "temperature": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0.0,
-                                "type": "number"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceFloat"
-                        }
-                    ],
-                    "title": "Temperature"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name",
-                "temperature"
-            ],
-            "title": "DescriptionScorerInitModel",
+            "title": "DataConfig",
             "type": "object"
         },
         "EmbedderConfig": {
+            "additionalProperties": false,
             "properties": {
                 "batch_size": {
                     "default": 32,
@@ -370,6 +126,7 @@
                     "title": "Max Length"
                 },
                 "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
                     "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
@@ -472,582 +229,62 @@
                     "type": "boolean"
                 }
             },
-            "required": [
-                "model_name"
-            ],
             "title": "EmbedderConfig",
             "type": "object"
         },
-        "EmbeddingNodeValidator": {
-            "description": "Search space configuration for the Embedding node.",
+        "LoggingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for the logging.",
             "properties": {
-                "node_type": {
-                    "$ref": "#/$defs/NodeType",
-                    "default": "embedding"
-                },
-                "target_metric": {
-                    "enum": [
-                        "retrieval_hit_rate",
-                        "retrieval_map",
-                        "retrieval_mrr",
-                        "retrieval_ndcg",
-                        "retrieval_precision",
-                        "retrieval_hit_rate_intersecting",
-                        "retrieval_hit_rate_macro",
-                        "retrieval_map_intersecting",
-                        "retrieval_map_macro",
-                        "retrieval_mrr_intersecting",
-                        "retrieval_mrr_macro",
-                        "retrieval_ndcg_intersecting",
-                        "retrieval_ndcg_macro",
-                        "retrieval_precision_intersecting",
-                        "retrieval_precision_macro",
-                        "scoring_accuracy",
-                        "scoring_f1",
-                        "scoring_log_likelihood",
-                        "scoring_precision",
-                        "scoring_recall",
-                        "scoring_roc_auc",
-                        "scoring_hit_rate",
-                        "scoring_map",
-                        "scoring_neg_coverage",
-                        "scoring_neg_ranking_loss"
-                    ],
-                    "title": "Target Metric",
-                    "type": "string"
-                },
-                "metrics": {
+                "project_dir": {
                     "anyOf": [
                         {
-                            "items": {
-                                "enum": [
-                                    "retrieval_hit_rate",
-                                    "retrieval_map",
-                                    "retrieval_mrr",
-                                    "retrieval_ndcg",
-                                    "retrieval_precision",
-                                    "retrieval_hit_rate_intersecting",
-                                    "retrieval_hit_rate_macro",
-                                    "retrieval_map_intersecting",
-                                    "retrieval_map_macro",
-                                    "retrieval_mrr_intersecting",
-                                    "retrieval_mrr_macro",
-                                    "retrieval_ndcg_intersecting",
-                                    "retrieval_ndcg_macro",
-                                    "retrieval_precision_intersecting",
-                                    "retrieval_precision_macro",
-                                    "scoring_accuracy",
-                                    "scoring_f1",
-                                    "scoring_log_likelihood",
-                                    "scoring_precision",
-                                    "scoring_recall",
-                                    "scoring_roc_auc",
-                                    "scoring_hit_rate",
-                                    "scoring_map",
-                                    "scoring_neg_coverage",
-                                    "scoring_neg_ranking_loss"
-                                ],
-                                "type": "string"
-                            },
-                            "type": "array"
+                            "format": "path",
+                            "type": "string"
+                        },
+                        {
+                            "type": "string"
                         },
                         {
                             "type": "null"
                         }
                     ],
                     "default": null,
-                    "title": "Metrics"
+                    "description": "Path to the directory with different runs.",
+                    "title": "Project Dir"
                 },
-                "search_space": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/RetrievalAimedEmbeddingInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/LogregAimedEmbeddingInitModel"
-                            }
-                        ]
-                    },
-                    "title": "Search Space",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "target_metric",
-                "search_space"
-            ],
-            "title": "EmbeddingNodeValidator",
-            "type": "object"
-        },
-        "JinoosDecisionInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "jinoos",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
+                "run_name": {
                     "anyOf": [
                         {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
+                            "type": "string"
                         },
                         {
                             "type": "null"
                         }
                     ],
                     "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
+                    "description": "Name of the run. If None, a random name will be generated.",
+                    "title": "Run Name"
                 },
-                "search_space": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "items": {
-                                    "maximum": 1.0,
-                                    "minimum": 0.0,
-                                    "type": "number"
-                                },
-                                "type": "array"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Search Space",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "JinoosDecisionInitModel",
-            "type": "object"
-        },
-        "KNNScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "knn",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "k": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "title": "K"
-                },
-                "weights": {
-                    "items": {
-                        "enum": [
-                            "uniform",
-                            "distance",
-                            "closest"
-                        ],
-                        "type": "string"
-                    },
-                    "title": "Weights",
-                    "type": "array"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name",
-                "k",
-                "weights"
-            ],
-            "title": "KNNScorerInitModel",
-            "type": "object"
-        },
-        "LinearScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "linear",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "LinearScorerInitModel",
-            "type": "object"
-        },
-        "LogregAimedEmbeddingInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "logreg_embedding",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "embedder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                },
-                "cv": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        3
-                    ],
-                    "title": "Cv"
-                }
-            },
-            "required": [
-                "module_name",
-                "embedder_config"
-            ],
-            "title": "LogregAimedEmbeddingInitModel",
-            "type": "object"
-        },
-        "MLKnnScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "mlknn",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "k": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "title": "K"
-                },
-                "s": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0.0,
-                                "type": "number"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceFloat"
-                        }
-                    ],
-                    "default": [
-                        1.0
-                    ],
-                    "title": "S"
-                },
-                "ignore_first_neighbours": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "minimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        0
-                    ],
-                    "title": "Ignore First Neighbours"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name",
-                "k"
-            ],
-            "title": "MLKnnScorerInitModel",
-            "type": "object"
-        },
-        "NodeType": {
-            "description": "Enumeration of node types in the AutoIntent pipeline.",
-            "enum": [
-                "regex",
-                "embedding",
-                "scoring",
-                "decision"
-            ],
-            "title": "NodeType",
-            "type": "string"
-        },
-        "ParamSpaceFloat": {
-            "properties": {
-                "low": {
-                    "description": "Low boundary of the search space.",
-                    "title": "Low",
-                    "type": "number"
-                },
-                "high": {
-                    "description": "High boundary of the search space.",
-                    "title": "High",
-                    "type": "number"
-                },
-                "step": {
-                    "anyOf": [
-                        {
-                            "type": "number"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Step of the search space.",
-                    "title": "Step"
-                },
-                "log": {
+                "dump_modules": {
                     "default": false,
-                    "description": "Whether to use a logarithmic scale.",
-                    "title": "Log",
+                    "description": "Whether to dump the modules or not",
+                    "title": "Dump Modules",
                     "type": "boolean"
-                }
-            },
-            "required": [
-                "low",
-                "high"
-            ],
-            "title": "ParamSpaceFloat",
-            "type": "object"
-        },
-        "ParamSpaceInt": {
-            "properties": {
-                "low": {
-                    "description": "Low boundary of the search space.",
-                    "title": "Low",
-                    "type": "integer"
                 },
-                "high": {
-                    "description": "High boundary of the search space.",
-                    "title": "High",
-                    "type": "integer"
-                },
-                "step": {
-                    "default": 1,
-                    "description": "Step of the search space.",
-                    "title": "Step",
-                    "type": "integer"
-                },
-                "log": {
+                "clear_ram": {
                     "default": false,
-                    "description": "Whether to use a logarithmic scale.",
-                    "title": "Log",
+                    "description": "Whether to clear the RAM after dumping the modules",
+                    "title": "Clear Ram",
                     "type": "boolean"
-                }
-            },
-            "required": [
-                "low",
-                "high"
-            ],
-            "title": "ParamSpaceInt",
-            "type": "object"
-        },
-        "RegexInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "regex",
-                    "title": "Module Name",
-                    "type": "string"
                 },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "RegexInitModel",
-            "type": "object"
-        },
-        "RegexNodeValidator": {
-            "description": "Search space configuration for the Regexp node.",
-            "properties": {
-                "node_type": {
-                    "$ref": "#/$defs/NodeType",
-                    "default": "regex"
-                },
-                "target_metric": {
-                    "enum": [
-                        "regex_partial_accuracy",
-                        "regex_partial_precision"
-                    ],
-                    "title": "Target Metric",
-                    "type": "string"
-                },
-                "metrics": {
+                "report_to": {
                     "anyOf": [
                         {
                             "items": {
                                 "enum": [
-                                    "regex_partial_accuracy",
-                                    "regex_partial_precision"
+                                    "wandb",
+                                    "tensorboard"
                                 ],
                                 "type": "string"
                             },
@@ -1058,523 +295,88 @@
                         }
                     ],
                     "default": null,
-                    "title": "Metrics"
-                },
-                "search_space": {
-                    "items": {
-                        "$ref": "#/$defs/RegexInitModel"
-                    },
-                    "title": "Search Space",
-                    "type": "array"
+                    "description": "List of callbacks to report to. If None, no callbacks will be used",
+                    "title": "Report To"
                 }
             },
-            "required": [
-                "target_metric",
-                "search_space"
-            ],
-            "title": "RegexNodeValidator",
-            "type": "object"
-        },
-        "RerankScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "rerank",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "k": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "title": "K"
-                },
-                "weights": {
-                    "items": {
-                        "enum": [
-                            "uniform",
-                            "distance",
-                            "closest"
-                        ],
-                        "type": "string"
-                    },
-                    "title": "Weights",
-                    "type": "array"
-                },
-                "cross_encoder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/CrossEncoderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Cross Encoder Config",
-                    "type": "array"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                },
-                "m": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        null
-                    ],
-                    "title": "M"
-                },
-                "rank_threshold_cutoff": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "type": "integer"
-                                    },
-                                    {
-                                        "type": "null"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        null
-                    ],
-                    "title": "Rank Threshold Cutoff"
-                }
-            },
-            "required": [
-                "module_name",
-                "k",
-                "weights",
-                "cross_encoder_config"
-            ],
-            "title": "RerankScorerInitModel",
-            "type": "object"
-        },
-        "RetrievalAimedEmbeddingInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "retrieval",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "k": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "title": "K"
-                },
-                "embedder_config": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name",
-                "k",
-                "embedder_config"
-            ],
-            "title": "RetrievalAimedEmbeddingInitModel",
-            "type": "object"
-        },
-        "ScoringNodeValidator": {
-            "description": "Search space configuration for the Scoring node.",
-            "properties": {
-                "node_type": {
-                    "$ref": "#/$defs/NodeType",
-                    "default": "scoring"
-                },
-                "target_metric": {
-                    "enum": [
-                        "scoring_accuracy",
-                        "scoring_f1",
-                        "scoring_log_likelihood",
-                        "scoring_precision",
-                        "scoring_recall",
-                        "scoring_roc_auc",
-                        "scoring_hit_rate",
-                        "scoring_map",
-                        "scoring_neg_coverage",
-                        "scoring_neg_ranking_loss"
-                    ],
-                    "title": "Target Metric",
-                    "type": "string"
-                },
-                "metrics": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "enum": [
-                                    "scoring_accuracy",
-                                    "scoring_f1",
-                                    "scoring_log_likelihood",
-                                    "scoring_precision",
-                                    "scoring_recall",
-                                    "scoring_roc_auc",
-                                    "scoring_hit_rate",
-                                    "scoring_map",
-                                    "scoring_neg_coverage",
-                                    "scoring_neg_ranking_loss"
-                                ],
-                                "type": "string"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Metrics"
-                },
-                "search_space": {
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/DNNCScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/KNNScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/LinearScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/DescriptionScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/RerankScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/SklearnScorerInitModel"
-                            },
-                            {
-                                "$ref": "#/$defs/MLKnnScorerInitModel"
-                            }
-                        ]
-                    },
-                    "title": "Search Space",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "target_metric",
-                "search_space"
-            ],
-            "title": "ScoringNodeValidator",
-            "type": "object"
-        },
-        "SklearnScorerInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "sklearn",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "clf_name": {
-                    "default": [
-                        "LogisticRegression"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "title": "Clf Name",
-                    "type": "array"
-                },
-                "clf_args": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "type": "object"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Clf Args",
-                    "type": "array"
-                },
-                "embedder_config": {
-                    "default": [
-                        null
-                    ],
-                    "items": {
-                        "anyOf": [
-                            {
-                                "$ref": "#/$defs/EmbedderConfig"
-                            },
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "title": "Embedder Config",
-                    "type": "array"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "SklearnScorerInitModel",
-            "type": "object"
-        },
-        "ThresholdDecisionInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "threshold",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "thresh": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "anyOf": [
-                                    {
-                                        "maximum": 1.0,
-                                        "minimum": 0.0,
-                                        "type": "number"
-                                    },
-                                    {
-                                        "items": {
-                                            "maximum": 1.0,
-                                            "minimum": 0.0,
-                                            "type": "number"
-                                        },
-                                        "type": "array"
-                                    }
-                                ]
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceFloat"
-                        }
-                    ],
-                    "default": [
-                        0.5
-                    ],
-                    "title": "Thresh"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "ThresholdDecisionInitModel",
-            "type": "object"
-        },
-        "TunableDecisionInitModel": {
-            "properties": {
-                "module_name": {
-                    "const": "tunable",
-                    "title": "Module Name",
-                    "type": "string"
-                },
-                "n_trials": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Number of trials",
-                    "title": "N Trials"
-                },
-                "target_metric": {
-                    "default": [
-                        "decision_accuracy"
-                    ],
-                    "items": {
-                        "enum": [
-                            "decision_accuracy",
-                            "decision_f1",
-                            "decision_roc_auc",
-                            "decision_precision",
-                            "decision_recall"
-                        ],
-                        "type": "string"
-                    },
-                    "title": "Target Metric",
-                    "type": "array"
-                },
-                "n_optuna_trials": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "exclusiveMinimum": 0,
-                                "type": "integer"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "$ref": "#/$defs/ParamSpaceInt"
-                        }
-                    ],
-                    "default": [
-                        320
-                    ],
-                    "title": "N Optuna Trials"
-                }
-            },
-            "required": [
-                "module_name"
-            ],
-            "title": "TunableDecisionInitModel",
+            "title": "LoggingConfig",
             "type": "object"
         }
     },
-    "description": "Optimizer configuration.",
-    "items": {
-        "anyOf": [
-            {
-                "$ref": "#/$defs/EmbeddingNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/ScoringNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/DecisionNodeValidator"
-            },
-            {
-                "$ref": "#/$defs/RegexNodeValidator"
+    "description": "Configuration for the optimization process.",
+    "properties": {
+        "data_config": {
+            "$ref": "#/$defs/DataConfig",
+            "default": {
+                "scheme": "ho",
+                "n_folds": 3,
+                "validation_size": 0.2,
+                "separation_ratio": 0.5
             }
-        ]
+        },
+        "search_space": {
+            "items": {
+                "type": "object"
+            },
+            "title": "Search Space",
+            "type": "array"
+        },
+        "logging_config": {
+            "$ref": "#/$defs/LoggingConfig",
+            "default": {
+                "project_dir": null,
+                "run_name": null,
+                "dump_modules": false,
+                "clear_ram": false,
+                "report_to": null
+            }
+        },
+        "embedder_config": {
+            "$ref": "#/$defs/EmbedderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+                "device": null,
+                "default_prompt": null,
+                "classifier_prompt": null,
+                "cluster_prompt": null,
+                "sts_prompt": null,
+                "query_prompt": null,
+                "passage_prompt": null,
+                "use_cache": false
+            }
+        },
+        "cross_encoder_config": {
+            "$ref": "#/$defs/CrossEncoderConfig",
+            "default": {
+                "batch_size": 32,
+                "max_length": null,
+                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "device": null,
+                "train_head": false
+            }
+        },
+        "sampler": {
+            "default": "brute",
+            "enum": [
+                "brute",
+                "tpe",
+                "random"
+            ],
+            "title": "Sampler",
+            "type": "string"
+        },
+        "seed": {
+            "default": 42,
+            "exclusiveMinimum": 0,
+            "title": "Seed",
+            "type": "integer"
+        }
     },
+    "required": [
+        "search_space"
+    ],
     "title": "OptimizationConfig",
-    "type": "array"
+    "type": "object"
 }

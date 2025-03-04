@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import Generator
-from typing import TypedDict, cast
+from typing import cast
 
 from datasets import concatenate_datasets
 from transformers import set_seed
@@ -16,34 +16,24 @@ from ._stratification import split_dataset
 logger = logging.getLogger(__name__)
 
 
-class RegexPatterns(TypedDict):
-    """Regex patterns for each intent class."""
-
-    id: int
-    """Intent class id."""
-    regex_full_match: list[str]
-    """Full match regex patterns."""
-    regex_partial_match: list[str]
-    """Partial match regex patterns."""
-
-
-class DataHandler:  # TODO rename to Validator
+class DataHandler:
     """Data handler class."""
 
     def __init__(
         self,
         dataset: Dataset,
         config: DataConfig | None = None,
-        random_seed: int = 0,
+        random_seed: int | None = 0,
     ) -> None:
-        """
-        Initialize the data handler.
+        """Initialize the data handler.
 
-        :param dataset: Training dataset.
-        :param random_seed: Seed for random number generation.
-        :param config: config
+        Args:
+            dataset: Training dataset.
+            config: Configuration object
+            random_seed: Seed for random number generation.
         """
-        set_seed(random_seed)
+        if random_seed is not None:
+            set_seed(random_seed)
         self.random_seed = random_seed
 
         self.dataset = dataset
@@ -56,15 +46,6 @@ class DataHandler:  # TODO rename to Validator
         elif self.config.scheme == "cv":
             self._split_cv()
 
-        self.regex_patterns = [
-            RegexPatterns(
-                id=intent.id,
-                regex_full_match=intent.regex_full_match,
-                regex_partial_match=intent.regex_partial_match,
-            )
-            for intent in self.dataset.intents
-        ]
-
         self.intent_descriptions = [intent.description for intent in self.dataset.intents]
         self.tags = self.dataset.get_tags()
 
@@ -72,10 +53,10 @@ class DataHandler:  # TODO rename to Validator
 
     @property
     def multilabel(self) -> bool:
-        """
-        Check if the dataset is multilabel.
+        """Check if the dataset is multilabel.
 
-        :return: True if the dataset is multilabel, False otherwise.
+        Returns:
+            True if the dataset is multilabel, False otherwise.
         """
         return self.dataset.multilabel
 
@@ -89,29 +70,33 @@ class DataHandler:  # TODO rename to Validator
         return split
 
     def train_utterances(self, idx: int | None = None) -> list[str]:
-        """
-        Retrieve training utterances from the dataset.
+        """Retrieve training utterances from the dataset.
 
         If a specific training split index is provided, retrieves utterances
         from the indexed training split. Otherwise, retrieves utterances from
         the primary training split.
 
-        :param idx: Optional index for a specific training split.
-        :return: List of training utterances.
+        Args:
+            idx: Optional index for a specific training split.
+
+        Returns:
+            List of training utterances.
         """
         split = self._choose_split(Split.TRAIN, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
     def train_labels(self, idx: int | None = None) -> ListOfGenericLabels:
-        """
-        Retrieve training labels from the dataset.
+        """Retrieve training labels from the dataset.
 
         If a specific training split index is provided, retrieves labels
         from the indexed training split. Otherwise, retrieves labels from
         the primary training split.
 
-        :param idx: Optional index for a specific training split.
-        :return: List of training labels.
+        Args:
+            idx: Optional index for a specific training split.
+
+        Returns:
+            List of training labels.
         """
         split = self._choose_split(Split.TRAIN, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
@@ -120,58 +105,52 @@ class DataHandler:  # TODO rename to Validator
         return [self.train_labels(j) for j in range(self.config.n_folds)]
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
-        """
-        Retrieve validation utterances from the dataset.
+        """Retrieve validation utterances from the dataset.
 
         If a specific validation split index is provided, retrieves utterances
         from the indexed validation split. Otherwise, retrieves utterances from
         the primary validation split.
 
-        :param idx: Optional index for a specific validation split.
-        :return: List of validation utterances.
+        Args:
+            idx: Optional index for a specific validation split.
+
+        Returns:
+            List of validation utterances.
         """
         split = self._choose_split(Split.VALIDATION, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
 
     def validation_labels(self, idx: int | None = None) -> ListOfGenericLabels:
-        """
-        Retrieve validation labels from the dataset.
+        """Retrieve validation labels from the dataset.
 
         If a specific validation split index is provided, retrieves labels
         from the indexed validation split. Otherwise, retrieves labels from
         the primary validation split.
 
-        :param idx: Optional index for a specific validation split.
-        :return: List of validation labels.
+        Args:
+            idx: Optional index for a specific validation split.
+
+        Returns:
+            List of validation labels.
         """
         split = self._choose_split(Split.VALIDATION, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self) -> list[str] | None:
-        """
-        Retrieve test utterances from the dataset.
+        """Retrieve test utterances from the dataset.
 
-        If a specific test split index is provided, retrieves utterances
-        from the indexed test split. Otherwise, retrieves utterances from
-        the primary test split.
-
-        :param idx: Optional index for a specific test split.
-        :return: List of test utterances.
+        Returns:
+            List of test utterances.
         """
         if Split.TEST not in self.dataset:
             return None
         return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
 
     def test_labels(self) -> ListOfGenericLabels:
-        """
-        Retrieve test labels from the dataset.
+        """Retrieve test labels from the dataset.
 
-        If a specific test split index is provided, retrieves labels
-        from the indexed test split. Otherwise, retrieves labels from
-        the primary test split.
-
-        :param idx: Optional index for a specific test split.
-        :return: List of test labels.
+        Returns:
+            List of test labels.
         """
         return cast(ListOfGenericLabels, self.dataset[Split.TEST][self.dataset.label_feature])
 
@@ -210,10 +189,12 @@ class DataHandler:  # TODO rename to Validator
                 raise ValueError(message)
 
     def _split_train(self, ratio: FloatFromZeroToOne) -> None:
-        """
-        Split on two sets.
+        """Split on two sets.
 
         One is for scoring node optimizaton, one is for decision node.
+
+        Args:
+            ratio: Split ratio
         """
         self.dataset[f"{Split.TRAIN}_0"], self.dataset[f"{Split.TRAIN}_1"] = split_dataset(
             self.dataset,

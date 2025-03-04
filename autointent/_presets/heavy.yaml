@@ -1,0 +1,45 @@
+# TODO add sklearn RandomForestClassifier
+search_space:
+  - node_type: scoring
+    target_metric: scoring_roc_auc
+    search_space:
+      - module_name: knn
+        k:
+          low: 1
+          high: 20
+        weights: [uniform, distance, closest]
+        n_trials: 10
+      - module_name: linear
+      - module_name: mlknn
+        k:
+          low: 1
+          high: 20
+        n_trials: 10
+      - module_name: description
+        temperature:
+          low: 0.01
+          high: 10
+          log: true
+        n_trials: 10
+      - module_name: rerank
+        k:
+          low: 10
+          high: 40
+        m:
+          low: 1
+          high: 10
+        weights: [uniform, distance, closest]
+        n_trials: 15
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+        n_trials: 10
+      - module_name: argmax
+      - module_name: jinoos
+      - module_name: tunable
+      - module_name: adaptive
+sampler: tpe

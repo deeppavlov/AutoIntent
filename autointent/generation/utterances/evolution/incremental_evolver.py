@@ -1,5 +1,4 @@
-"""
-Evolutionary strategy to augmenting utterances.
+"""Evolutionary strategy to augmenting utterances.
 
 Deeply inspired by DeepEval evolutions.
 """
@@ -51,11 +50,27 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         async_mode: bool = False,
         search_space: str | None = None,
     ) -> None:
-        """Initialize."""
+        """Initialize the IncrementalUtteranceEvolver.
+
+        Args:
+            generator: Generator instance for generating utterances.
+            prompt_makers: List of prompt makers for generating prompts.
+            seed: Random seed for reproducibility.
+            async_mode: Whether to use asynchronous mode for generation.
+            search_space: Search space for the pipeline optimizer.
+        """
         super().__init__(generator, prompt_makers, seed, async_mode)
         self.search_space = self._choose_search_space(search_space)
 
     def _choose_search_space(self, search_space: str | None) -> list[dict[str, Any]] | Path | str:
+        """Choose search space for the pipeline optimizer.
+
+        Args:
+            search_space: Search space for the pipeline optimizer. If None, default search space is used.
+
+        Returns:
+            The chosen search space.
+        """
         if search_space is None:
             return SEARCH_SPACE
         return search_space
@@ -67,11 +82,20 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         n_evolutions: int = 1,
         update_split: bool = True,
         batch_size: int = 4,
+        sequential: bool = False,
     ) -> HFDataset:
-        """
-        Augment some split of dataset.
+        """Augment some split of dataset.
 
-        Note that for now it supports only single-label datasets.
+        Args:
+            dataset: Dataset object.
+            split_name: Dataset split (default is TRAIN).
+            n_evolutions: Number of evolutions to perform.
+            update_split: Whether to update the dataset split with the new samples.
+            batch_size: Batch size for augmentation.
+            sequential: Whether to perform augmentations sequentially.
+
+        Returns:
+            List of generated samples.
         """
         best_result = 0
         merge_dataset = copy.deepcopy(dataset)
@@ -79,7 +103,12 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
         for _ in range(n_evolutions):
             new_samples_dataset = super().augment(
-                dataset, split_name=split_name, n_evolutions=1, update_split=False, batch_size=batch_size
+                dataset,
+                split_name=split_name,
+                n_evolutions=1,
+                update_split=False,
+                batch_size=batch_size,
+                sequential=sequential,
             )
             merge_dataset[split_name] = concatenate_datasets([merge_dataset[split_name], new_samples_dataset])
             generated_samples.append(new_samples_dataset)

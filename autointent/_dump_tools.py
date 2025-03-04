@@ -12,7 +12,8 @@ from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
-from autointent.schemas import CrossEncoderConfig, EmbedderConfig, TagsList
+from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
@@ -35,6 +36,11 @@ class Dumper:
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
+        """Make subdirectories for dumping.
+
+        Args:
+            path: Path to make subdirectories in
+        """
         subdirectories = [
             path / Dumper.tags,
             path / Dumper.embedders,
@@ -48,7 +54,12 @@ class Dumper:
 
     @staticmethod
     def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901
-        """Dump modules attributes to filestystem."""
+        """Dump modules attributes to filestystem.
+
+        Args:
+            obj: Object to dump
+            path: Path to dump to
+        """
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
@@ -88,7 +99,12 @@ class Dumper:
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
     @staticmethod
-    def load(obj: Any, path: Path) -> None:  # noqa: ANN401, PLR0912, C901, PLR0915
+    def load(  # noqa: PLR0912, C901, PLR0915
+        obj: Any,  # noqa: ANN401
+        path: Path,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> None:
         """Load attributes from file system."""
         tags: dict[str, Any] = {}
         simple_attrs: dict[str, Any] = {}
@@ -108,15 +124,18 @@ class Dumper:
             elif child.name == Dumper.arrays:
                 arrays = dict(np.load(child))
             elif child.name == Dumper.embedders:
-                # TODO propagate custom loading params (such as device, batch size etc) to this line
-                embedders = {embedder_dump.name: Embedder.load(embedder_dump) for embedder_dump in child.iterdir()}
+                embedders = {
+                    embedder_dump.name: Embedder.load(embedder_dump, override_config=embedder_config)
+                    for embedder_dump in child.iterdir()
+                }
             elif child.name == Dumper.indexes:
                 indexes = {index_dump.name: VectorIndex.load(index_dump) for index_dump in child.iterdir()}
             elif child.name == Dumper.estimators:
                 estimators = {estimator_dump.name: joblib.load(estimator_dump) for estimator_dump in child.iterdir()}
             elif child.name == Dumper.cross_encoders:
                 cross_encoders = {
-                    cross_encoder_dump.name: Ranker.load(cross_encoder_dump) for cross_encoder_dump in child.iterdir()
+                    cross_encoder_dump.name: Ranker.load(cross_encoder_dump, override_config=cross_encoder_config)
+                    for cross_encoder_dump in child.iterdir()
                 }
             elif child.name == Dumper.pydantic_models:
                 for model_file in child.iterdir():

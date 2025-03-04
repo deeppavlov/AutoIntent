@@ -19,8 +19,7 @@ class RetrievalMetricFn(Protocol):
         candidates_labels: CANDIDATE_TYPE,
         k: int | None = None,
     ) -> float:
-        """
-        Calculate retrieval metric.
+        """Calculate retrieval metric.
 
         - multiclass case: labels are integer
         - multilabel case: labels are binary
@@ -41,8 +40,7 @@ def _macrofy(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Extend single-label `metric_fn` to a multi-label case via macro averaging.
+    r"""Extend single-label `metric_fn` to a multi-label case via macro averaging.
 
     The macro-average score is calculated as:
 
@@ -78,8 +76,7 @@ def _macrofy(
 
 
 def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64], k: int | None = None) -> float:
-    r"""
-    Calculate the average precision at position k.
+    r"""Calculate the average precision at position k.
 
     The average precision is calculated as:
 
@@ -126,8 +123,7 @@ def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFn:
 
 @ignore_oos
 def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
-    r"""
-    Calculate the mean average precision at position k.
+    r"""Calculate the mean average precision at position k.
 
     The Mean Average Precision (MAP) is computed as the average of the average precision
     (AP) scores for all queries. The average precision for a single query computes the precision at each rank
@@ -158,8 +154,7 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
 def _average_precision_intersecting(
     query_label: list[int], candidate_labels: CANDIDATE_TYPE, k: int | None = None
 ) -> float:
-    r"""
-    Calculate the average precision at position k for the intersecting labels.
+    r"""Calculate the average precision at position k for the intersecting labels.
 
     The average precision for intersecting labels is calculated as:
 
@@ -202,8 +197,7 @@ def retrieval_map_intersecting(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the mean average precision at position k for the intersecting labels.
+    r"""Calculate the mean average precision at position k for the intersecting labels.
 
     The Mean Average Precision (MAP) for intersecting labels is computed as
     the average of the average precision (AP) scores for all queries. The average
@@ -238,8 +232,7 @@ def retrieval_map_macro(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the mean average precision at position k for the intersecting labels.
+    r"""Calculate the mean average precision at position k for the intersecting labels.
 
     This function internally uses :func:`retrieval_map` to calculate the MAP for each query and
     performs macro-averaging across multiple queries.
@@ -259,8 +252,7 @@ def retrieval_hit_rate(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the hit rate at position k.
+    r"""Calculate the hit rate at position k.
 
     The hit rate is calculated as:
 
@@ -299,8 +291,7 @@ def retrieval_hit_rate_intersecting(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the hit rate at position k for the intersecting labels.
+    r"""Calculate the hit rate at position k for the intersecting labels.
 
     The intersecting hit rate is calculated as:
 
@@ -345,8 +336,7 @@ def retrieval_hit_rate_macro(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the hit rate at position k for the intersecting labels.
+    r"""Calculate the hit rate at position k for the intersecting labels.
 
     This function internally uses :func:`retrieval_hit_rate` to calculate the hit rate at position :math:`k`
     for each query and performs macro-averaging across multiple queries.
@@ -366,8 +356,7 @@ def retrieval_precision(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the precision at position k.
+    r"""Calculate the precision at position k.
 
     Precision at position :math:`k` is calculated as:
 
@@ -408,8 +397,7 @@ def retrieval_precision_intersecting(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the precision at position k for the intersecting labels.
+    r"""Calculate the precision at position k for the intersecting labels.
 
     Precision at position :math:`k` for intersecting labels is calculated as:
 
@@ -456,8 +444,7 @@ def retrieval_precision_macro(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the precision at position k for the intersecting labels.
+    r"""Calculate the precision at position k for the intersecting labels.
 
     This function internally uses :func:`retrieval_precision` to calculate the precision at position :math:`k`
     for each query and performs macro-averaging across multiple queries.
@@ -472,8 +459,7 @@ def retrieval_precision_macro(
 
 
 def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
-    r"""
-    Calculate the Discounted Cumulative Gain (DCG) at position k.
+    r"""Calculate the Discounted Cumulative Gain (DCG) at position k.
 
     DCG is calculated as:
 
@@ -495,8 +481,7 @@ def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
 
 
 def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
-    r"""
-    Calculate the Ideal Discounted Cumulative Gain (IDCG) at position k.
+    r"""Calculate the Ideal Discounted Cumulative Gain (IDCG) at position k.
 
     IDCG is the maximum possible DCG that can be achieved if the relevance
     scores are sorted in descending order. It is calculated as:
@@ -519,8 +504,7 @@ def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
 
 @ignore_oos
 def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
-    r"""
-    Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k.
+    r"""Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k.
 
     NDCG at position :math:`k` is calculated as:
 
@@ -559,8 +543,7 @@ def retrieval_ndcg_intersecting(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
+    r"""Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
 
     NDCG at position :math:`k` for intersecting labels is calculated as:
 
@@ -602,8 +585,7 @@ def retrieval_ndcg_macro(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
+    r"""Calculate the Normalized Discounted Cumulative Gain (NDCG) at position k for the intersecting labels.
 
     This function calculates NDCG using :func:`retrieval_ndcg` and computes the macro-averaged score.
 
@@ -617,8 +599,7 @@ def retrieval_ndcg_macro(
 
 @ignore_oos
 def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
-    r"""
-    Calculate the Mean Reciprocal Rank (MRR) at position k.
+    r"""Calculate the Mean Reciprocal Rank (MRR) at position k.
 
     MRR is calculated as:
 
@@ -656,8 +637,7 @@ def retrieval_mrr_intersecting(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
+    r"""Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
 
     MRR is calculated as:
 
@@ -697,8 +677,7 @@ def retrieval_mrr_macro(
     candidates_labels: CANDIDATE_TYPE,
     k: int | None = None,
 ) -> float:
-    r"""
-    Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
+    r"""Calculate the Mean Reciprocal Rank (MRR) at position k for the intersecting labels.
 
     This function calculates MRR using :func:`retrieval_mrr` and computes the macro-averaged score.
 

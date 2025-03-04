@@ -8,21 +8,26 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import BaseScorer
-from autointent.schemas import EmbedderConfig, TaskTypeEnum
+from autointent.modules.base import BaseScorer
 
 
 class LinearScorer(BaseScorer):
-    """
-    Scoring module for linear classification using logistic regression.
+    """Scoring module for linear classification using logistic regression.
 
     This module uses embeddings generated from a transformer model to train a
     logistic regression classifier for intent classification.
 
-    :ivar name: Name of the scorer, defaults to "linear".
+    Attributes:
+        name: Name of the scorer, defaults to "linear"
+        _multilabel: Whether multilabel classification is used
+        _clf: Trained classifier instance
+        _embedder: Embedder instance for feature extraction
+        supports_multiclass: Whether multiclass classification is supported
+        supports_multilabel: Whether multilabel classification is supported
 
-    Example
+    Example:
     --------
     .. testcode::
 
@@ -53,23 +58,25 @@ class LinearScorer(BaseScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         cv: int = 3,
-        n_jobs: int | None = None,
         seed: int = 0,
     ) -> None:
-        """
-        Initialize the LinearScorer.
+        """Initialize the LinearScorer.
 
-        :param embedder_config: Config of the embedder model.
-        :param cv: Number of cross-validation folds, defaults to 3.
-        :param n_jobs: Number of parallel jobs for cross-validation, defaults to -1 (all CPUs).
-        :param seed: Random seed for reproducibility, defaults to 0.
+        Args:
+            embedder_config: Config of the embedder model
+            cv: Number of cross-validation folds, defaults to 3
+            n_jobs: Number of parallel jobs for cross-validation, defaults to None
+            seed: Random seed for reproducibility, defaults to 0
         """
         self.cv = cv
-        self.n_jobs = n_jobs
         self.seed = seed
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+
+        if self.cv < 0 or not isinstance(self.cv, int):
+            msg = "`cv` argument of `LinearScorer` must be a positive int"
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
@@ -77,25 +84,27 @@ class LinearScorer(BaseScorer):
         context: Context,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "LinearScorer":
-        """
-        Create a LinearScorer instance using a Context object.
+        """Create a LinearScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param embedder_config: Config of the embedder, or None to use the best embedder.
-        :return: Initialized LinearScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            embedder_config: Config of the embedder, or None to use the best embedder
+
+        Returns:
+            Initialized LinearScorer instance
         """
         if embedder_config is None:
-            embedder_config = context.optimization_info.get_best_embedder()
+            embedder_config = context.resolve_embedder()
 
         return cls(
             embedder_config=embedder_config,
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
-        """
-        Get the name of the embedder.
+        """Get the name of the embedder.
 
-        :return: Embedder name.
+        Returns:
+            Embedder name
         """
         return self.embedder_config.model_dump()
 
@@ -104,12 +113,14 @@ class LinearScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        """
-        Train the logistic regression classifier.
+        """Train the logistic regression classifier.
 
-        :param utterances: List of training utterances.
-        :param labels: List of labels corresponding to the utterances.
-        :raises ValueError: If the vector index mismatches the provided utterances.
+        Args:
+            utterances: List of training utterances
+            labels: List of labels corresponding to the utterances
+
+        Raises:
+            ValueError: If the vector index mismatches the provided utterances
         """
         if hasattr(self, "_clf"):
             self.clear_cache()
@@ -125,7 +136,7 @@ class LinearScorer(BaseScorer):
             base_clf = LogisticRegression()
             clf = MultiOutputClassifier(base_clf)
         else:
-            clf = LogisticRegressionCV(cv=self.cv, n_jobs=self.n_jobs, random_state=self.seed)
+            clf = LogisticRegressionCV(cv=self.cv, random_state=self.seed)
 
         clf.fit(features, labels)
 
@@ -133,11 +144,13 @@ class LinearScorer(BaseScorer):
         self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Predict probabilities for the given utterances.
+        """Predict probabilities for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Array of predicted probabilities for each class.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Array of predicted probabilities for each class
         """
         features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)

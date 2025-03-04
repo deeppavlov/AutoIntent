@@ -1,9 +1,11 @@
 """Configuration for the nodes."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 from autointent.custom_types import NodeType
+
+from ._transformers import CrossEncoderConfig, EmbedderConfig
 
 
 @dataclass
@@ -18,7 +20,19 @@ class InferenceNodeConfig:
     """Configuration of the module"""
     load_path: str | None = None
     """Path to the module dump. If None, the module will be trained from scratch"""
+    embedder_config: EmbedderConfig | None = None
+    """One can override presaved embedder config while loading from file system."""
+    cross_encoder_config: CrossEncoderConfig | None = None
+    """One can override presaved cross encoder config while loading from file system."""
 
-    def __post_init__(self) -> None:
-        if not isinstance(self.node_type, NodeType):
-            self.node_type = NodeType(self.node_type)
+    def asdict(self) -> dict[str, Any]:
+        res = asdict(self)
+        if self.embedder_config is not None:
+            res["embedder_config"] = self.embedder_config.model_dump()
+        else:
+            res.pop("embedder_config")
+        if self.cross_encoder_config is not None:
+            res["cross_encoder_config"] = self.cross_encoder_config.model_dump()
+        else:
+            res.pop("cross_encoder_config")
+        return res

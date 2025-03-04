@@ -6,7 +6,7 @@ import torch
 
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
-from autointent.modules.abc import BaseModule
+from autointent.modules.base import BaseModule
 from autointent.nodes.info import NODES_INFO
 
 
@@ -14,26 +14,30 @@ class InferenceNode:
     """Inference node class."""
 
     def __init__(self, module: BaseModule, node_type: NodeType) -> None:
-        """
-        Initialize the inference node.
+        """Initialize the inference node.
 
-        :param module: Module to use for inference
-        :param node_type: Node types
+        Args:
+            module: Module to use for inference
+            node_type: Node types
         """
         self.module = module
         self.node_type = node_type
 
     @classmethod
     def from_config(cls, config: InferenceNodeConfig) -> "InferenceNode":
-        """
-        Initialize from config.
+        """Initialize from config.
 
-        :param config: Configuration for the node.
+        Args:
+            config: Config to init from
         """
         node_info = NODES_INFO[config.node_type]
         module = node_info.modules_available[config.module_name](**config.module_config)
         if config.load_path is not None:
-            module.load(config.load_path)
+            module.load(
+                config.load_path,
+                embedder_config=config.embedder_config,
+                cross_encoder_config=config.cross_encoder_config,
+            )
         return cls(module, config.node_type)
 
     def clear_cache(self) -> None:

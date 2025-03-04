@@ -1,4 +1,4 @@
-"""File with definitions of DatasetReader and DatasetValidator."""
+"""File containing definitions of DatasetReader and DatasetValidator for handling dataset operations."""
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -6,17 +6,17 @@ from autointent.schemas import Intent, Sample
 
 
 class DatasetReader(BaseModel):
-    """
-    A class to represent a dataset reader for handling training, validation, and test data.
+    """Represents a dataset reader for handling training, validation, and test data splits.
 
-    :param train: List of samples for training. Defaults to an empty list.
-    :param train_0: List of samples for scoring module training. Defaults to an empty list.
-    :param train_1: List of samples for decision module training. Defaults to an empty list.
-    :param validation: List of samples for validation. Defaults to an empty list.
-    :param validation_0: List of samples for scoring module validation. Defaults to an empty list.
-    :param validation_1: List of samples for decision module validation. Defaults to an empty list.
-    :param test: List of samples for testing. Defaults to an empty list.
-    :param intents: List of intents associated with the dataset.
+    Attributes:
+        train: List of samples for training. Defaults to an empty list.
+        train_0: List of samples for scoring module training. Defaults to an empty list.
+        train_1: List of samples for decision module training. Defaults to an empty list.
+        validation: List of samples for validation. Defaults to an empty list.
+        validation_0: List of samples for scoring module validation. Defaults to an empty list.
+        validation_1: List of samples for decision module validation. Defaults to an empty list.
+        test: List of samples for testing. Defaults to an empty list.
+        intents: List of intents associated with the dataset.
     """
 
     train: list[Sample] = []
@@ -32,11 +32,13 @@ class DatasetReader(BaseModel):
 
     @model_validator(mode="after")
     def validate_dataset(self) -> "DatasetReader":
-        """
-        Validate the dataset by ensuring intents and data splits are consistent.
+        """Validates dataset integrity by ensuring consistent data splits and intent mappings.
 
-        :raises ValueError: If intents or samples are not properly validated.
-        :return: The validated DatasetReader instance.
+        Raises:
+            ValueError: If data splits are inconsistent or intent mappings are incorrect.
+
+        Returns:
+            DatasetReader: The validated dataset reader instance.
         """
         if self.train and (self.train_0 or self.train_1):
             message = "If `train` is provided, `train_0` and `train_1` should be empty."
@@ -75,11 +77,13 @@ class DatasetReader(BaseModel):
         return self
 
     def _get_n_classes(self, split: list[Sample]) -> int:
-        """
-        Get the number of classes in a dataset split.
+        """Determines the number of unique classes in a dataset split.
 
-        :param split: List of samples in a dataset split (train, validation, or test).
-        :return: The number of classes.
+        Args:
+            split (list[Sample]): List of samples in a dataset split.
+
+        Returns:
+            int: The number of unique classes.
         """
         classes = set()
         for sample in split:
@@ -92,7 +96,17 @@ class DatasetReader(BaseModel):
         return len(classes)
 
     def _validate_classes(self, splits: list[list[Sample]]) -> int:
-        """Validate that each split has all classes."""
+        """Ensures that all dataset splits have the same number of classes.
+
+        Args:
+            splits (list[list[Sample]]): List of dataset splits.
+
+        Raises:
+            ValueError: If the number of classes is inconsistent across splits or if no classes are found.
+
+        Returns:
+            int: The number of unique classes.
+        """
         n_classes = [self._get_n_classes(split) for split in splits]
         if len(set(n_classes)) != 1:
             message = (
@@ -106,12 +120,16 @@ class DatasetReader(BaseModel):
         return n_classes[0]
 
     def _validate_intents(self, n_classes: int) -> "DatasetReader":
-        """
-        Validate the intents by checking their IDs for sequential order.
+        """Ensures intent IDs are sequential and match the number of classes.
 
-        :param n_classes: The number of classes in the dataset.
-        :raises ValueError: If intent IDs are not sequential starting from 0.
-        :return: The DatasetReader instance after validation.
+        Args:
+            n_classes (int): The expected number of classes based on dataset splits.
+
+        Raises:
+            ValueError: If intent IDs are not sequential or valid.
+
+        Returns:
+            DatasetReader: The validated dataset reader instance.
         """
         if not self.intents:
             self.intents = [Intent(id=idx) for idx in range(n_classes)]
@@ -126,12 +144,16 @@ class DatasetReader(BaseModel):
         return self
 
     def _validate_split(self, split: list[Sample]) -> "DatasetReader":
-        """
-        Validate a dataset split to ensure all sample labels reference valid intent IDs.
+        """Validate a dataset split to ensure all sample labels reference valid intent IDs.
 
-        :param split: List of samples in a dataset split (train, validation, or test).
-        :raises ValueError: If a sample references an invalid or non-existent intent ID.
-        :return: The DatasetReader instance after validation.
+        Args:
+            split: List of samples in a dataset split.
+
+        Raises:
+            ValueError: If a sample references an invalid or non-existent intent ID.
+
+        Returns:
+            DatasetReader: The validated dataset reader instance.
         """
         intent_ids = {intent.id for intent in self.intents}
         for sample in split:
@@ -147,14 +169,16 @@ class DatasetReader(BaseModel):
 
 
 class DatasetValidator:
-    """A utility class for validating a DatasetReader instance."""
+    """Utility class for validating a DatasetReader instance."""
 
     @staticmethod
     def validate(dataset_reader: DatasetReader) -> DatasetReader:
-        """
-        Validate a DatasetReader instance.
+        """Validates a DatasetReader instance.
 
-        :param dataset_reader: An instance of DatasetReader to validate.
-        :return: The validated DatasetReader instance.
+        Args:
+            dataset_reader (DatasetReader): The dataset reader instance to validate.
+
+        Returns:
+            DatasetReader: The validated dataset reader instance.
         """
         return dataset_reader

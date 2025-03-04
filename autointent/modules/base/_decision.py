@@ -1,16 +1,17 @@
-"""Predictior module."""
+"""Predictor module."""
 
 from abc import ABC, abstractmethod
 from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import assert_never
 
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import ListOfGenericLabels
 from autointent.metrics import DECISION_METRICS
-from autointent.modules.abc import BaseModule
+from autointent.modules.base import BaseModule
 from autointent.schemas import Tag
 
 
@@ -24,29 +25,37 @@ class BaseDecision(BaseModule, ABC):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit the model.
+        """Fit the model.
 
-        :param scores: Scores to fit
-        :param labels: Labels to fit
-        :param tags: Tags to fit
+        Args:
+            scores: Scores to fit
+            labels: Labels to fit
+            tags: Tags to fit
         """
 
     @abstractmethod
     def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
-        """
-        Predict the best score.
+        """Predict the best score.
 
-        :param scores: Scores to predict
+        Args:
+            scores: Scores to predict
+
+        Returns:
+            Predicted labels
         """
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Calculate metric on test set and return metric value.
+        """Calculate metric on test set and return metric value.
 
-        :param context: Context to score
-        :param split: Target split
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context to score
+            metrics: List of metrics to compute
+
+        Returns:
+            Dictionary of computed metrics values for the test set
+
+        Raises:
+            RuntimeError: If no folded scores are found
         """
         train_scores, train_labels, tags = self.get_train_data(context)
         self.fit(train_scores, train_labels, tags)
@@ -58,12 +67,17 @@ class BaseDecision(BaseModule, ABC):
         return self.score_metrics_ho((val_labels, decisions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
-        """
-        Calculate metric on test set and return metric value.
+        """Calculate metric on test set and return metric value.
 
-        :param context: Context to score
-        :param split: Target split
-        :return: Computed metrics value for the test set or error code of metrics
+        Args:
+            context: Context to score
+            metrics: List of metrics to compute
+
+        Returns:
+            Dictionary of computed metrics values for the test set
+
+        Raises:
+            RuntimeError: If no folded scores are found
         """
         labels = context.data_handler.train_labels_folded()
         scores = context.optimization_info.get_best_folded_scores()
@@ -91,13 +105,26 @@ class BaseDecision(BaseModule, ABC):
         return {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
 
     def get_assets(self) -> DecisionArtifact:
-        """Return useful assets that represent intermediate data into context."""
+        """Return useful assets that represent intermediate data into context.
+
+        Returns:
+            Decision artifact containing intermediate data
+        """
         return self._artifact
 
     def clear_cache(self) -> None:
         """Clear cache."""
 
     def _validate_task(self, scores: npt.NDArray[Any], labels: ListOfGenericLabels) -> None:
+        """Validate task specifications.
+
+        Args:
+            scores: Input scores
+            labels: Input labels
+
+        Raises:
+            ValueError: If there is a mismatch between provided labels and scores
+        """
         self._n_classes, self._multilabel, self._oos = self._get_task_specs(labels)
         self._validate_multilabel(self._multilabel)
         self._validate_oos(self._oos, raise_error=False)
@@ -110,6 +137,14 @@ class BaseDecision(BaseModule, ABC):
             raise ValueError(msg)
 
     def get_train_data(self, context: Context) -> tuple[npt.NDArray[Any], ListOfGenericLabels, list[Tag]]:
+        """Get training data from context.
+
+        Args:
+            context: Context containing the data
+
+        Returns:
+            Tuple containing scores, labels, and tags
+        """
         labels, scores = get_decision_evaluation_data(context, "train")
         return (scores, labels, context.data_handler.tags)
 
@@ -118,12 +153,17 @@ def get_decision_evaluation_data(
     context: Context,
     split: Literal["train", "validation"],
 ) -> tuple[ListOfGenericLabels, npt.NDArray[np.float64]]:
-    """
-    Get decision evaluation data.
+    """Get decision evaluation data.
 
-    :param context: Context
-    :param split: Target split
-    :return:
+    Args:
+        context: Context containing the data
+        split: Target split (either 'train' or 'validation')
+
+    Returns:
+        Tuple containing labels and scores for the specified split
+
+    Raises:
+        ValueError: If invalid split name is provided or no scores are found
     """
     if split == "train":
         labels = context.data_handler.train_labels(1)
@@ -132,8 +172,7 @@ def get_decision_evaluation_data(
         labels = context.data_handler.validation_labels(1)
         scores = context.optimization_info.get_best_validation_scores()
     else:
-        message = f"Invalid split '{split}' provided. Expected one of 'train', 'validation'."
-        raise ValueError(message)
+        assert_never(split)
 
     if scores is None:
         message = f"No '{split}' scores found in the optimization info"

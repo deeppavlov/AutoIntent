@@ -12,8 +12,8 @@ from autointent.metrics import (
     RetrievalMetricFn,
     ScoringMetricFn,
 )
-from autointent.modules import EMBEDDING_MODULES_MULTICLASS, EMBEDDING_MODULES_MULTILABEL
-from autointent.modules.abc import BaseEmbedding
+from autointent.modules import EMBEDDING_MODULES
+from autointent.modules.base import BaseEmbedding
 
 from ._base import NodeInfo
 
@@ -28,8 +28,6 @@ class EmbeddingNodeInfo(NodeInfo):
         | SCORING_METRICS_MULTICLASS
     )
 
-    modules_available: ClassVar[Mapping[str, type[BaseEmbedding]]] = (
-        EMBEDDING_MODULES_MULTICLASS | EMBEDDING_MODULES_MULTILABEL
-    )
+    modules_available: ClassVar[Mapping[str, type[BaseEmbedding]]] = EMBEDDING_MODULES
 
     node_type = NodeType.embedding

@@ -1,0 +1,41 @@
+search_space:
+  - node_type: scoring
+    target_metric: scoring_roc_auc
+    search_space:
+      - module_name: knn
+        k:
+          low: 1
+          high: 20
+          step: 1
+        weights: [uniform, distance, closest]
+      - module_name: linear
+      - module_name: mlknn
+        k:
+          low: 1
+          high: 20
+          step: 1
+      - module_name: rerank
+        k:
+          low: 10
+          high: 40
+          step: 5
+        m:
+          low: 1
+          high: 9
+          step: 2
+        weights: [uniform, distance, closest]
+      - module_name: description
+        temperature: [0.01,  0.01637894,  0.02682696,  0.04393971,  0.07196857, 0.11787686,  0.19306977,  0.31622777,  0.51794747,  0.8483429 , 1.38949549,  2.27584593,  3.72759372,  6.1054023 , 10.]
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+          step: 0.1
+      - module_name: argmax
+      - module_name: jinoos
+      - module_name: tunable
+      - module_name: adaptive
+sampler: brute

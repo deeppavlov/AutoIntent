@@ -17,21 +17,22 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 
 from ._hash import Hasher
-from .schemas import EmbedderConfig, TaskTypeEnum
+from .configs import EmbedderConfig, TaskTypeEnum
 
 
 def get_embeddings_path(filename: str) -> Path:
-    """
-    Get the path to the embeddings file.
+    """Get the path to the embeddings file.
 
     This function constructs the full path to an embeddings file stored
     in a specific directory under the user's home directory. The embeddings
     file is named based on the provided filename, with the `.npy` extension
     added.
 
-    :param filename: The name of the embeddings file (without extension).
+    Args:
+        filename: The name of the embeddings file (without extension).
 
-    :return: The full path to the embeddings file.
+    Returns:
+        The full path to the embeddings file.
     """
     return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
 
@@ -39,7 +40,7 @@ def get_embeddings_path(filename: str) -> Path:
 class EmbedderDumpMetadata(TypedDict):
     """Metadata for saving and loading an Embedder instance."""
 
-    model_name_or_path: str
+    model_name: str
     """Name of the hugging face model or a local path to sentence transformers dump."""
     device: str | None
     """Torch notation for CPU or CUDA."""
@@ -52,8 +53,7 @@ class EmbedderDumpMetadata(TypedDict):
 
 
 class Embedder:
-    """
-    A wrapper for managing embedding models using Sentence Transformers.
+    """A wrapper for managing embedding models using Sentence Transformers.
 
     This class handles initialization, saving, loading, and clearing of
     embedding models, as well as calculating embeddings for input texts.
@@ -63,10 +63,10 @@ class Embedder:
     dump_dir: Path | None = None
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
-        """
-        Initialize the Embedder.
+        """Initialize the Embedder.
 
-        :param embedder_config: Config of embedder.
+        Args:
+            embedder_config: Config of embedder.
         """
         self.model_name = embedder_config.model_name
         self.device = embedder_config.device
@@ -82,10 +82,10 @@ class Embedder:
         self.logger = logging.getLogger(__name__)
 
     def __hash__(self) -> int:
-        """
-        Compute a hash value for the Embedder.
+        """Compute a hash value for the Embedder.
 
-        :returns: The hash value of the Embedder.
+        Returns:
+            The hash value of the Embedder.
         """
         hasher = Hasher()
         for parameter in self.embedding_model.parameters():
@@ -107,14 +107,14 @@ class Embedder:
             shutil.rmtree(self.dump_dir)
 
     def dump(self, path: Path) -> None:
-        """
-        Save the embedding model and metadata to disk.
+        """Save the embedding model and metadata to disk.
 
-        :param path: Path to the directory where the model will be saved.
+        Args:
+            path: Path to the directory where the model will be saved.
         """
         self.dump_dir = path
         metadata = EmbedderDumpMetadata(
-            model_name_or_path=str(self.model_name),
+            model_name=str(self.model_name),
             device=self.device,
             batch_size=self.batch_size,
             max_length=self.max_length,
@@ -125,32 +125,32 @@ class Embedder:
             json.dump(metadata, file, indent=4)
 
     @classmethod
-    def load(cls, path: Path | str) -> "Embedder":
-        """
-        Load the embedding model and metadata from disk.
+    def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
+        """Load the embedding model and metadata from disk.
 
-        :param path: Path to the directory where the model is stored.
+        Args:
+            path: Path to the directory where the model is stored.
+            override_config: one can override presaved settings
         """
         with (Path(path) / cls.metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
 
-        return cls(
-            EmbedderConfig(
-                model_name=metadata["model_name_or_path"],
-                device=metadata["device"],
-                batch_size=metadata["batch_size"],
-                max_length=metadata["max_length"],
-                use_cache=metadata["use_cache"],
-            )
-        )
+        if override_config is not None:
+            kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
+        else:
+            kwargs = metadata  # type: ignore[assignment]
+
+        return cls(EmbedderConfig(**kwargs))
 
     def embed(self, utterances: list[str], task_type: TaskTypeEnum | None = None) -> npt.NDArray[np.float32]:
-        """
-        Calculate embeddings for a list of utterances.
+        """Calculate embeddings for a list of utterances.
 
-        :param utterances: List of input texts to calculate embeddings for.
-        :param task_type: Type of task for which embeddings are calculated.
-        :return: A numpy array of embeddings.
+        Args:
+            utterances: List of input texts to calculate embeddings for.
+            task_type: Type of task for which embeddings are calculated.
+
+        Returns:
+            A numpy array of embeddings.
         """
         if self.use_cache:
             hasher = Hasher()
