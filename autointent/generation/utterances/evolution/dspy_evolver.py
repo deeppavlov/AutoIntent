@@ -1,19 +1,14 @@
-"""
-Evolutionary strategy to augmenting utterances.
-"""
+"""Evolutionary strategy to augmenting utterances."""
 
 import copy
 import logging
 import random
 from collections import Counter
 from pathlib import Path
-from typing import Any
 
 import dspy
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
-
-# from dspy.evaluate import CompleteAndGrounded, SemanticF1, answer_exact_match
 from dspy.evaluate.auto_evaluation import f1_score
 
 from autointent import Dataset, Pipeline
@@ -22,7 +17,7 @@ from autointent.custom_types import Split
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-SEARCH_SPACE = [
+DEFAULT_SEARCH_SPACE = [
     {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",
@@ -74,17 +69,16 @@ def repetition_factor(true_text: str, augmented_text: str) -> float:
     overlap = sum(min(true_counts[token], aug_counts[token]) for token in true_counts.keys() & aug_counts.keys())
     precision = overlap / len(aug_tokens)
     recall = overlap / len(true_tokens)
-    if precision + recall == 0:
-        f1 = 0.0
-    else:
-        f1 = 2 * precision * recall / (precision + recall)
-    return f1
+    return 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
 
 
 class SemanticRecallPrecision(dspy.Signature):
     """
     Compare a system's response to the ground truth to compute its recall and precision.
+
     If asked to reason, enumerate key ideas in each response, and whether they are present in the other response.
+
+    Copied from https://github.com/stanfordnlp/dspy/blob/2957c5f998e0bc652017b6e3b1f8af34970b6f6b/dspy/evaluate/auto_evaluation.py#L4-L14
     """
 
     # Copied from dspy
@@ -97,14 +91,37 @@ class SemanticRecallPrecision(dspy.Signature):
 
 
 class AugmentSemanticF1(dspy.Module):
-    # adapted SemanticF1
-    def __init__(self, threshold: float = 0.66, **kwargs: Any) -> None:
+    """Compare a system's response to the ground truth to compute its recall and precision.
+
+    Adapted from https://dspy.ai/api/evaluation/SemanticF1/
+    """
+
+    def __init__(self, threshold: float = 0.66) -> None:
+        """
+        Initialize the AugmentSemanticF1.
+
+        Args:
+            threshold: Threshold for the boolean output.
+        """
         self.threshold = threshold
         self.module = dspy.ChainOfThought(SemanticRecallPrecision)
 
     def forward(
         self, example: dspy.Example, pred: dspy.Prediction, trace: list[dspy.Prediction] | None = None
     ) -> float | bool:
+        """
+        Compute the score for the given example and prediction.
+
+        Uses SemanticF1 as the base metric with a ROUGE-1 as repetition penalty.
+
+        Args:
+            example: Question and ground truth.
+            pred: System response.
+            trace: Predictions from previous iterations.
+
+        Returns:
+            The final score or a boolean based on the threshold.
+        """
         # Compute base scores using the existing semantic metric.
         scores = self.module(question=example.question, ground_truth=example.response, system_response=pred.response)
         base_score = f1_score(scores.precision, scores.recall)
@@ -119,57 +136,97 @@ class AugmentSemanticF1(dspy.Module):
 
 
 class DSPYIncrementalUtteranceEvolver:
-    """Incremental evolutionary strategy to augmenting utterances using DSPy."""
+    """Incremental evolutionary strategy to augmenting utterances using DSPy.
+
+    Implements an evolutionary strategy to augment utterances using DSPy. This module would augment the utterances.
+    For ground truth utterances, it would generate new utterances and evaluate them using the pipeline.
+
+    For scoring generations it would use modified SemanticF1 as the base metric with a ROUGE-1 as repetition penalty.
+    """
 
     def __init__(
         self,
-        seed: int = 0,
+        model: str,
+        api_base: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int = 1000,
+        seed: int = 42,
         search_space: str | None = None,
     ) -> None:
-        """Initialize."""
-        self.search_space = self._choose_search_space(search_space)
+        """
+        Initialize the DSPYIncrementalUtteranceEvolver.
+
+        Args:
+            model: Model name. This should follow naming schema from litellm.
+                https://docs.litellm.ai/docs/providers
+            api_base: API base URL. Some models require this.
+            temperature: Sampling temperature. 0.0 is default from dspy LM.
+            max_tokens: Maximum number of tokens to generate. 1000 is default from dspy LM.
+            seed: Random seed for reproducibility.
+            search_space: Search space for the pipeline.
+        """
+        self.search_space = search_space or DEFAULT_SEARCH_SPACE
         random.seed(seed)
 
-        turbo = dspy.LM(
-            "hosted_vllm/x5-airun-medium-coder-prod",
-            api_base="http://mn-rtx01.x5.ru:8000/v1",
-            # api_key="test",
+        llm = dspy.LM(
+            model,
+            api_base=api_base,
             model_type="chat",
+            temperature=temperature,
+            max_tokens=max_tokens,
         )
-        dspy.settings.configure(lm=turbo)
-        # self.generator = dspy.ChainOfThought("text, n_examples -> augmented_texts: list[str]")
+        dspy.settings.configure(lm=llm)
         # input should be question and response is augmented. question and response required for metric
         self.generator = dspy.ChainOfThought("question -> response: str")
-
-    def _choose_search_space(self, search_space: str | None) -> list[dict[str, Any]] | Path | str:
-        if search_space is None:
-            return SEARCH_SPACE
-        return search_space
 
     def augment(
         self,
         dataset: Dataset,
         split_name: str = Split.TEST,
-        n_evolutions: int = 1,
+        n_evolutions: int = 3,
         update_split: bool = True,
-        batch_size: int = 4,
+        mipro_init_params: dict | None = None,
+        mipro_compile_params: dict | None = None,
+        save_path: Path | str = "evolution_config",
     ) -> HFDataset:
         """
-        Augment dataset split using DSPy with incremental optimization.
+        Augment the dataset using the evolutionary strategy.
+
+        Args:
+            dataset: The dataset to augment.
+            split_name: The name of the split to augment.
+            n_evolutions: Number of evolutions to perform.
+            update_split: Whether to update the split with the augmented data.
+            mipro_init_params: Parameters for the MIPROv2 augmentation.
+                Full list of params available at https://dspy.ai/deep-dive/optimizers/miprov2/#initialization-parameters
+            mipro_compile_params: Parameters for the MIPROv2 compilation.
+                Full list of params available at https://dspy.ai/deep-dive/optimizers/miprov2/#compile-parameters
+            save_path: Path to save the generated samples. Defaults to "evolution_config".
+
+        Returns:
+            The augmented dataset.
         """
         best_result = 0
         merge_dataset = copy.deepcopy(dataset)
         generated_samples = []
         original_split = dataset[split_name]
+        if mipro_init_params is None:
+            mipro_init_params = {}
+        if mipro_compile_params is None:
+            mipro_compile_params = {}
+
+        if isinstance(save_path, str):
+            save_path = Path(save_path)
+
+        if not save_path.exists():
+            save_path.mkdir(parents=True)
 
         dspy_dataset = [
             dspy.Example(
                 question=sample[Dataset.utterance_feature],
-                # n_examples=1,
                 response=sample[Dataset.utterance_feature],  # Use original as reference
             ).with_inputs(
                 "question",
-                # "n_examples"
             )
             for sample in original_split
         ]
@@ -177,29 +234,14 @@ class DSPYIncrementalUtteranceEvolver:
         for i in range(n_evolutions):
             metric = AugmentSemanticF1()
 
-            optimizer = dspy.MIPROv2(
-                metric=metric,  # SemanticF1
-                # auto="medium",  # can be low, medium, high. this setting will override params in compile
-                # num_threads=batch_size,
-                # log_dir="logs",
-            )
-            optimized_module = optimizer.compile(
-                self.generator,
-                trainset=dspy_dataset,
-                requires_permission_to_run=False,
-                minibatch=False,
-                # max_bootstrapped_demos=4,
-                # max_labeled_demos=4,
-                num_trials=5,
-            )
-            # evaluate(optimized_module)
-            # try:
-            self.generator.save("generator/", save_program=True)
-            # should be dir + file *.json or *.pkl
-            self.generator.save("generator/generator_state.json", save_program=False)
+            optimizer = dspy.MIPROv2(metric=metric, **mipro_init_params)
 
-            optimized_module.save("optimized_module", save_program=True)
-            optimized_module.save("optimized_module/optimized_module.json", save_program=False)
+            optimized_module = optimizer.compile(self.generator, trainset=dspy_dataset, **mipro_compile_params)
+
+            optimized_module.save((save_path / f"evolution_{i}").as_posix(), save_program=True)
+            optimized_module.save(
+                (save_path / f"evolution_{i}" / "generator_state.json").as_posix(), save_program=False
+            )
             # Generate new samples
             new_samples = []
             for sample in original_split:
@@ -219,9 +261,13 @@ class DSPYIncrementalUtteranceEvolver:
             ctx = pipeline_optimizer.fit(merge_dataset)
             results = ctx.optimization_info.dump_evaluation_results()
             decision_metric = results["metrics"]["decision"][0]
+            msg = f"Evolution {i} decision metric: {decision_metric}"
+            logger.info(msg)
 
             if decision_metric > best_result:
                 best_result = decision_metric
+                msg = f"Evolution {i} is the best so far."
+                logger.info(msg)
             else:
                 break
 
@@ -229,12 +275,3 @@ class DSPYIncrementalUtteranceEvolver:
             dataset[split_name] = merge_dataset[split_name]
 
         return concatenate_datasets(generated_samples)
-
-
-if __name__ == "__main__":
-    from autointent import Dataset
-
-    # Example usage
-    dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
-    evolver = DSPYIncrementalUtteranceEvolver(seed=42, search_space=None)
-    augmented_dataset = evolver.augment(dataset, split_name=Split.TEST, n_evolutions=2)
