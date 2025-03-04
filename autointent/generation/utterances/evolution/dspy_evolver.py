@@ -40,8 +40,7 @@ DEFAULT_SEARCH_SPACE = [
 
 
 def repetition_factor(true_text: str, augmented_text: str) -> float:
-    """
-    Calculate the average ROUGE-1 F1 score between pairs of texts in true_texts and augmented_texts.
+    """Calculate the average ROUGE-1 F1 score between pairs of texts in true_texts and augmented_texts.
 
     ROUGE-1 F1 is computed as:
         F1 = 2 * (precision * recall) / (precision + recall)
@@ -73,8 +72,7 @@ def repetition_factor(true_text: str, augmented_text: str) -> float:
 
 
 class SemanticRecallPrecision(dspy.Signature):
-    """
-    Compare a system's response to the ground truth to compute its recall and precision.
+    """Compare a system's response to the ground truth to compute its recall and precision.
 
     If asked to reason, enumerate key ideas in each response, and whether they are present in the other response.
 
@@ -97,8 +95,7 @@ class AugmentSemanticF1(dspy.Module):
     """
 
     def __init__(self, threshold: float = 0.66) -> None:
-        """
-        Initialize the AugmentSemanticF1.
+        """Initialize the AugmentSemanticF1.
 
         Args:
             threshold: Threshold for the boolean output.
@@ -109,8 +106,7 @@ class AugmentSemanticF1(dspy.Module):
     def forward(
         self, example: dspy.Example, pred: dspy.Prediction, trace: list[dspy.Prediction] | None = None
     ) -> float | bool:
-        """
-        Compute the score for the given example and prediction.
+        """Compute the score for the given example and prediction.
 
         Uses SemanticF1 as the base metric with a ROUGE-1 as repetition penalty.
 
@@ -162,8 +158,7 @@ class DSPYIncrementalUtteranceEvolver:
         seed: int = 42,
         search_space: str | None = None,
     ) -> None:
-        """
-        Initialize the DSPYIncrementalUtteranceEvolver.
+        """Initialize the DSPYIncrementalUtteranceEvolver.
 
         Args:
             model: Model name. This should follow naming schema from litellm.
@@ -197,8 +192,7 @@ class DSPYIncrementalUtteranceEvolver:
         mipro_compile_params: dict | None = None,
         save_path: Path | str = "evolution_config",
     ) -> HFDataset:
-        """
-        Augment the dataset using the evolutionary strategy.
+        """Augment the dataset using the evolutionary strategy.
 
         Args:
             dataset: The dataset to augment.
