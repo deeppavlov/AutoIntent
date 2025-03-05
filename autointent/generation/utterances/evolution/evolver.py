@@ -11,7 +11,7 @@ from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset
-from autointent.types import Split
+from autointent.custom_types import Split
 from autointent.generation.utterances.evolution.chat_templates import EvolutionChatTemplate
 from autointent.generation.utterances.generator import Generator
 from autointent.schemas import Intent

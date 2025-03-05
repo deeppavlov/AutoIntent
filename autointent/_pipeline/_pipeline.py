@@ -17,7 +17,7 @@ from autointent.configs import (
     InferenceNodeConfig,
     LoggingConfig,
 )
-from autointent.types import (
+from autointent.custom_types import (
     ListOfGenericLabels,
     NodeType,
     SamplerType,

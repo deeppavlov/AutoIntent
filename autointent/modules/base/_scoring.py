@@ -7,7 +7,7 @@ import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
-from autointent.types import ListOfLabels
+from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseModule
 

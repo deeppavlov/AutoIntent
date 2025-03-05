@@ -6,7 +6,7 @@ from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset
-from autointent.types import Split
+from autointent.custom_types import Split
 from autointent.generation.utterances.basic.chat_templates import BaseSynthesizerTemplate
 from autointent.generation.utterances.generator import Generator
 from autointent.schemas import Intent, Sample

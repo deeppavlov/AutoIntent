@@ -4,7 +4,7 @@ from typing import Any
 
 import numpy.typing as npt
 
-from autointent.types import ListOfLabels
+from autointent.custom_types import ListOfLabels
 
 LABELS_VALUE_TYPE = ListOfLabels
 

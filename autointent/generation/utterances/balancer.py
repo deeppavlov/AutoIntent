@@ -6,7 +6,7 @@ from collections import defaultdict
 from datasets import Dataset as HFDataset
 
 from autointent import Dataset
-from autointent.types import Split
+from autointent.custom_types import Split
 from autointent.generation.utterances.basic.chat_templates._base import BaseSynthesizerTemplate
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator

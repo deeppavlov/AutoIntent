@@ -14,7 +14,7 @@ from autointent._dump_tools import Dumper
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context import Context
 from autointent.context.optimization_info import Artifact
-from autointent.types import ListOfGenericLabels, ListOfLabels
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 from autointent.exceptions import WrongClassificationError
 
 logger = logging.getLogger(__name__)

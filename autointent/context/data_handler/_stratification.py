@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
 
 from autointent import Dataset
-from autointent.types import LabelType
+from autointent.custom_types import LabelType
 
 
 class StratifiedSplitter:

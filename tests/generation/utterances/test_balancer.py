@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from autointent import Dataset
-from autointent.types import Split
+from autointent.custom_types import Split
 from autointent.generation.utterances import DatasetBalancer, Generator
 from autointent.generation.utterances.basic.chat_templates._synthesizer_en import EnglishSynthesizerTemplate
 

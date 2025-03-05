@@ -16,7 +16,7 @@ from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.info import NODES_INFO
 
 

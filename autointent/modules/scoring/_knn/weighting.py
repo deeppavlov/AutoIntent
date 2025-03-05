@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from autointent.types import WeightType
+from autointent.custom_types import WeightType
 
 from .count_neighbors import get_counts, get_counts_multilabel
 

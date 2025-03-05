@@ -3,7 +3,7 @@ from typing import Any
 from pydantic import BaseModel, PositiveInt
 
 from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
-from .types import SamplerType
+from .custom_types import SamplerType
 
 
 class OptimizationConfig(BaseModel):

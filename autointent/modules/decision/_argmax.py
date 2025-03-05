@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.types import ListOfGenericLabels
+from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag

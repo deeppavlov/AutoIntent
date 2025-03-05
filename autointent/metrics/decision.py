@@ -8,7 +8,7 @@ import numpy as np
 import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
-from autointent.types import ListOfGenericLabels, ListOfLabels
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 
 from ._converter import transform
 

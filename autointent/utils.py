@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from autointent.types import SearchSpacePreset
+from autointent.custom_types import SearchSpacePreset
 
 
 def load_search_space(path: Path | str) -> list[dict[str, Any]]:

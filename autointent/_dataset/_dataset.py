@@ -10,7 +10,7 @@ from typing import Any, TypedDict
 from datasets import Dataset as HFDataset
 from datasets import Sequence, get_dataset_config_names, load_dataset
 
-from autointent.types import LabelWithOOS, Split
+from autointent.custom_types import LabelWithOOS, Split
 from autointent.schemas import Intent, Tag
 
 logger = logging.getLogger(__name__)

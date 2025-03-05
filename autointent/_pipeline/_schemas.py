@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from autointent.types import LabelWithOOS, ListOfLabels, ListOfLabelsWithOOS
+from autointent.custom_types import LabelWithOOS, ListOfLabels, ListOfLabelsWithOOS
 
 
 class InferencePipelineUtteranceOutput(BaseModel):

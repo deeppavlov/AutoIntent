@@ -9,7 +9,7 @@ from typing_extensions import assert_never
 
 from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
-from autointent.types import ListOfGenericLabels
+from autointent.custom_types import ListOfGenericLabels
 from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseModule
 from autointent.schemas import Tag

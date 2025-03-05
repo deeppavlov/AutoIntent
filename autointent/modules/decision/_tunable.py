@@ -9,7 +9,7 @@ from optuna.trial import Trial
 from pydantic import PositiveInt
 
 from autointent.context import Context
-from autointent.types import ListOfGenericLabels
+from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import DECISION_METRICS, DecisionMetricFn
 from autointent.modules.base import BaseDecision

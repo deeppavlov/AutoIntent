@@ -3,7 +3,7 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from autointent.types import NodeType
+from autointent.custom_types import NodeType
 
 from ._transformers import CrossEncoderConfig, EmbedderConfig
 

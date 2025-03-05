@@ -12,7 +12,7 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
-from autointent.types import LabelType, ListOfGenericLabels, ListOfLabels
+from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
 from autointent.metrics import REGEX_METRICS
 from autointent.modules.base import BaseRegex
 from autointent.schemas import Intent

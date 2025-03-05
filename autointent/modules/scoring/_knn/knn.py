@@ -8,7 +8,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
-from autointent.types import WeightType, ListOfLabels
+from autointent.custom_types import WeightType, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights

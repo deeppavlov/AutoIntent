@@ -4,7 +4,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, LoggingConfig
-from autointent.types import SearchSpacePreset
+from autointent.custom_types import SearchSpacePreset
 from tests.conftest import setup_environment
 
 

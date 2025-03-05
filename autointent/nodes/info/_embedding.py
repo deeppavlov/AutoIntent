@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
-from autointent.types import NodeType
+from autointent.custom_types import NodeType
 from autointent.metrics import (
     RETRIEVAL_METRICS_MULTICLASS,
     RETRIEVAL_METRICS_MULTILABEL,

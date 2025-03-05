@@ -9,7 +9,7 @@ from transformers import set_seed
 
 from autointent import Dataset
 from autointent.configs import DataConfig
-from autointent.types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
 
 from ._stratification import split_dataset
 
