@@ -35,7 +35,12 @@ if TYPE_CHECKING:
 
 
 class Pipeline:
-    """Pipeline optimizer class."""
+    """Pipeline optimizer class.
+    
+    See tutorial on AutoML features of AutoIntent.
+    """
+
+    nodes: list[NodeOptimizer] | list[InferenceNode]
 
     def __init__(
         self,
@@ -52,12 +57,12 @@ class Pipeline:
         """
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
-        self.seed = seed
+        self._seed = seed
         if sampler not in get_args(SamplerType):
             msg = f"Sampler should be one of {get_args(SamplerType)}"
             raise ValueError(msg)
 
-        self.sampler = sampler
+        self._sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig()
@@ -86,14 +91,11 @@ class Pipeline:
 
     @classmethod
     def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int | None = 42) -> "Pipeline":
-        """Search space to pipeline optimizer.
+        """Instantiate pipeline optimizer from given search space.
 
         Args:
-            search_space: Search space.
-            seed: Random seed.
-
-        Returns:
-            Pipeline optimizer.
+            search_space: dictionary or path to yaml file.
+            seed: random seed.
         """
         if not isinstance(search_space, list):
             search_space = load_search_space(search_space)
@@ -102,6 +104,7 @@ class Pipeline:
 
     @classmethod
     def from_preset(cls, name: SearchSpacePreset, seed: int | None = 42) -> "Pipeline":
+        """Instantiate pipeline optimizer from a preset."""
         optimization_config = load_preset(name)
         config = OptimizationConfig(seed=seed, **optimization_config)
         return cls.from_optimization_config(config=config)
@@ -110,7 +113,7 @@ class Pipeline:
     def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
         """Create pipeline optimizer from optimization config.
 
-        :param config: Optimization config
+        :param config: dictionary or a path to yaml file
         :return:
         """
         if isinstance(config, OptimizationConfig):
@@ -171,13 +174,10 @@ class Pipeline:
         """Optimize the pipeline from dataset.
 
         Args:
-            dataset: Dataset for optimization.
-            refit_after: Whether to refit after optimization.
-            sampler: Sampler type to use.
-            incompatible_search_space: How to handle incompatible search space.
-
-        Returns:
-            Context object.
+            dataset: dataset for optimization.
+            refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
+            sampler: sampler type to use.
+            incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
 
         Raises:
             RuntimeError: If pipeline is in inference mode.
@@ -186,7 +186,7 @@ class Pipeline:
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
 
-        context = Context(self.seed)
+        context = Context(self._seed)
         context.set_dataset(dataset, self.data_config)
         context.configure_logging(self.logging_config)
         context.configure_transformer(self.embedder_config)
@@ -207,7 +207,7 @@ class Pipeline:
             )
 
         if sampler is None:
-            sampler = self.sampler
+            sampler = self._sampler
 
         self._fit(context, sampler)
 
@@ -248,6 +248,9 @@ class Pipeline:
         return context
 
     def dump(self, path: str | Path | None = None) -> None:
+        """Dump pipeline to disk.
+        
+        One can reuse it for inference later with :py:meth:`autointent.Pipeline.load`."""
         if isinstance(path, str):
             path = Path(path)
         elif path is None:
@@ -299,9 +302,6 @@ class Pipeline:
 
         Args:
             nodes_configs: list of config for nodes
-
-        Returns:
-            Inference pipeline
         """
         nodes = [InferenceNode.from_config(cfg) for cfg in nodes_configs]
         return cls(nodes)
@@ -319,9 +319,6 @@ class Pipeline:
             path: Path to load
             embedder_config: one can override presaved settings
             cross_encoder_config: one can override presaved settings
-
-        Returns:
-            Inference pipeline
         """
         with (Path(path) / "inference_config.yaml").open() as file:
             inference_nodes_configs: list[dict[str, Any]] = yaml.safe_load(file)
@@ -340,9 +337,6 @@ class Pipeline:
 
         Args:
             utterances: list of utterances
-
-        Returns:
-            list of predicted labels
         """
         if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
@@ -382,8 +376,6 @@ class Pipeline:
 
         Args:
             utterances: list of utterances
-        Returns:
-            Inference pipeline output
         """
         if not self._is_inference():
             msg = "Pipeline in optimization mode cannot perform inference"
