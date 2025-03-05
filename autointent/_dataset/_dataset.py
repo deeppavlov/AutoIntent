@@ -40,7 +40,7 @@ class Dataset(dict[str, HFDataset]):
 
     utterance_feature: str = "utterance"
     """The feature name corresponding to utterances in the dataset"""
-    
+
     has_descriptions: bool
     """Whether the dataset includes descriptions for intents."""
 

@@ -11,7 +11,8 @@ class Hasher:
 
     This class supports both a class-level method for generating hashes from
     any given value, as well as an instance-level method for progressively
-    updating a hash state with new values. We use this class for hashing embeddings from :py:class:`autointent.Embedder`.
+    updating a hash state with new values. We use this class for
+    hashing embeddings from :py:class:`autointent.Embedder`.
     """
 
     def __init__(self) -> None:

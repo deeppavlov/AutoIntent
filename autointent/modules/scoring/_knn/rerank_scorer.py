@@ -8,7 +8,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, Ranker
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.custom_types import WeightType, ListOfLabels
+from autointent.custom_types import ListOfLabels, WeightType
 
 from .knn import KNNScorer
 
