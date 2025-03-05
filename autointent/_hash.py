@@ -7,11 +7,11 @@ import xxhash
 
 
 class Hasher:
-    """A class that provides methods for hashing data using xxhash.
+    """A class that provides methods for hashing data using `xxhash <https://github.com/ifduyue/python-xxhash>`_.
 
     This class supports both a class-level method for generating hashes from
     any given value, as well as an instance-level method for progressively
-    updating a hash state with new values.
+    updating a hash state with new values. We use this class for hashing embeddings from :py:class:`autointent.Embedder`.
     """
 
     def __init__(self) -> None:
