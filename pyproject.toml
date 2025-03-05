@@ -1,6 +1,6 @@
 [project]
 name = "autointent"
-version = "0.0.1"
+version = "0.1.0"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
 license = { text = "Apache 2.0" }
 authors = [
