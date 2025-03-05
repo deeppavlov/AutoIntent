@@ -220,9 +220,6 @@ class VectorIndex:
             embedder_device: Device for the embedding model.
             embedder_batch_size: Batch size for the embedding model.
             embedder_use_cache: Whether to use caching for the embedding model.
-
-        Returns:
-            VectorIndex instance with loaded data.
         """
         with (dir_path / cls._meta_data_file).open() as file:
             metadata: VectorIndexMetadata = json.load(file)
