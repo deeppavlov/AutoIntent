@@ -19,4 +19,4 @@ def test_create_collection(data_handler):
         data_handler.utterances_train,
         data_handler.labels_train,
     )
-    assert vector_index.embedder.model_name == "bert-base-uncased"
+    assert vector_index.embedder.config.model_name == "bert-base-uncased"
