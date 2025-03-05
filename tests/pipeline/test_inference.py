@@ -107,7 +107,7 @@ def test_load_with_overrided_params(dataset):
     # case 2: rich inference from file system
     rich_outputs = inference_pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
-    assert inference_pipeline.nodes[NodeType.scoring].module._embedder.max_length == 8
+    assert inference_pipeline.nodes[NodeType.scoring].module._embedder.config.max_length == 8
     del inference_pipeline
 
     # case 3: dump and then load pipeline
@@ -117,7 +117,7 @@ def test_load_with_overrided_params(dataset):
     loaded_pipe = Pipeline.load(logging_config.dirpath, embedder_config=EmbedderConfig(max_length=8))
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
-    assert loaded_pipe.nodes[NodeType.scoring].module._embedder.max_length == 8
+    assert loaded_pipe.nodes[NodeType.scoring].module._embedder.config.max_length == 8
 
 
 def test_no_saving(dataset):

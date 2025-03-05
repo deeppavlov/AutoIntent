@@ -62,7 +62,7 @@ class VectorIndex:
             texts: List of input texts.
             labels: List of labels corresponding to the texts.
         """
-        self.logger.debug("Adding embeddings to vector index %s", self.embedder.model_name)
+        self.logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
@@ -81,14 +81,14 @@ class VectorIndex:
 
     def delete(self) -> None:
         """Delete the vector index and all associated data from disk and memory."""
-        self.logger.debug("Deleting vector index %s", self.embedder.model_name)
+        self.logger.debug("Deleting vector index %s", self.embedder.config.model_name)
         self.embedder.delete()
         self.clear_ram()
         shutil.rmtree(self.dump_dir)
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        self.logger.debug("Clearing vector index %s from RAM", self.embedder.model_name)
+        self.logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
         self.embedder.clear_ram()
         self.index.reset()
         self.labels = []
@@ -195,11 +195,11 @@ class VectorIndex:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
         metadata = VectorIndexMetadata(
-            embedder_max_length=self.embedder.max_length,
-            embedder_model_name=str(self.embedder.model_name),
-            embedder_device=self.embedder.device,
-            embedder_batch_size=self.embedder.batch_size,
-            embedder_use_cache=self.embedder.use_cache,
+            embedder_max_length=self.embedder.config.max_length,
+            embedder_model_name=str(self.embedder.config.model_name),
+            embedder_device=self.embedder.config.device,
+            embedder_batch_size=self.embedder.config.batch_size,
+            embedder_use_cache=self.embedder.config.use_cache,
         )
 
         with (self.dump_dir / self._meta_data_file).open("w") as file:

@@ -53,14 +53,15 @@ class EmbedderDumpMetadata(TypedDict):
 
 
 class Embedder:
-    """A wrapper for managing embedding models using Sentence Transformers.
+    """A wrapper for managing embedding models using :py:class:`sentence_transformers.SentenceTransformer`.
 
     This class handles initialization, saving, loading, and clearing of
     embedding models, as well as calculating embeddings for input texts.
     """
 
-    metadata_dict_name: str = "metadata.json"
-    dump_dir: Path | None = None
+    _metadata_dict_name: str = "metadata.json"
+    _dump_dir: Path | None = None
+    config: EmbedderConfig
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
         """Initialize the Embedder.
@@ -68,15 +69,10 @@ class Embedder:
         Args:
             embedder_config: Config of embedder.
         """
-        self.model_name = embedder_config.model_name
-        self.device = embedder_config.device
-        self.batch_size = embedder_config.batch_size
-        self.max_length = embedder_config.max_length
-        self.use_cache = embedder_config.use_cache
-        self.embedding_config = embedder_config
+        self.config = embedder_config
 
         self.embedding_model = SentenceTransformer(
-            self.model_name, device=self.device, prompts=embedder_config.get_prompt_config()
+            self.config.model_name, device=self.config.device, prompts=embedder_config.get_prompt_config()
         )
 
         self.logger = logging.getLogger(__name__)
@@ -90,12 +86,12 @@ class Embedder:
         hasher = Hasher()
         for parameter in self.embedding_model.parameters():
             hasher.update(parameter.detach().cpu().numpy())
-        hasher.update(self.max_length)
+        hasher.update(self.config.max_length)
         return hasher.intdigest()
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
-        self.logger.debug("Clearing embedder %s from memory", self.model_name)
+        self.logger.debug("Clearing embedder %s from memory", self.config.model_name)
         self.embedding_model.cpu()
         del self.embedding_model
         torch.cuda.empty_cache()
@@ -103,8 +99,8 @@ class Embedder:
     def delete(self) -> None:
         """Delete the embedding model and its associated directory."""
         self.clear_ram()
-        if self.dump_dir is not None:
-            shutil.rmtree(self.dump_dir)
+        if self._dump_dir is not None:
+            shutil.rmtree(self._dump_dir)
 
     def dump(self, path: Path) -> None:
         """Save the embedding model and metadata to disk.
@@ -112,16 +108,16 @@ class Embedder:
         Args:
             path: Path to the directory where the model will be saved.
         """
-        self.dump_dir = path
+        self._dump_dir = path
         metadata = EmbedderDumpMetadata(
-            model_name=str(self.model_name),
-            device=self.device,
-            batch_size=self.batch_size,
-            max_length=self.max_length,
-            use_cache=self.use_cache,
+            model_name=str(self.config.model_name),
+            device=self.config.device,
+            batch_size=self.config.batch_size,
+            max_length=self.config.max_length,
+            use_cache=self.config.use_cache,
         )
         path.mkdir(parents=True, exist_ok=True)
-        with (path / self.metadata_dict_name).open("w") as file:
+        with (path / self._metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
     @classmethod
@@ -132,7 +128,7 @@ class Embedder:
             path: Path to the directory where the model is stored.
             override_config: one can override presaved settings
         """
-        with (Path(path) / cls.metadata_dict_name).open() as file:
+        with (Path(path) / cls._metadata_dict_name).open() as file:
             metadata: EmbedderDumpMetadata = json.load(file)
 
         if override_config is not None:
@@ -152,7 +148,7 @@ class Embedder:
         Returns:
             A numpy array of embeddings.
         """
-        if self.use_cache:
+        if self.config.use_cache:
             hasher = Hasher()
             hasher.update(self)
             hasher.update(utterances)
@@ -163,24 +159,24 @@ class Embedder:
 
         self.logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
-            self.model_name,
-            self.batch_size,
-            str(self.max_length),
-            self.device,
+            self.config.model_name,
+            self.config.batch_size,
+            str(self.config.max_length),
+            self.config.device,
         )
 
-        if self.max_length is not None:
-            self.embedding_model.max_seq_length = self.max_length
+        if self.config.max_length is not None:
+            self.embedding_model.max_seq_length = self.config.max_length
 
         embeddings = self.embedding_model.encode(
             utterances,
             convert_to_numpy=True,
-            batch_size=self.batch_size,
+            batch_size=self.config.batch_size,
             normalize_embeddings=True,
-            prompt_name=self.embedding_config.get_prompt_type(task_type),
+            prompt_name=self.config.get_prompt_type(task_type),
         )
 
-        if self.use_cache:
+        if self.config.use_cache:
             embeddings_path.parent.mkdir(parents=True, exist_ok=True)
             np.save(embeddings_path, embeddings)
 
