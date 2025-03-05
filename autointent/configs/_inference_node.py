@@ -13,19 +13,20 @@ class InferenceNodeConfig:
     """Configuration for the inference node."""
 
     node_type: NodeType
-    """Type of the node. Should be one of the NODE_TYPES"""
+    """Type of the node."""
     module_name: str
-    """Type of the module. Should be one of the Module"""
+    """Name of module which is specified as :py:attr:`autointent.modules.base.BaseModule.name`."""
     module_config: dict[str, Any]
-    """Configuration of the module"""
-    load_path: str | None = None
-    """Path to the module dump. If None, the module will be trained from scratch"""
+    """Hyperparameters of underlying module."""
+    load_path: str
+    """Path to the module dump."""
     embedder_config: EmbedderConfig | None = None
     """One can override presaved embedder config while loading from file system."""
     cross_encoder_config: CrossEncoderConfig | None = None
     """One can override presaved cross encoder config while loading from file system."""
 
     def asdict(self) -> dict[str, Any]:
+        """Convert config to dict format."""
         res = asdict(self)
         if self.embedder_config is not None:
             res["embedder_config"] = self.embedder_config.model_dump()
