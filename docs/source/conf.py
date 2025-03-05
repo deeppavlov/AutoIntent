@@ -64,6 +64,9 @@ intersphinx_mapping = {
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "datasets": ("https://huggingface.co/docs/datasets/master/en/", None),
     "transformers": ("https://huggingface.co/docs/transformers/master/en/", None),
+    "sklearn": ("https://scikit-learn.org/stable", None),
+    "sentence-transformers": ("https://sbert.net/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None)
 }
 
 autoapi_keep_files = True
@@ -156,7 +159,7 @@ nbsphinx_custom_formats = {".py": "docs_utils.notebook.py_percent_to_notebook"}
 nbsphinx_prolog = """
 :tutorial_name: {{ env.docname }}
 """
-# nbsphinx_execute = "never"
+nbsphinx_execute = "never"
 nbsphinx_thumbnails = {
     "user_guides/*": "_static/square-white.svg",
 }
@@ -165,7 +168,7 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 # sphinx_multiversion
 # Whitelist for tags matching v1.0.0, v2.1.0 format
-# smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+# smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
 smv_tag_whitelist = r"^.*$"
 
 # Whitelist for the dev branch
