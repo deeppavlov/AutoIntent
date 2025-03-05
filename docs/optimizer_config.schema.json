@@ -303,7 +303,7 @@
             "type": "object"
         }
     },
-    "description": "Configuration for the optimization process.",
+    "description": "Configuration for the optimization process.\n\nOne can use it to customize optimization beyond choosing different preset.\nInstantiate it and pass to :py:meth:`autointent.Pipeline.from_optimization_config`.",
     "properties": {
         "data_config": {
             "$ref": "#/$defs/DataConfig",
