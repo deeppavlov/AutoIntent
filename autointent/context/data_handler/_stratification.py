@@ -12,6 +12,7 @@ from datasets import concatenate_datasets
 from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
+from transformers import set_seed
 
 from autointent import Dataset
 from autointent.custom_types import LabelType
@@ -127,6 +128,7 @@ class StratifiedSplitter:
         Returns:
             A sequence containing indices for train and test splits.
         """
+        set_seed(self.random_seed)  # workaround for buggy nature of IterativeStratification from skmultilearn
         splitter = IterativeStratification(
             n_splits=2,
             order=2,

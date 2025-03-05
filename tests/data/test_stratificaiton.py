@@ -38,6 +38,6 @@ def test_multilabel_train_test_split(dataset_unsplitted):
 
     assert Split.TRAIN in dataset
     assert Split.TEST in dataset
-    assert dataset[Split.TRAIN].num_rows == 19
-    assert dataset[Split.TEST].num_rows == 17
+    assert dataset[Split.TRAIN].num_rows == 18
+    assert dataset[Split.TEST].num_rows == 18
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST)

@@ -74,7 +74,7 @@ def test_data_handler_initialization(sample_multiclass_data):
     handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
 
     assert handler.multilabel is False
-    assert handler.n_classes == 2
+    assert handler.dataset.n_classes == 2
     assert handler.train_utterances(0) == ["hello", "bye", "hi", "take care"]
     assert handler.test_utterances() == ["greetings", "farewell"]
     assert handler.train_labels(0) == [0, 1, 0, 1]
@@ -85,12 +85,12 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     handler = DataHandler(dataset=Dataset.from_dict(sample_multilabel_data), random_seed=42)
 
     assert handler.multilabel is True
-    assert handler.n_classes == 2
+    assert handler.dataset.n_classes == 2
     assert handler.train_utterances(0) == [
         "hey, how's it going?",
         "so long and take care",
         "hello, nice to meet you",
-        "later, see you soon",
+        "later, see you soon"
     ]
     assert handler.test_utterances() == ["greetings", "farewell"]
     assert handler.train_labels(0) == [[1, 0], [0, 1], [0, 1], [1, 0]]
