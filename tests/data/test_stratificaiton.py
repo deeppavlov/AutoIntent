@@ -1,7 +1,7 @@
 import pytest
 
 from autointent.context.data_handler._stratification import split_dataset
-from autointent.custom_types import Split
+from autointent.types import Split
 
 
 def test_train_test_split(dataset_unsplitted):

@@ -12,7 +12,7 @@ from pydantic import (
     model_validator,
 )
 
-from autointent.custom_types import LabelWithOOS
+from autointent.types import LabelWithOOS
 
 
 class Tag(BaseModel):

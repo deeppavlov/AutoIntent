@@ -17,11 +17,11 @@ from autointent.configs import (
     InferenceNodeConfig,
     LoggingConfig,
 )
-from autointent.custom_types import (
+from autointent.types import (
     ListOfGenericLabels,
     NodeType,
     SamplerType,
-    SearchSpacePresets,
+    SearchSpacePreset,
     SearchSpaceValidationMode,
 )
 from autointent.metrics import DECISION_METRICS
@@ -101,7 +101,7 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def from_preset(cls, name: SearchSpacePresets, seed: int | None = 42) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePreset, seed: int | None = 42) -> "Pipeline":
         optimization_config = load_preset(name)
         config = OptimizationConfig(seed=seed, **optimization_config)
         return cls.from_optimization_config(config=config)

@@ -8,7 +8,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, Ranker
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
+from autointent.types import WeightType, ListOfLabels
 
 from .knn import KNNScorer
 
@@ -29,7 +29,7 @@ class RerankScorer(KNNScorer):
     def __init__(
         self,
         k: int,
-        weights: WEIGHT_TYPES,
+        weights: WeightType,
         m: int | None = None,
         rank_threshold_cutoff: int | None = None,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
@@ -74,7 +74,7 @@ class RerankScorer(KNNScorer):
         cls,
         context: Context,
         k: int,
-        weights: WEIGHT_TYPES = "distance",
+        weights: WeightType = "distance",
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,

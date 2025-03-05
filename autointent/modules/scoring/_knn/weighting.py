@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from autointent.custom_types import WEIGHT_TYPES
+from autointent.types import WeightType
 
 from .count_neighbors import get_counts, get_counts_multilabel
 
@@ -13,7 +13,7 @@ from .count_neighbors import get_counts, get_counts_multilabel
 def apply_weights(
     labels: NDArray[Any],
     distances: NDArray[Any],
-    weights: WEIGHT_TYPES,
+    weights: WeightType,
     n_classes: int,
     multilabel: bool,
 ) -> NDArray[Any]:

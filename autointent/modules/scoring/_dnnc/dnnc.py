@@ -10,7 +10,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)

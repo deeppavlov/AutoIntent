@@ -62,6 +62,7 @@ class Embedder:
     _metadata_dict_name: str = "metadata.json"
     _dump_dir: Path | None = None
     config: EmbedderConfig
+    embedding_model: SentenceTransformer
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
         """Initialize the Embedder.
@@ -75,7 +76,7 @@ class Embedder:
             self.config.model_name, device=self.config.device, prompts=embedder_config.get_prompt_config()
         )
 
-        self.logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(__name__)
 
     def __hash__(self) -> int:
         """Compute a hash value for the Embedder.
@@ -91,7 +92,7 @@ class Embedder:
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
-        self.logger.debug("Clearing embedder %s from memory", self.config.model_name)
+        self._logger.debug("Clearing embedder %s from memory", self.config.model_name)
         self.embedding_model.cpu()
         del self.embedding_model
         torch.cuda.empty_cache()
@@ -157,7 +158,7 @@ class Embedder:
             if embeddings_path.exists():
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
-        self.logger.debug(
+        self._logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
             self.config.model_name,
             self.config.batch_size,

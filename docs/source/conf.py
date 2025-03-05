@@ -66,7 +66,8 @@ intersphinx_mapping = {
     "transformers": ("https://huggingface.co/docs/transformers/master/en/", None),
     "sklearn": ("https://scikit-learn.org/stable", None),
     "sentence-transformers": ("https://sbert.net/", None),
-    "numpy": ("https://numpy.org/doc/stable/", None)
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "optuna": ("https://optuna.readthedocs.io/en/stable/", None),
 }
 
 autoapi_keep_files = True

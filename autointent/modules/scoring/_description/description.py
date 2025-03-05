@@ -11,7 +11,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.context.optimization_info import ScorerArtifact
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
 

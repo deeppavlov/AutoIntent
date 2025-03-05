@@ -5,7 +5,7 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.custom_types import FloatFromZeroToOne, ValidationScheme
+from autointent.types import FloatFromZeroToOne, ValidationScheme
 
 from ._name import get_run_name
 

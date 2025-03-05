@@ -16,7 +16,7 @@ import numpy.typing as npt
 
 from autointent import Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 
 
 class VectorIndexMetadata(TypedDict):
@@ -53,7 +53,7 @@ class VectorIndex:
         self.labels: ListOfLabels = []  # (n_samples,) or (n_samples, n_classes)
         self.texts: list[str] = []
 
-        self.logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(__name__)
 
     def add(self, texts: list[str], labels: ListOfLabels) -> None:
         """Add texts and their corresponding labels to the index.
@@ -62,7 +62,7 @@ class VectorIndex:
             texts: List of input texts.
             labels: List of labels corresponding to the texts.
         """
-        self.logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
+        self._logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
@@ -81,14 +81,14 @@ class VectorIndex:
 
     def delete(self) -> None:
         """Delete the vector index and all associated data from disk and memory."""
-        self.logger.debug("Deleting vector index %s", self.embedder.config.model_name)
+        self._logger.debug("Deleting vector index %s", self.embedder.config.model_name)
         self.embedder.delete()
         self.clear_ram()
         shutil.rmtree(self.dump_dir)
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        self.logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
+        self._logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
         self.embedder.clear_ram()
         self.index.reset()
         self.labels = []

@@ -2,7 +2,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import EmbedderConfig, LoggingConfig
-from autointent.custom_types import NodeType
+from autointent.types import NodeType
 from tests.conftest import get_search_space, setup_environment
 
 

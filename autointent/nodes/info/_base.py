@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 from typing import ClassVar
 
-from autointent.custom_types import NodeType
+from autointent.types import NodeType
 from autointent.metrics import METRIC_FN
 from autointent.modules.base import BaseModule
 

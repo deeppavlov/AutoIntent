@@ -9,7 +9,7 @@ from typing_extensions import assert_never
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
 

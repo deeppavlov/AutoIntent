@@ -3,7 +3,7 @@
 from abc import ABC
 
 from autointent import Context
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 from autointent.modules.base import BaseModule
 
 

@@ -8,7 +8,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig
-from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
+from autointent.types import WeightType, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights
@@ -56,7 +56,7 @@ class KNNScorer(BaseScorer):
         self,
         k: PositiveInt,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        weights: WEIGHT_TYPES = "distance",
+        weights: WeightType = "distance",
     ) -> None:
         """Initialize the KNNScorer.
 
@@ -76,8 +76,8 @@ class KNNScorer(BaseScorer):
             msg = "`k` argument of `KNNScorer` must be a positive int"
             raise ValueError(msg)
 
-        if weights not in get_args(WEIGHT_TYPES):
-            msg = f"`weights` argument of `KNNScorer` must be a literal from a list: {get_args(WEIGHT_TYPES)}"
+        if weights not in get_args(WeightType):
+            msg = f"`weights` argument of `KNNScorer` must be a literal from a list: {get_args(WeightType)}"
             raise TypeError(msg)
 
     @classmethod
@@ -85,7 +85,7 @@ class KNNScorer(BaseScorer):
         cls,
         context: Context,
         k: PositiveInt,
-        weights: WEIGHT_TYPES = "distance",
+        weights: WeightType = "distance",
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
         """Create a KNNScorer instance using a Context object.

@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from autointent.custom_types import SearchSpacePresets
+from autointent.types import SearchSpacePreset
 
 
 def load_search_space(path: Path | str) -> list[dict[str, Any]]:
@@ -22,7 +22,7 @@ def load_search_space(path: Path | str) -> list[dict[str, Any]]:
         return yaml.safe_load(file)  # type: ignore[no-any-return]
 
 
-def load_preset(name: SearchSpacePresets) -> dict[str, Any]:
+def load_preset(name: SearchSpacePreset) -> dict[str, Any]:
     """Load one of preset search spaces.
 
     Args:

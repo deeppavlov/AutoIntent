@@ -21,7 +21,7 @@ class LogLevel(Enum):
 
 
 # Literal type for weight types in specific operations
-WEIGHT_TYPES = Literal["uniform", "distance", "closest"]
+WeightType = Literal["uniform", "distance", "closest"]
 """
 Represents weight calculation methods
 
@@ -32,20 +32,36 @@ Represents weight calculation methods
 
 # Type alias for label representation
 SimpleLabel = int
+"""Integer label for single-label classification problems."""
+
 MultiLabel = list[int]
+"""List label for multi-label classification problems."""
+
 SimpleLabelWithOOS = SimpleLabel | None
+"""Integer label for single-label classification problems with OOS samples."""
+
 MultiLabelWithOOS = MultiLabel | None
+"""List label for multi-label classification problems with OOS samples."""
+
 ListOfLabels = list[SimpleLabel] | list[MultiLabel]
+"""List of labels without OOS-samples that AutoIntent modules can handle."""
+
 ListOfLabelsWithOOS = list[SimpleLabelWithOOS] | list[MultiLabelWithOOS]
+"""List of labels with OOS-samples that AutoIntent modules can handle."""
+
 LabelType: TypeAlias = SimpleLabel | MultiLabel
-LabelWithOOS = LabelType | None
-ListOfGenericLabels = ListOfLabels | ListOfLabelsWithOOS
 """
 Type alias for label representation
 
 - `int`: For single-label classification.
 - `list[int]`: For multi-label classification.
 """
+
+LabelWithOOS = LabelType | None
+"""Any label that autointent modules can handle."""
+
+ListOfGenericLabels = ListOfLabels | ListOfLabelsWithOOS
+"""List of labels that AutoIntent modules can handle."""
 
 
 class NodeType(str, Enum):
@@ -74,12 +90,39 @@ class Split:
 
 
 SamplerType = Literal["brute", "tpe", "random"]
+"""Hyperparameter tuning strategies:
+
+- `brute`: :py:class:`optuna.samplers.BruteForceSampler`
+- `tpe`: :py:class:`optuna.samplers.TPESampler`
+- `random`: :py:class:`optuna.samplers.RandomSampler`
+"""
+
 ValidationScheme = Literal["ho", "cv"]
+"""Validation scheme used in hyperparameter tuning:
+
+- `ho`: hold-out validation
+- `cv`: cross-validation
+"""
 
 
 FloatFromZeroToOne = Annotated[float, Interval(ge=0, le=1)]
 """Float value between 0 and 1, inclusive."""
 
 SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
+"""Behavior when meet a data-incompatible module in search space:
 
-SearchSpacePresets = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]
+- `raise`: raise an error
+- `warning`: warn user
+- `filter`: drop incompatible modules from search space
+"""
+
+SearchSpacePreset = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]
+"""Some presets that our library supports from lightest to heaviest:
+
+- `light_extra`: just like `light` but tuned with `optuna.samplers.RandomSampler`
+- `light`: only light-weight modules tuned with `optuna.samplers.TPESampler`
+- `light_moderate`: just like `light` but tuned with `optuna.samplers.BruteForceSampler`
+- `heavy_moderate`: just like `heavy` but tuned with `optuna.samplers.RandomSampler`
+- `light`: light-weight modules accompanied with heavy-weight ones tuned with `optuna.samplers.TPESampler`
+- `heavy_extra`: just like `light` but tuned with `optuna.samplers.BruteForceSampler`
+"""

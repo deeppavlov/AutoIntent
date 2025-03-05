@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from autointent.custom_types import LogLevel
+from autointent.types import LogLevel
 
 
 def setup_logging(level: LogLevel | str, log_filename: Path | str | None = None) -> None:

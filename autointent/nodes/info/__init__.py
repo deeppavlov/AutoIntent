@@ -1,4 +1,4 @@
-from autointent.custom_types import NodeType
+from autointent.types import NodeType
 
 from ._base import NodeInfo
 from ._decision import DecisionNodeInfo

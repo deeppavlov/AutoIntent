@@ -9,7 +9,7 @@ from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
-from autointent.custom_types import ListOfLabels
+from autointent.types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
 
