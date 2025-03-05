@@ -33,16 +33,19 @@ class Dataset(dict[str, HFDataset]):
 
     This class extends a dictionary where the keys represent dataset splits (e.g., 'train', 'test'),
     and the values are Hugging Face datasets.
-
-    Attributes:
-        label_feature: The feature name corresponding to labels in the dataset.
-        utterance_feature: The feature name corresponding to utterances in the dataset.
-        has_descriptions: Whether the dataset includes descriptions for intents.
     """
 
-    label_feature = "label"
-    utterance_feature = "utterance"
+    label_feature: str = "label"
+    """The feature name corresponding to labels in the dataset."""
+
+    utterance_feature: str = "utterance"
+    """The feature name corresponding to utterances in the dataset"""
+    
     has_descriptions: bool
+    """Whether the dataset includes descriptions for intents."""
+
+    intents: list[Intent]
+    """All metadata about intents used in this dataset."""
 
     def __init__(self, *args: Any, intents: list[Intent], **kwargs: Any) -> None:  # noqa: ANN401
         """Initializes the dataset.
@@ -59,21 +62,13 @@ class Dataset(dict[str, HFDataset]):
 
     @property
     def multilabel(self) -> bool:
-        """Checks if the dataset is multilabel.
-
-        Returns:
-            True if the dataset supports multilabel classification, False otherwise.
-        """
+        """Checks if the dataset is multilabel."""
         split = Split.TRAIN if Split.TRAIN in self else f"{Split.TRAIN}_0"
         return isinstance(self[split].features[self.label_feature], Sequence)
 
     @cached_property
     def n_classes(self) -> int:
-        """Returns the number of classes in the dataset.
-
-        Returns:
-            The number of unique classes in the training split.
-        """
+        """Returns the number of classes in the dataset."""
         return len(self.intents)
 
     @classmethod
@@ -82,9 +77,6 @@ class Dataset(dict[str, HFDataset]):
 
         Args:
             mapping: A dictionary representation of the dataset.
-
-        Returns:
-            A `Dataset` instance initialized from the dictionary.
         """
         from ._reader import DictReader
 
@@ -96,39 +88,29 @@ class Dataset(dict[str, HFDataset]):
 
         Args:
             filepath: Path to the JSON file.
-
-        Returns:
-            A `Dataset` instance initialized from the JSON file.
         """
         from ._reader import JsonReader
 
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_hub(cls, repo_id: str) -> "Dataset":
+    def from_hub(cls, repo_name: str) -> "Dataset":
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
-            repo_id: The ID of the Hugging Face repository.
-
-        Returns:
-            A `Dataset` instance initialized from the Hugging Face dataset repository.
+            repo_name: The name of the Hugging Face repository, like `AutoIntent/clinc150`.
         """
         from ._reader import DictReader
 
-        splits = load_dataset(repo_id)
+        splits = load_dataset(repo_name)
         mapping = dict(**splits)
-        if Split.INTENTS in get_dataset_config_names(repo_id):
-            mapping["intents"] = load_dataset(repo_id, Split.INTENTS)[Split.INTENTS].to_list()
+        if Split.INTENTS in get_dataset_config_names(repo_name):
+            mapping["intents"] = load_dataset(repo_name, Split.INTENTS)[Split.INTENTS].to_list()
 
         return DictReader().read(mapping)
 
     def to_multilabel(self) -> "Dataset":
-        """Converts dataset labels to multilabel format.
-
-        Returns:
-            The dataset with labels converted to multilabel format.
-        """
+        """Converts dataset labels to multilabel format."""
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)
         return self
@@ -136,8 +118,7 @@ class Dataset(dict[str, HFDataset]):
     def to_dict(self) -> dict[str, list[dict[str, Any]]]:
         """Converts the dataset into a dictionary format.
 
-        Returns:
-            A dictionary where the keys are dataset splits and the values are lists of samples.
+        Returns a dictionary where the keys are dataset splits and the values are lists of samples.
         """
         mapping = {split_name: split.to_list() for split_name, split in self.items()}
         mapping[Split.INTENTS] = [intent.model_dump() for intent in self.intents]
@@ -155,26 +136,22 @@ class Dataset(dict[str, HFDataset]):
         with path.open("w") as file:
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
-    def push_to_hub(self, repo_id: str, private: bool = False) -> None:
+    def push_to_hub(self, repo_name: str, private: bool = False) -> None:
         """Uploads the dataset to the Hugging Face Hub.
 
         Args:
-            repo_id: The ID of the Hugging Face repository.
+            repo_name: The ID of the Hugging Face repository.
             private: Whether to make the repository private.
         """
         for split_name, split in self.items():
-            split.push_to_hub(repo_id, split=split_name, private=private)
+            split.push_to_hub(repo_name, split=split_name, private=private)
 
         if self.intents:
             intents = HFDataset.from_list([intent.model_dump() for intent in self.intents])
-            intents.push_to_hub(repo_id, config_name=Split.INTENTS, split=Split.INTENTS)
+            intents.push_to_hub(repo_name, config_name=Split.INTENTS, split=Split.INTENTS)
 
     def get_tags(self) -> list[Tag]:
-        """Extracts unique tags from the dataset's intents.
-
-        Returns:
-            A list of `Tag` objects containing unique tag names and associated intent IDs.
-        """
+        """Extracts unique tags from the dataset's intents."""
         tag_mapping = defaultdict(list)
         for intent in self.intents:
             for tag in intent.tags:
@@ -186,9 +163,6 @@ class Dataset(dict[str, HFDataset]):
 
         Args:
             split: The dataset split to analyze.
-
-        Returns:
-            The number of unique classes in the split.
         """
         classes = set()
         for label in self[split][self.label_feature]:
@@ -206,9 +180,6 @@ class Dataset(dict[str, HFDataset]):
 
         Args:
             sample: A sample from the dataset.
-
-        Returns:
-            The sample with its label converted to a multilabel format.
         """
         if isinstance(sample["label"], int):
             ohe_vector = [0] * self.n_classes
@@ -217,11 +188,7 @@ class Dataset(dict[str, HFDataset]):
         return sample
 
     def validate_descriptions(self) -> bool:
-        """Validates whether all intents in the dataset contain descriptions.
-
-        Returns:
-            True if all intents have descriptions, False otherwise.
-        """
+        """Validates whether all intents in the dataset contain descriptions."""
         has_any = any(intent.description is not None for intent in self.intents)
         has_all = all(intent.description is not None for intent in self.intents)
 
