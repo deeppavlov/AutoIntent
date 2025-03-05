@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 class Pipeline:
     """Pipeline optimizer class.
-    
+
     See tutorial on AutoML features of AutoIntent.
     """
 
@@ -113,8 +113,8 @@ class Pipeline:
     def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
         """Create pipeline optimizer from optimization config.
 
-        :param config: dictionary or a path to yaml file
-        :return:
+        Args:
+            config: dictionary or a path to yaml file.
         """
         if isinstance(config, OptimizationConfig):
             optimization_config = config
@@ -249,8 +249,9 @@ class Pipeline:
 
     def dump(self, path: str | Path | None = None) -> None:
         """Dump pipeline to disk.
-        
-        One can reuse it for inference later with :py:meth:`autointent.Pipeline.load`."""
+
+        One can reuse it for inference later with :py:meth:`autointent.Pipeline.load`.
+        """
         if isinstance(path, str):
             path = Path(path)
         elif path is None:
