@@ -108,10 +108,6 @@ class Context:
         """Check if the dataset is configured for multilabel classification."""
         return self.data_handler.multilabel
 
-    def get_n_classes(self) -> int:
-        """Get the number of classes in the dataset."""
-        return self.data_handler.n_classes
-
     def is_ram_to_clear(self) -> bool:
         """Check if RAM clearing is enabled in the logging configuration."""
         return self.logging_config.clear_ram

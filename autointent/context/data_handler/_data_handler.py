@@ -5,11 +5,11 @@ from collections.abc import Generator
 from typing import cast
 
 from datasets import concatenate_datasets
-from transformers import set_seed
 
 from autointent import Dataset
 from autointent.configs import DataConfig
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
+from autointent.schemas import Tag
 
 from ._stratification import split_dataset
 
@@ -17,7 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 class DataHandler:
-    """Data handler class."""
+    """Convenient wrapper for :py:class:`autointent.Dataset`.
+
+    Performs splitting of the wrapped dataset when instantiated.
+    """
+
+    dataset: Dataset
+    """Wrapped dataset."""
+    config: DataConfig
+    """Configuration used for instantiation."""
 
     def __init__(
         self,
@@ -32,32 +40,36 @@ class DataHandler:
             config: Configuration object
             random_seed: Seed for random number generation.
         """
-        if random_seed is not None:
-            set_seed(random_seed)
-        self.random_seed = random_seed
+        self._seed = random_seed
 
         self.dataset = dataset
         self.config = config if config is not None else DataConfig()
 
-        self.n_classes = self.dataset.n_classes
+        self._n_classes = self.dataset.n_classes
 
         if self.config.scheme == "ho":
             self._split_ho(self.config.separation_ratio, self.config.validation_size)
         elif self.config.scheme == "cv":
             self._split_cv()
 
-        self.intent_descriptions = [intent.description for intent in self.dataset.intents]
-        self.tags = self.dataset.get_tags()
-
         self._logger = logger
 
     @property
-    def multilabel(self) -> bool:
-        """Check if the dataset is multilabel.
+    def intent_descriptions(self) -> list[str | None]:
+        """String descriptions for all intents."""
+        return [intent.description for intent in self.dataset.intents]
 
-        Returns:
-            True if the dataset is multilabel, False otherwise.
+    @property
+    def tags(self) -> list[Tag]:
+        """Tags associated with intents.
+
+        Tagging is an experimental feature that is not guaranteed to work.
         """
+        return self.dataset.get_tags()
+
+    @property
+    def multilabel(self) -> bool:
+        """Check if the dataset is multilabel."""
         return self.dataset.multilabel
 
     def _choose_split(self, split_name: str, idx: int | None = None) -> str:
@@ -78,9 +90,6 @@ class DataHandler:
 
         Args:
             idx: Optional index for a specific training split.
-
-        Returns:
-            List of training utterances.
         """
         split = self._choose_split(Split.TRAIN, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
@@ -94,14 +103,12 @@ class DataHandler:
 
         Args:
             idx: Optional index for a specific training split.
-
-        Returns:
-            List of training labels.
         """
         split = self._choose_split(Split.TRAIN, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def train_labels_folded(self) -> list[ListOfGenericLabels]:
+        """Retrieve train labels fold by fold."""
         return [self.train_labels(j) for j in range(self.config.n_folds)]
 
     def validation_utterances(self, idx: int | None = None) -> list[str]:
@@ -113,9 +120,6 @@ class DataHandler:
 
         Args:
             idx: Optional index for a specific validation split.
-
-        Returns:
-            List of validation utterances.
         """
         split = self._choose_split(Split.VALIDATION, idx)
         return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
@@ -129,32 +133,22 @@ class DataHandler:
 
         Args:
             idx: Optional index for a specific validation split.
-
-        Returns:
-            List of validation labels.
         """
         split = self._choose_split(Split.VALIDATION, idx)
         return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self) -> list[str] | None:
-        """Retrieve test utterances from the dataset.
-
-        Returns:
-            List of test utterances.
-        """
+        """Retrieve test utterances from the dataset."""
         if Split.TEST not in self.dataset:
             return None
         return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
 
     def test_labels(self) -> ListOfGenericLabels:
-        """Retrieve test labels from the dataset.
-
-        Returns:
-            List of test labels.
-        """
+        """Retrieve test labels from the dataset."""
         return cast(ListOfGenericLabels, self.dataset[Split.TEST][self.dataset.label_feature])
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
+        """Yield folds for cross-validation."""
         if self.config.scheme == "ho":
             msg = "Cannot call cross-validation on hold-out DataHandler"
             raise RuntimeError(msg)
@@ -182,9 +176,9 @@ class DataHandler:
 
         for split in self.dataset:
             n_classes_in_split = self.dataset.get_n_classes(split)
-            if n_classes_in_split != self.n_classes:
+            if n_classes_in_split != self._n_classes:
                 message = (
-                    f"{n_classes_in_split=} for '{split=}' doesn't match initial number of classes ({self.n_classes})"
+                    f"{n_classes_in_split=} for '{split=}' doesn't match initial number of classes ({self._n_classes})"
                 )
                 raise ValueError(message)
 
@@ -200,7 +194,7 @@ class DataHandler:
             self.dataset,
             split=Split.TRAIN,
             test_size=ratio,
-            random_seed=self.random_seed,
+            random_seed=self._seed,
             allow_oos_in_train=False,  # only train data for decision node should contain OOS
         )
         self.dataset.pop(Split.TRAIN)
@@ -214,7 +208,7 @@ class DataHandler:
                 self.dataset,
                 split=Split.TRAIN,
                 test_size=1 / (self.config.n_folds - j),
-                random_seed=self.random_seed,
+                random_seed=self._seed,
                 allow_oos_in_train=True,
             )
         self.dataset[f"{Split.TRAIN}_{self.config.n_folds - 1}"] = self.dataset.pop(Split.TRAIN)
@@ -225,7 +219,7 @@ class DataHandler:
                 self.dataset,
                 split=Split.TRAIN,
                 test_size=size,
-                random_seed=self.random_seed,
+                random_seed=self._seed,
                 allow_oos_in_train=True,
             )
         else:
@@ -234,11 +228,12 @@ class DataHandler:
                     self.dataset,
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=size,
-                    random_seed=self.random_seed,
+                    random_seed=self._seed,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
 
     def prepare_for_refit(self) -> None:
+        """Merge all training folds into one in order to retrain configured optimal pipeline on it."""
         if self.config.scheme == "ho":
             return
 
@@ -249,7 +244,7 @@ class DataHandler:
             self.dataset,
             split=Split.TRAIN,
             test_size=self.config.separation_ratio or 0.5,
-            random_seed=self.random_seed,
+            random_seed=self._seed,
             allow_oos_in_train=False,
         )
 
