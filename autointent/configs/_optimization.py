@@ -42,7 +42,8 @@ class LoggingConfig(BaseModel):
     project_dir: Path | str | None = Field(None, description="Path to the directory with different runs.")
     """Path to the directory with different runs."""
     run_name: str | None = Field(None, description="Name of the run. If None, a random name will be generated.")
-    """Name of the run. If None, a random name will be generated"""
+    """Name of the run. If None, a random name will be generated.
+    To get run_name better use :py:meth:`autointent.configs.LoggingConfig.get_run_name`."""
     dump_modules: bool = Field(False, description="Whether to dump the modules or not")
     """Whether to dump the modules or not"""
     clear_ram: bool = Field(False, description="Whether to clear the RAM after dumping the modules")
@@ -68,6 +69,10 @@ class LoggingConfig(BaseModel):
         return self._dump_dir
 
     def get_run_name(self) -> str:
+        """Return name of the run.
+
+        Use this method instead of direct adressing to :py:attr:`autointent.configs.LoggingConfig.run_name`.
+        """
         if self.run_name is None:
             self.run_name = get_run_name()
         return self.run_name

@@ -21,19 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 class BaseModule(ABC):
-    """Base module for all modules.
-
-    Attributes:
-        supports_oos: Whether the module supports out-of-scope samples
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        name: Name of the module
-    """
+    """Base module for all intent classification modules."""
 
     supports_oos: bool
+    """Whether the module supports oos data"""
     supports_multilabel: bool
+    """Whether the module supports multilabel classification"""
     supports_multiclass: bool
+    """Whether the module supports multiclass classification"""
     name: str
+    """Name of the module."""
 
     @abstractmethod
     def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
@@ -50,9 +47,6 @@ class BaseModule(ABC):
         Args:
             context: Context to score
             metrics: Metrics to score
-
-        Returns:
-            Computed metrics value for the test set or error code of metrics
 
         Raises:
             ValueError: If unknown scheme is provided
@@ -113,9 +107,6 @@ class BaseModule(ABC):
         Args:
             *args: args to predict
             **kwargs: kwargs to predict
-
-        Returns:
-            Predictions
         """
 
     def predict_with_metadata(
@@ -148,11 +139,7 @@ class BaseModule(ABC):
         """
 
     def get_embedder_config(self) -> dict[str, Any] | None:
-        """Get the config of the embedder.
-
-        Returns:
-            Embedder config if available, None otherwise
-        """
+        """Get the config of the embedder."""
         return None
 
     @staticmethod
@@ -162,9 +149,6 @@ class BaseModule(ABC):
         Args:
             params: Params to score
             metrics_dict: Dictionary of metrics to compute
-
-        Returns:
-            Dictionary with computed metrics
         """
         metrics = {}
         for metric_name, metric_fn in metrics_dict.items():
@@ -183,9 +167,6 @@ class BaseModule(ABC):
             metrics_dict: Dictionary of metrics to compute
             cv_iterator: Cross-validation iterator
             **fit_kwargs: Additional arguments for fit method
-
-        Returns:
-            Tuple of metrics dictionary and predictions
         """
         metrics_values: dict[str, list[float]] = {name: [] for name in metrics_dict}
         all_val_preds = []

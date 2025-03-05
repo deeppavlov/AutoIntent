@@ -55,7 +55,7 @@ class Context:
         """Configure the vector index client and embedder.
 
         Args:
-            config: Configuration for the vector index.
+            config: configuration for the transformers to use during optimization.
         """
         if isinstance(config, EmbedderConfig):
             self.embedder_config = config
@@ -66,8 +66,8 @@ class Context:
         """Set the datasets for training, validation and testing.
 
         Args:
-            dataset: Dataset.
-            config: Data configuration settings.
+            dataset: dataset to use during optimization.
+            config: data configuration settings.
         """
         self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
