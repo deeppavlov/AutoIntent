@@ -40,8 +40,6 @@ class Pipeline:
     See tutorial on AutoML features of AutoIntent.
     """
 
-    nodes: list[NodeOptimizer] | list[InferenceNode]
-
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
