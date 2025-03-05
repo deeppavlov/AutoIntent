@@ -20,16 +20,17 @@ class Context:
 
     This class provides methods to set up logging, configure data and vector index components,
     manage datasets, and retrieve various configurations for inference and optimization.
-
-    Attributes:
-        data_handler: Handler for managing datasets.
-        optimization_info: Container for optimization information.
-        callback_handler: Handler for managing callbacks.
+    Not intended to be instantiated by user.
     """
 
     data_handler: DataHandler
+    """Convenient wrapper for :py:class:`autointent.Dataset`."""
+    
     optimization_info: OptimizationInfo
+    """Object for storing optimization trials and inter-node communication."""
+    
     callback_handler = CallbackHandler()
+    """Internal callback for logging to tensorboard or wandb."""
 
     def __init__(self, seed: int | None = 42) -> None:
         """Initialize the Context object.
@@ -71,7 +72,10 @@ class Context:
         self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
     def dump(self) -> None:
-        """Save logs, configurations, and datasets to disk."""
+        """Save all information about optimization process to disk.
+         
+        Save metrics, hyperparameters, inference, configurations, and datasets to disk.
+        """
         self._logger.debug("dumping logs...")
         optimization_results = self.optimization_info.dump_evaluation_results()
 
@@ -94,51 +98,33 @@ class Context:
     def get_dump_dir(self) -> Path | None:
         """Get the directory for saving dumped modules.
 
-        Returns:
-            Path to the dump directory or None if dumping is disabled.
+        Return path to the dump directory or None if dumping is disabled.
         """
         if self.logging_config.dump_modules:
             return self.logging_config.dump_dir
         return None
 
     def is_multilabel(self) -> bool:
-        """Check if the dataset is configured for multilabel classification.
-
-        Returns:
-            True if multilabel classification is enabled, False otherwise.
-        """
+        """Check if the dataset is configured for multilabel classification."""
         return self.data_handler.multilabel
 
     def get_n_classes(self) -> int:
-        """Get the number of classes in the dataset.
-
-        Returns:
-            Number of classes.
-        """
+        """Get the number of classes in the dataset."""
         return self.data_handler.n_classes
 
     def is_ram_to_clear(self) -> bool:
-        """Check if RAM clearing is enabled in the logging configuration.
-
-        Returns:
-            True if RAM clearing is enabled, False otherwise.
-        """
+        """Check if RAM clearing is enabled in the logging configuration."""
         return self.logging_config.clear_ram
 
     def has_saved_modules(self) -> bool:
-        """Check if any modules have been saved.
-
-        Returns:
-            True if there are saved modules, False otherwise.
-        """
+        """Check if any modules have been saved in RAM."""
         node_types = ["regex", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
 
     def resolve_embedder(self) -> EmbedderConfig:
         """Resolve the embedder configuration.
 
-        Returns:
-            The best embedder configuration or default configuration.
+        Returns the best embedder configuration or default configuration.
 
         Raises:
             RuntimeError: If embedder configuration cannot be resolved.
@@ -157,8 +143,7 @@ class Context:
     def resolve_ranker(self) -> CrossEncoderConfig:
         """Resolve the cross-encoder configuration.
 
-        Returns:
-            The cross-encoder configuration.
+        Returns default config if set.
 
         Raises:
             RuntimeError: If cross-encoder configuration cannot be resolved.
