@@ -25,10 +25,10 @@ class Context:
 
     data_handler: DataHandler
     """Convenient wrapper for :py:class:`autointent.Dataset`."""
-    
+
     optimization_info: OptimizationInfo
     """Object for storing optimization trials and inter-node communication."""
-    
+
     callback_handler = CallbackHandler()
     """Internal callback for logging to tensorboard or wandb."""
 
@@ -73,7 +73,7 @@ class Context:
 
     def dump(self) -> None:
         """Save all information about optimization process to disk.
-         
+
         Save metrics, hyperparameters, inference, configurations, and datasets to disk.
         """
         self._logger.debug("dumping logs...")
