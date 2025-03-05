@@ -94,6 +94,8 @@ class Ranker:
 
     _metadata_file_name = "metadata.json"
     _classifier_file_name = "classifier.joblib"
+    config: CrossEncoderConfig
+    cross_encoder: st.CrossEncoder
 
     def __init__(
         self,
@@ -106,17 +108,17 @@ class Ranker:
             cross_encoder_config: Configuration for the cross-encoder model
             classifier_head: Optional pre-trained classifier head
         """
-        self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
-            self.cross_encoder_config.model_name,
+            self.config.model_name,
             trust_remote_code=True,
-            device=self.cross_encoder_config.device,
-            max_length=self.cross_encoder_config.max_length,  # type: ignore[arg-type]
+            device=self.config.device,
+            max_length=self.config.max_length,  # type: ignore[arg-type]
         )
         self._train_head = False
         self._clf = classifier_head
 
-        if classifier_head is not None or self.cross_encoder_config.train_head:
+        if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
@@ -145,12 +147,12 @@ class Ranker:
             return np.array(
                 self.cross_encoder.predict(
                     pairs,
-                    batch_size=self.cross_encoder_config.batch_size,
+                    batch_size=self.config.batch_size,
                     activation_fct=nn.Sigmoid(),
                 )
             )
 
-        self.cross_encoder.predict(pairs, batch_size=self.cross_encoder_config.batch_size)
+        self.cross_encoder.predict(pairs, batch_size=self.config.batch_size)
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
         return res  # type: ignore[no-any-return]
@@ -247,11 +249,11 @@ class Ranker:
         dump_dir.mkdir(parents=True)
 
         metadata = CrossEncoderMetadata(
-            model_name=self.cross_encoder_config.model_name,
+            model_name=self.config.model_name,
             train_head=self._train_head,
-            device=self.cross_encoder_config.device,
-            max_length=self.cross_encoder_config.max_length,
-            batch_size=self.cross_encoder_config.batch_size,
+            device=self.config.device,
+            max_length=self.config.max_length,
+            batch_size=self.config.batch_size,
         )
 
         with (dump_dir / self._metadata_file_name).open("w") as file:
