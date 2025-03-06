@@ -6,7 +6,7 @@ from typing import Any, ClassVar
 import openai
 from dotenv import load_dotenv
 
-from .schemas import Message
+from autointent.generation.chat_templates import Message
 
 load_dotenv()
 

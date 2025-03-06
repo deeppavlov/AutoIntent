@@ -2,9 +2,8 @@
 
 from typing import ClassVar
 
-from autointent.generation.utterances.schemas import Message, Role
-
 from ._base_synthesizer import BaseSynthesizerTemplate
+from ._evolution_templates_schemas import Message, Role
 
 
 class RussianSynthesizerTemplate(BaseSynthesizerTemplate):

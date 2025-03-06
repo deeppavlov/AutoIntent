@@ -4,6 +4,7 @@ from ._abstract import AbstractEvolution
 from ._base_evolver import EvolutionChatTemplate
 from ._base_synthesizer import BaseSynthesizerTemplate
 from ._concrete import ConcreteEvolution
+from ._evolution_templates_schemas import Message, Role
 from ._formal import FormalEvolution
 from ._funny import FunnyEvolution
 from ._goofy import GoofyEvolution
@@ -29,7 +30,9 @@ __all__ = [
     "FunnyEvolution",
     "GoofyEvolution",
     "InformalEvolution",
+    "Message",
     "PromptDescription",
     "ReasoningEvolution",
+    "Role",
     "RussianSynthesizerTemplate",
 ]

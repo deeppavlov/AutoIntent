@@ -6,8 +6,9 @@ from copy import deepcopy
 from typing import ClassVar
 
 from autointent import Dataset
-from autointent.generation.utterances.schemas import Message, Role
 from autointent.schemas import Intent
+
+from ._evolution_templates_schemas import Message, Role
 
 
 class BaseChatTemplate(ABC):

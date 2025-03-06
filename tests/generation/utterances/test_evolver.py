@@ -2,7 +2,8 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
-from autointent.generation.utterances import AbstractEvolution, IncrementalUtteranceEvolver, UtteranceEvolver
+from autointent.generation.chat_templates import AbstractEvolution
+from autointent.generation.utterances import IncrementalUtteranceEvolver, UtteranceEvolver
 
 
 def test_on_dataset_incremental(dataset):

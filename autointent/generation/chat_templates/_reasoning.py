@@ -2,9 +2,8 @@
 
 from typing import ClassVar
 
-from autointent.generation.utterances.schemas import Message, Role
-
 from ._base_evolver import EvolutionChatTemplate
+from ._evolution_templates_schemas import Message, Role
 
 
 class ReasoningEvolution(EvolutionChatTemplate):

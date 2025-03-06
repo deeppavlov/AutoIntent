@@ -2,8 +2,9 @@
 
 from typing import ClassVar
 
-from autointent.generation.utterances.schemas import Message, Role
 from autointent.schemas import Intent
+
+from ._evolution_templates_schemas import Message, Role
 
 
 class EvolutionChatTemplate:

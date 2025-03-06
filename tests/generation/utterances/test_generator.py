@@ -2,8 +2,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from autointent.generation.chat_templates import Message
 from autointent.generation.utterances.generator import Generator
-from autointent.generation.utterances.schemas import Message
 
 
 @pytest.fixture(autouse=True)

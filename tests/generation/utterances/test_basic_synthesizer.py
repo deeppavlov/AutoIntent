@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, Mock
 
-from autointent.generation.utterances import EnglishSynthesizerTemplate, UtteranceGenerator
+from autointent.generation.chat_templates import EnglishSynthesizerTemplate
+from autointent.generation.utterances import UtteranceGenerator
 
 
 def has_unfilled_fields(template):
