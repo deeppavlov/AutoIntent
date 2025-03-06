@@ -22,23 +22,21 @@ class UtteranceEvolver:
 
     Deeply inspired by DeepEval evolutions. This method takes single utterance and prompts LLM
     to change it in a specific way.
+
+    Args:
+        generator: Generator instance for generating utterances.
+        prompt_makers: List of prompt makers for generating prompts.
+        seed: Random seed for reproducibility.
+        async_mode: Whether to use asynchronous mode for generation.
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         generator: Generator,
         prompt_makers: Sequence[EvolutionChatTemplate],
         seed: int = 0,
         async_mode: bool = False,
     ) -> None:
-        """Initialize the UtteranceEvolver.
-
-        Args:
-            generator: Generator instance for generating utterances.
-            prompt_makers: List of prompt makers for generating prompts.
-            seed: Random seed for reproducibility.
-            async_mode: Whether to use asynchronous mode for generation.
-        """
         self.generator = generator
         self.prompt_makers = prompt_makers
         self.async_mode = async_mode

@@ -18,16 +18,14 @@ class UtteranceGenerator:
     This augmentation method simply prompts LLM to look at existing examples
     and generate similar. Additionally, it can consider some aspects of style,
     punctuation, and length of the desired generations.
+
+    Args:
+        generator: Generator instance for generating utterances.
+        prompt_maker: Prompt maker instance for generating prompts.
+        async_mode: Whether to use asynchronous mode for generation.
     """
 
-    def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:
-        """Initialize the UtteranceGenerator.
-
-        Args:
-            generator: Generator instance for generating utterances.
-            prompt_maker: Prompt maker instance for generating prompts.
-            async_mode: Whether to use asynchronous mode for generation.
-        """
+    def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:  # noqa: D107
         self.generator = generator
         self.prompt_maker = prompt_maker
         self.async_mode = async_mode

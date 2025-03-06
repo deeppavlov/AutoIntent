@@ -12,7 +12,14 @@ load_dotenv()
 
 
 class Generator:
-    """Wrapper class for accessing OpenAI API."""
+    """Wrapper class for accessing OpenAI API.
+
+    Args:
+        base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
+            Omit this to infer OPENAI_BASE_URL from environment.
+        model_name: Name of LLM. Omit this to infer OPENAI_MODEL_NAME from environment.
+        **generation_params: kwargs that will be sent with a request to the endpoint.
+    """
 
     _default_generation_params: ClassVar[dict[str, Any]] = {
         "max_tokens": 150,
@@ -21,15 +28,7 @@ class Generator:
         "temperature": 0.7,
     }
 
-    def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
-        """Initialize the wrapper for LLM.
-
-        Args:
-            base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
-                Omit this to infer OPENAI_BASE_URL from environment.
-            model_name: Name of LLM. Omit this to infer OPENAI_MODEL_NAME from environment.
-            **generation_params: kwargs that will be sent with a request to the endpoint.
-        """
+    def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401, D107
         if not base_url:
             base_url = os.environ["OPENAI_BASE_URL"]
         if not model_name:

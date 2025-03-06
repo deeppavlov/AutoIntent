@@ -44,9 +44,16 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
     This method adds LLM-generated training samples until the quality
     of linear classification on resulting dataset is rising.
+
+    Args:
+        generator: Generator instance for generating utterances.
+        prompt_makers: List of prompt makers for generating prompts.
+        seed: Random seed for reproducibility.
+        async_mode: Whether to use asynchronous mode for generation.
+        search_space: Search space for the pipeline optimizer.
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         generator: Generator,
         prompt_makers: Sequence[EvolutionChatTemplate],
@@ -54,15 +61,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         async_mode: bool = False,
         search_space: str | None = None,
     ) -> None:
-        """Initialize the IncrementalUtteranceEvolver.
-
-        Args:
-            generator: Generator instance for generating utterances.
-            prompt_makers: List of prompt makers for generating prompts.
-            seed: Random seed for reproducibility.
-            async_mode: Whether to use asynchronous mode for generation.
-            search_space: Search space for the pipeline optimizer.
-        """
         super().__init__(generator, prompt_makers, seed, async_mode)
         self.search_space = self._choose_search_space(search_space)
 

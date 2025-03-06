@@ -19,27 +19,22 @@ class DatasetBalancer:
 
     If your dataset is unbalanced, you can add LLM-generated samples.
     This method uses :py:class:`autointent.generation.utterances.UtteranceGenerator` under the hood.
+
+    Args:
+        generator (Generator): The generator object used to create utterances.
+        prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
+        async_mode (bool, optional): Whether to run the generator in asynchronous mode. Defaults to False.
+        max_samples_per_class (int | None, optional): The maximum number of samples per class.
+            Must be a positive integer or None. Defaults to None.
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         generator: Generator,
         prompt_maker: BaseSynthesizerTemplate,
         async_mode: bool = False,
         max_samples_per_class: int | None = None,
     ) -> None:
-        """Initialize the UtteranceBalancer.
-
-        Args:
-            generator (Generator): The generator object used to create utterances.
-            prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
-            async_mode (bool, optional): Whether to run the generator in asynchronous mode. Defaults to False.
-            max_samples_per_class (int | None, optional): The maximum number of samples per class.
-                Must be a positive integer or None. Defaults to None.
-
-        Raises:
-            ValueError: If max_samples_per_class is not None and is less than or equal to 0.
-        """
         if max_samples_per_class is not None and max_samples_per_class <= 0:
             msg = "max_samples_per_class must be a positive integer or None"
             raise ValueError(msg)
