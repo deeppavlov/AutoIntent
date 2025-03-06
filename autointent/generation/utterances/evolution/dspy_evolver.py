@@ -185,7 +185,7 @@ class DSPYIncrementalUtteranceEvolver:
         dspy.settings.configure(lm=llm)
         self._generator = dspy.ChainOfThoughtWithHint(AugmentationSignature)
 
-    def augment(
+    def augment(  # noqa: C901
         self,
         dataset: Dataset,
         split_name: str = Split.TEST,
@@ -193,7 +193,7 @@ class DSPYIncrementalUtteranceEvolver:
         update_split: bool = True,
         mipro_init_params: dict[str, Any] | None = None,
         mipro_compile_params: dict[str, Any] | None = None,
-        save_path: Path | str = "evolution_config",
+        save_path: Path | str | None = None,
     ) -> HFDataset:
         """Augment the dataset using the evolutionary strategy.
 
@@ -206,7 +206,7 @@ class DSPYIncrementalUtteranceEvolver:
                 `Full list of parameters <https://dspy.ai/deep-dive/optimizers/miprov2/#initialization-parameters>`_
             mipro_compile_params: Parameters for the MIPROv2 compilation.
                 `Full list of params available <https://dspy.ai/deep-dive/optimizers/miprov2/#compile-parameters>`_
-            save_path: Path to save the generated samples. Defaults to "evolution_config".
+            save_path: Path to save the prompt of LLM. If None is provided, it will not be saved.
 
         Returns:
             The augmented dataset.
@@ -220,11 +220,12 @@ class DSPYIncrementalUtteranceEvolver:
         if mipro_compile_params is None:
             mipro_compile_params = {}
 
-        if isinstance(save_path, str):
-            save_path = Path(save_path)
+        if save_path is not None:
+            if isinstance(save_path, str):
+                save_path = Path(save_path)
 
-        if not save_path.exists():
-            save_path.mkdir(parents=True)
+            if not save_path.exists():
+                save_path.mkdir(parents=True)
 
         dspy_dataset = [
             dspy.Example(
@@ -243,10 +244,11 @@ class DSPYIncrementalUtteranceEvolver:
 
             optimized_module = optimizer.compile(self._generator, trainset=dspy_dataset, **mipro_compile_params)
 
-            optimized_module.save((save_path / f"evolution_{i}").as_posix(), save_program=True)
-            optimized_module.save(
-                (save_path / f"evolution_{i}" / "generator_state.json").as_posix(), save_program=False
-            )
+            if save_path is not None:
+                optimized_module.save((save_path / f"evolution_{i}").as_posix(), save_program=True)
+                optimized_module.save(
+                    (save_path / f"evolution_{i}" / "generator_state.json").as_posix(), save_program=False
+                )
             # Generate new samples
             new_samples = []
             for sample in original_split:
