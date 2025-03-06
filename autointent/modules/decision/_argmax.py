@@ -47,8 +47,7 @@ class ArgmaxDecision(BaseDecision):
     supports_multiclass = True
     _n_classes: int
 
-    def __init__(self) -> None:
-        ...
+    def __init__(self) -> None: ...
 
     @classmethod
     def from_context(cls, context: Context) -> "ArgmaxDecision":
