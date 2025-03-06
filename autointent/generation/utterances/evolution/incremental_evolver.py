@@ -40,7 +40,11 @@ SEARCH_SPACE = [
 
 
 class IncrementalUtteranceEvolver(UtteranceEvolver):
-    """Incremental evolutionary strategy to augmenting utterances."""
+    """Incremental evolutionary strategy to augmenting utterances.
+
+    This method adds LLM-generated training samples until the quality
+    of linear classification on resulting dataset is rising.
+    """
 
     def __init__(
         self,
@@ -67,9 +71,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
 
         Args:
             search_space: Search space for the pipeline optimizer. If None, default search space is used.
-
-        Returns:
-            The chosen search space.
         """
         if search_space is None:
             return SEARCH_SPACE
@@ -84,7 +85,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         batch_size: int = 4,
         sequential: bool = False,
     ) -> HFDataset:
-        """Augment some split of dataset.
+        """Add LLM-generated samples to some split of dataset.
 
         Args:
             dataset: Dataset object.
@@ -93,9 +94,6 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
             update_split: Whether to update the dataset split with the new samples.
             batch_size: Batch size for augmentation.
             sequential: Whether to perform augmentations sequentially.
-
-        Returns:
-            List of generated samples.
         """
         best_result = 0
         merge_dataset = copy.deepcopy(dataset)

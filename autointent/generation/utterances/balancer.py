@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 class DatasetBalancer:
-    """Class for balancing dataset through example augmentation."""
+    """Class for balancing dataset through example augmentation.
+
+    If your dataset is unbalanced, you can add LLM-generated samples.
+    """
 
     def __init__(
         self,
@@ -48,10 +51,10 @@ class DatasetBalancer:
     def balance(self, dataset: Dataset, split: str = Split.TRAIN, batch_size: int = 4) -> Dataset:
         """Balances the specified dataset split.
 
-        :param dataset: Source dataset
-        :param split: Target split for balancing
-        :param batch_size: Batch size for asynchronous processing
-        :return: Balanced dataset
+        Args:
+            dataset: Source dataset
+            split: Target split for balancing
+            batch_size: Batch size for asynchronous processing
         """
         if dataset.multilabel:
             msg = "Method supports only single-label datasets"

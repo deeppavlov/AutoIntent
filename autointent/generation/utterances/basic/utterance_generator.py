@@ -38,9 +38,6 @@ class UtteranceGenerator:
         Args:
             intent_data: Intent data for which to generate utterances.
             n_generations: Number of utterances to generate.
-
-        Returns:
-            List of generated utterances.
         """
         messages = self.prompt_maker(intent_data, n_generations)
         response_text = self.generator.get_chat_completion(messages)
@@ -52,9 +49,6 @@ class UtteranceGenerator:
         Args:
             intent_data: Intent data for which to generate utterances.
             n_generations: Number of utterances to generate.
-
-        Returns:
-            List of generated utterances.
         """
         messages = self.prompt_maker(intent_data, n_generations)
         response_text = await self.generator.get_chat_completion_async(messages)
@@ -68,7 +62,7 @@ class UtteranceGenerator:
         update_split: bool = True,
         batch_size: int = 4,
     ) -> list[Sample]:
-        """Augment some split of dataset.
+        """Add LLM-generated samples to some split of dataset.
 
         Args:
             dataset: Dataset object.
@@ -76,9 +70,6 @@ class UtteranceGenerator:
             n_generations: Number of utterances to generate per intent.
             update_split: Whether to update the dataset split.
             batch_size: Batch size for async generation.
-
-        Returns:
-            List of generated samples.
         """
         if self.async_mode:
             return asyncio.run(self._augment_async(dataset, split_name, n_generations, update_split, batch_size))

@@ -47,9 +47,6 @@ class Generator:
 
         Args:
             messages: List of messages to send to the model.
-
-        Returns:
-            Model's response.
         """
         response = self.client.chat.completions.create(
             messages=messages,  # type: ignore[arg-type]
@@ -63,9 +60,6 @@ class Generator:
 
         Args:
             messages: List of messages to send to the model.
-
-        Returns:
-            Model's response.
         """
         response = await self.async_client.chat.completions.create(
             messages=messages,  # type: ignore[arg-type]

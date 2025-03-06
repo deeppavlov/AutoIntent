@@ -69,7 +69,3 @@ def main() -> None:
 
     if args.output_repo is not None:
         dataset.push_to_hub(args.output_repo, private=args.private)
-
-
-if __name__ == "__main__":
-    main()

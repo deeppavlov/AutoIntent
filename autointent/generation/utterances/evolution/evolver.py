@@ -50,9 +50,6 @@ class UtteranceEvolver:
         Args:
             utterance: Utterance to be evolved.
             intent_data: Intent data for which to evolve the utterance.
-
-        Returns:
-            Evolved utterance.
         """
         maker = random.choice(self.prompt_makers)
         chat = maker(utterance, intent_data)
@@ -64,9 +61,6 @@ class UtteranceEvolver:
         Args:
             utterance: Utterance to be evolved.
             intent_data: Intent data for which to evolve the utterance.
-
-        Returns:
-            Evolved utterance.
         """
         maker = random.choice(self.prompt_makers)
         chat = maker(utterance, intent_data)
@@ -82,9 +76,6 @@ class UtteranceEvolver:
             intent_data: Intent data for which to evolve the utterance.
             n_evolutions: Number of evolutions to apply.
             sequential: Whether to apply evolutions sequentially.
-
-        Returns:
-            List of evolved utterances.
         """
         current_utterance = utterance
         generated_utterances = []
@@ -107,7 +98,7 @@ class UtteranceEvolver:
         batch_size: int = 4,
         sequential: bool = False,
     ) -> HFDataset:
-        """Augment some split of dataset.
+        """Add LLM-generated samples to some split of dataset.
 
         Args:
             dataset: Dataset object.
@@ -116,9 +107,6 @@ class UtteranceEvolver:
             update_split: Whether to update the dataset split.
             batch_size: Batch size for async generation.
             sequential: Whether to apply evolutions sequentially.
-
-        Returns:
-            List of generated samples.
         """
         if self.async_mode:
             if sequential:
