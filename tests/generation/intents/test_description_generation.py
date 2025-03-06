@@ -4,13 +4,13 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from autointent import Dataset
-from autointent.generation.intents.description_generation import (
+from autointent.generation.intents._description_generation import (
     create_intent_description,
-    enhance_dataset_with_descriptions,
+    generate_descriptions,
     generate_intent_descriptions,
     group_utterances_by_label,
 )
-from autointent.generation.intents.prompt_scheme import PromptDescription
+from autointent.generation.intents._prompt_scheme import PromptDescription
 from autointent.schemas import Intent, Sample
 
 
@@ -294,7 +294,7 @@ def test_enhance_dataset_with_descriptions_basic():
         prompt = PromptDescription(
             text="Describe intent {intent_name} with examples: {user_utterances} and patterns: {regex_patterns}",
         )
-        enhanced_dataset = enhance_dataset_with_descriptions(
+        enhanced_dataset = generate_descriptions(
             dataset=dataset,
             client=client,
             prompt=prompt,
@@ -342,7 +342,7 @@ def test_enhance_dataset_with_existing_descriptions():
         prompt = PromptDescription(
             text="Describe intent {intent_name} with examples: {user_utterances} and patterns: {regex_patterns}",
         )
-        enhanced_dataset = enhance_dataset_with_descriptions(
+        enhanced_dataset = generate_descriptions(
             dataset=dataset,
             client=client,
             prompt=prompt,

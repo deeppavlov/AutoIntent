@@ -12,7 +12,7 @@ from collections import defaultdict
 from openai import AsyncOpenAI
 
 from autointent import Dataset
-from autointent.generation.intents.prompt_scheme import PromptDescription
+from autointent.generation.intents._prompt_scheme import PromptDescription
 from autointent.schemas import Intent, Sample
 
 
@@ -59,9 +59,6 @@ async def create_intent_description(
                user_utterances, and regex_patterns.
         model_name: Identifier of the OpenAI model to use.
 
-    Returns:
-        Generated description of the intent.
-
     Raises:
         TypeError: If the model response is not a string.
     """
@@ -103,9 +100,6 @@ async def generate_intent_descriptions(
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
         model_name: Name of the OpenAI model to use.
-
-    Returns:
-        List of intents with updated descriptions.
     """
     tasks = []
     for intent in intents:
@@ -131,13 +125,13 @@ async def generate_intent_descriptions(
     return intents
 
 
-def enhance_dataset_with_descriptions(
+def generate_descriptions(
     dataset: Dataset,
     client: AsyncOpenAI,
-    prompt: PromptDescription,
-    model_name: str = "gpt-4o-mini",
+    model_name: str,
+    prompt: PromptDescription | None,
 ) -> Dataset:
-    """Enhance a dataset by adding generated descriptions to its intents.
+    """Add LLM-generated text descriptions to dataset's intents.
 
     Args:
         dataset: Dataset containing utterances and intents needing descriptions.
@@ -145,14 +139,13 @@ def enhance_dataset_with_descriptions(
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
         model_name: OpenAI model identifier for generating descriptions.
-
-    Returns:
-        Dataset with enhanced intent descriptions.
     """
     samples = []
     for split in dataset.values():
         samples.extend([Sample(**sample) for sample in split.to_list()])
     intent_utterances = group_utterances_by_label(samples)
+    if prompt is None:
+        prompt = PromptDescription()
     dataset.intents = asyncio.run(
         generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name),
     )
