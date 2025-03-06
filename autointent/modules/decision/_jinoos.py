@@ -20,14 +20,6 @@ class JinoosDecision(BaseDecision):
     JinoosDecision predicts the best scores for single-label classification tasks
     and detects out-of-scope (OOS) samples based on a threshold.
 
-    Attributes:
-        thresh: The optimized threshold value for OOS detection
-        name: Name of the predictor, defaults to "jinoos"
-        _n_classes: Number of classes determined during fitting
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        supports_oos: Whether the module supports out-of-scope samples
-
     Examples:
     --------
     .. testcode::
@@ -137,10 +129,10 @@ class JinoosDecision(BaseDecision):
 
         .. math::
 
-            \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}}
+            \frac{C_{in}}{N_{in}}+\frac{C_{oos}}{N_{oos}}
 
-        where C_in is the number of correctly predicted in-domain labels
-        and N_in is the total number of in-domain labels. The same for OOS samples.
+        where :math:`C_{in}` is the number of correctly predicted in-domain labels
+        and :math:`N_{in}` is the total number of in-domain labels. The same for OOS samples.
 
         Args:
             y_true: True labels

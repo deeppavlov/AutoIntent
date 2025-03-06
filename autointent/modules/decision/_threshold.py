@@ -23,15 +23,6 @@ class ThresholdDecision(BaseDecision):
     ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
     labels for single-label or multi-label classification tasks.
 
-    Attributes:
-        tags: Tags for predictions (if any)
-        name: Name of the predictor, defaults to "threshold"
-        supports_oos: Whether the module supports out-of-scope samples
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        _multilabel: Whether the task is multilabel
-        _n_classes: Number of classes in the dataset
-
     Examples:
     --------
     Single-label classification

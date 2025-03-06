@@ -27,15 +27,6 @@ class TunableDecision(BaseDecision):
     in single-label or multi-label classification tasks. It is designed for datasets with varying
     score distributions and supports out-of-scope (OOS) detection.
 
-    Attributes:
-        name: Name of the predictor, defaults to "tunable"
-        _n_classes: Number of classes determined during fitting
-        _multilabel: Whether the task is multilabel
-        tags: Tags for predictions (if any)
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        supports_oos: Whether the module supports out-of-scope samples
-
     Examples:
     --------
     Single-label classification

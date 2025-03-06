@@ -25,15 +25,6 @@ class AdaptiveDecision(BaseDecision):
     The AdaptiveDecision calculates optimal thresholds based on the given
     scores and labels, ensuring the best performance on multi-label data.
 
-    Attributes:
-        _n_classes: Number of classes in the dataset
-        _r: Scaling factor for thresholds
-        tags: List of Tag objects for mutually exclusive classes
-        name: Name of the predictor, defaults to "adaptive"
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        supports_oos: Whether the module supports out-of-scope samples
-
     Examples:
     --------
     .. testcode::

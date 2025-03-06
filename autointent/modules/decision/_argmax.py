@@ -21,13 +21,6 @@ class ArgmaxDecision(BaseDecision):
     The ArgmaxDecision is a simple predictor that selects the class with the highest
     score (argmax) for single-label classification tasks.
 
-    Attributes:
-        name: Name of the predictor, defaults to "argmax"
-        supports_oos: Whether the module supports out-of-scope samples
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_multiclass: Whether the module supports multiclass classification
-        _n_classes: Number of classes in the dataset
-
     Examples:
     --------
     .. testcode::
