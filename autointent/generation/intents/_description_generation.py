@@ -129,7 +129,7 @@ def generate_descriptions(
     dataset: Dataset,
     client: AsyncOpenAI,
     model_name: str,
-    prompt: PromptDescription | None,
+    prompt: PromptDescription | None = None,
 ) -> Dataset:
     """Add LLM-generated text descriptions to dataset's intents.
 
