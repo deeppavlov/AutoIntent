@@ -151,6 +151,15 @@ class DSPYIncrementalUtteranceEvolver:
     For ground truth utterances, it would generate new utterances and evaluate them using the pipeline.
 
     For scoring generations it would use modified SemanticF1 as the base metric with a ROUGE-1 as repetition penalty.
+
+    Args:
+        model: Model name. This should follow naming schema from `litellm providers <https://docs.litellm.ai/docs/providers>`_.
+        api_base: API base URL. Some models require this.
+        temperature: Sampling temperature. 0.0 is default from dspy LM.
+        max_tokens: Maximum number of tokens to generate. 1000 is default from dspy LM.
+        seed: Random seed for reproducibility.
+        search_space: Search space for the pipeline.
+
     """
 
     def __init__(
@@ -162,17 +171,8 @@ class DSPYIncrementalUtteranceEvolver:
         seed: int = 42,
         search_space: str | None = None,
     ) -> None:
-        """Initialize the DSPYIncrementalUtteranceEvolver.
-
-        Args:
-            model: Model name. This should follow naming schema from `litellm providers <https://docs.litellm.ai/docs/providers>`_.
-            api_base: API base URL. Some models require this.
-            temperature: Sampling temperature. 0.0 is default from dspy LM.
-            max_tokens: Maximum number of tokens to generate. 1000 is default from dspy LM.
-            seed: Random seed for reproducibility.
-            search_space: Search space for the pipeline.
-        """
-        self.search_space = search_space or DEFAULT_SEARCH_SPACE
+        """Initialize the DSPYIncrementalUtteranceEvolver."""
+        self._search_space = search_space or DEFAULT_SEARCH_SPACE
         random.seed(seed)
 
         llm = dspy.LM(
@@ -183,7 +183,7 @@ class DSPYIncrementalUtteranceEvolver:
             max_tokens=max_tokens,
         )
         dspy.settings.configure(lm=llm)
-        self.generator = dspy.ChainOfThoughtWithHint(AugmentationSignature)
+        self._generator = dspy.ChainOfThoughtWithHint(AugmentationSignature)
 
     def augment(
         self,
@@ -241,7 +241,7 @@ class DSPYIncrementalUtteranceEvolver:
 
             optimizer = dspy.MIPROv2(metric=metric, **mipro_init_params)
 
-            optimized_module = optimizer.compile(self.generator, trainset=dspy_dataset, **mipro_compile_params)
+            optimized_module = optimizer.compile(self._generator, trainset=dspy_dataset, **mipro_compile_params)
 
             optimized_module.save((save_path / f"evolution_{i}").as_posix(), save_program=True)
             optimized_module.save(
@@ -260,7 +260,7 @@ class DSPYIncrementalUtteranceEvolver:
             generated_samples.append(new_samples_dataset)
 
             # Check if the new samples improve the model
-            pipeline_optimizer = Pipeline.from_search_space(self.search_space)
+            pipeline_optimizer = Pipeline.from_search_space(self._search_space)
             ctx = pipeline_optimizer.fit(merge_dataset)
             results = ctx.optimization_info.dump_evaluation_results()
             decision_metric = results["metrics"]["decision"][0]
