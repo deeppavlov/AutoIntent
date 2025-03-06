@@ -25,6 +25,10 @@ class AdaptiveDecision(BaseDecision):
     The AdaptiveDecision calculates optimal thresholds based on the given
     scores and labels, ensuring the best performance on multi-label data.
 
+    Args:
+        search_space: List of threshold scaling factors to search for optimal performance.
+            Defaults to a range between 0 and 1
+
     Examples:
     --------
     .. testcode::
@@ -53,12 +57,6 @@ class AdaptiveDecision(BaseDecision):
     name = "adaptive"
 
     def __init__(self, search_space: list[FloatFromZeroToOne] | None = None) -> None:
-        """Initialize the AdaptiveDecision.
-
-        Args:
-            search_space: List of threshold scaling factors to search for optimal performance.
-                Defaults to a range between 0 and 1
-        """
         self.search_space = search_space if search_space is not None else default_search_space
 
         if any(val < 0 or val > 1 for val in self.search_space):
@@ -72,9 +70,6 @@ class AdaptiveDecision(BaseDecision):
         Args:
             context: Context containing configurations and utilities
             search_space: List of threshold scaling factors, or None for default
-
-        Returns:
-            Initialized AdaptiveDecision instance
         """
         return cls(
             search_space=search_space,

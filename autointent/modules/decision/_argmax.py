@@ -48,7 +48,7 @@ class ArgmaxDecision(BaseDecision):
     _n_classes: int
 
     def __init__(self) -> None:
-        """Initialize ArgmaxDecision."""
+        ...
 
     @classmethod
     def from_context(cls, context: Context) -> "ArgmaxDecision":
@@ -56,9 +56,6 @@ class ArgmaxDecision(BaseDecision):
 
         Args:
             context: Context object containing configurations and utilities
-
-        Returns:
-            Initialized ArgmaxDecision instance
         """
         return cls()
 
