@@ -20,6 +20,15 @@ class KNNScorer(BaseScorer):
     This module uses a vector index to retrieve nearest neighbors for query utterances
     and applies a weighting strategy to compute class probabilities.
 
+    Args:
+        embedder_config: Config of the embedder used for vectorization
+        k: Number of closest neighbors to consider during inference
+        weights: Weighting strategy:
+
+            - "uniform": Equal weight for all neighbors
+            - "distance": Weight inversely proportional to distance
+            - "closest": Only the closest neighbor of each class is weighted
+
     Examples:
     --------
 
@@ -51,16 +60,6 @@ class KNNScorer(BaseScorer):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         weights: WeightType = "distance",
     ) -> None:
-        """Initialize the KNNScorer.
-
-        Args:
-            embedder_config: Config of the embedder used for vectorization
-            k: Number of closest neighbors to consider during inference
-            weights: Weighting strategy:
-                - "uniform": Equal weight for all neighbors
-                - "distance": Weight inversely proportional to distance
-                - "closest": Only the closest neighbor of each class is weighted
-        """
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
@@ -88,9 +87,6 @@ class KNNScorer(BaseScorer):
             k: Number of closest neighbors to consider during inference
             weights: Weighting strategy for scoring
             embedder_config: Config of the embedder, or None to use the best embedder
-
-        Returns:
-            Initialized KNNScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()

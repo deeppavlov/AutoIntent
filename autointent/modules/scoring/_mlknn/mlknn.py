@@ -19,6 +19,12 @@ class MLKnnScorer(BaseScorer):
     This module implements ML-KNN, a multi-label classifier that computes probabilities
     based on the k-nearest neighbors of a query instance.
 
+    Args:
+        k: Number of nearest neighbors to consider
+        embedder_config: Config of the embedder used for vectorization
+        s: Smoothing parameter for probability calculations, defaults to 1.0
+        ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
+
     Example:
     --------
 
@@ -62,14 +68,6 @@ class MLKnnScorer(BaseScorer):
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
     ) -> None:
-        """Initialize the MLKnnScorer.
-
-        Args:
-            k: Number of nearest neighbors to consider
-            embedder_config: Config of the embedder used for vectorization
-            s: Smoothing parameter for probability calculations, defaults to 1.0
-            ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
-        """
         self.k = k
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.s = s

@@ -22,10 +22,10 @@ class DNNCScorer(BaseScorer):
     This module uses a Ranker for scoring candidate intents and can optionally
     train a logistic regression head on top of cross-encoder features.
 
-    Reference:
-        Zhang, J. G., Hashimoto, K., Liu, W., Wu, C. S., Wan, Y., Yu, P. S., ... & Xiong, C. (2020).
-        Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference.
-        arXiv preprint arXiv:2010.13009.
+    Args:
+            cross_encoder_config: Config of the cross-encoder model
+            embedder_config: Config of the embedder model
+            k: Number of nearest neighbors to retrieve
 
     Examples:
     --------
@@ -45,6 +45,11 @@ class DNNCScorer(BaseScorer):
         test_utterances = ["Hello!", "What's up?"]
         scores = scorer.predict(test_utterances)
 
+    Reference:
+        Zhang, J. G., Hashimoto, K., Liu, W., Wu, C. S., Wan, Y., Yu, P. S., ... & Xiong, C. (2020).
+        Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference.
+        arXiv preprint arXiv:2010.13009.
+
     """
 
     name = "dnnc"
@@ -60,13 +65,6 @@ class DNNCScorer(BaseScorer):
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
-        """Initialize the DNNCScorer.
-
-        Args:
-            cross_encoder_config: Config of the cross-encoder model
-            embedder_config: Config of the embedder model
-            k: Number of nearest neighbors to retrieve
-        """
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
@@ -90,9 +88,6 @@ class DNNCScorer(BaseScorer):
             cross_encoder_config: Config of the cross-encoder model
             k: Number of nearest neighbors to retrieve
             embedder_config: Config of the embedder model, or None to use the best embedder
-
-        Returns:
-            Initialized DNNCScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()

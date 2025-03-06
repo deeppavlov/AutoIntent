@@ -21,6 +21,10 @@ class DescriptionScorer(BaseScorer):
 
     DescriptionScorer embeds both the utterances and the intent descriptions, then computes
     a similarity score between the two, using either cosine similarity and softmax.
+
+    Args:
+        embedder_config: Config of the embedder model
+        temperature: Temperature parameter for scaling logits, defaults to 1.0
     """
 
     _embedder: Embedder
@@ -36,12 +40,6 @@ class DescriptionScorer(BaseScorer):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
     ) -> None:
-        """Initialize the DescriptionScorer.
-
-        Args:
-            embedder_config: Config of the embedder model
-            temperature: Temperature parameter for scaling logits, defaults to 1.0
-        """
         self.temperature = temperature
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
 

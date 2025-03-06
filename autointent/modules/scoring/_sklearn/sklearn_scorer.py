@@ -35,6 +35,11 @@ class SklearnScorer(BaseScorer):
     This module uses embeddings generated from a transformer model to train
     chosen sklearn classifier for intent classification.
 
+    Args:
+        clf_name: Name of the sklearn classifier to use
+        embedder_config: Config of the embedder model
+        **clf_args: Arguments for the chosen sklearn classifier
+
     Examples:
         >>> from autointent.modules.scoring import SklearnScorer
         >>> utterances = ["hello", "how are you?"]
@@ -59,11 +64,6 @@ class SklearnScorer(BaseScorer):
         **clf_args: Any,  # noqa: ANN401
     ) -> None:
         """Initialize the SklearnScorer.
-
-        Args:
-            clf_name: Name of the sklearn classifier to use
-            embedder_config: Config of the embedder model
-            **clf_args: Arguments for the chosen sklearn classifier
 
         Raises:
             ValueError: If the specified classifier doesn't exist or lacks predict_proba
@@ -94,9 +94,6 @@ class SklearnScorer(BaseScorer):
             clf_name: Name of the sklearn classifier to use
             embedder_config: Config of the embedder, or None to use the best embedder
             **clf_args: Arguments for the chosen sklearn classifier
-
-        Returns:
-            Initialized SklearnScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()

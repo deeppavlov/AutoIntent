@@ -18,6 +18,10 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its retrieval quality as a sort of proxy metric.
 
+    Args:
+        k: Number of nearest neighbors to retrieve
+        embedder_config: Config of the embedder used for creating embeddings
+
     Examples:
     --------
 
@@ -45,12 +49,6 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any],
         k: PositiveInt = 10,
     ) -> None:
-        """Initialize the RetrievalAimedEmbedding.
-
-        Args:
-            k: Number of nearest neighbors to retrieve
-            embedder_config: Config of the embedder used for creating embeddings
-        """
         self.k = k
         embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.embedder_config = embedder_config
@@ -72,9 +70,6 @@ class RetrievalAimedEmbedding(BaseEmbedding):
             context: The context containing configurations and utilities
             k: Number of nearest neighbors to retrieve
             embedder_config: Config of the embedder to use
-
-        Returns:
-            Initialized RetrievalAimedEmbedding instance
         """
         return cls(
             k=k,

@@ -19,6 +19,12 @@ class LinearScorer(BaseScorer):
     This module uses embeddings generated from a transformer model to train a
     logistic regression classifier for intent classification.
 
+    Args:
+        embedder_config: Config of the embedder model
+        cv: Number of cross-validation folds, defaults to 3
+        n_jobs: Number of parallel jobs for cross-validation, defaults to None
+        seed: Random seed for reproducibility, defaults to 0
+
     Example:
     --------
     .. testcode::
@@ -54,14 +60,6 @@ class LinearScorer(BaseScorer):
         cv: int = 3,
         seed: int = 0,
     ) -> None:
-        """Initialize the LinearScorer.
-
-        Args:
-            embedder_config: Config of the embedder model
-            cv: Number of cross-validation folds, defaults to 3
-            n_jobs: Number of parallel jobs for cross-validation, defaults to None
-            seed: Random seed for reproducibility, defaults to 0
-        """
         self.cv = cv
         self.seed = seed
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -81,9 +79,6 @@ class LinearScorer(BaseScorer):
         Args:
             context: Context containing configurations and utilities
             embedder_config: Config of the embedder, or None to use the best embedder
-
-        Returns:
-            Initialized LinearScorer instance
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
