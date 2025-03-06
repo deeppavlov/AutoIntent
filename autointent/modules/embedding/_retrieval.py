@@ -18,13 +18,6 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     The main purpose of this module is to be used at embedding node for optimizing
     embedding configuration using its retrieval quality as a sort of proxy metric.
 
-    Attributes:
-        _vector_index: The vector index used for nearest neighbor retrieval
-        name: Name of the module, defaults to "retrieval"
-        supports_multiclass: Whether the module supports multiclass classification
-        supports_multilabel: Whether the module supports multilabel classification
-        supports_oos: Whether the module supports out-of-scope detection
-
     Examples:
     --------
 

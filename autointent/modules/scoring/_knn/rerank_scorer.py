@@ -17,10 +17,6 @@ class RerankScorer(KNNScorer):
     """Re-ranking scorer using a cross-encoder for intent classification.
 
     This module uses a cross-encoder to re-rank the nearest neighbors retrieved by a KNN scorer.
-
-    Attributes:
-        name: Name of the scorer, defaults to "rerank"
-        _scorer: Ranker instance for re-ranking
     """
 
     name = "rerank"

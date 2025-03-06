@@ -35,11 +35,6 @@ class SklearnScorer(BaseScorer):
     This module uses embeddings generated from a transformer model to train
     chosen sklearn classifier for intent classification.
 
-    Attributes:
-        name: Name of the scorer, defaults to "sklearn"
-        supports_multilabel: Whether multilabel classification is supported
-        supports_multiclass: Whether multiclass classification is supported
-
     Examples:
         >>> from autointent.modules.scoring import SklearnScorer
         >>> utterances = ["hello", "how are you?"]

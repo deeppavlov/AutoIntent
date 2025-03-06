@@ -37,9 +37,6 @@ class SimpleRegex(BaseRegex):
 
     A module that uses regular expressions to detect intents in text utterances.
     Supports both full and partial pattern matching.
-
-    Attributes:
-        name: Name of the module, defaults to "regex"
     """
 
     name = "simple"

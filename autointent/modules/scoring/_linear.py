@@ -19,14 +19,6 @@ class LinearScorer(BaseScorer):
     This module uses embeddings generated from a transformer model to train a
     logistic regression classifier for intent classification.
 
-    Attributes:
-        name: Name of the scorer, defaults to "linear"
-        _multilabel: Whether multilabel classification is used
-        _clf: Trained classifier instance
-        _embedder: Embedder instance for feature extraction
-        supports_multiclass: Whether multiclass classification is supported
-        supports_multilabel: Whether multilabel classification is supported
-
     Example:
     --------
     .. testcode::

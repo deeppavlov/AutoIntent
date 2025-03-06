@@ -20,13 +20,6 @@ class KNNScorer(BaseScorer):
     This module uses a vector index to retrieve nearest neighbors for query utterances
     and applies a weighting strategy to compute class probabilities.
 
-    Attributes:
-        weights: Weighting strategy used for scoring
-        _vector_index: VectorIndex instance for neighbor retrieval
-        name: Name of the scorer, defaults to "knn"
-        supports_multiclass: Whether multiclass classification is supported
-        supports_multilabel: Whether multilabel classification is supported
-
     Examples:
     --------
 

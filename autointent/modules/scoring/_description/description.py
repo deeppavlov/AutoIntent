@@ -21,15 +21,6 @@ class DescriptionScorer(BaseScorer):
 
     DescriptionScorer embeds both the utterances and the intent descriptions, then computes
     a similarity score between the two, using either cosine similarity and softmax.
-
-    Attributes:
-        _embedder: The embedder used to generate embeddings for utterances and descriptions
-        name: Name of the scorer, defaults to "description"
-        _n_classes: Number of intent classes
-        _multilabel: Whether the task is multilabel
-        _description_vectors: Embedded vectors of intent descriptions
-        supports_multiclass: Whether multiclass classification is supported
-        supports_multilabel: Whether multilabel classification is supported
     """
 
     _embedder: Embedder

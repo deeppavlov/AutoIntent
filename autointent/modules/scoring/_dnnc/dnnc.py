@@ -27,14 +27,6 @@ class DNNCScorer(BaseScorer):
         Discriminative Nearest Neighbor Few-Shot Intent Detection by Transferring Natural Language Inference.
         arXiv preprint arXiv:2010.13009.
 
-    Attributes:
-        _n_classes: Number of intent classes
-        _vector_index: Index for nearest neighbor search
-        _cross_encoder: Ranker model for scoring pairs
-        name: Name of the scorer, defaults to "dnnc"
-        supports_multilabel: Whether multilabel classification is supported
-        supports_multiclass: Whether multiclass classification is supported
-
     Examples:
     --------
 
