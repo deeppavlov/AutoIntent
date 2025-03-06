@@ -1,3 +1,5 @@
+"""Types used throughout AutoIntent library."""
+
 from ._types import (
     FloatFromZeroToOne,
     LabelType,
