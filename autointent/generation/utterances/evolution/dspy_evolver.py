@@ -64,8 +64,8 @@ def repetition_factor(true_text: str, augmented_text: str) -> float:
     Raises:
         ValueError: If the lengths of true_texts and augmented_texts differ.
     """
-    true_tokens = true_text.split()
-    aug_tokens = augmented_text.split()
+    true_tokens = "".join(c for c in true_text.lower() if c.isalnum() or c.isspace()).split()
+    aug_tokens = "".join(c for c in augmented_text.lower() if c.isalnum() or c.isspace()).split()
     if not true_tokens or not aug_tokens:
         return 0.0
     true_counts = Counter(true_tokens)
@@ -82,7 +82,7 @@ class SemanticRecallPrecision(dspy.Signature):  # type: ignore[misc]
 
     If asked to reason, enumerate key ideas in each response, and whether they are present in the other response.
 
-    Copied from https://github.com/stanfordnlp/dspy/blob/2957c5f998e0bc652017b6e3b1f8af34970b6f6b/dspy/evaluate/auto_evaluation.py#L4-L14
+    Copied from `dspy <https://github.com/stanfordnlp/dspy/blob/2957c5f998e0bc652017b6e3b1f8af34970b6f6b/dspy/evaluate/auto_evaluation.py#L4-L14>`_
     """
 
     question: str = dspy.InputField()
@@ -95,7 +95,7 @@ class SemanticRecallPrecision(dspy.Signature):  # type: ignore[misc]
 class AugmentSemanticF1(dspy.Module):  # type: ignore[misc]
     """Compare a system's response to the ground truth to compute its recall and precision.
 
-    Adapted from https://dspy.ai/api/evaluation/SemanticF1/
+    Adapted from `dspy SemanticF1 <https://dspy.ai/api/evaluation/SemanticF1/>_
     """
 
     def __init__(self, threshold: float = 0.66) -> None:
@@ -165,8 +165,7 @@ class DSPYIncrementalUtteranceEvolver:
         """Initialize the DSPYIncrementalUtteranceEvolver.
 
         Args:
-            model: Model name. This should follow naming schema from litellm.
-                https://docs.litellm.ai/docs/providers
+            model: Model name. This should follow naming schema from `litellm providers <https://docs.litellm.ai/docs/providers>`_.
             api_base: API base URL. Some models require this.
             temperature: Sampling temperature. 0.0 is default from dspy LM.
             max_tokens: Maximum number of tokens to generate. 1000 is default from dspy LM.
@@ -204,9 +203,9 @@ class DSPYIncrementalUtteranceEvolver:
             n_evolutions: Number of evolutions to perform.
             update_split: Whether to update the split with the augmented data.
             mipro_init_params: Parameters for the MIPROv2 augmentation.
-                Full list of params available at https://dspy.ai/deep-dive/optimizers/miprov2/#initialization-parameters
+                `Full list of parameters <https://dspy.ai/deep-dive/optimizers/miprov2/#initialization-parameters>`_
             mipro_compile_params: Parameters for the MIPROv2 compilation.
-                Full list of params available at https://dspy.ai/deep-dive/optimizers/miprov2/#compile-parameters
+                `Full list of params available <https://dspy.ai/deep-dive/optimizers/miprov2/#compile-parameters>`_
             save_path: Path to save the generated samples. Defaults to "evolution_config".
 
         Returns:
