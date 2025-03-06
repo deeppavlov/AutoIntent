@@ -1,16 +1,17 @@
-"""Chat template for evolution augmentation via abstractization."""
+"""Chat template for evolution augmentation via concretizing."""
 
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
 
-from .base import EvolutionChatTemplate
+from ._base_evolver import EvolutionChatTemplate
 
 
-class AbstractEvolution(EvolutionChatTemplate):
-    """Chat template for evolution augmentation via abstraction."""
+class ConcreteEvolution(EvolutionChatTemplate):
+    """Chat template for evolution augmentation via concretizing."""
 
-    name = "abstract"
+    name = "concrete"
+
     _messages: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,
@@ -22,17 +23,14 @@ class AbstractEvolution(EvolutionChatTemplate):
                 "2. Rewritten utterance should be concise and understandable by humans.\n"
                 "3. Rewritten utterance must be fully answerable.\n"
                 "4. Rewritten utterance should not contain more than 10 words.\n\n"
-                "Intent name: Reserve Restaurant"
-                "Utterance: I want to reserve a table for 4 persons at 9 pm."
+                "Intent name: Reserve Restaurant\n"
+                "Utterance: I want to make a reservation for dinner tonight."
             ),
         ),
-        Message(role=Role.ASSISTANT, content="Please, reserve a table for me."),
+        Message(role=Role.ASSISTANT, content="I want to reserve a table for 4 persons at 9 pm."),
         Message(
             role=Role.USER,
-            content=(
-                "Intent name: requesting technical support\n"
-                "Utterance: My Lenovo laptop is constantly rebooting and overheating."
-            ),
+            content="Intent name: requesting technical support\nUtterance: I'm having trouble with my laptop.",
         ),
-        Message(role=Role.ASSISTANT, content="I'm having trouble with my laptop."),
+        Message(role=Role.ASSISTANT, content="My laptop is constantly rebooting and overheating."),
     ]

@@ -7,7 +7,7 @@ from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation.utterances.basic.chat_templates._base import BaseSynthesizerTemplate
+from autointent.generation.chat_templates import BaseSynthesizerTemplate
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
 from autointent.generation.utterances.generator import Generator
 
@@ -15,9 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 class DatasetBalancer:
-    """Class for balancing dataset through example augmentation.
+    """Balance dataset's classes distribution.
 
     If your dataset is unbalanced, you can add LLM-generated samples.
+    This method uses :py:class:`autointent.generation.utterances.UtteranceGenerator` under the hood.
     """
 
     def __init__(

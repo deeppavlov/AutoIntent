@@ -1,17 +1,16 @@
-"""Chat template for evolution augmentation via concretizing."""
+"""Chat template for evolution augmentation via abstractization."""
 
 from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
 
-from .base import EvolutionChatTemplate
+from ._base_evolver import EvolutionChatTemplate
 
 
-class ConcreteEvolution(EvolutionChatTemplate):
-    """Chat template for evolution augmentation via concretizing."""
+class AbstractEvolution(EvolutionChatTemplate):
+    """Chat template for evolution augmentation via abstraction."""
 
-    name = "concrete"
-
+    name = "abstract"
     _messages: ClassVar[list[Message]] = [
         Message(
             role=Role.USER,
@@ -23,14 +22,17 @@ class ConcreteEvolution(EvolutionChatTemplate):
                 "2. Rewritten utterance should be concise and understandable by humans.\n"
                 "3. Rewritten utterance must be fully answerable.\n"
                 "4. Rewritten utterance should not contain more than 10 words.\n\n"
-                "Intent name: Reserve Restaurant\n"
-                "Utterance: I want to make a reservation for dinner tonight."
+                "Intent name: Reserve Restaurant"
+                "Utterance: I want to reserve a table for 4 persons at 9 pm."
             ),
         ),
-        Message(role=Role.ASSISTANT, content="I want to reserve a table for 4 persons at 9 pm."),
+        Message(role=Role.ASSISTANT, content="Please, reserve a table for me."),
         Message(
             role=Role.USER,
-            content="Intent name: requesting technical support\nUtterance: I'm having trouble with my laptop.",
+            content=(
+                "Intent name: requesting technical support\n"
+                "Utterance: My Lenovo laptop is constantly rebooting and overheating."
+            ),
         ),
-        Message(role=Role.ASSISTANT, content="My laptop is constantly rebooting and overheating."),
+        Message(role=Role.ASSISTANT, content="I'm having trouble with my laptop."),
     ]

@@ -4,7 +4,7 @@ from typing import ClassVar
 
 from autointent.generation.utterances.schemas import Message, Role
 
-from ._base import BaseSynthesizerTemplate
+from ._base_synthesizer import BaseSynthesizerTemplate
 
 
 class EnglishSynthesizerTemplate(BaseSynthesizerTemplate):
