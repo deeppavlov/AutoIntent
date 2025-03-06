@@ -61,7 +61,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 
     .. math::
 
-        \\frac{1}{\\ell}\\sum_{i=1}^{\\ell}\\log(s[y[i]])
+        \frac{1}{\ell}\sum_{i=1}^{\ell}\log(s[y[i]])
 
     where ``s[y[i]]`` is the predicted score of the ``i``-th utterance having the ground truth label.
 
@@ -70,7 +70,7 @@ def scoring_log_likelihood(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE,
 
     .. math::
 
-        \\frac{1}{\\ell}\\sum_{i=1}^\\ell\\sum_{c=1}^C\\Big[y[i,c]\\cdot\\log(s[i,c])+(1-y[i,c])\\cdot\\log(1-s[i,c])\\Big]
+        \frac{1}{\ell}\sum_{i=1}^\ell\sum_{c=1}^C\Big[y[i,c]\cdot\log(s[i,c])+(1-y[i,c])\cdot\log(1-s[i,c])\Big]
 
     Args:
         labels: Ground truth labels for each utterance.
@@ -109,7 +109,7 @@ def scoring_roc_auc(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> flo
 
     .. math::
 
-        \\frac{1}{C}\\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
+        \frac{1}{C}\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
 
     where ``C`` is the number of classes.
 
@@ -229,7 +229,7 @@ def scoring_hit_rate(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> fl
 
     .. math::
 
-        \\text{Hit Rate} = \\frac{1}{N} \\sum_{i=1}^N \\mathbb{1}(y_{\\text{top},i} \\in y_{\\text{true},i})
+        \text{Hit Rate} = \frac{1}{N} \sum_{i=1}^N \mathbb{1}(y_{\text{top},i} \in y_{\text{true},i})
 
     Args:
         labels: Ground truth labels for each sample.

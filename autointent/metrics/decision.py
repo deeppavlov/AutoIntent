@@ -93,6 +93,7 @@ def decision_accuracy(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) 
         \text{Accuracy} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{true},i} = y_{\text{pred},i})}{N}
 
     where:
+
     - :math:`N` is the total number of samples,
     - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
     - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
@@ -122,6 +123,7 @@ def _decision_roc_auc_multiclass(y_true: npt.NDArray[Any], y_pred: npt.NDArray[A
         \text{ROC AUC}_{\text{multiclass}} = \frac{1}{K} \sum_{k=1}^K \text{ROC AUC}_k
 
     where:
+
     - :math:`K` is the number of classes,
     - :math:`\text{ROC AUC}_k` is the ROC AUC score for the :math:`k`-th class,
     calculated by treating it as a binary classification problem (class :math:`k` vs rest).

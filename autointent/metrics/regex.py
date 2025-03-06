@@ -34,6 +34,7 @@ def regex_partial_accuracy(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE)
         \text{Partial Accuracy} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{true},i} \in y_{\text{pred},i})}{N}
 
     where:
+
     - :math:`N` is the total number of samples,
     - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
     - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
@@ -66,6 +67,7 @@ def regex_partial_precision(y_true: LABELS_VALUE_TYPE, y_pred: LABELS_VALUE_TYPE
         \mathbb{1}(|y_{\text{pred},i}| > 0)}
 
     where:
+
     - :math:`N` is the total number of samples,
     - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
     - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,

@@ -49,6 +49,7 @@ def _macrofy(
         \text{MacroAvg} = \frac{1}{C} \sum_{i=1}^{C} \text{metric}(y_{\text{true},i}, y_{\text{pred},i}, k)
 
     where:
+
     - :math:`C` is the number of classes,
     - :math:`y_{\text{true},i}` is the true binary indicator for the :math:`i`-th class label,
     - :math:`y_{\text{pred},i}` is the predicted binary indicator for the :math:`i`-th class label,
@@ -86,6 +87,7 @@ def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64]
         \cdot \frac{\text{num_relevant}}{i+1}
 
     where:
+
     - :math:`k` is the number of top items to consider for each query,
     - :math:`\text{num_relevant}` is the number of relevant items in the top-k ranking,
     - :math:`y_{\text{true},i}` is the true label (query label) for the :math:`i`-th ranked item,
@@ -136,6 +138,7 @@ def retrieval_map(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
         \text{MAP} = \frac{1}{Q} \sum_{q=1}^{Q} \text{AP}(q, c, k)
 
     where:
+
     - :math:`Q` is the total number of queries,
     - :math:`\text{AP}(q, c, k)` is the average precision for the :math:`q`-th query,
     calculated considering the true labels for that query :math:`q`, the ranked candidate
@@ -164,6 +167,7 @@ def _average_precision_intersecting(
         y_{\text{true},j}(q) \cdot y_{\text{pred},j}(i) > 0 \right) \cdot \frac{\text{num_relevant}}{i+1}
 
     where:
+
     - :math:`k` is the number of top items to consider for each query,
     - :math:`\text{num_relevant}` is the number of relevant items in the top-k ranking,
     - :math:`y_{\text{true},j}(q)` is the true binary label for the :math:`j`-th
@@ -211,6 +215,7 @@ def retrieval_map_intersecting(
         \text{MAP} = \frac{1}{Q} \sum_{q=1}^{Q} \text{AP}_{\text{intersecting}}(q, c, k)
 
     where:
+
     - :math:`Q` is the total number of queries,
     - :math:`\text{AP}_{\text{intersecting}}(q, c, k)` is the average precision for the
     :math:`q`-th query, calculated using the intersecting true labels (`q`),
@@ -261,6 +266,7 @@ def retrieval_hit_rate(
         \text{Hit Rate} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{query},i} \in y_{\text{candidates},i}^{(1:k)})}{N}
 
     where:
+
     - :math:`N` is the total number of queries,
     - :math:`y_{\text{query},i}` is the true label for the :math:`i`-th query,
     - :math:`y_{\text{candidates},i}^{(1:k)}` is the set of top-k predicted labels for the :math:`i`-th query,
@@ -301,6 +307,7 @@ def retrieval_hit_rate_intersecting(
         \left( y_{\text{query},i} \cdot y_{\text{candidates},i,j} \right) > 0 \right)}{N}
 
     where:
+
     - :math:`N` is the total number of queries,
     - :math:`y_{\text{query},i}` is the one-hot encoded label vector for the :math:`i`-th query,
     - :math:`y_{\text{candidates},i,j}` is the one-hot encoded label vector of the :math:`j`-th
@@ -366,6 +373,7 @@ def retrieval_precision(
         y_{\text{candidates},i}^{(1:k)}|}{k}
 
     where:
+
     - :math:`N` is the total number of queries,
     - :math:`y_{\text{query},i}` is the true label for the :math:`i`-th query,
     - :math:`y_{\text{candidates},i}^{(1:k)}` is the set of top-k predicted labels for the :math:`i`-th query.
@@ -407,6 +415,7 @@ def retrieval_precision_intersecting(
         \frac{\sum_{j=1}^k \mathbb{1} \left( y_{\text{query},i} \cdot y_{\text{candidates},i,j} > 0 \right)}{k}
 
     where:
+
     - :math:`N` is the total number of queries,
     - :math:`y_{\text{query},i}` is the one-hot encoded label vector for the :math:`i`-th query,
     - :math:`y_{\text{candidates},i,j}` is the one-hot encoded label vector of the :math:`j`-th
@@ -468,6 +477,7 @@ def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
         \text{DCG@k} = \sum_{i=1}^k \frac{r_i}{\log_2(i + 1)}
 
     where:
+
     - :math:`r_i` is the relevance score of the item at rank :math:`i`,
     - :math:`k` is the number of top items considered.
 
@@ -491,6 +501,7 @@ def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
         \text{IDCG@k} = \sum_{i=1}^k \frac{r_i^{\text{ideal}}}{\log_2(i + 1)}
 
     where:
+
     - :math:`r_i^{\text{ideal}}` is the relevance score of the item at rank :math:`i` in the ideal (sorted) order,
     - :math:`k` is the number of top items considered.
 
@@ -513,6 +524,7 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
         \text{NDCG@k} = \frac{\text{DCG@k}}{\text{IDCG@k}}
 
     where:
+
     - :math:`\text{DCG@k}` is the Discounted Cumulative Gain at position :math:`k`,
     - :math:`\text{IDCG@k}` is the Ideal Discounted Cumulative Gain at position :math:`k`.
 
@@ -608,6 +620,7 @@ def retrieval_mrr(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_
         \text{MRR@k} = \frac{1}{N} \sum_{i=1}^N \frac{1}{\text{rank}_i}
 
     where:
+
     - :math:`\text{rank}_i` is the rank position of the first relevant item in the top-k results for query :math:`i`,
     - :math:`N` is the total number of queries.
 
@@ -646,6 +659,7 @@ def retrieval_mrr_intersecting(
         \text{MRR@k}_{\text{intersecting}} = \frac{1}{N} \sum_{i=1}^N \frac{1}{\text{rank}_i}
 
     where:
+
     - :math:`\text{rank}_i` is the rank position of the first relevant (intersecting) item in the top-k
     results for query :math:`i`,
     - :math:`N` is the total number of queries.
