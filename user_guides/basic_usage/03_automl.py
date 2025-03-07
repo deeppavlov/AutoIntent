@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Pipeline Auto Configuration (AutoML)
+# AutoML
 """
 
 # %%

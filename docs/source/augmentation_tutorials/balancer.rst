@@ -3,7 +3,7 @@
 Balancing Datasets with DatasetBalancer
 =======================================
 
-This guide demonstrates how to use the DatasetBalancer class to balance class distribution in your datasets through LLM-based data augmentation.
+This guide demonstrates how to use the :py:class:`autointent.generation.utterances.DatasetBalancer` class to balance class distribution in your datasets through LLM-based data augmentation.
 
 .. contents:: Table of Contents
     :depth: 2
@@ -57,8 +57,8 @@ Setting up the Generator and Template
 ------------------------------------
 
 DatasetBalancer requires two main components:
-1. A Generator - responsible for creating new utterances using an LLM
-2. A Template - defines the prompt format sent to the LLM
+1. A :py:class:`autointnt.generation.utterances.Generator`` - responsible for creating new utterances using an LLM
+2. A :py:class:`autointent.generation.chat_templates.EnglishSynthesizerTemplate` - defines the prompt format sent to the LLM
 
 Let's set up these components:
 
