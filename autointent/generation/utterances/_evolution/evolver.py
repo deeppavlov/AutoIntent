@@ -28,6 +28,22 @@ class UtteranceEvolver:
         prompt_makers: List of prompt makers for generating prompts.
         seed: Random seed for reproducibility.
         async_mode: Whether to use asynchronous mode for generation.
+
+    Usage
+    -----
+
+    .. code-block:: python
+
+        from autointent import Dataset
+        from autointent.generation import Generator
+        from autointent.generation.utterances import UtteranceEvolver
+        from autointent.generation.chat_templates import GoofyEvolution, InformalEvolution
+
+        dataset = Dataset.from_json(path_to_json)
+        generator = Generator()
+        evolver = UtteranceEvolver(generator, prompt_makers=[GoofyEvolution(), InformalEvolution()])
+        evolver.augment(dataset)
+
     """
 
     def __init__(

@@ -6,6 +6,7 @@ from copy import deepcopy
 from typing import ClassVar
 
 from autointent import Dataset
+from autointent.custom_types import Split
 from autointent.schemas import Intent
 
 from ._evolution_templates_schemas import Message, Role
@@ -38,7 +39,7 @@ class BaseSynthesizerTemplate(BaseChatTemplate):
     def __init__(
         self,
         dataset: Dataset,
-        split: str,
+        split: str = Split.TRAIN,
         extra_instructions: str | None = None,
         max_sample_utterances: int | None = None,
     ) -> None:

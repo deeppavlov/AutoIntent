@@ -23,6 +23,23 @@ class UtteranceGenerator:
         generator: Generator instance for generating utterances.
         prompt_maker: Prompt maker instance for generating prompts.
         async_mode: Whether to use asynchronous mode for generation.
+
+    Usage
+    -----
+
+    .. code-block:: python
+
+        from autointent import Dataset
+        from autointent.generation import Generator
+        from autointent.generation.utterances import UtteranceGenerator
+        from autointent.generation.chat_templates import RussianSynthesizerTemplate
+
+        dataset = Dataset.from_json(path_to_json)
+        generator = Generator()
+        prompt = RussianSynthesizerTemplate(dataset)
+        augmenter = UtteranceGenerator(generator, prompt_maker=prompt)
+        augmenter.augment(dataset)
+
     """
 
     def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:
