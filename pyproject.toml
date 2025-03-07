@@ -36,9 +36,7 @@ dependencies = [
     "scikit-learn (>=1.5,<2.0)",
     "scikit-multilearn (==0.2.0)",
     "appdirs (>=1.4,<2.0)",
-    "sre-yield (>=1.2,<2.0)",
     "optuna (>=4.0.0,<5.0.0)",
-    "xeger (>=0.4.0,<0.5.0)",
     "pathlib (>=1.0.1,<2.0.0)",
     "pydantic (>=2.10.5,<3.0.0)",
     "faiss-cpu (>=1.9.0,<2.0.0)",
@@ -46,8 +44,6 @@ dependencies = [
     "datasets (>=3.2.0,<4.0.0)",
     "xxhash (>=3.5.0,<4.0.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
-    "ipykernel (>=6.29.5,<7.0.0)",
-    "jupyter (>=1.1.1,<2.0.0)",
 ]
 
 [project.urls]
