@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 class Pipeline:
     """Pipeline optimizer class.
 
-    See tutorial on AutoML features of AutoIntent.
+    See tutorial on AutoML features of AutoIntent in :ref:`user_guides`.
     """
 
     def __init__(
