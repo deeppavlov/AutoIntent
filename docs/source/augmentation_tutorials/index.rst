@@ -1,3 +1,5 @@
+.. _data-aug-tuts:
+
 Data augmentation tutorials
 ---------------------------
 
