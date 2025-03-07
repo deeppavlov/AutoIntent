@@ -16,4 +16,5 @@ Data augmentation tutorials
    :maxdepth: 1
 
    augmentation_tutorials/dspy_augmentation
+   augmentation_tutorials/balancer
 
