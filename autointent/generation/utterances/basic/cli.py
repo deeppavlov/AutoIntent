@@ -4,8 +4,9 @@ import logging
 from argparse import ArgumentParser
 
 from autointent import load_dataset
+from autointent.generation import Generator
 from autointent.generation.chat_templates import EnglishSynthesizerTemplate, RussianSynthesizerTemplate
-from autointent.generation.utterances import Generator, UtteranceGenerator
+from autointent.generation.utterances import UtteranceGenerator
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
