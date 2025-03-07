@@ -3,7 +3,7 @@
 DSPY Augmentation
 #################
 
-This tutorial covers the implementation and usage of an evolutionary strategy to augment utterances using DSPy. It explains how DSPy is used, how the module functions, and how the scoring metric works.
+This tutorial covers the implementation and usage of an evolutionary strategy to augment utterances using DSPy. It explains how DSPy is used, how the module functions, and how the scoring metric works. This method is a wrapper for more simple method :py:class:`autointent.generation.utterances.UtteranceEvolver`.
 
 .. contents:: Table of Contents
     :depth: 2

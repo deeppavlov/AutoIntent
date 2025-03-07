@@ -3,7 +3,7 @@
 Balancing Datasets with DatasetBalancer
 =======================================
 
-This guide demonstrates how to use the :py:class:`autointent.generation.utterances.DatasetBalancer` class to balance class distribution in your datasets through LLM-based data augmentation.
+This guide demonstrates how to use the :py:class:`autointent.generation.utterances.DatasetBalancer` class to balance class distribution in your datasets through LLM-based data augmentation. This method is a wrapper for more simple method :py:class:`autointent.generation.utterances.UtteranceGenerator`.
 
 .. contents:: Table of Contents
     :depth: 2
