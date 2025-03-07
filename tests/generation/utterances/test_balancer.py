@@ -7,8 +7,9 @@ import pytest
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation import Generator
 from autointent.generation.chat_templates import EnglishSynthesizerTemplate
-from autointent.generation.utterances import DatasetBalancer, Generator
+from autointent.generation.utterances import DatasetBalancer
 
 logger = logging.getLogger(__name__)
 

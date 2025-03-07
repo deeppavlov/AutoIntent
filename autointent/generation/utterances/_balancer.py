@@ -7,9 +7,9 @@ from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
+from autointent.generation import Generator
 from autointent.generation.chat_templates import BaseSynthesizerTemplate
 from autointent.generation.utterances.basic.utterance_generator import UtteranceGenerator
-from autointent.generation.utterances.generator import Generator
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class DatasetBalancer:
             Must be a positive integer or None. Defaults to None.
     """
 
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         generator: Generator,
         prompt_maker: BaseSynthesizerTemplate,

@@ -28,7 +28,7 @@ class Generator:
         "temperature": 0.7,
     }
 
-    def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401, D107
+    def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
         if not base_url:
             base_url = os.environ["OPENAI_BASE_URL"]
         if not model_name:

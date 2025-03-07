@@ -13,9 +13,9 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset, Pipeline
 from autointent.custom_types import Split
+from autointent.generation import Generator
 from autointent.generation.chat_templates import EvolutionChatTemplate
 from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
-from autointent.generation.utterances.generator import Generator
 
 SEARCH_SPACE = [
     {
