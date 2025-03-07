@@ -9,7 +9,9 @@ from autointent.generation.chat_templates import (
     EVOLUTION_MAPPING,
     EVOLUTION_NAMES,
 )
-from autointent.generation.utterances.evolution import IncrementalUtteranceEvolver, UtteranceEvolver
+
+from .evolver import UtteranceEvolver
+from .incremental_evolver import IncrementalUtteranceEvolver
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)

@@ -30,7 +30,7 @@ class UtteranceEvolver:
         async_mode: Whether to use asynchronous mode for generation.
     """
 
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         generator: Generator,
         prompt_makers: Sequence[EvolutionChatTemplate],

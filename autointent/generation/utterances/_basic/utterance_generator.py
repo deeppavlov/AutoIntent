@@ -25,7 +25,7 @@ class UtteranceGenerator:
         async_mode: Whether to use asynchronous mode for generation.
     """
 
-    def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:  # noqa: D107
+    def __init__(self, generator: Generator, prompt_maker: BaseSynthesizerTemplate, async_mode: bool = False) -> None:
         self.generator = generator
         self.prompt_maker = prompt_maker
         self.async_mode = async_mode

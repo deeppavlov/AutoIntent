@@ -30,7 +30,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-          pip install .[test,dspy]
+          pip install .
+          pip install pytest pytest-asyncio dspy
 
     - name: Run tests
       run: |

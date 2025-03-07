@@ -1,13 +1,10 @@
 """Generative methods for enriching dataset with synthetic samples."""
 
-from ._balancer import DatasetBalancer
-from .basic import UtteranceGenerator
-from .evolution import (
-    IncrementalUtteranceEvolver,
-    UtteranceEvolver,
-)
+from ._basic import DatasetBalancer, UtteranceGenerator
+from ._evolution import DSPYIncrementalUtteranceEvolver, IncrementalUtteranceEvolver, UtteranceEvolver
 
 __all__ = [
+    "DSPYIncrementalUtteranceEvolver",
     "DatasetBalancer",
     "IncrementalUtteranceEvolver",
     "UtteranceEvolver",

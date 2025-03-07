@@ -15,7 +15,7 @@ from autointent import Dataset, Pipeline
 from autointent.custom_types import Split
 from autointent.generation import Generator
 from autointent.generation.chat_templates import EvolutionChatTemplate
-from autointent.generation.utterances.evolution.evolver import UtteranceEvolver
+from autointent.generation.utterances._evolution.evolver import UtteranceEvolver
 
 SEARCH_SPACE = [
     {
@@ -53,7 +53,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
         search_space: Search space for the pipeline optimizer.
     """
 
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         generator: Generator,
         prompt_makers: Sequence[EvolutionChatTemplate],
