@@ -131,7 +131,18 @@ dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
 from autointent import Pipeline
 
 pipeline_optimizer = Pipeline.from_search_space(search_space)
-pipeline_optimizer.fit(dataset)
+pipeline_optimizer.fit(dataset, sampler="random")
+
+# %% [markdown]
+"""
+There are three hyperparameter tuning samplers available:
+
+- "random"
+- "brute"
+- "tpe"
+
+All the samplers are implemented with ![optuna](https://optuna.org/).
+"""
 
 # %% [markdown]
 """

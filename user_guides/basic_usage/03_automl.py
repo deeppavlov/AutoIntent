@@ -76,6 +76,42 @@ custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
 """
+## Default Transformers
+
+One can specify what embedding model and cross-encoder model want to use along with default settings:
+"""
+
+# %%
+from autointent.configs import EmbedderConfig, CrossEncoderConfig
+
+custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny", device="cpu"))
+custom_pipeline.set_config(CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", max_length=8))
+
+# %% [markdown]
+"""
+See the docs for %mddoclink(class,configs,EmbedderConfig) and %mddoclink(class,configs,CrossEncoderConfig) for options available to customize.
+"""
+
+# %% [markdown]
+"""
+## Cross-Validation vs Hold-Out Validation
+
+If you have lots of training and evaluation data, you can use default hold-out validation strategy. If not, you can choose cross-validation and spend a little more time but utilize the full amount of available data for better hyperparameter tuning.
+
+This behavior is controlled with %mddoclink(class,configs,DataConfig):
+"""
+
+# %%
+from autointent.configs import DataConfig
+custom_pipeline.set_config(DataConfig(scheme="cv", n_folds=3))
+
+# %% [markdown]
+"""
+See the docs for %mddoclink(class,configs,DataConfig) for other options available to customize.
+"""
+
+# %% [markdown]
+"""
 ## Complete Example
 """
 
@@ -101,7 +137,7 @@ custom_pipeline.set_config(logging_config)
 # start auto-configuration
 context = custom_pipeline.fit(dataset)
 
-# inference
+# inference on-the-fly
 custom_pipeline.predict(["hello world!"])
 
 # %% [markdown]
