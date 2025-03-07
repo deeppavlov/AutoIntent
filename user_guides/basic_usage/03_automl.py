@@ -99,7 +99,43 @@ logging_config = LoggingConfig()
 custom_pipeline.set_config(logging_config)
 
 # start auto-configuration
-custom_pipeline.fit(dataset)
+context = custom_pipeline.fit(dataset)
 
 # inference
 custom_pipeline.predict(["hello world!"])
+
+# %%[markdown]
+"""
+## Dump Results
+
+One can save all results of auto-configuration process to file system (to ``LoggingConfig.dirpath``):
+"""
+
+# %%
+context.dump()
+
+# %%[markdown]
+"""
+Or one can dump only the configured pipeline to any desired location (by default ``LoggingConfig.dirpath``):
+"""
+
+# %%
+custom_pipeline.dump()
+
+# %%[markdown]
+"""
+## Load Pipeline for Inference
+"""
+
+# %%
+loaded_pipe = Pipeline.load(logging_config.dirpath)
+
+# %%[markdown]
+"""
+Since this notebook is launched automatically while building the docs, we will clean the space if you don't mind :)
+"""
+
+# %%
+import shutil
+
+shutil.rmtree(logging_config.dirpath)

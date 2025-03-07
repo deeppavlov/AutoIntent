@@ -80,6 +80,7 @@ Secondly, after optimization finished, you need to save the auto-configuration r
 # %%
 context = pipeline.fit(dataset)
 context.dump()
+# or pipeline.dump() to save only configured pipeline but not all the optimization assets
 
 # %% [markdown]
 """

@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Search Space Configuration
+# AutoML Customization
 
 In this guide, you will learn how to configure a custom hyperparameter search space.
 """
@@ -29,15 +29,23 @@ knn_module = {
 
 # %% [markdown]
 """
-The ``module_name`` field specifies the name of the module. You can find the names, for example, in...
+The ``module_name`` field specifies the name of the module. You can explore the available names by yourself:
+"""
 
-TODO: _Add docs for all available modules._
+# %%
+from autointent.modules import SCORING_MODULES, DECISION_MODULES, EMBEDDING_MODULES, REGEX_MODULES
 
+print(list(SCORING_MODULES.keys()))
+print(list(DECISION_MODULES.keys()))
+print(list(EMBEDDING_MODULES.keys()))
+print(list(REGEX_MODULES.keys()))
+
+# %%[markdown]
+"""
 All fields except ``module_name`` are lists that define the search space for each hyperparameter (see %mddoclink(class,modules.scoring,KNNScorer)). If you omit them, the default set of hyperparameters will be used:
 """
 
 # %%
-
 linear_module = {"module_name": "linear"}
 
 # %% [markdown]
@@ -110,7 +118,6 @@ Let us use small subset of popular `clinc150` dataset:
 """
 
 # %%
-
 from autointent import Dataset
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
@@ -125,6 +132,11 @@ from autointent import Pipeline
 
 pipeline_optimizer = Pipeline.from_search_space(search_space)
 pipeline_optimizer.fit(dataset)
+
+# %%[markdown]
+"""
+One can use more versatile %mddoclink(class,,OptimizationConfig) and %mddoclink(method,Pipeline,from_optimization_config).
+"""
 
 # %% [markdown]
 """
