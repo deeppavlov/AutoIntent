@@ -16,8 +16,8 @@ class Generator:
 
     Args:
         base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
-            Omit this to infer OPENAI_BASE_URL from environment.
-        model_name: Name of LLM. Omit this to infer OPENAI_MODEL_NAME from environment.
+            Omit this to infer ``OPENAI_BASE_URL`` from environment.
+        model_name: Name of LLM. Omit this to infer ``OPENAI_MODEL_NAME`` from environment.
         **generation_params: kwargs that will be sent with a request to the endpoint.
     """
 

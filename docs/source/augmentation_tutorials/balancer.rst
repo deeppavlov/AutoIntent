@@ -57,7 +57,8 @@ Setting up the Generator and Template
 ------------------------------------
 
 DatasetBalancer requires two main components:
-1. A :py:class:`autointnt.generation.utterances.Generator`` - responsible for creating new utterances using an LLM
+
+1. A :py:class:`autointent.generation.Generator`` - responsible for creating new utterances using an LLM
 2. A :py:class:`autointent.generation.chat_templates.EnglishSynthesizerTemplate` - defines the prompt format sent to the LLM
 
 Let's set up these components:
