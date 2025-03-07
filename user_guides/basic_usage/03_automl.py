@@ -104,7 +104,7 @@ context = custom_pipeline.fit(dataset)
 # inference
 custom_pipeline.predict(["hello world!"])
 
-# %%[markdown]
+# %% [markdown]
 """
 ## Dump Results
 
@@ -114,7 +114,7 @@ One can save all results of auto-configuration process to file system (to ``Logg
 # %%
 context.dump()
 
-# %%[markdown]
+# %% [markdown]
 """
 Or one can dump only the configured pipeline to any desired location (by default ``LoggingConfig.dirpath``):
 """
@@ -122,7 +122,7 @@ Or one can dump only the configured pipeline to any desired location (by default
 # %%
 custom_pipeline.dump()
 
-# %%[markdown]
+# %% [markdown]
 """
 ## Load Pipeline for Inference
 """
@@ -130,7 +130,7 @@ custom_pipeline.dump()
 # %%
 loaded_pipe = Pipeline.load(logging_config.dirpath)
 
-# %%[markdown]
+# %% [markdown]
 """
 Since this notebook is launched automatically while building the docs, we will clean the space if you don't mind :)
 """

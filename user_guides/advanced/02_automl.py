@@ -40,7 +40,7 @@ print(list(DECISION_MODULES.keys()))
 print(list(EMBEDDING_MODULES.keys()))
 print(list(REGEX_MODULES.keys()))
 
-# %%[markdown]
+# %% [markdown]
 """
 All fields except ``module_name`` are lists that define the search space for each hyperparameter (see %mddoclink(class,modules.scoring,KNNScorer)). If you omit them, the default set of hyperparameters will be used:
 """
@@ -133,7 +133,7 @@ from autointent import Pipeline
 pipeline_optimizer = Pipeline.from_search_space(search_space)
 pipeline_optimizer.fit(dataset)
 
-# %%[markdown]
+# %% [markdown]
 """
 One can use more versatile %mddoclink(class,,OptimizationConfig) and %mddoclink(method,Pipeline,from_optimization_config).
 """
