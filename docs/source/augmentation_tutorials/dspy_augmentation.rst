@@ -8,13 +8,11 @@ This tutorial covers the implementation and usage of an evolutionary strategy to
 .. contents:: Table of Contents
     :depth: 2
 
--------------
 What is DSPy?
 -------------
 
 DSPy is a framework for optimizing and evaluating language models. It provides tools for defining signatures, optimizing modules, and measuring evaluation metrics. This module leverages DSPy to generate augmented utterances using an evolutionary approach.
 
----------------------
 How This Module Works
 ---------------------
 
@@ -26,7 +24,6 @@ This module applies an incremental evolutionary strategy for augmenting utteranc
 
 The augmentation process runs for a specified number of evolutions, saving intermediate models and optimizing the results.
 
-------------
 Installation
 ------------
 
@@ -36,7 +33,6 @@ Ensure you have the required dependencies installed:
 
     pip install "autointent[dspy]"
 
---------------
 Scoring Metric
 --------------
 
@@ -54,7 +50,6 @@ The scoring metric consists of:
    - `Final Score = SemanticF1 * Repetition Factor`
    - A higher score means better augmentation.
 
--------------
 Usage Example
 -------------
 

@@ -1,7 +1,12 @@
+.. _balancer_aug:
+
 Balancing Datasets with DatasetBalancer
 =======================================
 
 This guide demonstrates how to use the DatasetBalancer class to balance class distribution in your datasets through LLM-based data augmentation.
+
+.. contents:: Table of Contents
+    :depth: 2
 
 Why Balance Datasets?
 ---------------------

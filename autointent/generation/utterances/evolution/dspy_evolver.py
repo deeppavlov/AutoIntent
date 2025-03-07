@@ -152,6 +152,8 @@ class DSPYIncrementalUtteranceEvolver:
 
     For scoring generations it would use modified SemanticF1 as the base metric with a ROUGE-1 as repetition penalty.
 
+    See tutorial :ref:`evolutionary_strategy_augmentation` for usage examples.
+
     Args:
         model: Model name. This should follow naming schema from `litellm providers <https://docs.litellm.ai/docs/providers>`_.
         api_base: API base URL. Some models require this.

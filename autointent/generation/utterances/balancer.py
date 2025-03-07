@@ -20,6 +20,8 @@ class DatasetBalancer:
     If your dataset is unbalanced, you can add LLM-generated samples.
     This method uses :py:class:`autointent.generation.utterances.UtteranceGenerator` under the hood.
 
+    See tutorial :ref:`balancer_aug` for usage examples.
+
     Args:
         generator (Generator): The generator object used to create utterances.
         prompt_maker (Callable[[Intent, int], list[Message]]): A callable that creates prompts for the generator.
