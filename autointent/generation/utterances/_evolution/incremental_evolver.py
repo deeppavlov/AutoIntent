@@ -43,7 +43,7 @@ class IncrementalUtteranceEvolver(UtteranceEvolver):
     """Incremental evolutionary strategy to augmenting utterances.
 
     This method adds LLM-generated training samples until the quality
-    of linear classification on resulting dataset is rising.
+    of linear classification on resulting dataset stops rising.
 
     Args:
         generator: Generator instance for generating utterances.

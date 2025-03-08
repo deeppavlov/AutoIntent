@@ -8,3 +8,4 @@ Data augmentation tutorials
 
    balancer
    dspy_augmentation
+   intent_description

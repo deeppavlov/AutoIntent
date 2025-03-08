@@ -139,6 +139,8 @@ def generate_descriptions(
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
         model_name: OpenAI model identifier for generating descriptions.
+
+    See :ref:`intent_description_generation` tutorial.
     """
     samples = []
     for split in dataset.values():
