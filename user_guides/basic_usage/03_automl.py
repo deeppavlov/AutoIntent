@@ -103,6 +103,7 @@ This behavior is controlled with %mddoclink(class,configs,DataConfig):
 
 # %%
 from autointent.configs import DataConfig
+
 custom_pipeline.set_config(DataConfig(scheme="cv", n_folds=3))
 
 # %% [markdown]
