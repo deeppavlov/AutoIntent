@@ -15,12 +15,12 @@ Functions
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/utils/load_default_search_space
    /autoapi/autointent/utils/load_search_space
+   /autoapi/autointent/utils/load_preset
 
 .. autoapisummary::
 
-   autointent.utils.load_default_search_space
    autointent.utils.load_search_space
+   autointent.utils.load_preset
 
 

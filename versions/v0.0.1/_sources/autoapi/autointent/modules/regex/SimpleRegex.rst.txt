@@ -1,0 +1,129 @@
+autointent.modules.regex.SimpleRegex
+====================================
+
+.. py:class:: autointent.modules.regex.SimpleRegex
+
+   Bases: :py:obj:`autointent.modules.base.BaseRegex`
+
+
+   Regular expressions based intent detection module.
+
+   A module that uses regular expressions to detect intents in text utterances.
+   Supports both full and partial pattern matching.
+
+
+   .. py:attribute:: name
+      :value: 'simple'
+
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+
+   .. py:attribute:: supports_oos
+      :value: False
+
+
+
+   .. py:method:: from_context(context)
+      :classmethod:
+
+
+      Initialize from context.
+
+      :param context: Context object containing configuration
+
+      :returns: Initialized SimpleRegex instance
+
+
+
+   .. py:method:: fit(intents)
+
+      Fit the model with intent patterns.
+
+      :param intents: List of intents to fit the model with
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict intents for given utterances.
+
+      :param utterances: List of utterances to predict intents for
+
+      :returns: List of predicted intent labels
+
+
+
+   .. py:method:: predict_with_metadata(utterances)
+
+      Predict intents for utterances with pattern matching metadata.
+
+      :param utterances: List of utterances to predict intents for
+
+      :returns:     - List of predicted intent labels
+                    - List of pattern matching metadata for each utterance
+      :rtype: Tuple containing
+
+
+
+   .. py:method:: score_ho(context, metrics)
+
+      Score the model using holdout validation.
+
+      :param context: Context containing validation data
+      :param metrics: List of metric names to compute
+
+      :returns: Dictionary of computed metric values
+
+
+
+   .. py:method:: score_cv(context, metrics)
+
+      Score the model in cross-validation mode.
+
+      :param context: Context containing validation data
+      :param metrics: List of metric names to compute
+
+      :returns: Dictionary of computed metric values
+
+
+
+   .. py:method:: score_metrics_cv(metrics_dict, cv_iterator, intents)
+
+      Score metrics using cross-validation.
+
+      :param metrics_dict: Dictionary of metrics to compute
+      :param cv_iterator: Cross-validation iterator
+      :param intents: intents from the dataset
+
+      :returns: Tuple of metrics dictionary and predictions
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached regex patterns.
+
+
+
+   .. py:method:: get_assets()
+
+      Get model assets.
+
+      :returns: Empty Artifact object
+
+
+
+   .. py:method:: dump(path)
+
+
+   .. py:method:: load(path, embedder_config = None, cross_encoder_config = None)
+

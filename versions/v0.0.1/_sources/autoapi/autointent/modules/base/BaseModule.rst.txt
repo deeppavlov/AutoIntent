@@ -1,0 +1,166 @@
+autointent.modules.base.BaseModule
+==================================
+
+.. py:class:: autointent.modules.base.BaseModule
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Base module for all intent classification modules.
+
+
+   .. py:attribute:: supports_oos
+      :type:  bool
+
+      Whether the module supports oos data
+
+
+   .. py:attribute:: supports_multilabel
+      :type:  bool
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :type:  bool
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: name
+      :type:  str
+
+      Name of the module.
+
+
+   .. py:method:: fit(*args, **kwargs)
+      :abstractmethod:
+
+
+      Fit the model.
+
+      :param \*args: Args to fit
+      :param \*\*kwargs: Kwargs to fit
+
+
+
+   .. py:method:: score(context, metrics)
+
+      Calculate metric on test set and return metric value.
+
+      :param context: Context to score
+      :param metrics: Metrics to score
+
+      :raises ValueError: If unknown scheme is provided
+
+
+
+   .. py:method:: score_cv(context, metrics)
+      :abstractmethod:
+
+
+
+   .. py:method:: score_ho(context, metrics)
+      :abstractmethod:
+
+
+
+   .. py:method:: get_assets()
+      :abstractmethod:
+
+
+      Return useful assets that represent intermediate data into context.
+
+      :returns: Artifact containing intermediate data
+
+
+
+   .. py:method:: clear_cache()
+      :abstractmethod:
+
+
+      Clear cache.
+
+
+
+   .. py:method:: dump(path)
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
+
+
+   .. py:method:: load(path, embedder_config = None, cross_encoder_config = None)
+
+      Load data from file system.
+
+      :param path: Path to load
+      :param embedder_config: one can override presaved settings
+      :param cross_encoder_config: one can override presaved settings
+
+
+
+   .. py:method:: predict(*args, **kwargs)
+      :abstractmethod:
+
+
+      Predict on the input.
+
+      :param \*args: args to predict
+      :param \*\*kwargs: kwargs to predict
+
+
+
+   .. py:method:: predict_with_metadata(*args, **kwargs)
+
+      Predict on the input with metadata.
+
+      :param \*args: args to predict
+      :param \*\*kwargs: kwargs to predict
+
+      :returns: Tuple of predictions and metadata
+
+
+
+   .. py:method:: from_context(context, **kwargs)
+      :classmethod:
+
+      :abstractmethod:
+
+
+      Initialize self from context.
+
+      :param context: Context to init from
+      :param \*\*kwargs: Additional kwargs
+
+      :returns: Initialized module
+
+
+
+   .. py:method:: get_embedder_config()
+
+      Get the config of the embedder.
+
+
+
+   .. py:method:: score_metrics_ho(params, metrics_dict)
+      :staticmethod:
+
+
+      Score metrics on the test set.
+
+      :param params: Params to score
+      :param metrics_dict: Dictionary of metrics to compute
+
+
+
+   .. py:method:: score_metrics_cv(metrics_dict, cv_iterator, **fit_kwargs)
+
+      Score metrics using cross-validation.
+
+      :param metrics_dict: Dictionary of metrics to compute
+      :param cv_iterator: Cross-validation iterator
+      :param \*\*fit_kwargs: Additional arguments for fit method
+
+

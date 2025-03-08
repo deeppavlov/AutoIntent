@@ -1,0 +1,10 @@
+autointent.generation.chat_templates.EnglishSynthesizerTemplate
+===============================================================
+
+.. py:class:: autointent.generation.chat_templates.EnglishSynthesizerTemplate
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_synthesizer.BaseSynthesizerTemplate`
+
+
+   Chat template for generating additional examples for a given intent class.
+

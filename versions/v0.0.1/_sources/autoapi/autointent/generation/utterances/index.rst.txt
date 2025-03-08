@@ -1,0 +1,30 @@
+autointent.generation.utterances
+================================
+
+.. py:module:: autointent.generation.utterances
+
+.. autoapi-nested-parse::
+
+   Generative methods for enriching dataset with synthetic samples.
+
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/utterances/DatasetBalancer
+   /autoapi/autointent/generation/utterances/UtteranceGenerator
+   /autoapi/autointent/generation/utterances/IncrementalUtteranceEvolver
+   /autoapi/autointent/generation/utterances/UtteranceEvolver
+
+.. autoapisummary::
+
+   autointent.generation.utterances.DatasetBalancer
+   autointent.generation.utterances.UtteranceGenerator
+   autointent.generation.utterances.IncrementalUtteranceEvolver
+   autointent.generation.utterances.UtteranceEvolver
+
+

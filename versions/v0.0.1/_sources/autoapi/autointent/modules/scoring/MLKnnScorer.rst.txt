@@ -1,9 +1,9 @@
 autointent.modules.scoring.MLKnnScorer
 ======================================
 
-.. py:class:: autointent.modules.scoring.MLKnnScorer(k, embedder_name, db_dir = None, s = 1.0, ignore_first_neighbours = 0, embedder_device = 'cpu', batch_size = 32, max_length = None, embedder_use_cache = False)
+.. py:class:: autointent.modules.scoring.MLKnnScorer(k, embedder_config = None, s = 1.0, ignore_first_neighbours = 0)
 
-   Bases: :py:obj:`autointent.modules.abc.ScoringModule`
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
 
    Multi-label k-nearest neighbors (ML-KNN) scorer.
@@ -11,16 +11,13 @@ autointent.modules.scoring.MLKnnScorer
    This module implements ML-KNN, a multi-label classifier that computes probabilities
    based on the k-nearest neighbors of a query instance.
 
-   :ivar arrays_filename: Filename for saving probabilities to disk.
-   :ivar metadata: Metadata about the scorer's configuration.
-   :ivar prebuilt_index: Flag indicating if the vector index is prebuilt.
-   :ivar name: Name of the scorer, defaults to "mlknn".
+   :param k: Number of nearest neighbors to consider
+   :param embedder_config: Config of the embedder used for vectorization
+   :param s: Smoothing parameter for probability calculations, defaults to 1.0
+   :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
 
-   Example
+   Example:
    --------
-   .. testsetup::
-
-       db_dir = "doctests-db"
 
    .. testcode::
 
@@ -29,8 +26,7 @@ autointent.modules.scoring.MLKnnScorer
        labels = [[1,0], [0,1]]
        scorer = MLKnnScorer(
            k=5,
-           embedder_name="sergeyzh/rubert-tiny-turbo",
-           db_dir=db_dir,
+           embedder_config="sergeyzh/rubert-tiny-turbo",
        )
        scorer.fit(utterances, labels)
        test_utterances = ["Hi!", "What's up?"]
@@ -42,38 +38,33 @@ autointent.modules.scoring.MLKnnScorer
        [[0.5 0.5]
         [0.5 0.5]]
 
-   .. testcleanup::
-
-       import shutil
-       shutil.rmtree(db_dir)
-
-
-
-   .. py:attribute:: arrays_filename
-      :type:  str
-      :value: 'probs.npz'
-
-
-
-   .. py:attribute:: metadata
-      :type:  MLKnnScorerDumpMetadata
-
-
-   .. py:attribute:: prebuilt_index
-      :type:  bool
-      :value: False
-
 
 
    .. py:attribute:: name
       :value: 'mlknn'
 
 
+      Name of the module.
+
+
+   .. py:attribute:: supports_multiclass
+      :value: False
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
 
    .. py:attribute:: k
 
 
-   .. py:attribute:: embedder_name
+   .. py:attribute:: embedder_config
 
 
    .. py:attribute:: s
@@ -86,56 +77,27 @@ autointent.modules.scoring.MLKnnScorer
 
 
 
-   .. py:attribute:: embedder_device
-      :value: 'cpu'
-
-
-
-   .. py:attribute:: batch_size
-      :value: 32
-
-
-
-   .. py:attribute:: max_length
-      :value: None
-
-
-
-   .. py:attribute:: embedder_use_cache
-      :value: False
-
-
-
-   .. py:property:: db_dir
-      :type: str
-
-
-      Get the database directory for the vector index.
-
-      :return: Path to the database directory.
-
-
-
-   .. py:method:: from_context(context, k, s = 1.0, ignore_first_neighbours = 0, embedder_name = None)
+   .. py:method:: from_context(context, k, s = 1.0, ignore_first_neighbours = 0, embedder_config = None)
       :classmethod:
 
 
       Create an MLKnnScorer instance using a Context object.
 
-      :param context: Context containing configurations and utilities.
-      :param k: Number of nearest neighbors to consider.
-      :param s: Smoothing parameter for probability calculations, defaults to 1.0.
-      :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0.
-      :param embedder_name: Name of the embedder, or None to use the best embedder.
-      :return: Initialized MLKnnScorer instance.
+      :param context: Context containing configurations and utilities
+      :param k: Number of nearest neighbors to consider
+      :param s: Smoothing parameter for probability calculations, defaults to 1.0
+      :param ignore_first_neighbours: Number of closest neighbors to ignore, defaults to 0
+      :param embedder_config: Config of the embedder, or None to use the best embedder
+
+      :returns: Initialized MLKnnScorer instance
 
 
 
-   .. py:method:: get_embedder_name()
+   .. py:method:: get_embedder_config()
 
       Get the name of the embedder.
 
-      :return: Embedder name.
+      :returns: Embedder name
 
 
 
@@ -143,10 +105,11 @@ autointent.modules.scoring.MLKnnScorer
 
       Fit the scorer by training or loading the vector index and calculating probabilities.
 
-      :param utterances: List of training utterances.
-      :param labels: List of multi-label targets for each utterance.
-      :raises TypeError: If the labels are not multi-label.
-      :raises ValueError: If the vector index mismatches the provided utterances.
+      :param utterances: List of training utterances
+      :param labels: List of multi-label targets for each utterance
+
+      :raises TypeError: If the labels are not multi-label
+      :raises ValueError: If the vector index mismatches the provided utterances
 
 
 
@@ -154,9 +117,10 @@ autointent.modules.scoring.MLKnnScorer
 
       Predict labels for the given utterances.
 
-      :param utterances: List of query utterances.
-      :param thresh: Threshold for binary classification, defaults to 0.5.
-      :return: Predicted labels as a binary array.
+      :param utterances: List of query utterances
+      :param thresh: Threshold for binary classification, defaults to 0.5
+
+      :returns: Predicted labels as a binary array
 
 
 
@@ -164,8 +128,9 @@ autointent.modules.scoring.MLKnnScorer
 
       Predict probabilities for the given utterances.
 
-      :param utterances: List of query utterances.
-      :return: Array of predicted probabilities for each class.
+      :param utterances: List of query utterances
+
+      :returns: Array of predicted probabilities for each class
 
 
 
@@ -173,29 +138,16 @@ autointent.modules.scoring.MLKnnScorer
 
       Predict probabilities along with metadata for the given utterances.
 
-      :param utterances: List of query utterances.
-      :return: Tuple of probabilities and metadata with neighbor information.
+      :param utterances: List of query utterances
+
+      :returns:     - Array of predicted probabilities
+                    - List of metadata with neighbor information
+      :rtype: Tuple containing
 
 
 
    .. py:method:: clear_cache()
 
       Clear cached data in memory used by the vector index.
-
-
-
-   .. py:method:: dump(path)
-
-      Save the MLKnnScorer's metadata and probabilities to disk.
-
-      :param path: Path to the directory where assets will be dumped.
-
-
-
-   .. py:method:: load(path)
-
-      Load the MLKnnScorer's metadata and probabilities from disk.
-
-      :param path: Path to the directory containing the dumped assets.
 
 

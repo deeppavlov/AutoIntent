@@ -36,6 +36,7 @@ Functions
 .. toctree::
    :hidden:
 
+   /autoapi/autointent/metrics/decision/handle_oos
    /autoapi/autointent/metrics/decision/decision_accuracy
    /autoapi/autointent/metrics/decision/decision_roc_auc
    /autoapi/autointent/metrics/decision/decision_precision
@@ -44,6 +45,7 @@ Functions
 
 .. autoapisummary::
 
+   autointent.metrics.decision.handle_oos
    autointent.metrics.decision.decision_accuracy
    autointent.metrics.decision.decision_roc_auc
    autointent.metrics.decision.decision_precision

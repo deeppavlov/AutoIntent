@@ -14,9 +14,10 @@ autointent.metrics.DecisionMetricFn
       Calculate decision metric.
 
       :param y_true: True values of labels
-          - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
-          - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
+                     - multiclass case: list representing an array shape `(n_samples,)` of integer class labels
+                     - multilabel case: list representing a matrix of shape `(n_samples, n_classes)` with binary values
       :param y_pred: Predicted values of labels. Same shape as `y_true`
-      :return: Score of the decision metric
+
+      :returns: Score of the decision metric
 
 

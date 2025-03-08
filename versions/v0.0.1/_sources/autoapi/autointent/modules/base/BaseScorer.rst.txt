@@ -1,0 +1,81 @@
+autointent.modules.base.BaseScorer
+==================================
+
+.. py:class:: autointent.modules.base.BaseScorer
+
+   Bases: :py:obj:`autointent.modules.base.BaseModule`, :py:obj:`abc.ABC`
+
+
+   Abstract base class for scoring modules.
+
+   Scoring modules predict scores for utterances and evaluate their performance
+   using a scoring metric.
+
+
+   .. py:attribute:: supports_oos
+      :value: False
+
+
+
+   .. py:method:: fit(utterances, labels)
+      :abstractmethod:
+
+
+      Fit the scoring module to the training data.
+
+      :param utterances: List of training utterances.
+      :param labels: List of training labels.
+
+
+
+   .. py:method:: score_ho(context, metrics)
+
+      Evaluate the scorer on a test set and compute the specified metric.
+
+      :param context: Context containing test set and other data.
+      :param metrics: List of metrics to compute.
+
+      :returns: Computed metrics value for the test set or error code of metrics.
+
+
+
+   .. py:method:: score_cv(context, metrics)
+
+      Evaluate the scorer on a test set and compute the specified metric.
+
+      :param context: Context containing test set and other data.
+      :param metrics: List of metrics to compute.
+
+      :returns: Computed metrics value for the test set or error code of metrics.
+
+
+
+   .. py:method:: get_assets()
+
+      Retrieve assets generated during scoring.
+
+      :returns: ScorerArtifact containing test, validation and test scores.
+
+
+
+   .. py:method:: get_train_data(context)
+
+      Get train data.
+
+      :param context: Context to get train data from
+
+      :returns: Tuple of train utterances and train labels
+
+
+
+   .. py:method:: predict(utterances)
+      :abstractmethod:
+
+
+      Predict scores for a list of utterances.
+
+      :param utterances: List of utterances to score.
+
+      :returns: Array of predicted scores.
+
+

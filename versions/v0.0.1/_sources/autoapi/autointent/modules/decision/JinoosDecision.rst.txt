@@ -3,7 +3,7 @@ autointent.modules.decision.JinoosDecision
 
 .. py:class:: autointent.modules.decision.JinoosDecision(search_space = None)
 
-   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+   Bases: :py:obj:`autointent.modules.base.BaseDecision`
 
 
    Jinoos predictor module.
@@ -11,11 +11,9 @@ autointent.modules.decision.JinoosDecision
    JinoosDecision predicts the best scores for single-label classification tasks
    and detects out-of-scope (OOS) samples based on a threshold.
 
-   :ivar thresh: The optimized threshold value for OOS detection.
-   :ivar name: Name of the predictor, defaults to "adaptive".
-   :ivar n_classes: Number of classes determined during fitting.
+   :param search_space: List of threshold values to search through for OOS detection
 
-   Examples
+   Examples:
    --------
    .. testcode::
 
@@ -32,7 +30,7 @@ autointent.modules.decision.JinoosDecision
 
    .. testoutput::
 
-       [1 0]
+       [1, 0]
 
 
 
@@ -44,9 +42,28 @@ autointent.modules.decision.JinoosDecision
       :value: 'jinoos'
 
 
+      Name of the module.
 
-   .. py:attribute:: n_classes
-      :type:  int
+
+   .. py:attribute:: supports_multilabel
+      :value: False
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: supports_oos
+      :value: True
+
+
+      Whether the module supports oos data
 
 
    .. py:attribute:: search_space
@@ -58,8 +75,8 @@ autointent.modules.decision.JinoosDecision
 
       Initialize from context.
 
-      :param context: Context
-      :param search_space: Search space
+      :param context: Context containing configurations and utilities
+      :param search_space: List of threshold values to search through
 
 
 
@@ -67,9 +84,9 @@ autointent.modules.decision.JinoosDecision
 
       Fit the model.
 
-      :param scores: Scores to fit
-      :param labels: Labels to fit
-      :param tags: Tags to fit
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+      :param labels: List of true labels
+      :param tags: List of Tag objects for mutually exclusive classes, or None
 
 
 
@@ -77,23 +94,11 @@ autointent.modules.decision.JinoosDecision
 
       Predict the best score.
 
-      :param scores: Scores to predict
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
 
+      :returns: List of predicted class indices or None for OOS samples
 
-
-   .. py:method:: dump(path)
-
-      Dump all data needed for inference.
-
-      :param path: Path to dump
-
-
-
-   .. py:method:: load(path)
-
-      Load data from dump.
-
-      :param path: Path to load
+      :raises MismatchNumClassesError: If the number of classes does not match the trained predictor
 
 
 
@@ -103,14 +108,18 @@ autointent.modules.decision.JinoosDecision
 
       Calculate Jinoos score.
 
+      The score is calculated as:
+
       .. math::
 
-          \\frac{C_{in}}{N_{in}}+\\frac{C_{oos}}{N_{oos}}
+          \frac{C_{in}}{N_{in}}+\frac{C_{oos}}{N_{oos}}
 
-      where $C_{in}$ is the number of correctly predicted in-domain labels
-       and $N_{in}$ is the total number of in-domain labels. The same for OOS samples
+      where :math:`C_{in}` is the number of correctly predicted in-domain labels
+      and :math:`N_{in}` is the total number of in-domain labels. The same for OOS samples.
 
       :param y_true: True labels
       :param y_pred: Predicted labels
+
+      :returns: Combined accuracy score for in-domain and OOS samples
 
 

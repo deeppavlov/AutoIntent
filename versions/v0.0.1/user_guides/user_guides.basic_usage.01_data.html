@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -394,20 +394,15 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index_basic_usage.html">Basic Usage</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Working with data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.02_modules.html">Modules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.03_automl.html">Pipeline Auto Configuration (AutoML)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.03_automl.html">AutoML</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.04_inference.html">Inference Pipeline</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="index_advanced_usage.html">Advanced Usage</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.01_data.html">Working with data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_search_space.html">Search Space Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_caching.html">Caching in AutoIntent</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_reporting.html">Run reporting</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="index_cli_usage.html">CLI Usage</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.cli.01_search_space.html">Search Space as YAML</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.cli.02_basic_usage.html">Command Line Interface for Pipeline Auto Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_automl.html">AutoML Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_reporting.html">Run reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_logging.html">Logging to stdout and file</a></li>
 </ul>
 </details></li>
 </ul>
@@ -480,11 +475,11 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">importlib.resources</span> <span class="k">as</span> <span class="nn">ires</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ires</span>
 
-<span class="kn">import</span> <span class="nn">datasets</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
 
-<span class="kn">from</span> <span class="nn">autointent</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 </pre></div>
 </div>
 </div>
@@ -539,7 +534,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_dataset</span> <span class="o">=</span> <span class="n">ires</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;tests.assets.data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;clinc_subset.json&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">path_to_dataset</span> <span class="o">=</span> <span class="n">ires</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;tests.assets.data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;clinc_subset_unsplitted.json&quot;</span><span class="p">)</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">path_to_dataset</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -564,7 +559,7 @@
 <div class="highlight"><pre>
 Dataset({
     features: [&#39;utterance&#39;, &#39;label&#39;],
-    num_rows: 37
+    num_rows: 36
 })
 </pre></div></div>
 </div>
@@ -586,12 +581,12 @@ Dataset({
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;utterance&#39;: [&#39;can i make a reservation for redrobin&#39;,
-  &#39;is it possible to make a reservation at redrobin&#39;,
-  &#39;does redrobin take reservations&#39;,
-  &#39;are reservations taken at redrobin&#39;,
-  &#39;does redrobin do reservations&#39;],
- &#39;label&#39;: [0, 0, 0, 0, 0]}
+{&#39;utterance&#39;: [&#39;do they take reservations at mcdonalds&#39;,
+  &#39;i would like an update on the progress of my credit card application&#39;,
+  &#39;can you tell me why is my bank account frozen&#39;,
+  &#39;why in the world am i locked out of my bank account&#39;,
+  &#39;who froze my bank account&#39;],
+ &#39;label&#39;: [0, 3, 1, 1, 1]}
 </pre></div></div>
 </div>
 </section>
@@ -607,6 +602,31 @@ Dataset({
 </div>
 </div>
 <p>Note: ensure that you are logged in using <code class="docutils literal notranslate"><span class="pre">huggingface-cli</span></code>.</p>
+<p>After that you can load the dataset with one line. For example:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/banking77&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;train&#39;: Dataset({
+     features: [&#39;utterance&#39;, &#39;label&#39;],
+     num_rows: 10003
+ }),
+ &#39;test&#39;: Dataset({
+     features: [&#39;utterance&#39;, &#39;label&#39;],
+     num_rows: 3080
+ })}
+</pre></div></div>
+</div>
 </section>
 </section>
 <section id="See-Also">
@@ -700,7 +720,7 @@ Dataset({
 
   <p class="copyright">
     
-      © Copyright 2024, DeepPavlov.
+      © Copyright 2025, DeepPavlov.
       <br/>
     
   </p>

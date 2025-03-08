@@ -1,0 +1,15 @@
+autointent.generation.chat_templates.AbstractEvolution
+======================================================
+
+.. py:class:: autointent.generation.chat_templates.AbstractEvolution
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_evolver.EvolutionChatTemplate`
+
+
+   Chat template for evolution augmentation via abstraction.
+
+
+   .. py:attribute:: name
+      :value: 'abstract'
+
+

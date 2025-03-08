@@ -8,52 +8,59 @@ autointent.Dataset
 
    Represents a dataset with associated metadata and utilities for processing.
 
-   :param args: Positional arguments to initialize the dataset.
-   :param intents: List of intents associated with the dataset.
-   :param kwargs: Additional keyword arguments to initialize the dataset.
+   This class extends a dictionary where the keys represent dataset splits (e.g., 'train', 'test'),
+   and the values are Hugging Face datasets.
 
 
    .. py:attribute:: label_feature
+      :type:  str
       :value: 'label'
 
 
+      The feature name corresponding to labels in the dataset.
+
 
    .. py:attribute:: utterance_feature
+      :type:  str
       :value: 'utterance'
 
 
+      The feature name corresponding to utterances in the dataset
+
+
+   .. py:attribute:: has_descriptions
+      :type:  bool
+
+      Whether the dataset includes descriptions for intents.
+
 
    .. py:attribute:: intents
+      :type:  list[autointent.schemas.Intent]
+
+      All metadata about intents used in this dataset.
 
 
    .. py:property:: multilabel
       :type: bool
 
 
-      Check if the dataset is multilabel.
-
-      :return: True if the dataset is multilabel, False otherwise.
-
+      Checks if the dataset is multilabel.
 
 
    .. py:property:: n_classes
       :type: int
 
 
-      Get the number of classes in the training split.
-
-      :return: Number of classes.
-
+      Returns the number of classes in the dataset.
 
 
    .. py:method:: from_dict(mapping)
       :classmethod:
 
 
-      Load a dataset from a dictionary mapping.
+      Creates a dataset from a dictionary mapping.
 
-      :param mapping: Dictionary representing the dataset.
-      :return: Initialized Dataset object.
+      :param mapping: A dictionary representation of the dataset.
 
 
 
@@ -61,69 +68,69 @@ autointent.Dataset
       :classmethod:
 
 
-      Load a dataset from a JSON file.
+      Loads a dataset from a JSON file.
 
       :param filepath: Path to the JSON file.
-      :return: Initialized Dataset object.
 
 
 
-   .. py:method:: from_hub(repo_id)
+   .. py:method:: from_hub(repo_name)
       :classmethod:
 
 
-      Load a dataset from a Hugging Face repository.
+      Loads a dataset from the Hugging Face Hub.
 
-      :param repo_id: ID of the Hugging Face repository.
-      :return: Initialized Dataset object.
+      :param repo_name: The name of the Hugging Face repository, like `AutoIntent/clinc150`.
 
 
 
    .. py:method:: to_multilabel()
 
-      Convert dataset labels to multilabel format.
-
-      :return: Self, with labels converted to multilabel.
+      Converts dataset labels to multilabel format.
 
 
 
    .. py:method:: to_dict()
 
-      Convert the dataset splits and intents to a dictionary of lists.
+      Converts the dataset into a dictionary format.
 
-      :return: A dictionary containing dataset splits and intents as lists of dictionaries.
+      Returns a dictionary where the keys are dataset splits and the values are lists of samples.
 
 
 
    .. py:method:: to_json(filepath)
 
-      Save the dataset splits and intents to a JSON file.
+      Saves the dataset to a JSON file.
 
-      :param filepath: The path to the file where the JSON data will be saved.
+      :param filepath: The file path where the dataset should be saved.
 
 
 
-   .. py:method:: push_to_hub(repo_id, private = False)
+   .. py:method:: push_to_hub(repo_name, private = False)
 
-      Push dataset splits to a Hugging Face repository.
+      Uploads the dataset to the Hugging Face Hub.
 
-      :param repo_id: ID of the Hugging Face repository.
+      :param repo_name: The ID of the Hugging Face repository.
+      :param private: Whether to make the repository private.
 
 
 
    .. py:method:: get_tags()
 
-      Extract unique tags from the dataset's intents.
-
-      :return: List of tags with their associated intent IDs.
+      Extracts unique tags from the dataset's intents.
 
 
 
    .. py:method:: get_n_classes(split)
 
-      Calculate the number of unique classes in a given split.
+      Calculates the number of unique classes in a dataset split.
 
-      :param split: The split to analyze.
-      :return: Number of unique classes.
+      :param split: The dataset split to analyze.
+
+
+
+   .. py:method:: validate_descriptions()
+
+      Validates whether all intents in the dataset contain descriptions.
 
 

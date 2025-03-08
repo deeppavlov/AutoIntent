@@ -1,9 +1,12 @@
 autointent.nodes.NodeOptimizer
 ==============================
 
-.. py:class:: autointent.nodes.NodeOptimizer(node_type, search_space, metric)
+.. py:class:: autointent.nodes.NodeOptimizer(node_type, search_space, target_metric, metrics = None)
 
-   Node optimizer class.
+   Class for optimizing nodes in a computational pipeline.
+
+   This class is responsible for optimizing different modules within a node
+   using various search strategies and logging the results.
 
 
    .. py:attribute:: node_type
@@ -12,36 +15,79 @@ autointent.nodes.NodeOptimizer
    .. py:attribute:: node_info
 
 
-   .. py:attribute:: metric_name
+   .. py:attribute:: target_metric
+
+
+   .. py:attribute:: metrics
+      :value: None
+
 
 
    .. py:attribute:: modules_search_spaces
 
 
-   .. py:method:: fit(context)
+   .. py:method:: fit(context, sampler = 'brute')
 
-      Fit the node optimizer.
+      Performs the optimization process for the node.
 
-      :param context: Context
+      :param context: The optimization context containing relevant data.
+      :param sampler: The sampling strategy used for optimization.
+
+      :raises AssertionError: If an invalid sampler type is provided.
+
+
+
+   .. py:method:: objective(trial, module_name, search_space, context)
+
+      Defines the objective function for optimization.
+
+      :param trial: The Optuna trial instance.
+      :param module_name: The name of the module being optimized.
+      :param search_space: The parameter search space.
+      :param context: The execution context.
+
+      :returns: The value of the target metric for the given trial.
+
+
+
+   .. py:method:: suggest(trial, search_space)
+
+      Suggests parameter values based on the search space.
+
+      :param trial: The Optuna trial instance.
+      :param search_space: A dictionary defining the parameter search space.
+
+      :returns: A dictionary containing the suggested parameter values.
+
+      :raises TypeError: If an unsupported parameter search space type is encountered.
 
 
 
    .. py:method:: get_module_dump_dir(dump_dir, module_name, j_combination)
 
-      Get module dump directory.
+      Creates and returns the path to the module dump directory.
 
-      :param dump_dir: The base directory where the module dump directories will be created.
-      :param module_name: The type of the module being optimized.
-      :param j_combination: The index of the parameter combination being used.
-      :return: The path to the module dump directory as a string.
+      :param dump_dir: The base directory for storing module dumps.
+      :param module_name: The name of the module being optimized.
+      :param j_combination: The combination index for the parameters.
+
+      :returns: The path to the module dump directory.
 
 
 
-   .. py:method:: module_fit(module, context)
+   .. py:method:: validate_nodes_with_dataset(dataset, mode)
 
-      Fit the module.
+      Validates nodes against the dataset.
 
-      :param module: Module to fit
-      :param context: Context to use
+      :param dataset: The dataset used for validation.
+      :param mode: The validation mode ("raise" or "warning").
+
+      :raises ValueError: If validation fails and `mode` is set to "raise".
+
+
+
+   .. py:method:: validate_search_space(search_space)
+
+      Check if search space is configured correctly.
 
 

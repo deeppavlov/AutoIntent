@@ -25,13 +25,13 @@ autointent.schemas.Intent
 
 
 
-   .. py:attribute:: regexp_full_match
+   .. py:attribute:: regex_full_match
       :type:  list[str]
       :value: []
 
 
 
-   .. py:attribute:: regexp_partial_match
+   .. py:attribute:: regex_partial_match
       :type:  list[str]
       :value: []
 

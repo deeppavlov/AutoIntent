@@ -36,6 +36,7 @@ Functions
 .. toctree::
    :hidden:
 
+   /autoapi/autointent/metrics/scoring/ignore_oos
    /autoapi/autointent/metrics/scoring/scoring_log_likelihood
    /autoapi/autointent/metrics/scoring/scoring_roc_auc
    /autoapi/autointent/metrics/scoring/scoring_accuracy
@@ -49,6 +50,7 @@ Functions
 
 .. autoapisummary::
 
+   autointent.metrics.scoring.ignore_oos
    autointent.metrics.scoring.scoring_log_likelihood
    autointent.metrics.scoring.scoring_roc_auc
    autointent.metrics.scoring.scoring_accuracy

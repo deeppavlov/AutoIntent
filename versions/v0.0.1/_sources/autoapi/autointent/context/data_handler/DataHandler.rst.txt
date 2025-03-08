@@ -1,24 +1,39 @@
 autointent.context.data_handler.DataHandler
 ===========================================
 
-.. py:class:: autointent.context.data_handler.DataHandler(dataset, force_multilabel = False, random_seed = 0)
+.. py:class:: autointent.context.data_handler.DataHandler(dataset, config = None, random_seed = 0)
 
-   Data handler class.
+   Convenient wrapper for :py:class:`autointent.Dataset`.
+
+   Performs splitting of the wrapped dataset when instantiated.
 
 
    .. py:attribute:: dataset
+      :type:  autointent.Dataset
+
+      Wrapped dataset.
 
 
-   .. py:attribute:: n_classes
+   .. py:attribute:: config
+      :type:  autointent.configs.DataConfig
+
+      Configuration used for instantiation.
 
 
-   .. py:attribute:: regexp_patterns
+   .. py:property:: intent_descriptions
+      :type: list[str | None]
 
 
-   .. py:attribute:: intent_descriptions
+      String descriptions for all intents.
 
 
-   .. py:attribute:: tags
+   .. py:property:: tags
+      :type: list[autointent.schemas.Tag]
+
+
+      Tags associated with intents.
+
+      Tagging is an experimental feature that is not guaranteed to work.
 
 
    .. py:property:: multilabel
@@ -26,9 +41,6 @@ autointent.context.data_handler.DataHandler
 
 
       Check if the dataset is multilabel.
-
-      :return: True if the dataset is multilabel, False otherwise.
-
 
 
    .. py:method:: train_utterances(idx = None)
@@ -40,7 +52,6 @@ autointent.context.data_handler.DataHandler
       the primary training split.
 
       :param idx: Optional index for a specific training split.
-      :return: List of training utterances.
 
 
 
@@ -53,7 +64,12 @@ autointent.context.data_handler.DataHandler
       the primary training split.
 
       :param idx: Optional index for a specific training split.
-      :return: List of training labels.
+
+
+
+   .. py:method:: train_labels_folded()
+
+      Retrieve train labels fold by fold.
 
 
 
@@ -66,7 +82,6 @@ autointent.context.data_handler.DataHandler
       the primary validation split.
 
       :param idx: Optional index for a specific validation split.
-      :return: List of validation utterances.
 
 
 
@@ -79,61 +94,29 @@ autointent.context.data_handler.DataHandler
       the primary validation split.
 
       :param idx: Optional index for a specific validation split.
-      :return: List of validation labels.
 
 
 
-   .. py:method:: test_utterances(idx = None)
+   .. py:method:: test_utterances()
 
       Retrieve test utterances from the dataset.
 
-      If a specific test split index is provided, retrieves utterances
-      from the indexed test split. Otherwise, retrieves utterances from
-      the primary test split.
-
-      :param idx: Optional index for a specific test split.
-      :return: List of test utterances.
 
 
-
-   .. py:method:: test_labels(idx = None)
+   .. py:method:: test_labels()
 
       Retrieve test labels from the dataset.
 
-      If a specific test split index is provided, retrieves labels
-      from the indexed test split. Otherwise, retrieves labels from
-      the primary test split.
-
-      :param idx: Optional index for a specific test split.
-      :return: List of test labels.
 
 
+   .. py:method:: validation_iterator()
 
-   .. py:method:: oos_utterances(idx = None)
-
-      Retrieve out-of-scope (OOS) utterances from the dataset.
-
-      If the dataset contains out-of-scope samples, retrieves the utterances
-      from the specified OOS split index (if provided) or the primary OOS split.
-      Returns an empty list if no OOS samples are available in the dataset.
-
-      :param idx: Optional index for a specific OOS split.
-      :return: List of out-of-scope utterances, or an empty list if unavailable.
+      Yield folds for cross-validation.
 
 
 
-   .. py:method:: has_oos_samples()
+   .. py:method:: prepare_for_refit()
 
-      Check if there are out-of-scope samples.
-
-      :return: True if there are out-of-scope samples.
-
-
-
-   .. py:method:: dump(filepath)
-
-      Save the dataset splits and intents to a JSON file.
-
-      :param filepath: The path to the file where the JSON data will be saved.
+      Merge all training folds into one in order to retrain configured optimal pipeline on it.
 
 

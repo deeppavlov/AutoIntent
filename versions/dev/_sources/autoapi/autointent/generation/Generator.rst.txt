@@ -1,0 +1,44 @@
+autointent.generation.Generator
+===============================
+
+.. py:class:: autointent.generation.Generator(base_url = None, model_name = None, **generation_params)
+
+   Wrapper class for accessing OpenAI API.
+
+   :param base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
+                    Omit this to infer ``OPENAI_BASE_URL`` from environment.
+   :param model_name: Name of LLM. Omit this to infer ``OPENAI_MODEL_NAME`` from environment.
+   :param \*\*generation_params: kwargs that will be sent with a request to the endpoint.
+
+
+   .. py:attribute:: model_name
+      :value: None
+
+
+
+   .. py:attribute:: client
+
+
+   .. py:attribute:: async_client
+
+
+   .. py:attribute:: generation_params
+
+
+   .. py:method:: get_chat_completion(messages)
+
+      Prompt LLM and return its answer.
+
+      :param messages: List of messages to send to the model.
+
+
+
+   .. py:method:: get_chat_completion_async(messages)
+      :async:
+
+
+      Prompt LLM and return its answer asynchronously.
+
+      :param messages: List of messages to send to the model.
+
+

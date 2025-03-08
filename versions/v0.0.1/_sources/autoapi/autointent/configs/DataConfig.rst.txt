@@ -1,34 +1,47 @@
 autointent.configs.DataConfig
 =============================
 
-.. py:class:: autointent.configs.DataConfig
+.. py:class:: autointent.configs.DataConfig(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
 
    Configuration for the data used in the optimization process.
 
 
-   .. py:attribute:: train_path
-      :type:  str | pathlib.Path
-      :value: '???'
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
 
 
-      Path to the training data
-
-
-
-   .. py:attribute:: test_path
-      :type:  pathlib.Path | None
+   .. py:attribute:: scheme
+      :type:  autointent.custom_types.ValidationScheme
       :value: None
 
 
-      Path to the testing data. If None, no testing data will be used
+      Hold-out or cross-validation.
 
 
+   .. py:attribute:: n_folds
+      :type:  pydantic.PositiveInt
+      :value: None
 
-   .. py:attribute:: force_multilabel
-      :type:  bool
-      :value: False
+
+      Number of folds in cross-validation.
 
 
-      Force multilabel classification even if the data is multiclass
+   .. py:attribute:: validation_size
+      :type:  autointent.custom_types.FloatFromZeroToOne
+      :value: None
 
+
+      Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).
+
+
+   .. py:attribute:: separation_ratio
+      :type:  autointent.custom_types.FloatFromZeroToOne | None
+      :value: None
+
+
+      Set to float to prevent data leak between scoring and decision nodes.
 

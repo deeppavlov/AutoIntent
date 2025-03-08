@@ -3,6 +3,6 @@ Advanced Usage
 
 .. nbgallery::
    user_guides.advanced.01_data.py
-   user_guides.advanced.02_search_space.py
-   user_guides.advanced.03_caching.py
-   user_guides.advanced.04_reporting.py
+   user_guides.advanced.02_automl.py
+   user_guides.advanced.03_reporting.py
+   user_guides.advanced.04_logging.py

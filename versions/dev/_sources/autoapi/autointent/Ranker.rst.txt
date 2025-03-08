@@ -1,0 +1,79 @@
+autointent.Ranker
+=================
+
+.. py:class:: autointent.Ranker(cross_encoder_config, classifier_head = None)
+
+   Cross-encoder for Natural Language Inference (NLI).
+
+   This class uses :py:class:`sentence_transformers.cross_encoder.CrossEncoder` model to extract features.
+   It can use either the model's classifier or a custom trained :py:class:`sklearn.linear_model.LogisticRegressionCV`
+   to rank documents using similarity scores to the query.
+
+
+   .. py:attribute:: config
+      :type:  autointent.configs.CrossEncoderConfig
+
+
+   .. py:attribute:: cross_encoder
+      :type:  sentence_transformers.CrossEncoder
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Construct training samples and train the logistic regression classifier.
+
+      :param utterances: List of utterances (texts)
+      :param labels: Intent class labels corresponding to the utterances
+
+
+
+   .. py:method:: predict(pairs)
+
+      Predict probabilities of two utterances having the same intent label.
+
+      :param pairs: List of text pairs to classify
+
+      :returns: Array of probabilities
+
+      :raises ValueError: If classifier is not trained yet
+
+
+
+   .. py:method:: rank(query, query_docs, top_k = None)
+
+      Rank documents according to meaning closeness to the query.
+
+      :param query: Reference document
+      :param query_docs: List of documents to rank
+      :param top_k: Number of documents to return
+
+      :returns: List of dictionaries containing ranked items with scores
+
+
+
+   .. py:method:: save(path)
+
+      Save the model and classifier to disk.
+
+      :param path: Directory path to save the model and classifier
+
+
+
+   .. py:method:: load(path, override_config = None)
+      :classmethod:
+
+
+      Load the model and classifier from disk.
+
+      :param path: Directory path containing the saved model and classifier
+      :param override_config: one can override presaved settings
+
+      :returns: Initialized Ranker instance
+
+
+
+   .. py:method:: clear_ram()
+
+      Clear model from RAM and GPU memory.
+
+

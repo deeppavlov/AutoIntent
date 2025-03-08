@@ -1,0 +1,21 @@
+autointent.nodes.info.DecisionNodeInfo
+======================================
+
+.. py:class:: autointent.nodes.info.DecisionNodeInfo
+
+   Bases: :py:obj:`autointent.nodes.info._base.NodeInfo`
+
+
+   Prediction node info.
+
+
+   .. py:attribute:: metrics_available
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.DecisionMetricFn]]
+
+
+   .. py:attribute:: modules_available
+      :type:  ClassVar[dict[str, type[autointent.modules.base.BaseDecision]]]
+
+
+   .. py:attribute:: node_type
+

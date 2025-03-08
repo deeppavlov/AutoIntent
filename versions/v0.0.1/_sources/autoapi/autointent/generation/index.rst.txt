@@ -5,7 +5,9 @@ autointent.generation
 
 .. autoapi-nested-parse::
 
-   Experimental subpackage that someday will evolve into data augmentation tools.
+   Some generative methods for enriching training datasets.
+
+   See :ref:`data-aug-tuts`.
 
 
 
@@ -15,8 +17,21 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
-   /autoapi/autointent/generation/description_generation/index
-   /autoapi/autointent/generation/prompt_scheme/index
-   /autoapi/autointent/generation/prompts/index
+   /autoapi/autointent/generation/chat_templates/index
+   /autoapi/autointent/generation/intents/index
+   /autoapi/autointent/generation/utterances/index
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/Generator
+
+.. autoapisummary::
+
+   autointent.generation.Generator
 
 

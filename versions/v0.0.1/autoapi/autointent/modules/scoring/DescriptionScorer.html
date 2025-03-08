@@ -30,7 +30,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
   
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -391,61 +391,79 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/InferenceNodeConfig.html">autointent.configs.InferenceNodeConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/DataConfig.html">autointent.configs.DataConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/LoggingConfig.html">autointent.configs.LoggingConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../configs/OptimizationConfig.html">autointent.configs.OptimizationConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../configs/TaskConfig.html">autointent.configs.TaskConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../configs/VectorIndexConfig.html">autointent.configs.VectorIndexConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/CrossEncoderConfig.html">autointent.configs.CrossEncoderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/TaskTypeEnum.html">autointent.configs.TaskTypeEnum</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../context/index.html">autointent.context</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../context/data_handler/index.html">autointent.context.data_handler</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../context/data_handler/DataHandler.html">autointent.context.data_handler.DataHandler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../context/data_handler/StratifiedSplitter.html">autointent.context.data_handler.StratifiedSplitter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../context/data_handler/split_dataset.html">autointent.context.data_handler.split_dataset</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../context/optimization_info/index.html">autointent.context.optimization_info</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/Artifact.html">autointent.context.optimization_info.Artifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/DecisionArtifact.html">autointent.context.optimization_info.DecisionArtifact</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/RetrieverArtifact.html">autointent.context.optimization_info.RetrieverArtifact</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/EmbeddingArtifact.html">autointent.context.optimization_info.EmbeddingArtifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/ScorerArtifact.html">autointent.context.optimization_info.ScorerArtifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../context/optimization_info/OptimizationInfo.html">autointent.context.optimization_info.OptimizationInfo</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../context/vector_index_client/index.html">autointent.context.vector_index_client</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../context/vector_index_client/VectorIndex.html">autointent.context.vector_index_client.VectorIndex</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../context/vector_index_client/VectorIndexClient.html">autointent.context.vector_index_client.VectorIndexClient</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../context/vector_index_client/get_db_dir.html">autointent.context.vector_index_client.get_db_dir</a></li>
-</ul>
-</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../context/Context.html">autointent.context.Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../context/load_dataset.html">autointent.context.load_dataset</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../custom_types/index.html">autointent.custom_types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../custom_types/LogLevel.html">autointent.custom_types.LogLevel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../custom_types/BaseMetadataDict.html">autointent.custom_types.BaseMetadataDict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../custom_types/NodeType.html">autointent.custom_types.NodeType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../custom_types/Split.html">autointent.custom_types.Split</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../exceptions/index.html">autointent.exceptions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../exceptions/WrongClassificationError.html">autointent.exceptions.WrongClassificationError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../exceptions/MismatchNumClassesError.html">autointent.exceptions.MismatchNumClassesError</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../generation/index.html">autointent.generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../generation/description_generation/index.html">autointent.generation.description_generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../generation/description_generation/group_utterances_by_label.html">autointent.generation.description_generation.group_utterances_by_label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../generation/description_generation/create_intent_description.html">autointent.generation.description_generation.create_intent_description</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../generation/description_generation/generate_intent_descriptions.html">autointent.generation.description_generation.generate_intent_descriptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../generation/description_generation/enhance_dataset_with_descriptions.html">autointent.generation.description_generation.enhance_dataset_with_descriptions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../generation/chat_templates/index.html">autointent.generation.chat_templates</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/AbstractEvolution.html">autointent.generation.chat_templates.AbstractEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/EvolutionChatTemplate.html">autointent.generation.chat_templates.EvolutionChatTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/BaseSynthesizerTemplate.html">autointent.generation.chat_templates.BaseSynthesizerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/ConcreteEvolution.html">autointent.generation.chat_templates.ConcreteEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/Message.html">autointent.generation.chat_templates.Message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/Role.html">autointent.generation.chat_templates.Role</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/FormalEvolution.html">autointent.generation.chat_templates.FormalEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/FunnyEvolution.html">autointent.generation.chat_templates.FunnyEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/GoofyEvolution.html">autointent.generation.chat_templates.GoofyEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/InformalEvolution.html">autointent.generation.chat_templates.InformalEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/PromptDescription.html">autointent.generation.chat_templates.PromptDescription</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/ReasoningEvolution.html">autointent.generation.chat_templates.ReasoningEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/EnglishSynthesizerTemplate.html">autointent.generation.chat_templates.EnglishSynthesizerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/chat_templates/RussianSynthesizerTemplate.html">autointent.generation.chat_templates.RussianSynthesizerTemplate</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../generation/prompt_scheme/index.html">autointent.generation.prompt_scheme</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../generation/prompt_scheme/PromptDescription.html">autointent.generation.prompt_scheme.PromptDescription</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../generation/intents/index.html">autointent.generation.intents</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/intents/generate_descriptions.html">autointent.generation.intents.generate_descriptions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../../generation/prompts/index.html">autointent.generation.prompts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../generation/utterances/index.html">autointent.generation.utterances</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/utterances/DatasetBalancer.html">autointent.generation.utterances.DatasetBalancer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/utterances/UtteranceGenerator.html">autointent.generation.utterances.UtteranceGenerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/utterances/IncrementalUtteranceEvolver.html">autointent.generation.utterances.IncrementalUtteranceEvolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../generation/utterances/UtteranceEvolver.html">autointent.generation.utterances.UtteranceEvolver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../generation/Generator.html">autointent.generation.Generator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../metrics/index.html">autointent.metrics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/custom_types/index.html">autointent.metrics.custom_types</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../metrics/decision/index.html">autointent.metrics.decision</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/DecisionMetricFn.html">autointent.metrics.decision.DecisionMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/handle_oos.html">autointent.metrics.decision.handle_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/decision_accuracy.html">autointent.metrics.decision.decision_accuracy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/decision_roc_auc.html">autointent.metrics.decision.decision_roc_auc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/decision_precision.html">autointent.metrics.decision.decision_precision</a></li>
@@ -453,14 +471,15 @@
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/decision/decision_f1.html">autointent.metrics.decision.decision_f1</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../metrics/regexp/index.html">autointent.metrics.regexp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../metrics/regexp/RegexpMetricFn.html">autointent.metrics.regexp.RegexpMetricFn</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../metrics/regexp/regexp_partial_accuracy.html">autointent.metrics.regexp.regexp_partial_accuracy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../metrics/regexp/regexp_partial_precision.html">autointent.metrics.regexp.regexp_partial_precision</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../metrics/regex/index.html">autointent.metrics.regex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/regex/RegexMetricFn.html">autointent.metrics.regex.RegexMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/regex/regex_partial_accuracy.html">autointent.metrics.regex.regex_partial_accuracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/regex/regex_partial_precision.html">autointent.metrics.regex.regex_partial_precision</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../metrics/retrieval/index.html">autointent.metrics.retrieval</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/retrieval/RetrievalMetricFn.html">autointent.metrics.retrieval.RetrievalMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/retrieval/ignore_oos.html">autointent.metrics.retrieval.ignore_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/retrieval/retrieval_map.html">autointent.metrics.retrieval.retrieval_map</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/retrieval/retrieval_map_intersecting.html">autointent.metrics.retrieval.retrieval_map_intersecting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/retrieval/retrieval_map_macro.html">autointent.metrics.retrieval.retrieval_map_macro</a></li>
@@ -480,6 +499,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../metrics/scoring/index.html">autointent.metrics.scoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/scoring/ScoringMetricFn.html">autointent.metrics.scoring.ScoringMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../metrics/scoring/ignore_oos.html">autointent.metrics.scoring.ignore_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/scoring/scoring_log_likelihood.html">autointent.metrics.scoring.scoring_log_likelihood</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/scoring/scoring_roc_auc.html">autointent.metrics.scoring.scoring_roc_auc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../metrics/scoring/scoring_accuracy.html">autointent.metrics.scoring.scoring_accuracy</a></li>
@@ -493,7 +513,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/DecisionMetricFn.html">autointent.metrics.DecisionMetricFn</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../metrics/RegexpMetricFn.html">autointent.metrics.RegexpMetricFn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../metrics/RegexMetricFn.html">autointent.metrics.RegexMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/RetrievalMetricFn.html">autointent.metrics.RetrievalMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/ScoringMetricFn.html">autointent.metrics.ScoringMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/decision_accuracy.html">autointent.metrics.decision_accuracy</a></li>
@@ -501,8 +521,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/decision_precision.html">autointent.metrics.decision_precision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/decision_recall.html">autointent.metrics.decision_recall</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/decision_roc_auc.html">autointent.metrics.decision_roc_auc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../metrics/regexp_partial_accuracy.html">autointent.metrics.regexp_partial_accuracy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../metrics/regexp_partial_precision.html">autointent.metrics.regexp_partial_precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../metrics/regex_partial_accuracy.html">autointent.metrics.regex_partial_accuracy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../metrics/regex_partial_precision.html">autointent.metrics.regex_partial_precision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/retrieval_hit_rate.html">autointent.metrics.retrieval_hit_rate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/retrieval_hit_rate_intersecting.html">autointent.metrics.retrieval_hit_rate_intersecting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../metrics/retrieval_hit_rate_macro.html">autointent.metrics.retrieval_hit_rate_macro</a></li>
@@ -531,11 +551,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">autointent.modules</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../abc/index.html">autointent.modules.abc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../abc/Module.html">autointent.modules.abc.Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../abc/DecisionModule.html">autointent.modules.abc.DecisionModule</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../abc/EmbeddingModule.html">autointent.modules.abc.EmbeddingModule</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../abc/ScoringModule.html">autointent.modules.abc.ScoringModule</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../base/index.html">autointent.modules.base</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../base/BaseModule.html">autointent.modules.base.BaseModule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/BaseDecision.html">autointent.modules.base.BaseDecision</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/BaseEmbedding.html">autointent.modules.base.BaseEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/BaseRegex.html">autointent.modules.base.BaseRegex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../base/BaseScorer.html">autointent.modules.base.BaseScorer</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../decision/index.html">autointent.modules.decision</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -547,11 +568,12 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../embedding/index.html">autointent.modules.embedding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../embedding/RetrievalEmbedding.html">autointent.modules.embedding.RetrievalEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../embedding/LogregAimedEmbedding.html">autointent.modules.embedding.LogregAimedEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../embedding/RetrievalAimedEmbedding.html">autointent.modules.embedding.RetrievalAimedEmbedding</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../regexp/index.html">autointent.modules.regexp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../regexp/RegExp.html">autointent.modules.regexp.RegExp</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../regex/index.html">autointent.modules.regex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../regex/SimpleRegex.html">autointent.modules.regex.SimpleRegex</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">autointent.modules.scoring</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -561,17 +583,21 @@
 <li class="toctree-l3"><a class="reference internal" href="RerankScorer.html">autointent.modules.scoring.RerankScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="LinearScorer.html">autointent.modules.scoring.LinearScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="MLKnnScorer.html">autointent.modules.scoring.MLKnnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="SklearnScorer.html">autointent.modules.scoring.SklearnScorer</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../nodes/index.html">autointent.nodes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../nodes/info/index.html">autointent.nodes.info</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../nodes/info/NodeInfo.html">autointent.nodes.info.NodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../nodes/info/DecisionNodeInfo.html">autointent.nodes.info.DecisionNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../nodes/info/EmbeddingNodeInfo.html">autointent.nodes.info.EmbeddingNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../nodes/info/RegexNodeInfo.html">autointent.nodes.info.RegexNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../nodes/info/ScoringNodeInfo.html">autointent.nodes.info.ScoringNodeInfo</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../nodes/InferenceNode.html">autointent.nodes.InferenceNode</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../nodes/DecisionNodeInfo.html">autointent.nodes.DecisionNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../nodes/EmbeddingNodeInfo.html">autointent.nodes.EmbeddingNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../nodes/NodeInfo.html">autointent.nodes.NodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../nodes/RegExpNodeInfo.html">autointent.nodes.RegExpNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../nodes/ScoringNodeInfo.html">autointent.nodes.ScoringNodeInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../nodes/NodeOptimizer.html">autointent.nodes.NodeOptimizer</a></li>
 </ul>
 </details></li>
@@ -579,20 +605,28 @@
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Intent.html">autointent.schemas.Intent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Sample.html">autointent.schemas.Sample</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Tag.html">autointent.schemas.Tag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../schemas/TagsList.html">autointent.schemas.TagsList</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../utils/index.html">autointent.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../utils/load_default_search_space.html">autointent.utils.load_default_search_space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../utils/load_search_space.html">autointent.utils.load_search_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils/load_preset.html">autointent.utils.load_preset</a></li>
 </ul>
 </details></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../Ranker.html">autointent.Ranker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Embedder.html">autointent.Embedder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../VectorIndex.html">autointent.VectorIndex</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Dataset.html">autointent.Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Hasher.html">autointent.Hasher</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Context.html">autointent.Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../OptimizationConfig.html">autointent.OptimizationConfig</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Pipeline.html">autointent.Pipeline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../setup_logging.html">autointent.setup_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../load_dataset.html">autointent.load_dataset</a></li>
 </ul>
 </div>
 </nav></div>
@@ -663,63 +697,36 @@
 <h1>autointent.modules.scoring.DescriptionScorer<a class="headerlink" href="#autointent-modules-scoring-descriptionscorer" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autointent.modules.scoring.</span></span><span class="sig-name descname"><span class="pre">DescriptionScorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedder_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedder_device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedder_use_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../abc/ScoringModule.html#autointent.modules.abc.ScoringModule" title="autointent.modules.abc.ScoringModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autointent.modules.abc.ScoringModule</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autointent.modules.scoring.</span></span><span class="sig-name descname"><span class="pre">DescriptionScorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedder_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../base/BaseScorer.html#autointent.modules.base.BaseScorer" title="autointent.modules.base.BaseScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autointent.modules.base.BaseScorer</span></code></a></p>
 <p>Scoring module that scores utterances based on similarity to intent descriptions.</p>
-<p>DescriptionScorer embeds both the utterances and the intent descriptions, then computes a similarity score
-between the two, using either cosine similarity and softmax.</p>
+<p>DescriptionScorer embeds both the utterances and the intent descriptions, then computes
+a similarity score between the two, using either cosine similarity and softmax.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weights_file_name</strong> – Filename for saving the description vectors (<cite>description_vectors.npy</cite>).</p></li>
-<li><p><strong>embedder</strong> – The embedder used to generate embeddings for utterances and descriptions.</p></li>
-<li><p><strong>precomputed_embeddings</strong> – Flag indicating whether precomputed embeddings are used.</p></li>
-<li><p><strong>embedding_model_subdir</strong> – Directory for storing the embedder’s model files.</p></li>
-<li><p><strong>_vector_index</strong> – Internal vector index used when embeddings are precomputed.</p></li>
-<li><p><strong>db_dir</strong> – Directory path where the vector database is stored.</p></li>
-<li><p><strong>name</strong> – Name of the scorer, defaults to “description”.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>embedder_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
-<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>)</p></li>
-<li><p><strong>embedder_device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>)</p></li>
-<li><p><strong>max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>embedder_use_cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+<li><p><strong>embedder_config</strong> (<a class="reference internal" href="../../configs/EmbedderConfig.html#autointent.configs.EmbedderConfig" title="autointent.configs.EmbedderConfig"><em>autointent.configs.EmbedderConfig</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Config of the embedder model</p></li>
+<li><p><strong>temperature</strong> (<em>pydantic.PositiveFloat</em>) – Temperature parameter for scaling logits, defaults to 1.0</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.weights_file_name">
-<span class="sig-name descname"><span class="pre">weights_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'description_vectors.npy'</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.weights_file_name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedder">
-<span class="sig-name descname"><span class="pre">embedder</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../../Embedder.html#autointent.Embedder" title="autointent.Embedder"><span class="pre">autointent.Embedder</span></a></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedder" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.precomputed_embeddings">
-<span class="sig-name descname"><span class="pre">precomputed_embeddings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.precomputed_embeddings" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedding_model_subdir">
-<span class="sig-name descname"><span class="pre">embedding_model_subdir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'embedding_model'</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedding_model_subdir" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.db_dir">
-<span class="sig-name descname"><span class="pre">db_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.db_dir" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'description'</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Name of the module.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.supports_multiclass">
+<span class="sig-name descname"><span class="pre">supports_multiclass</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.supports_multiclass" title="Link to this definition">#</a></dt>
+<dd><p>Whether the module supports multiclass classification</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.supports_multilabel">
+<span class="sig-name descname"><span class="pre">supports_multilabel</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.supports_multilabel" title="Link to this definition">#</a></dt>
+<dd><p>Whether the module supports multilabel classification</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.temperature">
@@ -727,44 +734,24 @@ between the two, using either cosine similarity and softmax.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedder_device">
-<span class="sig-name descname"><span class="pre">embedder_device</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cpu'</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedder_device" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedder_name">
-<span class="sig-name descname"><span class="pre">embedder_name</span></span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedder_name" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.batch_size">
-<span class="sig-name descname"><span class="pre">batch_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.batch_size" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.max_length">
-<span class="sig-name descname"><span class="pre">max_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.max_length" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedder_use_cache">
-<span class="sig-name descname"><span class="pre">embedder_use_cache</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedder_use_cache" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.embedder_config">
+<span class="sig-name descname"><span class="pre">embedder_config</span></span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.embedder_config" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.from_context">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.from_context" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedder_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.from_context" title="Link to this definition">#</a></dt>
 <dd><p>Create a DescriptionScorer instance using a Context object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<a class="reference internal" href="../../Context.html#autointent.Context" title="autointent.Context"><em>autointent.Context</em></a>) – Context containing configurations and utilities.</p></li>
-<li><p><strong>temperature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Temperature parameter for scaling logits.</p></li>
-<li><p><strong>embedder_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – Name of the embedder model. If None, the best embedder is used.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="../../Context.html#autointent.Context" title="autointent.Context"><em>autointent.Context</em></a>) – Context containing configurations and utilities</p></li>
+<li><p><strong>temperature</strong> (<em>pydantic.PositiveFloat</em>) – Temperature parameter for scaling logits</p></li>
+<li><p><strong>embedder_config</strong> (<a class="reference internal" href="../../configs/EmbedderConfig.html#autointent.configs.EmbedderConfig" title="autointent.configs.EmbedderConfig"><em>autointent.configs.EmbedderConfig</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – Config of the embedder model. If None, the best embedder is used</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Initialized DescriptionScorer instance.</p>
+<dd class="field-even"><p>Initialized DescriptionScorer instance</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#autointent.modules.scoring.DescriptionScorer" title="autointent.modules.scoring.DescriptionScorer">DescriptionScorer</a></p>
@@ -773,15 +760,15 @@ between the two, using either cosine similarity and softmax.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.get_embedder_name">
-<span class="sig-name descname"><span class="pre">get_embedder_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.get_embedder_name" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.get_embedder_config">
+<span class="sig-name descname"><span class="pre">get_embedder_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.get_embedder_config" title="Link to this definition">#</a></dt>
 <dd><p>Get the name of the embedder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Embedder name.</p>
+<dd class="field-odd"><p>Embedder name</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, Any]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -793,13 +780,13 @@ between the two, using either cosine similarity and softmax.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>utterances</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of utterances to embed.</p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><em>autointent.custom_types.LabelType</em><em>]</em>) – List of labels corresponding to the utterances.</p></li>
-<li><p><strong>descriptions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of intent descriptions.</p></li>
+<li><p><strong>utterances</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of utterances to embed</p></li>
+<li><p><strong>labels</strong> (<em>autointent.custom_types.ListOfLabels</em>) – List of labels corresponding to the utterances</p></li>
+<li><p><strong>descriptions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of intent descriptions</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If descriptions contain None values or embeddings mismatch utterances.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If descriptions contain None values or embeddings mismatch utterances</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -813,10 +800,10 @@ between the two, using either cosine similarity and softmax.</p>
 <dd><p>Predict scores for utterances based on similarity to intent descriptions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>utterances</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of utterances to score.</p>
+<dd class="field-odd"><p><strong>utterances</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of utterances to score</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Array of probabilities for each utterance.</p>
+<dd class="field-even"><p>Array of probabilities for each utterance</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.typing.NDArray[numpy.float64]</p>
@@ -836,29 +823,38 @@ between the two, using either cosine similarity and softmax.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.dump">
-<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.dump" title="Link to this definition">#</a></dt>
-<dd><p>Save the scorer’s metadata, description vectors, and embedder state.</p>
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.get_train_data">
+<span class="sig-name descname"><span class="pre">get_train_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.get_train_data" title="Link to this definition">#</a></dt>
+<dd><p>Get training data from context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Path to the directory where assets will be dumped.</p>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="../../Context.html#autointent.Context" title="autointent.Context"><em>autointent.Context</em></a>) – Context containing training data</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple containing utterances, labels, and descriptions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>], autointent.custom_types.ListOfLabels, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.load">
-<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.load" title="Link to this definition">#</a></dt>
-<dd><p>Load the scorer’s metadata, description vectors, and embedder state.</p>
+<dt class="sig sig-object py" id="autointent.modules.scoring.DescriptionScorer.score_cv">
+<span class="sig-name descname"><span class="pre">score_cv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.modules.scoring.DescriptionScorer.score_cv" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate the scorer on a test set and compute the specified metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Path to the directory containing the dumped assets.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<a class="reference internal" href="../../Context.html#autointent.Context" title="autointent.Context"><em>autointent.Context</em></a>) – Context containing test set and other data</p></li>
+<li><p><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – List of metric names to compute</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of computed metric values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -915,25 +911,18 @@ between the two, using either cosine similarity and softmax.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer"><code class="docutils literal notranslate"><span class="pre">DescriptionScorer</span></code></a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.weights_file_name"><code class="docutils literal notranslate"><span class="pre">weights_file_name</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedder"><code class="docutils literal notranslate"><span class="pre">embedder</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.precomputed_embeddings"><code class="docutils literal notranslate"><span class="pre">precomputed_embeddings</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedding_model_subdir"><code class="docutils literal notranslate"><span class="pre">embedding_model_subdir</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.db_dir"><code class="docutils literal notranslate"><span class="pre">db_dir</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.supports_multiclass"><code class="docutils literal notranslate"><span class="pre">supports_multiclass</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.supports_multilabel"><code class="docutils literal notranslate"><span class="pre">supports_multilabel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.temperature"><code class="docutils literal notranslate"><span class="pre">temperature</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedder_device"><code class="docutils literal notranslate"><span class="pre">embedder_device</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedder_name"><code class="docutils literal notranslate"><span class="pre">embedder_name</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.batch_size"><code class="docutils literal notranslate"><span class="pre">batch_size</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.max_length"><code class="docutils literal notranslate"><span class="pre">max_length</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedder_use_cache"><code class="docutils literal notranslate"><span class="pre">embedder_use_cache</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.embedder_config"><code class="docutils literal notranslate"><span class="pre">embedder_config</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.from_context"><code class="docutils literal notranslate"><span class="pre">from_context()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.get_embedder_name"><code class="docutils literal notranslate"><span class="pre">get_embedder_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.get_embedder_config"><code class="docutils literal notranslate"><span class="pre">get_embedder_config()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.fit"><code class="docutils literal notranslate"><span class="pre">fit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.predict"><code class="docutils literal notranslate"><span class="pre">predict()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.clear_cache"><code class="docutils literal notranslate"><span class="pre">clear_cache()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.dump"><code class="docutils literal notranslate"><span class="pre">dump()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.get_train_data"><code class="docutils literal notranslate"><span class="pre">get_train_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.modules.scoring.DescriptionScorer.score_cv"><code class="docutils literal notranslate"><span class="pre">score_cv()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -964,7 +953,7 @@ between the two, using either cosine similarity and softmax.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, DeepPavlov.
+      © Copyright 2025, DeepPavlov.
       <br/>
     
   </p>

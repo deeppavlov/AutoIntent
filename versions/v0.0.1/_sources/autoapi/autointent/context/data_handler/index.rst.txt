@@ -11,9 +11,24 @@ Classes
    :hidden:
 
    /autoapi/autointent/context/data_handler/DataHandler
+   /autoapi/autointent/context/data_handler/StratifiedSplitter
 
 .. autoapisummary::
 
    autointent.context.data_handler.DataHandler
+   autointent.context.data_handler.StratifiedSplitter
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/context/data_handler/split_dataset
+
+.. autoapisummary::
+
+   autointent.context.data_handler.split_dataset
 
 

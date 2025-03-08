@@ -1,0 +1,39 @@
+autointent.context.data_handler.StratifiedSplitter
+==================================================
+
+.. py:class:: autointent.context.data_handler.StratifiedSplitter(test_size, label_feature, random_seed, shuffle = True)
+
+   A class for stratified splitting of datasets.
+
+   This class provides methods to split a dataset into training and testing subsets
+   while preserving the distribution of target labels. It supports both single-label
+   and multi-label datasets.
+
+
+   .. py:attribute:: test_size
+
+
+   .. py:attribute:: label_feature
+
+
+   .. py:attribute:: random_seed
+
+
+   .. py:attribute:: shuffle
+      :value: True
+
+
+
+   .. py:method:: __call__(dataset, multilabel, allow_oos_in_train = None)
+
+      Split the dataset into training and testing subsets.
+
+      :param dataset: The input dataset to be split.
+      :param multilabel: Whether the dataset is multi-label.
+      :param allow_oos_in_train: Set to True if you want to see out-of-scope utterances in train split.
+
+      :returns: A tuple containing the training and testing datasets.
+
+      :raises ValueError: If OOS samples are present but allow_oos_in_train is not specified.
+
+

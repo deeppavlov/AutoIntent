@@ -13,6 +13,7 @@ autointent.metrics.retrieval.retrieval_hit_rate_intersecting
        \left( y_{\text{query},i} \cdot y_{\text{candidates},i,j} \right) > 0 \right)}{N}
 
    where:
+
    - :math:`N` is the total number of queries,
    - :math:`y_{\text{query},i}` is the one-hot encoded label vector for the :math:`i`-th query,
    - :math:`y_{\text{candidates},i,j}` is the one-hot encoded label vector of the :math:`j`-th

@@ -12,6 +12,7 @@ autointent.metrics.decision.decision_accuracy
        \text{Accuracy} = \frac{\sum_{i=1}^N \mathbb{1}(y_{\text{true},i} = y_{\text{pred},i})}{N}
 
    where:
+
    - :math:`N` is the total number of samples,
    - :math:`y_{\text{true},i}` is the true label for the :math:`i`-th sample,
    - :math:`y_{\text{pred},i}` is the predicted label for the :math:`i`-th sample,
@@ -20,5 +21,6 @@ autointent.metrics.decision.decision_accuracy
 
    :param y_true: True values of labels
    :param y_pred: Predicted values of labels
-   :return: Score of the decision accuracy
+
+   :returns: Score of the decision accuracy
 

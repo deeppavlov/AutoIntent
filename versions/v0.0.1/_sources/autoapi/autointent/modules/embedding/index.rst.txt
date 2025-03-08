@@ -15,10 +15,12 @@ Classes
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/modules/embedding/RetrievalEmbedding
+   /autoapi/autointent/modules/embedding/LogregAimedEmbedding
+   /autoapi/autointent/modules/embedding/RetrievalAimedEmbedding
 
 .. autoapisummary::
 
-   autointent.modules.embedding.RetrievalEmbedding
+   autointent.modules.embedding.LogregAimedEmbedding
+   autointent.modules.embedding.RetrievalAimedEmbedding
 
 

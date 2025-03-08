@@ -3,13 +3,23 @@ autointent.custom_types.Split
 
 .. py:class:: autointent.custom_types.Split
 
-   Constants representing dataset splits.
+   Enumeration of data splits in the AutoIntent framework.
 
-   :cvar str TRAIN: Training split.
-   :cvar str VALIDATION: Validation split.
-   :cvar str TEST: Testing split.
-   :cvar str OOS: Out-of-scope split.
-   :cvar str INTENTS: Intents split.
+   .. attribute:: TRAIN
+
+      Represents the training data split.
+
+   .. attribute:: VALIDATION
+
+      Represents the validation data split.
+
+   .. attribute:: TEST
+
+      Represents the test data split.
+
+   .. attribute:: INTENTS
+
+      Represents the intents data split.
 
 
    .. py:attribute:: TRAIN
@@ -24,11 +34,6 @@ autointent.custom_types.Split
 
    .. py:attribute:: TEST
       :value: 'test'
-
-
-
-   .. py:attribute:: OOS
-      :value: 'oos'
 
 
 

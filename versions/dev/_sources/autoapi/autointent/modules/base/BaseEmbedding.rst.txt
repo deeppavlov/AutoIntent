@@ -1,0 +1,20 @@
+autointent.modules.base.BaseEmbedding
+=====================================
+
+.. py:class:: autointent.modules.base.BaseEmbedding
+
+   Bases: :py:obj:`autointent.modules.base.BaseModule`, :py:obj:`abc.ABC`
+
+
+   Base class for embedding modules.
+
+
+   .. py:method:: get_train_data(context)
+
+      Get train data.
+
+      :param context: Context to get train data from
+
+      :returns: Tuple of train utterances and train labels
+
+

@@ -3,11 +3,6 @@ autointent.modules.scoring
 
 .. py:module:: autointent.modules.scoring
 
-.. autoapi-nested-parse::
-
-   These modules take utterance as input and output predicted probabilities for each intent.
-
-
 
 Classes
 -------
@@ -21,6 +16,7 @@ Classes
    /autoapi/autointent/modules/scoring/RerankScorer
    /autoapi/autointent/modules/scoring/LinearScorer
    /autoapi/autointent/modules/scoring/MLKnnScorer
+   /autoapi/autointent/modules/scoring/SklearnScorer
 
 .. autoapisummary::
 
@@ -30,5 +26,6 @@ Classes
    autointent.modules.scoring.RerankScorer
    autointent.modules.scoring.LinearScorer
    autointent.modules.scoring.MLKnnScorer
+   autointent.modules.scoring.SklearnScorer
 
 

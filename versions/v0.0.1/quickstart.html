@@ -30,7 +30,7 @@
   <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
   
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -470,7 +470,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </div>
 <p>For a multilabel dataset, the <code class="docutils literal notranslate"><span class="pre">label</span></code> field should be a list of integers representing the corresponding class labels.</p>
 <p>To use it with our Python API, you can use our <a class="reference internal" href="autoapi/autointent/Dataset.html#autointent.Dataset" title="autointent.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.Dataset</span></code></a> object.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autointent</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]})</span>
 </pre></div>
@@ -489,7 +489,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <p>This command will start the hyperparameter search in the default <a class="reference internal" href="concepts.html#key-search-space"><span class="std std-ref">search space</span></a>.</p>
 <p>As a result, a <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder will be created in the current working directory, which will save the selected classifier ready for inference.</p>
 <p>Similar actions but in a limited mode can be started using the Python API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autointent</span> <span class="kn">import</span> <span class="n">PipelineOptimizer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineOptimizer</span>
 
 <span class="n">pipeline_optimizer</span> <span class="o">=</span> <span class="n">PipelineOptimizer</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">multilabel</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">pipeline_optimizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
@@ -499,7 +499,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <section id="inference">
 <h2>Inference<a class="headerlink" href="#inference" title="Link to this heading">#</a></h2>
 <p>To apply the built classifier to new data, you can use our Python API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autointent</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;path/to/run/directory&quot;</span><span class="p">)</span>
 <span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="s2">&quot;hello world&quot;</span><span class="p">]</span>
@@ -510,7 +510,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <section id="modular-approach">
 <h2>Modular Approach<a class="headerlink" href="#modular-approach" title="Link to this heading">#</a></h2>
 <p>If there is no need to iterate over pipelines and hyperparameters, you can import classification methods directly.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">autointent.modules</span> <span class="kn">import</span> <span class="n">KNNScorer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNScorer</span>
 
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_name</span><span class="o">=</span><span class="s2">&quot;sergeyzh/rubert-tiny-turbo&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">train_utterances</span> <span class="o">=</span> <span class="p">[</span>
@@ -618,7 +618,7 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 
   <p class="copyright">
     
-      © Copyright 2024, DeepPavlov.
+      © Copyright 2025, DeepPavlov.
       <br/>
     
   </p>

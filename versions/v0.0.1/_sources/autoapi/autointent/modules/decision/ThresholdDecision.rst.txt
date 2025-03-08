@@ -1,9 +1,9 @@
 autointent.modules.decision.ThresholdDecision
 =============================================
 
-.. py:class:: autointent.modules.decision.ThresholdDecision(thresh)
+.. py:class:: autointent.modules.decision.ThresholdDecision(thresh = 0.5)
 
-   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+   Bases: :py:obj:`autointent.modules.base.BaseDecision`
 
 
    Threshold predictor module.
@@ -11,13 +11,9 @@ autointent.modules.decision.ThresholdDecision
    ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
    labels for single-label or multi-label classification tasks.
 
-   :ivar metadata_dict_name: Filename for saving metadata to disk.
-   :ivar multilabel: If True, the model supports multi-label classification.
-   :ivar n_classes: Number of classes in the dataset.
-   :ivar tags: Tags for predictions (if any).
-   :ivar name: Name of the predictor, defaults to "adaptive".
+   :param thresh: Threshold for the scores, shape (n_classes,) or float
 
-   Examples
+   Examples:
    --------
    Single-label classification
    ===========================
@@ -36,7 +32,7 @@ autointent.modules.decision.ThresholdDecision
 
    .. testoutput::
 
-       [1 0]
+       [1, 0]
 
    Multi-label classification
    ==========================
@@ -51,21 +47,8 @@ autointent.modules.decision.ThresholdDecision
 
    .. testoutput::
 
-       [[0 1]
-        [1 0]]
+       [[0, 1], [1, 0]]
 
-
-
-   .. py:attribute:: metadata
-      :type:  ThresholdDecisionDumpMetadata
-
-
-   .. py:attribute:: multilabel
-      :type:  bool
-
-
-   .. py:attribute:: n_classes
-      :type:  int
 
 
    .. py:attribute:: tags
@@ -76,8 +59,33 @@ autointent.modules.decision.ThresholdDecision
       :value: 'threshold'
 
 
+      Name of the module.
+
+
+   .. py:attribute:: supports_oos
+      :value: True
+
+
+      Whether the module supports oos data
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+      Whether the module supports multiclass classification
+
 
    .. py:attribute:: thresh
+      :value: 0.5
+
 
 
    .. py:method:: from_context(context, thresh = 0.5)
@@ -86,8 +94,8 @@ autointent.modules.decision.ThresholdDecision
 
       Initialize from context.
 
-      :param context: Context
-      :param thresh: Threshold
+      :param context: Context containing configurations and utilities
+      :param thresh: Threshold for classification
 
 
 
@@ -95,32 +103,22 @@ autointent.modules.decision.ThresholdDecision
 
       Fit the model.
 
-      :param scores: Scores to fit
-      :param labels: Labels to fit
-      :param tags: Tags to fit
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+      :param labels: List of true labels
+      :param tags: List of Tag objects for mutually exclusive classes, or None
+
+      :raises MismatchNumClassesError: If number of thresholds doesn't match number of classes
 
 
 
    .. py:method:: predict(scores)
 
-      Predict the best score.
+      Predict labels using thresholds.
 
-      :param scores: Scores to predict
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
 
+      :returns: Predicted labels (either single-label or multi-label)
 
-
-   .. py:method:: dump(path)
-
-      Dump the metadata.
-
-      :param path: Path to dump
-
-
-
-   .. py:method:: load(path)
-
-      Load the metadata.
-
-      :param path: Path to load
+      :raises MismatchNumClassesError: If number of classes in scores doesn't match training data
 
 

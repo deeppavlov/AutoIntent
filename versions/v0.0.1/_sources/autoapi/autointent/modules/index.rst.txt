@@ -15,10 +15,10 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
-   /autoapi/autointent/modules/abc/index
+   /autoapi/autointent/modules/base/index
    /autoapi/autointent/modules/decision/index
    /autoapi/autointent/modules/embedding/index
-   /autoapi/autointent/modules/regexp/index
+   /autoapi/autointent/modules/regex/index
    /autoapi/autointent/modules/scoring/index
 
 

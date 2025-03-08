@@ -30,7 +30,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
   
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.0.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="autointent.custom_types.LogLevel" href="LogLevel.html" />
-    <link rel="prev" title="autointent.context.Context" href="../context/Context.html" />
+    <link rel="prev" title="autointent.context.load_dataset" href="../context/load_dataset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -391,61 +391,79 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../configs/InferenceNodeConfig.html">autointent.configs.InferenceNodeConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/DataConfig.html">autointent.configs.DataConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/LoggingConfig.html">autointent.configs.LoggingConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../configs/OptimizationConfig.html">autointent.configs.OptimizationConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../configs/TaskConfig.html">autointent.configs.TaskConfig</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../configs/VectorIndexConfig.html">autointent.configs.VectorIndexConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/CrossEncoderConfig.html">autointent.configs.CrossEncoderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/TaskTypeEnum.html">autointent.configs.TaskTypeEnum</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../context/index.html">autointent.context</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../context/data_handler/index.html">autointent.context.data_handler</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../context/data_handler/DataHandler.html">autointent.context.data_handler.DataHandler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../context/data_handler/StratifiedSplitter.html">autointent.context.data_handler.StratifiedSplitter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../context/data_handler/split_dataset.html">autointent.context.data_handler.split_dataset</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../context/optimization_info/index.html">autointent.context.optimization_info</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/Artifact.html">autointent.context.optimization_info.Artifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/DecisionArtifact.html">autointent.context.optimization_info.DecisionArtifact</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/RetrieverArtifact.html">autointent.context.optimization_info.RetrieverArtifact</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/EmbeddingArtifact.html">autointent.context.optimization_info.EmbeddingArtifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/ScorerArtifact.html">autointent.context.optimization_info.ScorerArtifact</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../context/optimization_info/OptimizationInfo.html">autointent.context.optimization_info.OptimizationInfo</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../context/vector_index_client/index.html">autointent.context.vector_index_client</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../context/vector_index_client/VectorIndex.html">autointent.context.vector_index_client.VectorIndex</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../context/vector_index_client/VectorIndexClient.html">autointent.context.vector_index_client.VectorIndexClient</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../context/vector_index_client/get_db_dir.html">autointent.context.vector_index_client.get_db_dir</a></li>
-</ul>
-</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../context/Context.html">autointent.context.Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context/load_dataset.html">autointent.context.load_dataset</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">autointent.custom_types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="LogLevel.html">autointent.custom_types.LogLevel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="BaseMetadataDict.html">autointent.custom_types.BaseMetadataDict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="NodeType.html">autointent.custom_types.NodeType</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Split.html">autointent.custom_types.Split</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../exceptions/index.html">autointent.exceptions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../exceptions/WrongClassificationError.html">autointent.exceptions.WrongClassificationError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../exceptions/MismatchNumClassesError.html">autointent.exceptions.MismatchNumClassesError</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../generation/index.html">autointent.generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../generation/description_generation/index.html">autointent.generation.description_generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../generation/description_generation/group_utterances_by_label.html">autointent.generation.description_generation.group_utterances_by_label</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../generation/description_generation/create_intent_description.html">autointent.generation.description_generation.create_intent_description</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../generation/description_generation/generate_intent_descriptions.html">autointent.generation.description_generation.generate_intent_descriptions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../generation/description_generation/enhance_dataset_with_descriptions.html">autointent.generation.description_generation.enhance_dataset_with_descriptions</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../generation/chat_templates/index.html">autointent.generation.chat_templates</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/AbstractEvolution.html">autointent.generation.chat_templates.AbstractEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/EvolutionChatTemplate.html">autointent.generation.chat_templates.EvolutionChatTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/BaseSynthesizerTemplate.html">autointent.generation.chat_templates.BaseSynthesizerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/ConcreteEvolution.html">autointent.generation.chat_templates.ConcreteEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/Message.html">autointent.generation.chat_templates.Message</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/Role.html">autointent.generation.chat_templates.Role</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/FormalEvolution.html">autointent.generation.chat_templates.FormalEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/FunnyEvolution.html">autointent.generation.chat_templates.FunnyEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/GoofyEvolution.html">autointent.generation.chat_templates.GoofyEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/InformalEvolution.html">autointent.generation.chat_templates.InformalEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/PromptDescription.html">autointent.generation.chat_templates.PromptDescription</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/ReasoningEvolution.html">autointent.generation.chat_templates.ReasoningEvolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/EnglishSynthesizerTemplate.html">autointent.generation.chat_templates.EnglishSynthesizerTemplate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/chat_templates/RussianSynthesizerTemplate.html">autointent.generation.chat_templates.RussianSynthesizerTemplate</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../generation/prompt_scheme/index.html">autointent.generation.prompt_scheme</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../generation/prompt_scheme/PromptDescription.html">autointent.generation.prompt_scheme.PromptDescription</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../generation/intents/index.html">autointent.generation.intents</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../generation/intents/generate_descriptions.html">autointent.generation.intents.generate_descriptions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2"><a class="reference internal" href="../generation/prompts/index.html">autointent.generation.prompts</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../generation/utterances/index.html">autointent.generation.utterances</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../generation/utterances/DatasetBalancer.html">autointent.generation.utterances.DatasetBalancer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/utterances/UtteranceGenerator.html">autointent.generation.utterances.UtteranceGenerator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/utterances/IncrementalUtteranceEvolver.html">autointent.generation.utterances.IncrementalUtteranceEvolver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../generation/utterances/UtteranceEvolver.html">autointent.generation.utterances.UtteranceEvolver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../generation/Generator.html">autointent.generation.Generator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../metrics/index.html">autointent.metrics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/custom_types/index.html">autointent.metrics.custom_types</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../metrics/decision/index.html">autointent.metrics.decision</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/decision/DecisionMetricFn.html">autointent.metrics.decision.DecisionMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/decision/handle_oos.html">autointent.metrics.decision.handle_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/decision/decision_accuracy.html">autointent.metrics.decision.decision_accuracy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/decision/decision_roc_auc.html">autointent.metrics.decision.decision_roc_auc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/decision/decision_precision.html">autointent.metrics.decision.decision_precision</a></li>
@@ -453,14 +471,15 @@
 <li class="toctree-l3"><a class="reference internal" href="../metrics/decision/decision_f1.html">autointent.metrics.decision.decision_f1</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../metrics/regexp/index.html">autointent.metrics.regexp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../metrics/regexp/RegexpMetricFn.html">autointent.metrics.regexp.RegexpMetricFn</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../metrics/regexp/regexp_partial_accuracy.html">autointent.metrics.regexp.regexp_partial_accuracy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../metrics/regexp/regexp_partial_precision.html">autointent.metrics.regexp.regexp_partial_precision</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../metrics/regex/index.html">autointent.metrics.regex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/regex/RegexMetricFn.html">autointent.metrics.regex.RegexMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/regex/regex_partial_accuracy.html">autointent.metrics.regex.regex_partial_accuracy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/regex/regex_partial_precision.html">autointent.metrics.regex.regex_partial_precision</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../metrics/retrieval/index.html">autointent.metrics.retrieval</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/retrieval/RetrievalMetricFn.html">autointent.metrics.retrieval.RetrievalMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/retrieval/ignore_oos.html">autointent.metrics.retrieval.ignore_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/retrieval/retrieval_map.html">autointent.metrics.retrieval.retrieval_map</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/retrieval/retrieval_map_intersecting.html">autointent.metrics.retrieval.retrieval_map_intersecting</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/retrieval/retrieval_map_macro.html">autointent.metrics.retrieval.retrieval_map_macro</a></li>
@@ -480,6 +499,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../metrics/scoring/index.html">autointent.metrics.scoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/scoring/ScoringMetricFn.html">autointent.metrics.scoring.ScoringMetricFn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../metrics/scoring/ignore_oos.html">autointent.metrics.scoring.ignore_oos</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/scoring/scoring_log_likelihood.html">autointent.metrics.scoring.scoring_log_likelihood</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/scoring/scoring_roc_auc.html">autointent.metrics.scoring.scoring_roc_auc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../metrics/scoring/scoring_accuracy.html">autointent.metrics.scoring.scoring_accuracy</a></li>
@@ -493,7 +513,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/DecisionMetricFn.html">autointent.metrics.DecisionMetricFn</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../metrics/RegexpMetricFn.html">autointent.metrics.RegexpMetricFn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics/RegexMetricFn.html">autointent.metrics.RegexMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/RetrievalMetricFn.html">autointent.metrics.RetrievalMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/ScoringMetricFn.html">autointent.metrics.ScoringMetricFn</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/decision_accuracy.html">autointent.metrics.decision_accuracy</a></li>
@@ -501,8 +521,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../metrics/decision_precision.html">autointent.metrics.decision_precision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/decision_recall.html">autointent.metrics.decision_recall</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/decision_roc_auc.html">autointent.metrics.decision_roc_auc</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../metrics/regexp_partial_accuracy.html">autointent.metrics.regexp_partial_accuracy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../metrics/regexp_partial_precision.html">autointent.metrics.regexp_partial_precision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics/regex_partial_accuracy.html">autointent.metrics.regex_partial_accuracy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics/regex_partial_precision.html">autointent.metrics.regex_partial_precision</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/retrieval_hit_rate.html">autointent.metrics.retrieval_hit_rate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/retrieval_hit_rate_intersecting.html">autointent.metrics.retrieval_hit_rate_intersecting</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics/retrieval_hit_rate_macro.html">autointent.metrics.retrieval_hit_rate_macro</a></li>
@@ -531,11 +551,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../modules/index.html">autointent.modules</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/abc/index.html">autointent.modules.abc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../modules/abc/Module.html">autointent.modules.abc.Module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../modules/abc/DecisionModule.html">autointent.modules.abc.DecisionModule</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../modules/abc/EmbeddingModule.html">autointent.modules.abc.EmbeddingModule</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../modules/abc/ScoringModule.html">autointent.modules.abc.ScoringModule</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/base/index.html">autointent.modules.base</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/base/BaseModule.html">autointent.modules.base.BaseModule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/base/BaseDecision.html">autointent.modules.base.BaseDecision</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/base/BaseEmbedding.html">autointent.modules.base.BaseEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/base/BaseRegex.html">autointent.modules.base.BaseRegex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/base/BaseScorer.html">autointent.modules.base.BaseScorer</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../modules/decision/index.html">autointent.modules.decision</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -547,11 +568,12 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../modules/embedding/index.html">autointent.modules.embedding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../modules/embedding/RetrievalEmbedding.html">autointent.modules.embedding.RetrievalEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/embedding/LogregAimedEmbedding.html">autointent.modules.embedding.LogregAimedEmbedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/embedding/RetrievalAimedEmbedding.html">autointent.modules.embedding.RetrievalAimedEmbedding</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/regexp/index.html">autointent.modules.regexp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../modules/regexp/RegExp.html">autointent.modules.regexp.RegExp</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../modules/regex/index.html">autointent.modules.regex</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/regex/SimpleRegex.html">autointent.modules.regex.SimpleRegex</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../modules/scoring/index.html">autointent.modules.scoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -561,17 +583,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/RerankScorer.html">autointent.modules.scoring.RerankScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/LinearScorer.html">autointent.modules.scoring.LinearScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/MLKnnScorer.html">autointent.modules.scoring.MLKnnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/SklearnScorer.html">autointent.modules.scoring.SklearnScorer</a></li>
 </ul>
 </details></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../nodes/index.html">autointent.nodes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../nodes/info/index.html">autointent.nodes.info</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../nodes/info/NodeInfo.html">autointent.nodes.info.NodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nodes/info/DecisionNodeInfo.html">autointent.nodes.info.DecisionNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nodes/info/EmbeddingNodeInfo.html">autointent.nodes.info.EmbeddingNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nodes/info/RegexNodeInfo.html">autointent.nodes.info.RegexNodeInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../nodes/info/ScoringNodeInfo.html">autointent.nodes.info.ScoringNodeInfo</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../nodes/InferenceNode.html">autointent.nodes.InferenceNode</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nodes/DecisionNodeInfo.html">autointent.nodes.DecisionNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nodes/EmbeddingNodeInfo.html">autointent.nodes.EmbeddingNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nodes/NodeInfo.html">autointent.nodes.NodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nodes/RegExpNodeInfo.html">autointent.nodes.RegExpNodeInfo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../nodes/ScoringNodeInfo.html">autointent.nodes.ScoringNodeInfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../nodes/NodeOptimizer.html">autointent.nodes.NodeOptimizer</a></li>
 </ul>
 </details></li>
@@ -579,20 +605,28 @@
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Intent.html">autointent.schemas.Intent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Sample.html">autointent.schemas.Sample</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Tag.html">autointent.schemas.Tag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../schemas/TagsList.html">autointent.schemas.TagsList</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../utils/index.html">autointent.utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../utils/load_default_search_space.html">autointent.utils.load_default_search_space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils/load_search_space.html">autointent.utils.load_search_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils/load_preset.html">autointent.utils.load_preset</a></li>
 </ul>
 </details></li>
 </ul>
 <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../Ranker.html">autointent.Ranker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Embedder.html">autointent.Embedder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../VectorIndex.html">autointent.VectorIndex</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Dataset.html">autointent.Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Hasher.html">autointent.Hasher</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Context.html">autointent.Context</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../OptimizationConfig.html">autointent.OptimizationConfig</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Pipeline.html">autointent.Pipeline</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../setup_logging.html">autointent.setup_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../load_dataset.html">autointent.load_dataset</a></li>
 </ul>
 </div>
 </nav></div>
@@ -655,18 +689,55 @@
                   
   <section id="module-autointent.custom_types">
 <span id="autointent-custom-types"></span><h1>autointent.custom_types<a class="headerlink" href="#module-autointent.custom_types" title="Link to this heading">#</a></h1>
-<p>Custom types for AutoIntent.</p>
-<p>This module defines custom types, enumerations, and constants used throughout
-the AutoIntent framework for improved type safety and clarity.</p>
+<p>Types used throughout AutoIntent library.</p>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.WEIGHT_TYPES" title="autointent.custom_types.WEIGHT_TYPES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WEIGHT_TYPES</span></code></a></p></td>
-<td><p>Represents weight calculation methods</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.FloatFromZeroToOne" title="autointent.custom_types.FloatFromZeroToOne"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FloatFromZeroToOne</span></code></a></p></td>
+<td><p>Float value between 0 and 1, inclusive.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.LabelType" title="autointent.custom_types.LabelType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LabelType</span></code></a></p></td>
 <td><p>Type alias for label representation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.LabelWithOOS" title="autointent.custom_types.LabelWithOOS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LabelWithOOS</span></code></a></p></td>
+<td><p>Any label that autointent modules can handle.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.ListOfGenericLabels" title="autointent.custom_types.ListOfGenericLabels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ListOfGenericLabels</span></code></a></p></td>
+<td><p>List of labels that AutoIntent modules can handle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.ListOfLabels" title="autointent.custom_types.ListOfLabels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ListOfLabels</span></code></a></p></td>
+<td><p>List of labels without OOS-samples that AutoIntent modules can handle.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.ListOfLabelsWithOOS" title="autointent.custom_types.ListOfLabelsWithOOS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ListOfLabelsWithOOS</span></code></a></p></td>
+<td><p>List of labels with OOS-samples that AutoIntent modules can handle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.MultiLabel" title="autointent.custom_types.MultiLabel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiLabel</span></code></a></p></td>
+<td><p>List label for multi-label classification problems.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.MultiLabelWithOOS" title="autointent.custom_types.MultiLabelWithOOS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultiLabelWithOOS</span></code></a></p></td>
+<td><p>List label for multi-label classification problems with OOS samples.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.SamplerType" title="autointent.custom_types.SamplerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SamplerType</span></code></a></p></td>
+<td><p>Hyperparameter tuning strategies:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.SearchSpacePreset" title="autointent.custom_types.SearchSpacePreset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchSpacePreset</span></code></a></p></td>
+<td><p>Some presets that our library supports from lightest to heaviest:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.SearchSpaceValidationMode" title="autointent.custom_types.SearchSpaceValidationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchSpaceValidationMode</span></code></a></p></td>
+<td><p>Behavior when meet a data-incompatible module in search space:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.SimpleLabel" title="autointent.custom_types.SimpleLabel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleLabel</span></code></a></p></td>
+<td><p>Integer label for single-label classification problems.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.SimpleLabelWithOOS" title="autointent.custom_types.SimpleLabelWithOOS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleLabelWithOOS</span></code></a></p></td>
+<td><p>Integer label for single-label classification problems with OOS samples.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.ValidationScheme" title="autointent.custom_types.ValidationScheme"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValidationScheme</span></code></a></p></td>
+<td><p>Validation scheme used in hyperparameter tuning:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.WeightType" title="autointent.custom_types.WeightType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightType</span></code></a></p></td>
+<td><p>Represents weight calculation methods</p></td>
 </tr>
 </tbody>
 </table>
@@ -681,39 +752,136 @@ the AutoIntent framework for improved type safety and clarity.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="LogLevel.html#autointent.custom_types.LogLevel" title="autointent.custom_types.LogLevel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogLevel</span></code></a></p></td>
 <td><p>Logging levels for the AutoIntent framework.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="BaseMetadataDict.html#autointent.custom_types.BaseMetadataDict" title="autointent.custom_types.BaseMetadataDict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseMetadataDict</span></code></a></p></td>
-<td><p>Base metadata dictionary for storing additional information.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="NodeType.html#autointent.custom_types.NodeType" title="autointent.custom_types.NodeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeType</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="NodeType.html#autointent.custom_types.NodeType" title="autointent.custom_types.NodeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeType</span></code></a></p></td>
 <td><p>Enumeration of node types in the AutoIntent pipeline.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="Split.html#autointent.custom_types.Split" title="autointent.custom_types.Split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Split</span></code></a></p></td>
-<td><p>Constants representing dataset splits.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="Split.html#autointent.custom_types.Split" title="autointent.custom_types.Split"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Split</span></code></a></p></td>
+<td><p>Enumeration of data splits in the AutoIntent framework.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="module-contents">
-<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<section id="package-contents">
+<h2>Package Contents<a class="headerlink" href="#package-contents" title="Link to this heading">#</a></h2>
 <dl class="py data">
-<dt class="sig sig-object py" id="autointent.custom_types.WEIGHT_TYPES">
-<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">WEIGHT_TYPES</span></span><a class="headerlink" href="#autointent.custom_types.WEIGHT_TYPES" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="autointent.custom_types.FloatFromZeroToOne">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">FloatFromZeroToOne</span></span><a class="headerlink" href="#autointent.custom_types.FloatFromZeroToOne" title="Link to this definition">#</a></dt>
+<dd><p>Float value between 0 and 1, inclusive.</p>
+</dd></dl>
+
+<dl class="py type">
+<dt class="sig sig-object py" id="autointent.custom_types.LabelType">
+<em class="property"><span class="pre">type</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">LabelType</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">SimpleLabel</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MultiLabel</span></em><a class="headerlink" href="#autointent.custom_types.LabelType" title="Link to this definition">#</a></dt>
+<dd><p>Type alias for label representation</p>
+<ul class="simple">
+<li><p><cite>int</cite>: For single-label classification.</p></li>
+<li><p><cite>list[int]</cite>: For multi-label classification.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.LabelWithOOS">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">LabelWithOOS</span></span><a class="headerlink" href="#autointent.custom_types.LabelWithOOS" title="Link to this definition">#</a></dt>
+<dd><p>Any label that autointent modules can handle.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.ListOfGenericLabels">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">ListOfGenericLabels</span></span><a class="headerlink" href="#autointent.custom_types.ListOfGenericLabels" title="Link to this definition">#</a></dt>
+<dd><p>List of labels that AutoIntent modules can handle.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.ListOfLabels">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">ListOfLabels</span></span><a class="headerlink" href="#autointent.custom_types.ListOfLabels" title="Link to this definition">#</a></dt>
+<dd><p>List of labels without OOS-samples that AutoIntent modules can handle.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.ListOfLabelsWithOOS">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">ListOfLabelsWithOOS</span></span><a class="headerlink" href="#autointent.custom_types.ListOfLabelsWithOOS" title="Link to this definition">#</a></dt>
+<dd><p>List of labels with OOS-samples that AutoIntent modules can handle.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.MultiLabel">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">MultiLabel</span></span><a class="headerlink" href="#autointent.custom_types.MultiLabel" title="Link to this definition">#</a></dt>
+<dd><p>List label for multi-label classification problems.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.MultiLabelWithOOS">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">MultiLabelWithOOS</span></span><a class="headerlink" href="#autointent.custom_types.MultiLabelWithOOS" title="Link to this definition">#</a></dt>
+<dd><p>List label for multi-label classification problems with OOS samples.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.SamplerType">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SamplerType</span></span><a class="headerlink" href="#autointent.custom_types.SamplerType" title="Link to this definition">#</a></dt>
+<dd><p>Hyperparameter tuning strategies:</p>
+<ul class="simple">
+<li><p><cite>brute</cite>: <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna.samplers.BruteForceSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.BruteForceSampler</span></code></a></p></li>
+<li><p><cite>tpe</cite>: <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html#optuna.samplers.TPESampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.TPESampler</span></code></a></p></li>
+<li><p><cite>random</cite>: <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna.samplers.RandomSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.RandomSampler</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.SearchSpacePreset">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SearchSpacePreset</span></span><a class="headerlink" href="#autointent.custom_types.SearchSpacePreset" title="Link to this definition">#</a></dt>
+<dd><p>Some presets that our library supports from lightest to heaviest:</p>
+<ul class="simple">
+<li><p><cite>light_extra</cite>: just like <cite>light</cite> but tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna.samplers.RandomSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.RandomSampler</span></code></a></p></li>
+<li><p><cite>light</cite>: only light-weight modules tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html#optuna.samplers.TPESampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.TPESampler</span></code></a></p></li>
+<li><p><cite>light_moderate</cite>: just like <cite>light</cite> but tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna.samplers.BruteForceSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.BruteForceSampler</span></code></a></p></li>
+<li><p><cite>heavy_moderate</cite>: just like <cite>heavy</cite> but tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna.samplers.RandomSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.RandomSampler</span></code></a></p></li>
+<li><p><cite>light</cite>: light-weight modules accompanied with heavy-weight ones tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html#optuna.samplers.TPESampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.TPESampler</span></code></a></p></li>
+<li><p><cite>heavy_extra</cite>: just like <cite>light</cite> but tuned with <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna.samplers.BruteForceSampler" title="(in Optuna v4.2.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optuna.samplers.BruteForceSampler</span></code></a></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.SearchSpaceValidationMode">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SearchSpaceValidationMode</span></span><a class="headerlink" href="#autointent.custom_types.SearchSpaceValidationMode" title="Link to this definition">#</a></dt>
+<dd><p>Behavior when meet a data-incompatible module in search space:</p>
+<ul class="simple">
+<li><p><cite>raise</cite>: raise an error</p></li>
+<li><p><cite>warning</cite>: warn user</p></li>
+<li><p><cite>filter</cite>: drop incompatible modules from search space</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.SimpleLabel">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SimpleLabel</span></span><a class="headerlink" href="#autointent.custom_types.SimpleLabel" title="Link to this definition">#</a></dt>
+<dd><p>Integer label for single-label classification problems.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.SimpleLabelWithOOS">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SimpleLabelWithOOS</span></span><a class="headerlink" href="#autointent.custom_types.SimpleLabelWithOOS" title="Link to this definition">#</a></dt>
+<dd><p>Integer label for single-label classification problems with OOS samples.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.ValidationScheme">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">ValidationScheme</span></span><a class="headerlink" href="#autointent.custom_types.ValidationScheme" title="Link to this definition">#</a></dt>
+<dd><p>Validation scheme used in hyperparameter tuning:</p>
+<ul class="simple">
+<li><p><cite>ho</cite>: hold-out validation</p></li>
+<li><p><cite>cv</cite>: cross-validation</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="autointent.custom_types.WeightType">
+<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">WeightType</span></span><a class="headerlink" href="#autointent.custom_types.WeightType" title="Link to this definition">#</a></dt>
 <dd><p>Represents weight calculation methods</p>
 <ul class="simple">
 <li><p>“uniform”: Equal weight for all elements.</p></li>
 <li><p>“distance”: Weights based on distance.</p></li>
 <li><p>“closest”: Prioritizes closest elements.</p></li>
-</ul>
-</dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="autointent.custom_types.LabelType">
-<span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">LabelType</span></span><a class="headerlink" href="#autointent.custom_types.LabelType" title="Link to this definition">#</a></dt>
-<dd><p>Type alias for label representation</p>
-<ul class="simple">
-<li><p><cite>int</cite>: For single-label classification.</p></li>
-<li><p><cite>list[int]</cite>: For multi-label classification.</p></li>
 </ul>
 </dd></dl>
 
@@ -731,12 +899,12 @@ the AutoIntent framework for improved type safety and clarity.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../context/Context.html"
+       href="../context/load_dataset.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">autointent.context.Context</p>
+        <p class="prev-next-title">autointent.context.load_dataset</p>
       </div>
     </a>
     <a class="right-next"
@@ -769,9 +937,22 @@ the AutoIntent framework for improved type safety and clarity.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes">Attributes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classes">Classes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.WEIGHT_TYPES"><code class="docutils literal notranslate"><span class="pre">WEIGHT_TYPES</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-contents">Package Contents</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.FloatFromZeroToOne"><code class="docutils literal notranslate"><span class="pre">FloatFromZeroToOne</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.LabelType"><code class="docutils literal notranslate"><span class="pre">LabelType</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.LabelWithOOS"><code class="docutils literal notranslate"><span class="pre">LabelWithOOS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.ListOfGenericLabels"><code class="docutils literal notranslate"><span class="pre">ListOfGenericLabels</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.ListOfLabels"><code class="docutils literal notranslate"><span class="pre">ListOfLabels</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.ListOfLabelsWithOOS"><code class="docutils literal notranslate"><span class="pre">ListOfLabelsWithOOS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.MultiLabel"><code class="docutils literal notranslate"><span class="pre">MultiLabel</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.MultiLabelWithOOS"><code class="docutils literal notranslate"><span class="pre">MultiLabelWithOOS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.SamplerType"><code class="docutils literal notranslate"><span class="pre">SamplerType</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.SearchSpacePreset"><code class="docutils literal notranslate"><span class="pre">SearchSpacePreset</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.SearchSpaceValidationMode"><code class="docutils literal notranslate"><span class="pre">SearchSpaceValidationMode</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.SimpleLabel"><code class="docutils literal notranslate"><span class="pre">SimpleLabel</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.SimpleLabelWithOOS"><code class="docutils literal notranslate"><span class="pre">SimpleLabelWithOOS</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.ValidationScheme"><code class="docutils literal notranslate"><span class="pre">ValidationScheme</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.custom_types.WeightType"><code class="docutils literal notranslate"><span class="pre">WeightType</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -802,7 +983,7 @@ the AutoIntent framework for improved type safety and clarity.</p>
 
   <p class="copyright">
     
-      © Copyright 2024, DeepPavlov.
+      © Copyright 2025, DeepPavlov.
       <br/>
     
   </p>

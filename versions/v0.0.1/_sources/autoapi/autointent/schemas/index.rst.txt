@@ -18,11 +18,13 @@ Classes
    /autoapi/autointent/schemas/Intent
    /autoapi/autointent/schemas/Sample
    /autoapi/autointent/schemas/Tag
+   /autoapi/autointent/schemas/TagsList
 
 .. autoapisummary::
 
    autointent.schemas.Intent
    autointent.schemas.Sample
    autointent.schemas.Tag
+   autointent.schemas.TagsList
 
 

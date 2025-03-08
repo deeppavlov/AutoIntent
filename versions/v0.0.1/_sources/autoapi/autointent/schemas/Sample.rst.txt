@@ -18,7 +18,7 @@ autointent.schemas.Sample
 
 
    .. py:attribute:: label
-      :type:  autointent.custom_types.LabelType | None
+      :type:  autointent.custom_types.LabelWithOOS
       :value: None
 
 

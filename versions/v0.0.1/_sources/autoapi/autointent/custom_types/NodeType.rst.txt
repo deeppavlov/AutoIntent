@@ -9,8 +9,8 @@ autointent.custom_types.NodeType
    Enumeration of node types in the AutoIntent pipeline.
 
 
-   .. py:attribute:: regexp
-      :value: 'regexp'
+   .. py:attribute:: regex
+      :value: 'regex'
 
 
 

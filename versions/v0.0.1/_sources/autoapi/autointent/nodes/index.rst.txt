@@ -9,6 +9,15 @@ autointent.nodes
 
 
 
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/nodes/info/index
+
+
 Classes
 -------
 
@@ -16,21 +25,11 @@ Classes
    :hidden:
 
    /autoapi/autointent/nodes/InferenceNode
-   /autoapi/autointent/nodes/DecisionNodeInfo
-   /autoapi/autointent/nodes/EmbeddingNodeInfo
-   /autoapi/autointent/nodes/NodeInfo
-   /autoapi/autointent/nodes/RegExpNodeInfo
-   /autoapi/autointent/nodes/ScoringNodeInfo
    /autoapi/autointent/nodes/NodeOptimizer
 
 .. autoapisummary::
 
    autointent.nodes.InferenceNode
-   autointent.nodes.DecisionNodeInfo
-   autointent.nodes.EmbeddingNodeInfo
-   autointent.nodes.NodeInfo
-   autointent.nodes.RegExpNodeInfo
-   autointent.nodes.ScoringNodeInfo
    autointent.nodes.NodeOptimizer
 
 

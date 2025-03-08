@@ -5,6 +5,7 @@ autointent.utils.load_search_space
 
    Load hyperparameters search space from file.
 
-   :param path: path to yaml file
-   :return:
+   :param path: Path to the search space file.
+
+   :returns: List of dictionaries representing the search space.
 

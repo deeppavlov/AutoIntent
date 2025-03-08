@@ -1,0 +1,10 @@
+autointent.modules.base.BaseRegex
+=================================
+
+.. py:class:: autointent.modules.base.BaseRegex
+
+   Bases: :py:obj:`autointent.modules.base.BaseModule`, :py:obj:`abc.ABC`
+
+
+   Base class for rule-based modules.
+

@@ -16,6 +16,7 @@ autointent.metrics.retrieval_map
        \text{MAP} = \frac{1}{Q} \sum_{q=1}^{Q} \text{AP}(q, c, k)
 
    where:
+
    - :math:`Q` is the total number of queries,
    - :math:`\text{AP}(q, c, k)` is the average precision for the :math:`q`-th query,
    calculated considering the true labels for that query :math:`q`, the ranked candidate

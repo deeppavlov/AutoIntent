@@ -18,7 +18,7 @@ autointent.nodes.InferenceNode
 
       Initialize from config.
 
-      :param config: Configuration for the node.
+      :param config: Config to init from
 
 
 

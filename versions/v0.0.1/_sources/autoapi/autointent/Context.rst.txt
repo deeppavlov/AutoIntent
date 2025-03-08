@@ -7,21 +7,24 @@ autointent.Context
 
    This class provides methods to set up logging, configure data and vector index components,
    manage datasets, and retrieve various configurations for inference and optimization.
+   Not intended to be instantiated by user.
 
 
    .. py:attribute:: data_handler
       :type:  autointent.context.data_handler.DataHandler
 
-
-   .. py:attribute:: vector_index_client
-      :type:  autointent.context.vector_index_client.VectorIndexClient
+      Convenient wrapper for :py:class:`autointent.Dataset`.
 
 
    .. py:attribute:: optimization_info
       :type:  autointent.context.optimization_info.OptimizationInfo
 
+      Object for storing optimization trials and inter-node communication.
+
 
    .. py:attribute:: callback_handler
+
+      Internal callback for logging to tensorboard or wandb.
 
 
    .. py:attribute:: seed
@@ -37,86 +40,28 @@ autointent.Context
 
 
 
-   .. py:method:: configure_vector_index(config, embedder_config = None)
+   .. py:method:: configure_transformer(config)
 
       Configure the vector index client and embedder.
 
-      :param config: Configuration for the vector index.
-      :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+      :param config: configuration for the transformers to use during optimization.
 
 
 
-   .. py:method:: configure_data(config)
-
-      Configure data handling.
-
-      :param config: Configuration for the data handling process.
-
-
-
-   .. py:method:: set_dataset(dataset, force_multilabel = False)
+   .. py:method:: set_dataset(dataset, config)
 
       Set the datasets for training, validation and testing.
 
-      :param dataset: Dataset.
-      :param force_multilabel: Whether to force multilabel classification.
-
-
-
-   .. py:method:: get_inference_config()
-
-      Generate configuration settings for inference.
-
-      :return: Dictionary containing inference configuration.
+      :param dataset: dataset to use during optimization.
+      :param config: data configuration settings.
 
 
 
    .. py:method:: dump()
 
-      Save logs, configurations, and datasets to disk.
+      Save all information about optimization process to disk.
 
-      Dumps evaluation results, training/test data splits, and inference configurations
-      to the specified logging directory.
-
-
-
-   .. py:method:: get_db_dir()
-
-      Get the database directory of the vector index.
-
-      :return: Path to the database directory.
-
-
-
-   .. py:method:: get_device()
-
-      Get the embedder device used by the vector index client.
-
-      :return: Device name.
-
-
-
-   .. py:method:: get_batch_size()
-
-      Get the batch size used by the embedder.
-
-      :return: Batch size.
-
-
-
-   .. py:method:: get_max_length()
-
-      Get the maximum sequence length for embeddings.
-
-      :return: Maximum length or None if not set.
-
-
-
-   .. py:method:: get_use_cache()
-
-      Check if caching is enabled for the embedder.
-
-      :return: True if caching is enabled, False otherwise.
+      Save metrics, hyperparameters, inference, configurations, and datasets to disk.
 
 
 
@@ -124,7 +69,7 @@ autointent.Context
 
       Get the directory for saving dumped modules.
 
-      :return: Path to the dump directory or None if dumping is disabled.
+      Return path to the dump directory or None if dumping is disabled.
 
 
 
@@ -132,30 +77,36 @@ autointent.Context
 
       Check if the dataset is configured for multilabel classification.
 
-      :return: True if multilabel classification is enabled, False otherwise.
-
-
-
-   .. py:method:: get_n_classes()
-
-      Get the number of classes in the dataset.
-
-      :return: Number of classes.
-
 
 
    .. py:method:: is_ram_to_clear()
 
       Check if RAM clearing is enabled in the logging configuration.
 
-      :return: True if RAM clearing is enabled, False otherwise.
-
 
 
    .. py:method:: has_saved_modules()
 
-      Check if any modules have been saved.
+      Check if any modules have been saved in RAM.
 
-      :return: True if there are saved modules, False otherwise.
+
+
+   .. py:method:: resolve_embedder()
+
+      Resolve the embedder configuration.
+
+      Returns the best embedder configuration or default configuration.
+
+      :raises RuntimeError: If embedder configuration cannot be resolved.
+
+
+
+   .. py:method:: resolve_ranker()
+
+      Resolve the cross-encoder configuration.
+
+      Returns default config if set.
+
+      :raises RuntimeError: If cross-encoder configuration cannot be resolved.
 
 

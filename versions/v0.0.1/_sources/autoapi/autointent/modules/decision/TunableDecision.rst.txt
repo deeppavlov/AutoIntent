@@ -1,9 +1,9 @@
 autointent.modules.decision.TunableDecision
 ===========================================
 
-.. py:class:: autointent.modules.decision.TunableDecision(n_trials = 320, seed = 0, tags = None)
+.. py:class:: autointent.modules.decision.TunableDecision(target_metric = 'decision_accuracy', n_optuna_trials = 320, seed = 0, tags = None)
 
-   Bases: :py:obj:`autointent.modules.abc.DecisionModule`
+   Bases: :py:obj:`autointent.modules.base.BaseDecision`
 
 
    Tunable predictor module.
@@ -12,12 +12,12 @@ autointent.modules.decision.TunableDecision
    in single-label or multi-label classification tasks. It is designed for datasets with varying
    score distributions and supports out-of-scope (OOS) detection.
 
-   :ivar name: Name of the predictor, defaults to "tunable".
-   :ivar multilabel: Whether the task is multi-label classification.
-   :ivar n_classes: Number of classes determined during fitting.
-   :ivar tags: Tags for predictions, if any.
+   :param target_metric: Metric to optimize during threshold tuning
+   :param n_optuna_trials: Number of optimization trials
+   :param seed: Random seed for reproducibility
+   :param tags: Tags for predictions (if any)
 
-   Examples
+   Examples:
    --------
    Single-label classification
    ===========================
@@ -27,7 +27,7 @@ autointent.modules.decision.TunableDecision
        from autointent.modules import TunableDecision
        scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
        labels = [1, 0, 1]
-       predictor = TunableDecision(n_trials=100, seed=42)
+       predictor = TunableDecision(n_optuna_trials=100, seed=42)
        predictor.fit(scores, labels)
        test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
        predictions = predictor.predict(test_scores)
@@ -35,14 +35,14 @@ autointent.modules.decision.TunableDecision
 
    .. testoutput::
 
-       [1 0]
+       [1, 0]
 
    Multi-label classification
    ==========================
    .. testcode::
 
        labels = [[1, 0], [0, 1], [1, 1]]
-       predictor = TunableDecision(n_trials=100, seed=42)
+       predictor = TunableDecision(n_optuna_trials=100, seed=42)
        predictor.fit(scores, labels)
        test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
        predictions = predictor.predict(test_scores)
@@ -50,8 +50,7 @@ autointent.modules.decision.TunableDecision
 
    .. testoutput::
 
-       [[1 1]
-        [1 1]]
+       [[1, 0], [1, 0]]
 
 
 
@@ -59,20 +58,40 @@ autointent.modules.decision.TunableDecision
       :value: 'tunable'
 
 
-
-   .. py:attribute:: multilabel
-      :type:  bool
+      Name of the module.
 
 
-   .. py:attribute:: n_classes
-      :type:  int
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: supports_oos
+      :value: True
+
+
+      Whether the module supports oos data
 
 
    .. py:attribute:: tags
       :type:  list[autointent.schemas.Tag] | None
 
 
-   .. py:attribute:: n_trials
+   .. py:attribute:: target_metric
+      :value: 'decision_accuracy'
+
+
+
+   .. py:attribute:: n_optuna_trials
       :value: 320
 
 
@@ -82,50 +101,39 @@ autointent.modules.decision.TunableDecision
 
 
 
-   .. py:method:: from_context(context, n_trials = 320)
+   .. py:method:: from_context(context, target_metric = 'decision_accuracy', n_optuna_trials = 320)
       :classmethod:
 
 
       Initialize from context.
 
-      :param context: Context
-      :param n_trials: Number of trials
+      :param context: Context containing configurations and utilities
+      :param target_metric: Metric to optimize during threshold tuning
+      :param n_optuna_trials: Number of optimization trials
 
 
 
    .. py:method:: fit(scores, labels, tags = None)
 
-      Fit module.
+      Fit the predictor by optimizing thresholds.
 
-      When data doesn't contain out-of-scope utterances, using TunableDecision imposes unnecessary
-       computational overhead.
+      Note: When data doesn't contain out-of-scope utterances, using TunableDecision imposes
+      unnecessary computational overhead.
 
-      :param scores: Scores to fit
-      :param labels: Labels to fit
-      :param tags: Tags to fit
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+      :param labels: List of true labels
+      :param tags: Tags for predictions (if any)
 
 
 
    .. py:method:: predict(scores)
 
-      Predict the best score.
+      Predict labels using optimized thresholds.
 
-      :param scores: Scores to predict
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
 
+      :returns: Predicted labels (either single-label or multi-label)
 
-
-   .. py:method:: dump(path)
-
-      Dump all data needed for inference.
-
-      :param path: Path to dump
-
-
-
-   .. py:method:: load(path)
-
-      Load data from dump.
-
-      :param path: Path to load
+      :raises MismatchNumClassesError: If number of classes in scores doesn't match training data
 
 

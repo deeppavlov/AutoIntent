@@ -11,5 +11,6 @@ autointent.metrics.decision.decision_recall
 
    :param y_true: True values of labels
    :param y_pred: Predicted values of labels
-   :return: Score of the decision recall
+
+   :returns: Score of the decision recall
 

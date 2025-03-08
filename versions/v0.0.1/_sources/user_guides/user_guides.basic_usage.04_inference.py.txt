@@ -15,8 +15,31 @@ Here's the basic example:
 # %%
 from autointent import Dataset, Pipeline
 
+search_space = [
+    {
+        "node_type": "scoring",
+        "target_metric": "scoring_roc_auc",
+        "search_space": [
+            {
+                "module_name": "knn",
+                "k": [1],
+                "weights": ["uniform"],
+                "embedder_config": ["avsolatorio/GIST-small-Embedding-v0"],
+            },
+        ],
+    },
+    {
+        "node_type": "decision",
+        "target_metric": "decision_accuracy",
+        "search_space": [
+            {"module_name": "threshold", "thresh": [0.5]},
+            {"module_name": "argmax"},
+        ],
+    },
+]
+
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
-pipeline = Pipeline.default_optimizer(multilabel=False)
+pipeline = Pipeline.from_search_space(search_space)
 context = pipeline.fit(dataset)
 pipeline.predict(["hello, world!"])
 
@@ -24,19 +47,7 @@ pipeline.predict(["hello, world!"])
 """
 There are several caveats.
 
-1. **Save vector databse.**
-
-When customizing configuration of pipeline optimization, you need to ensure that the option `save_db` of %mddoclink(class,configs,VectorIndexConfig) is set to `True`:
-"""
-# %%
-from autointent.configs import VectorIndexConfig
-
-# isn't compatible with "right-after-optimization" inference
-vector_index_config = VectorIndexConfig(save_db=False)
-
-# %% [markdown]
-"""
-2. **RAM usage.**
+**RAM usage.**
 
 You can optimize RAM usage by saving all modules to file system. Just set the following options:
 """
@@ -54,16 +65,12 @@ Firstly, your auto-configuration run should dump modules into file system:
 """
 
 # %%
-from pathlib import Path
-
 from autointent import Dataset, Pipeline
-from autointent.configs import LoggingConfig, VectorIndexConfig
+from autointent.configs import LoggingConfig
 
 dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
-pipeline = Pipeline.default_optimizer(multilabel=False)
-dump_dir = Path("my_dumps")
-pipeline.set_config(LoggingConfig(dump_dir=dump_dir, dump_modules=True, clear_ram=True))
-pipeline.set_config(VectorIndexConfig(save_db=True))
+pipeline = Pipeline.from_search_space(search_space)
+pipeline.set_config(LoggingConfig(dump_modules=True, clear_ram=True))
 
 # %% [markdown]
 """
@@ -73,6 +80,7 @@ Secondly, after optimization finished, you need to save the auto-configuration r
 # %%
 context = pipeline.fit(dataset)
 context.dump()
+# or pipeline.dump() to save only configured pipeline but not all the optimization assets
 
 # %% [markdown]
 """
@@ -96,12 +104,3 @@ loaded_pipeline.predict(["hello, world!"])
 """
 ## That's all!
 """
-
-# %%
-# [you didn't see it]
-import shutil
-
-shutil.rmtree(dump_dir)
-
-for file in Path.cwd().glob("vector_db*"):
-    shutil.rmtree(file)

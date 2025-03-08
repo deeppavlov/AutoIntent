@@ -1,0 +1,12 @@
+autointent.context.load_dataset
+===============================
+
+.. py:function:: autointent.context.load_dataset(path)
+
+   Load data from a specified path or use default sample data.
+
+   This function loads a dataset from a JSON file. If the path doesn't exist,
+   it attempts to load from the Hugging Face hub.
+
+   :param path: Path to the dataset file or hugging face repo name.
+

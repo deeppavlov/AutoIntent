@@ -1,0 +1,10 @@
+autointent.generation.chat_templates.RussianSynthesizerTemplate
+===============================================================
+
+.. py:class:: autointent.generation.chat_templates.RussianSynthesizerTemplate
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_synthesizer.BaseSynthesizerTemplate`
+
+
+   Russian language template for generating additional intent examples.
+

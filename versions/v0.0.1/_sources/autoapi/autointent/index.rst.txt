@@ -18,6 +18,7 @@ Submodules
    /autoapi/autointent/configs/index
    /autoapi/autointent/context/index
    /autoapi/autointent/custom_types/index
+   /autoapi/autointent/exceptions/index
    /autoapi/autointent/generation/index
    /autoapi/autointent/metrics/index
    /autoapi/autointent/modules/index
@@ -32,18 +33,39 @@ Classes
 .. toctree::
    :hidden:
 
+   /autoapi/autointent/Ranker
    /autoapi/autointent/Embedder
+   /autoapi/autointent/VectorIndex
    /autoapi/autointent/Dataset
    /autoapi/autointent/Hasher
    /autoapi/autointent/Context
+   /autoapi/autointent/OptimizationConfig
    /autoapi/autointent/Pipeline
 
 .. autoapisummary::
 
+   autointent.Ranker
    autointent.Embedder
+   autointent.VectorIndex
    autointent.Dataset
    autointent.Hasher
    autointent.Context
+   autointent.OptimizationConfig
    autointent.Pipeline
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/setup_logging
+   /autoapi/autointent/load_dataset
+
+.. autoapisummary::
+
+   autointent.setup_logging
+   autointent.load_dataset
 
 

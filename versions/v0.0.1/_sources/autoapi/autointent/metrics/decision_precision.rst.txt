@@ -11,5 +11,6 @@ autointent.metrics.decision_precision
 
    :param y_true: True values of labels
    :param y_pred: Predicted values of labels
-   :return: Score of the decision precision
+
+   :returns: Score of the decision precision
 

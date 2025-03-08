@@ -1,0 +1,107 @@
+autointent.VectorIndex
+======================
+
+.. py:class:: autointent.VectorIndex(embedder_config)
+
+   A class for managing a vector index using FAISS and embedding models.
+
+   This class allows adding, querying, and managing embeddings and their associated
+   labels for efficient nearest neighbor search.
+
+
+   .. py:attribute:: embedder
+
+
+   .. py:attribute:: labels
+      :type:  autointent.custom_types.ListOfLabels
+      :value: []
+
+
+
+   .. py:attribute:: texts
+      :type:  list[str]
+      :value: []
+
+
+
+   .. py:method:: add(texts, labels)
+
+      Add texts and their corresponding labels to the index.
+
+      :param texts: List of input texts.
+      :param labels: List of labels corresponding to the texts.
+
+
+
+   .. py:method:: is_empty()
+
+      Check if the index is empty.
+
+      :returns: True if the index contains no embeddings, False otherwise.
+
+
+
+   .. py:method:: delete()
+
+      Delete the vector index and all associated data from disk and memory.
+
+
+
+   .. py:method:: clear_ram()
+
+      Clear the vector index from RAM.
+
+
+
+   .. py:method:: get_all_embeddings()
+
+      Retrieve all embeddings stored in the index.
+
+      :returns: Array of all embeddings.
+
+      :raises ValueError: If the index has not been created yet.
+
+
+
+   .. py:method:: get_all_labels()
+
+      Retrieve all labels stored in the index.
+
+      :returns: List of all labels.
+
+
+
+   .. py:method:: query(queries, k)
+
+      Query the index to retrieve nearest neighbors.
+
+      :param queries: List of text queries or embedding vectors.
+      :param k: Number of nearest neighbors to return for each query.
+
+      :returns:     - `labels`: List of retrieved labels for each query.
+                    - `distances`: Corresponding distances for each neighbor.
+                    - `texts`: Corresponding texts for each neighbor.
+      :rtype: A tuple containing
+
+
+
+   .. py:method:: dump(dir_path)
+
+      Save the index and associated data to disk.
+
+      :param dir_path: Directory path where the data will be stored.
+
+
+
+   .. py:method:: load(dir_path, embedder_device = None, embedder_batch_size = None, embedder_use_cache = None)
+      :classmethod:
+
+
+      Load the index and associated data from disk.
+
+      :param dir_path: Directory path where the data is stored.
+      :param embedder_device: Device for the embedding model.
+      :param embedder_batch_size: Batch size for the embedding model.
+      :param embedder_use_cache: Whether to use caching for the embedding model.
+
+

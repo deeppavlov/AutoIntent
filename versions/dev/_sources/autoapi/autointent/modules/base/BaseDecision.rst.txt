@@ -1,0 +1,84 @@
+autointent.modules.base.BaseDecision
+====================================
+
+.. py:class:: autointent.modules.base.BaseDecision
+
+   Bases: :py:obj:`autointent.modules.base.BaseModule`, :py:obj:`abc.ABC`
+
+
+   Base class for decision modules.
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+      :abstractmethod:
+
+
+      Fit the model.
+
+      :param scores: Scores to fit
+      :param labels: Labels to fit
+      :param tags: Tags to fit
+
+
+
+   .. py:method:: predict(scores)
+      :abstractmethod:
+
+
+      Predict the best score.
+
+      :param scores: Scores to predict
+
+      :returns: Predicted labels
+
+
+
+   .. py:method:: score_ho(context, metrics)
+
+      Calculate metric on test set and return metric value.
+
+      :param context: Context to score
+      :param metrics: List of metrics to compute
+
+      :returns: Dictionary of computed metrics values for the test set
+
+      :raises RuntimeError: If no folded scores are found
+
+
+
+   .. py:method:: score_cv(context, metrics)
+
+      Calculate metric on test set and return metric value.
+
+      :param context: Context to score
+      :param metrics: List of metrics to compute
+
+      :returns: Dictionary of computed metrics values for the test set
+
+      :raises RuntimeError: If no folded scores are found
+
+
+
+   .. py:method:: get_assets()
+
+      Return useful assets that represent intermediate data into context.
+
+      :returns: Decision artifact containing intermediate data
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cache.
+
+
+
+   .. py:method:: get_train_data(context)
+
+      Get training data from context.
+
+      :param context: Context containing the data
+
+      :returns: Tuple containing scores, labels, and tags
+
+

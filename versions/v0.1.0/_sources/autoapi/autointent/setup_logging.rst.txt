@@ -1,0 +1,14 @@
+autointent.setup_logging
+========================
+
+.. py:function:: autointent.setup_logging(level, log_filename = None)
+
+   Set stdout and file handlers for logging autointent internal actions.
+
+   The first parameter affects the logs to the standard output stream. The second parameter is optional.
+   If it is specified, then the "DEBUG" messages are logged to the file,
+   regardless of what is specified by the first parameter.
+
+   :param level: one of "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+   :param log_filename: specify location of logfile, omit extension as suffix ``.log.jsonl`` will be appended.
+

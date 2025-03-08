@@ -10,11 +10,26 @@ autointent.context.optimization_info.ScorerArtifact
 
    Outputs from the best scorer, numpy arrays of shape (n_samples, n_classes).
 
+   .. attribute:: train_scores
+
+      Scorer outputs for train utterances.
+
+   .. attribute:: validation_scores
+
+      Scorer outputs for validation utterances.
+
+   .. attribute:: test_scores
+
+      Scorer outputs for test utterances.
+
+   .. attribute:: folded_scores
+
+      Scores for each fold from cross-validation.
+
 
    .. py:attribute:: model_config
 
       Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
-
 
 
    .. py:attribute:: train_scores
@@ -35,8 +50,8 @@ autointent.context.optimization_info.ScorerArtifact
 
 
 
-   .. py:attribute:: oos_scores
-      :type:  dict[str, numpy.typing.NDArray[numpy.float64]] | None
+   .. py:attribute:: folded_scores
+      :type:  list[numpy.typing.NDArray[numpy.float64]] | None
       :value: None
 
 

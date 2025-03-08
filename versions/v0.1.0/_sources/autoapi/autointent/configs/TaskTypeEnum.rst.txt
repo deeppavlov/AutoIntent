@@ -1,0 +1,40 @@
+autointent.configs.TaskTypeEnum
+===============================
+
+.. py:class:: autointent.configs.TaskTypeEnum
+
+   Bases: :py:obj:`enum.Enum`
+
+
+   Enum for different types of prompts.
+
+
+   .. py:attribute:: default
+      :value: 'default'
+
+
+
+   .. py:attribute:: classification
+      :value: 'classification'
+
+
+
+   .. py:attribute:: cluster
+      :value: 'cluster'
+
+
+
+   .. py:attribute:: query
+      :value: 'query'
+
+
+
+   .. py:attribute:: passage
+      :value: 'passage'
+
+
+
+   .. py:attribute:: sts
+      :value: 'sts'
+
+

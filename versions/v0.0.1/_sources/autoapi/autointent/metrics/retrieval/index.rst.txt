@@ -28,6 +28,7 @@ Functions
 .. toctree::
    :hidden:
 
+   /autoapi/autointent/metrics/retrieval/ignore_oos
    /autoapi/autointent/metrics/retrieval/retrieval_map
    /autoapi/autointent/metrics/retrieval/retrieval_map_intersecting
    /autoapi/autointent/metrics/retrieval/retrieval_map_macro
@@ -46,6 +47,7 @@ Functions
 
 .. autoapisummary::
 
+   autointent.metrics.retrieval.ignore_oos
    autointent.metrics.retrieval.retrieval_map
    autointent.metrics.retrieval.retrieval_map_intersecting
    autointent.metrics.retrieval.retrieval_map_macro
