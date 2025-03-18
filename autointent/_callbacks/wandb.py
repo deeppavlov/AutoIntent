@@ -63,6 +63,7 @@ class WandbCallback(OptimizerCallback):
             group=self.group,
             name=f"{module_name}_{num}",
             config=module_kwargs,
+            settings=self.wandb.Settings(x_stats_sampling_interval=1),
         )
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
