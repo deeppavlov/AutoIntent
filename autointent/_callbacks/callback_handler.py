@@ -21,14 +21,15 @@ class CallbackHandler(OptimizerCallback):
 
         self.callbacks = [cb() for cb in callbacks]
 
-    def start_run(self, run_name: str, dirpath: Path) -> None:
+    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
         """Start a new run.
 
         Args:
             run_name: Name of the run.
             dirpath: Path to the directory where the logs will be saved.
+            log_interval_time: Sampling interval for the system monitor in seconds.
         """
-        self.call_events("start_run", run_name=run_name, dirpath=dirpath)
+        self.call_events("start_run", run_name=run_name, dirpath=dirpath, log_interval_time=log_interval_time)
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
         """Start a new module.

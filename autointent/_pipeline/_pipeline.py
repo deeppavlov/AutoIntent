@@ -147,6 +147,7 @@ class Pipeline:
         self.context.callback_handler.start_run(
             run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
+            log_interval_time=self.context.logging_config.log_interval_time,
         )
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
