@@ -4,7 +4,7 @@ from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
 from ._mlknn import MLKnnScorer
 from ._sklearn import SklearnScorer
-from ._transformer import BertScorer
+from ._bert import BertScorer
 
 __all__ = [
     "BertScorer",
