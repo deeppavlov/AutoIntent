@@ -1,4 +1,4 @@
-"""TransformerScorer class for transformer-based classification."""
+"""BertScorer class for transformer-based classification."""
 
 import tempfile
 from typing import Any
@@ -21,7 +21,21 @@ from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
 
-class TransformerScorer(BaseScorer):
+class TokenizerConfig:
+    """Configuration for tokenizer parameters."""
+
+    def __init__(
+        self,
+        max_length: int = 128,
+        padding: str = "max_length",
+        truncation: bool = True,
+    ) -> None:
+        self.max_length = max_length
+        self.padding = padding
+        self.truncation = truncation
+
+
+class BertScorer(BaseScorer):
     name = "transformer"
     supports_multiclass = True
     supports_multilabel = True
@@ -36,25 +50,45 @@ class TransformerScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
+        tokenizer_config: TokenizerConfig | None = None,
     ) -> None:
         self.model_config = EmbedderConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
+        self.tokenizer_config = tokenizer_config or TokenizerConfig()
+        self._multilabel = False
 
     @classmethod
     def from_context(
         cls,
         context: Context,
         model_config: EmbedderConfig | str | None = None,
-    ) -> "TransformerScorer":
+        num_train_epochs: int = 3,
+        batch_size: int = 8,
+        learning_rate: float = 5e-5,
+        seed: int = 0,
+        tokenizer_config: TokenizerConfig | None = None,
+    ) -> "BertScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
-        return cls(model_config=model_config)
+        return cls(
+            model_config=model_config,
+            num_train_epochs=num_train_epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+            seed=seed,
+            tokenizer_config=tokenizer_config,
+        )
 
     def get_embedder_config(self) -> dict[str, Any]:
         return self.model_config.model_dump()
+
+    def _validate_task(self, labels: ListOfLabels) -> None:
+        """Validate the task and set _multilabel flag."""
+        super()._validate_task(labels)
+        self._multilabel = isinstance(labels[0], list)
 
     def fit(
         self,
@@ -67,7 +101,7 @@ class TransformerScorer(BaseScorer):
         self._validate_task(labels)
 
         if self._multilabel:
-            labels_array = np.array(labels) if not isinstance(labels, np.ndarray) else labels
+            labels_array = np.array(labels)
             num_labels = labels_array.shape[1]
         else:
             num_labels = len(set(labels))
@@ -76,8 +110,15 @@ class TransformerScorer(BaseScorer):
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
 
-        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+        use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
+
+        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:  # type: ignore[no-any-return]
+            return self._tokenizer(
+                examples["text"],
+                padding=self.tokenizer_config.padding,
+                truncation=self.tokenizer_config.truncation,
+                max_length=self.tokenizer_config.max_length,
+            )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
         tokenized_dataset = dataset.map(tokenize_function, batched=True)
@@ -90,8 +131,10 @@ class TransformerScorer(BaseScorer):
                 learning_rate=self.learning_rate,
                 seed=self.seed,
                 save_strategy="no",
-                logging_strategy="no",
-                report_to="none",
+                logging_strategy="steps",
+                logging_steps=10,
+                report_to="wandb",
+                use_cpu=use_cpu,
             )
 
             trainer = Trainer(
@@ -111,7 +154,9 @@ class TransformerScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(utterances, padding=True, truncation=True, max_length=128, return_tensors="pt")
+        inputs = self._tokenizer(
+            utterances, padding=True, truncation=True, max_length=self.tokenizer_config.max_length, return_tensors="pt"
+        )
 
         with torch.no_grad():
             outputs = self._model(**inputs)
@@ -120,7 +165,6 @@ class TransformerScorer(BaseScorer):
         if self._multilabel:
             return torch.sigmoid(logits).numpy()
         return torch.softmax(logits, dim=1).numpy()
-
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):

@@ -13,6 +13,7 @@ from .decision import (
 from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
 from .regex import SimpleRegex
 from .scoring import (
+    BertScorer,
     DescriptionScorer,
     DNNCScorer,
     KNNScorer,
@@ -20,7 +21,6 @@ from .scoring import (
     MLKnnScorer,
     RerankScorer,
     SklearnScorer,
-    TransformerScorer,
 )
 
 T = TypeVar("T", bound=BaseModule)
@@ -45,7 +45,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,
-        TransformerScorer,
+        BertScorer,
     ]
 )
 
