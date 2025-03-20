@@ -112,8 +112,8 @@ class BertScorer(BaseScorer):
 
         use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
 
-        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(
+        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:  # type: ignore[no-any-return]
+            return self._tokenizer(  # type: ignore[no-any-return]
                 examples["text"],
                 padding=self.tokenizer_config.padding,
                 truncation=self.tokenizer_config.truncation,
