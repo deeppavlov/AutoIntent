@@ -1,10 +1,10 @@
+from ._bert import BertScorer
 from ._description import DescriptionScorer
 from ._dnnc import DNNCScorer
 from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
 from ._mlknn import MLKnnScorer
 from ._sklearn import SklearnScorer
-from ._bert import BertScorer
 
 __all__ = [
     "BertScorer",
