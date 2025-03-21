@@ -54,6 +54,7 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
+"system-resource" = "autointent.generation.system_recources.wandb_cli:main"
 
 [tool.poetry.group.dev]
 optional = true
