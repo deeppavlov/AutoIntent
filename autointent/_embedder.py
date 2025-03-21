@@ -137,6 +137,10 @@ class Embedder:
         else:
             kwargs = metadata  # type: ignore[assignment]
 
+        max_length = kwargs.pop("max_length", None)
+        if max_length is not None:
+            kwargs["tokenizer_config"] = {"max_length": max_length}
+
         return cls(EmbedderConfig(**kwargs))
 
     def embed(self, utterances: list[str], task_type: TaskTypeEnum | None = None) -> npt.NDArray[np.float32]:

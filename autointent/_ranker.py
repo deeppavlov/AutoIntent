@@ -282,6 +282,10 @@ class Ranker:
         else:
             kwargs = metadata  # type: ignore[assignment]
 
+        max_length = kwargs.pop("max_length", None)
+        if max_length is not None:
+            kwargs["tokenizer_config"] = {"max_length": max_length}
+
         return cls(
             CrossEncoderConfig(**kwargs),
             classifier_head=clf,
