@@ -31,18 +31,15 @@ class TensorBoardCallback(OptimizerCallback):
                 )
                 raise ImportError(msg) from None
 
-    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
+    def start_run(self, run_name: str, dirpath: Path) -> None:
         """Starts a new run and sets the directory for storing logs.
 
         Args:
             run_name: Name of the run.
             dirpath: Path to the directory where logs will be saved.
-            log_interval_time: Sampling interval for the system monitor in seconds.
-                (not utilized in Tensorboard logging).
         """
         self.run_name = run_name
         self.dirpath = dirpath
-        self.log_interval_time = log_interval_time
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
         """Starts a new module and initializes a TensorBoard writer for it.
@@ -64,7 +61,7 @@ class TensorBoardCallback(OptimizerCallback):
         """Logs scalar or text values.
 
         Args:
-            **kwargs: Key-value pairs of data to log. Scalars will be logged as numerical values, others as text.
+            **kwargs: Key-value pairs of data to log. Scalars wil be logged as numerical values, others as text.
         """
         for key, value in kwargs.items():
             if isinstance(value, int | float):
