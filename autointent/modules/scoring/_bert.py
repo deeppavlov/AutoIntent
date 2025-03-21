@@ -89,13 +89,15 @@ class BertScorer(BaseScorer):
             num_labels = len(set(labels))
 
         model_name = self.model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name, **self.model_config.tokenizer_config.model_dump())
+        self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
 
         use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(examples["text"], return_tensors="pt")  # type: ignore[no-any-return]
+            return self._tokenizer(  # type: ignore[no-any-return]
+                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
+            )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
         tokenized_dataset = dataset.map(tokenize_function, batched=True)
@@ -131,7 +133,7 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(utterances, return_tensors="pt")
+        inputs = self._tokenizer(utterances, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
 
         with torch.no_grad():
             outputs = self._model(**inputs)

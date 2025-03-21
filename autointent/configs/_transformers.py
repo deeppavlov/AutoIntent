@@ -6,7 +6,7 @@ from typing_extensions import Self, assert_never
 
 
 class TokenizerConfig(BaseModel):
-    padding: bool | Literal["longest", "max_length", "do_not_pad"] = "max_length"
+    padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
     truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
