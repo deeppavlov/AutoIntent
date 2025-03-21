@@ -87,7 +87,7 @@ class Embedder:
         hasher = Hasher()
         for parameter in self.embedding_model.parameters():
             hasher.update(parameter.detach().cpu().numpy())
-        hasher.update(self.config.max_length)
+        hasher.update(self.config.tokenizer_config.max_length)
         return hasher.intdigest()
 
     def clear_ram(self) -> None:
@@ -114,7 +114,7 @@ class Embedder:
             model_name=str(self.config.model_name),
             device=self.config.device,
             batch_size=self.config.batch_size,
-            max_length=self.config.max_length,
+            max_length=self.config.tokenizer_config.max_length,
             use_cache=self.config.use_cache,
         )
         path.mkdir(parents=True, exist_ok=True)
@@ -162,12 +162,12 @@ class Embedder:
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
             self.config.model_name,
             self.config.batch_size,
-            str(self.config.max_length),
+            str(self.config.tokenizer_config.max_length),
             self.config.device,
         )
 
-        if self.config.max_length is not None:
-            self.embedding_model.max_seq_length = self.config.max_length
+        if self.config.tokenizer_config.max_length is not None:
+            self.embedding_model.max_seq_length = self.config.tokenizer_config.max_length
 
         embeddings = self.embedding_model.encode(
             utterances,

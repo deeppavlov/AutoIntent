@@ -15,7 +15,7 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, TaskTypeEnum, TokenizerConfig
 from autointent.custom_types import ListOfLabels
 
 
@@ -195,7 +195,7 @@ class VectorIndex:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
         metadata = VectorIndexMetadata(
-            embedder_max_length=self.embedder.config.max_length,
+            embedder_max_length=self.embedder.config.tokenizer_config.max_length,
             embedder_model_name=str(self.embedder.config.model_name),
             embedder_device=self.embedder.config.device,
             embedder_batch_size=self.embedder.config.batch_size,
@@ -229,7 +229,7 @@ class VectorIndex:
                 model_name=metadata["embedder_model_name"],
                 device=embedder_device or metadata["embedder_device"],
                 batch_size=embedder_batch_size or metadata["embedder_batch_size"],
-                max_length=metadata["embedder_max_length"],
+                tokenizer_config=TokenizerConfig(max_length=metadata["embedder_max_length"]),
                 use_cache=embedder_use_cache or metadata["embedder_use_cache"],
             )
         )

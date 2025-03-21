@@ -18,7 +18,7 @@ class HFModelConfig(BaseModel):
     )
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
-    tokenizer_config: TokenizerConfig | None = None
+    tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
@@ -31,7 +31,7 @@ class HFModelConfig(BaseModel):
             Model configuration.
         """
         if values is None:
-            return cls()  # type: ignore[call-arg]
+            return cls()
         if isinstance(values, BaseModel):
             return values  # type: ignore[return-value]
         if isinstance(values, str):

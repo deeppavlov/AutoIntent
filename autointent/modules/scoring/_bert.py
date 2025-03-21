@@ -16,7 +16,7 @@ from transformers import (
 )
 
 from autointent import Context
-from autointent.configs import HFModelConfig, TokenizerConfig
+from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -32,7 +32,6 @@ class BertScorer(BaseScorer):
     def __init__(
         self,
         model_config: HFModelConfig | str | dict[str, Any] | None = None,
-        tokenizer_config: TokenizerConfig | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -43,7 +42,6 @@ class BertScorer(BaseScorer):
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
-        self.tokenizer_config = tokenizer_config
         self._multilabel = False
 
     @classmethod
@@ -51,7 +49,6 @@ class BertScorer(BaseScorer):
         cls,
         context: Context,
         model_config: HFModelConfig | str | dict[str, Any] | None = None,
-        tokenizer_config: TokenizerConfig | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -65,7 +62,6 @@ class BertScorer(BaseScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            tokenizer_config=tokenizer_config,
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
@@ -93,7 +89,7 @@ class BertScorer(BaseScorer):
             num_labels = len(set(labels))
 
         model_name = self.model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name, **self.tokenizer_config.model_dump())
+        self._tokenizer = AutoTokenizer.from_pretrained(model_name, **self.model_config.tokenizer_config.model_dump())
         self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
 
         use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
