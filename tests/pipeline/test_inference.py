@@ -100,7 +100,7 @@ def test_load_with_overrided_params(dataset):
 
     # case 1: simple inference from file system
     inference_pipeline = Pipeline.load(
-        logging_config.dirpath, embedder_config=EmbedderConfig(TokenizerConfig(max_length=8))
+        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
     )
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
@@ -116,7 +116,9 @@ def test_load_with_overrided_params(dataset):
     pipeline_optimizer.dump()
     del pipeline_optimizer
 
-    loaded_pipe = Pipeline.load(logging_config.dirpath, embedder_config=EmbedderConfig(TokenizerConfig(max_length=8)))
+    loaded_pipe = Pipeline.load(
+        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
+    )
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
     assert loaded_pipe.nodes[NodeType.scoring].module._embedder.config.tokenizer_config.max_length == 8
