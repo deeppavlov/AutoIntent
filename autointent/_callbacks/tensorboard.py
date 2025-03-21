@@ -61,7 +61,7 @@ class TensorBoardCallback(OptimizerCallback):
         """Logs scalar or text values.
 
         Args:
-            **kwargs: Key-value pairs of data to log. Scalars wil be logged as numerical values, others as text.
+            **kwargs: Key-value pairs of data to log. Scalars will be logged as numerical values, others as text.
         """
         for key, value in kwargs.items():
             if isinstance(value, int | float):
