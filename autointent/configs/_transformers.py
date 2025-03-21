@@ -13,7 +13,9 @@ class TokenizerConfig(BaseModel):
 
 class HFModelConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    model_name: str = Field(description="Name of hugging face repository with transformer model.")
+    model_name: str = Field(
+        "prajjwal1/bert-tiny", description="Name of the hugging face repository with transformer model."
+    )
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
     tokenizer_config: TokenizerConfig | None = None

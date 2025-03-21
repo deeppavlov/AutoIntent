@@ -16,23 +16,9 @@ from transformers import (
 )
 
 from autointent import Context
-from autointent.configs import EmbedderConfig
+from autointent.configs import HFModelConfig, TokenizerConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
-
-
-class TokenizerConfig:
-    """Configuration for tokenizer parameters."""
-
-    def __init__(
-        self,
-        max_length: int = 128,
-        padding: str = "max_length",
-        truncation: bool = True,
-    ) -> None:
-        self.max_length = max_length
-        self.padding = padding
-        self.truncation = truncation
 
 
 class BertScorer(BaseScorer):
@@ -45,31 +31,31 @@ class BertScorer(BaseScorer):
 
     def __init__(
         self,
-        model_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        tokenizer_config: TokenizerConfig | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        tokenizer_config: TokenizerConfig | None = None,
     ) -> None:
-        self.model_config = EmbedderConfig.from_search_config(model_config)
+        self.model_config = HFModelConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
-        self.tokenizer_config = tokenizer_config or TokenizerConfig()
+        self.tokenizer_config = tokenizer_config
         self._multilabel = False
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        model_config: EmbedderConfig | str | None = None,
+        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        tokenizer_config: TokenizerConfig | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        tokenizer_config: TokenizerConfig | None = None,
     ) -> "BertScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
@@ -107,18 +93,13 @@ class BertScorer(BaseScorer):
             num_labels = len(set(labels))
 
         model_name = self.model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(model_name, **self.tokenizer_config.model_dump())
         self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
 
         use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"],
-                padding=self.tokenizer_config.padding,
-                truncation=self.tokenizer_config.truncation,
-                max_length=self.tokenizer_config.max_length,
-            )
+            return self._tokenizer(examples["text"], return_tensors="pt")  # type: ignore[no-any-return]
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
         tokenized_dataset = dataset.map(tokenize_function, batched=True)
@@ -154,9 +135,7 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(
-            utterances, padding=True, truncation=True, max_length=self.tokenizer_config.max_length, return_tensors="pt"
-        )
+        inputs = self._tokenizer(utterances, return_tensors="pt")
 
         with torch.no_grad():
             outputs = self._model(**inputs)
