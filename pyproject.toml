@@ -210,4 +210,3 @@ module = [
     "autointent._callbacks.*",
     "autointent.modules.abc.*",
 ]
-warn_unreachable = false
