@@ -3,13 +3,14 @@
 import argparse
 import re
 from collections.abc import Sequence
+from typing import Any
 
 from scipy.integrate import trapezoid
 
 import wandb
 
 
-def calculate_area(metrics: Sequence[float], timestamps: Sequence[float]) -> float:
+def calculate_area(metrics: Sequence[float], timestamps: Sequence[float]) -> Any:
     """Calculate the area under the curve using the trapezoidal rule.
 
     Args:
@@ -40,7 +41,7 @@ def sanitize_filename(filename: str) -> str:
     return re.sub(r"[^a-zA-Z0-9_\-]", "_", filename)
 
 
-def process_run(run: wandb.Run) -> dict[str, float]:
+def process_run(run: wandb.Api.Run) -> dict[str, dict[str, float]]:
     """Process a wandb run to extract system metrics and compute statistics.
 
     Args:
@@ -93,13 +94,17 @@ def main() -> None:
         if "final_metrics" not in run.name:
             wandb.init(project=args.project, group=args.group, name=f"system_resources_{run.name}")
             results = process_run(run)
+
             for column, metrics in results.items():
                 column_process = column.replace("/", "-")
                 log_data = {}
+
                 for m in args.metrics:
-                    if m in metrics:
+                    if m in metrics.keys():
                         log_data[f"system_resources/{column_process}_{m}"] = metrics[m]
+
                 wandb.log(log_data)
+
             wandb.finish()
 
 
