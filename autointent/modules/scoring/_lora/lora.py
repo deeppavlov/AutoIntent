@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
+from peft import LoraConfig, get_peft_model
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -14,7 +15,6 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
-from peft import LoraConfig, get_peft_model
 
 from autointent import Context
 from autointent.configs import EmbedderConfig
@@ -66,7 +66,6 @@ class BERTLoRAScorer(BaseScorer):
         self.lora_rank = lora_rank
         self.lora_alpha = lora_alpha
         self.lora_dropout = lora_dropout
-        print("BERTLoRAScorer initialized with LoRA support.")
 
     @classmethod
     def from_context(

@@ -2,11 +2,12 @@ from ._description import DescriptionScorer
 from ._dnnc import DNNCScorer
 from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
+from ._lora import BERTLoRAScorer
 from ._mlknn import MLKnnScorer
 from ._sklearn import SklearnScorer
-from ._lora import BERTLoRAScorer
 
 __all__ = [
+    "BERTLoRAScorer",
     "DNNCScorer",
     "DescriptionScorer",
     "KNNScorer",
@@ -14,5 +15,4 @@ __all__ = [
     "MLKnnScorer",
     "RerankScorer",
     "SklearnScorer",
-    "BERTLoRAScorer"
 ]
