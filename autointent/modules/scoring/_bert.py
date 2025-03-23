@@ -16,23 +16,9 @@ from transformers import (
 )
 
 from autointent import Context
-from autointent.configs import EmbedderConfig
+from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
-
-
-class TokenizerConfig:
-    """Configuration for tokenizer parameters."""
-
-    def __init__(
-        self,
-        max_length: int = 128,
-        padding: str = "max_length",
-        truncation: bool = True,
-    ) -> None:
-        self.max_length = max_length
-        self.padding = padding
-        self.truncation = truncation
 
 
 class BertScorer(BaseScorer):
@@ -45,31 +31,28 @@ class BertScorer(BaseScorer):
 
     def __init__(
         self,
-        model_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        tokenizer_config: TokenizerConfig | None = None,
     ) -> None:
-        self.model_config = EmbedderConfig.from_search_config(model_config)
+        self.model_config = HFModelConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
-        self.tokenizer_config = tokenizer_config or TokenizerConfig()
         self._multilabel = False
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        model_config: EmbedderConfig | str | None = None,
+        model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        tokenizer_config: TokenizerConfig | None = None,
     ) -> "BertScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
@@ -79,7 +62,6 @@ class BertScorer(BaseScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            tokenizer_config=tokenizer_config,
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
@@ -114,10 +96,7 @@ class BertScorer(BaseScorer):
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"],
-                padding=self.tokenizer_config.padding,
-                truncation=self.tokenizer_config.truncation,
-                max_length=self.tokenizer_config.max_length,
+                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
@@ -154,9 +133,7 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(
-            utterances, padding=True, truncation=True, max_length=self.tokenizer_config.max_length, return_tensors="pt"
-        )
+        inputs = self._tokenizer(utterances, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
 
         with torch.no_grad():
             outputs = self._model(**inputs)
