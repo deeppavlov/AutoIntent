@@ -3,7 +3,6 @@
 import tempfile
 from typing import Any
 
-import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
@@ -16,6 +15,7 @@ from transformers import (
 )
 
 from autointent import Context
+from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
@@ -35,12 +35,14 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
     ) -> None:
         self.model_config = HFModelConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
+        self.report_to = report_to
 
     @classmethod
     def from_context(
@@ -54,12 +56,16 @@ class BertScorer(BaseScorer):
     ) -> "BertScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
+
+        report_to = context.logging_config.report_to
+
         return cls(
             model_config=model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
+            report_to=report_to,
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
@@ -75,15 +81,9 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        if self._multilabel:
-            labels_array = np.array(labels)
-            num_labels = labels_array.shape[1]
-        else:
-            num_labels = len(set(labels))
-
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=self._n_classes)
 
         use_cpu = self.model_config.device == "cpu"
 
@@ -105,7 +105,7 @@ class BertScorer(BaseScorer):
                 save_strategy="no",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to="wandb",
+                report_to=self.report_to,
                 use_cpu=use_cpu,
             )
 
