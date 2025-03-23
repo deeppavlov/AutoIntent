@@ -25,7 +25,6 @@ class BertScorer(BaseScorer):
     name = "transformer"
     supports_multiclass = True
     supports_multilabel = True
-    _multilabel: bool
     _model: Any
     _tokenizer: Any
 
@@ -42,7 +41,6 @@ class BertScorer(BaseScorer):
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
-        self._multilabel = False
 
     @classmethod
     def from_context(
@@ -67,11 +65,6 @@ class BertScorer(BaseScorer):
     def get_embedder_config(self) -> dict[str, Any]:
         return self.model_config.model_dump()
 
-    def _validate_task(self, labels: ListOfLabels) -> None:
-        """Validate the task and set _multilabel flag."""
-        super()._validate_task(labels)
-        self._multilabel = isinstance(labels[0], list)
-
     def fit(
         self,
         utterances: list[str],
@@ -92,7 +85,7 @@ class BertScorer(BaseScorer):
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
 
-        use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
+        use_cpu = self.model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
