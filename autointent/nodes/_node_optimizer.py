@@ -87,10 +87,19 @@ class NodeOptimizer:
         """
         self._logger.info("Starting %s node optimization...", self.node_info.node_type)
 
+        storage_dir = context.get_dump_dir()
+        if storage_dir is None:
+            storage_dir = Path("optuna_storage")
+            self._logger.warning("No dump directory specified in context. Using default: %s", storage_dir)
+        else:
+            storage_dir = storage_dir / "optuna_storage"
+
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter: int = 0
             module_name = search_space.pop("module_name")
             n_trials = search_space.pop("n_trials", None)
+
+            study_name = f"{self.node_info.node_type}_{module_name}"
 
             if sampler == "tpe":
                 sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
@@ -104,10 +113,32 @@ class NodeOptimizer:
             else:
                 assert_never(sampler)
 
-            study = optuna.create_study(direction="maximize", sampler=sampler_instance)
+            study = load_or_create_study(
+                study_name=study_name, storage_dir=storage_dir, direction="maximize", sampler=sampler_instance
+            )
+
+            # If the study already has trials, update our counter
+            if study.trials:
+                self._logger.info(
+                    "Resuming optimization for %s from previous run. %d trials already completed.",
+                    module_name,
+                    len(study.trials),
+                )
+                # Find the highest trial number to continue counting
+                self._counter = max(t.number for t in study.trials) + 1
+
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
-            study.optimize(obj, n_trials=n_trials)
+            # Calculate remaining trials if n_trials is specified
+            remaining_trials = None if n_trials is None else max(0, n_trials - len(study.trials))
+
+            if remaining_trials == 0 and n_trials is not None:
+                self._logger.info(
+                    "Skipping optimization for %s as all %d trials have been completed.", module_name, n_trials
+                )
+                continue
+
+            study.optimize(obj, n_trials=remaining_trials)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
@@ -302,3 +333,50 @@ class NodeOptimizer:
                 raise TypeError(msg)
 
         return res, module_name
+
+
+def get_storage_url(study_name: str, storage_dir: Path) -> str:
+    """Create SQLite database URL for Optuna study persistence.
+
+    Args:
+        study_name: Name of the study to be used as filename
+        storage_dir: Directory to store the database file
+
+    Returns:
+        SQLite URL for Optuna storage
+    """
+    storage_dir.mkdir(parents=True, exist_ok=True)
+    return f"sqlite:///{storage_dir / f'{study_name}.db'}"
+
+
+def load_or_create_study(
+    study_name: str,
+    storage_dir: Path,
+    sampler: optuna.samplers.BaseSampler,
+    direction: str = "maximize",
+) -> optuna.Study:
+    """Load an existing study or create a new one if it doesn't exist.
+
+    Args:
+        study_name: Name of the study
+        storage_dir: Directory where study databases are stored
+        direction: Optimization direction (maximize or minimize)
+        sampler: Optuna sampler instance
+
+    Returns:
+        Optuna study instance
+    """
+    storage_url = get_storage_url(study_name, storage_dir)
+
+    try:
+        # Try to load an existing study
+        return optuna.load_study(study_name=study_name, storage=storage_url)
+    except Exception:  # noqa: BLE001
+        # Create a new study if none exists
+        return optuna.create_study(
+            study_name=study_name,
+            storage=storage_url,
+            direction=direction,
+            sampler=sampler,
+            load_if_exists=True,
+        )
