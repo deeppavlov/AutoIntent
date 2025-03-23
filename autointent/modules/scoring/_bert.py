@@ -3,6 +3,7 @@
 import tempfile
 from typing import Any
 
+import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
@@ -126,15 +127,19 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(utterances, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
-
-        with torch.no_grad():
-            outputs = self._model(**inputs)
-            logits = outputs.logits
-
-        if self._multilabel:
-            return torch.sigmoid(logits).numpy()
-        return torch.softmax(logits, dim=1).numpy()
+        all_predictions = []
+        for i in range(0, len(utterances), self.batch_size):
+            batch = utterances[i:i + self.batch_size]
+            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            with torch.no_grad():
+                outputs = self._model(**inputs)
+                logits = outputs.logits
+            if self._multilabel:
+                batch_predictions = torch.sigmoid(logits).numpy()
+            else:
+                batch_predictions = torch.softmax(logits, dim=1).numpy()
+            all_predictions.append(batch_predictions)
+        return np.vstack(all_predictions) if all_predictions else np.array([])
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
