@@ -68,7 +68,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline_optimizer.nodes[NodeType.scoring], "objective", exception_raising_objective)
 
     # InterruptAfterNCallsException will be raised and optuna will rise ValueError
-    with pytest.raises(InterruptAfterNCallsError):  # noqa: PT011
+    with pytest.raises(InterruptAfterNCallsError):
         pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
     # Verify that some trials were completed in the first run

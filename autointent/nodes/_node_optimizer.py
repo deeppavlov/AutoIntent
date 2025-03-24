@@ -114,7 +114,11 @@ class NodeOptimizer:
                 assert_never(sampler)
 
             study, finished_trials, remaining_trials = load_or_create_study(
-                study_name=study_name, storage_dir=storage_dir, direction="maximize", sampler=sampler_instance, n_trials=n_trials,
+                study_name=study_name,
+                storage_dir=storage_dir,
+                direction="maximize",
+                sampler=sampler_instance,
+                n_trials=n_trials,
             )
             self._counter = max(self._counter, finished_trials)
 
@@ -122,9 +126,8 @@ class NodeOptimizer:
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
 
             if remaining_trials == 0:
-                self._logger.info(
-                    "Skipping optimization for %s as all %d trials have been completed.", module_name
-                )
+                msg = f"Skipping optimization for {module_name} as all trials have been completed."
+                self._logger.info(msg)
                 continue
 
             study.optimize(obj, n_trials=remaining_trials, n_jobs=1)
@@ -375,13 +378,17 @@ def load_or_create_study(
             finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
             remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
-        return study, finished_trials, remaining_trials
+        return study, finished_trials, remaining_trials  # noqa: TRY300
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
-        return optuna.create_study(
-            study_name=study_name,
-            storage=storage_url,
-            direction=direction,
-            sampler=sampler,
-            load_if_exists=True,
-        ), finished_trials, remaining_trials
+        return (
+            optuna.create_study(
+                study_name=study_name,
+                storage=storage_url,
+                direction=direction,
+                sampler=sampler,
+                load_if_exists=True,
+            ),
+            finished_trials,
+            remaining_trials,
+        )
