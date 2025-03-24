@@ -138,7 +138,7 @@ class NodeOptimizer:
                 )
                 continue
 
-            study.optimize(obj, n_trials=remaining_trials)
+            study.optimize(obj, n_trials=remaining_trials, n_jobs=1)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
