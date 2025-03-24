@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+from unittest.mock import patch
 
 import pytest
 
@@ -32,7 +33,7 @@ def get_completed_trial_numbers(db_path):
         return {row[0] for row in cursor.fetchall()}
 
 
-def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
+def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     """Test that pipeline can resume after an exception and continues from where it left off."""
     project_dir = tmp_path
     search_space = get_search_space("optuna")
@@ -47,8 +48,6 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
-
-    # Monkey patch the objective function to raise an exception and track trials
     original_objective = pipeline_optimizer.nodes[NodeType.scoring].objective
 
     def exception_raising_objective(trial, *args, **kwargs):
@@ -65,10 +64,10 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
 
     # Replace the objective with our exception-raising version
     # pipeline_optimizer.nodes[NodeType.scoring].objective = exception_raising_objective
-    monkeypatch.setattr(pipeline_optimizer.nodes[NodeType.scoring], "objective", exception_raising_objective)
-
-    # InterruptAfterNCallsException will be raised and optuna will rise ValueError
-    with pytest.raises(InterruptAfterNCallsError):
+    with (
+        patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=exception_raising_objective),
+        pytest.raises(InterruptAfterNCallsError),
+    ):
         pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
     # Verify that some trials were completed in the first run
@@ -98,12 +97,11 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
         return original_objective2(trial, *args, **kwargs)
 
     # pipeline_optimizer.nodes[NodeType.scoring].objective = tracking_objective2
-    monkeypatch.setattr(pipeline_optimizer.nodes[NodeType.scoring], "objective", tracking_objective2)
-
-    # This run should complete without exceptions
-    pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
+    with patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=tracking_objective2):
+        # This run should complete without exceptions
+        pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
     # Verify the Optuna storage exists and has more trials
     db_files_second_run = list(optuna_storage_dir.glob("*.db"))
