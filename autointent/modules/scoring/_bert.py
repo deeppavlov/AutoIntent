@@ -5,7 +5,6 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-import torch
 from datasets import Dataset
 from transformers import (
     AutoModelForSequenceClassification,
@@ -84,7 +83,13 @@ class BertScorer(BaseScorer):
 
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=self._n_classes)
+
+        label2id = {i: i for i in range(self._n_classes)}
+        id2label = {i: i for i in range(self._n_classes)}
+
+        self._model = AutoModelForSequenceClassification.from_pretrained(
+            model_name, num_labels=self._n_classes, label2id=label2id, id2label=id2label
+        )
 
         use_cpu = self.model_config.device == "cpu"
 
@@ -127,19 +132,23 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        all_predictions = []
-        for i in range(0, len(utterances), self.batch_size):
-            batch = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
-            with torch.no_grad():
-                outputs = self._model(**inputs)
-                logits = outputs.logits
-            if self._multilabel:
-                batch_predictions = torch.sigmoid(logits).numpy()
-            else:
-                batch_predictions = torch.softmax(logits, dim=1).numpy()
-            all_predictions.append(batch_predictions)
-        return np.vstack(all_predictions) if all_predictions else np.array([])
+        from transformers import pipeline
+
+        task = "text-classification"
+
+        classifier = pipeline(
+            task,
+            model=self._model,
+            tokenizer=self._tokenizer,
+            device=self.model_config.device if self.model_config.device != "cpu" else -1,
+            batch_size=self.batch_size,
+        )
+
+        raw_predictions = classifier(utterances)
+
+        if self._multilabel:
+            return np.array([[pred["score"] for pred in item_preds] for item_preds in raw_predictions])
+        return np.array([pred["scores"] for pred in raw_predictions])
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
