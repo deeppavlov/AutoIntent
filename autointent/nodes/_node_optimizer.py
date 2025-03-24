@@ -345,7 +345,7 @@ def load_or_create_study(
     sampler: optuna.samplers.BaseSampler,
     direction: str = "maximize",
     n_trials: int = 10,
-) -> tuple[optuna.Study, int, int | None]:
+) -> tuple[optuna.Study, int, int]:
     """Load an existing study or create a new one if it doesn't exist.
 
     Args:
@@ -353,19 +353,18 @@ def load_or_create_study(
         storage_dir: Directory where study databases are stored
         direction: Optimization direction (maximize or minimize)
         sampler: Optuna sampler instance
-        n_trials
+        n_trials: n_trials
 
     Returns:
         Optuna study instance, number of completed trials, and number trials to run
     """
     storage_url = get_storage_url(study_name, storage_dir)
+    remaining_trials = n_trials
+    finished_trials = 0
 
     try:
         # Try to load an existing study
         study = optuna.load_study(study_name=study_name, storage=storage_url, sampler=sampler)
-        # If the study already has trials, update our counter
-        remaining_trials = None
-        counter = 0
 
         if study.trials:
             logger.info(
@@ -373,10 +372,10 @@ def load_or_create_study(
                 len(study.trials),
             )
             # Find the highest trial number to continue counting
-            counter = max(t.number for t in study.trials) + 1
+            finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
-            remaining_trials = None if n_trials is None else max(0, n_trials - len(study.trials))
-        return study, counter, remaining_trials
+            remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
+        return study, finished_trials, remaining_trials
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
         return optuna.create_study(
@@ -385,4 +384,4 @@ def load_or_create_study(
             direction=direction,
             sampler=sampler,
             load_if_exists=True,
-        ), 0, None
+        ), finished_trials, remaining_trials

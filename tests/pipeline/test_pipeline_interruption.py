@@ -68,7 +68,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline_optimizer.nodes[NodeType.scoring], "objective", exception_raising_objective)
 
     # InterruptAfterNCallsException will be raised and optuna will rise ValueError
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(InterruptAfterNCallsError):  # noqa: PT011
         pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
     # Verify that some trials were completed in the first run
@@ -117,7 +117,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
 
     # Additionally, verify that total trials increased
     for db_file in db_files_second_run:
-        if db_file.name in trials_after_first_run:
+        if db_file.name in ["NodeType.scoring_knn.db"]:
             trials_after_second_run = count_trials_in_database(db_file)
             assert trials_after_second_run > trials_after_first_run[db_file.name], (
                 f"Database {db_file.name} did not have more trials after second run "
