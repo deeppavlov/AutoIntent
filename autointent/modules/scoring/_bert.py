@@ -22,7 +22,7 @@ from autointent.modules.base import BaseScorer
 
 
 class BertScorer(BaseScorer):
-    name = "transformer"
+    name = "bert"
     supports_multiclass = True
     supports_multilabel = True
     _model: Any
@@ -142,13 +142,18 @@ class BertScorer(BaseScorer):
             tokenizer=self._tokenizer,
             device=self.model_config.device if self.model_config.device != "cpu" else -1,
             batch_size=self.batch_size,
+            return_all_scores=True,
         )
 
         raw_predictions = classifier(utterances)
 
-        if self._multilabel:
-            return np.array([[pred["score"] for pred in item_preds] for item_preds in raw_predictions])
-        return np.array([pred["scores"] for pred in raw_predictions])
+        scores_matrix = []
+        for example_scores in raw_predictions:
+            sorted_scores = sorted(example_scores, key=lambda x: int(x["label"]))
+            scores = [item["score"] for item in sorted_scores]
+            scores_matrix.append(scores)
+
+        return np.array(scores_matrix)
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
