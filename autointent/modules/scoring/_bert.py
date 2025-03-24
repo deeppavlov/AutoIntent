@@ -5,6 +5,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+import torch
 from datasets import Dataset
 from transformers import (
     AutoModelForSequenceClassification,
@@ -132,28 +133,21 @@ class BertScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        from transformers import pipeline
-
-        task = "text-classification"
-
-        classifier = pipeline(
-            task,
-            model=self._model,
-            tokenizer=self._tokenizer,
-            device=self.model_config.device if self.model_config.device != "cpu" else -1,
-            batch_size=self.batch_size,
-            return_all_scores=True,
-        )
-
-        raw_predictions = classifier(utterances)
-
-        scores_matrix = []
-        for example_scores in raw_predictions:
-            sorted_scores = sorted(example_scores, key=lambda x: int(x["label"].replace("LABEL_", "")))
-            scores = [item["score"] for item in sorted_scores]
-            scores_matrix.append(scores)
-
-        return np.array(scores_matrix)
+        device = next(self._model.parameters()).device
+        all_predictions = []
+        for i in range(0, len(utterances), self.batch_size):
+            batch = utterances[i : i + self.batch_size]
+            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            inputs = {k: v.to(device) for k, v in inputs.items()}
+            with torch.no_grad():
+                outputs = self._model(**inputs)
+                logits = outputs.logits
+            if self._multilabel:
+                batch_predictions = torch.sigmoid(logits).cpu().numpy()
+            else:
+                batch_predictions = torch.softmax(logits, dim=1).cpu().numpy()
+            all_predictions.append(batch_predictions)
+        return np.vstack(all_predictions) if all_predictions else np.array([])
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
