@@ -82,10 +82,12 @@ One can specify what embedding model and cross-encoder model want to use along w
 """
 
 # %%
-from autointent.configs import EmbedderConfig, CrossEncoderConfig
+from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
 
 custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny", device="cpu"))
-custom_pipeline.set_config(CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", max_length=8))
+custom_pipeline.set_config(
+    CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", tokenizer_config=TokenizerConfig(max_length=8))
+)
 
 # %% [markdown]
 """
