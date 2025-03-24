@@ -113,28 +113,17 @@ class NodeOptimizer:
             else:
                 assert_never(sampler)
 
-            study = load_or_create_study(
-                study_name=study_name, storage_dir=storage_dir, direction="maximize", sampler=sampler_instance
+            study, finished_trials, remaining_trials = load_or_create_study(
+                study_name=study_name, storage_dir=storage_dir, direction="maximize", sampler=sampler_instance, n_trials=n_trials,
             )
-
-            # If the study already has trials, update our counter
-            if study.trials:
-                self._logger.info(
-                    "Resuming optimization for %s from previous run. %d trials already completed.",
-                    module_name,
-                    len(study.trials),
-                )
-                # Find the highest trial number to continue counting
-                self._counter = max(t.number for t in study.trials) + 1
+            self._counter = max(self._counter, finished_trials)
 
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
-            # Calculate remaining trials if n_trials is specified
-            remaining_trials = None if n_trials is None else max(0, n_trials - len(study.trials))
 
-            if remaining_trials == 0 and n_trials is not None:
+            if remaining_trials == 0:
                 self._logger.info(
-                    "Skipping optimization for %s as all %d trials have been completed.", module_name, n_trials
+                    "Skipping optimization for %s as all %d trials have been completed.", module_name
                 )
                 continue
 
@@ -346,7 +335,8 @@ def get_storage_url(study_name: str, storage_dir: Path) -> str:
         SQLite URL for Optuna storage
     """
     storage_dir.mkdir(parents=True, exist_ok=True)
-    return f"sqlite:///{storage_dir / f'{study_name}.db'}"
+    db_path = storage_dir / f"{study_name}.db"
+    return f"sqlite:///{db_path}"
 
 
 def load_or_create_study(
@@ -354,7 +344,8 @@ def load_or_create_study(
     storage_dir: Path,
     sampler: optuna.samplers.BaseSampler,
     direction: str = "maximize",
-) -> optuna.Study:
+    n_trials: int = 10,
+) -> tuple[optuna.Study, int, int | None]:
     """Load an existing study or create a new one if it doesn't exist.
 
     Args:
@@ -362,15 +353,30 @@ def load_or_create_study(
         storage_dir: Directory where study databases are stored
         direction: Optimization direction (maximize or minimize)
         sampler: Optuna sampler instance
+        n_trials
 
     Returns:
-        Optuna study instance
+        Optuna study instance, number of completed trials, and number trials to run
     """
     storage_url = get_storage_url(study_name, storage_dir)
 
     try:
         # Try to load an existing study
-        return optuna.load_study(study_name=study_name, storage=storage_url)
+        study = optuna.load_study(study_name=study_name, storage=storage_url, sampler=sampler)
+        # If the study already has trials, update our counter
+        remaining_trials = None
+        counter = 0
+
+        if study.trials:
+            logger.info(
+                "Resuming optimization from previous run. %d trials already completed.",
+                len(study.trials),
+            )
+            # Find the highest trial number to continue counting
+            counter = max(t.number for t in study.trials) + 1
+            # Calculate remaining trials if n_trials is specified
+            remaining_trials = None if n_trials is None else max(0, n_trials - len(study.trials))
+        return study, counter, remaining_trials
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
         return optuna.create_study(
@@ -379,4 +385,4 @@ def load_or_create_study(
             direction=direction,
             sampler=sampler,
             load_if_exists=True,
-        )
+        ), 0, None

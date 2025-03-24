@@ -1,14 +1,12 @@
 import logging
 import sqlite3
-from pathlib import Path
-from time import sleep
 
 import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, LoggingConfig
 from autointent.custom_types import NodeType
-from tests.conftest import get_search_space, setup_environment
+from tests.conftest import get_search_space
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,7 +41,9 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
     call_count = 0
     max_calls_before_exception = 2
 
-    logging_config = LoggingConfig(project_dir=project_dir, run_name="test_pipeline_with_exception_resume", dump_modules=True, clear_ram=True)
+    logging_config = LoggingConfig(
+        project_dir=project_dir, run_name="test_pipeline_with_exception_resume", dump_modules=True, clear_ram=True
+    )
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
@@ -69,7 +69,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
 
     # InterruptAfterNCallsException will be raised and optuna will rise ValueError
     with pytest.raises(ValueError):  # noqa: PT011
-        pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
+        pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
     # Verify that some trials were completed in the first run
     assert call_count > 0, "No trials were completed in the first run"
@@ -101,7 +101,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline_optimizer.nodes[NodeType.scoring], "objective", tracking_objective2)
 
     # This run should complete without exceptions
-    pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
 
