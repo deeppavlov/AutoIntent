@@ -31,15 +31,17 @@ class TensorBoardCallback(OptimizerCallback):
                 )
                 raise ImportError(msg) from None
 
-    def start_run(self, run_name: str, dirpath: Path) -> None:
+    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
         """Starts a new run and sets the directory for storing logs.
 
         Args:
             run_name: Name of the run.
             dirpath: Path to the directory where logs will be saved.
+            log_interval_time: Sampling interval for the system monitor in seconds.
         """
         self.run_name = run_name
         self.dirpath = dirpath
+        self.log_interval_time = log_interval_time
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
         """Starts a new module and initializes a TensorBoard writer for it.

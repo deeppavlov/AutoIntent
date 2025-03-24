@@ -16,12 +16,13 @@ class OptimizerCallback(ABC):
         pass
 
     @abstractmethod
-    def start_run(self, run_name: str, dirpath: Path) -> None:
+    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
         """Start a new run.
 
         Args:
             run_name: Name of the run.
             dirpath: Path to the directory where the logs will be saved.
+            log_interval_time: Sampling interval for the system monitor in seconds.
         """
 
     @abstractmethod
