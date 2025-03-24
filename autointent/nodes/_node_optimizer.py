@@ -75,7 +75,7 @@ class NodeOptimizer:
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
 
-    def fit(self, context: Context, sampler: SamplerType = "brute", n_jobs: int = 1) -> None:
+    def fit(self, context: Context, sampler: SamplerType = "brute", n_jobs: int = -1) -> None:
         """Performs the optimization process for the node.
 
         Args:
