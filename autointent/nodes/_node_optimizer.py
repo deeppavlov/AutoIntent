@@ -75,12 +75,13 @@ class NodeOptimizer:
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
 
-    def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
+    def fit(self, context: Context, sampler: SamplerType = "brute", n_jobs: int = 1) -> None:
         """Performs the optimization process for the node.
 
         Args:
             context: The optimization context containing relevant data.
             sampler: The sampling strategy used for optimization.
+            n_jobs: The number of parallel jobs to run (if applicable).
 
         Raises:
             AssertionError: If an invalid sampler type is provided.
@@ -130,7 +131,7 @@ class NodeOptimizer:
                 self._logger.info(msg)
                 continue
 
-            study.optimize(obj, n_trials=remaining_trials, n_jobs=1)
+            study.optimize(obj, n_trials=remaining_trials, n_jobs=n_jobs)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
