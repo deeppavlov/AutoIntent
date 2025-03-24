@@ -5,6 +5,7 @@
       k: [10]
       embedder_config:
         - sentence-transformers/all-MiniLM-L6-v2
+        - avsolatorio/GIST-small-Embedding-v0
 - node_type: scoring
   target_metric: scoring_roc_auc
   search_space:
@@ -29,5 +30,6 @@
       thresh:
         low: 0.1
         high: 0.9
+        step: 0.3
     - module_name: argmax
     - module_name: jinoos
