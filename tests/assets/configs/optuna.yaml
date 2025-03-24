@@ -30,6 +30,5 @@
       thresh:
         low: 0.1
         high: 0.9
-        step: 0.3
     - module_name: argmax
     - module_name: jinoos
