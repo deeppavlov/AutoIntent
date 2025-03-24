@@ -149,7 +149,7 @@ class BertScorer(BaseScorer):
 
         scores_matrix = []
         for example_scores in raw_predictions:
-            sorted_scores = sorted(example_scores, key=lambda x: int(x["label"]))
+            sorted_scores = sorted(example_scores, key=lambda x: int(x["label"].replace("LABEL_", "")))
             scores = [item["score"] for item in sorted_scores]
             scores_matrix.append(scores)
 
