@@ -281,6 +281,25 @@
                     "description": "Sampling interval for the system monitor in seconds for Wandb logger.",
                     "title": "Log Interval Time",
                     "type": "number"
+                },
+                "track_emissions": {
+                    "default": false,
+                    "description": "Whether to track carbon emissions using codecarbon",
+                    "title": "Track Emissions",
+                    "type": "boolean"
+                },
+                "country_iso_code": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Country ISO code for emissions calculation",
+                    "title": "Country Iso Code"
                 }
             },
             "title": "LoggingConfig",
@@ -355,7 +374,9 @@
                 "dump_modules": false,
                 "clear_ram": false,
                 "report_to": null,
-                "log_interval_time": 0.1
+                "log_interval_time": 0.1,
+                "track_emissions": false,
+                "country_iso_code": null
             }
         },
         "embedder_config": {
