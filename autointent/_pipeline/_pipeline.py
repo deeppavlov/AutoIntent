@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
 import yaml
+from codecarbon import OfflineEmissionsTracker
 from typing_extensions import assert_never
 
 from autointent import Context, Dataset, OptimizationConfig
@@ -144,15 +145,32 @@ class Pipeline:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")
+
+        tracker = None
+        if context.logging_config.track_emissions:
+            tracker = OfflineEmissionsTracker(
+                country_iso_code=context.logging_config.country_iso_code or "USA",
+                output_dir=context.logging_config.dirpath,
+            )
+            tracker.start_task()
+
         self.context.callback_handler.start_run(
             run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
             log_interval_time=self.context.logging_config.log_interval_time,
         )
-        for node_type in NodeType:
-            node_optimizer = self.nodes.get(node_type, None)
-            if node_optimizer is not None:
-                node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
+
+        try:
+            for node_type in NodeType:
+                node_optimizer = self.nodes.get(node_type, None)
+                if node_optimizer is not None:
+                    node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
+        finally:
+            if tracker is not None:
+                emissions_data = tracker.stop_task()
+                emissions_data_dict = json.loads(emissions_data.toJSON())
+                context.callback_handler.log_emissions(emissions_data_dict)
+
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:

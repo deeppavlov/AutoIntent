@@ -120,3 +120,29 @@ class TensorBoardCallback(OptimizerCallback):
 
     def end_run(self) -> None:
         """Ends the current run. This method is currently a placeholder."""
+
+    def log_emissions(self, emissions_data: dict[str, Any]) -> None:
+        """Logs emissions data to TensorBoard.
+
+        A new TensorBoard run named `emissions` is created to store the emissions metrics.
+
+        Args:
+            emissions_data: Dictionary containing emissions metrics.
+
+        Raises:
+            RuntimeError: If `start_run` has not been called before logging emissions.
+        """
+        if self.module_writer is None:
+            msg = "start_run must be called before log_emissions."
+            raise RuntimeError(msg)
+
+        log_dir = Path(self.dirpath) / "emissions"
+        self.module_writer = self.writer(log_dir=log_dir)  # type: ignore[no-untyped-call]
+
+        for key, value in emissions_data.items():
+            if isinstance(value, int | float):
+                self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]
+            else:
+                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+
+        self.module_writer.close()  # type: ignore[no-untyped-call]

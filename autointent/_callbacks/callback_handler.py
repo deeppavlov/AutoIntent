@@ -73,6 +73,14 @@ class CallbackHandler(OptimizerCallback):
         """
         self.call_events("log_final_metrics", metrics=metrics)
 
+    def log_emissions(self, emissions_data: dict[str, Any]) -> None:
+        """Log emissions data.
+
+        Args:
+            emissions_data: Dictionary containing emissions metrics.
+        """
+        self.call_events("log_emissions", emissions_data=emissions_data)
+
     def call_events(self, event: str, **kwargs: Any) -> None:  # noqa: ANN401
         """Call events for all callbacks.
 

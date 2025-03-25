@@ -55,6 +55,10 @@ class LoggingConfig(BaseModel):
         0.1, description="Sampling interval for the system monitor in seconds for Wandb logger."
     )
     """List of callbacks to report to. If None, no callbacks will be used"""
+    track_emissions: bool = Field(False, description="Whether to track carbon emissions using codecarbon")
+    """Whether to track carbon emissions using codecarbon"""
+    country_iso_code: str | None = Field(None, description="Country ISO code for emissions calculation")
+    """Country ISO code for emissions calculation"""
 
     @property
     def dirpath(self) -> Path:

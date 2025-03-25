@@ -117,3 +117,22 @@ class WandbCallback(OptimizerCallback):
 
         This method is currently a placeholder and does not perform additional operations.
         """
+
+    def log_emissions(self, emissions_data: dict[str, Any]) -> None:
+        """Logs emissions data to W&B.
+
+        A new W&B run named `emissions` is created to store the emissions metrics.
+
+        Args:
+            emissions_data: Dictionary containing emissions metrics.
+        """
+        self.wandb.init(
+            project=self.project_name,
+            group=self.group,
+            name="emissions",
+            config=emissions_data,
+            settings=self.wandb.Settings(x_stats_sampling_interval=self.log_interval_time),
+        )
+
+        self.wandb.log(emissions_data)
+        self.wandb.finish()

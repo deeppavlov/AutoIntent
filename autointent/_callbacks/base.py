@@ -66,3 +66,11 @@ class OptimizerCallback(ABC):
         Args:
             metrics: Final metrics.
         """
+
+    @abstractmethod
+    def log_emissions(self, emissions_data: dict[str, Any]) -> None:
+        """Log emissions data.
+
+        Args:
+            emissions_data: Dictionary containing emissions metrics.
+        """
