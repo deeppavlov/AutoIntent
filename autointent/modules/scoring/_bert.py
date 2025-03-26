@@ -88,7 +88,11 @@ class BertScorer(BaseScorer):
         id2label = {i: i for i in range(self._n_classes)}
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name, num_labels=self._n_classes, label2id=label2id, id2label=id2label
+            model_name,
+            num_labels=self._n_classes,
+            label2id=label2id,
+            id2label=id2label,
+            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
         )
 
         use_cpu = self.model_config.device == "cpu"
