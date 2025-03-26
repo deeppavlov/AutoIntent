@@ -3,32 +3,18 @@
         "CrossEncoderConfig": {
             "additionalProperties": false,
             "properties": {
+                "model_name": {
+                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "batch_size": {
                     "default": 32,
                     "description": "Batch size for model inference.",
                     "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
-                },
-                "max_length": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Maximum length of input sequences.",
-                    "title": "Max Length"
-                },
-                "model_name": {
-                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
                 },
                 "device": {
                     "anyOf": [
@@ -42,6 +28,9 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
+                },
+                "tokenizer_config": {
+                    "$ref": "#/$defs/TokenizerConfig"
                 },
                 "train_head": {
                     "default": false,
@@ -104,32 +93,18 @@
         "EmbedderConfig": {
             "additionalProperties": false,
             "properties": {
+                "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
                 "batch_size": {
                     "default": 32,
                     "description": "Batch size for model inference.",
                     "exclusiveMinimum": 0,
                     "title": "Batch Size",
                     "type": "integer"
-                },
-                "max_length": {
-                    "anyOf": [
-                        {
-                            "exclusiveMinimum": 0,
-                            "type": "integer"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Maximum length of input sequences.",
-                    "title": "Max Length"
-                },
-                "model_name": {
-                    "default": "sentence-transformers/all-MiniLM-L6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
                 },
                 "device": {
                     "anyOf": [
@@ -143,6 +118,9 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
+                },
+                "tokenizer_config": {
+                    "$ref": "#/$defs/TokenizerConfig"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -307,6 +285,48 @@
             },
             "title": "LoggingConfig",
             "type": "object"
+        },
+        "TokenizerConfig": {
+            "properties": {
+                "padding": {
+                    "anyOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "enum": [
+                                "longest",
+                                "max_length",
+                                "do_not_pad"
+                            ],
+                            "type": "string"
+                        }
+                    ],
+                    "default": true,
+                    "title": "Padding"
+                },
+                "truncation": {
+                    "default": true,
+                    "title": "Truncation",
+                    "type": "boolean"
+                },
+                "max_length": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum length of input sequences.",
+                    "title": "Max Length"
+                }
+            },
+            "title": "TokenizerConfig",
+            "type": "object"
         }
     },
     "description": "Configuration for the optimization process.\n\nOne can use it to customize optimization beyond choosing different preset.\nInstantiate it and pass to :py:meth:`autointent.Pipeline.from_optimization_config`.",
@@ -341,10 +361,14 @@
         "embedder_config": {
             "$ref": "#/$defs/EmbedderConfig",
             "default": {
-                "batch_size": 32,
-                "max_length": null,
                 "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+                "batch_size": 32,
                 "device": null,
+                "tokenizer_config": {
+                    "max_length": null,
+                    "padding": true,
+                    "truncation": true
+                },
                 "default_prompt": null,
                 "classifier_prompt": null,
                 "cluster_prompt": null,
@@ -357,10 +381,14 @@
         "cross_encoder_config": {
             "$ref": "#/$defs/CrossEncoderConfig",
             "default": {
-                "batch_size": 32,
-                "max_length": null,
                 "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "batch_size": 32,
                 "device": null,
+                "tokenizer_config": {
+                    "max_length": null,
+                    "padding": true,
+                    "truncation": true
+                },
                 "train_head": false
             }
         },

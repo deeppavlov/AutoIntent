@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import EmbedderConfig, LoggingConfig
+from autointent.configs import EmbedderConfig, LoggingConfig, TokenizerConfig
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space, setup_environment
 
@@ -99,7 +99,9 @@ def test_load_with_overrided_params(dataset):
     context.dump()
 
     # case 1: simple inference from file system
-    inference_pipeline = Pipeline.load(logging_config.dirpath, embedder_config=EmbedderConfig(max_length=8))
+    inference_pipeline = Pipeline.load(
+        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
+    )
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
     assert len(prediction) == 2
@@ -107,17 +109,19 @@ def test_load_with_overrided_params(dataset):
     # case 2: rich inference from file system
     rich_outputs = inference_pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
-    assert inference_pipeline.nodes[NodeType.scoring].module._embedder.config.max_length == 8
+    assert inference_pipeline.nodes[NodeType.scoring].module._embedder.config.tokenizer_config.max_length == 8
     del inference_pipeline
 
     # case 3: dump and then load pipeline
     pipeline_optimizer.dump()
     del pipeline_optimizer
 
-    loaded_pipe = Pipeline.load(logging_config.dirpath, embedder_config=EmbedderConfig(max_length=8))
+    loaded_pipe = Pipeline.load(
+        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
+    )
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
-    assert loaded_pipe.nodes[NodeType.scoring].module._embedder.config.max_length == 8
+    assert loaded_pipe.nodes[NodeType.scoring].module._embedder.config.tokenizer_config.max_length == 8
 
 
 def test_no_saving(dataset):

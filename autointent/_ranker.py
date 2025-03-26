@@ -113,7 +113,7 @@ class Ranker:
             self.config.model_name,
             trust_remote_code=True,
             device=self.config.device,
-            max_length=self.config.max_length,  # type: ignore[arg-type]
+            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
         )
         self._train_head = False
         self._clf = classifier_head
@@ -252,7 +252,7 @@ class Ranker:
             model_name=self.config.model_name,
             train_head=self._train_head,
             device=self.config.device,
-            max_length=self.config.max_length,
+            max_length=self.config.tokenizer_config.max_length,
             batch_size=self.config.batch_size,
         )
 
@@ -281,6 +281,10 @@ class Ranker:
             kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
         else:
             kwargs = metadata  # type: ignore[assignment]
+
+        max_length = kwargs.pop("max_length", None)
+        if max_length is not None:
+            kwargs["tokenizer_config"] = {"max_length": max_length}
 
         return cls(
             CrossEncoderConfig(**kwargs),

@@ -1,19 +1,24 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import Self, assert_never
 
 
-class ModelConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
+class TokenizerConfig(BaseModel):
+    padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
+    truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
 
-class STModelConfig(ModelConfig):
-    model_name: str
+class HFModelConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    model_name: str = Field(
+        "prajjwal1/bert-tiny", description="Name of the hugging face repository with transformer model."
+    )
+    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
+    tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
@@ -26,7 +31,7 @@ class STModelConfig(ModelConfig):
             Model configuration.
         """
         if values is None:
-            return cls()  # type: ignore[call-arg]
+            return cls()
         if isinstance(values, BaseModel):
             return values  # type: ignore[return-value]
         if isinstance(values, str):
@@ -45,7 +50,7 @@ class TaskTypeEnum(Enum):
     sts = "sts"
 
 
-class EmbedderConfig(STModelConfig):
+class EmbedderConfig(HFModelConfig):
     model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
     default_prompt: str | None = Field(
         None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
@@ -105,7 +110,7 @@ class EmbedderConfig(STModelConfig):
     use_cache: bool = Field(False, description="Whether to use embeddings caching.")
 
 
-class CrossEncoderConfig(STModelConfig):
+class CrossEncoderConfig(HFModelConfig):
     model_name: str = Field("cross-encoder/ms-marco-MiniLM-L-6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
         False, description="Whether to train the head of the model. If False, LogReg will be trained."
