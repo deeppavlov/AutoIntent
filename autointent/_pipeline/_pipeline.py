@@ -2,6 +2,7 @@
 
 import json
 import logging
+from dataclasses import asdict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, get_args
 
@@ -281,7 +282,7 @@ class Pipeline:
             regex_module.dump(regex_dump_dir)
             self._nodes_configs[NodeType.regex].load_path = regex_dump_dir
 
-        inference_nodes_configs = [cfg.asdict() for cfg in self._nodes_configs.values()]
+        inference_nodes_configs = [asdict(cfg) for cfg in self._nodes_configs.values()]
         with (path / "inference_config.yaml").open("w") as file:
             yaml.dump(inference_nodes_configs, file)
 
