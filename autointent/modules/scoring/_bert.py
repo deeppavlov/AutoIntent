@@ -7,7 +7,6 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
-from sklearn.preprocessing import LabelEncoder
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -80,10 +79,6 @@ class BertScorer(BaseScorer):
     ) -> None:
         if hasattr(self, "_model"):
             self.clear_cache()
-        if not isinstance(labels[0], list) and isinstance(labels[0], str):
-            self._label_encoder = LabelEncoder()
-            encoded_labels = self._label_encoder.fit_transform(labels)
-            labels = encoded_labels.tolist()
         self._validate_task(labels)
 
         model_name = self.model_config.model_name
