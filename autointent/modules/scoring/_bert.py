@@ -103,7 +103,15 @@ class BertScorer(BaseScorer):
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
-        tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+        if self._multilabel:
+            # hugging face uses F.binary_cross_entropy_with_logits under the hood
+            # which requires target labels to be of float type
+            dataset = dataset.map(
+                lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns="labels"
+            )
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
