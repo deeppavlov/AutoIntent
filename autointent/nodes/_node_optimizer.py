@@ -104,20 +104,19 @@ class NodeOptimizer:
             else:
                 assert_never(sampler)
 
-            study, finished_trials, remaining_trials = load_or_create_study(
+            study, finished_trials, n_trials = load_or_create_study(
                 study_name=f"{self.node_info.node_type}_{module_name}",
                 storage_dir=context.get_dump_dir(),
                 direction="maximize",
                 sampler=sampler_instance,
                 n_trials=n_trials,
             )
-
             self._counter = max(self._counter, finished_trials)
-            study = optuna.create_study(direction="maximize", sampler=sampler_instance)
+
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
 
-            study.optimize(obj, n_trials=remaining_trials, n_jobs=n_jobs)
+            study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
