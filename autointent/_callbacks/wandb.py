@@ -33,7 +33,7 @@ class WandbCallback(OptimizerCallback):
 
         self.wandb = wandb
 
-    def start_run(self, run_name: str, dirpath: Path) -> None:
+    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
         """Starts a new W&B run.
 
         Initializes the project name and run group. The directory path argument is not
@@ -42,10 +42,12 @@ class WandbCallback(OptimizerCallback):
         Args:
             run_name: Name of the run (used as a W&B group).
             dirpath: Path to store logs (not utilized in W&B logging).
+            log_interval_time: Sampling interval for the system monitor in seconds.
         """
         self.project_name = os.getenv("WANDB_PROJECT", "autointent")
         self.group = run_name
         self.dirpath = dirpath
+        self.log_interval_time = log_interval_time
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
         """Starts a new module within the W&B logging system.
@@ -63,6 +65,7 @@ class WandbCallback(OptimizerCallback):
             group=self.group,
             name=f"{module_name}_{num}",
             config=module_kwargs,
+            settings=self.wandb.Settings(x_stats_sampling_interval=self.log_interval_time),
         )
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
@@ -96,6 +99,7 @@ class WandbCallback(OptimizerCallback):
             group=self.group,
             name="final_metrics",
             config=metrics,
+            settings=self.wandb.Settings(x_stats_sampling_interval=self.log_interval_time),
         )
 
         self.wandb.log(metrics.get("pipeline_metrics", {}))

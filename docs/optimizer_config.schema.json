@@ -297,6 +297,12 @@
                     "default": null,
                     "description": "List of callbacks to report to. If None, no callbacks will be used",
                     "title": "Report To"
+                },
+                "log_interval_time": {
+                    "default": 0.1,
+                    "description": "Sampling interval for the system monitor in seconds for Wandb logger.",
+                    "title": "Log Interval Time",
+                    "type": "number"
                 }
             },
             "title": "LoggingConfig",
@@ -328,7 +334,8 @@
                 "run_name": null,
                 "dump_modules": false,
                 "clear_ram": false,
-                "report_to": null
+                "report_to": null,
+                "log_interval_time": 0.1
             }
         },
         "embedder_config": {
