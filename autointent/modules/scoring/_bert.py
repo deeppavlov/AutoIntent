@@ -7,7 +7,6 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
-from sklearn.preprocessing import LabelEncoder
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -80,10 +79,6 @@ class BertScorer(BaseScorer):
     ) -> None:
         if hasattr(self, "_model"):
             self.clear_cache()
-        if not isinstance(labels[0], list) and isinstance(labels[0], str):
-            self._label_encoder = LabelEncoder()
-            encoded_labels = self._label_encoder.fit_transform(labels)
-            labels = encoded_labels.tolist()
         self._validate_task(labels)
 
         model_name = self.model_config.model_name
@@ -93,7 +88,11 @@ class BertScorer(BaseScorer):
         id2label = {i: i for i in range(self._n_classes)}
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name, num_labels=self._n_classes, label2id=label2id, id2label=id2label
+            model_name,
+            num_labels=self._n_classes,
+            label2id=label2id,
+            id2label=id2label,
+            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
         )
 
         use_cpu = self.model_config.device == "cpu"
@@ -104,7 +103,15 @@ class BertScorer(BaseScorer):
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
-        tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+        if self._multilabel:
+            # hugging face uses F.binary_cross_entropy_with_logits under the hood
+            # which requires target labels to be of float type
+            dataset = dataset.map(
+                lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns="labels"
+            )
+
+        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(

@@ -30,11 +30,10 @@
       n_estimators: [5, 10]
     - module_name: bert
       model_config:
-        - model_name: bert-base-uncased 
-        - model_name: distilbert-base-uncased
-      num_train_epochs: [2, 3]
+        - model_name: avsolatorio/GIST-small-Embedding-v0
+      num_train_epochs: [1]
       batch_size: [8, 16]
-      learning_rate: [5e-5, 3e-5]
+      learning_rate: [5.0e-5]
       seed: [0]
 - node_type: decision
   target_metric: decision_accuracy
