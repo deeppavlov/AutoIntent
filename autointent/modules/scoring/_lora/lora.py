@@ -17,6 +17,7 @@ from transformers import (
 )
 
 from autointent import Context
+from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
@@ -26,7 +27,6 @@ class BERTLoRAScorer(BaseScorer):
     name = "lora"
     supports_multiclass = True
     supports_multilabel = True
-    _multilabel: bool
     _model: Any
     _tokenizer: Any
 
@@ -37,14 +37,15 @@ class BERTLoRAScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **lora_kwargs: Any,
+        report_to: REPORTERS_NAMES | None = None, # type: ignore
+        **lora_kwargs: Any, # noqa: ANN401
     ) -> None:
         self.model_config = HFModelConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
-        self._multilabel = False
+        self.report_to = report_to
         self._lora_config = LoraConfig(**lora_kwargs)
 
     @classmethod
@@ -56,7 +57,7 @@ class BERTLoRAScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **lora_kwargs: Any,
+        **lora_kwargs: Any, # noqa: ANN401
     ) -> "BERTLoRAScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
@@ -66,16 +67,12 @@ class BERTLoRAScorer(BaseScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
+            report_to=context.logging_config.report_to
             **lora_kwargs,
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
         return self.model_config.model_dump()
-
-    def _validate_task(self, labels: ListOfLabels) -> None:
-        """Validate the task and set _multilabel flag."""
-        super()._validate_task(labels)
-        self._multilabel = isinstance(labels[0], list)
 
     def fit(
         self,
@@ -87,20 +84,12 @@ class BERTLoRAScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        if self._multilabel:
-            labels_array = np.array(labels)
-            num_labels = labels_array.shape[1]
-        else:
-            num_labels = len(set(labels))
-
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
-
-        # Apply LoRA to the model
+        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=self._n_classes)
         self._model = get_peft_model(self._model, self._lora_config)
 
-        use_cpu = hasattr(self.model_config, "device") and self.model_config.device == "cpu"
+        use_cpu = self.model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
@@ -120,7 +109,7 @@ class BERTLoRAScorer(BaseScorer):
                 save_strategy="no",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to="wandb",
+                report_to=self.report_to,
                 use_cpu=use_cpu,
             )
 
@@ -141,17 +130,19 @@ class BERTLoRAScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        inputs = self._tokenizer(
-            utterances, padding=True, truncation=True, max_length=self.model_config.tokenizer_config.max_length, return_tensors="pt"
-        )
-
-        with torch.no_grad():
-            outputs = self._model(**inputs)
-            logits = outputs.logits
-
-        if self._multilabel:
-            return torch.sigmoid(logits).numpy()
-        return torch.softmax(logits, dim=1).numpy()
+        all_predictions = []
+        for i in range(0, len(utterances), self.batch_size):
+            batch = utterances[i : i + self.batch_size]
+            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            with torch.no_grad():
+                outputs = self._model(**inputs)
+                logits = outputs.logits
+            if self._multilabel:
+                batch_predictions = torch.sigmoid(logits).numpy()
+            else:
+                batch_predictions = torch.softmax(logits, dim=1).numpy()
+            all_predictions.append(batch_predictions)
+        return np.vstack(all_predictions) if all_predictions else np.array([])
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
