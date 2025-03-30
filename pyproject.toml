@@ -148,13 +148,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-ra" # `--cov` option breaks pycharm's test debugger
 testpaths = [
     "tests",
 ]
 pythonpath = "autointent"
+# `--cov` option breaks pycharm's test debugger
 addopts = """
-    --cov
+    --ra
     --reruns 3
     --only-rerun requests.exceptions.ReadTimeout
     --only-rerun huggingface_hub.errors.HfHubHTTPError
