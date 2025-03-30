@@ -3,8 +3,8 @@
 import json
 import logging
 
-from codecarbon import EmissionsTracker as CodeCarbonTracker
-from codecarbon.output import EmissionsData
+from codecarbon import EmissionsTracker as CodeCarbonTracker  # type: ignore[import]
+from codecarbon.output import EmissionsData  # type: ignore[import]
 
 logger = logging.getLogger(__name__)
 
