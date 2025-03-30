@@ -16,4 +16,4 @@ jobs:
           pip install .[typing]
 
       - name: Run mypy
-        run: make typing
+        run: mypy autointent

@@ -146,6 +146,7 @@ addopts = """
     --only-rerun huggingface_hub.errors.HfHubHTTPError
     --only-rerun huggingface_hub.errors.LocalEntryNotFoundError
     --only-rerun FileNotFoundError
+    --only-rerun OSError
     --durations 5
     --reruns-delay 10
 """

@@ -48,17 +48,17 @@ jobs:
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "Testing documentation build..."
-          make test-docs
+          python -m sphinx build -b doctest docs/source docs/build/html
 
       - name: Build documentation
         if: ${{ github.ref == 'refs/heads/dev' }} && github.event_name != 'workflow_dispatch'
         run: |
-          make docs
+          python -m sphinx build -b html docs/source docs/build/html
 
       - name: build multiversion documentation
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
-          make multi-version-docs
+          sphinx-multiversion docs/source docs/build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
