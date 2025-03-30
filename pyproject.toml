@@ -72,6 +72,7 @@ pytest = "8.3.2"
 pytest-cov = "^5.0.0"
 coverage = "^7.6.1"
 pytest-asyncio = "^0.24.0"
+pytest-rerunfailures = "^15.0"
 
 [tool.poetry.group.typing]
 optional = true
@@ -152,6 +153,22 @@ testpaths = [
     "tests",
 ]
 pythonpath = "autointent"
+addopts = """
+    --cov
+    --reruns 3
+    --only-rerun requests.exceptions.ReadTimeout
+    --only-rerun huggingface_hub.errors.HfHubHTTPError
+    --only-rerun huggingface_hub.errors.LocalEntryNotFoundError
+    --only-rerun FileNotFoundError
+    --durations 5
+    --reruns-delay 10
+"""
+# --reruns 3 -> # Retry failed tests 3 times
+# requests.exceptions.ReadTimeout -> # HF Read timed out
+# huggingface_hub.errors.HfHubHTTPError -> # HF is unavailable
+# huggingface_hub.errors.LocalEntryNotFoundError -> # Gateway Time-out from HF
+# FileNotFoundError -> HF Cache is broken
+# --reruns-delay 10 -> Delay between reruns in seconds to avoid running into the same issue again
 
 [tool.coverage.run]
 branch = true
