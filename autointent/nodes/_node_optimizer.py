@@ -2,7 +2,6 @@
 
 import gc
 import itertools as it
-import json
 import logging
 from copy import deepcopy
 from functools import partial
@@ -11,7 +10,6 @@ from typing import Any
 
 import optuna
 import torch
-from codecarbon import EmissionsTracker
 from optuna.trial import Trial
 from pydantic import BaseModel, Field
 from typing_extensions import assert_never
@@ -19,6 +17,7 @@ from typing_extensions import assert_never
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 
 
@@ -69,7 +68,7 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
-        self.tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}", measure_power_secs=1)
+        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -77,36 +76,6 @@ class NodeOptimizer:
 
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
-
-    def _start_emissions_tracking(self, task_name: str) -> None:
-        """Start tracking emissions for a specific task.
-
-        Args:
-            task_name: Name of the task to track emissions for.
-        """
-        self.tracker.start_task(task_name)
-
-    def _stop_emissions_tracking(self) -> dict[str, float]:
-        """Stop tracking emissions and return the emissions data.
-
-        Returns:
-            Dictionary containing emissions metrics.
-        """
-        emissions_data = self.tracker.stop_task()
-        emissions_data_dict = json.loads(emissions_data.toJSON())
-        _ = self.tracker.stop()
-        return emissions_data_dict
-
-    def _process_emissions_metrics(self, emissions_data: dict[str, float]) -> dict[str, float]:
-        """Process emissions data into metrics with the 'emissions/' prefix.
-
-        Args:
-            emissions_data: Raw emissions data from the tracker.
-
-        Returns:
-            Dictionary of processed emissions metrics with the 'emissions/' prefix.
-        """
-        return {f"emissions/{k}": v for k, v in emissions_data.items()}
 
     def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
         """Performs the optimization process for the node.
@@ -175,12 +144,12 @@ class NodeOptimizer:
 
         self._logger.debug("Scoring %s module...", module_name)
 
-        self._start_emissions_tracking("module_scoring")
-        all_metrics = module.score(context, metrics=self.metrics)
-        emissions_data = self._stop_emissions_tracking()
-        all_metrics.update(self._process_emissions_metrics(emissions_data))
+        self.emissions_tracker.start_task("module_scoring")
+        final_metrics = module.score(context, metrics=self.metrics)
+        emissions_metrics = self.emissions_tracker.stop_task()
+        all_metrics = {**final_metrics, **emissions_metrics}
 
-        target_metric = all_metrics[self.target_metric]
+        target_metric = final_metrics[self.target_metric]
 
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
@@ -199,7 +168,7 @@ class NodeOptimizer:
             config,
             target_metric,
             self.target_metric,
-            all_metrics,
+            final_metrics,
             module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
