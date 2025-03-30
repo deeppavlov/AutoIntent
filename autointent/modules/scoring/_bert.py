@@ -148,7 +148,9 @@ class BertScorer(BaseScorer):
         all_predictions = []
         for i in range(0, len(utterances), self.batch_size):
             batch = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(batch, return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump())
+            inputs = self._tokenizer(
+                batch, return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump()
+            )
             inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**inputs)
