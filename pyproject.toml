@@ -59,6 +59,7 @@ test = [
     "coverage (>=7.6.1,<8.0.0)",
     "pytest-asyncio (>=0.24.0,<1.0.0)",
     "pytest-rerunfailures (>=15.0,<16.0)",
+    "pytest-xdist (>=3.6.1,<4.0.0)",
 ]
 typing = [
     "mypy (>=1,<2)",
