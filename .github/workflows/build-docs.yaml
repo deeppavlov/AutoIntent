@@ -36,17 +36,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: setup poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python -
-
       - name: Install pandoc
         run: |
           sudo apt install pandoc
 
       - name: Install dependencies
         run: |
-          poetry install --with docs
+          pip install .[docs]
 
       - name: Run tests
         if: github.event_name != 'workflow_dispatch'

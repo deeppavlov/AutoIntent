@@ -139,7 +139,7 @@ testpaths = [
 pythonpath = "autointent"
 # `--cov` option breaks pycharm's test debugger
 addopts = """
-    --ra
+    -ra
     --reruns 3
     --only-rerun requests.exceptions.ReadTimeout
     --only-rerun huggingface_hub.errors.HfHubHTTPError
