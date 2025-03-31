@@ -66,16 +66,16 @@
                 "validation_size": {
                     "default": 0.2,
                     "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
-                    "maximum": 1.0,
-                    "minimum": 0.0,
+                    "maximum": 1,
+                    "minimum": 0,
                     "title": "Validation Size",
                     "type": "number"
                 },
                 "separation_ratio": {
                     "anyOf": [
                         {
-                            "maximum": 1.0,
-                            "minimum": 0.0,
+                            "maximum": 1,
+                            "minimum": 0,
                             "type": "number"
                         },
                         {
@@ -342,6 +342,7 @@
         },
         "search_space": {
             "items": {
+                "additionalProperties": true,
                 "type": "object"
             },
             "title": "Search Space",
