@@ -58,7 +58,7 @@ class PTuningScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         **ptuning_kwargs: dict[str, Any],
     ) -> None:
         self.base_model_config = HFModelConfig.from_search_config(base_model_config)
