@@ -26,6 +26,7 @@ class DummyCallback(OptimizerCallback):
 
     def log_metrics(self, **kwargs: dict[str, Any]) -> None:
         metrics = kwargs["metrics"]
+        metrics = {k: v for k, v in metrics.items() if not k.startswith("emissions/")}
         for metric_name, metric_value in metrics.items():
             if not isinstance(metric_value, str) and np.isnan(metric_value):
                 metrics[metric_name] = None
