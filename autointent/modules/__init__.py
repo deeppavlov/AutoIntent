@@ -19,6 +19,7 @@ from .scoring import (
     KNNScorer,
     LinearScorer,
     MLKnnScorer,
+    PTuningScorer,
     RerankScorer,
     SklearnScorer,
 )
@@ -46,6 +47,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         SklearnScorer,
         MLKnnScorer,
         BertScorer,
+        PTuningScorer,
     ]
 )
 
