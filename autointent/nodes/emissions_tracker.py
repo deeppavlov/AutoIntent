@@ -50,4 +50,4 @@ class EmissionsTracker:
             Dictionary of processed emissions metrics with the 'emissions/' prefix.
         """
         emissions_data_dict = json.loads(emissions_data.toJSON())
-        return {f"emissions/{k}": v for k, v in emissions_data_dict.items()}
+        return {f"emissions/{k}": v for k, v in emissions_data_dict.items() if isinstance(v, int | float)}
