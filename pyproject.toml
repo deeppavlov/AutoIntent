@@ -158,6 +158,13 @@ pythonpath = "autointent"
 branch = true
 omit = [
     "__init__.py",
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/venv/*",
+    "*/.env/*",
+    "*/.venv/*",
+    "*/virtualenv/*",
+    "*/tests/*",
 ]
 
 [tool.coverage.paths]
