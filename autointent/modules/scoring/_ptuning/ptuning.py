@@ -27,7 +27,7 @@ class PTuningScorer(BaseScorer):
     """PEFT P-tuning scorer.
 
     Args:
-        model_config: Config of the base transformer model (HFModelConfig)
+        base_model_config: Config of the base transformer model (HFModelConfig)
         num_train_epochs: Number of training epochs
         batch_size: Batch size for training
         learning_rate: Learning rate for training
@@ -53,21 +53,20 @@ class PTuningScorer(BaseScorer):
 
     def __init__(
         self,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        base_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore
         **ptuning_kwargs: dict[str, Any],
     ) -> None:
-        self.model_config = HFModelConfig.from_search_config(model_config)
+        self.base_model_config = HFModelConfig.from_search_config(base_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
-        self._multilabel = False
         self._model = None
         self._tokenizer = None
         self._ptuning_config = PromptEncoderConfig(**ptuning_kwargs)  # type: ignore[arg-type]
@@ -76,7 +75,7 @@ class PTuningScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        base_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -87,20 +86,20 @@ class PTuningScorer(BaseScorer):
 
         Args:
             context: Context containing configurations and utilities
-            model_config: Config of the base model, or None to use the best embedder
+            base_model_config: Config of the base model, or None to use the best embedder
             num_train_epochs: Number of training epochs
             batch_size: Batch size for training
             learning_rate: Learning rate for training
             seed: Random seed for reproducibility
             **ptuning_kwargs: Arguments for PromptEncoderConfig
         """
-        if model_config is None:
-            model_config = context.resolve_embedder()
+        if base_model_config is None:
+            base_model_config = context.resolve_embedder()
 
         report_to = context.logging_config.report_to
 
         return cls(
-            model_config=model_config,
+            base_model_config=base_model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
@@ -111,7 +110,7 @@ class PTuningScorer(BaseScorer):
 
     def get_embedder_config(self) -> dict[str, Any]:
         """Return the configuration of the base model."""
-        return self.model_config.model_dump()
+        return self.base_model_config.model_dump()
 
     def fit(
         self,
@@ -128,7 +127,7 @@ class PTuningScorer(BaseScorer):
             self.clear_cache()
         self._validate_task(labels)
 
-        model_name = self.model_config.model_name
+        model_name = self.base_model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
@@ -140,11 +139,11 @@ class PTuningScorer(BaseScorer):
 
         self._model = get_peft_model(self._model, self._ptuning_config)
 
-        use_cpu = self.model_config.device == "cpu"
+        use_cpu = self.base_model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
+                examples["text"], return_tensors="pt", **self.base_model_config.tokenizer_config.model_dump()
             )
 
         dataset_dict = {"text": utterances, "labels": labels}
@@ -199,7 +198,7 @@ class PTuningScorer(BaseScorer):
         Raises:
             RuntimeError: If the model is not trained yet
         """
-        if not hasattr(self, "_model") or not hasattr(self, "_tokenizer"):
+        if self._model is None or self._tokenizer is None:
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
@@ -209,7 +208,7 @@ class PTuningScorer(BaseScorer):
         for i in range(0, len(utterances), self.batch_size):
             batch_utterances = utterances[i : i + self.batch_size]
             inputs = self._tokenizer(
-                batch_utterances, return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
+                batch_utterances, return_tensors="pt", **self.base_model_config.tokenizer_config.model_dump()
             )
             inputs = {k: v.to(device) for k, v in inputs.items()}
 
