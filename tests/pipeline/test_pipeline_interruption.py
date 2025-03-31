@@ -96,7 +96,6 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
         second_run_trials.add(trial.number)
         return original_objective2(trial, *args, **kwargs)
 
-    # pipeline_optimizer.nodes[NodeType.scoring].objective = tracking_objective2
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
     with patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=tracking_objective2):
@@ -121,3 +120,30 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
                 f"Database {db_file.name} did not have more trials after second run "
                 f"({trials_after_first_run[db_file.name]} vs {trials_after_second_run})"
             )
+
+
+def test_resuming_with_memory_storage_warning(dataset_no_oos, tmp_path, caplog):
+    """Test that a warning is issued when trying to resume with memory storage."""
+    project_dir = tmp_path
+    search_space = get_search_space("optuna")
+
+    # Setup first pipeline with memory storage
+    logging_config = LoggingConfig(
+        project_dir=project_dir,
+        run_name="test_memory_storage_warning",
+        dump_modules=False,  # Keep modules in RAM
+        clear_ram=False,
+    )
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+    pipeline_optimizer.set_config(logging_config)
+    pipeline_optimizer.set_config(DataConfig(
+        scheme="ho",
+        separation_ratio=None,
+        n_folds=2,
+        validation_size=0.2
+    ))
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
+
+    assert any("Memory storage is not compatible with resuming optimization" in record.message for record in caplog.records)
+

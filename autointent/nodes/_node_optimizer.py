@@ -113,6 +113,12 @@ class NodeOptimizer:
             )
             self._counter = max(self._counter, finished_trials)
 
+            # if n_trials == 0:
+            #     config = self.suggest(Trial(), search_space)
+            #
+            #     module = self.node_info.modules_available[module_name]
+            #     module.load()
+
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
 
