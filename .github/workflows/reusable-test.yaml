@@ -24,6 +24,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Cache Hugging Face
+      id: cache-hf
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/huggingface
+        key: ${{ runner.os }}-hf
+
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
