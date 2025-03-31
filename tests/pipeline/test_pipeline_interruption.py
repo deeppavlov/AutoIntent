@@ -137,13 +137,9 @@ def test_resuming_with_memory_storage_warning(dataset_no_oos, tmp_path, caplog):
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
-    pipeline_optimizer.set_config(DataConfig(
-        scheme="ho",
-        separation_ratio=None,
-        n_folds=2,
-        validation_size=0.2
-    ))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None, n_folds=2, validation_size=0.2))
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
 
-    assert any("Memory storage is not compatible with resuming optimization" in record.message for record in caplog.records)
-
+    assert any(
+        "Memory storage is not compatible with resuming optimization" in record.message for record in caplog.records
+    )
