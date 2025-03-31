@@ -51,6 +51,9 @@ class LoggingConfig(BaseModel):
     report_to: list[REPORTERS_NAMES] | None = Field(  # type: ignore[valid-type]
         None, description="List of callbacks to report to. If None, no callbacks will be used"
     )
+    log_interval_time: float = Field(
+        0.1, description="Sampling interval for the system monitor in seconds for Wandb logger."
+    )
     """List of callbacks to report to. If None, no callbacks will be used"""
 
     @property
