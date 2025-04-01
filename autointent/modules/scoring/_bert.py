@@ -7,6 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
+from sklearn.preprocessing import LabelEncoder
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -79,6 +80,10 @@ class BertScorer(BaseScorer):
     ) -> None:
         if hasattr(self, "_model"):
             self.clear_cache()
+        if not isinstance(labels[0], list) and isinstance(labels[0], str):
+            self._label_encoder = LabelEncoder()
+            encoded_labels = self._label_encoder.fit_transform(labels)
+            labels = encoded_labels.tolist()
         self._validate_task(labels)
 
         model_name = self.model_config.model_name
@@ -88,30 +93,20 @@ class BertScorer(BaseScorer):
         id2label = {i: i for i in range(self._n_classes)}
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name,
-            num_labels=self._n_classes,
-            label2id=label2id,
-            id2label=id2label,
-            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+            model_name, num_labels=self._n_classes, label2id=label2id, id2label=id2label
         )
 
         use_cpu = self.model_config.device == "cpu"
 
-        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
-            )
-
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
 
-        if self._multilabel:
-            # hugging face uses F.binary_cross_entropy_with_logits under the hood
-            # which requires target labels to be of float type
-            dataset = dataset.map(
-                lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns="labels"
-            )
+        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
+            tokenizer_options = self.model_config.tokenizer_config.model_dump()
+            tokenizer_options.pop("padding", None)
+            tokenizer_options.pop("truncation", None)
+            return self._tokenizer(examples["text"], truncation=True, padding=False, **tokenizer_options)
 
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
+        tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
@@ -127,12 +122,14 @@ class BertScorer(BaseScorer):
                 use_cpu=use_cpu,
             )
 
+            data_collator = DataCollatorWithPadding(tokenizer=self._tokenizer)
+
             trainer = Trainer(
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset,
                 tokenizer=self._tokenizer,
-                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
+                data_collator=data_collator,
             )
 
             trainer.train()
@@ -146,9 +143,12 @@ class BertScorer(BaseScorer):
 
         device = next(self._model.parameters()).device
         all_predictions = []
+        tokenizer_options = self.model_config.tokenizer_config.model_dump()
+        tokenizer_options.pop("padding", None)
+        tokenizer_options.pop("truncation", None)
         for i in range(0, len(utterances), self.batch_size):
             batch = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            inputs = self._tokenizer(batch, return_tensors="pt", padding=True, truncation=True, **tokenizer_options)
             inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**inputs)
