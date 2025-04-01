@@ -123,7 +123,7 @@ class PTuningScorer(BaseScorer):
             utterances: List of training utterances
             labels: List of labels corresponding to the utterances
         """
-        if hasattr(self, "_model"):
+        if getattr(self, "_model", None) is not None:
             self.clear_cache()
         self._validate_task(labels)
 
