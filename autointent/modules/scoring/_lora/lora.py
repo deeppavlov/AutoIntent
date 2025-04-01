@@ -37,7 +37,7 @@ class BERTLoRAScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
         **lora_kwargs: Any, # noqa: ANN401
     ) -> None:
         self.model_config = HFModelConfig.from_search_config(model_config)
@@ -53,7 +53,7 @@ class BERTLoRAScorer(BaseScorer):
         cls,
         context: Context,
         model_config: HFModelConfig | str | dict[str, Any] | None = None,
-        num_train_epochs: int = 10,
+        num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
@@ -67,7 +67,7 @@ class BERTLoRAScorer(BaseScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            report_to=context.logging_config.report_to
+            report_to=context.logging_config.report_to,
             **lora_kwargs,
         )
 
@@ -86,8 +86,15 @@ class BERTLoRAScorer(BaseScorer):
 
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=self._n_classes)
+        self._model = AutoModelForSequenceClassification.from_pretrained(
+            model_name, 
+            num_labels=self._n_classes,
+            problem_type="multi_label_classification" if self._multilabel else "single_label_classification"
+            )
         self._model = get_peft_model(self._model, self._lora_config)
+
+        device = torch.device(self.model_config.device)
+        self._model = self._model.to(device)
 
         use_cpu = self.model_config.device == "cpu"
 
@@ -129,18 +136,22 @@ class BERTLoRAScorer(BaseScorer):
         if not hasattr(self, "_model") or not hasattr(self, "_tokenizer"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
+        
+        device = torch.device(self.model_config.device)
+        self._model = self._model.to(device)
 
         all_predictions = []
         for i in range(0, len(utterances), self.batch_size):
             batch = utterances[i : i + self.batch_size]
             inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**inputs)
                 logits = outputs.logits
             if self._multilabel:
-                batch_predictions = torch.sigmoid(logits).numpy()
+                batch_predictions = torch.sigmoid(logits).cpu().numpy()
             else:
-                batch_predictions = torch.softmax(logits, dim=1).numpy()
+                batch_predictions = torch.softmax(logits, dim=1).cpu().numpy()
             all_predictions.append(batch_predictions)
         return np.vstack(all_predictions) if all_predictions else np.array([])
 
