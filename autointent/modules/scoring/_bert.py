@@ -1,7 +1,7 @@
 """BertScorer class for transformer-based classification."""
 
 import tempfile
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -11,6 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
+    BatchEncoding,
     DataCollatorWithPadding,
     Trainer,
     TrainingArguments,
@@ -78,13 +79,21 @@ class BertScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        if hasattr(self, "_model"):
-            self.clear_cache()
-        if not isinstance(labels[0], list) and isinstance(labels[0], str):
+        self.clear_cache()
+
+        processed_labels: list[int] | list[list[int]]
+
+        if labels and all(isinstance(item, str) for item in labels):
             self._label_encoder = LabelEncoder()
-            encoded_labels = self._label_encoder.fit_transform(labels)
-            labels = encoded_labels.tolist()
-        self._validate_task(labels)
+            labels_str = cast(list[str], labels)
+            encoded_labels_array = self._label_encoder.fit_transform(labels_str)
+            processed_labels = encoded_labels_array.tolist()
+        else:
+            processed_labels = cast(list[int] | list[list[int]], labels)
+            if hasattr(self, "_label_encoder"):
+                del self._label_encoder
+
+        self._validate_task(processed_labels)
 
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -98,13 +107,16 @@ class BertScorer(BaseScorer):
 
         use_cpu = self.model_config.device == "cpu"
 
-        dataset = Dataset.from_dict({"text": utterances, "labels": labels})
+        dataset = Dataset.from_dict({"text": utterances, "labels": processed_labels})
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             tokenizer_options = self.model_config.tokenizer_config.model_dump()
             tokenizer_options.pop("padding", None)
             tokenizer_options.pop("truncation", None)
-            return self._tokenizer(examples["text"], truncation=True, padding=False, **tokenizer_options)
+            tokenized_output: BatchEncoding = self._tokenizer(
+                examples["text"], truncation=True, padding=False, **tokenizer_options
+            )
+            return dict(tokenized_output)
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
 
@@ -158,10 +170,12 @@ class BertScorer(BaseScorer):
             else:
                 batch_predictions = torch.softmax(logits, dim=1).cpu().numpy()
             all_predictions.append(batch_predictions)
-        return np.vstack(all_predictions) if all_predictions else np.array([])
+        return np.vstack(all_predictions).astype(np.float32) if all_predictions else np.array([], dtype=np.float32)
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
             del self._model
         if hasattr(self, "_tokenizer"):
             del self._tokenizer
+        if hasattr(self, "_label_encoder"):
+            del self._label_encoder

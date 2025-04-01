@@ -28,7 +28,7 @@ ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[
 ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes
     | TagsList
-    | np.ndarray
+    | npt.NDArray[Any]
     | Embedder
     | VectorIndex
     | BaseEstimator
@@ -208,7 +208,7 @@ class Dumper:
                                     logger.error("No type annotation found for pydantic model %s", variable_name)
                                     continue
 
-                                potential_types = []
+                                potential_types: list[Any] = []  # Added type annotation
                                 if get_origin(model_type) in (UnionType, Union):
                                     potential_types.extend(get_args(model_type))
                                 else:
