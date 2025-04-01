@@ -87,13 +87,13 @@ class BERTLoRAScorer(BaseScorer):
         model_name = self.model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name, 
+            model_name,
             num_labels=self._n_classes,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification"
             )
         self._model = get_peft_model(self._model, self._lora_config)
 
-        device = torch.device(self.model_config.device if self.model_config.device else 'cpu')
+        device = torch.device(self.model_config.device if self.model_config.device else "cpu")
         self._model = self._model.to(device)
 
         use_cpu = self.model_config.device == "cpu"
@@ -136,8 +136,8 @@ class BERTLoRAScorer(BaseScorer):
         if not hasattr(self, "_model") or not hasattr(self, "_tokenizer"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
-        
-        device = torch.device(self.model_config.device if self.model_config.device else 'cpu')
+
+        device = torch.device(self.model_config.device if self.model_config.device else "cpu")
         self._model = self._model.to(device)
 
         all_predictions = []
