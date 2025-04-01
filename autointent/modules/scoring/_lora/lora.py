@@ -93,7 +93,7 @@ class BERTLoRAScorer(BaseScorer):
             )
         self._model = get_peft_model(self._model, self._lora_config)
 
-        device = torch.device(self.model_config.device)
+        device = torch.device(self.model_config.device if self.model_config.device else 'cpu')
         self._model = self._model.to(device)
 
         use_cpu = self.model_config.device == "cpu"
@@ -137,7 +137,7 @@ class BERTLoRAScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
         
-        device = torch.device(self.model_config.device)
+        device = torch.device(self.model_config.device if self.model_config.device else 'cpu')
         self._model = self._model.to(device)
 
         all_predictions = []
