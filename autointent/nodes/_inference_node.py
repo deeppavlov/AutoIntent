@@ -34,8 +34,8 @@ class InferenceNode:
         module = node_info.modules_available[config.module_name](**config.module_config)
         module.load(
             config.load_path,
-            embedder_config=config.embedder_config,
-            cross_encoder_config=config.cross_encoder_config,
+            embedder_config=getattr(config, "embedder_config", None),
+            cross_encoder_config=getattr(config, "cross_encoder_config", None),
         )
         return cls(module, config.node_type)
 

@@ -17,6 +17,7 @@ from typing_extensions import assert_never
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 
 
@@ -67,6 +68,7 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
+        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -141,8 +143,13 @@ class NodeOptimizer:
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 
         self._logger.debug("Scoring %s module...", module_name)
-        all_metrics = module.score(context, metrics=self.metrics)
-        target_metric = all_metrics[self.target_metric]
+
+        self.emissions_tracker.start_task("module_scoring")
+        final_metrics = module.score(context, metrics=self.metrics)
+        emissions_metrics = self.emissions_tracker.stop_task()
+        all_metrics = {**final_metrics, **emissions_metrics}
+
+        target_metric = final_metrics[self.target_metric]
 
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
@@ -161,7 +168,7 @@ class NodeOptimizer:
             config,
             target_metric,
             self.target_metric,
-            all_metrics,
+            final_metrics,
             module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,

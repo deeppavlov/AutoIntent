@@ -128,7 +128,7 @@ class SklearnScorer(BaseScorer):
                 model_name=self.embedder_config.model_name,
                 device=self.embedder_config.device,
                 batch_size=self.embedder_config.batch_size,
-                max_length=self.embedder_config.max_length,
+                tokenizer_config=self.embedder_config.tokenizer_config,
                 use_cache=self.embedder_config.use_cache,
             )
         )

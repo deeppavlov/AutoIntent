@@ -2,14 +2,16 @@
 
 from ._inference_node import InferenceNodeConfig
 from ._optimization import DataConfig, LoggingConfig
-from ._transformers import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum
+from ._transformers import CrossEncoderConfig, EmbedderConfig, HFModelConfig, TaskTypeEnum, TokenizerConfig
 
 __all__ = [
     "CrossEncoderConfig",
     "DataConfig",
     "EmbedderConfig",
+    "HFModelConfig",
     "InferenceNodeConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
     "TaskTypeEnum",
+    "TokenizerConfig",
 ]
