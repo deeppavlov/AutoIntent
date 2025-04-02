@@ -44,10 +44,6 @@ class PTuningScorer(BaseScorer):
     """
 
     name = "ptuning"
-    _multilabel: bool
-    _model: Any
-    _tokenizer: Any
-    _n_classes: int
     supports_multiclass = True
     supports_multilabel = True
 
@@ -58,7 +54,7 @@ class PTuningScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         **ptuning_kwargs: dict[str, Any],
     ) -> None:
         self.base_model_config = HFModelConfig.from_search_config(base_model_config)
@@ -67,8 +63,8 @@ class PTuningScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
-        self._model = None
-        self._tokenizer = None
+        self._model: Any = None
+        self._tokenizer: Any = None
         self._ptuning_config = PromptEncoderConfig(**ptuning_kwargs)  # type: ignore[arg-type]
 
     @classmethod
