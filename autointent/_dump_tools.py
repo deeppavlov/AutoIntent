@@ -209,7 +209,7 @@ class Dumper:
                         model_class = getattr(module, class_info["name"])
 
                         hf_models[model_dir.name] = model_class.from_pretrained(model_dir)
-                    except Exception as e:
+                    except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.hf_tokenizers:
@@ -222,7 +222,7 @@ class Dumper:
                         tokenizer_class = getattr(module, class_info["name"])
 
                         hf_tokenizers[tokenizer_dir.name] = tokenizer_class.from_pretrained(tokenizer_dir)
-                    except Exception as e:
+                    except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
             else:
