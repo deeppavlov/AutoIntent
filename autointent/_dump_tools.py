@@ -171,18 +171,20 @@ class Dumper:
                         content = json.load(file)
                     variable_name = model_file.stem
 
+                    # First try to get the type annotation from the class annotations.
                     model_type = obj.__class__.__annotations__.get(variable_name)
 
+                    # Fallback: inspect __init__ signature if not found in class-level annotations.
                     if model_type is None:
                         sig = inspect.signature(obj.__init__)
                         if variable_name in sig.parameters:
                             model_type = sig.parameters[variable_name].annotation
-
                     if model_type is None:
                         msg = f"No type annotation found for {variable_name}"
                         logger.error(msg)
                         continue
 
+                    # If the annotation is a Union, extract the pydantic model type.
                     if get_origin(model_type) in (UnionType, Union):
                         for arg in get_args(model_type):
                             if isinstance(arg, type) and issubclass(arg, BaseModel):
