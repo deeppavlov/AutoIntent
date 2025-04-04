@@ -9,7 +9,7 @@ def test_bert_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -46,7 +46,7 @@ def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 

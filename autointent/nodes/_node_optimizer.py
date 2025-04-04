@@ -11,7 +11,6 @@ from typing import Any
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field
 from typing_extensions import assert_never
 
 from autointent import Dataset
@@ -19,25 +18,7 @@ from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
-
-
-class ParamSpaceInt(BaseModel):
-    """Integer parameter search space configuration."""
-
-    low: int = Field(..., description="Lower boundary of the search space.")
-    high: int = Field(..., description="Upper boundary of the search space.")
-    step: int = Field(1, description="Step size for the search space.")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
-
-class ParamSpaceFloat(BaseModel):
-    """Float parameter search space configuration."""
-
-    low: float = Field(..., description="Lower boundary of the search space.")
-    high: float = Field(..., description="Upper boundary of the search space.")
-    step: float | None = Field(None, description="Step size for the search space (if applicable).")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
+from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, SearchSpaceConfig
 
 logger = logging.getLogger(__name__)
 
@@ -277,7 +258,8 @@ class NodeOptimizer:
 
     def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
         """Check if search space is configured correctly."""
-        for module_search_space in search_space:
+        validated_search_space = SearchSpaceConfig(search_space).model_dump()
+        for module_search_space in validated_search_space:
             module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
             for params_combination in it.product(*module_search_space_no_optuna.values()):
