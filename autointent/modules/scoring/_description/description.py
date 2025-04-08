@@ -174,6 +174,10 @@ class DescriptionScorer(BaseScorer):
                 error_text = "Cross encoder is not initialized. Call fit() before predict()."
                 raise RuntimeError(error_text)
 
+            if self._description_texts is None:
+                error_text = "Description texts are not initialized. Call fit() before predict()."
+                raise RuntimeError(error_text)
+
             pairs = [(utterance, description) for utterance in utterances for description in self._description_texts]
 
             scores = self._cross_encoder.predict(pairs)
