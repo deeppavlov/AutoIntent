@@ -57,7 +57,7 @@ class BERTLoRAScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **lora_kwargs: Any, # noqa: ANN401
+        **lora_kwargs: dict[str, Any],
     ) -> "BERTLoRAScorer":
         if model_config is None:
             model_config = context.resolve_embedder()
