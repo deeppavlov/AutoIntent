@@ -19,7 +19,7 @@ def test_decision_multiclass(scoring_optimizer_multiclass):
         "node_type": "decision",
         "search_space": [
             {"module_name": "threshold", "thresh": [0.5]},
-            {"module_name": "tunable", "n_trials": [None, 3]},
+            {"module_name": "tunable", "n_trials": 3},
             {
                 "module_name": "argmax",
             },
@@ -58,7 +58,7 @@ def test_decision_multilabel(scoring_optimizer_multilabel):
         "node_type": "decision",
         "search_space": [
             {"module_name": "threshold", "thresh": [0.5]},
-            {"module_name": "tunable", "n_trials": [None, 3]},
+            {"module_name": "tunable", "n_trials": 3},
             {"module_name": "adaptive"},
         ],
     }

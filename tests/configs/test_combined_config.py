@@ -74,8 +74,7 @@ def test_invalid_optimizer_config_missing_field():
 
 def test_invalid_optimizer_config_wrong_type():
     """Test that an invalid field type raises ValidationError."""
-    invalid_config = [
-        {
+    invalid_config = {
             "node_type": "scoring",
             "target_metric": "scoring_roc_auc",
             "search_space": [
@@ -87,7 +86,6 @@ def test_invalid_optimizer_config_wrong_type():
                 }
             ],
         }
-    ]
 
     with pytest.raises(TypeError):
         NodeOptimizer(**invalid_config)
