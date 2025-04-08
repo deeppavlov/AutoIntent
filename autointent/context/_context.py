@@ -1,6 +1,5 @@
 """Context manager for configuring and managing data handling, vector indexing, and optimization."""
 
-import json
 import logging
 from pathlib import Path
 
@@ -10,7 +9,6 @@ from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
 
-from ._utils import NumpyEncoder
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 

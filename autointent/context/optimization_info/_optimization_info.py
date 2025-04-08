@@ -6,17 +6,17 @@ trials, and modules during the pipeline's execution.
 
 import logging
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
-from pathlib import Path
 
+from autointent._dump_tools import Dumper
 from autointent.configs import EmbedderConfig, InferenceNodeConfig
 from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
-from ..._dump_tools import Dumper
 
 if TYPE_CHECKING:
     from autointent.modules.base import BaseModule
