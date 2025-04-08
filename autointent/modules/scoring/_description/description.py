@@ -161,10 +161,7 @@ class DescriptionScorer(BaseScorer):
             utterance_vectors = self._embedder.embed(utterances, TaskTypeEnum.sts)
             similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
         else:
-            pairs = []
-            pairs.extend(
-                [(utterance, description) for utterance in utterances for description in self._description_texts]
-            )
+            pairs = [(utterance, description) for utterance in utterances for description in self._description_texts]
 
             scores = self._cross_encoder.predict(pairs)
             similarities = np.array(scores).reshape(len(utterances), len(self._description_texts))
