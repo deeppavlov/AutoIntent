@@ -47,6 +47,8 @@ def test_scoring_multiclass(embedding_optimizer_multiclass):
                 "module_name": "description",
                 "temperature": [1.0, 0.5, 0.1, 0.05],
                 "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
+                "encoder_type": ["bi", "cross"],
+                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
             },
             {
                 "module_name": "rerank",
@@ -103,6 +105,13 @@ def test_scoring_multilabel(embedding_optimizer_multilabel):
                     "LogisticRegression",
                     "RandomForestClassifier",
                 ],
+            },
+            {
+                "module_name": "description",
+                "temperature": [1.0, 0.5, 0.1, 0.05],
+                "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
+                "encoder_type": ["bi", "cross"],
+                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
             },
             {
                 "module_name": "rerank",
