@@ -205,4 +205,5 @@ class Embedder:
         Returns:
             A numpy array of similarities.
         """
-        return self.embedding_model.similarity(embeddings1, embeddings2)
+        result = self.embedding_model.similarity(embeddings1, embeddings2)
+        return result.detach().cpu().numpy().astype(np.float32)
