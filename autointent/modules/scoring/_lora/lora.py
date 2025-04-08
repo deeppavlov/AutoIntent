@@ -104,6 +104,11 @@ class BERTLoRAScorer(BaseScorer):
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
+        if self._multilabel:
+            dataset = dataset.map(
+                lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns=["labels"]
+            )
+            dataset = dataset.rename_column("label", "labels")
         tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
