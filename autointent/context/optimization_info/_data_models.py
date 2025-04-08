@@ -136,6 +136,15 @@ class Artifacts(BaseModel):
         """
         return self.get_artifacts(node_type)[idx]
 
+    def has_artifacts(self) -> bool:
+        """Check if any artifacts have been saved in RAM.
+
+        Returns:
+            True if any artifacts exist, False otherwise.
+        """
+        node_types = [NodeType.regex, NodeType.embedding, NodeType.scoring, NodeType.decision]
+        return any(len(self.get_artifacts(nt)) > 0 for nt in node_types)
+
 
 class Trial(BaseModel):
     """Representation of an individual optimization trial.

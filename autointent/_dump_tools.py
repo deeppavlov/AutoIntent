@@ -81,7 +81,7 @@ class Dumper:
                 joblib.dump(val, path / Dumper.estimators / key)
             elif isinstance(val, Ranker):
                 val.save(str(path / Dumper.cross_encoders / key))
-            elif isinstance(val, CrossEncoderConfig | EmbedderConfig):
+            elif isinstance(val, BaseModel):
                 try:
                     pydantic_path = path / Dumper.pydantic_models / f"{key}.json"
                     with pydantic_path.open("w", encoding="utf-8") as file:

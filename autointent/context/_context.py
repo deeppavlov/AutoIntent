@@ -77,15 +77,9 @@ class Context:
         Save metrics, hyperparameters, inference, configurations, and datasets to disk.
         """
         self._logger.debug("dumping logs...")
-        optimization_results = self.optimization_info.dump_evaluation_results()
-
         logs_dir = self.logging_config.dirpath
-        logs_dir.mkdir(parents=True, exist_ok=True)
 
-        logs_path = logs_dir / "logs.json"
-        with logs_path.open("w") as file:
-            json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-
+        self.optimization_info.dump(logs_dir)
         self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
@@ -94,6 +88,18 @@ class Context:
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
+
+    def load(self) -> None:
+        """Load all information about optimization process from disk."""
+        self._logger.debug("loading logs...")
+        logs_dir = self.logging_config.dirpath
+        self.optimization_info.load(logs_dir)
+        if not self.optimization_info.artifacts.has_artifacts():
+            msg = (
+                "It is impossible to continue from the previous point, "
+                "start again with dump_modules=True settings if you want to resume the run"
+            )
+            raise RuntimeError(msg)
 
     def get_dump_dir(self) -> Path | None:
         """Get the directory for saving dumped modules.

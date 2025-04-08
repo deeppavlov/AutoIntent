@@ -10,11 +10,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
+from pathlib import Path
 
 from autointent.configs import EmbedderConfig, InferenceNodeConfig
 from autointent.custom_types import NodeType
 
 from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from ..._dump_tools import Dumper
 
 if TYPE_CHECKING:
     from autointent.modules.base import BaseModule
@@ -55,6 +57,19 @@ class ModulesList:
             module: The module to add.
         """
         self.get(node_type).append(module)
+
+    def model_dump(self) -> dict[str, list["BaseModule"]]:
+        """Dump the modules to a dictionary format.
+
+        Returns:
+            Dictionary representation of the modules.
+        """
+        return {
+            "regex": self.regex,
+            "embedding": self.embedding,
+            "scoring": self.scoring,
+            "decision": self.decision,
+        }
 
 
 class OptimizationInfo:
@@ -225,7 +240,17 @@ class OptimizationInfo:
             "pipeline_metrics": self.pipeline_metrics,
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
+            "artifacts": self.artifacts.model_dump(),
+            "modules": self.modules.model_dump(),
         }
+
+    def dump(self, path: Path) -> None:
+        """Dump the optimization information to a file."""
+        Dumper.dump(self, path / "optimization_info")
+
+    def load(self, path: Path) -> None:
+        """Load the optimization information from a file."""
+        Dumper.load(self, path / "optimization_info")
 
     def get_inference_nodes_config(self, asdict: bool = False) -> list[InferenceNodeConfig]:
         """Generate configuration for inference nodes based on the best trials.
