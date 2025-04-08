@@ -6,7 +6,6 @@ import numpy as np
 import scipy
 from numpy.typing import NDArray
 from pydantic import PositiveFloat
-from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent import Context, Embedder, Ranker
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum
@@ -159,7 +158,7 @@ class DescriptionScorer(BaseScorer):
         """
         if self._encoder_type == "bi":
             utterance_vectors = self._embedder.embed(utterances, TaskTypeEnum.sts)
-            similarities: NDArray[np.float64] = cosine_similarity(utterance_vectors, self._description_vectors)
+            similarities: NDArray[np.float64] = self._embedder.similarity(utterance_vectors, self._description_vectors)
         else:
             pairs = [(utterance, description) for utterance in utterances for description in self._description_texts]
 

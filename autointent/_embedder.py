@@ -50,6 +50,8 @@ class EmbedderDumpMetadata(TypedDict):
     """Maximum sequence length for the embedding model."""
     use_cache: bool
     """Whether to use embeddings caching."""
+    similarity_fn_name: str | None
+    """Name of the similarity function to use."""
 
 
 class Embedder:
@@ -73,7 +75,10 @@ class Embedder:
         self.config = embedder_config
 
         self.embedding_model = SentenceTransformer(
-            self.config.model_name, device=self.config.device, prompts=embedder_config.get_prompt_config()
+            self.config.model_name,
+            device=self.config.device,
+            prompts=embedder_config.get_prompt_config(),
+            similarity_fn_name=self.config.similarity_fn_name,
         )
 
         self._logger = logging.getLogger(__name__)
@@ -116,6 +121,7 @@ class Embedder:
             batch_size=self.config.batch_size,
             max_length=self.config.tokenizer_config.max_length,
             use_cache=self.config.use_cache,
+            similarity_fn_name=self.config.similarity_fn_name,
         )
         path.mkdir(parents=True, exist_ok=True)
         with (path / self._metadata_dict_name).open("w") as file:
@@ -186,3 +192,17 @@ class Embedder:
             np.save(embeddings_path, embeddings)
 
         return embeddings
+
+    def similarity(
+        self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
+    ) -> npt.NDArray[np.float32]:
+        """Calculate similarity between two sets of embeddings.
+
+        Args:
+            embeddings1: First set of embeddings.
+            embeddings2: Second set of embeddings.
+
+        Returns:
+            A numpy array of similarities.
+        """
+        return self.embedding_model.similarity(embeddings1, embeddings2)
