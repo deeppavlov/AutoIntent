@@ -156,14 +156,28 @@ class DescriptionScorer(BaseScorer):
         Returns:
             Array of probabilities for each utterance
         """
+        if self._description_vectors is None:
+            error_text = "Description vectors are not initialized. Call fit() before predict()."
+            raise RuntimeError(error_text)
+
         if self._encoder_type == "bi":
+            if self._embedder is None:
+                error_text = "Embedder is not initialized. Call fit() before predict()."
+                raise RuntimeError(error_text)
+
             utterance_vectors = self._embedder.embed(utterances, TaskTypeEnum.sts)
-            similarities: NDArray[np.float64] = self._embedder.similarity(utterance_vectors, self._description_vectors)
+            similarities: NDArray[np.float64] = np.array(
+                self._embedder.similarity(utterance_vectors, self._description_vectors), dtype=np.float64
+            )
         else:
+            if self._cross_encoder is None:
+                error_text = "Cross encoder is not initialized. Call fit() before predict()."
+                raise RuntimeError(error_text)
+
             pairs = [(utterance, description) for utterance in utterances for description in self._description_texts]
 
             scores = self._cross_encoder.predict(pairs)
-            similarities = np.array(scores).reshape(len(utterances), len(self._description_texts))
+            similarities = np.array(scores, dtype=np.float64).reshape(len(utterances), len(self._description_texts))
 
         if self._multilabel:
             probabilities = scipy.special.expit(similarities / self.temperature)
