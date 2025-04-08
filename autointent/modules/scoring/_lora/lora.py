@@ -38,7 +38,7 @@ class BERTLoRAScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
-        **lora_kwargs: Any, # noqa: ANN401
+        **lora_kwargs: dict[str, Any],
     ) -> None:
         self.model_config = HFModelConfig.from_search_config(model_config)
         self.num_train_epochs = num_train_epochs
