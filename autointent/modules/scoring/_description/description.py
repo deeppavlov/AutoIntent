@@ -156,11 +156,11 @@ class DescriptionScorer(BaseScorer):
         Returns:
             Array of probabilities for each utterance
         """
-        if self._description_vectors is None:
-            error_text = "Description vectors are not initialized. Call fit() before predict()."
-            raise RuntimeError(error_text)
-
         if self._encoder_type == "bi":
+            if self._description_vectors is None:
+                error_text = "Description vectors are not initialized. Call fit() before predict()."
+                raise RuntimeError(error_text)
+
             if self._embedder is None:
                 error_text = "Embedder is not initialized. Call fit() before predict()."
                 raise RuntimeError(error_text)
