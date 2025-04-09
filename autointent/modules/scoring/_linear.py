@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
@@ -22,7 +23,6 @@ class LinearScorer(BaseScorer):
     Args:
         embedder_config: Config of the embedder model
         cv: Number of cross-validation folds, defaults to 3
-        n_jobs: Number of parallel jobs for cross-validation, defaults to None
         seed: Random seed for reproducibility, defaults to 0
 
     Example:
@@ -72,18 +72,21 @@ class LinearScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
+        cv: PositiveInt = 3,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "LinearScorer":
         """Create a LinearScorer instance using a Context object.
 
         Args:
             context: Context containing configurations and utilities
+            cv: Number of cross-validation folds, defaults to 3
             embedder_config: Config of the embedder, or None to use the best embedder
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
 
         return cls(
+            cv=cv,
             embedder_config=embedder_config,
         )
 

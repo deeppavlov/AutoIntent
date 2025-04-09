@@ -54,4 +54,25 @@ DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
 )
 
 
-__all__ = []  # type: ignore[var-annotated]
+__all__ = [
+    "AdaptiveDecision",
+    "ArgmaxDecision",
+    "BaseDecision",
+    "BaseEmbedding",
+    "BaseModule",
+    "BaseRegex",
+    "BaseScorer",
+    "DNNCScorer",
+    "DescriptionScorer",
+    "JinoosDecision",
+    "KNNScorer",
+    "LinearScorer",
+    "LogregAimedEmbedding",
+    "MLKnnScorer",
+    "RerankScorer",
+    "RetrievalAimedEmbedding",
+    "SimpleRegex",
+    "SklearnScorer",
+    "ThresholdDecision",
+    "TunableDecision",
+]
