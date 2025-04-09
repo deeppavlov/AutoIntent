@@ -1,3 +1,4 @@
+import gc
 import shutil
 import tempfile
 from pathlib import Path
@@ -51,6 +52,7 @@ def test_bert_scorer_dump_load(dataset):
 
     finally:
         # Clean up
+        gc.collect() # try to fix windows permission error, i suppose this statement will close all file handlers
         shutil.rmtree(temp_dir_path)
 
 
