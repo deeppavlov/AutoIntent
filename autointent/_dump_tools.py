@@ -13,6 +13,7 @@ from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.context._utils import NumpyEncoder
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
@@ -85,7 +86,7 @@ class Dumper:
                 try:
                     pydantic_path = path / Dumper.pydantic_models / f"{key}.json"
                     with pydantic_path.open("w", encoding="utf-8") as file:
-                        json.dump(val.model_dump(), file, ensure_ascii=False, indent=4)
+                        json.dump(val.model_dump(), file, ensure_ascii=False, indent=4, cls=NumpyEncoder)
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
