@@ -14,7 +14,7 @@ def test_bert_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer_original = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer_original = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -33,7 +33,7 @@ def test_bert_scorer_dump_load(dataset):
         scorer_original.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+        scorer_loaded = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
         scorer_loaded.load(str(temp_dir_path))
 
         # Verify model and tokenizer are loaded
@@ -51,14 +51,14 @@ def test_bert_scorer_dump_load(dataset):
 
     finally:
         # Clean up
-        shutil.rmtree(temp_dir_path)
+        shutil.rmtree(temp_dir_path, ignore_errors=True) # workaround for windows permission error
 
 
 def test_bert_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -95,7 +95,7 @@ def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
