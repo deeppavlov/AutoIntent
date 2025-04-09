@@ -36,7 +36,6 @@ class DescriptionScorer(BaseScorer):
     _multilabel: bool
     _description_vectors: NDArray[Any] | None = None
     _description_texts: list[str] | None = None
-    _encoder_type: Literal["bi", "cross"]
     supports_multiclass = True
     supports_multilabel = True
 
