@@ -6,6 +6,10 @@
       embedder_config:
         - model_name: sentence-transformers/all-MiniLM-L6-v2
           device: cpu
+      cross_encoder_config:
+        - model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
+          device: cpu
+      encoder_type: [cross, bi]
 - node_type: scoring
   target_metric: scoring_roc_auc
   search_space:
