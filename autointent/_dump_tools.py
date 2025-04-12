@@ -33,6 +33,8 @@ class Dumper:
     estimators = "estimators"
     cross_encoders = "cross_encoders"
     pydantic_models: str = "pydantic"
+    hf_models = "hf_models"
+    hf_tokenizers = "hf_tokenizers"
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
@@ -48,12 +50,14 @@ class Dumper:
             path / Dumper.estimators,
             path / Dumper.cross_encoders,
             path / Dumper.pydantic_models,
+            path / Dumper.hf_models,
+            path / Dumper.hf_tokenizers,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
-    def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901
+    def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901, PLR0912, PLR0915
         """Dump modules attributes to filestystem.
 
         Args:
@@ -89,6 +93,28 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
+            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
+                model_path = path / Dumper.hf_models / key
+                model_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    val.save_pretrained(model_path)
+                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
+                    with (model_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                except Exception as e:
+                    msg = f"Error dumping HF model {key}: {e}"
+                    logger.exception(msg)
+            elif (key == "_tokenizer" or "tokenizer" in key.lower()) and hasattr(val, "save_pretrained"):
+                tokenizer_path = path / Dumper.hf_tokenizers / key
+                tokenizer_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    val.save_pretrained(tokenizer_path)
+                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
+                    with (tokenizer_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                except Exception as e:
+                    msg = f"Error dumping HF tokenizer {key}: {e}"
+                    logger.exception(msg)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -114,6 +140,8 @@ class Dumper:
         estimators: dict[str, Any] = {}
         cross_encoders: dict[str, Any] = {}
         pydantic_models: dict[str, Any] = {}
+        hf_models: dict[str, Any] = {}
+        hf_tokenizers: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -151,7 +179,6 @@ class Dumper:
                         sig = inspect.signature(obj.__init__)
                         if variable_name in sig.parameters:
                             model_type = sig.parameters[variable_name].annotation
-
                     if model_type is None:
                         msg = f"No type annotation found for {variable_name}"
                         logger.error(msg)
@@ -174,9 +201,45 @@ class Dumper:
                         continue
 
                     pydantic_models[variable_name] = model_type(**content)
+            elif child.name == Dumper.hf_models:
+                for model_dir in child.iterdir():
+                    try:
+                        with (model_dir / "class_info.json").open("r") as f:
+                            class_info = json.load(f)
+
+                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
+                        model_class = getattr(module, class_info["name"])
+
+                        hf_models[model_dir.name] = model_class.from_pretrained(model_dir)
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading HF model {model_dir.name}: {e}"
+                        logger.exception(msg)
+            elif child.name == Dumper.hf_tokenizers:
+                for tokenizer_dir in child.iterdir():
+                    try:
+                        with (tokenizer_dir / "class_info.json").open("r") as f:
+                            class_info = json.load(f)
+
+                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
+                        tokenizer_class = getattr(module, class_info["name"])
+
+                        hf_tokenizers[tokenizer_dir.name] = tokenizer_class.from_pretrained(tokenizer_dir)
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
+                        logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
+
         obj.__dict__.update(
-            tags | simple_attrs | arrays | embedders | indexes | estimators | cross_encoders | pydantic_models
+            tags
+            | simple_attrs
+            | arrays
+            | embedders
+            | indexes
+            | estimators
+            | cross_encoders
+            | pydantic_models
+            | hf_models
+            | hf_tokenizers
         )

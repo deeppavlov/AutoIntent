@@ -11,32 +11,14 @@ from typing import Any
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field
 from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
-
-
-class ParamSpaceInt(BaseModel):
-    """Integer parameter search space configuration."""
-
-    low: int = Field(..., description="Lower boundary of the search space.")
-    high: int = Field(..., description="Upper boundary of the search space.")
-    step: int = Field(1, description="Step size for the search space.")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
-
-class ParamSpaceFloat(BaseModel):
-    """Float parameter search space configuration."""
-
-    low: float = Field(..., description="Lower boundary of the search space.")
-    high: float = Field(..., description="Upper boundary of the search space.")
-    step: float | None = Field(None, description="Step size for the search space (if applicable).")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
+from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, SearchSpaceConfig
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +49,7 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
+        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -141,8 +124,13 @@ class NodeOptimizer:
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 
         self._logger.debug("Scoring %s module...", module_name)
-        all_metrics = module.score(context, metrics=self.metrics)
-        target_metric = all_metrics[self.target_metric]
+
+        self.emissions_tracker.start_task("module_scoring")
+        final_metrics = module.score(context, metrics=self.metrics)
+        emissions_metrics = self.emissions_tracker.stop_task()
+        all_metrics = {**final_metrics, **emissions_metrics}
+
+        target_metric = final_metrics[self.target_metric]
 
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
@@ -161,7 +149,7 @@ class NodeOptimizer:
             config,
             target_metric,
             self.target_metric,
-            all_metrics,
+            final_metrics,
             module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
@@ -270,7 +258,8 @@ class NodeOptimizer:
 
     def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
         """Check if search space is configured correctly."""
-        for module_search_space in search_space:
+        validated_search_space = SearchSpaceConfig(search_space).model_dump()
+        for module_search_space in validated_search_space:
             module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
             for params_combination in it.product(*module_search_space_no_optuna.values()):

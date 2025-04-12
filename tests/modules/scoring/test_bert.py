@@ -1,3 +1,7 @@
+import shutil
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -5,11 +9,56 @@ from autointent.context.data_handler import DataHandler
 from autointent.modules import BertScorer
 
 
+def test_bert_scorer_dump_load(dataset):
+    """Test that BertScorer can be saved and loaded while preserving predictions."""
+    data_handler = DataHandler(dataset)
+
+    # Create and train scorer
+    scorer_original = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+
+    # Test data
+    test_data = [
+        "why is there a hold on my account",
+        "why is my bank account frozen",
+    ]
+
+    # Get predictions before saving
+    predictions_before = scorer_original.predict(test_data)
+
+    # Create temp directory and save model
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="bert_scorer_test_"))
+    try:
+        # Save the model
+        scorer_original.dump(str(temp_dir_path))
+
+        # Create a new scorer and load saved model
+        scorer_loaded = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+        scorer_loaded.load(str(temp_dir_path))
+
+        # Verify model and tokenizer are loaded
+        assert hasattr(scorer_loaded, "_model")
+        assert scorer_loaded._model is not None
+        assert hasattr(scorer_loaded, "_tokenizer")
+        assert scorer_loaded._tokenizer is not None
+
+        # Get predictions after loading
+        predictions_after = scorer_loaded.predict(test_data)
+
+        # Verify predictions match
+        assert predictions_before.shape == predictions_after.shape
+        np.testing.assert_allclose(predictions_before, predictions_after, atol=1e-6)
+
+    finally:
+        # Clean up
+        shutil.rmtree(temp_dir_path, ignore_errors=True) # workaround for windows permission error
+
+
 def test_bert_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -46,7 +95,7 @@ def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
