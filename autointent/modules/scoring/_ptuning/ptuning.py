@@ -8,7 +8,7 @@ import numpy.typing as npt
 import torch
 from datasets import Dataset
 from peft import PromptEncoderConfig, get_peft_model  # type: ignore[attr-defined]
-from transformers import (
+from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
@@ -170,7 +170,7 @@ class PTuningScorer(BaseScorer):
 
             data_collator = DataCollatorWithPadding(tokenizer=self._tokenizer)
 
-            trainer = Trainer(
+            trainer = Trainer(  # type: ignore[no-untyped-call]
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset,
@@ -178,7 +178,7 @@ class PTuningScorer(BaseScorer):
                 data_collator=data_collator,
             )
 
-            trainer.train()
+            trainer.train()  # type: ignore[attr-defined]
 
         self._model.eval()
 
