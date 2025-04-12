@@ -194,7 +194,7 @@ class PTuningScorer(BaseScorer):
         Raises:
             RuntimeError: If the model is not trained yet
         """
-        if self._model is None or self._tokenizer is None:
+        if getattr(self, "_model", None) is None or getattr(self, "_tokenizer", None) is None:
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
