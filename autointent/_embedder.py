@@ -178,7 +178,7 @@ class Embedder:
             convert_to_numpy=True,
             batch_size=self.config.batch_size,
             normalize_embeddings=True,
-            prompt_name=self.config.get_prompt_type(task_type),
+            prompt=self.config.get_prompt_type(task_type),
         )
 
         if self.config.use_cache:
