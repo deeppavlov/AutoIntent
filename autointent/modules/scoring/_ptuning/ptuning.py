@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
-from peft import PromptEncoderConfig, get_peft_model  # type: ignore[attr-defined]
+from peft import PromptEncoderConfig, get_peft_model
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
