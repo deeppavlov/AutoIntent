@@ -1,16 +1,17 @@
 """CNNScorer class for scoring."""
 
-from typing import Any
-import numpy as np
-import numpy.typing as npt
-import torch
-import torch.nn as nn
 from collections import Counter
 import re
+from typing import Any
+
+import numpy as np
+import numpy.typing as npt
+from torch import nn
+import torch
+from torch.utils.data import TensorDataset, DataLoader
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import EmbedderConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._cnn.textcnn import TextCNN
@@ -47,8 +48,8 @@ class CNNScorer(BaseScorer):
         self._model = None
         self._vocab = None
         self._padding_idx = 0
-        self._unk_token = "<UNK>"
-        self._pad_token = "<PAD>"
+        self._unk_token = "<UNK>"  # noqa: S105
+        self._pad_token = "<PAD>"  # noqa: S105
 
     @classmethod
     def from_context(
@@ -74,45 +75,46 @@ class CNNScorer(BaseScorer):
             self.clear_cache()
         
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], (list, np.ndarray))
+        self._multilabel = isinstance(labels[0], list | np.ndarray)
         
         # Build vocabulary and tokenize
         self._build_vocab(utterances)
         
         # Convert text to padded indices
-        X = self._text_to_indices(utterances)
-        X = torch.tensor(X, dtype=torch.long)
+        x = self._text_to_indices(utterances)
+        x = torch.tensor(x, dtype=torch.long)
         y = torch.tensor(labels, dtype=torch.long)
         
         # Initialize model
         self._model = TextCNN(
             vocab_size=len(self._vocab),
             n_classes=self._n_classes,
-            embed_dim=self.cnn_config.get('embed_dim', 128),
-            kernel_sizes=self.cnn_config.get('kernel_sizes', (3, 4, 5)),
-            num_filters=self.cnn_config.get('num_filters', 100),
-            dropout=self.cnn_config.get('dropout', 0.1),
+            embed_dim=self.cnn_config.get("embed_dim", 128),
+            kernel_sizes=self.cnn_config.get("kernel_sizes", (3, 4, 5)),
+            num_filters=self.cnn_config.get("num_filters", 100),
+            dropout=self.cnn_config.get("dropout", 0.1),
             padding_idx=self._padding_idx,
-            pretrained_embs=self.cnn_config.get('pretrained_embs', None)
+            pretrained_embs=self.cnn_config.get("pretrained_embs", None)
         )
         
         # Training
-        self._train_model(X, y)
+        self._train_model(x, y)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if self._model is None:
-            raise RuntimeError("Model not trained. Call fit() first.")
+            error_msg = "Model not trained. Call fit() first."
+            raise RuntimeError(error_msg)
         
-        X = self._text_to_indices(utterances)
-        X = torch.tensor(X, dtype=torch.long)
+        x = self._text_to_indices(utterances)
+        x = torch.tensor(x, dtype=torch.long)
         
         self._model.eval()
         all_probs = []
         
         with torch.no_grad():
-            for i in range(0, len(X), self.batch_size):
-                batch_X = X[i:i+self.batch_size]
-                outputs = self._model(batch_X)
+            for i in range(0, len(x), self.batch_size):
+                batch_x = x[i:i+self.batch_size]
+                outputs = self._model(batch_x)
                 if self._multilabel:
                     probs = torch.sigmoid(outputs).cpu().numpy()
                 else:
@@ -125,7 +127,7 @@ class CNNScorer(BaseScorer):
         """Build vocabulary from training utterances."""
         word_counts = Counter()
         for utterance in utterances:
-            words = re.findall(r'\w+', utterance.lower())
+            words = re.findall(r"\w+", utterance.lower())
             word_counts.update(words)
         
         # Create vocabulary with special tokens
@@ -146,7 +148,7 @@ class CNNScorer(BaseScorer):
         """Convert utterances to padded sequences of word indices."""
         sequences = []
         for utterance in utterances:
-            words = re.findall(r'\w+', utterance.lower())
+            words = re.findall(r"\w+", utterance.lower())
             # Convert words to indices, using UNK for unknown words
             seq = [self._vocab.get(word, self._unk_idx) for word in words]
             # Truncate if too long
@@ -160,9 +162,9 @@ class CNNScorer(BaseScorer):
         self._model = None
         torch.cuda.empty_cache()
 
-    def _train_model(self, X: torch.Tensor, y: torch.Tensor) -> None:
-        dataset = torch.utils.data.TensorDataset(X, y)
-        dataloader = torch.utils.data.DataLoader(
+    def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
+        dataset = TensorDataset(x, y)
+        dataloader = DataLoader(
             dataset,
             batch_size=self.batch_size,
             shuffle=True
@@ -172,10 +174,10 @@ class CNNScorer(BaseScorer):
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self.learning_rate)
         
         self._model.train()
-        for epoch in range(self.num_train_epochs):
-            for batch_X, batch_y in dataloader:
+        for _ in range(self.num_train_epochs):
+            for batch_x, batch_y in dataloader:
                 optimizer.zero_grad()
-                outputs = self._model(batch_X)
+                outputs = self._model(batch_x)
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 optimizer.step()
