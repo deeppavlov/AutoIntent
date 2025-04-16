@@ -89,6 +89,7 @@ class BertScorer(BaseScorer):
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
+            trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
             label2id=label2id,
             id2label=id2label,

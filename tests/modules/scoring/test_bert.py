@@ -51,7 +51,7 @@ def test_bert_scorer_dump_load(dataset):
 
     finally:
         # Clean up
-        shutil.rmtree(temp_dir_path, ignore_errors=True) # workaround for windows permission error
+        shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
 def test_bert_prediction(dataset):

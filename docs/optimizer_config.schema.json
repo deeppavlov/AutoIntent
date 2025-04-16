@@ -32,6 +32,12 @@
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
                 },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                },
                 "train_head": {
                     "default": false,
                     "description": "Whether to train the head of the model. If False, LogReg will be trained.",
@@ -121,6 +127,12 @@
                 },
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -370,6 +382,7 @@
                     "padding": true,
                     "truncation": true
                 },
+                "trust_remote_code": false,
                 "default_prompt": null,
                 "classifier_prompt": null,
                 "cluster_prompt": null,
@@ -390,6 +403,7 @@
                     "padding": true,
                     "truncation": true
                 },
+                "trust_remote_code": false,
                 "train_head": false
             }
         },
