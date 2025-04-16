@@ -1,3 +1,3 @@
-from .catboost import CatboostScorer
+from .catboost import CatBoostScorer
 
-__all__ = ["CatboostScorer"]
+__all__ = ["CatBoostScorer"]
