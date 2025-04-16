@@ -73,7 +73,10 @@ class Embedder:
         self.config = embedder_config
 
         self.embedding_model = SentenceTransformer(
-            self.config.model_name, device=self.config.device, prompts=embedder_config.get_prompt_config()
+            self.config.model_name,
+            device=self.config.device,
+            prompts=embedder_config.get_prompt_config(),
+            trust_remote_code=self.config.trust_remote_code,
         )
 
         self._logger = logging.getLogger(__name__)
