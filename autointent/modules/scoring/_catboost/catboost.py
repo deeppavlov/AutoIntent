@@ -1,4 +1,4 @@
-"""CatboostScorer class for CatBoost-based classification."""
+"""CatBoostScorer class for CatBoost-based classification."""
 
 from typing import Any
 
@@ -14,7 +14,7 @@ from autointent.modules.base import BaseScorer
 _BINARY_CLASS_COUNT = 2
 
 
-class CatboostScorer(BaseScorer):
+class CatBoostScorer(BaseScorer):
     """CatBoost scorer using embeddings as features.
 
     Args:
@@ -61,8 +61,8 @@ class CatboostScorer(BaseScorer):
         random_seed: int = 0,
         verbose: bool = False,
         **catboost_kwargs: dict[str, Any],
-    ) -> "CatboostScorer":
-        """Create a CatboostScorer instance using a Context object."""
+    ) -> "CatBoostScorer":
+        """Create a CatBoostScorer instance using a Context object."""
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
         return cls(
