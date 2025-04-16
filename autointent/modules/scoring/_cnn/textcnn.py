@@ -1,10 +1,8 @@
 """TextCNN model for text classification."""
 
-from typing import Optional, Tuple
-
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class TextCNN(nn.Module):
@@ -15,15 +13,15 @@ class TextCNN(nn.Module):
         vocab_size: int,
         n_classes: int,
         embed_dim: int = 128,
-        kernel_sizes: Tuple[int, ...] = (3, 4, 5),
+        kernel_sizes: tuple[int, ...] = (3, 4, 5),
         num_filters: int = 100,
         dropout: float = 0.1,
         padding_idx: int = 0,
-        pretrained_embs: Optional[torch.Tensor] = None,
+        pretrained_embs: torch.Tensor | None = None,
     ) -> None:
         """Initialize TextCNN model."""
         super().__init__()
-        
+
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
             self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
@@ -33,7 +31,7 @@ class TextCNN(nn.Module):
                 embedding_dim=embed_dim,
                 padding_idx=padding_idx
             )
-        
+
         self.convs = nn.ModuleList([
             nn.Conv1d(
                 in_channels=embed_dim,

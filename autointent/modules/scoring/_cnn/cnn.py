@@ -1,16 +1,14 @@
 """CNNScorer class for scoring."""
 
-from __future__ import annotations
-
-import re
 from collections import Counter
-from typing import Any, Dict, List, Optional, Union
+import re
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from torch import nn
 import torch
-from torch import nn, Tensor
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import TensorDataset, DataLoader
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -33,8 +31,8 @@ class CNNScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None, # type: ignore[no-any-return]
-        **cnn_kwargs: Dict[str, Any],
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
+        **cnn_kwargs: dict[str, Any],
     ) -> None:
         self.max_seq_length = max_seq_length
         self.num_train_epochs = num_train_epochs
@@ -43,10 +41,10 @@ class CNNScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self.cnn_config = cnn_kwargs
-        
+
         # Will be initialized during fit()
-        self._model: Optional[TextCNN] = None
-        self._vocab: Optional[Dict[str, int]] = None
+        self._model: TextCNN | None = None
+        self._vocab: dict[str, int] | None = None
         self._padding_idx = 0
         self._unk_token = "<UNK>"  # noqa: S105
         self._pad_token = "<PAD>"  # noqa: S105
@@ -62,8 +60,8 @@ class CNNScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **cnn_kwargs: Dict[str, Any],
-    ) -> "CNNScorer":
+        **cnn_kwargs: dict[str, Any],
+    ) -> CNNScorer:
         return cls(
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
@@ -73,23 +71,25 @@ class CNNScorer(BaseScorer):
             **cnn_kwargs,
         )
 
-    def fit(self, utterances: List[str], labels: ListOfLabels) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], (list, np.ndarray))
+        self._multilabel = isinstance(labels[0], list | np.ndarray)
         self._n_classes = len(labels[0]) if self._multilabel else len(set(labels))
-        
+
         # Build vocabulary and tokenize
         self._build_vocab(utterances)
-        
+
         # Convert text to padded indices
         x = self._text_to_indices(utterances)
         x_tensor = torch.tensor(x, dtype=torch.long)
-        y_tensor = torch.tensor(labels, dtype=torch.long if not self._multilabel else torch.float)
-        
+        y_tensor = torch.tensor(
+            labels, dtype=torch.long if not self._multilabel else torch.float
+        )
+
         # Initialize model
         if self._vocab is None:
-            raise RuntimeError("Vocabulary not built")
-        
+            raise ValueError("Vocabulary not built")
+
         self._model = TextCNN(
             vocab_size=len(self._vocab),
             n_classes=self._n_classes,
@@ -98,70 +98,67 @@ class CNNScorer(BaseScorer):
             num_filters=self.cnn_config.get("num_filters", 100),
             dropout=self.cnn_config.get("dropout", 0.1),
             padding_idx=self._padding_idx,
-            pretrained_embs=self.cnn_config.get("pretrained_embs", None)
+            pretrained_embs=self.cnn_config.get("pretrained_embs", None),
         )
-        
+
         # Training
         self._train_model(x_tensor, y_tensor)
 
-    def predict(self, utterances: List[str]) -> npt.NDArray[Any]:
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if self._model is None:
-            raise RuntimeError("Model not trained. Call fit() first.")
-        
+            raise ValueError("Model not trained. Call fit() first.")
+
         x = self._text_to_indices(utterances)
         x_tensor = torch.tensor(x, dtype=torch.long)
-        
+
         self._model.eval()
-        all_probs: List[npt.NDArray[Any]] = []
-        
+        all_probs: list[npt.NDArray[Any]] = []
+
         with torch.no_grad():
             for i in range(0, len(x_tensor), self.batch_size):
-                batch_x = x_tensor[i:i+self.batch_size]
+                batch_x = x_tensor[i : i + self.batch_size]
                 outputs = self._model(batch_x)
                 if self._multilabel:
                     probs = torch.sigmoid(outputs).cpu().numpy()
                 else:
                     probs = torch.softmax(outputs, dim=1).cpu().numpy()
                 all_probs.append(probs)
-        
+
         return np.concatenate(all_probs, axis=0) if all_probs else np.array([])
 
-    def _build_vocab(self, utterances: List[str]) -> None:
+    def _build_vocab(self, utterances: list[str]) -> None:
         """Build vocabulary from training utterances."""
-        word_counts: Dict[str, int] = Counter()
+        word_counts: dict[str, int] = Counter()
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
             word_counts.update(words)
-        
+
         # Create vocabulary with special tokens
-        self._vocab = {
-            self._pad_token: 0,
-            self._unk_token: 1
-        }
-        
+        self._vocab = {self._pad_token: 0, self._unk_token: 1}
+
         # Add words to vocabulary
         if self._vocab is None:
-            raise RuntimeError("Vocabulary not initialized")
-            
+            raise ValueError("Vocabulary not initialized")
+
         for word, _ in word_counts.most_common():
             if word not in self._vocab:
                 self._vocab[word] = len(self._vocab)
-        
+
         self._unk_idx = 1
         self._padding_idx = 0
 
-    def _text_to_indices(self, utterances: List[str]) -> List[List[int]]:
+    def _text_to_indices(self, utterances: list[str]) -> list[list[int]]:
         """Convert utterances to padded sequences of word indices."""
         if self._vocab is None:
-            raise RuntimeError("Vocabulary not built")
-            
-        sequences: List[List[int]] = []
+            raise ValueError("Vocabulary not built")
+
+        sequences: list[list[int]] = []
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
             # Convert words to indices, using UNK for unknown words
-            seq = [self._vocab.get(word, self._unk_idx) for word in words]  # type: ignore
+            seq = [self._vocab.get(word, self._unk_idx) for word in words]  # type: ignore[union-attr]
             # Truncate if too long
-            seq = seq[:self.max_seq_length]
+            seq = seq[: self.max_seq_length]
             # Pad if too short
             seq = seq + [self._padding_idx] * (self.max_seq_length - len(seq))
             sequences.append(seq)
@@ -171,20 +168,18 @@ class CNNScorer(BaseScorer):
         self._model = None
         torch.cuda.empty_cache()
 
-    def _train_model(self, x: Tensor, y: Tensor) -> None:
+    def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
         if self._model is None:
-            raise RuntimeError("Model not initialized")
-            
+            raise ValueError("Model not initialized")
+
         dataset = TensorDataset(x, y)
-        dataloader = DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=True
+        dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+
+        criterion = (
+            nn.CrossEntropyLoss() if not self._multilabel else nn.BCEWithLogitsLoss()
         )
-        
-        criterion = nn.CrossEntropyLoss() if not self._multilabel else nn.BCEWithLogitsLoss()
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self.learning_rate)
-        
+
         self._model.train()
         for _ in range(self.num_train_epochs):
             for batch_x, batch_y in dataloader:
@@ -193,5 +188,6 @@ class CNNScorer(BaseScorer):
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 optimizer.step()
-        
+
         self._model.eval()
+        
