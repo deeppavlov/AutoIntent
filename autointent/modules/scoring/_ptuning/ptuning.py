@@ -8,7 +8,7 @@ import numpy.typing as npt
 import torch
 from datasets import Dataset
 from peft import PromptEncoderConfig, get_peft_model
-from transformers import (  # type: ignore[attr-defined]
+from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
@@ -33,13 +33,31 @@ class PTuningScorer(BaseScorer):
         learning_rate: Learning rate for training
         seed: Random seed for reproducibility
         report_to: Reporting tool for training logs
-        **ptuning_kwargs: Arguments for PromptEncoderConfig
+        **ptuning_kwargs: Arguments for PromptEncoderConfig <https://huggingface.co/docs/peft/package_reference/p_tuning#peft.PromptEncoderConfig>
 
     Example:
     --------
     .. testcode::
 
+        from autointent.modules import PTuningScorer
+        scorer = PTuningScorer(
+            base_model_config="prajjwal1/bert-tiny",
+            num_train_epochs=3,
+            batch_size=8,
+            task_type="SEQ_CLS",
+            num_virtual_tokens=10
+        )
+        utterances = ["hello", "goodbye", "allo", "sayonara"]
+        labels = [0, 1, 0, 1]
+        scorer.fit(utterances, labels)
+        test_utterances = ["hi", "bye"]
+        probabilities = scorer.predict(test_utterances)
+        print(probabilities)
+
     .. testoutput::
+
+        [[0.49624494 0.5037551 ]
+        [0.5066545  0.4933455 ]]
 
     """
 
@@ -170,7 +188,7 @@ class PTuningScorer(BaseScorer):
 
             data_collator = DataCollatorWithPadding(tokenizer=self._tokenizer)
 
-            trainer = Trainer(  # type: ignore[no-untyped-call]
+            trainer = Trainer(
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset,
@@ -178,7 +196,7 @@ class PTuningScorer(BaseScorer):
                 data_collator=data_collator,
             )
 
-            trainer.train()  # type: ignore[attr-defined]
+            trainer.train()
 
         self._model.eval()
 
