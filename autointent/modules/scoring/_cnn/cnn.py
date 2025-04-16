@@ -1,14 +1,14 @@
 """CNNScorer class for scoring."""
 
-from collections import Counter
 import re
+from collections import Counter
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from torch import nn
 import torch
-from torch.utils.data import TensorDataset, DataLoader
+from torch import nn, Tensor
+from torch.utils.data import DataLoader, TensorDataset
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -61,7 +61,7 @@ class CNNScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         **cnn_kwargs: dict[str, Any],
-    ) -> CNNScorer:
+    ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
@@ -88,7 +88,8 @@ class CNNScorer(BaseScorer):
 
         # Initialize model
         if self._vocab is None:
-            raise ValueError("Vocabulary not built")
+            msg = "Vocabulary not built"
+            raise ValueError(msg)
 
         self._model = TextCNN(
             vocab_size=len(self._vocab),
@@ -106,7 +107,8 @@ class CNNScorer(BaseScorer):
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if self._model is None:
-            raise ValueError("Model not trained. Call fit() first.")
+            msg = "Model not trained. Call fit() first."
+            raise ValueError(msg)
 
         x = self._text_to_indices(utterances)
         x_tensor = torch.tensor(x, dtype=torch.long)
@@ -138,7 +140,8 @@ class CNNScorer(BaseScorer):
 
         # Add words to vocabulary
         if self._vocab is None:
-            raise ValueError("Vocabulary not initialized")
+            msg = "Vocabulary not initialized"
+            raise ValueError(msg)
 
         for word, _ in word_counts.most_common():
             if word not in self._vocab:
@@ -150,7 +153,8 @@ class CNNScorer(BaseScorer):
     def _text_to_indices(self, utterances: list[str]) -> list[list[int]]:
         """Convert utterances to padded sequences of word indices."""
         if self._vocab is None:
-            raise ValueError("Vocabulary not built")
+            msg = "Vocabulary not built"
+            raise ValueError(msg)
 
         sequences: list[list[int]] = []
         for utterance in utterances:
@@ -170,7 +174,8 @@ class CNNScorer(BaseScorer):
 
     def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
         if self._model is None:
-            raise ValueError("Model not initialized")
+            msg = "Model not initialized"
+            raise ValueError(msg)
 
         dataset = TensorDataset(x, y)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -190,4 +195,3 @@ class CNNScorer(BaseScorer):
                 optimizer.step()
 
         self._model.eval()
-        
