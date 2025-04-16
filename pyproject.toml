@@ -46,6 +46,7 @@ dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
     "transformers[torch] (>=4.49.0,<5.0.0)",
     "codecarbon (==2.6)",
+    "catboost (>=1.2.8,<2.0.0)",
 ]
 
 [project.optional-dependencies]
