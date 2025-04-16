@@ -14,6 +14,7 @@ from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
 from .regex import SimpleRegex
 from .scoring import (
     BertScorer,
+    CatBoostScorer,
     DescriptionScorer,
     DNNCScorer,
     KNNScorer,
@@ -38,6 +39,7 @@ EMBEDDING_MODULES: dict[str, type[BaseEmbedding]] = _create_modules_dict(
 
 SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
+        CatBoostScorer,
         DNNCScorer,
         KNNScorer,
         LinearScorer,
@@ -62,6 +64,7 @@ __all__ = [
     "BaseModule",
     "BaseRegex",
     "BaseScorer",
+    "CatBoostScorer",
     "DNNCScorer",
     "DescriptionScorer",
     "JinoosDecision",
