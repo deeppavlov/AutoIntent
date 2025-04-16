@@ -104,7 +104,7 @@ After that you can load the dataset with one line. For example:
 """
 
 # %%
-Dataset.from_hub("AutoIntent/banking77")
+Dataset.from_hub("DeepPavlov/banking77")
 
 # %% [markdown]
 """
