@@ -142,12 +142,15 @@ class PTuningScorer(BaseScorer):
         self._validate_task(labels)
 
         model_name = self.base_model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_name, trust_remote_code=self.base_model_config.trust_remote_code
+        )
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
             num_labels=self._n_classes,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+            trust_remote_code=self.base_model_config.trust_remote_code,
             return_dict=True,
         )
 
