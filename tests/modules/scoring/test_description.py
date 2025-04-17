@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 import pytest
 
@@ -91,3 +93,17 @@ def test_description_scorer_cross_encoder(dataset, expected_prediction, multilab
     assert metadata is None
 
     scorer.clear_cache()
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        scorer.dump(temp_dir)
+
+        new_scorer = DescriptionScorer(
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2", encoder_type="cross", temperature=0.3
+        )
+        new_scorer.load(temp_dir)
+
+        loaded_predictions = new_scorer.predict(test_utterances)
+
+        np.testing.assert_almost_equal(predictions, loaded_predictions, decimal=5)
+
+        new_scorer.clear_cache()
