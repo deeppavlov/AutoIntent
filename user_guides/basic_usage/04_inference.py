@@ -38,7 +38,7 @@ search_space = [
     },
 ]
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 pipeline = Pipeline.from_search_space(search_space)
 context = pipeline.fit(dataset)
 pipeline.predict(["hello, world!"])
@@ -68,7 +68,7 @@ Firstly, your auto-configuration run should dump modules into file system:
 from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 pipeline = Pipeline.from_search_space(search_space)
 pipeline.set_config(LoggingConfig(dump_modules=True, clear_ram=True))
 

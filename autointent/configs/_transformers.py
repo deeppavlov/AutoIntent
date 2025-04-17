@@ -19,6 +19,7 @@ class HFModelConfig(BaseModel):
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
     tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
+    trust_remote_code: bool = Field(False, description="Whether to trust the remote code when loading the model.")
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:

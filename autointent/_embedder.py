@@ -79,6 +79,7 @@ class Embedder:
             device=self.config.device,
             prompts=embedder_config.get_prompt_config(),
             similarity_fn_name=self.config.similarity_fn_name,
+            trust_remote_code=self.config.trust_remote_code,
         )
 
         self._logger = logging.getLogger(__name__)
@@ -184,7 +185,7 @@ class Embedder:
             convert_to_numpy=True,
             batch_size=self.config.batch_size,
             normalize_embeddings=True,
-            prompt_name=self.config.get_prompt_type(task_type),
+            prompt=self.config.get_prompt_type(task_type),
         )
 
         if self.config.use_cache:
