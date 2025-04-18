@@ -5,13 +5,14 @@ from collections.abc import Generator
 from typing import cast
 
 from datasets import concatenate_datasets
+from pydantic import PositiveInt
 
 from autointent import Dataset
 from autointent.configs import DataConfig
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
 from autointent.schemas import Tag
 
-from ._stratification import split_dataset
+from ._stratification import create_few_shot_split, split_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,8 @@ class DataHandler:
             self._split_ho(self.config.separation_ratio, self.config.validation_size)
         elif self.config.scheme == "cv":
             self._split_cv()
+        elif self.config.scheme == "few-shot":
+            self._split_few_shot(self.config.examples_per_intent)
 
         self._logger = logger
 
@@ -149,8 +152,8 @@ class DataHandler:
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         """Yield folds for cross-validation."""
-        if self.config.scheme == "ho":
-            msg = "Cannot call cross-validation on hold-out DataHandler"
+        if self.config.scheme != "cv":
+            msg = f"Cannot call cross-validation on {self.config.scheme} DataHandler"
             raise RuntimeError(msg)
 
         for j in range(self.config.n_folds):
@@ -181,6 +184,9 @@ class DataHandler:
                     f"{n_classes_in_split=} for '{split=}' doesn't match initial number of classes ({self._n_classes})"
                 )
                 raise ValueError(message)
+
+    def _split_few_shot(self, examples_per_intent: PositiveInt) -> None:
+        self._split_validation_few_shot_from_train(examples_per_intent)
 
     def _split_train(self, ratio: FloatFromZeroToOne) -> None:
         """Split on two sets.
@@ -230,6 +236,25 @@ class DataHandler:
                     test_size=size,
                     random_seed=self._seed,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
+                )
+
+    def _split_validation_few_shot_from_train(self, size: int) -> None:
+        if Split.TRAIN in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = create_few_shot_split(
+                self.dataset,
+                split=Split.TRAIN,
+                label_column=self.dataset.label_feature,
+                examples_per_label=size,
+                random_seed=self._seed,
+            )
+        else:
+            for idx in range(2):
+                self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = create_few_shot_split(
+                    self.dataset,
+                    split=f"{Split.TRAIN}_{idx}",
+                    label_column=self.dataset.label_feature,
+                    examples_per_label=size,
+                    random_seed=self._seed,
                 )
 
     def prepare_for_refit(self) -> None:

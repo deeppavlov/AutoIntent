@@ -29,6 +29,10 @@ class DataConfig(BaseModel):
         0.5, description="Set to float to prevent data leak between scoring and decision nodes."
     )
     """Set to float to prevent data leak between scoring and decision nodes."""
+    examples_per_intent: PositiveInt = Field(
+        8,
+        description="Number of examples per intent for few-shot validation. If None, all examples will be used.",
+    )
 
 
 class LoggingConfig(BaseModel):

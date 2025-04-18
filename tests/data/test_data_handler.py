@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pytest
 
 from autointent import Dataset
@@ -223,3 +225,18 @@ def test_cv_iterator(dataset):
         assert count_oos_labels(y_train) == specs["train"]["oos"]
         assert len(x_val) == len(y_val) == specs["val"]["total"]
         assert count_oos_labels(y_val) == specs["val"]["oos"]
+
+
+def test_few_shot_split(dataset):
+    dh = DataHandler(dataset, config=DataConfig(scheme="few-shot", examples_per_intent=2))
+
+    desired_specs = {
+        "train_0": {0: 2, 1: 2, 2: 2, 3: 2},
+        "train_1": {2: 2, 0: 2, None: 2, 1: 1, 3: 1},
+        "validation_0": {3: 3, 1: 3, 0: 2, 2: 2},
+        "validation_1": {None: 10},
+        "test": {None: 4, 0: 2, 2: 2, 3: 2, 1: 2},
+    }
+
+    for data_split in dh.dataset:
+        assert Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split]

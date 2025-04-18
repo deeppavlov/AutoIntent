@@ -97,11 +97,12 @@ SamplerType = Literal["brute", "tpe", "random"]
 - `random`: :py:class:`optuna.samplers.RandomSampler`
 """
 
-ValidationScheme = Literal["ho", "cv"]
+ValidationScheme = Literal["ho", "cv", "few-shot"]
 """Validation scheme used in hyperparameter tuning:
 
 - `ho`: hold-out validation
 - `cv`: cross-validation
+- `few-shot`: few-shot validation. Like to `ho` but with a few-shot split
 """
 
 

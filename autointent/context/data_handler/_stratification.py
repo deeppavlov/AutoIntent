@@ -4,6 +4,7 @@ This module provides utilities for splitting datasets into training and testing 
 It includes support for both single-label and multi-label stratified splitting.
 """
 
+import logging
 from collections.abc import Sequence
 
 import numpy as np
@@ -16,6 +17,8 @@ from transformers import set_seed  # type: ignore[attr-defined]
 
 from autointent import Dataset
 from autointent.custom_types import LabelType
+
+logger = logging.getLogger(__name__)
 
 
 class StratifiedSplitter:
@@ -307,3 +310,58 @@ def split_dataset(
         random_seed=random_seed,
     )
     return splitter(dataset[split], dataset.multilabel, allow_oos_in_train=allow_oos_in_train)
+
+
+def create_few_shot_split(
+    dataset: Dataset, split: str, label_column: str, examples_per_label: int = 8, random_seed: int | None = None
+) -> tuple[HFDataset, HFDataset]:
+    """Create a few-shot dataset split with a specified number of examples per label.
+
+    Args:
+        dataset: A Hugging Face dataset or DatasetDict
+        split: The name of the split to use (default: 'train')
+        label_column: The name of the column containing labels (default: 'label')
+        examples_per_label: Number of examples to include per label in the train split (default: 8)
+        random_seed: Random seed for reproducibility (default: 42)
+
+    Returns:
+        A tuple containing the train and validation datasets.
+    """
+    data = dataset[split]
+    # Add a unique index column to track examples
+    data = data.add_column("__index__", list(range(len(data))))
+
+    unique_labels = data.unique(label_column)
+
+    # Create train dataset by sampling examples_per_label for each label
+    train_datasets = []
+    selected_indices = set()
+
+    for label in unique_labels:
+        label_examples = data.filter(lambda example: example[label_column] == label)  # noqa: B023
+        label_examples = label_examples.shuffle(seed=random_seed)
+
+        num_to_select = min(examples_per_label, len(label_examples))
+        selected_examples = label_examples.select(range(num_to_select))
+
+        if num_to_select < examples_per_label:
+            msg = (
+                f"Warning: Only {num_to_select} examples available for label '{label}', "
+                f"which is less than the requested {examples_per_label}"
+            )
+            logger.warning(msg)
+
+        train_datasets.append(selected_examples)
+        selected_indices.update([ex["__index__"] for ex in selected_examples])
+
+    # Combine all selected examples into train split
+    train_dataset = data.filter(lambda example: example["__index__"] in selected_indices)
+
+    # Create validation split with remaining examples
+    validation_dataset = data.filter(lambda example: example["__index__"] not in selected_indices)
+
+    # Remove the temporary index column
+    train_dataset = train_dataset.remove_columns("__index__")
+    validation_dataset = validation_dataset.remove_columns("__index__")
+
+    return train_dataset, validation_dataset
