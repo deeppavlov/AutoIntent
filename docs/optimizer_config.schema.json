@@ -57,7 +57,8 @@
                     "description": "Validation scheme to use.",
                     "enum": [
                         "ho",
-                        "cv"
+                        "cv",
+                        "few-shot"
                     ],
                     "title": "Scheme",
                     "type": "string"
@@ -91,6 +92,13 @@
                     "default": 0.5,
                     "description": "Set to float to prevent data leak between scoring and decision nodes.",
                     "title": "Separation Ratio"
+                },
+                "examples_per_intent": {
+                    "default": 8,
+                    "description": "Number of examples per intent for few-shot validation. If None, all examples will be used.",
+                    "exclusiveMinimum": 0,
+                    "title": "Examples Per Intent",
+                    "type": "integer"
                 }
             },
             "title": "DataConfig",
@@ -349,7 +357,8 @@
                 "scheme": "ho",
                 "n_folds": 3,
                 "validation_size": 0.2,
-                "separation_ratio": 0.5
+                "separation_ratio": 0.5,
+                "examples_per_intent": 8
             }
         },
         "search_space": {
