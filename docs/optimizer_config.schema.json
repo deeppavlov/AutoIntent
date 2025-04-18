@@ -212,6 +212,19 @@
                     "description": "Prompt for passage.",
                     "title": "Passage Prompt"
                 },
+                "similarity_fn_name": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "cosine",
+                    "description": "Name of the similarity function to use (cosine, dot, euclidean, manhattan).",
+                    "title": "Similarity Fn Name"
+                },
                 "use_cache": {
                     "default": false,
                     "description": "Whether to use embeddings caching.",
@@ -389,6 +402,7 @@
                 "sts_prompt": null,
                 "query_prompt": null,
                 "passage_prompt": null,
+                "similarity_fn_name": "cosine",
                 "use_cache": false
             }
         },

@@ -61,6 +61,9 @@ class EmbedderConfig(HFModelConfig):
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
     passage_prompt: str | None = Field(None, description="Prompt for passage.")
+    similarity_fn_name: str | None = Field(
+        "cosine", description="Name of the similarity function to use (cosine, dot, euclidean, manhattan)."
+    )
 
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.

@@ -11,6 +11,11 @@
   search_space:
     - module_name: description
       temperature: [1.0, 0.5, 0.1, 0.05]
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+      cross_encoder_config:
+        - model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
+      encoder_type: [cross, bi]
 - node_type: decision
   target_metric: decision_accuracy
   search_space:
