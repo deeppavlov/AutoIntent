@@ -57,8 +57,7 @@
                     "description": "Validation scheme to use.",
                     "enum": [
                         "ho",
-                        "cv",
-                        "few-shot"
+                        "cv"
                     ],
                     "title": "Scheme",
                     "type": "string"
@@ -72,7 +71,7 @@
                 },
                 "validation_size": {
                     "default": 0.2,
-                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
+                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split). If `is_few_shot_train` is True, this value will be ignored.",
                     "maximum": 1,
                     "minimum": 0,
                     "title": "Validation Size",
@@ -92,6 +91,12 @@
                     "default": 0.5,
                     "description": "Set to float to prevent data leak between scoring and decision nodes.",
                     "title": "Separation Ratio"
+                },
+                "is_few_shot_train": {
+                    "default": false,
+                    "description": "Whether to use few-shot training.",
+                    "title": "Is Few Shot Train",
+                    "type": "boolean"
                 },
                 "examples_per_intent": {
                     "default": 8,
@@ -358,6 +363,7 @@
                 "n_folds": 3,
                 "validation_size": 0.2,
                 "separation_ratio": 0.5,
+                "is_few_shot_train": false,
                 "examples_per_intent": 8
             }
         },
