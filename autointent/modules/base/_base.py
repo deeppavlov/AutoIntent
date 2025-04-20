@@ -51,11 +51,11 @@ class BaseModule(ABC):
         Raises:
             ValueError: If unknown scheme is provided
         """
-        if context.data_handler.config.scheme in {"ho", "few-shot"}:
+        if context.data_handler.config.scheme == "ho":
             return self.score_ho(context, metrics)
         if context.data_handler.config.scheme == "cv":
             return self.score_cv(context, metrics)
-        assert_never(context.data_handler.config.scheme)  # type: ignore[arg-type]
+        assert_never(context.data_handler.config.scheme)
 
     @abstractmethod
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]: ...

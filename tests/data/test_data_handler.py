@@ -228,13 +228,13 @@ def test_cv_iterator(dataset):
 
 
 def test_few_shot_split(dataset):
-    dh = DataHandler(dataset, config=DataConfig(scheme="few-shot", examples_per_intent=2))
+    dh = DataHandler(dataset, config=DataConfig(scheme="ho", is_few_shot_train=True, examples_per_intent=2))
 
     desired_specs = {
         "train_0": {0: 2, 1: 2, 2: 2, 3: 2},
         "train_1": {2: 2, 0: 2, None: 2, 1: 1, 3: 1},
-        "validation_0": {3: 3, 1: 3, 0: 2, 2: 2},
-        "validation_1": {None: 10},
+        "validation_0": {1: 1, 3: 1, 0: 1, 2: 1},
+        "validation_1": {None: 4, 3: 1, 0: 1, 1: 1, 2: 1},
         "test": {None: 4, 0: 2, 2: 2, 3: 2, 1: 2},
     }
 
