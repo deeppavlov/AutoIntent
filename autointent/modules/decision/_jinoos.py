@@ -113,7 +113,7 @@ class JinoosDecision(BaseDecision):
         if scores.shape[1] != self._n_classes:
             raise MismatchNumClassesError
         pred_classes, best_scores = _predict(scores)
-        y_pred: list[int] = _detect_oos(pred_classes, best_scores, self._thresh).tolist()  # type: ignore[assignment]
+        y_pred: list[int] = _detect_oos(pred_classes, best_scores, self._thresh).tolist()
         return [lab if lab != -1 else None for lab in y_pred]
 
     @staticmethod
