@@ -33,7 +33,7 @@ class PTuningScorer(BaseScorer):
         learning_rate: Learning rate for training
         seed: Random seed for reproducibility
         report_to: Reporting tool for training logs
-        **ptuning_kwargs: Arguments for PromptEncoderConfig <https://huggingface.co/docs/peft/package_reference/p_tuning#peft.PromptEncoderConfig>
+        **ptuning_kwargs: Arguments for `PromptEncoderConfig <https://huggingface.co/docs/peft/package_reference/p_tuning#peft.PromptEncoderConfig>`_
 
     Example:
     --------
