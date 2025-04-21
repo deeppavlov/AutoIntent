@@ -145,7 +145,7 @@ class Pipeline:
         self.context = context
         self._logger.info("starting pipeline optimization...")
 
-        if context.logging_config.clear_ram:
+        if not context.logging_config.dump_modules:
             self._logger.warning(
                 "Memory storage is not compatible with resuming optimization. "
                 "Modules from previous runs won't be available. "
