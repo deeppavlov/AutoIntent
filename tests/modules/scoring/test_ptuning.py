@@ -1,8 +1,59 @@
+import shutil
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import PTuningScorer
+
+
+def test_ptuning_scorer_dump_load(dataset):
+    """Test that PTuningScorer can be saved and loaded while preserving predictions."""
+    data_handler = DataHandler(dataset)
+
+    scorer_original = PTuningScorer(
+        base_model_config="prajjwal1/bert-tiny",
+        num_train_epochs=1,
+        batch_size=8,
+        task_type="SEQ_CLS",
+        num_virtual_tokens=10,
+    )
+    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+
+    test_data = [
+        "why is there a hold on my account",
+        "why is my bank account frozen",
+    ]
+
+    predictions_before = scorer_original.predict(test_data)
+
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="ptuning_scorer_test_"))
+    try:
+        scorer_original.dump(str(temp_dir_path))
+
+        scorer_loaded = PTuningScorer(
+            base_model_config="prajjwal1/bert-tiny",
+            num_train_epochs=1,
+            batch_size=8,
+            task_type="SEQ_CLS",
+            num_virtual_tokens=10,
+        )
+        scorer_loaded.load(str(temp_dir_path))
+
+        assert hasattr(scorer_loaded, "_model")
+        assert scorer_loaded._model is not None
+        assert hasattr(scorer_loaded, "_tokenizer")
+        assert scorer_loaded._tokenizer is not None
+
+        predictions_after = scorer_loaded.predict(test_data)
+
+        assert predictions_before.shape == predictions_after.shape
+        np.testing.assert_allclose(predictions_before, predictions_after, atol=1e-6)
+
+    finally:
+        shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
 def test_ptuning_prediction(dataset):
