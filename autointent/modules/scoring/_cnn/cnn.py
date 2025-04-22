@@ -24,7 +24,7 @@ class CNNScorer(BaseScorer):
     supports_multilabel = True
     supports_multiclass = True
 
-    def __init__( # noqa: PLR0913
+    def __init__(
         self,
         max_seq_length: int = 50,
         num_train_epochs: int = 3,
@@ -35,8 +35,7 @@ class CNNScorer(BaseScorer):
         embed_dim: int = 128,
         kernel_sizes: tuple[int, ...] = (3, 4, 5),
         num_filters: int = 100,
-        dropout: float = 0.1,
-        pretrained_embs: torch.Tensor | None = None,
+        dropout: float = 0.1
     ) -> None:
         self.max_seq_length = max_seq_length
         self.num_train_epochs = num_train_epochs
@@ -48,7 +47,6 @@ class CNNScorer(BaseScorer):
         self.kernel_sizes = kernel_sizes
         self.num_filters = num_filters
         self.dropout = dropout
-        self.pretrained_embs = pretrained_embs
 
         # Will be initialized during fit()
         self._model: TextCNN | None = None
@@ -71,8 +69,7 @@ class CNNScorer(BaseScorer):
         embed_dim: int = 128,
         kernel_sizes: tuple[int, ...] = (3, 4, 5),
         num_filters: int = 100,
-        dropout: float = 0.1,
-        pretrained_embs: torch.Tensor | None = None,
+        dropout: float = 0.1
     ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
@@ -83,8 +80,7 @@ class CNNScorer(BaseScorer):
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,
             num_filters=num_filters,
-            dropout=dropout,
-            pretrained_embs=pretrained_embs
+            dropout=dropout
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -114,8 +110,7 @@ class CNNScorer(BaseScorer):
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,
             dropout=self.dropout,
-            padding_idx=self._padding_idx,
-            pretrained_embs=self.pretrained_embs
+            padding_idx=self._padding_idx
         )
 
         # Training
