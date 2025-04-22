@@ -32,7 +32,7 @@ class BERTLoRAScorer(BaseScorer):
 
     def __init__(
         self,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        transformer_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -40,7 +40,7 @@ class BERTLoRAScorer(BaseScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
         **lora_kwargs: dict[str, Any],
     ) -> None:
-        self.model_config = HFModelConfig.from_search_config(model_config)
+        self.model_config = HFModelConfig.from_search_config(transformer_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -89,7 +89,8 @@ class BERTLoRAScorer(BaseScorer):
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
             num_labels=self._n_classes,
-            problem_type="multi_label_classification" if self._multilabel else "single_label_classification"
+            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+            trust_remote_code=self.transformer_config.trust_remote_code,
             )
         self._model = get_peft_model(self._model, self._lora_config)
 
