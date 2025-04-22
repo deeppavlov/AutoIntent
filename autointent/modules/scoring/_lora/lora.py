@@ -25,7 +25,7 @@ class BERTLoRAScorer(BertScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         **lora_kwargs: dict[str, Any],
     ) -> None:
         super().__init__(
@@ -34,9 +34,9 @@ class BERTLoRAScorer(BertScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            report_to=report_to,  # type: ignore[no-any-return]
+            report_to=report_to,
             )
-        self._lora_config = LoraConfig(**lora_kwargs)
+        self._lora_config = LoraConfig(**lora_kwargs) # type: ignore[valid-type]
 
     @classmethod
     def from_context(
