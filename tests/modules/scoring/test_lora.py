@@ -10,7 +10,7 @@ def test_lora_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BERTLoRAScorer(transformer_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
@@ -29,7 +29,7 @@ def test_lora_prediction(dataset):
         dump_path = pathlib.Path(tmpdir)
         Dumper.dump(scorer, dump_path)
 
-        new_scorer = BERTLoRAScorer(transformer_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+        new_scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
         Dumper.load(new_scorer, dump_path)
 
         loaded_predictions = new_scorer.predict(test_data)
@@ -54,7 +54,7 @@ def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BERTLoRAScorer(transformer_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = ["test text"]
