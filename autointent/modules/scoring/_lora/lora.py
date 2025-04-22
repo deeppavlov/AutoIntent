@@ -1,20 +1,9 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
-import tempfile
 from typing import Any
 
-import numpy as np
-import numpy.typing as npt
-import torch
-from datasets import Dataset
 from peft import LoraConfig, get_peft_model
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import AutoModelForSequenceClassification
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -39,7 +28,7 @@ class BERTLoRAScorer(BertScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
         **lora_kwargs: dict[str, Any],
     ) -> None:
-        super(BERTLoRAScorer, self).__init__(
+        super().__init__(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
@@ -71,8 +60,8 @@ class BERTLoRAScorer(BertScorer):
             report_to=context.logging_config.report_to,
             **lora_kwargs,
         )
-    
-    def __initialize_model(self, ):
+
+    def __initialize_model(self) -> None:
         self._model = AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             num_labels=self._n_classes,

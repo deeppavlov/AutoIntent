@@ -71,8 +71,8 @@ class BertScorer(BaseScorer):
 
     def get_embedder_config(self) -> dict[str, Any]:
         return self.classification_model_config.model_dump()
-    
-    def __initialize_model(self):
+
+    def __initialize_model(self) -> None:
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
