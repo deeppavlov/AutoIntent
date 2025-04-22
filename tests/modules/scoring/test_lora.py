@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from autointent.context.data_handler import DataHandler
+from autointent._dump_tools import Dumper
 from autointent.modules import BERTLoRAScorer
 
 
@@ -20,15 +21,30 @@ def test_lora_prediction(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    predictions = scorer.predict(test_data)
+    # Get initial predictions
+    initial_predictions = scorer.predict(test_data)
 
-    assert predictions.shape[0] == len(test_data)
-    assert predictions.shape[1] == len(set(data_handler.train_labels(0)))
+    # Perform dump and load
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmpdir:
+        import pathlib
+        dump_path = pathlib.Path(tmpdir)
+        Dumper.dump(scorer, dump_path)
+        
+        # Create new scorer instance and load state
+        new_scorer = BERTLoRAScorer(transformer_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+        Dumper.load(new_scorer, dump_path)
+        
+        loaded_predictions = new_scorer.predict(test_data)
+        np.testing.assert_array_almost_equal(initial_predictions, loaded_predictions, decimal=5)
 
-    assert 0.0 <= np.min(predictions) <= np.max(predictions) <= 1.0
+    assert initial_predictions.shape[0] == len(test_data)
+    assert initial_predictions.shape[1] == len(set(data_handler.train_labels(0)))
+
+    assert 0.0 <= np.min(initial_predictions) <= np.max(initial_predictions) <= 1.0
 
     if not scorer._multilabel:
-        for pred_row in predictions:
+        for pred_row in initial_predictions:
             np.testing.assert_almost_equal(np.sum(pred_row), 1.0, decimal=5)
 
     if hasattr(scorer, "predict_with_metadata"):
