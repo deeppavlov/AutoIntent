@@ -65,7 +65,7 @@ def test_cnn_cache_clearing(dataset):
 
     # Первое предсказание
     scorer.predict(test_data)
-    
+
     # Очистка кэша
     scorer.clear_cache()
 
@@ -96,6 +96,6 @@ def test_cnn_multilabel(dataset_multilabel):
     # Для multilabel проверяем что выходные вероятности независимы
     assert predictions.shape[0] == len(test_data)
     assert predictions.shape[1] == len(data_handler.train_labels(0)[0])
-    
+
     # Проверяем что есть предсказания не только 0 и 1
     assert np.any((predictions > 0) & (predictions < 1))
