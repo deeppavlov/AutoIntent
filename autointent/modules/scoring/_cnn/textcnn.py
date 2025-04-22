@@ -44,9 +44,9 @@ class TextCNN(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
-        embedded = self.embedding(x)
+        embedded: torch.Tensor = self.embedding(x)
         embedded = embedded.permute(0, 2, 1)
-        conved = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
-        concatenated = torch.cat(conved, dim=1)
-        dropped = self.dropout(concatenated)
+        conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
+        concatenated: torch.Tensor = torch.cat(conved, dim=1)
+        dropped: torch.Tensor = self.dropout(concatenated)
         return self.fc(dropped)

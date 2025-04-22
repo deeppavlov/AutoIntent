@@ -2,7 +2,7 @@
 
 import re
 from collections import Counter
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -85,7 +85,7 @@ class CNNScorer(BaseScorer):
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], list | np.ndarray)
+        self._multilabel = isinstance(labels[0], (list, np.ndarray))
         self._n_classes = len(labels[0]) if self._multilabel else len(set(labels))
 
         # Build vocabulary and tokenize
@@ -141,7 +141,7 @@ class CNNScorer(BaseScorer):
 
     def _build_vocab(self, utterances: list[str]) -> None:
         """Build vocabulary from training utterances."""
-        word_counts: dict[str, int] = Counter()
+        word_counts = Counter()
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
             word_counts.update(words)
@@ -154,7 +154,9 @@ class CNNScorer(BaseScorer):
             msg = "Vocabulary not initialized"
             raise ValueError(msg)
 
-        for word, _ in word_counts.most_common():
+        # Convert Counter to list of (word, count) tuples sorted by frequency
+        sorted_words = word_counts.most_common()
+        for word, _ in sorted_words:
             if word not in self._vocab:
                 self._vocab[word] = len(self._vocab)
 
@@ -171,7 +173,7 @@ class CNNScorer(BaseScorer):
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
             # Convert words to indices, using UNK for unknown words
-            seq = [self._vocab.get(word, self._unk_idx) for word in words]  # type: ignore[union-attr]
+            seq = [self._vocab.get(word, self._unk_idx) for word in words]
             # Truncate if too long
             seq = seq[: self.max_seq_length]
             # Pad if too short
