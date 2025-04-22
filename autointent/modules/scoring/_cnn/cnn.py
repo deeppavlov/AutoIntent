@@ -31,9 +31,9 @@ class CNNScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         embed_dim: int = 128,
-        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        kernel_sizes: list[int] = [3, 4, 5],
         num_filters: int = 100,
         dropout: float = 0.1
     ) -> None:

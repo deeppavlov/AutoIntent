@@ -13,7 +13,7 @@ class TextCNN(nn.Module):
         vocab_size: int,
         n_classes: int,
         embed_dim: int = 128,
-        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        kernel_sizes: list[int] = [3, 4, 5],
         num_filters: int = 100,
         dropout: float = 0.1,
         padding_idx: int = 0,
@@ -49,4 +49,4 @@ class TextCNN(nn.Module):
         conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
         concatenated: torch.Tensor = torch.cat(conved, dim=1)
         dropped: torch.Tensor = self.dropout(concatenated)
-        return self.fc(dropped)
+        return self.fc(dropped) # type: ignore[no-any-return]
