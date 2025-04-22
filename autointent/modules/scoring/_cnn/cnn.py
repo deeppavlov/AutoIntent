@@ -61,7 +61,7 @@ class CNNScorer(BaseScorer):
         self._multilabel: bool = False
 
     @classmethod
-    def from_context( # noqa: PLR0913
+    def from_context(
         cls,
         context: Context,
         num_train_epochs: int = 3,
