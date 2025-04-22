@@ -4,11 +4,11 @@ import re
 from collections import Counter
 from typing import Any
 
-from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 import numpy.typing as npt
 import torch
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -24,7 +24,7 @@ class CNNScorer(BaseScorer):
     supports_multilabel = True
     supports_multiclass = True
 
-    def __init__(
+    def __init__( # noqa: PLR0913
         self,
         max_seq_length: int = 50,
         num_train_epochs: int = 3,
@@ -61,14 +61,18 @@ class CNNScorer(BaseScorer):
         self._multilabel: bool = False
 
     @classmethod
-    def from_context(
+    def from_context( # noqa: PLR0913
         cls,
         context: Context,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **cnn_kwargs: dict[str, Any],
+        embed_dim: int = 128,
+        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        num_filters: int = 100,
+        dropout: float = 0.1,
+        pretrained_embs: torch.Tensor | None = None,
     ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
@@ -76,7 +80,11 @@ class CNNScorer(BaseScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=context.logging_config.report_to,
-            **cnn_kwargs,
+            embed_dim=embed_dim,
+            kernel_sizes=kernel_sizes,
+            num_filters=num_filters,
+            dropout=dropout,
+            pretrained_embs=pretrained_embs
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:

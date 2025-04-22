@@ -1,8 +1,8 @@
 """TextCNN model for text classification."""
 
-from torch import nn
 import torch
-import torch.nn.functional as F # noqa: N812
+import torch.nn.functional as F  # noqa: N812
+from torch import nn
 
 
 class TextCNN(nn.Module):
