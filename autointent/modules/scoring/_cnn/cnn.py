@@ -33,7 +33,7 @@ class CNNScorer(BaseScorer):
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         embed_dim: int = 128,
-        kernel_sizes: list[int] = [3, 4, 5],
+        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1
     ) -> None:
@@ -51,10 +51,10 @@ class CNNScorer(BaseScorer):
         # Will be initialized during fit()
         self._model: TextCNN | None = None
         self._vocab: dict[str, int] | None = None
-        self._padding_idx = 0
         self._unk_token = "<UNK>"  # noqa: S105
         self._pad_token = "<PAD>"  # noqa: S105
         self._unk_idx = 1
+        self._pad_idx = 0
         self._n_classes: int = 0
         self._multilabel: bool = False
 
@@ -67,7 +67,7 @@ class CNNScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         embed_dim: int = 128,
-        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1
     ) -> "CNNScorer":
@@ -86,7 +86,11 @@ class CNNScorer(BaseScorer):
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
         self._multilabel = isinstance(labels[0], (list, np.ndarray))
-        self._n_classes = len(labels[0]) if self._multilabel else len(set(labels))
+    
+        if self._multilabel:
+            self._n_classes = len(labels[0])
+        else:
+            self._n_classes = len(set(labels)) if labels else 0
 
         # Build vocabulary and tokenize
         self._build_vocab(utterances)
@@ -110,7 +114,7 @@ class CNNScorer(BaseScorer):
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,
             dropout=self.dropout,
-            padding_idx=self._padding_idx
+            padding_idx=self._pad_idx
         )
 
         # Training
@@ -141,27 +145,19 @@ class CNNScorer(BaseScorer):
 
     def _build_vocab(self, utterances: list[str]) -> None:
         """Build vocabulary from training utterances."""
-        word_counts = Counter()
+        word_counts: Counter[str] = Counter()
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
             word_counts.update(words)
 
         # Create vocabulary with special tokens
-        self._vocab = {self._pad_token: 0, self._unk_token: 1}
-
-        # Add words to vocabulary
-        if self._vocab is None:
-            msg = "Vocabulary not initialized"
-            raise ValueError(msg)
+        self._vocab = {self._pad_token: self._pad_idx, self._unk_token: self._unk_idx}
 
         # Convert Counter to list of (word, count) tuples sorted by frequency
         sorted_words = word_counts.most_common()
         for word, _ in sorted_words:
             if word not in self._vocab:
                 self._vocab[word] = len(self._vocab)
-
-        self._unk_idx = 1
-        self._padding_idx = 0
 
     def _text_to_indices(self, utterances: list[str]) -> list[list[int]]:
         """Convert utterances to padded sequences of word indices."""
@@ -177,7 +173,7 @@ class CNNScorer(BaseScorer):
             # Truncate if too long
             seq = seq[: self.max_seq_length]
             # Pad if too short
-            seq = seq + [self._padding_idx] * (self.max_seq_length - len(seq))
+            seq = seq + [self._pad_idx] * (self.max_seq_length - len(seq))
             sequences.append(seq)
         return sequences
 
