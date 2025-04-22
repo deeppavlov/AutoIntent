@@ -40,7 +40,7 @@ class BERTLoRAScorer(BaseScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
         **lora_kwargs: dict[str, Any],
     ) -> None:
-        self.model_config = HFModelConfig.from_search_config(transformer_config)
+        self.transformer_config = HFModelConfig.from_search_config(transformer_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -52,17 +52,17 @@ class BERTLoRAScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        transformer_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
         **lora_kwargs: dict[str, Any],
     ) -> "BERTLoRAScorer":
-        if model_config is None:
-            model_config = context.resolve_embedder()
+        if transformer_config is None:
+            transformer_config = context.resolve_embedder()
         return cls(
-            model_config=model_config,
+            transformer_config=transformer_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
@@ -72,7 +72,7 @@ class BERTLoRAScorer(BaseScorer):
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
-        return self.model_config.model_dump()
+        return self.transformer_config.model_dump()
 
     def fit(
         self,
@@ -84,7 +84,7 @@ class BERTLoRAScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        model_name = self.model_config.model_name
+        model_name = self.transformer_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
@@ -94,14 +94,14 @@ class BERTLoRAScorer(BaseScorer):
             )
         self._model = get_peft_model(self._model, self._lora_config)
 
-        device = torch.device(self.model_config.device if self.model_config.device else "cpu")
+        device = torch.device(self.transformer_config.device if self.transformer_config.device else "cpu")
         self._model = self._model.to(device)
 
-        use_cpu = self.model_config.device == "cpu"
+        use_cpu = self.transformer_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
+                examples["text"], return_tensors="pt", **self.transformer_config.tokenizer_config.model_dump()
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
@@ -143,13 +143,13 @@ class BERTLoRAScorer(BaseScorer):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
 
-        device = torch.device(self.model_config.device if self.model_config.device else "cpu")
+        device = torch.device(self.transformer_config.device if self.transformer_config.device else "cpu")
         self._model = self._model.to(device)
 
         all_predictions = []
         for i in range(0, len(utterances), self.batch_size):
             batch = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            inputs = self._tokenizer(batch, return_tensors="pt", **self.transformer_config.tokenizer_config.model_dump())
             inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**inputs)
