@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 import torch
-from torch import nn, Tensor
+from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from autointent import Context
@@ -16,23 +16,40 @@ from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._cnn.textcnn import TextCNN
 
-
 class CNNScorer(BaseScorer):
-    """Convolutional Neural Network (CNN) scorer for intent classification."""
+    """Convolutional Neural Network (CNN) scorer for intent classification.
+
+    Args:
+        max_seq_length: Maximum length of input sequences.
+        num_train_epochs: Number of training epochs.
+        batch_size: Batch size for training.
+        learning_rate: Learning rate for optimizer.
+        seed: Random seed.
+        report_to: Where to report training metrics.
+        embed_dim: Dimension of word embeddings.
+        kernel_sizes: Tuple of kernel sizes for convolutional layers.
+        num_filters: Number of filters for each convolutional layer.
+        dropout: Dropout rate.
+        pretrained_embs: Pretrained embeddings tensor (optional).
+    """
 
     name = "cnn"
     supports_multilabel = True
     supports_multiclass = True
 
-    def __init__(
+    def __init__( # noqa: PLR0913
         self,
         max_seq_length: int = 50,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore[no-any-return]
-        **cnn_kwargs: dict[str, Any],
+        report_to: REPORTERS_NAMES | None = None,
+        embed_dim: int = 128,
+        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        num_filters: int = 100,
+        dropout: float = 0.1,
+        pretrained_embs: torch.Tensor | None = None,
     ) -> None:
         self.max_seq_length = max_seq_length
         self.num_train_epochs = num_train_epochs
@@ -40,7 +57,13 @@ class CNNScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
-        self.cnn_config = cnn_kwargs
+
+        # CNN-specific parameters
+        self.embed_dim = embed_dim
+        self.kernel_sizes = kernel_sizes
+        self.num_filters = num_filters
+        self.dropout = dropout
+        self.pretrained_embs = pretrained_embs
 
         # Will be initialized during fit()
         self._model: TextCNN | None = None
@@ -53,22 +76,32 @@ class CNNScorer(BaseScorer):
         self._multilabel: bool = False
 
     @classmethod
-    def from_context(
+    def from_context( # noqa: PLR0913
         cls,
         context: Context,
+        max_seq_length: int = 50,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **cnn_kwargs: dict[str, Any],
+        embed_dim: int = 128,
+        kernel_sizes: tuple[int, ...] = (3, 4, 5),
+        num_filters: int = 100,
+        dropout: float = 0.1,
+        pretrained_embs: torch.Tensor | None = None,
     ) -> "CNNScorer":
         return cls(
+            max_seq_length=max_seq_length,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
             report_to=context.logging_config.report_to,
-            **cnn_kwargs,
+            embed_dim=embed_dim,
+            kernel_sizes=kernel_sizes,
+            num_filters=num_filters,
+            dropout=dropout,
+            pretrained_embs=pretrained_embs,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -94,12 +127,12 @@ class CNNScorer(BaseScorer):
         self._model = TextCNN(
             vocab_size=len(self._vocab),
             n_classes=self._n_classes,
-            embed_dim=self.cnn_config.get("embed_dim", 128),
-            kernel_sizes=self.cnn_config.get("kernel_sizes", (3, 4, 5)),
-            num_filters=self.cnn_config.get("num_filters", 100),
-            dropout=self.cnn_config.get("dropout", 0.1),
+            embed_dim=self.embed_dim,
+            kernel_sizes=self.kernel_sizes,
+            num_filters=self.num_filters,
+            dropout=self.dropout,
             padding_idx=self._padding_idx,
-            pretrained_embs=self.cnn_config.get("pretrained_embs", None),
+            pretrained_embs=self.pretrained_embs,
         )
 
         # Training
