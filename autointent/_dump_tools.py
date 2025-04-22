@@ -8,6 +8,7 @@ from typing import Any, TypeAlias, Union, get_args, get_origin
 import joblib
 import numpy as np
 import numpy.typing as npt
+import torch
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
@@ -18,7 +19,7 @@ from autointent.schemas import TagsList
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker  # type: ignore[type-arg]
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | torch.nn.Module  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
+    torch_models = "torch_models"
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
@@ -52,6 +54,7 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
+            path / Dumper.torch_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=True)
@@ -115,6 +118,23 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
+            elif isinstance(val, torch.nn.Module):
+                model_path = path / Dumper.torch_models / key
+                model_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    # Save model state dict
+                    torch.save(val.state_dict(), model_path / "model.pt")
+                    # Save class info for reconstruction
+                    class_info = {
+                        "module": val.__class__.__module__,
+                        "name": val.__class__.__name__,
+                        "init_args": getattr(val, "_init_args", {}),
+                    }
+                    with (model_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                except Exception as e:
+                    msg = f"Error dumping torch model {key}: {e}"
+                    logger.exception(msg)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -142,6 +162,7 @@ class Dumper:
         pydantic_models: dict[str, Any] = {}
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
+        torch_models: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -227,6 +248,26 @@ class Dumper:
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
+            elif child.name == Dumper.torch_models:
+                for model_dir in child.iterdir():
+                    try:
+                        with (model_dir / "class_info.json").open("r") as f:
+                            class_info = json.load(f)
+
+                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
+                        model_class = getattr(module, class_info["name"])
+
+                        # Initialize model with saved init args
+                        model = model_class(**class_info.get("init_args", {}))
+
+                        # Load state dict
+                        state_dict = torch.load(model_dir / "model.pt")
+                        model.load_state_dict(state_dict)
+
+                        torch_models[model_dir.name] = model
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading torch model {model_dir.name}: {e}"
+                        logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
@@ -242,4 +283,5 @@ class Dumper:
             | pydantic_models
             | hf_models
             | hf_tokenizers
+            | torch_models
         )
