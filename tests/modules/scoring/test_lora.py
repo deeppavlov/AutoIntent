@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from autointent.context.data_handler import DataHandler
 from autointent._dump_tools import Dumper
+from autointent.context.data_handler import DataHandler
 from autointent.modules import BERTLoRAScorer
 
 
@@ -21,20 +21,17 @@ def test_lora_prediction(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    # Get initial predictions
     initial_predictions = scorer.predict(test_data)
 
-    # Perform dump and load
     import tempfile
     with tempfile.TemporaryDirectory() as tmpdir:
         import pathlib
         dump_path = pathlib.Path(tmpdir)
         Dumper.dump(scorer, dump_path)
-        
-        # Create new scorer instance and load state
+
         new_scorer = BERTLoRAScorer(transformer_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
         Dumper.load(new_scorer, dump_path)
-        
+
         loaded_predictions = new_scorer.predict(test_data)
         np.testing.assert_array_almost_equal(initial_predictions, loaded_predictions, decimal=5)
 
