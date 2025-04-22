@@ -126,7 +126,7 @@ html_theme_options = {
         },
         {
             "name": "HuggingFace",
-            "url": "https://huggingface.co/AutoIntent",
+            "url": "https://huggingface.co/DeepPavlov",
             "icon": f"{BASE_STATIC_URL}/hf-logo.svg",
             "type": "local",
         },

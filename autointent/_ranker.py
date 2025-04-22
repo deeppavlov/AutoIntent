@@ -111,7 +111,7 @@ class Ranker:
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
             self.config.model_name,
-            trust_remote_code=True,
+            trust_remote_code=self.config.trust_remote_code,
             device=self.config.device,
             max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
         )

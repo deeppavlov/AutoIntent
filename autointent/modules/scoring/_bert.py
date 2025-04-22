@@ -7,7 +7,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
-from transformers import (
+from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
@@ -31,14 +31,14 @@ class BertScorer(BaseScorer):
 
     def __init__(
         self,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
     ) -> None:
-        self.model_config = HFModelConfig.from_search_config(model_config)
+        self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -49,19 +49,19 @@ class BertScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
     ) -> "BertScorer":
-        if model_config is None:
-            model_config = context.resolve_embedder()
+        if classification_model_config is None:
+            classification_model_config = context.resolve_embedder()
 
         report_to = context.logging_config.report_to
 
         return cls(
-            model_config=model_config,
+            classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
@@ -70,7 +70,7 @@ class BertScorer(BaseScorer):
         )
 
     def get_embedder_config(self) -> dict[str, Any]:
-        return self.model_config.model_dump()
+        return self.classification_model_config.model_dump()
 
     def fit(
         self,
@@ -81,7 +81,7 @@ class BertScorer(BaseScorer):
             self.clear_cache()
         self._validate_task(labels)
 
-        model_name = self.model_config.model_name
+        model_name = self.classification_model_config.model_name
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         label2id = {i: i for i in range(self._n_classes)}
@@ -89,17 +89,18 @@ class BertScorer(BaseScorer):
 
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
+            trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
             label2id=label2id,
             id2label=id2label,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
         )
 
-        use_cpu = self.model_config.device == "cpu"
+        use_cpu = self.classification_model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"], return_tensors="pt", **self.model_config.tokenizer_config.model_dump()
+                examples["text"], return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump()
             )
 
         dataset = Dataset.from_dict({"text": utterances, "labels": labels})
@@ -127,7 +128,7 @@ class BertScorer(BaseScorer):
                 use_cpu=use_cpu,
             )
 
-            trainer = Trainer(
+            trainer = Trainer(  # type: ignore[no-untyped-call]
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset,
@@ -135,7 +136,7 @@ class BertScorer(BaseScorer):
                 data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
             )
 
-            trainer.train()
+            trainer.train()  # type: ignore[attr-defined]
 
         self._model.eval()
 
@@ -148,7 +149,9 @@ class BertScorer(BaseScorer):
         all_predictions = []
         for i in range(0, len(utterances), self.batch_size):
             batch = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(batch, return_tensors="pt", **self.model_config.tokenizer_config.model_dump())
+            inputs = self._tokenizer(
+                batch, return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump()
+            )
             inputs = {k: v.to(device) for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**inputs)

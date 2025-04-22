@@ -40,7 +40,7 @@ log_config = LoggingConfig(project_dir=Path("logging_tutorial"))
 pipeline_optimizer = Pipeline.from_search_space(search_space)
 pipeline_optimizer.set_config(log_config)
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # %% [markdown]
 """
