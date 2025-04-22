@@ -32,6 +32,12 @@
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
                 },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                },
                 "train_head": {
                     "default": false,
                     "description": "Whether to train the head of the model. If False, LogReg will be trained.",
@@ -65,7 +71,7 @@
                 },
                 "validation_size": {
                     "default": 0.2,
-                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).",
+                    "description": "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split). If `is_few_shot_train` is True, this value will be ignored.",
                     "maximum": 1,
                     "minimum": 0,
                     "title": "Validation Size",
@@ -85,6 +91,19 @@
                     "default": 0.5,
                     "description": "Set to float to prevent data leak between scoring and decision nodes.",
                     "title": "Separation Ratio"
+                },
+                "is_few_shot_train": {
+                    "default": false,
+                    "description": "Whether to use few-shot training.",
+                    "title": "Is Few Shot Train",
+                    "type": "boolean"
+                },
+                "examples_per_intent": {
+                    "default": 8,
+                    "description": "Number of examples per intent for few-shot validation. If None, all examples will be used.",
+                    "exclusiveMinimum": 0,
+                    "title": "Examples Per Intent",
+                    "type": "integer"
                 }
             },
             "title": "DataConfig",
@@ -121,6 +140,12 @@
                 },
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
                 },
                 "default_prompt": {
                     "anyOf": [
@@ -199,6 +224,19 @@
                     "default": null,
                     "description": "Prompt for passage.",
                     "title": "Passage Prompt"
+                },
+                "similarity_fn_name": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "cosine",
+                    "description": "Name of the similarity function to use (cosine, dot, euclidean, manhattan).",
+                    "title": "Similarity Fn Name"
                 },
                 "use_cache": {
                     "default": false,
@@ -337,7 +375,9 @@
                 "scheme": "ho",
                 "n_folds": 3,
                 "validation_size": 0.2,
-                "separation_ratio": 0.5
+                "separation_ratio": 0.5,
+                "is_few_shot_train": false,
+                "examples_per_intent": 8
             }
         },
         "search_space": {
@@ -370,12 +410,14 @@
                     "padding": true,
                     "truncation": true
                 },
+                "trust_remote_code": false,
                 "default_prompt": null,
                 "classifier_prompt": null,
                 "cluster_prompt": null,
                 "sts_prompt": null,
                 "query_prompt": null,
                 "passage_prompt": null,
+                "similarity_fn_name": "cosine",
                 "use_cache": false
             }
         },
@@ -390,6 +432,7 @@
                     "padding": true,
                     "truncation": true
                 },
+                "trust_remote_code": false,
                 "train_head": false
             }
         },

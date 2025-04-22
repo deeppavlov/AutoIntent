@@ -19,6 +19,7 @@ class HFModelConfig(BaseModel):
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
     tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
+    trust_remote_code: bool = Field(False, description="Whether to trust the remote code when loading the model.")
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
@@ -60,6 +61,9 @@ class EmbedderConfig(HFModelConfig):
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
     passage_prompt: str | None = Field(None, description="Prompt for passage.")
+    similarity_fn_name: str | None = Field(
+        "cosine", description="Name of the similarity function to use (cosine, dot, euclidean, manhattan)."
+    )
 
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.
