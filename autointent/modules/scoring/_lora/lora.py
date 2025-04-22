@@ -36,7 +36,7 @@ class BERTLoRAScorer(BertScorer):
             seed=seed,
             report_to=report_to,
             )
-        self._lora_config = LoraConfig(**lora_kwargs) # type: ignore[valid-type]
+        self._lora_config = LoraConfig(**lora_kwargs) # type: ignore[arg-type]
 
     @classmethod
     def from_context(
