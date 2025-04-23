@@ -45,7 +45,8 @@ class PTuningScorer(BaseScorer):
             num_train_epochs=3,
             batch_size=8,
             task_type="SEQ_CLS",
-            num_virtual_tokens=10
+            num_virtual_tokens=10,
+            seed=42
         )
         utterances = ["hello", "goodbye", "allo", "sayonara"]
         labels = [0, 1, 0, 1]
@@ -56,8 +57,8 @@ class PTuningScorer(BaseScorer):
 
     .. testoutput::
 
-        [[0.49624494 0.5037551 ]
-        [0.5066545  0.4933455 ]]
+        [[0.5097008  0.49029925]
+        [0.51252764 0.4874724n]]
 
     """
 
@@ -84,6 +85,7 @@ class PTuningScorer(BaseScorer):
         self._model: Any = None
         self._tokenizer: Any = None
         self._ptuning_config = PromptEncoderConfig(**ptuning_kwargs)  # type: ignore[arg-type]
+        torch.manual_seed(seed)
 
     @classmethod
     def from_context(
