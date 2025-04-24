@@ -12,6 +12,52 @@ from autointent.modules.scoring._bert import BertScorer
 
 
 class BERTLoRAScorer(BertScorer):
+    """BERTLoRAScorer class for transformer-based classification with LoRA (Low-Rank Adaptation).
+
+    Args:
+        classification_model_config: Config of the base transformer model (HFModelConfig, str, or dict)
+        num_train_epochs: Number of training epochs (default: 3)
+        batch_size: Batch size for training (default: 8)
+        learning_rate: Learning rate for training (default: 5e-5)
+        seed: Random seed for reproducibility (default: 0)
+        report_to: Reporting tool for training logs
+        **lora_kwargs: Arguments for `LoraConfig <https://huggingface.co/docs/peft/package_reference/lora#peft.LoraConfig>`_
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules import BERTLoRAScorer
+        
+        # Initialize scorer with LoRA configuration
+        scorer = BERTLoRAScorer(
+            classification_model_config="bert-base-uncased",
+            num_train_epochs=3,
+            batch_size=8,
+            learning_rate=5e-5,
+            seed=42,
+            r=8,  # LoRA rank
+            lora_alpha=16,  # LoRA alpha
+        )
+        
+        # Training data
+        utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+        labels = [1, 0, 1, 0]  # Binary classification
+        
+        # Fit the model
+        scorer.fit(utterances, labels)
+        
+        # Make predictions
+        test_utterances = ["Good product", "Not worth it"]
+        probabilities = scorer.predict(test_utterances)
+        print(probabilities)
+
+    .. testoutput::
+
+        [[0.89 0.11]
+        [0.23 0.77]]
+    """
+
     name = "lora"
     supports_multiclass = True
     supports_multilabel = True
