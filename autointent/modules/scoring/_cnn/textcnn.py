@@ -24,7 +24,7 @@ class TextCNN(nn.Module):
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True) # type: ignore[no-untyped-call]
         else:
             self.embedding = nn.Embedding(
                 num_embeddings=vocab_size,
