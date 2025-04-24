@@ -14,11 +14,12 @@ def test_ptuning_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     scorer_original = PTuningScorer(
-        base_model_config="prajjwal1/bert-tiny",
+        classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
         task_type="SEQ_CLS",
         num_virtual_tokens=10,
+        seed=42,
     )
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -34,11 +35,12 @@ def test_ptuning_scorer_dump_load(dataset):
         scorer_original.dump(str(temp_dir_path))
 
         scorer_loaded = PTuningScorer(
-            base_model_config="prajjwal1/bert-tiny",
+            classification_model_config="prajjwal1/bert-tiny",
             num_train_epochs=1,
             batch_size=8,
             task_type="SEQ_CLS",
             num_virtual_tokens=10,
+            seed=42,
         )
         scorer_loaded.load(str(temp_dir_path))
 
@@ -61,11 +63,12 @@ def test_ptuning_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = PTuningScorer(
-        base_model_config="prajjwal1/bert-tiny",
+        classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
         task_type="SEQ_CLS",
         num_virtual_tokens=10,
+        seed=42,
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -100,11 +103,12 @@ def test_ptuning_cache_clearing(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = PTuningScorer(
-        base_model_config="prajjwal1/bert-tiny",
+        classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
         task_type="SEQ_CLS",
         num_virtual_tokens=20,
+        seed=42,
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
