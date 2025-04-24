@@ -1,33 +1,24 @@
 """PTuningScorer class for ptuning-based classification."""
 
-import tempfile
 from typing import Any
 
-import numpy as np
-import numpy.typing as npt
 import torch
-from datasets import Dataset
 from peft import PromptEncoderConfig, get_peft_model
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    Trainer,
-    TrainingArguments,
 )
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import HFModelConfig
-from autointent.custom_types import ListOfLabels
-from autointent.modules.base import BaseScorer
+from autointent.modules.scoring._bert import BertScorer
 
 
-class PTuningScorer(BaseScorer):
+class PTuningScorer(BertScorer):
     """PEFT P-tuning scorer.
 
     Args:
-        base_model_config: Config of the base transformer model (HFModelConfig)
+        classification_model_config: Config of the base transformer model (HFModelConfig, str, or dict)
         num_train_epochs: Number of training epochs
         batch_size: Batch size for training
         learning_rate: Learning rate for training
@@ -41,7 +32,7 @@ class PTuningScorer(BaseScorer):
 
         from autointent.modules import PTuningScorer
         scorer = PTuningScorer(
-            base_model_config="prajjwal1/bert-tiny",
+            classification_model_config="prajjwal1/bert-tiny",
             num_train_epochs=3,
             batch_size=8,
             task_type="SEQ_CLS",
@@ -57,18 +48,20 @@ class PTuningScorer(BaseScorer):
 
     .. testoutput::
 
-        [[0.5097008  0.49029925]
-        [0.51252764 0.4874724n]]
+        [[0.49925193 0.50074804]
+        [0.4944601  0.5055399 ]]
 
     """
 
     name = "ptuning"
     supports_multiclass = True
     supports_multilabel = True
+    _model: Any
+    _tokenizer: Any
 
     def __init__(
         self,
-        base_model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -76,14 +69,14 @@ class PTuningScorer(BaseScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         **ptuning_kwargs: dict[str, Any],
     ) -> None:
-        self.base_model_config = HFModelConfig.from_search_config(base_model_config)
-        self.num_train_epochs = num_train_epochs
-        self.batch_size = batch_size
-        self.learning_rate = learning_rate
-        self.seed = seed
-        self.report_to = report_to
-        self._model: Any = None
-        self._tokenizer: Any = None
+        super().__init__(
+            classification_model_config=classification_model_config,
+            num_train_epochs=num_train_epochs,
+            batch_size=batch_size,
+            learning_rate=learning_rate,
+            seed=seed,
+            report_to=report_to,
+        )
         self._ptuning_config = PromptEncoderConfig(**ptuning_kwargs)  # type: ignore[arg-type]
         torch.manual_seed(seed)
 
@@ -91,7 +84,7 @@ class PTuningScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        base_model_config: HFModelConfig | str | dict[str, Any] | None = None,
+        classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -102,20 +95,20 @@ class PTuningScorer(BaseScorer):
 
         Args:
             context: Context containing configurations and utilities
-            base_model_config: Config of the base model, or None to use the best embedder
+            classification_model_config: Config of the base model, or None to use the best embedder
             num_train_epochs: Number of training epochs
             batch_size: Batch size for training
             learning_rate: Learning rate for training
             seed: Random seed for reproducibility
             **ptuning_kwargs: Arguments for PromptEncoderConfig
         """
-        if base_model_config is None:
-            base_model_config = context.resolve_embedder()
+        if classification_model_config is None:
+            classification_model_config = context.resolve_embedder()
 
         report_to = context.logging_config.report_to
 
         return cls(
-            base_model_config=base_model_config,
+            classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
@@ -124,129 +117,14 @@ class PTuningScorer(BaseScorer):
             **ptuning_kwargs,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Return the configuration of the base model."""
-        return self.base_model_config.model_dump()
-
-    def fit(
-        self,
-        utterances: list[str],
-        labels: ListOfLabels,
-    ) -> None:
-        """Train the model using P-tuning with the PEFT library.
-
-        Args:
-            utterances: List of training utterances
-            labels: List of labels corresponding to the utterances
-        """
-        if getattr(self, "_model", None) is not None:
-            self.clear_cache()
-        self._validate_task(labels)
-
-        model_name = self.base_model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(
-            model_name, trust_remote_code=self.base_model_config.trust_remote_code
-        )
-
+    def _initialize_model(self) -> None:
+        """Initialize the model with P-tuning configuration."""
+        model_name = self.classification_model_config.model_name
         self._model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
             num_labels=self._n_classes,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
-            trust_remote_code=self.base_model_config.trust_remote_code,
+            trust_remote_code=self.classification_model_config.trust_remote_code,
             return_dict=True,
         )
-
         self._model = get_peft_model(self._model, self._ptuning_config)
-
-        use_cpu = self.base_model_config.device == "cpu"
-
-        def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
-            return self._tokenizer(  # type: ignore[no-any-return]
-                examples["text"], return_tensors="pt", **self.base_model_config.tokenizer_config.model_dump()
-            )
-
-        dataset_dict = {"text": utterances, "labels": labels}
-        dataset = Dataset.from_dict(dataset_dict)
-
-        if self._multilabel:
-            dataset = dataset.map(
-                lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns=["labels"]
-            )
-            dataset = dataset.rename_column("label", "labels")
-
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            training_args = TrainingArguments(
-                output_dir=tmp_dir,
-                num_train_epochs=self.num_train_epochs,
-                per_device_train_batch_size=self.batch_size,
-                learning_rate=self.learning_rate,
-                seed=self.seed,
-                save_strategy="no",
-                logging_strategy="steps",
-                logging_steps=10,
-                report_to=self.report_to,
-                use_cpu=use_cpu,
-                label_names=["labels"],
-            )
-
-            data_collator = DataCollatorWithPadding(tokenizer=self._tokenizer)
-
-            trainer = Trainer(  # type: ignore[no-untyped-call]
-                model=self._model,
-                args=training_args,
-                train_dataset=tokenized_dataset,
-                processing_class=self._tokenizer,
-                data_collator=data_collator,
-            )
-
-            trainer.train()  # type: ignore[attr-defined]
-
-        self._model.eval()
-
-    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """Predict probabilities for the given utterances.
-
-        Args:
-            utterances: List of query utterances
-
-        Returns:
-            Array of predicted probabilities for each class (shape: [n_utterances, n_classes])
-
-        Raises:
-            RuntimeError: If the model is not trained yet
-        """
-        if getattr(self, "_model", None) is None or getattr(self, "_tokenizer", None) is None:
-            msg = "Model is not trained. Call fit() first."
-            raise RuntimeError(msg)
-
-        device = next(self._model.parameters()).device
-        all_predictions = []
-
-        for i in range(0, len(utterances), self.batch_size):
-            batch_utterances = utterances[i : i + self.batch_size]
-            inputs = self._tokenizer(
-                batch_utterances, return_tensors="pt", **self.base_model_config.tokenizer_config.model_dump()
-            )
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-
-            with torch.no_grad():
-                outputs = self._model(**inputs)
-                logits = outputs.logits
-
-            if self._multilabel:
-                batch_predictions = torch.sigmoid(logits).cpu().numpy()
-            else:
-                batch_predictions = torch.softmax(logits, dim=-1).cpu().numpy()
-
-            all_predictions.append(batch_predictions)
-
-        return np.vstack(all_predictions) if all_predictions else np.array([])
-
-    def clear_cache(self) -> None:
-        """Clear cached data in memory used by the model and tokenizer."""
-        if hasattr(self, "_model"):
-            del self._model
-        if hasattr(self, "_tokenizer"):
-            del self._tokenizer
