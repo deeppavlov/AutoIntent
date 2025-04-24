@@ -28,7 +28,7 @@ class BERTLoRAScorer(BertScorer):
     .. testcode::
 
         from autointent.modules import BERTLoRAScorer
-        
+
         # Initialize scorer with LoRA configuration
         scorer = BERTLoRAScorer(
             classification_model_config="bert-base-uncased",
@@ -39,14 +39,14 @@ class BERTLoRAScorer(BertScorer):
             r=8,  # LoRA rank
             lora_alpha=16,  # LoRA alpha
         )
-        
+
         # Training data
         utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
         labels = [1, 0, 1, 0]  # Binary classification
-        
+
         # Fit the model
         scorer.fit(utterances, labels)
-        
+
         # Make predictions
         test_utterances = ["Good product", "Not worth it"]
         probabilities = scorer.predict(test_utterances)
