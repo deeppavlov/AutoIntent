@@ -13,7 +13,7 @@ class TextCNN(nn.Module):
         vocab_size: int,
         n_classes: int,
         embed_dim: int = 128,
-        kernel_sizes: list[int] = [3, 4, 5],
+        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
         padding_idx: int = 0,
@@ -24,7 +24,7 @@ class TextCNN(nn.Module):
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True) # type: ignore
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
         else:
             self.embedding = nn.Embedding(
                 num_embeddings=vocab_size,

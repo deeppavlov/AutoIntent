@@ -2,7 +2,7 @@
 
 import re
 from collections import Counter
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -85,8 +85,8 @@ class CNNScorer(BaseScorer):
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], (list, np.ndarray))
-    
+        self._multilabel = isinstance(labels[0], (list, np.ndarray)) # noqa: UP038
+
         if self._multilabel:
             self._n_classes = len(labels[0])
         else:
