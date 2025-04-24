@@ -15,10 +15,8 @@ def test_lora_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer_original = BERTLoRAScorer(
-        classification_model_config="prajjwal1/bert-tiny",
-        num_train_epochs=1,
-        batch_size=8
-        )
+        classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8
+    )
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -38,10 +36,8 @@ def test_lora_scorer_dump_load(dataset):
 
         # Create a new scorer and load saved model
         scorer_loaded = BERTLoRAScorer(
-            classification_model_config="prajjwal1/bert-tiny",
-            num_train_epochs=1,
-            batch_size=8
-            )
+            classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8
+        )
         scorer_loaded.load(str(temp_dir_path))
 
         # Verify model and tokenizer are loaded

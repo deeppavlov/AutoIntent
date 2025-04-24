@@ -85,7 +85,6 @@ class BertScorer(BaseScorer):
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
         )
 
-
     def fit(
         self,
         utterances: list[str],

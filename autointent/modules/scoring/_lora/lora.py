@@ -81,8 +81,8 @@ class BERTLoRAScorer(BertScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
-            )
-        self._lora_config = LoraConfig(**lora_kwargs) # type: ignore[arg-type]
+        )
+        self._lora_config = LoraConfig(**lora_kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_context(
@@ -113,5 +113,5 @@ class BERTLoRAScorer(BertScorer):
             num_labels=self._n_classes,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
             trust_remote_code=self.classification_model_config.trust_remote_code,
-            )
+        )
         self._model = get_peft_model(self._model, self._lora_config)
