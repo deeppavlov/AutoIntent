@@ -49,7 +49,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         MLKnnScorer,
         BertScorer,
         BERTLoRAScorer,
-        RNNScorer
+        RNNScorer,
     ]
 )
 

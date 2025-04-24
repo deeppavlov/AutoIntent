@@ -4,6 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from torch import nn
+from torch.optim import Adam
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -63,15 +64,6 @@ class RNNScorer(BaseScorer):
         """Get the configuration of the embedder."""
         return self.rnn_config.model_dump()
 
-    def _validate_task(self, labels: ListOfLabels) -> None:
-        """Validate the task type and set appropriate attributes."""
-        if isinstance(labels[0], list):
-            self._multilabel = True
-            self._n_classes = len(labels[0])
-        else:
-            self._multilabel = False
-            self._n_classes = max(labels) + 1
-
     def __initialize_model(self, vocab_size: int) -> None:
         """Initialize the RNN model."""
         self._model = SupervisedRNNClassifier(
@@ -128,7 +120,7 @@ class RNNScorer(BaseScorer):
     def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
         """Train the model."""
         self._model.train()
-        optimizer = torch.optim.Adam(self._model.parameters(), lr=self.learning_rate)
+        optimizer = Adam(self._model.parameters(), lr=self.learning_rate)
 
         criterion = nn.BCEWithLogitsLoss() if self._multilabel else nn.CrossEntropyLoss()
 
@@ -201,7 +193,7 @@ class SupervisedRNNClassifier(nn.Module):
         super().__init__()
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)  # type: ignore[no-untyped-call]
         else:
             self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=padding_idx)
         self.rnn = nn.LSTM(embed_dim, hidden_dim, num_layers=n_layers, batch_first=True, dropout=dropout)

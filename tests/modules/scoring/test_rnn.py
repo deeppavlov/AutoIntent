@@ -1,4 +1,3 @@
-
 import numpy as np
 import pytest
 
@@ -11,11 +10,7 @@ def test_rnn_prediction(dataset):
     """Test that the RNN model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(
-        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1),
-        num_train_epochs=1,
-        batch_size=8
-    )
+    scorer = RNNScorer(rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1), num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -52,11 +47,7 @@ def test_rnn_cache_clearing(dataset):
     """Test that the RNN model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(
-        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1),
-        num_train_epochs=1,
-        batch_size=8
-    )
+    scorer = RNNScorer(rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1), num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -82,9 +73,7 @@ def test_rnn_device(dataset):
 
     # Force CPU
     scorer_cpu = RNNScorer(
-        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1, device="cpu"),
-        num_train_epochs=1,
-        batch_size=8
+        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1, device="cpu"), num_train_epochs=1, batch_size=8
     )
 
     scorer_cpu.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -97,9 +86,7 @@ def test_rnn_device(dataset):
 
     # Test with default device
     scorer_default = RNNScorer(
-        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1),
-        num_train_epochs=1,
-        batch_size=8
+        rnn_config=RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1), num_train_epochs=1, batch_size=8
     )
 
     scorer_default.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
