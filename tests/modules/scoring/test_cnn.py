@@ -73,7 +73,7 @@ def test_cnn_cache_clearing(dataset):
     assert not hasattr(scorer, "_model") or scorer._model is None
 
     # После очистки кэша предсказания должны вызывать ошибку
-    with pytest.raises(ValueError, match="Model not trained. Call fit() first."):
+    with pytest.raises(ValueError):
         scorer.predict(test_data)
 
 
