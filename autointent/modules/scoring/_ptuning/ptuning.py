@@ -4,7 +4,7 @@ from typing import Any
 
 import torch
 from peft import PromptEncoderConfig, get_peft_model
-from transformers import (  # type: ignore[attr-defined]
+from transformers import (
     AutoModelForSequenceClassification,
 )
 
