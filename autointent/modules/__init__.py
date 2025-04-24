@@ -13,6 +13,7 @@ from .decision import (
 from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
 from .regex import SimpleRegex
 from .scoring import (
+    BERTLoRAScorer,
     BertScorer,
     CNNScorer,
     DescriptionScorer,
@@ -47,7 +48,8 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         SklearnScorer,
         MLKnnScorer,
         BertScorer,
-        CNNScorer
+        CNNScorer,
+        BERTLoRAScorer
     ]
 )
 
