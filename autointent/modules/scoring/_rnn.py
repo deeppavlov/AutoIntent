@@ -1,57 +1,45 @@
-import torch
-import torch.nn as nn
+from typing import Any
+
 import numpy as np
 import numpy.typing as npt
-from typing import Any, Optional, Dict, List, Union
+import torch
+from torch import nn
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import Config
+from autointent.configs import RNNConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
-from autointent.context.optimization_info import ScorerArtifact
 
-class RNNConfig(Config):
-    """Configuration for RNN models."""
-    model_name: str = "rnn"
-    embed_dim: int = 128
-    hidden_dim: int = 512
-    n_layers: int = 2
-    dropout: float = 0.1
-    device: str = "cuda" if torch.cuda.is_available() else "cpu"
-    max_seq_length: int = 128
-    padding_idx: int = 0
-    pretrained_embs: Optional[torch.Tensor] = None
 
 class RNNScorer(BaseScorer):
     """Scorer based on RNN model for text classification."""
     name = "rnn"
     supports_multiclass = True
     supports_multilabel = True
-    
     def __init__(
         self,
-        rnn_config: Optional[Union[RNNConfig, str, Dict[str, Any]]] = None,
+        rnn_config: RNNConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: Optional[REPORTERS_NAMES] = None,
+        report_to: REPORTERS_NAMES | None = None, # type: ignore  # noqa: PGH003
     ) -> None:
         """Initialize the RNN scorer."""
-        self.rnn_config = RNNConfig.from_search_config(rnn_config) if rnn_config else RNNConfig()
+        self.rnn_config = RNNConfig.from_search_config(rnn_config)
         self.num_train_epochs = num_train_epochs
-        self.batch_size = batch_size
+        self.batch_size = batch_size or self.rnn_config.batch_size
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
         self._artifact = None
-        
+
     @classmethod
     def from_context(
         cls,
         context: Context,
-        rnn_config: Optional[Union[RNNConfig, str, Dict[str, Any]]] = None,
+        rnn_config: RNNConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -68,8 +56,8 @@ class RNNScorer(BaseScorer):
             seed=seed,
             report_to=report_to,
         )
-    
-    def get_embedder_config(self) -> Dict[str, Any]:
+
+    def get_embedder_config(self) -> dict[str, Any]:
         """Get the configuration of the embedder."""
         return self.rnn_config.model_dump()
 
@@ -94,128 +82,109 @@ class RNNScorer(BaseScorer):
             dropout=self.rnn_config.dropout,
             pretrained_embs=self.rnn_config.pretrained_embs
         )
-        self._model.to(self.rnn_config.device)
+        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self._model.to(device)
 
     def fit(
         self,
-        utterances: List[str],
+        utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
         """Fit the model to the given data."""
         if hasattr(self, "_model"):
             self.clear_cache()
         self._validate_task(labels)
-        
-        # Create vocabulary
         self._create_vocab(utterances)
-        
-        # Initialize model
         self.__initialize_model(len(self._vocab))
-        
-        # Convert utterances to sequences
-        X = self._texts_to_sequences(utterances)
-        
-        # Convert labels to tensors
-        if self._multilabel:
-            y = torch.tensor(labels, dtype=torch.float)
-        else:
-            y = torch.tensor(labels, dtype=torch.long)
-        
-        # Train the model
-        self._train_model(X, y)
-        
-    def _create_vocab(self, utterances: List[str]) -> None:
+        x = self._texts_to_sequences(utterances)
+        y = torch.tensor(labels, dtype=torch.float) if self._multilabel else torch.tensor(labels, dtype=torch.long)
+        self._train_model(x, y)
+
+    def _create_vocab(self, utterances: list[str]) -> None:
         """Create vocabulary from utterances."""
-        # Create a simple vocabulary based on all words in the dataset
         unique_words = set()
         for text in utterances:
             for word in text.lower().split():
                 unique_words.add(word)
-        
+
         self._vocab = {"<PAD>": 0, "<UNK>": 1}
         for i, word in enumerate(unique_words):
             self._vocab[word] = i + 2
-            
-    def _texts_to_sequences(self, texts: List[str]) -> torch.Tensor:
+
+    def _texts_to_sequences(self, texts: list[str]) -> torch.Tensor:
         """Convert texts to sequences using the vocabulary."""
-        # Convert texts to sequences using the vocabulary
         sequences = []
         for text in texts:
             sequence = []
             for word in text.lower().split():
                 sequence.append(self._vocab.get(word, self._vocab["<UNK>"]))
             sequences.append(sequence)
-        
-        # Pad sequences
+
         max_len = min(max(len(seq) for seq in sequences), self.rnn_config.max_seq_length)
         padded_sequences = []
         for seq in sequences:
-            if len(seq) > max_len:
-                padded_seq = seq[:max_len]
-            else:
-                padded_seq = seq + [self._vocab["<PAD>"]] * (max_len - len(seq))
+            padded_seq = seq[:max_len] if len(seq) > max_len else seq + [self._vocab["<PAD>"]] * (max_len - len(seq))
             padded_sequences.append(padded_seq)
-        
+
         return torch.tensor(padded_sequences, dtype=torch.long)
-    
-    def _train_model(self, X: torch.Tensor, y: torch.Tensor) -> None:
+
+    def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
         """Train the model."""
         self._model.train()
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self.learning_rate)
-        
-        if self._multilabel:
-            criterion = nn.BCEWithLogitsLoss()
-        else:
-            criterion = nn.CrossEntropyLoss()
-        
-        X = X.to(self.rnn_config.device)
-        y = y.to(self.rnn_config.device)
-        
-        dataset = torch.utils.data.TensorDataset(X, y)
+
+        criterion = nn.BCEWithLogitsLoss() if self._multilabel else nn.CrossEntropyLoss()
+
+        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
+        x = x.to(device)
+        y = y.to(device)
+
+        dataset = torch.utils.data.TensorDataset(x, y)
         dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size, shuffle=True
         )
-        
+
         torch.manual_seed(self.seed)
-        
-        for epoch in range(self.num_train_epochs):
+
+        for _epoch in range(self.num_train_epochs):
             total_loss = 0
-            for batch_X, batch_y in dataloader:
+            for batch_x, batch_y in dataloader:
                 optimizer.zero_grad()
-                outputs, _ = self._model(batch_X)
+                outputs, _ = self._model(batch_x)
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 optimizer.step()
                 total_loss += loss.item()
-        
+
         self._model.eval()
-    
-    def predict(self, utterances: List[str]) -> npt.NDArray[Any]:
+
+    def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         """Predict probabilities for utterances."""
         if not hasattr(self, "_model") or not hasattr(self, "_vocab"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
-        
-        X = self._texts_to_sequences(utterances)
-        X = X.to(self.rnn_config.device)
-        
+
+        x = self._texts_to_sequences(utterances)
+        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
+        x = x.to(device)
+
         self._model.eval()
         all_predictions = []
-        
+
         with torch.no_grad():
-            for i in range(0, len(X), self.batch_size):
-                batch_X = X[i:i+self.batch_size]
-                outputs, _ = self._model(batch_X)
-                
+            for i in range(0, len(x), self.batch_size):
+                batch_x = x[i:i+self.batch_size]
+                outputs, _ = self._model(batch_x)
+
                 if self._multilabel:
                     batch_predictions = torch.sigmoid(outputs).cpu().numpy()
                 else:
                     batch_predictions = torch.softmax(outputs, dim=1).cpu().numpy()
-                
+
                 all_predictions.append(batch_predictions)
-        
+
         return np.vstack(all_predictions) if all_predictions else np.array([])
-    
+
     def clear_cache(self) -> None:
         """Clear model cache."""
         if hasattr(self, "_model"):
@@ -223,16 +192,16 @@ class RNNScorer(BaseScorer):
 
 
 class SupervisedRNNClassifier(nn.Module):
-    def __init__(self, 
-                 vocab_size, 
-                 n_classes, 
-                 embed_dim=128, 
-                 hidden_dim=512, 
-                 n_layers=2, 
+    def __init__(self,
+                 vocab_size,
+                 n_classes,
+                 embed_dim=128,
+                 hidden_dim=512,
+                 n_layers=2,
                  padding_idx=0,
                  dropout=0.1,
                  pretrained_embs=None
-        ):
+        ) -> None:
         super().__init__()
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
@@ -241,7 +210,7 @@ class SupervisedRNNClassifier(nn.Module):
             self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=padding_idx)
         self.rnn = nn.LSTM(embed_dim, hidden_dim, num_layers=n_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(hidden_dim, n_classes)
-    
+
     def forward(self, text):
         embedded = self.embedding(text)
         outputs, (hidden, _) = self.rnn(embedded)
