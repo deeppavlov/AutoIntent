@@ -148,7 +148,7 @@ def multilabel_predict(scores: npt.NDArray[Any], r: float, tags: list[Tag] | Non
     res = (scores >= thresh[:, None]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    y_pred: list[MultiLabel] = res.tolist()
     return [lab if sum(lab) > 0 else None for lab in y_pred]
 
 

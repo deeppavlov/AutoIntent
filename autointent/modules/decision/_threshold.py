@@ -169,7 +169,7 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
         thresh_selected = thresh[pred_classes]
         pred_classes[best_scores < thresh_selected] = -1  # out of scope
 
-    y_pred: list[int] = pred_classes.tolist()  # type: ignore[assignment]
+    y_pred: list[int] = pred_classes.tolist()
     return [lab if lab != -1 else None for lab in y_pred]
 
 
@@ -191,5 +191,5 @@ def multilabel_predict(
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    y_pred: list[MultiLabel] = res.tolist()
     return [lab if sum(lab) > 0 else None for lab in y_pred]

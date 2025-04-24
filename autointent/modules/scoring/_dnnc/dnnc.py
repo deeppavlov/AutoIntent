@@ -180,7 +180,7 @@ class DNNCScorer(BaseScorer):
 
         flattened_cross_encoder_scores: npt.NDArray[np.float64] = self._cross_encoder.predict(flattened_text_pairs)
         return [
-            flattened_cross_encoder_scores[i : i + self.k].tolist()  # type: ignore[misc]
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 

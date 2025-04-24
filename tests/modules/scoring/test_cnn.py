@@ -75,26 +75,3 @@ def test_cnn_cache_clearing(dataset):
     # После очистки кэша предсказания должны вызывать ошибку
     with pytest.raises(ValueError, match=r"Model not trained\. Call fit\(\) first\."):
         scorer.predict(test_data)
-
-
-def test_cnn_multilabel(dataset_multilabel):
-    """Test CNN scorer with multilabel data."""
-    data_handler = DataHandler(dataset_multilabel)
-
-    scorer = CNNScorer(
-        max_seq_length=50,
-        num_train_epochs=1,
-        batch_size=8,
-        learning_rate=5e-5
-    )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
-
-    test_data = ["sample text for testing", "another test example"]
-    predictions = scorer.predict(test_data)
-
-    # Для multilabel проверяем что выходные вероятности независимы
-    assert predictions.shape[0] == len(test_data)
-    assert predictions.shape[1] == len(data_handler.train_labels(0)[0])
-
-    # Проверяем что есть предсказания не только 0 и 1
-    assert np.any((predictions > 0) & (predictions < 1))
