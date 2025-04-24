@@ -118,8 +118,9 @@ def test_cnn_scorer_dump_load(dataset):
         )
         scorer_loaded.load(str(temp_dir_path))
 
-        # Verify model and tokenizer are loaded
-        assert not hasattr(scorer, "_model") or scorer._model is None
+        # Verify model is loaded
+        assert hasattr(scorer_loaded, "_model")
+        assert scorer_loaded._model is not None
 
         # Get predictions after loading
         predictions_after = scorer_loaded.predict(test_data)
