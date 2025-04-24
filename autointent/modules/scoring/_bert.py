@@ -72,6 +72,20 @@ class BertScorer(BaseScorer):
     def get_embedder_config(self) -> dict[str, Any]:
         return self.classification_model_config.model_dump()
 
+    def __initialize_model(self) -> None:
+        label2id = {i: i for i in range(self._n_classes)}
+        id2label = {i: i for i in range(self._n_classes)}
+
+        self._model = AutoModelForSequenceClassification.from_pretrained(
+            self.classification_model_config.model_name,
+            trust_remote_code=self.classification_model_config.trust_remote_code,
+            num_labels=self._n_classes,
+            label2id=label2id,
+            id2label=id2label,
+            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+        )
+
+
     def fit(
         self,
         utterances: list[str],
@@ -81,20 +95,9 @@ class BertScorer(BaseScorer):
             self.clear_cache()
         self._validate_task(labels)
 
-        model_name = self.classification_model_config.model_name
-        self._tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
 
-        label2id = {i: i for i in range(self._n_classes)}
-        id2label = {i: i for i in range(self._n_classes)}
-
-        self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name,
-            trust_remote_code=self.classification_model_config.trust_remote_code,
-            num_labels=self._n_classes,
-            label2id=label2id,
-            id2label=id2label,
-            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
-        )
+        self.__initialize_model()
 
         use_cpu = self.classification_model_config.device == "cpu"
 
