@@ -44,7 +44,7 @@
       seed: [0]
       lora_alpha: [16]
     - module_name: ptuning
-      base_model_config: ["prajjwal1/bert-tiny"]
+      classification_model_config: ["prajjwal1/bert-tiny"]
       num_train_epochs: [1]
       batch_size: [8, 16]
       task_type: ["SEQ_CLS"]

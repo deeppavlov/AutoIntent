@@ -32,7 +32,7 @@
       learning_rate: [5.0e-5]
       seed: [0]
     - module_name: ptuning
-      base_model_config: ["prajjwal1/bert-tiny"]
+      classification_model_config: ["prajjwal1/bert-tiny"]
       num_train_epochs: [1]
       batch_size: [8]
       task_type: ["SEQ_CLS"]
