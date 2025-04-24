@@ -14,9 +14,11 @@ from autointent.modules.base import BaseScorer
 
 class RNNScorer(BaseScorer):
     """Scorer based on RNN model for text classification."""
+
     name = "rnn"
     supports_multiclass = True
     supports_multilabel = True
+
     def __init__(
         self,
         rnn_config: RNNConfig | str | dict[str, Any] | None = None,
@@ -24,7 +26,7 @@ class RNNScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None, # type: ignore  # noqa: PGH003
+        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
     ) -> None:
         """Initialize the RNN scorer."""
         self.rnn_config = RNNConfig.from_search_config(rnn_config)
@@ -80,7 +82,7 @@ class RNNScorer(BaseScorer):
             n_layers=self.rnn_config.n_layers,
             padding_idx=self.rnn_config.padding_idx,
             dropout=self.rnn_config.dropout,
-            pretrained_embs=self.rnn_config.pretrained_embs
+            pretrained_embs=self.rnn_config.pretrained_embs,
         )
         device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
         self._model.to(device)
@@ -113,18 +115,13 @@ class RNNScorer(BaseScorer):
 
     def _texts_to_sequences(self, texts: list[str]) -> torch.Tensor:
         """Convert texts to sequences using the vocabulary."""
-        sequences = []
-        for text in texts:
-            sequence = []
-            for word in text.lower().split():
-                sequence.append(self._vocab.get(word, self._vocab["<UNK>"]))
-            sequences.append(sequence)
+        sequences = [[self._vocab.get(word, self._vocab["<UNK>"]) for word in text.lower().split()] for text in texts]
 
         max_len = min(max(len(seq) for seq in sequences), self.rnn_config.max_seq_length)
-        padded_sequences = []
-        for seq in sequences:
-            padded_seq = seq[:max_len] if len(seq) > max_len else seq + [self._vocab["<PAD>"]] * (max_len - len(seq))
-            padded_sequences.append(padded_seq)
+        padded_sequences = [
+            seq[:max_len] if len(seq) > max_len else seq + [self._vocab["<PAD>"]] * (max_len - len(seq))
+            for seq in sequences
+        ]
 
         return torch.tensor(padded_sequences, dtype=torch.long)
 
@@ -140,9 +137,7 @@ class RNNScorer(BaseScorer):
         y = y.to(device)
 
         dataset = torch.utils.data.TensorDataset(x, y)
-        dataloader = torch.utils.data.DataLoader(
-            dataset, batch_size=self.batch_size, shuffle=True
-        )
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         torch.manual_seed(self.seed)
 
@@ -173,7 +168,7 @@ class RNNScorer(BaseScorer):
 
         with torch.no_grad():
             for i in range(0, len(x), self.batch_size):
-                batch_x = x[i:i+self.batch_size]
+                batch_x = x[i : i + self.batch_size]
                 outputs, _ = self._model(batch_x)
 
                 if self._multilabel:
@@ -192,16 +187,17 @@ class RNNScorer(BaseScorer):
 
 
 class SupervisedRNNClassifier(nn.Module):
-    def __init__(self,
-                 vocab_size,
-                 n_classes,
-                 embed_dim=128,
-                 hidden_dim=512,
-                 n_layers=2,
-                 padding_idx=0,
-                 dropout=0.1,
-                 pretrained_embs=None
-        ) -> None:
+    def __init__(
+        self,
+        vocab_size: int,
+        n_classes: int,
+        embed_dim: int = 128,
+        hidden_dim: int = 512,
+        n_layers: int = 2,
+        padding_idx: int = 0,
+        dropout: float = 0.1,
+        pretrained_embs: torch.Tensor | None = None,
+    ) -> None:
         super().__init__()
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
@@ -211,7 +207,7 @@ class SupervisedRNNClassifier(nn.Module):
         self.rnn = nn.LSTM(embed_dim, hidden_dim, num_layers=n_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, text):
+    def forward(self, text: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         embedded = self.embedding(text)
         outputs, (hidden, _) = self.rnn(embedded)
-        return self.fc(outputs[:,-1]), hidden[-1]
+        return self.fc(outputs[:, -1]), hidden[-1]
