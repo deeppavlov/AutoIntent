@@ -87,11 +87,6 @@ class CNNScorer(BaseScorer):
         self._validate_task(labels)
         self._multilabel = isinstance(labels[0], (list, np.ndarray)) # noqa: UP038
 
-        if self._multilabel:
-            self._n_classes = len(labels[0]) #type: ignore[arg-type]
-        else:
-            self._n_classes = len(set(labels)) if labels else 0
-
         # Build vocabulary and tokenize
         self._build_vocab(utterances)
 

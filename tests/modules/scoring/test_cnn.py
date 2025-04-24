@@ -1,3 +1,7 @@
+import shutil
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -75,3 +79,58 @@ def test_cnn_cache_clearing(dataset):
     # После очистки кэша предсказания должны вызывать ошибку
     with pytest.raises(ValueError, match=r"Model not trained\. Call fit\(\) first\."):
         scorer.predict(test_data)
+
+
+def test_lora_scorer_dump_load(dataset):
+    """Test that BERTLoRAScorer can be saved and loaded while preserving predictions."""
+    data_handler = DataHandler(dataset)
+
+    # Create and train scorer
+    scorer = CNNScorer(
+        max_seq_length=50,
+        num_train_epochs=1,
+        batch_size=8,
+        learning_rate=5e-5
+    )
+    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+
+    # Test data
+    test_data = [
+        "why is there a hold on my account",
+        "why is my bank account frozen",
+    ]
+
+    # Get predictions before saving
+    predictions_before = scorer.predict(test_data)
+
+    # Create temp directory and save model
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="lora_scorer_test_"))
+    try:
+        # Save the model
+        scorer.dump(str(temp_dir_path))
+
+        # Create a new scorer and load saved model
+        scorer_loaded = CNNScorer(
+            max_seq_length=50,
+            num_train_epochs=1,
+            batch_size=8,
+            learning_rate=5e-5
+        )
+        scorer_loaded.load(str(temp_dir_path))
+
+        # Verify model and tokenizer are loaded
+        assert hasattr(scorer_loaded, "_model")
+        assert scorer_loaded._model is not None
+        assert hasattr(scorer_loaded, "_tokenizer")
+        assert scorer_loaded._tokenizer is not None
+
+        # Get predictions after loading
+        predictions_after = scorer_loaded.predict(test_data)
+
+        # Verify predictions match
+        assert predictions_before.shape == predictions_after.shape
+        np.testing.assert_allclose(predictions_before, predictions_after, atol=1e-6)
+
+    finally:
+        # Clean up
+        shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
