@@ -31,6 +31,12 @@
       batch_size: [8]
       learning_rate: [5.0e-5]
       seed: [0]
+    - module_name: ptuning
+      classification_model_config: ["prajjwal1/bert-tiny"]
+      num_train_epochs: [1]
+      batch_size: [8]
+      task_type: ["SEQ_CLS"]
+      num_virtual_tokens: [10, 20]
     - module_name: lora
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0
