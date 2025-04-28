@@ -6,6 +6,7 @@ from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
 from ._lora import BERTLoRAScorer
 from ._mlknn import MLKnnScorer
+from ._ptuning import PTuningScorer
 from ._sklearn import SklearnScorer
 
 __all__ = [
@@ -17,6 +18,7 @@ __all__ = [
     "KNNScorer",
     "LinearScorer",
     "MLKnnScorer",
+    "PTuningScorer",
     "RerankScorer",
     "SklearnScorer",
 ]

@@ -37,6 +37,12 @@
       embed_dim: [128]
       kernel_sizes: [[3, 4, 5]]
       num_filters: [100]
+    - module_name: ptuning
+      classification_model_config: ["prajjwal1/bert-tiny"]
+      num_train_epochs: [1]
+      batch_size: [8]
+      task_type: ["SEQ_CLS"]
+      num_virtual_tokens: [10, 20]
     - module_name: lora
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0
