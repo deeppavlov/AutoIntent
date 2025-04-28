@@ -1,3 +1,7 @@
+import shutil
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pytest
 
@@ -94,3 +98,50 @@ def test_rnn_device(dataset):
 
     # Both models should produce valid predictions
     assert predictions_cpu.shape == predictions_default.shape
+
+
+
+def test_rnn_scorer_dump_load(dataset):
+    """Test that RNNScorer can be saved and loaded while preserving predictions."""
+    data_handler = DataHandler(dataset)
+
+    # Create and train scorer
+    rnn_config = RNNConfig(embed_dim=64, hidden_dim=128, n_layers=1)
+    scorer_original = RNNScorer(rnn_config=rnn_config, num_train_epochs=1, batch_size=8)
+    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+
+    # Test data
+    test_data = [
+        "why is there a hold on my account",
+        "why is my bank account frozen",
+    ]
+
+    # Get predictions before saving
+    predictions_before = scorer_original.predict(test_data)
+
+    # Create temp directory and save model
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="rnn_scorer_test_"))
+    try:
+        # Save the model
+        scorer_original.dump(str(temp_dir_path))
+
+        # Create a new scorer and load saved model
+        scorer_loaded = RNNScorer(rnn_config=rnn_config, num_train_epochs=1, batch_size=8)
+        scorer_loaded.load(str(temp_dir_path))
+
+        # Verify model and vocabulary are loaded
+        assert hasattr(scorer_loaded, "_model")
+        assert scorer_loaded._model is not None
+        assert hasattr(scorer_loaded, "_vocab")
+        assert scorer_loaded._vocab is not None
+
+        # Get predictions after loading
+        predictions_after = scorer_loaded.predict(test_data)
+
+        # Verify predictions match
+        assert predictions_before.shape == predictions_after.shape
+        np.testing.assert_allclose(predictions_before, predictions_after, atol=1e-6)
+
+    finally:
+        # Clean up
+        shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
