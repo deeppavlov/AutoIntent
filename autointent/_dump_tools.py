@@ -8,18 +8,20 @@ from typing import Any, TypeAlias, Union, get_args, get_origin
 import joblib
 import numpy as np
 import numpy.typing as npt
-import torch
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+import torch
+from torch import nn
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.modules.scoring._cnn.textcnn import TextCNN
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | torch.nn.Module  # type: ignore[type-arg]
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | nn.Module  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)
@@ -96,6 +98,22 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
+            elif isinstance(val, nn.Module):
+                model_path = path / Dumper.torch_models / key
+                model_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    torch.save(val.state_dict(), model_path / "model.pt")
+                    # Save class info for loading
+                    class_info = {
+                        "module": val.__class__.__module__,
+                        "name": val.__class__.__name__,
+                        "is_textcnn": isinstance(val, TextCNN)
+                    }
+                    with (model_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                except Exception as e:
+                    msg = f"Error dumping torch model {key}: {e}"
+                    logger.exception(msg)
             elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
@@ -117,23 +135,6 @@ class Dumper:
                         json.dump(class_info, f)
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
-                    logger.exception(msg)
-            elif isinstance(val, torch.nn.Module):
-                model_path = path / Dumper.torch_models / key
-                model_path.mkdir(parents=True, exist_ok=True)
-                try:
-                    # Save model state dict
-                    torch.save(val.state_dict(), model_path / "model.pt")
-                    # Save class info for reconstruction
-                    class_info = {
-                        "module": val.__class__.__module__,
-                        "name": val.__class__.__name__,
-                        "init_args": getattr(val, "_init_args", {}),
-                    }
-                    with (model_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
-                except Exception as e:
-                    msg = f"Error dumping torch model {key}: {e}"
                     logger.exception(msg)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
@@ -257,13 +258,25 @@ class Dumper:
                         module = __import__(class_info["module"], fromlist=[class_info["name"]])
                         model_class = getattr(module, class_info["name"])
 
-                        # Initialize model with saved init args
-                        model = model_class(**class_info.get("init_args", {}))
+                        # Create model instance
+                        if class_info.get("is_textcnn"):
+                            # For TextCNN, we need to get the parameters from the parent CNNScorer
+                            model = model_class(
+                                vocab_size=len(obj._vocab) if hasattr(obj, "_vocab") and obj._vocab else 0,
+                                n_classes=obj._n_classes if hasattr(obj, "_n_classes") else 0,
+                                embed_dim=obj.embed_dim if hasattr(obj, "embed_dim") else 128,
+                                kernel_sizes=obj.kernel_sizes if hasattr(obj, "kernel_sizes") else [3, 4, 5],
+                                num_filters=obj.num_filters if hasattr(obj, "num_filters") else 100,
+                                dropout=obj.dropout if hasattr(obj, "dropout") else 0.1,
+                                padding_idx=obj._pad_idx if hasattr(obj, "_pad_idx") else 0
+                            )
+                        else:
+                            # For other torch models, create with default parameters
+                            model = model_class()
 
                         # Load state dict
-                        state_dict = torch.load(model_dir / "model.pt")
-                        model.load_state_dict(state_dict)
-
+                        model.load_state_dict(torch.load(model_dir / "model.pt"))
+                        model.eval()
                         torch_models[model_dir.name] = model
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading torch model {model_dir.name}: {e}"
