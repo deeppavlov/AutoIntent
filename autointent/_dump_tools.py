@@ -118,7 +118,7 @@ class Dumper:
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(model_path) # type: ignore[operator]
+                    val.save_pretrained(model_path)
                     class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
@@ -129,7 +129,7 @@ class Dumper:
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(tokenizer_path) # type: ignore[operator]
+                    val.save_pretrained(tokenizer_path)
                     class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
                     with (tokenizer_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
