@@ -37,6 +37,7 @@ class RNNScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self._artifact = None
+        self._device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
 
     @classmethod
     def from_context(
@@ -76,8 +77,7 @@ class RNNScorer(BaseScorer):
             dropout=self.rnn_config.dropout,
             pretrained_embs=self.rnn_config.pretrained_embs,
         )
-        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
-        self._model.to(device)
+        self._model.to(self.device)
 
     def fit(
         self,
@@ -124,9 +124,8 @@ class RNNScorer(BaseScorer):
 
         criterion = nn.BCEWithLogitsLoss() if self._multilabel else nn.CrossEntropyLoss()
 
-        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
-        x = x.to(device)
-        y = y.to(device)
+        x = x.to(self._device)
+        y = y.to(self._device)
 
         dataset = torch.utils.data.TensorDataset(x, y)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
@@ -152,8 +151,7 @@ class RNNScorer(BaseScorer):
             raise RuntimeError(msg)
 
         x = self._texts_to_sequences(utterances)
-        device = self.rnn_config.device or ("cuda" if torch.cuda.is_available() else "cpu")
-        x = x.to(device)
+        x = x.to(self.device)
 
         self._model.eval()
         all_predictions = []
