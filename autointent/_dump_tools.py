@@ -38,6 +38,7 @@ class Dumper:
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
     torch_models = "torch_models"
+    containers = "containers"
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
@@ -56,6 +57,7 @@ class Dumper:
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
             path / Dumper.torch_models,
+            path / Dumper.containers
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=True)
@@ -101,10 +103,7 @@ class Dumper:
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    torch.save(val._model.state_dict(), model_path / "model.pt") # noqa: SLF001
-                    vocab_path = path / Dumper.torch_models / "vocab.json"
-                    with vocab_path.open("w") as f:
-                        json.dump(val._vocab, f) # noqa: SLF001
+                    torch.save(val.state_dict(), model_path / "model.pt") # noqa: SLF001
                     class_info = {
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
@@ -164,6 +163,7 @@ class Dumper:
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
         torch_models: dict[str, Any] = {}
+        containers: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -260,7 +260,7 @@ class Dumper:
 
                         # Create model instance
                         model = model_class()
-                        vocab_path = path / Dumper.torch_models / "vocab.json"
+                        vocab_path = path / Dumper.containers / "vocab.json"
                         with vocab_path.open("r") as f:
                             model._vocab = json.load(f) # noqa: SLF001
 
@@ -270,6 +270,14 @@ class Dumper:
                         torch_models[model_dir.name] = model
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading torch model {model_dir.name}: {e}"
+                        logger.exception(msg)
+            elif child.name == Dumper.containers:
+                for container_file in child.iterdir():
+                    try:
+                        with container_file.open("r") as f:
+                            containers[container_file.stem] = json.load(f)
+                    except Exception as e:
+                        msg = f"Error loading container {container_file.stem}: {e}"
                         logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
@@ -287,4 +295,5 @@ class Dumper:
             | hf_models
             | hf_tokenizers
             | torch_models
+            | containers
         )
