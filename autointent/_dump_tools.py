@@ -15,7 +15,6 @@ from torch import nn
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.modules.scoring._cnn.textcnn import TextCNN
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
@@ -102,10 +101,10 @@ class Dumper:
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    torch.save(val._model.state_dict(), model_path / "model.pt")
+                    torch.save(val._model.state_dict(), model_path / "model.pt") # noqa: SLF001
                     vocab_path = path / Dumper.torch_models / "vocab.json"
                     with vocab_path.open("w") as f:
-                        json.dump(obj._vocab, f)
+                        json.dump(val._vocab, f) # noqa: SLF001
                     class_info = {
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
@@ -255,15 +254,15 @@ class Dumper:
                     try:
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
-                        vocab_path = path / Dumper.torch_models / "vocab.json"
-                        with vocab_path.open("r") as f:
-                            obj._vocab = json.load(f)
 
                         module = __import__(class_info["module"], fromlist=[class_info["name"]])
                         model_class = getattr(module, class_info["name"])
 
                         # Create model instance
                         model = model_class()
+                        vocab_path = path / Dumper.torch_models / "vocab.json"
+                        with vocab_path.open("r") as f:
+                            model._vocab = json.load(f) # noqa: SLF001
 
                         # Load state dict
                         model.load_state_dict(torch.load(model_dir / "model.pt"))

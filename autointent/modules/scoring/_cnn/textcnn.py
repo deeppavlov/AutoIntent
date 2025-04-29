@@ -70,5 +70,5 @@ class TextCNN(nn.Module):
         Args:
             model_path: Path to the saved model state dictionary.
         """
-        state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+        state_dict = torch.load(model_path)
         self.load_state_dict(state_dict)
