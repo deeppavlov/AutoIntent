@@ -102,12 +102,13 @@ class Dumper:
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    torch.save(val.state_dict(), model_path / "model.pt")
-                    # Save class info for loading
+                    torch.save(val._model.state_dict(), model_path / "model.pt")
+                    vocab_path = path / Dumper.torch_models / "vocab.json"
+                    with vocab_path.open("w") as f:
+                        json.dump(obj._vocab, f)
                     class_info = {
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
-                        "is_textcnn": isinstance(val, TextCNN)
                     }
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
@@ -254,25 +255,15 @@ class Dumper:
                     try:
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
+                        vocab_path = path / Dumper.torch_models / "vocab.json"
+                        with vocab_path.open("r") as f:
+                            obj._vocab = json.load(f)
 
                         module = __import__(class_info["module"], fromlist=[class_info["name"]])
                         model_class = getattr(module, class_info["name"])
 
                         # Create model instance
-                        if class_info.get("is_textcnn"):
-                            # For TextCNN, we need to get the parameters from the parent CNNScorer
-                            model = model_class(
-                                vocab_size=len(obj._vocab) if hasattr(obj, "_vocab") and obj._vocab else 0,
-                                n_classes=obj._n_classes if hasattr(obj, "_n_classes") else 0,
-                                embed_dim=obj.embed_dim if hasattr(obj, "embed_dim") else 128,
-                                kernel_sizes=obj.kernel_sizes if hasattr(obj, "kernel_sizes") else [3, 4, 5],
-                                num_filters=obj.num_filters if hasattr(obj, "num_filters") else 100,
-                                dropout=obj.dropout if hasattr(obj, "dropout") else 0.1,
-                                padding_idx=obj._pad_idx if hasattr(obj, "_pad_idx") else 0
-                            )
-                        else:
-                            # For other torch models, create with default parameters
-                            model = model_class()
+                        model = model_class()
 
                         # Load state dict
                         model.load_state_dict(torch.load(model_dir / "model.pt"))
