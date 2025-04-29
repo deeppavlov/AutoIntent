@@ -8,9 +8,9 @@ from typing import Any, TypeAlias, Union, get_args, get_origin
 import joblib
 import numpy as np
 import numpy.typing as npt
+import torch
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
-import torch
 from torch import nn
 
 from autointent import Embedder, Ranker, VectorIndex

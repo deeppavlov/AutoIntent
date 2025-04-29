@@ -63,10 +63,10 @@ class TextCNN(nn.Module):
         concatenated: torch.Tensor = torch.cat(conved, dim=1)
         dropped: torch.Tensor = self.dropout(concatenated)
         return self.fc(dropped) # type: ignore[no-any-return]
-    
+
     def load(self, model_path: str) -> None:
         """Load model from saved state.
-        
+
         Args:
             model_path: Path to the saved model state dictionary.
         """
