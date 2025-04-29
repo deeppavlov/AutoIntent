@@ -103,7 +103,7 @@ class Dumper:
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    torch.save(val.state_dict(), model_path / "model.pt") # noqa: SLF001
+                    torch.save(val.state_dict(), model_path / "model.pt")
                     class_info = {
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
@@ -272,13 +272,13 @@ class Dumper:
                         msg = f"Error loading torch model {model_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.containers:
-                for container_file in child.iterdir():
-                    try:
+                try:
+                    for container_file in child.iterdir():
                         with container_file.open("r") as f:
                             containers[container_file.stem] = json.load(f)
-                    except Exception as e:
-                        msg = f"Error loading container {container_file.stem}: {e}"
-                        logger.exception(msg)
+                except Exception as e:
+                    msg = f"Error loading containers: {e}"
+                    logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
