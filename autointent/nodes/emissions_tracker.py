@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 
 from codecarbon import EmissionsTracker as CodeCarbonTracker  # type: ignore[import-untyped]
 from codecarbon.output import EmissionsData  # type: ignore[import-untyped]
@@ -20,7 +21,12 @@ class EmissionsTracker:
             measure_power_secs: How often to measure power consumption in seconds.
         """
         self._logger = logger
-        self.tracker = CodeCarbonTracker(project_name=project_name, measure_power_secs=measure_power_secs)
+        self._disabled = int(os.getenv("DISABLE_EMISSIONS_TRACKING", "0"))
+        if not self._disabled:
+            self.tracker = CodeCarbonTracker(project_name=project_name, measure_power_secs=measure_power_secs)
+        else:
+            self._logger.info("Emissions tracking is disabled via DISABLE_EMISSIONS_TRACKING environment variable")
+            self.tracker = None
 
     def start_task(self, task_name: str) -> None:
         """Start tracking emissions for a specific task.
@@ -28,7 +34,8 @@ class EmissionsTracker:
         Args:
             task_name: Name of the task to track emissions for.
         """
-        self.tracker.start_task(task_name)
+        if not self._disabled:
+            self.tracker.start_task(task_name)
 
     def stop_task(self) -> dict[str, float]:
         """Stop tracking emissions and return the emissions data.
@@ -36,6 +43,9 @@ class EmissionsTracker:
         Returns:
             Dictionary containing emissions metrics.
         """
+        if self._disabled:
+            return {}
+
         emissions_data = self.tracker.stop_task()
         _ = self.tracker.stop()
         return self._process_metrics(emissions_data)
