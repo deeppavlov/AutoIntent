@@ -123,23 +123,18 @@ class CrossEncoderConfig(HFModelConfig):
 
 class RNNConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    model_name: str = Field("rnn", description="Name of the RNN model.")
-    embed_dim: int = Field(128, description="Dimension of word embeddings.")
-    hidden_dim: int = Field(512, description="Dimension of hidden states in RNN.")
-    n_layers: int = Field(2, description="Number of RNN layers.")
-    dropout: float = Field(0.1, description="Dropout rate.")
     device: str = Field(None, description="Torch notation for CPU or CUDA.")
     max_seq_length: int = Field(128, description="Maximum sequence length.")
     padding_idx: int = Field(0, description="Index used for padding.")
-    pretrained_embs: Any = Field(None, description="Pretrained embedding weights if available.")
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
 
     @classmethod
-    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> "RNNConfig":
         if values is None:
             return cls()
         if isinstance(values, BaseModel):
             return values  # type: ignore[return-value]
         if isinstance(values, str):
-            return cls(model_name=values)
+            return cls()
         return cls(**values)
+

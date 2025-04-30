@@ -22,6 +22,10 @@ class RNNScorer(BaseScorer):
 
     def __init__(
         self,
+        embed_dim: int = 128,
+        hidden_dim: int = 512,
+        n_layers: int = 2,
+        dropout: float = 0.1,
         rnn_config: RNNConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
@@ -30,6 +34,10 @@ class RNNScorer(BaseScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
     ) -> None:
         """Initialize the RNN scorer."""
+        self.embed_dim = embed_dim
+        self.hidden_dim = hidden_dim
+        self.n_layers = n_layers
+        self.dropout = dropout
         self.rnn_config = RNNConfig.from_search_config(rnn_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size or self.rnn_config.batch_size
@@ -43,6 +51,10 @@ class RNNScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
+        embed_dim: int = 128,
+        hidden_dim: int = 512,
+        n_layers: int = 2,
+        dropout: float = 0.1,
         rnn_config: RNNConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
         batch_size: int = 8,
@@ -53,6 +65,10 @@ class RNNScorer(BaseScorer):
         report_to = context.logging_config.report_to
 
         return cls(
+            embed_dim=embed_dim,
+            hidden_dim=hidden_dim,
+            n_layers=n_layers,
+            dropout=dropout,
             rnn_config=rnn_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
@@ -63,19 +79,26 @@ class RNNScorer(BaseScorer):
 
     def get_embedder_config(self) -> dict[str, Any]:
         """Get the configuration of the embedder."""
-        return self.rnn_config.model_dump()
+        config = self.rnn_config.model_dump()
+        config.update({
+            "embed_dim": self.embed_dim,
+            "hidden_dim": self.hidden_dim,
+            "n_layers": self.n_layers,
+            "dropout": self.dropout,
+        })
+        return config
 
     def __initialize_model(self, vocab_size: int) -> None:
         """Initialize the RNN model."""
         self._model = SupervisedRNNClassifier(
             vocab_size=vocab_size,
             n_classes=self._n_classes,
-            embed_dim=self.rnn_config.embed_dim,
-            hidden_dim=self.rnn_config.hidden_dim,
-            n_layers=self.rnn_config.n_layers,
+            embed_dim=self.embed_dim,
+            hidden_dim=self.hidden_dim,
+            n_layers=self.n_layers,
             padding_idx=self.rnn_config.padding_idx,
-            dropout=self.rnn_config.dropout,
-            pretrained_embs=self.rnn_config.pretrained_embs,
+            dropout=self.dropout,
+            pretrained_embs=None,
         )
         self._model.to(self.device)
 
