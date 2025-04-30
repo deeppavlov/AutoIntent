@@ -99,6 +99,17 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
+            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
+                model_path = path / Dumper.hf_models / key
+                model_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    val.save_pretrained(model_path)
+                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
+                    with (model_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                except Exception as e:
+                    msg = f"Error dumping HF model {key}: {e}"
+                    logger.exception(msg)
             elif isinstance(val, nn.Module):
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
@@ -112,17 +123,6 @@ class Dumper:
                         json.dump(class_info, f)
                 except Exception as e:
                     msg = f"Error dumping torch model {key}: {e}"
-                    logger.exception(msg)
-            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
-                model_path = path / Dumper.hf_models / key
-                model_path.mkdir(parents=True, exist_ok=True)
-                try:
-                    val.save_pretrained(model_path)
-                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                    with (model_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
-                except Exception as e:
-                    msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
             elif (key == "_tokenizer" or "tokenizer" in key.lower()) and hasattr(val, "save_pretrained"):
                 tokenizer_path = path / Dumper.hf_tokenizers / key
