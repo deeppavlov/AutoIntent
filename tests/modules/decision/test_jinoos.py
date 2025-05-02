@@ -42,6 +42,7 @@ def test_fails_on_wrong_clf_problem(multilabel_fit_data):
     with pytest.raises(WrongClassificationError):
         predictor.fit(*multilabel_fit_data)
 
+
 def test_dump_load(multiclass_fit_data):
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)

@@ -39,6 +39,7 @@ def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
     with pytest.raises(MismatchNumClassesError):
         predictor.predict(scores)
 
+
 @pytest.mark.parametrize("fit_fixture", ["multiclass_fit_data", "multilabel_fit_data"])
 def test_dump_load(fit_fixture, request):
     fit_data = request.getfixturevalue(fit_fixture)
