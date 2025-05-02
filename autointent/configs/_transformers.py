@@ -115,7 +115,10 @@ class EmbedderConfig(HFModelConfig):
 
 
 class CrossEncoderConfig(HFModelConfig):
-    model_name: str = Field("DiTy/cross-encoder-russian-msmarco", description="Name of the hugging face model.")
+    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
         False, description="Whether to train the head of the model. If False, LogReg will be trained."
     )
+    tokenizer_config: TokenizerConfig = Field(
+        default_factory=lambda: TokenizerConfig(max_length=512)
+    )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly

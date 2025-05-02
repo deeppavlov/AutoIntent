@@ -21,11 +21,11 @@ class EmissionsTracker:
             measure_power_secs: How often to measure power consumption in seconds.
         """
         self._logger = logger
-        self._disabled = int(os.getenv("DISABLE_EMISSIONS_TRACKING", "0"))
-        if not self._disabled:
+        self._enabled = int(os.getenv("TRACK_EMISSIONS", "0"))
+        if self._enabled:
             self.tracker = CodeCarbonTracker(project_name=project_name, measure_power_secs=measure_power_secs)
         else:
-            self._logger.info("Emissions tracking is disabled via DISABLE_EMISSIONS_TRACKING environment variable")
+            self._logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
             self.tracker = None
 
     def start_task(self, task_name: str) -> None:
@@ -34,7 +34,7 @@ class EmissionsTracker:
         Args:
             task_name: Name of the task to track emissions for.
         """
-        if not self._disabled:
+        if self._enabled:
             self.tracker.start_task(task_name)
 
     def stop_task(self) -> dict[str, float]:
@@ -43,7 +43,7 @@ class EmissionsTracker:
         Returns:
             Dictionary containing emissions metrics.
         """
-        if self._disabled:
+        if not self._enabled:
             return {}
 
         emissions_data = self.tracker.stop_task()
