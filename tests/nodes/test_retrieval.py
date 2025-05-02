@@ -24,7 +24,7 @@ def test_embedding_multiclass():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        labels, distances, texts = node.module.predict(["hello", "card"])
+        node.module.predict(["hello", "card"])
         node.module.clear_cache()
         gc.collect()
         torch.cuda.empty_cache()
@@ -43,7 +43,7 @@ def test_embedding_multilabel():
             load_path=trial.module_dump_dir,
         )
         node = InferenceNode.from_config(config)
-        labels, distances, texts = node.module.predict(["hello", "card"])
+        node.module.predict(["hello", "card"])
         node.module.clear_cache()
         gc.collect()
         torch.cuda.empty_cache()
@@ -59,7 +59,7 @@ def get_embedding_optimizer(multilabel: bool):
         "search_space": [
             {
                 "k": [10],
-                "embedder_name": [
+                "embedder_config": [
                     "sentence-transformers/all-MiniLM-L6-v2",
                     "avsolatorio/GIST-small-Embedding-v0",
                 ],

@@ -22,9 +22,9 @@ from docs_utils.skip_members import skip_member  # noqa: E402
 from docs_utils.versions_generator import generate_versions_json  # noqa: E402
 
 project = "AutoIntent"
-copyright = "2024, DeepPavlov"
+copyright = "2025, DeepPavlov"
 author = "DeepPavlov"
-release = "0.0.1"
+release = "0.1.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -49,6 +49,7 @@ extensions = [
     "nbsphinx",
     "sphinx.ext.intersphinx",
     "sphinx_multiversion",
+    "sphinx.ext.napoleon",
 ]
 
 templates_path = ["_templates"]
@@ -63,6 +64,10 @@ intersphinx_mapping = {
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
     "datasets": ("https://huggingface.co/docs/datasets/master/en/", None),
     "transformers": ("https://huggingface.co/docs/transformers/master/en/", None),
+    "sklearn": ("https://scikit-learn.org/stable", None),
+    "sentence-transformers": ("https://sbert.net/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "optuna": ("https://optuna.readthedocs.io/en/stable/", None),
 }
 
 autoapi_keep_files = True
@@ -80,6 +85,21 @@ autodoc_typehints = "description"
 autoapi_own_page_level = "function"
 suppress_warnings = ["autoapi.python_import_resolution"]
 autoapi_add_toctree_entry = False
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_preprocess_types = False
+napoleon_type_aliases = None
+napoleon_attr_annotations = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -106,7 +126,7 @@ html_theme_options = {
         },
         {
             "name": "HuggingFace",
-            "url": "https://huggingface.co/AutoIntent",
+            "url": "https://huggingface.co/DeepPavlov",
             "icon": f"{BASE_STATIC_URL}/hf-logo.svg",
             "type": "local",
         },
@@ -149,7 +169,7 @@ mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 
 # sphinx_multiversion
 # Whitelist for tags matching v1.0.0, v2.1.0 format
-# smv_tag_whitelist = r'^v\d+\.\d+\.\d+$'
+# smv_tag_whitelist = r"^v\d+\.\d+\.\d+$"
 smv_tag_whitelist = r"^.*$"
 
 # Whitelist for the dev branch

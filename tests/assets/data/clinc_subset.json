@@ -254,32 +254,32 @@
             "id": 0,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": "some description to some intent"
         },
         {
             "id": 1,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": "some description to another intent"
         },
         {
             "id": 2,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": "another description to some intent"
         },
         {
             "id": 3,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": "another description to another intent"
         }
     ]

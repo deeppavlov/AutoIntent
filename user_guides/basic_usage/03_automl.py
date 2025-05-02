@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Pipeline Auto Configuration (AutoML)
+# AutoML
 """
 
 # %%
@@ -16,7 +16,7 @@ Let us use small subset of popular `clinc150` dataset for the demonstation.
 # %%
 from autointent import Dataset
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 dataset
 
 # %%
@@ -27,12 +27,11 @@ dataset["train_0"][0]
 """
 ## Search Space
 
-AutoIntent provides default search spaces for multi-label and single-label classification problems. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,default_optimizer):
+AutoIntent provides default search spaces. One can utilize them by constructing %mddoclink(class,,Pipeline) with factory %mddoclink(method,Pipeline,from_preset):
 """
 
 # %%
-multiclass_pipeline = Pipeline.default_optimizer(multilabel=False)
-multilabel_pipeline = Pipeline.default_optimizer(multilabel=True)
+pipeline = Pipeline.from_preset("light_extra")
 
 # %% [markdown]
 """
@@ -42,10 +41,10 @@ One can explore its contents:
 # %%
 from pprint import pprint
 
-from autointent.utils import load_default_search_space
+from autointent.utils import load_preset
 
-search_space = load_default_search_space(multilabel=True)
-pprint(search_space)
+preset = load_preset("light_extra")
+pprint(preset)
 
 # %% [markdown]
 """
@@ -53,65 +52,13 @@ Search space is allowed to customize:
 """
 
 # %%
-search_space[1]["search_space"][0]["k"] = [1, 3]
-custom_pipeline = Pipeline.from_search_space(search_space)
+preset["search_space"][0]["search_space"][0]["k"] = [1, 3]
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
 See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
 """
-
-# %% [markdown]
-"""
-## Embedder Settings
-
-%mddoclink(class,,Embedder) is one of the key components of AutoIntent. It affects both the quality of the resulting classifier and the efficiency of the auto configuration process.
-
-To select embedding models for your optimization, you need to customize search space (%mddoclink(notebook,advanced.02_search_space_configuration)). Here, we will observe settings affecting efficiency.
-
-Several options are customizable via %mddoclink(class,configs,EmbedderConfig). Defaults are the following:
-"""
-
-# %%
-from autointent.configs import EmbedderConfig
-
-embedder_config = EmbedderConfig(
-    batch_size=32,
-    max_length=None,
-    use_cache=False,
-)
-
-# %% [markdown]
-"""
-To set selected settings, method %mddoclink(method,Pipeline,set_config) is provided:
-"""
-
-# %%
-custom_pipeline.set_config(embedder_config)
-
-# %% [markdown]
-"""
-## Vector Index Settings
-
-%mddoclink(class,,VectorIndex) is one of the key utilities of AutoIntent. During the auto-configuration process, lots of retrieval is used. By modifying %mddoclink(class,configs,VectorIndexConfig) you can select whether to save built vector index into file system and where to save it.
-
-Default options are the following:
-"""
-
-# %%
-from autointent.configs import VectorIndexConfig
-
-vector_index_config = VectorIndexConfig(save_db=False)
-
-# %% [markdown]
-"""
-- `save_db=False` tells AutoIntent to clear all the files after auto configuration is finished
-
-These settings can be applied in a familiar way:
-"""
-
-# %%
-custom_pipeline.set_config(vector_index_config)
 
 # %% [markdown]
 """
@@ -129,34 +76,105 @@ custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
 """
+## Default Transformers
+
+One can specify what embedding model and cross-encoder model want to use along with default settings:
+"""
+
+# %%
+from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
+
+custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny", device="cpu"))
+custom_pipeline.set_config(
+    CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", tokenizer_config=TokenizerConfig(max_length=8))
+)
+
+# %% [markdown]
+"""
+See the docs for %mddoclink(class,configs,EmbedderConfig) and %mddoclink(class,configs,CrossEncoderConfig) for options available to customize.
+"""
+
+# %% [markdown]
+"""
+## Cross-Validation vs Hold-Out Validation
+
+If you have lots of training and evaluation data, you can use default hold-out validation strategy. If not, you can choose cross-validation and spend a little more time but utilize the full amount of available data for better hyperparameter tuning.
+
+This behavior is controlled with %mddoclink(class,configs,DataConfig):
+"""
+
+# %%
+from autointent.configs import DataConfig
+
+custom_pipeline.set_config(DataConfig(scheme="cv", n_folds=3))
+
+# %% [markdown]
+"""
+See the docs for %mddoclink(class,configs,DataConfig) for other options available to customize.
+"""
+
+# %% [markdown]
+"""
 ## Complete Example
 """
 
 # %%
 from autointent import Dataset, Pipeline
-from autointent.configs import EmbedderConfig, LoggingConfig, VectorIndexConfig
-from autointent.utils import load_default_search_space
+from autointent.configs import LoggingConfig
+from autointent.utils import load_preset
 
 # load data
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # customize search space
-search_space = load_default_search_space(multilabel=False)
+preset = load_preset("light_extra")
 
 # make pipeline
-custom_pipeline = Pipeline.from_search_space(search_space)
+custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # custom settings
-embedder_config = EmbedderConfig()
-vector_index_config = VectorIndexConfig()
 logging_config = LoggingConfig()
 
-custom_pipeline.set_config(embedder_config)
-custom_pipeline.set_config(vector_index_config)
 custom_pipeline.set_config(logging_config)
 
 # start auto-configuration
-custom_pipeline.fit(dataset)
+context = custom_pipeline.fit(dataset)
 
-# inference
+# inference on-the-fly
 custom_pipeline.predict(["hello world!"])
+
+# %% [markdown]
+"""
+## Dump Results
+
+One can save all results of auto-configuration process to file system (to ``LoggingConfig.dirpath``):
+"""
+
+# %%
+context.dump()
+
+# %% [markdown]
+"""
+Or one can dump only the configured pipeline to any desired location (by default ``LoggingConfig.dirpath``):
+"""
+
+# %%
+custom_pipeline.dump()
+
+# %% [markdown]
+"""
+## Load Pipeline for Inference
+"""
+
+# %%
+loaded_pipe = Pipeline.load(logging_config.dirpath)
+
+# %% [markdown]
+"""
+Since this notebook is launched automatically while building the docs, we will clean the space if you don't mind :)
+"""
+
+# %%
+import shutil
+
+shutil.rmtree(logging_config.dirpath)

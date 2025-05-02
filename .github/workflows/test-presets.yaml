@@ -1,0 +1,13 @@
+name: test presets
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+
+jobs:
+  test:
+    uses: ./.github/workflows/reusable-test.yaml
+    with:
+      test_command: pytest -n auto tests/pipeline/test_presets.py

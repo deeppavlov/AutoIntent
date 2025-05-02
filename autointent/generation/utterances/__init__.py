@@ -1,14 +1,11 @@
-from .basic import SynthesizerChatTemplate, UtteranceGenerator
-from .evolution import AbstractEvolution, ConcreteEvolution, EvolutionChatTemplate, ReasoningEvolution, UtteranceEvolver
-from .generator import Generator
+"""Generative methods for enriching dataset with synthetic samples."""
+
+from ._basic import DatasetBalancer, UtteranceGenerator
+from ._evolution import IncrementalUtteranceEvolver, UtteranceEvolver
 
 __all__ = [
-    "AbstractEvolution",
-    "ConcreteEvolution",
-    "EvolutionChatTemplate",
-    "Generator",
-    "ReasoningEvolution",
-    "SynthesizerChatTemplate",
+    "DatasetBalancer",
+    "IncrementalUtteranceEvolver",
     "UtteranceEvolver",
     "UtteranceGenerator",
 ]

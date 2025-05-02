@@ -7,6 +7,7 @@ from ._vector_index import VectorIndex
 from ._dataset import Dataset
 from ._hash import Hasher
 from .context import Context, load_dataset
+from ._optimization_config import OptimizationConfig
 from ._pipeline import Pipeline
 
 
@@ -15,6 +16,7 @@ __all__ = [
     "Dataset",
     "Embedder",
     "Hasher",
+    "OptimizationConfig",
     "Pipeline",
     "Ranker",
     "VectorIndex",

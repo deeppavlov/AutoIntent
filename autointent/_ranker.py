@@ -1,8 +1,10 @@
-"""Ranker class for cross-encoder-based estimation of meaning closeness.
+"""Module for cross-encoder-based meaning closeness estimation using ranking.
 
-Can be used to rank retrieved sentences by meaning closeness to provided utterance.
+This module provides functionality for ranking retrieved sentences by meaning closeness
+to provided utterances using cross-encoder models.
 """
 
+import gc
 import itertools as it
 import json
 import logging
@@ -18,15 +20,26 @@ import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
+from autointent.configs import CrossEncoderConfig
 from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
 
 class CrossEncoderMetadata(TypedDict):
+    """Metadata for CrossEncoder model.
+
+    Attributes:
+        model_name: Name of the model
+        train_head: Whether to train a classifier
+        device: Device to use for inference
+        max_length: Maximum sequence length
+        batch_size: Batch size for inference
+    """
+
     model_name: str
-    train_classifier: bool
-    device: str
+    train_head: bool
+    device: str | None
     max_length: int | None
     batch_size: int
 
@@ -36,13 +49,17 @@ def construct_samples(
     labels: list[Any],
     balancing_factor: int | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """
-    Construct balanced samples of text pairs for training.
+    """Construct balanced samples of text pairs for training.
 
-    :param texts: List of texts to create pairs from.
-    :param labels: List of labels corresponding to the texts.
-    :param balancing_factor: Factor for balancing the positive and negative samples. If None, no balancing is applied.
-    :return: Tuple containing lists of text pairs and their corresponding binary labels.
+    Args:
+        texts: List of texts to create pairs from
+        labels: List of labels corresponding to the texts
+        balancing_factor: Factor for balancing positive and negative samples
+
+    Returns:
+        Tuple containing:
+            - List of text pairs
+            - List of corresponding binary labels
     """
     samples = [[], []]  # type: ignore[var-annotated]
 
@@ -68,103 +85,87 @@ def construct_samples(
 
 
 class Ranker:
-    r"""
-    Cross-encoder for NLI.
+    """Cross-encoder for Natural Language Inference (NLI).
 
-    In the hart this class uses a SentenceTransformers Ranker model to extract features.
-    Then it uses either the model's clissifier or our custom trained LogisticRegressionCV
-    (custom classifier layer in the future) to rank documents using similarity score to the query.
-
-    :ivar cross_encoder: The Ranker model used to extract features.
-    :ivar batch_size: Batch size for processing text pairs.
-    :ivar _clf: The trained LogisticRegressionCV classifier.
-    :ivar model_subdir: Directory for storing the cross-encoder model files.
-
-    Examples
-    --------
-    Creating and fitting the CrossEncoderWithLogreg:
-    >>> from autointent import Ranker
-    >>> scorer = Ranker("cross-encoder-model")
-    >>> utterances = ["What is your name?", "How old are you?"]
-    >>> labels = [1, 0]
-    >>> scorer.fit(utterances, labels)
-
-    Predicting probabilities:
-    >>> test_pairs = [["What is your name?", "Hello!"], ["How old are you?", "What is your age?"]]
-    >>> probs = scorer.predict(test_pairs)
-    >>> print(probs)
-
-    Saving and loading the model:
-    >>> scorer.save("outputs/")
-    >>> loaded_scorer = Ranker.load("outputs/")
+    This class uses :py:class:`sentence_transformers.cross_encoder.CrossEncoder` model to extract features.
+    It can use either the model's classifier or a custom trained :py:class:`sklearn.linear_model.LogisticRegressionCV`
+    to rank documents using similarity scores to the query.
     """
 
-    metadata_file_name = "metadata.json"
-    classifier_file_name = "classifier.joblib"
+    _metadata_file_name = "metadata.json"
+    _classifier_file_name = "classifier.joblib"
+    config: CrossEncoderConfig
+    cross_encoder: st.CrossEncoder
 
     def __init__(
         self,
-        model_name: str,
-        device: str = "cpu",
-        train_classifier: bool = False,
-        batch_size: int = 326,
-        max_length: int | None = None,
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
         classifier_head: LogisticRegressionCV | None = None,
     ) -> None:
-        """
-        Initialize the Ranker.
+        """Initialize the Ranker.
 
-        :param model: The cross-encoder hugging face model name to use.
-        :param device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param train_classifier: Whether to train a custom classifier, defaults to False.
-        :param batch_size: Batch size for processing text pairs, defaults to 326.
-        :param max_length (int, optional): Max length for input sequences for the cross encoder.
-        :param classifier_head (LogisticRegressionCV, optional): Classifier (to be used in restore procedure mainly).
+        Args:
+            cross_encoder_config: Configuration for the cross-encoder model
+            classifier_head: Optional pre-trained classifier head
         """
-        self.model_name = model_name
-        self.device = device
-        self.cross_encoder = st.CrossEncoder(model_name, trust_remote_code=True, device=device, max_length=max_length)  # type: ignore[arg-type]
-        self.train_classifier = False
-        self.batch_size = batch_size
-        self.max_length = max_length
+        self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.cross_encoder = st.CrossEncoder(
+            self.config.model_name,
+            trust_remote_code=self.config.trust_remote_code,
+            device=self.config.device,
+            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
+        )
+        self._train_head = False
         self._clf = classifier_head
 
-        if classifier_head is not None or train_classifier:
-            self.train_classifier = True
+        if classifier_head is not None or self.config.train_head:
+            self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
             self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
+        """Hook to capture classifier activations.
+
+        Args:
+            _module: Module being hooked
+            input_tensor: Input tensor to the classifier
+            _output_tensor: Output tensor from the classifier
+        """
         self._activations_list.append(input_tensor[0].cpu().numpy())
 
     @torch.no_grad()
     def _get_features_or_predictions(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+        """Extract features or get predictions using the Ranker model.
+
+        Args:
+            pairs: List of text pairs
+
+        Returns:
+            Array of extracted features or predictions
         """
-        Extract features or get predictions using the Ranker model.
+        if not self._train_head:
+            return np.array(
+                self.cross_encoder.predict(
+                    pairs,
+                    batch_size=self.config.batch_size,
+                    activation_fct=nn.Sigmoid(),
+                )
+            )
 
-        If :py:attr:`~train_classifier` is ``True``, return raw activations from
-        cross-encoder transformer. Otherwise, get predictions from cross-encoder head.
-
-        :param pairs: List of text pairs.
-        :return: Numpy array of extracted features.
-        """
-        if not self.train_classifier:
-            return np.array(self.cross_encoder.predict(pairs, batch_size=self.batch_size, activation_fct=nn.Sigmoid()))
-
-        # put the data through, features will be taken in the hook
-        self.cross_encoder.predict(pairs, batch_size=self.batch_size)
-
+        self.cross_encoder.predict(pairs, batch_size=self.config.batch_size)
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
         return res  # type: ignore[no-any-return]
 
     def _fit(self, pairs: list[tuple[str, str]], labels: ListOfLabels) -> None:
-        """
-        Train the logistic regression model on cross-encoder features.
+        """Train the logistic regression model on cross-encoder features.
 
-        :param pairs: List of text pairs.
-        :param labels: Binary labels (1 = same class, 0 = different classes).
-        :raises ValueError: If the number of pairs and labels do not match.
+        Args:
+            pairs: List of text pairs
+            labels: Binary labels (1 = same class, 0 = different classes)
+
+        Raises:
+            ValueError: If number of pairs and labels don't match
         """
         n_samples = len(pairs)
         if n_samples != len(labels):
@@ -173,35 +174,36 @@ class Ranker:
             raise ValueError(msg)
 
         features = self._get_features_or_predictions(pairs)
-
-        # TODO: LogisticRegressionCV has class_weight="balanced". Is it better to use it instead of balance_factor in
-        # construct_samples?
         clf = LogisticRegressionCV()
         clf.fit(features, labels)
-
         self._clf = clf
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Construct training samples and train the logistic regression classifier.
+        """Construct training samples and train the logistic regression classifier.
 
-        :param utterances: List of utterances (texts).
-        :param labels: Intent class labels corresponding to the utterances.
+        Args:
+            utterances: List of utterances (texts)
+            labels: Intent class labels corresponding to the utterances
         """
-        if not self.train_classifier:
-            return  # do nothing if the classifier is not to be re-trained
+        if not self._train_head:
+            return
 
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
     def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
-        """
-        Predict probabilities of two utterances having the same intent label.
+        """Predict probabilities of two utterances having the same intent label.
 
-        :param pairs: List of text pairs to classify.
-        :return: Numpy array of probabilities.
+        Args:
+            pairs: List of text pairs to classify
+
+        Returns:
+            Array of probabilities
+
+        Raises:
+            ValueError: If classifier is not trained yet
         """
-        if self.train_classifier and self._clf is None:
+        if self._train_head and self._clf is None:
             msg = "Classifier is not trained yet"
             raise ValueError(msg)
 
@@ -209,7 +211,6 @@ class Ranker:
 
         if self._clf is not None:
             return np.array(self._clf.predict_proba(features)[:, 1])
-
         return features
 
     def rank(
@@ -218,13 +219,15 @@ class Ranker:
         query_docs: list[str],
         top_k: int | None = None,
     ) -> list[dict[str, Any]]:
-        """
-        Rank documents according to meaning closeness to the query.
+        """Rank documents according to meaning closeness to the query.
 
-        :param query: The reference document.
-        :query_docs: List of documents to rank
-        :top_k: how many document to return
-        :return: array of dictionaries of ranked items.
+        Args:
+            query: Reference document
+            query_docs: List of documents to rank
+            top_k: Number of documents to return
+
+        Returns:
+            List of dictionaries containing ranked items with scores
         """
         query_doc_pairs = [(query, doc) for doc in query_docs]
         scores = self.predict(query_doc_pairs)
@@ -237,38 +240,60 @@ class Ranker:
         return results[:top_k]
 
     def save(self, path: str) -> None:
-        """
-        Save the model and classifier to disk.
+        """Save the model and classifier to disk.
 
-        :param path: Directory path to save the model and classifier.
+        Args:
+            path: Directory path to save the model and classifier
         """
         dump_dir = Path(path)
         dump_dir.mkdir(parents=True)
 
         metadata = CrossEncoderMetadata(
-            model_name=self.model_name,
-            train_classifier=self.train_classifier,
-            device=self.device,
-            max_length=self.max_length,
-            batch_size=self.batch_size,
+            model_name=self.config.model_name,
+            train_head=self._train_head,
+            device=self.config.device,
+            max_length=self.config.tokenizer_config.max_length,
+            batch_size=self.config.batch_size,
         )
 
-        with (dump_dir / self.metadata_file_name).open("w") as file:
+        with (dump_dir / self._metadata_file_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
-        joblib.dump(self._clf, dump_dir / self.classifier_file_name)
+        joblib.dump(self._clf, dump_dir / self._classifier_file_name)
 
     @classmethod
-    def load(cls, path: Path) -> "Ranker":
-        """
-        Load the model and classifier from disk.
+    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> "Ranker":
+        """Load the model and classifier from disk.
 
-        :param path: Directory path containing the saved model and classifier.
-        :return: Initialized Ranker instance.
-        """
-        clf = joblib.load(path / cls.classifier_file_name)
+        Args:
+            path: Directory path containing the saved model and classifier
+            override_config: one can override presaved settings
 
-        with (path / cls.metadata_file_name).open() as file:
+        Returns:
+            Initialized Ranker instance
+        """
+        clf = joblib.load(path / cls._classifier_file_name)
+
+        with (path / cls._metadata_file_name).open() as file:
             metadata: CrossEncoderMetadata = json.load(file)
 
-        return cls(**metadata, classifier_head=clf)
+        if override_config is not None:
+            kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
+        else:
+            kwargs = metadata  # type: ignore[assignment]
+
+        max_length = kwargs.pop("max_length", None)
+        if max_length is not None:
+            kwargs["tokenizer_config"] = {"max_length": max_length}
+
+        return cls(
+            CrossEncoderConfig(**kwargs),
+            classifier_head=clf,
+        )
+
+    def clear_ram(self) -> None:
+        """Clear model from RAM and GPU memory."""
+        self.cross_encoder.model.cpu()
+        del self.cross_encoder
+        gc.collect()
+        torch.cuda.empty_cache()

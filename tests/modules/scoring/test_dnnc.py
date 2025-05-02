@@ -10,10 +10,9 @@ def test_base_dnnc(dataset, train_head, pred_score):
     data_handler = DataHandler(dataset)
 
     scorer = DNNCScorer(
-        cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-        embedder_name="sergeyzh/rubert-tiny-turbo",
+        cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": train_head},
+        embedder_config="sergeyzh/rubert-tiny-turbo",
         k=3,
-        train_head=train_head,
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))

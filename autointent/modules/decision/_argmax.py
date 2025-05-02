@@ -9,22 +9,19 @@ import numpy.typing as npt
 from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import DecisionModule
+from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag
 
 logger = logging.getLogger(__name__)
 
 
-class ArgmaxDecision(DecisionModule):
-    """
-    Argmax decision module.
+class ArgmaxDecision(BaseDecision):
+    """Argmax decision module.
 
     The ArgmaxDecision is a simple predictor that selects the class with the highest
     score (argmax) for single-label classification tasks.
 
-    :ivar n_classes: Number of classes in the dataset.
-
-    Examples
+    Examples:
     --------
     .. testcode::
 
@@ -50,15 +47,14 @@ class ArgmaxDecision(DecisionModule):
     supports_multiclass = True
     _n_classes: int
 
-    def __init__(self) -> None:
-        """Init."""
+    def __init__(self) -> None: ...
 
     @classmethod
     def from_context(cls, context: Context) -> "ArgmaxDecision":
-        """
-        Initialize form context.
+        """Initialize from context.
 
-        :param context: Context
+        Args:
+            context: Context object containing configurations and utilities
         """
         return cls()
 
@@ -68,22 +64,29 @@ class ArgmaxDecision(DecisionModule):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Argmax not fitting anything.
+        """Fit the predictor (no-op for ArgmaxDecision).
 
-        :param scores: Scores to fit
-        :param labels: Labels to fit
-        :param tags: Tags to fit
-        :raises WrongClassificationError: If the classification is wrong.
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+            labels: List of true labels
+            tags: List of Tag objects for mutually exclusive classes, or None
+
+        Raises:
+            WrongClassificationError: If used on non-single-label data
         """
         self._validate_task(scores, labels)
 
     def predict(self, scores: npt.NDArray[Any]) -> list[int]:
-        """
-        Predict the argmax.
+        """Predict labels using argmax strategy.
 
-        :param scores: Scores to predict
-        :raises MismatchNumClassesError: If the number of classes is invalid.
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+
+        Returns:
+            List of predicted class indices
+
+        Raises:
+            MismatchNumClassesError: If the number of classes does not match the trained predictor
         """
         if scores.shape[1] != self._n_classes:
             raise MismatchNumClassesError

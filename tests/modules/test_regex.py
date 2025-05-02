@@ -1,6 +1,7 @@
 import pytest
 
-from autointent.modules.regexp import RegExp
+from autointent.modules import SimpleRegex
+from autointent.schemas import Intent
 
 
 @pytest.mark.parametrize(
@@ -9,20 +10,11 @@ from autointent.modules.regexp import RegExp
 )
 def test_base_regex(partial_match, expected_predictions):
     train_data = [
-        {
-            "id": 0,
-            "name": "accept_reservations",
-            "regexp_full_match": [".*"],
-            "regexp_partial_match": [".*"],
-        },
-        {
-            "id": 1,
-            "name": "account_blocked",
-            "regexp_partial_match": [partial_match],
-        },
+        Intent(id=0, name="accept_reservations", regex_full_match=[".*"], regex_partial_match=[".*"]),
+        Intent(id=1, name="account_blocked", regex_partial_match=[partial_match]),
     ]
 
-    matcher = RegExp()
+    matcher = SimpleRegex()
     matcher.fit(train_data)
 
     test_data = [

@@ -1,10 +1,11 @@
+from copy import deepcopy
 from typing import Any
 
 import numpy as np
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
-from autointent.configs import LoggingConfig, VectorIndexConfig
+from autointent.configs import DataConfig, LoggingConfig
 from tests.conftest import setup_environment
 
 
@@ -18,13 +19,14 @@ class DummyCallback(OptimizerCallback):
         self.history.append(("start_run", kwargs))
 
     def start_module(self, **kwargs: dict[str, Any]) -> None:
-        self.history.append(("start_module", kwargs))
+        self.history.append(("start_module", deepcopy(kwargs)))
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("log_value", kwargs))
 
     def log_metrics(self, **kwargs: dict[str, Any]) -> None:
         metrics = kwargs["metrics"]
+        metrics = {k: v for k, v in metrics.items() if not k.startswith("emissions/")}
         for metric_name, metric_value in metrics.items():
             if not isinstance(metric_value, str) and np.isnan(metric_value):
                 metrics[metric_name] = None
@@ -52,7 +54,7 @@ def test_pipeline_callbacks(dataset):
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_name": ["sergeyzh/rubert-tiny-turbo"],
+                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 }
             ],
         },
@@ -82,12 +84,11 @@ def test_pipeline_callbacks(dataset):
     ]
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     context = Context()
-    context.configure_vector_index(VectorIndexConfig(save_db=True))
     context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
-    context.set_dataset(dataset)
+    context.set_dataset(dataset, DataConfig(scheme="ho"))
 
-    pipeline_optimizer._fit(context)
+    pipeline_optimizer._fit(context, "brute")
 
     dummy_callback = context.callback_handler.callbacks[0]
 
@@ -98,9 +99,9 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 5},
                 "module_name": "retrieval",
                 "num": 0,
-                "module_kwargs": {"k": 5, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
         (
@@ -115,9 +116,9 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 10},
                 "module_name": "retrieval",
                 "num": 1,
-                "module_kwargs": {"k": 10, "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
         (
@@ -132,9 +133,27 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {
+                    "embedder_config": {
+                        "batch_size": 32,
+                        "classifier_prompt": None,
+                        "cluster_prompt": None,
+                        "default_prompt": None,
+                        "device": None,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "passage_prompt": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
+                        "use_cache": False,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
+                    },
+                    "k": 1,
+                    "weights": "uniform",
+                },
                 "module_name": "knn",
                 "num": 0,
-                "module_kwargs": {"k": 1, "weights": "uniform", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
         (
@@ -150,9 +169,27 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {
+                    "embedder_config": {
+                        "batch_size": 32,
+                        "classifier_prompt": None,
+                        "cluster_prompt": None,
+                        "default_prompt": None,
+                        "device": None,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "passage_prompt": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
+                        "use_cache": False,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
+                    },
+                    "k": 1,
+                    "weights": "distance",
+                },
                 "module_name": "knn",
                 "num": 1,
-                "module_kwargs": {"k": 1, "weights": "distance", "embedder_name": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
         (
@@ -167,7 +204,27 @@ def test_pipeline_callbacks(dataset):
         ("end_module", {}),
         (
             "start_module",
-            {"module_name": "linear", "num": 0, "module_kwargs": {"embedder_name": "sergeyzh/rubert-tiny-turbo"}},
+            {
+                "module_kwargs": {
+                    "embedder_config": {
+                        "batch_size": 32,
+                        "classifier_prompt": None,
+                        "cluster_prompt": None,
+                        "default_prompt": None,
+                        "device": None,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "passage_prompt": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
+                        "use_cache": False,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
+                    },
+                },
+                "module_name": "linear",
+                "num": 0,
+            },
         ),
         (
             "log_metric",
@@ -179,7 +236,7 @@ def test_pipeline_callbacks(dataset):
             },
         ),
         ("end_module", {}),
-        ("start_module", {"module_name": "threshold", "num": 0, "module_kwargs": {"thresh": 0.5}}),
+        ("start_module", {"module_kwargs": {"thresh": 0.5}, "module_name": "threshold", "num": 0}),
         (
             "log_metric",
             {
@@ -193,7 +250,7 @@ def test_pipeline_callbacks(dataset):
             },
         ),
         ("end_module", {}),
-        ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
+        ("start_module", {"module_kwargs": {}, "module_name": "argmax", "num": 0}),
         (
             "log_metric",
             {

@@ -1,4 +1,4 @@
-"""Threshold."""
+"""Threshold decision module."""
 
 import logging
 from typing import Any
@@ -7,9 +7,9 @@ import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
-from autointent.custom_types import ListOfGenericLabels, MultiLabel
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules.abc import DecisionModule
+from autointent.modules.base import BaseDecision
 from autointent.schemas import Tag
 
 from ._utils import apply_tags
@@ -17,17 +17,16 @@ from ._utils import apply_tags
 logger = logging.getLogger(__name__)
 
 
-class ThresholdDecision(DecisionModule):
-    """
-    Threshold predictor module.
+class ThresholdDecision(BaseDecision):
+    """Threshold predictor module.
 
     ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
     labels for single-label or multi-label classification tasks.
 
-    :ivar tags: Tags for predictions (if any).
-    :ivar name: Name of the predictor, defaults to "adaptive".
+    Args:
+        thresh: Threshold for the scores, shape (n_classes,) or float
 
-    Examples
+    Examples:
     --------
     Single-label classification
     ===========================
@@ -75,22 +74,28 @@ class ThresholdDecision(DecisionModule):
 
     def __init__(
         self,
-        thresh: float | list[float],
+        thresh: FloatFromZeroToOne | list[FloatFromZeroToOne] = 0.5,
     ) -> None:
-        """
-        Initialize threshold predictor.
-
-        :param thresh: Threshold for the scores, shape (n_classes,) or float
-        """
+        val_error = False
         self.thresh = thresh if isinstance(thresh, float) else np.array(thresh)
+        if isinstance(thresh, float):
+            val_error = val_error or thresh < 0 or thresh > 1
+        else:
+            val_error = val_error or any(val < 0 or val > 1 for val in thresh)
+
+        if val_error:
+            msg = "`thresh` arg of `ThresholdDecision` must contain a float from zero to one (or list of floats)."
+            raise ValueError(msg)
 
     @classmethod
-    def from_context(cls, context: Context, thresh: float | list[float] = 0.5) -> "ThresholdDecision":
-        """
-        Initialize from context.
+    def from_context(
+        cls, context: Context, thresh: FloatFromZeroToOne | list[FloatFromZeroToOne] = 0.5
+    ) -> "ThresholdDecision":
+        """Initialize from context.
 
-        :param context: Context
-        :param thresh: Threshold
+        Args:
+            context: Context containing configurations and utilities
+            thresh: Threshold for classification
         """
         return cls(
             thresh=thresh,
@@ -102,12 +107,15 @@ class ThresholdDecision(DecisionModule):
         labels: ListOfGenericLabels,
         tags: list[Tag] | None = None,
     ) -> None:
-        """
-        Fit the model.
+        """Fit the model.
 
-        :param scores: Scores to fit
-        :param labels: Labels to fit
-        :param tags: Tags to fit
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+            labels: List of true labels
+            tags: List of Tag objects for mutually exclusive classes, or None
+
+        Raises:
+            MismatchNumClassesError: If number of thresholds doesn't match number of classes
         """
         self.tags = tags
         self._validate_task(scores, labels)
@@ -123,10 +131,16 @@ class ThresholdDecision(DecisionModule):
             self.thresh = np.array(self.thresh)
 
     def predict(self, scores: npt.NDArray[Any]) -> ListOfGenericLabels:
-        """
-        Predict the best score.
+        """Predict labels using thresholds.
 
-        :param scores: Scores to predict
+        Args:
+            scores: Array of shape (n_samples, n_classes) with predicted scores
+
+        Returns:
+            Predicted labels (either single-label or multi-label)
+
+        Raises:
+            MismatchNumClassesError: If number of classes in scores doesn't match training data
         """
         if scores.shape[1] != self._n_classes:
             msg = "Provided scores number don't match with number of classes which predictor was trained on."
@@ -137,12 +151,14 @@ class ThresholdDecision(DecisionModule):
 
 
 def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any]) -> ListOfGenericLabels:
-    """
-    Make predictions for multiclass classification task.
+    """Make predictions for multiclass classification task.
 
-    :param scores: Scores from the model, shape (n_samples, n_classes)
-    :param thresh: Threshold for the scores, shape (n_classes,) or float
-    :return: Predicted classes, shape (n_samples,)
+    Args:
+        scores: Array of shape (n_samples, n_classes) with predicted scores
+        thresh: Threshold for the scores, shape (n_classes,) or float
+
+    Returns:
+        List of predicted class indices or None for OOS samples
     """
     pred_classes: npt.NDArray[Any] = np.argmax(scores, axis=1)
     best_scores = scores[np.arange(len(scores)), pred_classes]
@@ -153,7 +169,7 @@ def multiclass_predict(scores: npt.NDArray[Any], thresh: float | npt.NDArray[Any
         thresh_selected = thresh[pred_classes]
         pred_classes[best_scores < thresh_selected] = -1  # out of scope
 
-    y_pred: list[int] = pred_classes.tolist()  # type: ignore[assignment]
+    y_pred: list[int] = pred_classes.tolist()
     return [lab if lab != -1 else None for lab in y_pred]
 
 
@@ -162,16 +178,18 @@ def multilabel_predict(
     thresh: float | npt.NDArray[Any],
     tags: list[Tag] | None,
 ) -> ListOfGenericLabels:
-    """
-    Make predictions for multilabel classification task.
+    """Make predictions for multilabel classification task.
 
-    :param scores: Scores from the model, shape (n_samples, n_classes)
-    :param thresh: Threshold for the scores, shape (n_classes,) or float
-    :param tags: Tags for predictions
-    :return: Multilabel prediction
+    Args:
+        scores: Array of shape (n_samples, n_classes) with predicted scores
+        thresh: Threshold for the scores, shape (n_classes,) or float
+        tags: List of Tag objects for mutually exclusive classes, or None
+
+    Returns:
+        List of predicted multi-label targets or None for OOS samples
     """
     res = (scores >= thresh).astype(int) if isinstance(thresh, float) else (scores >= thresh[None, :]).astype(int)
     if tags:
         res = apply_tags(res, scores, tags)
-    y_pred: list[MultiLabel] = res.tolist()  # type: ignore[assignment]
+    y_pred: list[MultiLabel] = res.tolist()
     return [lab if sum(lab) > 0 else None for lab in y_pred]

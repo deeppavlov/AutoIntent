@@ -1,29 +1,35 @@
 """KNNScorer class for k-nearest neighbors scoring."""
 
-from typing import Any
+from typing import Any, get_args
 
 import numpy as np
 import numpy.typing as npt
+from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
-from autointent.custom_types import WEIGHT_TYPES, ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.configs import EmbedderConfig
+from autointent.custom_types import ListOfLabels, WeightType
+from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights
 
 
-class KNNScorer(ScoringModule):
-    """
-    K-nearest neighbors (KNN) scorer for intent classification.
+class KNNScorer(BaseScorer):
+    """K-nearest neighbors (KNN) scorer for intent classification.
 
     This module uses a vector index to retrieve nearest neighbors for query utterances
     and applies a weighting strategy to compute class probabilities.
 
-    :ivar weights: Weighting strategy used for scoring.
-    :ivar _vector_index: VectorIndex instance for neighbor retrieval.
-    :ivar name: Name of the scorer, defaults to "knn".
+    Args:
+        embedder_config: Config of the embedder used for vectorization
+        k: Number of closest neighbors to consider during inference
+        weights: Weighting strategy:
 
-    Examples
+            - "uniform": Equal weight for all neighbors
+            - "distance": Weight inversely proportional to distance
+            - "closest": Only the closest neighbor of each class is weighted
+
+    Examples:
     --------
 
     .. testcode::
@@ -32,18 +38,12 @@ class KNNScorer(ScoringModule):
         utterances = ["hello", "how are you?"]
         labels = [0, 1]
         scorer = KNNScorer(
-            embedder_name="sergeyzh/rubert-tiny-turbo",
+            embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "what's up?"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)  # Outputs predicted class probabilities for the utterances
-
-    .. testoutput::
-
-        [[0.67297815 0.32702185]
-         [0.44031667 0.55968333]]
 
     """
 
@@ -56,108 +56,95 @@ class KNNScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_name: str,
-        k: int,
-        weights: WEIGHT_TYPES = "distance",
-        embedder_device: str = "cpu",
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_use_cache: bool = True,
+        k: PositiveInt,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        weights: WeightType = "distance",
     ) -> None:
-        """
-        Initialize the KNNScorer.
-
-        :param embedder_name: Name of the embedder used for vectorization.
-        :param k: Number of closest neighbors to consider during inference.
-        :param weights: Weighting strategy:
-            - "uniform" (or False): Equal weight for all neighbors.
-            - "distance" (or True): Weight inversely proportional to distance.
-            - "closest": Only the closest neighbor of each class is weighted.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
-        """
-        self.embedder_name = embedder_name
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
-        self.embedder_device = embedder_device
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_use_cache = embedder_use_cache
+
+        if self.k < 0 or not isinstance(self.k, int):
+            msg = "`k` argument of `KNNScorer` must be a positive int"
+            raise ValueError(msg)
+
+        if weights not in get_args(WeightType):
+            msg = f"`weights` argument of `KNNScorer` must be a literal from a list: {get_args(WeightType)}"
+            raise TypeError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        k: int,
-        weights: WEIGHT_TYPES,
-        embedder_name: str | None = None,
+        k: PositiveInt,
+        weights: WeightType = "distance",
+        embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
-        """
-        Create a KNNScorer instance using a Context object.
+        """Create a KNNScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param k: Number of closest neighbors to consider during inference.
-        :param weights: Weighting strategy for scoring.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
-        :return: Initialized KNNScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            k: Number of closest neighbors to consider during inference
+            weights: Weighting strategy for scoring
+            embedder_config: Config of the embedder, or None to use the best embedder
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.resolve_embedder()
 
         return cls(
-            embedder_name=embedder_name,
+            embedder_config=embedder_config,
             k=k,
             weights=weights,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
         )
 
-    def get_embedder_name(self) -> str:
-        """
-        Get the name of the embedder.
+    def get_embedder_config(self) -> dict[str, Any]:
+        """Get the name of the embedder.
 
-        :return: Embedder name.
+        Returns:
+            Embedder name
         """
-        return self.embedder_name
+        return self.embedder_config.model_dump()
 
-    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
-        """
-        Fit the scorer by training or loading the vector index.
+    def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
+        """Fit the scorer by training or loading the vector index.
 
-        :param utterances: List of training utterances.
-        :param labels: List of labels corresponding to the utterances.
-        :raises ValueError: If the vector index mismatches the provided utterances.
+        Args:
+            utterances: List of training utterances
+            labels: List of labels corresponding to the utterances
+            clear_cache: Whether to clear the vector index cache before fitting
+
+        Raises:
+            ValueError: If the vector index mismatches the provided utterances
         """
+        if hasattr(self, "_vector_index") and clear_cache:
+            self.clear_cache()
+
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(
-            self.embedder_name,
-            self.embedder_device,
-            self.embedder_batch_size,
-            self.embedder_max_length,
-            self.embedder_use_cache,
-        )
+        self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Predict class probabilities for the given utterances.
+        """Predict class probabilities for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Array of predicted probabilities for each class.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Array of predicted probabilities for each class
         """
         return self._predict(utterances)[0]
 
     def predict_with_metadata(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[dict[str, Any]] | None]:
-        """
-        Predict class probabilities along with metadata for the given utterances.
+        """Predict class probabilities along with metadata for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Tuple of predicted probabilities and metadata with neighbor information.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - Array of predicted probabilities
+                - List of metadata with neighbor information
         """
         scores, neighbors = self._predict(utterances)
         metadata = [{"neighbors": utterance_neighbors} for utterance_neighbors in neighbors]
@@ -168,17 +155,41 @@ class KNNScorer(ScoringModule):
         self._vector_index.clear_ram()
 
     def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+        """Get nearest neighbors for given utterances.
+
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - List of labels for neighbors
+                - List of distances to neighbors
+                - List of neighbor utterances
+        """
         return self._vector_index.query(utterances, self.k)
 
     def _count_scores(self, labels: npt.NDArray[Any], distances: npt.NDArray[Any]) -> npt.NDArray[Any]:
+        """Calculate weighted scores for labels based on distances.
+
+        Args:
+            labels: Array of neighbor labels
+            distances: Array of distances to neighbors
+
+        Returns:
+            Array of weighted scores
+        """
         return apply_weights(labels, distances, self.weights, self._n_classes, self._multilabel)
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
-        """
-        Predict class probabilities and retrieve neighbors for the given utterances.
+        """Predict class probabilities and retrieve neighbors for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Tuple containing class probabilities and neighbor utterances.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Tuple containing:
+                - Array of class probabilities
+                - List of neighbor utterances
         """
         labels, distances, neighbors = self._get_neighbours(utterances)
         scores = self._count_scores(np.array(labels), np.array(distances))

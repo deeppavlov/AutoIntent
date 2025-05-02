@@ -3,244 +3,148 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any
 
 import yaml
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import (
-    CrossEncoderConfig,
-    DataConfig,
-    EmbedderConfig,
-    LoggingConfig,
-    VectorIndexConfig,
-)
+from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
 
-from ._utils import NumpyEncoder, load_dataset
+from ._utils import NumpyEncoder
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 
 
 class Context:
-    """
-    Context manager for configuring and managing data handling, vector indexing, and optimization.
+    """Context manager for configuring and managing data handling, vector indexing, and optimization.
 
     This class provides methods to set up logging, configure data and vector index components,
     manage datasets, and retrieve various configurations for inference and optimization.
+    Not intended to be instantiated by user.
     """
 
     data_handler: DataHandler
+    """Convenient wrapper for :py:class:`autointent.Dataset`."""
+
     optimization_info: OptimizationInfo
+    """Object for storing optimization trials and inter-node communication."""
+
     callback_handler = CallbackHandler()
+    """Internal callback for logging to tensorboard or wandb."""
 
-    def __init__(self, seed: int = 42) -> None:
-        """
-        Initialize the Context object with a specified random seed.
+    def __init__(self, seed: int | None = 42) -> None:
+        """Initialize the Context object.
 
-        :param seed: Random seed for reproducibility, defaults to 42.
+        Args:
+            seed: Random seed for reproducibility.
         """
         self.seed = seed
         self._logger = logging.getLogger(__name__)
 
     def configure_logging(self, config: LoggingConfig) -> None:
-        """
-        Configure logging settings.
+        """Configure logging settings.
 
-        :param config: Logging configuration settings.
+        Args:
+            config: Logging configuration settings.
         """
         self.logging_config = config
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
-    def configure_vector_index(self, config: VectorIndexConfig, embedder_config: EmbedderConfig | None = None) -> None:
-        """
-        Configure the vector index client and embedder.
+    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig) -> None:
+        """Configure the vector index client and embedder.
 
-        :param config: Configuration for the vector index.
-        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+        Args:
+            config: configuration for the transformers to use during optimization.
         """
-        self.vector_index_config = config
-        if embedder_config is None:
-            embedder_config = EmbedderConfig()
-        self.embedder_config = embedder_config
+        if isinstance(config, EmbedderConfig):
+            self.embedder_config = config
+        elif isinstance(config, CrossEncoderConfig):
+            self.cross_encoder_config = config
 
-    def configure_cross_encoder(self, config: CrossEncoderConfig) -> None:
-        """
-        Configure the vector index client and embedder.
+    def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
+        """Set the datasets for training, validation and testing.
 
-        :param config: Configuration for the vector index.
-        :param embedder_config: Configuration for the embedder. If None, a default EmbedderConfig is used.
+        Args:
+            dataset: dataset to use during optimization.
+            config: data configuration settings.
         """
-        self.cross_encoder_config = config
-
-    def configure_data(self, config: DataConfig) -> None:
-        """
-        Configure data handling.
-
-        :param config: Configuration for the data handling process.
-        """
-        self.data_handler = DataHandler(
-            dataset=load_dataset(config.train_path),
-            random_seed=self.seed,
-        )
-
-    def set_dataset(self, dataset: Dataset) -> None:
-        """
-        Set the datasets for training, validation and testing.
-
-        :param dataset: Dataset.
-        """
-        self.data_handler = DataHandler(
-            dataset=dataset,
-            random_seed=self.seed,
-        )
-
-    def get_inference_config(self) -> dict[str, Any]:
-        """
-        Generate configuration settings for inference.
-
-        :return: Dictionary containing inference configuration.
-        """
-        nodes_configs = self.optimization_info.get_inference_nodes_config(asdict=True)
-        return {
-            "metadata": {
-                "embedder_device": self.get_device(),
-                "multilabel": self.is_multilabel(),
-                "n_classes": self.get_n_classes(),
-                "seed": self.seed,
-            },
-            "nodes_configs": nodes_configs,
-        }
+        self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
     def dump(self) -> None:
-        """
-        Save logs, configurations, and datasets to disk.
+        """Save all information about optimization process to disk.
 
-        Dumps evaluation results, training/test data splits, and inference configurations
-        to the specified logging directory.
+        Save metrics, hyperparameters, inference, configurations, and datasets to disk.
         """
         self._logger.debug("dumping logs...")
         optimization_results = self.optimization_info.dump_evaluation_results()
 
         logs_dir = self.logging_config.dirpath
-        if logs_dir is None:
-            msg = "something's wrong with LoggingConfig"
-            raise ValueError(msg)
-
         logs_dir.mkdir(parents=True, exist_ok=True)
 
         logs_path = logs_dir / "logs.json"
         with logs_path.open("w") as file:
             json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
 
-        # self._logger.info(make_report(optimization_results, nodes=nodes))
-
-        # dump train and test data splits
-        self.data_handler.dump(logs_dir / "dataset.json")
+        self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
 
-        inference_config = self.get_inference_config()
+        inference_config = self.optimization_info.get_inference_nodes_config(asdict=True)
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
 
-    def get_device(self) -> str:
-        """
-        Get the embedder device used by the vector index client.
-
-        :return: Device name.
-        """
-        return self.embedder_config.device
-
-    def get_cross_encoder_device(self) -> str:
-        """
-        Get the cross encoder device used by default during optimization.
-
-        :return: Device name.
-        """
-        return self.cross_encoder_config.device
-
-    def get_batch_size(self) -> int:
-        """
-        Get the batch size used by the embedder.
-
-        :return: Batch size.
-        """
-        return self.embedder_config.batch_size
-
-    def get_cross_encoder_batch_size(self) -> int:
-        """
-        Get the batch size used by the cross encoder by default during optimization.
-
-        :return: Batch size.
-        """
-        return self.cross_encoder_config.batch_size
-
-    def get_max_length(self) -> int | None:
-        """
-        Get the maximum sequence length for embeddings.
-
-        :return: Maximum length or None if not set.
-        """
-        return self.embedder_config.max_length
-
-    def get_cross_encoder_max_length(self) -> int | None:
-        """
-        Get the maximum sequence length for embeddings.
-
-        :return: Maximum length or None if not set.
-        """
-        return self.cross_encoder_config.max_length
-
-    def get_use_cache(self) -> bool:
-        """
-        Check if caching is enabled for the embedder.
-
-        :return: True if caching is enabled, False otherwise.
-        """
-        return self.embedder_config.use_cache
-
     def get_dump_dir(self) -> Path | None:
-        """
-        Get the directory for saving dumped modules.
+        """Get the directory for saving dumped modules.
 
-        :return: Path to the dump directory or None if dumping is disabled.
+        Return path to the dump directory or None if dumping is disabled.
         """
         if self.logging_config.dump_modules:
             return self.logging_config.dump_dir
         return None
 
     def is_multilabel(self) -> bool:
-        """
-        Check if the dataset is configured for multilabel classification.
-
-        :return: True if multilabel classification is enabled, False otherwise.
-        """
+        """Check if the dataset is configured for multilabel classification."""
         return self.data_handler.multilabel
 
-    def get_n_classes(self) -> int:
-        """
-        Get the number of classes in the dataset.
-
-        :return: Number of classes.
-        """
-        return self.data_handler.n_classes
-
     def is_ram_to_clear(self) -> bool:
-        """
-        Check if RAM clearing is enabled in the logging configuration.
-
-        :return: True if RAM clearing is enabled, False otherwise.
-        """
+        """Check if RAM clearing is enabled in the logging configuration."""
         return self.logging_config.clear_ram
 
     def has_saved_modules(self) -> bool:
-        """
-        Check if any modules have been saved.
-
-        :return: True if there are saved modules, False otherwise.
-        """
-        node_types = ["regexp", "embedding", "scoring", "decision"]
+        """Check if any modules have been saved in RAM."""
+        node_types = ["regex", "embedding", "scoring", "decision"]
         return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
+
+    def resolve_embedder(self) -> EmbedderConfig:
+        """Resolve the embedder configuration.
+
+        Returns the best embedder configuration or default configuration.
+
+        Raises:
+            RuntimeError: If embedder configuration cannot be resolved.
+        """
+        try:
+            return self.optimization_info.get_best_embedder()
+        except ValueError as e:
+            if hasattr(self, "embedder_config"):
+                return self.embedder_config
+            msg = (
+                "Embedder could't be resolved. Either include embedding node into the "
+                "search space or set default config with Context.configure_transformer."
+            )
+            raise RuntimeError(msg) from e
+
+    def resolve_ranker(self) -> CrossEncoderConfig:
+        """Resolve the cross-encoder configuration.
+
+        Returns default config if set.
+
+        Raises:
+            RuntimeError: If cross-encoder configuration cannot be resolved.
+        """
+        if hasattr(self, "cross_encoder_config"):
+            return self.cross_encoder_config
+        msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."
+        raise RuntimeError(msg)

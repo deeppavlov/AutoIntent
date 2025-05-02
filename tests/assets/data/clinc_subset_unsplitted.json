@@ -250,32 +250,32 @@
             "id": 0,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": null
         },
         {
             "id": 1,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": null
         },
         {
             "id": 2,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": null
         },
         {
             "id": 3,
             "name": null,
             "tags": [],
-            "regexp_full_match": [],
-            "regexp_partial_match": [],
+            "regex_full_match": [],
+            "regex_partial_match": [],
             "description": null
         }
     ]

@@ -1,0 +1,14 @@
+- node_type: regex
+  target_metric: regex_partial_accuracy
+  search_space:
+    - module_name: simple
+- node_type: scoring
+  target_metric: scoring_roc_auc
+  search_space:
+    - module_name: linear
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+- node_type: decision
+  target_metric: decision_accuracy
+  search_space:
+    - module_name: argmax

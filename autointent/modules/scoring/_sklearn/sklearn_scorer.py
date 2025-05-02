@@ -1,16 +1,18 @@
+"""Module for classification scoring using sklearn classifiers with predict_proba() method."""
+
 import logging
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from sklearn.linear_model import LogisticRegression
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 from autointent.custom_types import ListOfLabels
-from autointent.modules.abc import ScoringModule
+from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS = {
@@ -27,14 +29,28 @@ AVAILABLE_CLASSIFIERS = {
 }
 
 
-class SklearnScorer(ScoringModule):
-    """
-    Scoring module for classification using sklearn classifiers with implemented predict_proba() method.
+class SklearnScorer(BaseScorer):
+    """Scoring module for classification using sklearn classifiers.
 
     This module uses embeddings generated from a transformer model to train
     chosen sklearn classifier for intent classification.
 
-    :ivar name: Name of the scorer, defaults to "linear".
+    Args:
+        clf_name: Name of the sklearn classifier to use
+        embedder_config: Config of the embedder model
+        **clf_args: Arguments for the chosen sklearn classifier
+
+    Examples:
+        >>> from autointent.modules.scoring import SklearnScorer
+        >>> utterances = ["hello", "how are you?"]
+        >>> labels = [0, 1]
+        >>> scorer = SklearnScorer(
+        ...     clf_name="LogisticRegression",
+        ...     embedder_config="sergeyzh/rubert-tiny-turbo",
+        ... )
+        >>> scorer.fit(utterances, labels)
+        >>> test_utterances = ["hi", "what's up?"]
+        >>> probabilities = scorer.predict(test_utterances)
     """
 
     name = "sklearn"
@@ -43,61 +59,49 @@ class SklearnScorer(ScoringModule):
 
     def __init__(
         self,
-        embedder_name: str,
         clf_name: str,
-        embedder_batch_size: int = 32,
-        embedder_max_length: int | None = None,
-        embedder_device: str = "cpu",
-        embedder_use_cache: bool = True,
-        clf_args: dict[str, Any] | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        **clf_args: Any,  # noqa: ANN401
     ) -> None:
-        """
-        Initialize the SklearnScorer.
+        """Initialize the SklearnScorer.
 
-        :param embedder_name: Name of the embedder model.
-        :param clf_name: Name of the sklearn classifier to use.
-        :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param embedder_batch_size: Batch size for embedding generation, defaults to 32.
-        :param embedder_max_length: Maximum sequence length for embedding, or None for default.
-        :param embedder_device: Device to run operations on, e.g., "cpu" or "cuda".
-        :param embedder_use_cache: Flag indicating whether to cache intermediate embeddings.
+        Raises:
+            ValueError: If the specified classifier doesn't exist or lacks predict_proba
         """
-        self.embedder_name = embedder_name
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.clf_name = clf_name
-        self.clf_args = clf_args or {}
-        self.embedder_batch_size = embedder_batch_size
-        self.embedder_max_length = embedder_max_length
-        self.embedder_device = embedder_device
-        self.embedder_use_cache = embedder_use_cache
+
+        clf_type = AVAILABLE_CLASSIFIERS.get(self.clf_name, None)
+        if clf_type:
+            self._base_clf = clf_type(**clf_args)
+        else:
+            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
+            logger.error(msg)
+            raise ValueError(msg)
 
     @classmethod
     def from_context(
         cls,
         context: Context,
-        clf_name: str = LogisticRegression.__name__,
-        clf_args: dict[str, Any] | None = None,
-        embedder_name: str | None = None,
+        clf_name: str,
+        embedder_config: EmbedderConfig | str | None = None,
+        **clf_args: float | str | bool,
     ) -> Self:
-        """
-        Create a SklearnScorer instance using a Context object.
+        """Create a SklearnScorer instance using a Context object.
 
-        :param context: Context containing configurations and utilities.
-        :param clf_name: Name of the sklearn classifier to use.
-        :param clf_args: dictionary with the chosen sklearn classifier arguments, defaults to {}.
-        :param embedder_name: Name of the embedder, or None to use the best embedder.
-        :return: Initialized SklearnScorer instance.
+        Args:
+            context: Context containing configurations and utilities
+            clf_name: Name of the sklearn classifier to use
+            embedder_config: Config of the embedder, or None to use the best embedder
+            **clf_args: Arguments for the chosen sklearn classifier
         """
-        if embedder_name is None:
-            embedder_name = context.optimization_info.get_best_embedder()
+        if embedder_config is None:
+            embedder_config = context.resolve_embedder()
 
         return cls(
-            embedder_name=embedder_name,
-            embedder_device=context.get_device(),
-            embedder_batch_size=context.get_batch_size(),
-            embedder_max_length=context.get_max_length(),
-            embedder_use_cache=context.get_use_cache(),
+            embedder_config=embedder_config,
             clf_name=clf_name,
-            clf_args=clf_args,
+            **clf_args,
         )
 
     def fit(
@@ -105,31 +109,32 @@ class SklearnScorer(ScoringModule):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        """
-        Train the chosen sklearn classifier.
+        """Train the chosen sklearn classifier.
 
-        :param utterances: List of training utterances.
-        :param labels: List of labels corresponding to the utterances.
-        :raises ValueError: If the vector index mismatches the provided utterances.
+        Args:
+            utterances: List of training utterances
+            labels: List of labels corresponding to the utterances
+
+        Raises:
+            ValueError: If the vector index mismatches the provided utterances
         """
+        if hasattr(self, "_clf"):
+            self.clear_cache()
+
         self._validate_task(labels)
 
         embedder = Embedder(
-            device=self.embedder_device,
-            model_name_or_path=self.embedder_name,
-            batch_size=self.embedder_batch_size,
-            max_length=self.embedder_max_length,
-            use_cache=self.embedder_use_cache,
+            EmbedderConfig(
+                model_name=self.embedder_config.model_name,
+                device=self.embedder_config.device,
+                batch_size=self.embedder_config.batch_size,
+                tokenizer_config=self.embedder_config.tokenizer_config,
+                use_cache=self.embedder_config.use_cache,
+            )
         )
-        features = embedder.embed(utterances)
-        if AVAILABLE_CLASSIFIERS.get(self.clf_name):
-            base_clf = AVAILABLE_CLASSIFIERS[self.clf_name](**self.clf_args)
-        else:
-            msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
-            logger.error(msg)
-            raise ValueError(msg)
+        features = embedder.embed(utterances, TaskTypeEnum.classification)
 
-        clf = MultiOutputClassifier(base_clf) if self._multilabel else base_clf
+        clf = MultiOutputClassifier(self._base_clf) if self._multilabel else self._base_clf
 
         clf.fit(features, labels)
 
@@ -137,13 +142,15 @@ class SklearnScorer(ScoringModule):
         self._embedder = embedder
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        """
-        Predict probabilities for the given utterances.
+        """Predict probabilities for the given utterances.
 
-        :param utterances: List of query utterances.
-        :return: Array of predicted probabilities for each class.
+        Args:
+            utterances: List of query utterances
+
+        Returns:
+            Array of predicted probabilities for each class
         """
-        features = self._embedder.embed(utterances)
+        features = self._embedder.embed(utterances, TaskTypeEnum.classification)
         probas = self._clf.predict_proba(features)
         if self._multilabel:
             probas = np.stack(probas, axis=1)[..., 1]

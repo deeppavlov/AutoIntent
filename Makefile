@@ -3,7 +3,7 @@ poetry = poetry run
 
 .PHONY: install
 install:
-	poetry install --with dev,test,typing,docs
+	poetry install --extras "dev test typing docs"
 
 .PHONY: test
 test:
@@ -24,7 +24,7 @@ lint:
 
 .PHONY: sync
 sync:
-	poetry sync --with dev,test,typing,docs
+	poetry sync --extras "dev test typing docs"
 
 .PHONY: docs
 docs:
@@ -47,6 +47,10 @@ clean-docs:
 	rm -rf docs/build
 	rm -rf docs/source/autoapi
 	rm -rf docs/source/user_guides
+
+.PHONY: schema
+schema:
+	$(poetry) python -m scripts.generate_json_schema_config
 
 .PHONY: all
 all: lint

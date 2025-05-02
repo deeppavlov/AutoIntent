@@ -6,9 +6,8 @@ This chapter is a more detailed version of data chapter from basic user guide ab
 """
 
 # %%
-import importlib.resources as ires
-
 import datasets
+import huggingface_hub
 
 from autointent import Dataset
 
@@ -93,8 +92,8 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
             "id": 0,
             "name": "greeting",
             "tags": ["conversation_start"],
-            "regexp_partial_match": ["\bhello\b"],
-            "regexp_full_match": ["^hello$"],
+            "regex_partial_match": ["\bhello\b"],
+            "regex_full_match": ["^hello$"],
             "description": "User wants to initiate a conversation with a greeting."
         },
         "...",
@@ -104,7 +103,7 @@ regular expressions, intent names, descriptions, or tags, using the `intents` fi
 
 - `name`: A human-readable representation of the intent.
 - `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(class,schemas,Tag).
-- `regexp_partial_match` and `regexp_full_match`: Used by the %mddoclink(class,modules.regexp,RegExp) module to predict intents based on provided patterns.
+- `regex_partial_match` and `regex_full_match`: Used by the %mddoclink(class,modules.regex,RegExp) module to predict intents based on provided patterns.
 - `description`: Used by the %mddoclink(class,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
 
 All fields in the `intents` list are optional except for `id`.
@@ -180,7 +179,11 @@ The AutoIntent library includes sample datasets.
 """
 
 # %%
-path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+path_to_dataset = huggingface_hub.hf_hub_download(
+    repo_id="DeepPavlov/clinc150_subset",
+    filename="clinc_subset.json",
+    repo_type="dataset",
+)
 dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
@@ -191,7 +194,7 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 """
 
 # %%
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # %% [markdown]
 """

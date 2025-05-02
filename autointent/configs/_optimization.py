@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
+
+from autointent._callbacks import REPORTERS_NAMES
+from autointent.custom_types import FloatFromZeroToOne, ValidationScheme
 
 from ._name import get_run_name
 
@@ -10,89 +13,77 @@ from ._name import get_run_name
 class DataConfig(BaseModel):
     """Configuration for the data used in the optimization process."""
 
-    train_path: str | Path
-    """Path to the training data. Can be local path or HF repo."""
-
-
-class TaskConfig(BaseModel):
-    """Configuration for the task to optimize."""
-
-    search_space_path: Path | None = None
-    """Path to the search space configuration file. If None, the default search space will be used"""
+    model_config = ConfigDict(extra="forbid")
+    scheme: ValidationScheme = Field("ho", description="Validation scheme to use.")
+    """Hold-out or cross-validation."""
+    n_folds: PositiveInt = Field(3, description="Number of folds in cross-validation.")
+    """Number of folds in cross-validation."""
+    validation_size: FloatFromZeroToOne = Field(
+        0.2,
+        description=(
+            "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split). "
+            "If `is_few_shot_train` is True, this value will be ignored."
+        ),
+    )
+    """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
+    separation_ratio: FloatFromZeroToOne | None = Field(
+        0.5, description="Set to float to prevent data leak between scoring and decision nodes."
+    )
+    """Set to float to prevent data leak between scoring and decision nodes."""
+    is_few_shot_train: bool = Field(False, description="Whether to use few-shot training.")
+    """Whether to use few-shot training."""
+    examples_per_intent: PositiveInt = Field(
+        8,
+        description="Number of examples per intent for few-shot validation. If None, all examples will be used.",
+    )
+    """Number of examples per intent for few-shot validation. If None, all examples will be used."""
 
 
 class LoggingConfig(BaseModel):
     """Configuration for the logging."""
 
-    project_dir: Path = Field(default_factory=lambda: Path.cwd() / "runs")
+    model_config = ConfigDict(extra="forbid")
+
+    _dirpath: Path | None = None
+    _dump_dir: Path | None = None
+
+    project_dir: Path | str | None = Field(None, description="Path to the directory with different runs.")
     """Path to the directory with different runs."""
-    run_name: str = Field(default_factory=get_run_name)
-    """Name of the run. If None, a random name will be generated"""
-    dump_modules: bool = False
+    run_name: str | None = Field(None, description="Name of the run. If None, a random name will be generated.")
+    """Name of the run. If None, a random name will be generated.
+    To get run_name better use :py:meth:`autointent.configs.LoggingConfig.get_run_name`."""
+    dump_modules: bool = Field(False, description="Whether to dump the modules or not")
     """Whether to dump the modules or not"""
-    clear_ram: bool = False
+    clear_ram: bool = Field(False, description="Whether to clear the RAM after dumping the modules")
     """Whether to clear the RAM after dumping the modules"""
-    report_to: list[str] | None = None
+    report_to: list[REPORTERS_NAMES] | None = Field(  # type: ignore[valid-type]
+        None, description="List of callbacks to report to. If None, no callbacks will be used"
+    )
+    log_interval_time: float = Field(
+        0.1, description="Sampling interval for the system monitor in seconds for Wandb logger."
+    )
     """List of callbacks to report to. If None, no callbacks will be used"""
 
     @property
     def dirpath(self) -> Path:
         """Path to the directory where the logs will be saved."""
-        if not hasattr(self, "_dirpath"):
-            self._dirpath = self.project_dir / self.run_name
+        if self._dirpath is None:
+            project_dir = Path.cwd() / "runs" if self.project_dir is None else Path(self.project_dir)
+            self._dirpath = project_dir / self.get_run_name()
         return self._dirpath
 
     @property
     def dump_dir(self) -> Path:
         """Path to the directory where the modules will be dumped."""
-        if not hasattr(self, "_dump_dir"):
+        if self._dump_dir is None:
             self._dump_dir = self.dirpath / "modules_dumps"
         return self._dump_dir
 
+    def get_run_name(self) -> str:
+        """Return name of the run.
 
-class VectorIndexConfig(BaseModel):
-    """Configuration for the vector index."""
-
-    save_db: bool = False
-    """Whether to save the vector index database or not"""
-
-
-class TransformerConfig(BaseModel):
-    """
-    Base class for configuration for the transformer.
-
-    Transformer is used under the hood in :py:class:`autointent.Embedder` and :py:class:`autointent.Ranker`.
-    """
-
-    batch_size: int = 32
-    """Batch size for the embedder"""
-    max_length: int | None = None
-    """Max length for the embedder. If None, the max length will be taken from model config"""
-    device: str = "cpu"
-    """Device to use for the vector index. Can be 'cpu', 'cuda', 'cuda:0', 'mps', etc."""
-
-
-class EmbedderConfig(TransformerConfig):
-    """
-    Configuration for the embedder.
-
-    The embedder is used to embed the data before training the model. These parameters
-    will be applied to the embedder used in the optimization process in vector db.
-    Only one model can be used globally.
-    """
-
-    use_cache: bool = True
-    """Whether to cache embeddings for reuse, improving performance in repeated operations."""
-
-
-class CrossEncoderConfig(TransformerConfig):
-    """
-    Configuration for the embedder.
-
-    The embedder is used to embed the data before training the model. These parameters
-    will be applied to the embedder used in the optimization process in vector db.
-    Only one model can be used globally.
-    """
-
-    train_head: bool = False
-    """Whether to train the ranking head of a cross encoder."""
+        Use this method instead of direct adressing to :py:attr:`autointent.configs.LoggingConfig.run_name`.
+        """
+        if self.run_name is None:
+            self.run_name = get_run_name()
+        return self.run_name
