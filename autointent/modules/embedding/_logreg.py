@@ -50,7 +50,7 @@ class LogregAimedEmbedding(BaseEmbedding):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
     ) -> None:
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -64,7 +64,7 @@ class LogregAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | None = None,
         cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":
         """Create a LogregAimedEmbedding instance using a Context object.

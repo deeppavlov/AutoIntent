@@ -17,12 +17,14 @@ def test_dump_and_load_preserves_model_state():
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
+    predictions = module.predict(utterances)
 
     module.dump(project_dir)
+    del module
 
-    loaded_module = RetrievalAimedEmbedding(k=5, embedder_config="sergeyzh/rubert-tiny-turbo")
+    loaded_module = RetrievalAimedEmbedding()
     loaded_module.load(project_dir)
-
-    assert loaded_module.embedder_config == module.embedder_config
+    predictions_loaded = loaded_module.predict(utterances)
+    assert predictions == predictions_loaded
 
     shutil.rmtree(project_dir)
