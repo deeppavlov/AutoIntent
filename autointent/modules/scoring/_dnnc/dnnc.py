@@ -61,7 +61,7 @@ class DNNCScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
@@ -77,7 +77,7 @@ class DNNCScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":

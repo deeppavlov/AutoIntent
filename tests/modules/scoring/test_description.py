@@ -46,7 +46,13 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     assert len(predictions) == len(test_utterances)
     assert metadata is None
 
-    scorer.clear_cache()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        scorer.dump(temp_dir)
+        del scorer
+        new_scorer = DescriptionScorer()
+        new_scorer.load(temp_dir)
+        new_predictions = new_scorer.predict(test_utterances)
+        np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
 
 @pytest.mark.parametrize(

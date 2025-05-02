@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 import pytest
 
@@ -31,4 +33,10 @@ def test_base_dnnc(dataset, train_head, pred_score):
     assert "neighbors" in metadata[0]
     assert "scores" in metadata[0]
 
-    scorer.clear_cache()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        scorer.dump(temp_dir)
+        del scorer
+        new_scorer = DNNCScorer()
+        new_scorer.load(temp_dir)
+        new_predictions = new_scorer.predict(test_data)
+        np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)

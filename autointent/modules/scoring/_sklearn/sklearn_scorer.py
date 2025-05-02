@@ -59,7 +59,7 @@ class SklearnScorer(BaseScorer):
 
     def __init__(
         self,
-        clf_name: str,
+        clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         **clf_args: Any,  # noqa: ANN401
     ) -> None:
@@ -83,7 +83,7 @@ class SklearnScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        clf_name: str,
+        clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | None = None,
         **clf_args: float | str | bool,
     ) -> Self:

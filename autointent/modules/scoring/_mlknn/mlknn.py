@@ -63,7 +63,7 @@ class MLKnnScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
@@ -84,7 +84,7 @@ class MLKnnScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         s: PositiveFloat = 1.0,
         ignore_first_neighbours: NonNegativeInt = 0,
         embedder_config: EmbedderConfig | str | None = None,

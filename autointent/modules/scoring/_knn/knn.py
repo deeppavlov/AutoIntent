@@ -56,7 +56,7 @@ class KNNScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         weights: WeightType = "distance",
     ) -> None:
@@ -76,7 +76,7 @@ class KNNScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         weights: WeightType = "distance",
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
