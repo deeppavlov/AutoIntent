@@ -10,9 +10,11 @@ import numpy as np
 import numpy.typing as npt
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
@@ -71,6 +73,8 @@ class Dumper:
         Dumper.make_subdirectories(path)
 
         for key, val in attrs.items():
+            if isinstance(val, Artifact):
+                continue
             if isinstance(val, TagsList):
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
@@ -93,7 +97,7 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
-            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PreTrainedModel) and hasattr(val, "save_pretrained"):
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
@@ -104,7 +108,7 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
-            elif (key == "_tokenizer" or "tokenizer" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PreTrainedTokenizer | PreTrainedTokenizerFast) and hasattr(val, "save_pretrained"):
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
                 try:
