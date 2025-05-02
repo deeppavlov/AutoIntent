@@ -115,7 +115,7 @@ class EmbedderConfig(HFModelConfig):
 
 
 class CrossEncoderConfig(HFModelConfig):
-    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L-6-v2", description="Name of the hugging face model.")
+    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
         False, description="Whether to train the head of the model. If False, LogReg will be trained."
     )

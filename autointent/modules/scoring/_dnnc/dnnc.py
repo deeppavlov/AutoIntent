@@ -36,7 +36,7 @@ class DNNCScorer(BaseScorer):
         utterances = ["what is your name?", "how are you?"]
         labels = [0, 1]
         scorer = DNNCScorer(
-            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
             embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )

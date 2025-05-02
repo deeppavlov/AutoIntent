@@ -26,7 +26,7 @@ search_space = [
             {"module_name": "linear"},
             {
                 "module_name": "dnnc",
-                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L6-v2"],
                 "k": [1, 3, 5, 10],
             },
         ],

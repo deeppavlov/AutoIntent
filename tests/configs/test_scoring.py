@@ -13,8 +13,8 @@ def valid_scoring_config():
             {
                 "module_name": "dnnc",
                 "cross_encoder_config": [
-                    "cross-encoder/ms-marco-MiniLM-L-6-v2",
-                    {"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": True},
+                    "cross-encoder/ms-marco-MiniLM-L6-v2",
+                    {"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2", "train_head": True},
                 ],
                 "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 "k": [5, 10],
@@ -40,7 +40,7 @@ def valid_scoring_config():
             },
             {
                 "module_name": "rerank",
-                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L6-v2"],
                 "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 "k": [5],
                 "weights": ["distance"],
@@ -71,7 +71,7 @@ def test_invalid_scoring_config_missing_field():
         "node_type": "scoring",
         # Missing "target_metric"
         "search_space": [
-            {"module_name": "dnnc", "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L-6-v2"], "k": [5, 10]}
+            {"module_name": "dnnc", "cross_encoder_name": ["cross-encoder/ms-marco-MiniLM-L6-v2"], "k": [5, 10]}
         ],
     }
 
