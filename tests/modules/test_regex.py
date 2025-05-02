@@ -38,7 +38,6 @@ def test_base_regex(partial_match, expected_predictions):
     with tempfile.TemporaryDirectory() as temp_dir:
         matcher.dump(temp_dir)
         del matcher
-        new_matcher = SimpleRegex()
-        new_matcher.load(temp_dir)
+        new_matcher = SimpleRegex.load(temp_dir)
         new_predictions = new_matcher.predict(test_data)
         assert predictions == new_predictions

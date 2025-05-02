@@ -53,8 +53,7 @@ def test_dump_load(fit_fixture, request):
     predictor.dump(path)
     del predictor
 
-    predictor = ThresholdDecision()
-    predictor.load(path)
+    predictor = ThresholdDecision.load(path)
 
     assert hasattr(predictor, "thresh")
     assert predictor.thresh is not None

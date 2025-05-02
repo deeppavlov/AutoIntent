@@ -41,7 +41,6 @@ def test_base_knn(dataset):
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
         del scorer
-        new_scorer = KNNScorer()
-        new_scorer.load(temp_dir)
+        new_scorer = KNNScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)

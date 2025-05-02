@@ -39,8 +39,7 @@ def test_dump_load(multilabel_fit_data):
     predictor.dump(path)
     del predictor
 
-    predictor = AdaptiveDecision()
-    predictor.load(path)
+    predictor = AdaptiveDecision.load(path)
 
     assert hasattr(predictor, "_r")
     assert predictor._r is not None

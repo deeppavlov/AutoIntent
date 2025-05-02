@@ -51,8 +51,7 @@ def test_dump_load(fit_fixture, request):
     predictor.dump(path)
     del predictor
 
-    predictor = TunableDecision()
-    predictor.load(path)
+    predictor = TunableDecision.load(path)
     assert hasattr(predictor, "thresh")
     assert predictor.thresh is not None
     assert isinstance(predictor.thresh, np.ndarray)

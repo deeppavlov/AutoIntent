@@ -47,7 +47,6 @@ def test_dump_load():
 
     module.dump(dump_path)
     del module
-    module = LogregAimedEmbedding()
-    module.load(dump_path)
+    module = LogregAimedEmbedding.load(dump_path)
     predictions_loaded = module.predict(["hello", "bye"])
     assert np.allclose(predictions, predictions_loaded)

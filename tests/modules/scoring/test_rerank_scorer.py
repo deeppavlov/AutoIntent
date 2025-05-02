@@ -47,7 +47,6 @@ def test_base_rerank_scorer(dataset):
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
         del scorer
-        new_scorer = RerankScorer()
-        new_scorer.load(temp_dir)
+        new_scorer = RerankScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)

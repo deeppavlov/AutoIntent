@@ -36,8 +36,7 @@ def test_dump_load(multiclass_fit_data):
     predictor.dump(path)
     del predictor
 
-    predictor = ArgmaxDecision()
-    predictor.load(path)
+    predictor = ArgmaxDecision.load(path)
     new_predictions = predictor.predict(multiclass_fit_data[0])
 
     assert all(p == n for p, n in zip(predictions, new_predictions, strict=True))

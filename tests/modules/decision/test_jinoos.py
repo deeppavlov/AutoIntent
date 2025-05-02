@@ -52,8 +52,7 @@ def test_dump_load(multiclass_fit_data):
     predictor.dump(path)
     del predictor
 
-    predictor = JinoosDecision()
-    predictor.load(path)
+    predictor = JinoosDecision.load(path)
 
     assert hasattr(predictor, "_thresh")
     assert predictor._thresh is not None

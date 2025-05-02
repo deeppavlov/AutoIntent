@@ -41,7 +41,6 @@ def test_base_linear(dataset):
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
         del scorer
-        new_scorer = LinearScorer()
-        new_scorer.load(temp_dir)
+        new_scorer = LinearScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)

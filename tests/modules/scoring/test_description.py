@@ -49,8 +49,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
         del scorer
-        new_scorer = DescriptionScorer()
-        new_scorer.load(temp_dir)
+        new_scorer = DescriptionScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_utterances)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
@@ -103,10 +102,7 @@ def test_description_scorer_cross_encoder(dataset, expected_prediction, multilab
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
 
-        new_scorer = DescriptionScorer(
-            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2", encoder_type="cross", temperature=0.3
-        )
-        new_scorer.load(temp_dir)
+        new_scorer = DescriptionScorer.load(temp_dir)
 
         loaded_predictions = new_scorer.predict(test_utterances)
 

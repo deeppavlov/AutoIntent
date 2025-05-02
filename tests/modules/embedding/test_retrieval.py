@@ -22,8 +22,7 @@ def test_dump_and_load_preserves_model_state():
     module.dump(project_dir)
     del module
 
-    loaded_module = RetrievalAimedEmbedding()
-    loaded_module.load(project_dir)
+    loaded_module = RetrievalAimedEmbedding.load(project_dir)
     predictions_loaded = loaded_module.predict(utterances)
     assert predictions == predictions_loaded
 
