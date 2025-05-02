@@ -23,9 +23,9 @@ class EmissionsTracker:
         self._logger = logger
         self._enabled = int(os.getenv("TRACK_EMISSIONS", "0"))
         if self._enabled:
+            self._logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
             self.tracker = CodeCarbonTracker(project_name=project_name, measure_power_secs=measure_power_secs)
         else:
-            self._logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
             self.tracker = None
 
     def start_task(self, task_name: str) -> None:
