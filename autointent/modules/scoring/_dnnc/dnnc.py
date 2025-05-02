@@ -119,7 +119,7 @@ class DNNCScorer(BaseScorer):
         self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
-        self._cross_encoder = Ranker(self.cross_encoder_config)
+        self._cross_encoder = Ranker(self.cross_encoder_config, output_range="sigmoid")
         self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
