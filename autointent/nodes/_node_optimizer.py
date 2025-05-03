@@ -87,7 +87,7 @@ class NodeOptimizer:
         Raises:
             AssertionError: If an invalid sampler type is provided.
         """
-        self._logger.info("Starting %s node optimization...", self.node_info.node_type)
+        self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter: int = 0
             module_name = search_space.pop("module_name")
@@ -118,7 +118,7 @@ class NodeOptimizer:
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
 
             study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs)
-        context.dump()
+
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def objective(
@@ -176,6 +176,7 @@ class NodeOptimizer:
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
         )
+        context.dump()
 
         if context.is_ram_to_clear():
             module.clear_cache()

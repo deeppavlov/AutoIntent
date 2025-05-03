@@ -52,6 +52,32 @@ class ScorerArtifact(Artifact):
         None, description="Scores for each fold from cross-validation"
     )
 
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
+        """Convert the model to a dictionary, converting numpy arrays to lists."""
+        data = super().model_dump(**kwargs)
+        if data["train_scores"] is not None:
+            data["train_scores"] = data["train_scores"].tolist()
+        if data["validation_scores"] is not None:
+            data["validation_scores"] = data["validation_scores"].tolist()
+        if data["test_scores"] is not None:
+            data["test_scores"] = data["test_scores"].tolist()
+        if data["folded_scores"] is not None:
+            data["folded_scores"] = [arr.tolist() for arr in data["folded_scores"]]
+        return data
+
+    @classmethod
+    def model_validate(cls, obj: dict[str, Any]) -> "ScorerArtifact":
+        """Convert lists back to numpy arrays during validation."""
+        if obj.get("train_scores") is not None:
+            obj["train_scores"] = np.array(obj["train_scores"])
+        if obj.get("validation_scores") is not None:
+            obj["validation_scores"] = np.array(obj["validation_scores"])
+        if obj.get("test_scores") is not None:
+            obj["test_scores"] = np.array(obj["test_scores"])
+        if obj.get("folded_scores") is not None:
+            obj["folded_scores"] = [np.array(arr) for arr in obj["folded_scores"]]
+        return super().model_validate(obj)
+
 
 class DecisionArtifact(Artifact):
     """Artifact containing outputs from the predictor node.
@@ -103,6 +129,31 @@ class Artifacts(BaseModel):
     embedding: list[EmbeddingArtifact] = []
     scoring: list[ScorerArtifact] = []
     decision: list[DecisionArtifact] = []
+
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]:  # noqa: ANN401
+        """Convert the model to a dictionary, ensuring nested artifacts are properly serialized."""
+        data = super().model_dump(**kwargs)
+        for node_type in [NodeType.regex, NodeType.embedding, NodeType.scoring, NodeType.decision]:
+            artifacts = getattr(self, node_type.value)
+            data[node_type.value] = [artifact.model_dump(**kwargs) for artifact in artifacts]
+        return data
+
+    @classmethod
+    def model_validate(cls, obj: dict[str, Any]) -> "Artifacts":
+        """Convert the dictionary back to an Artifacts instance, ensuring nested artifacts are properly deserialized."""
+        # First convert the lists back to numpy arrays in the scoring artifacts
+        if "scoring" in obj:
+            for artifact in obj["scoring"]:
+                if artifact.get("train_scores") is not None:
+                    artifact["train_scores"] = np.array(artifact["train_scores"])
+                if artifact.get("validation_scores") is not None:
+                    artifact["validation_scores"] = np.array(artifact["validation_scores"])
+                if artifact.get("test_scores") is not None:
+                    artifact["test_scores"] = np.array(artifact["test_scores"])
+                if artifact.get("folded_scores") is not None:
+                    artifact["folded_scores"] = [np.array(arr) for arr in artifact["folded_scores"]]
+
+        return super().model_validate(obj)
 
     def add_artifact(self, node_type: str, artifact: Artifact) -> None:
         """Add an artifact to the specified node type.
