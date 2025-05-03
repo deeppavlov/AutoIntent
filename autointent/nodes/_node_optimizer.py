@@ -9,11 +9,10 @@ from functools import partial
 from pathlib import Path
 from typing import Any, TypeVar
 
-import numpy as np
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from typing_extensions import assert_never
 
 from autointent import Dataset
@@ -48,9 +47,6 @@ class ParamSpaceInt(ParamSpace):
         Returns:
             The number of possible values.
         """
-        if self.log:
-            return int(np.logspace(np.log10(self.low), np.log10(self.high), num=self.step))
-
         return (self.high - self.low) // self.step + 1
 
 
@@ -62,6 +58,26 @@ class ParamSpaceFloat(ParamSpace):
     step: float | None = Field(None, description="Step size for the search space (if applicable).")
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
+    @field_validator("step")
+    @classmethod
+    def validate_step_with_log(cls, v: float | None, info: ValidationInfo) -> float | None:
+        """Validate that step is not used when log is True.
+
+        Args:
+            v: The step value to validate
+            info: Validation info containing other field values
+
+        Returns:
+            The validated step value
+
+        Raises:
+            ValueError: If step is provided when log is True
+        """
+        if info.data.get("log", False) and v is not None:
+            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float`."
+            raise ValueError(msg)
+        return v
+
     def n_possible_values(self) -> int | None:
         """Calculate the number of possible values in the search space.
 
@@ -70,9 +86,7 @@ class ParamSpaceFloat(ParamSpace):
         """
         if self.step is None:
             return None
-        if self.log:
-            return int(np.logspace(np.log10(self.low), np.log10(self.high), num=self.step))
-        return (self.high - self.low) // self.step + 1
+        return int((self.high - self.low) // self.step) + 1
 
 
 logger = logging.getLogger(__name__)
@@ -256,25 +270,27 @@ class NodeOptimizer:
                 raise TypeError(msg)
         return res
 
-    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int:
+    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int | None:
         """Calculate the number of possible combinations in the search space.
 
         Args:
             search_space: The parameter search space.
+
+        Returns:
+            The number of possible combinations or None if search space is continuous.
         """
         n_combinations = 1
         for param_space in search_space.values():
             if isinstance(param_space, list):
                 n_combinations *= len(param_space)
+            elif param_space_int := self._parse_param_space(param_space, ParamSpaceInt):
+                n_combinations *= param_space_int.n_possible_values()
+            elif param_space_float := self._parse_param_space(param_space, ParamSpaceFloat):
+                n_possible_values = param_space_float.n_possible_values()
+                if n_possible_values is None:
+                    return None
+                n_combinations *= n_possible_values
             else:
-                param_space_int = self._parse_param_space(param_space, ParamSpaceInt)
-                if param_space_int is not None:
-                    n_combinations *= param_space_int.n_possible_values()
-                    continue
-                param_space_float = self._parse_param_space(param_space, ParamSpaceFloat)
-                if param_space_float is not None:
-                    n_combinations *= param_space_float.n_possible_values()
-                    continue
                 assert_never(param_space)
         return n_combinations
 
@@ -366,7 +382,7 @@ class NodeOptimizer:
                 continue
             if isinstance(param_space, list):
                 res[param_name] = param_space
-            elif self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+            elif self._parse_param_space(param_space, ParamSpaceInt) or self._parse_param_space(
                 param_space, ParamSpaceFloat
             ):
                 res[param_name] = [param_space["low"], param_space["high"]]
