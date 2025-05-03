@@ -4,96 +4,24 @@ import gc
 import itertools as it
 import json
 import logging
-from abc import ABC, abstractmethod
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
-
-
-class ParamSpace(BaseModel, ABC):
-    """Base class for parameter search space configuration."""
-
-    @abstractmethod
-    def n_possible_values(self) -> int | None:
-        """Calculate the number of possible values in the search space.
-
-        Returns:
-            The number of possible values or None if search space is continuous.
-        """
-
-
-class ParamSpaceInt(ParamSpace):
-    """Integer parameter search space configuration."""
-
-    low: int = Field(..., description="Lower boundary of the search space.")
-    high: int = Field(..., description="Upper boundary of the search space.")
-    step: int = Field(1, description="Step size for the search space.")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
-    def n_possible_values(self) -> int:
-        """Calculate the number of possible values in the search space.
-
-        Returns:
-            The number of possible values.
-        """
-        return (self.high - self.low) // self.step + 1
-
-
-class ParamSpaceFloat(ParamSpace):
-    """Float parameter search space configuration."""
-
-    low: float = Field(..., description="Lower boundary of the search space.")
-    high: float = Field(..., description="Upper boundary of the search space.")
-    step: float | None = Field(None, description="Step size for the search space (if applicable).")
-    log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
-
-    @field_validator("step")
-    @classmethod
-    def validate_step_with_log(cls, v: float | None, info: ValidationInfo) -> float | None:
-        """Validate that step is not used when log is True.
-
-        Args:
-            v: The step value to validate
-            info: Validation info containing other field values
-
-        Returns:
-            The validated step value
-
-        Raises:
-            ValueError: If step is provided when log is True
-        """
-        if info.data.get("log", False) and v is not None:
-            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float` (https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_float)."
-            raise ValueError(msg)
-        return v
-
-    def n_possible_values(self) -> int | None:
-        """Calculate the number of possible values in the search space.
-
-        Returns:
-            The number of possible values or None if search space is continuous.
-        """
-        if self.step is None:
-            return None
-        return int((self.high - self.low) // self.step) + 1
-
+from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
 
 logger = logging.getLogger(__name__)
-
-
-ParamSpaceT = TypeVar("ParamSpaceT", bound=ParamSpace)
 
 
 class NodeOptimizer:
@@ -122,6 +50,7 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
+        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -208,8 +137,13 @@ class NodeOptimizer:
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 
         self._logger.debug("Scoring %s module...", module_name)
-        all_metrics = module.score(context, metrics=self.metrics)
-        target_metric = all_metrics[self.target_metric]
+
+        self.emissions_tracker.start_task("module_scoring")
+        final_metrics = module.score(context, metrics=self.metrics)
+        emissions_metrics = self.emissions_tracker.stop_task()
+        all_metrics = {**final_metrics, **emissions_metrics}
+
+        target_metric = final_metrics[self.target_metric]
 
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
@@ -228,7 +162,7 @@ class NodeOptimizer:
             config,
             target_metric,
             self.target_metric,
-            all_metrics,
+            final_metrics,
             module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
@@ -359,7 +293,8 @@ class NodeOptimizer:
 
     def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
         """Check if search space is configured correctly."""
-        for module_search_space in search_space:
+        validated_search_space = SearchSpaceConfig(search_space).model_dump()
+        for module_search_space in validated_search_space:
             module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
             for params_combination in it.product(*module_search_space_no_optuna.values()):

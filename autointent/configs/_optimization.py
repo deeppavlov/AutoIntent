@@ -21,7 +21,8 @@ class DataConfig(BaseModel):
     validation_size: FloatFromZeroToOne = Field(
         0.2,
         description=(
-            "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."
+            "Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split). "
+            "If `is_few_shot_train` is True, this value will be ignored."
         ),
     )
     """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
@@ -29,6 +30,13 @@ class DataConfig(BaseModel):
         0.5, description="Set to float to prevent data leak between scoring and decision nodes."
     )
     """Set to float to prevent data leak between scoring and decision nodes."""
+    is_few_shot_train: bool = Field(False, description="Whether to use few-shot training.")
+    """Whether to use few-shot training."""
+    examples_per_intent: PositiveInt = Field(
+        8,
+        description="Number of examples per intent for few-shot validation. If None, all examples will be used.",
+    )
+    """Number of examples per intent for few-shot validation. If None, all examples will be used."""
 
 
 class LoggingConfig(BaseModel):

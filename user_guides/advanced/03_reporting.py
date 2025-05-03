@@ -26,7 +26,7 @@ search_space = [
             {"module_name": "linear"},
             {
                 "module_name": "dnnc",
-                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L-6-v2"],
+                "cross_encoder_config": ["cross-encoder/ms-marco-MiniLM-L6-v2"],
                 "k": [1, 3, 5, 10],
             },
         ],
@@ -49,7 +49,7 @@ Let us use small subset of popular `clinc150` dataset:
 
 from autointent import Dataset
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # %% [markdown]
 """

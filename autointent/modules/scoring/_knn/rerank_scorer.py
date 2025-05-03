@@ -29,7 +29,6 @@ class RerankScorer(KNNScorer):
 
         cross_encoder_config: Config of the cross-encoder model used for re-ranking
         m: Number of top-ranked neighbors to consider, or None to use k
-        rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
     """
 
     name = "rerank"
@@ -38,9 +37,9 @@ class RerankScorer(KNNScorer):
     def __init__(
         self,
         k: int,
-        weights: WeightType,
+        weights: WeightType = "distance",
+        use_crosencoder_scores: bool = False,
         m: int | None = None,
-        rank_threshold_cutoff: int | None = None,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
@@ -53,16 +52,10 @@ class RerankScorer(KNNScorer):
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
 
         self.m = k if m is None else m
-        self.rank_threshold_cutoff = rank_threshold_cutoff
+        self.use_crosencoder_scores = use_crosencoder_scores
 
         if self.m < 0 or not isinstance(self.m, int):
             msg = "`m` argument of `RerankScorer` must be a positive int"
-            raise ValueError(msg)
-
-        if self.rank_threshold_cutoff is not None and (
-            self.rank_threshold_cutoff < 0 or not isinstance(self.rank_threshold_cutoff, int)
-        ):
-            msg = "`rank_threshold_cutoff` argument of `RerankScorer` must be a positive int or None"
             raise ValueError(msg)
 
     @classmethod
@@ -74,7 +67,7 @@ class RerankScorer(KNNScorer):
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
-        rank_threshold_cutoff: int | None = None,
+        use_crosencoder_scores: bool = False,
     ) -> "RerankScorer":
         """Create a RerankScorer instance from a given context.
 
@@ -86,7 +79,7 @@ class RerankScorer(KNNScorer):
             embedder_config: Config of the embedder used for vectorization,
                 or None to use the best existing embedder
             m: Number of top-ranked neighbors to consider, or None to use k
-            rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
+            use_crosencoder_scores: use crosencoder scores for the output probability vector computation
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -98,7 +91,7 @@ class RerankScorer(KNNScorer):
             k=k,
             weights=weights,
             m=m,
-            rank_threshold_cutoff=rank_threshold_cutoff,
+            use_crosencoder_scores=use_crosencoder_scores,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
         )
@@ -113,9 +106,7 @@ class RerankScorer(KNNScorer):
         if hasattr(self, "_scorer"):
             self.clear_cache()
 
-        self._scorer = Ranker(
-            self.cross_encoder_config,
-        )
+        self._scorer = Ranker(self.cross_encoder_config, output_range="tanh")
         self._scorer.fit(utterances, labels)
 
         super().fit(utterances, labels, clear_cache=False)
@@ -147,10 +138,14 @@ class RerankScorer(KNNScorer):
         ):
             cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
-            for dst, src in zip(
-                [labels, distances, neighbours], [query_labels, query_distances, query_docs], strict=True
-            ):
+            for dst, src in zip([labels, neighbours], [query_labels, query_docs], strict=True):
                 dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
 
+            if self.use_crosencoder_scores:
+                distances.append([rank["score"] for rank in cur_ranks])
+            else:
+                distances.append([query_distances[rank["corpus_id"]] for rank in cur_ranks])
+
         scores = self._count_scores(np.array(labels), np.array(distances))
+
         return scores, neighbours

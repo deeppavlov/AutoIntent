@@ -26,6 +26,7 @@ class DummyCallback(OptimizerCallback):
 
     def log_metrics(self, **kwargs: dict[str, Any]) -> None:
         metrics = kwargs["metrics"]
+        metrics = {k: v for k, v in metrics.items() if not k.startswith("emissions/")}
         for metric_name, metric_value in metrics.items():
             if not isinstance(metric_value, str) and np.isnan(metric_value):
                 metrics[metric_name] = None
@@ -103,7 +104,14 @@ def test_pipeline_callbacks(dataset):
                 "num": 0,
             },
         ),
-        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "retrieval_hit_rate": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -113,7 +121,14 @@ def test_pipeline_callbacks(dataset):
                 "num": 1,
             },
         ),
-        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "retrieval_hit_rate": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -125,12 +140,15 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,
-                        "max_length": None,
+                        "freeze": True,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
                         "model_name": "sergeyzh/rubert-tiny-turbo",
                         "passage_prompt": None,
                         "query_prompt": None,
                         "sts_prompt": None,
-                        "use_cache": False,
+                        "use_cache": True,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
                     },
                     "k": 1,
                     "weights": "uniform",
@@ -139,7 +157,15 @@ def test_pipeline_callbacks(dataset):
                 "num": 0,
             },
         ),
-        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 1.0,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -151,12 +177,15 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,
-                        "max_length": None,
+                        "freeze": True,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
                         "model_name": "sergeyzh/rubert-tiny-turbo",
                         "passage_prompt": None,
                         "query_prompt": None,
                         "sts_prompt": None,
-                        "use_cache": False,
+                        "use_cache": True,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
                     },
                     "k": 1,
                     "weights": "distance",
@@ -165,7 +194,15 @@ def test_pipeline_callbacks(dataset):
                 "num": 1,
             },
         ),
-        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 1.0,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         (
             "start_module",
@@ -177,19 +214,30 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,
-                        "max_length": None,
+                        "freeze": True,
+                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
                         "model_name": "sergeyzh/rubert-tiny-turbo",
                         "passage_prompt": None,
                         "query_prompt": None,
                         "sts_prompt": None,
-                        "use_cache": False,
+                        "use_cache": True,
+                        "similarity_fn_name": "cosine",
+                        "trust_remote_code": False,
                     },
                 },
                 "module_name": "linear",
                 "num": 0,
             },
         ),
-        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "scoring_accuracy": 0.75,
+                    "scoring_roc_auc": 1.0,
+                }
+            },
+        ),
         ("end_module", {}),
         ("start_module", {"module_kwargs": {"thresh": 0.5}, "module_name": "threshold", "num": 0}),
         (
