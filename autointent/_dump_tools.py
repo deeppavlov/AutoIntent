@@ -53,7 +53,7 @@ class Dumper:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
 
     @staticmethod
-    def dump(obj: Any, path: Path, exists_ok: bool = False, exclude: list[type] | None = None) -> None:  # noqa: ANN401, C901
+    def dump(obj: Any, path: Path, exists_ok: bool = False, exclude: list[type[Any]] | None = None) -> None:  # noqa: ANN401, C901
         """Dump modules attributes to filestystem.
 
         Args:
