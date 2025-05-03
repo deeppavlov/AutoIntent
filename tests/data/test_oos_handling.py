@@ -10,7 +10,7 @@ def count_oos(split: HFDataset):
 
 
 def create_clinc150_subset():
-    clinc = Dataset.from_hub("AutoIntent/clinc150")
+    clinc = Dataset.from_hub("DeepPavlov/clinc150")
 
     intents_subset = clinc.intents[:4]
     intent_ids = [intent.id for intent in intents_subset]

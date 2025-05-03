@@ -16,7 +16,7 @@ Let us use small subset of popular `clinc150` dataset for the demonstation.
 # %%
 from autointent import Dataset
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 dataset
 
 # %%
@@ -82,10 +82,12 @@ One can specify what embedding model and cross-encoder model want to use along w
 """
 
 # %%
-from autointent.configs import EmbedderConfig, CrossEncoderConfig
+from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
 
 custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny", device="cpu"))
-custom_pipeline.set_config(CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", max_length=8))
+custom_pipeline.set_config(
+    CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", tokenizer_config=TokenizerConfig(max_length=8))
+)
 
 # %% [markdown]
 """
@@ -122,7 +124,7 @@ from autointent.configs import LoggingConfig
 from autointent.utils import load_preset
 
 # load data
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # customize search space
 preset = load_preset("light_extra")

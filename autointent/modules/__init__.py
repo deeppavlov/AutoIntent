@@ -12,7 +12,18 @@ from .decision import (
 )
 from .embedding import LogregAimedEmbedding, RetrievalAimedEmbedding
 from .regex import SimpleRegex
-from .scoring import DescriptionScorer, DNNCScorer, KNNScorer, LinearScorer, MLKnnScorer, RerankScorer, SklearnScorer
+from .scoring import (
+    BERTLoRAScorer,
+    BertScorer,
+    DescriptionScorer,
+    DNNCScorer,
+    KNNScorer,
+    LinearScorer,
+    MLKnnScorer,
+    PTuningScorer,
+    RerankScorer,
+    SklearnScorer,
+)
 
 T = TypeVar("T", bound=BaseModule)
 
@@ -36,6 +47,9 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,
+        BertScorer,
+        BERTLoRAScorer,
+        PTuningScorer,
     ]
 )
 
@@ -44,4 +58,25 @@ DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
 )
 
 
-__all__ = []  # type: ignore[var-annotated]
+__all__ = [
+    "AdaptiveDecision",
+    "ArgmaxDecision",
+    "BaseDecision",
+    "BaseEmbedding",
+    "BaseModule",
+    "BaseRegex",
+    "BaseScorer",
+    "DNNCScorer",
+    "DescriptionScorer",
+    "JinoosDecision",
+    "KNNScorer",
+    "LinearScorer",
+    "LogregAimedEmbedding",
+    "MLKnnScorer",
+    "RerankScorer",
+    "RetrievalAimedEmbedding",
+    "SimpleRegex",
+    "SklearnScorer",
+    "ThresholdDecision",
+    "TunableDecision",
+]

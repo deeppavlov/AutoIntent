@@ -12,7 +12,7 @@ def test_base_rerank_scorer(dataset):
         weights="distance",
         embedder_config="sergeyzh/rubert-tiny-turbo",
         m=2,
-        cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+        cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
     )
 
     test_data = [

@@ -6,9 +6,8 @@ This chapter is a more detailed version of data chapter from basic user guide ab
 """
 
 # %%
-import importlib.resources as ires
-
 import datasets
+import huggingface_hub
 
 from autointent import Dataset
 
@@ -180,7 +179,11 @@ The AutoIntent library includes sample datasets.
 """
 
 # %%
-path_to_dataset = ires.files("tests.assets.data").joinpath("clinc_subset.json")
+path_to_dataset = huggingface_hub.hf_hub_download(
+    repo_id="DeepPavlov/clinc150_subset",
+    filename="clinc_subset.json",
+    repo_type="dataset",
+)
 dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
@@ -191,7 +194,7 @@ If your dataset on the Hugging Face Hub matches the required format, you can loa
 """
 
 # %%
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # %% [markdown]
 """

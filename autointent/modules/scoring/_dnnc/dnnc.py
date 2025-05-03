@@ -36,7 +36,7 @@ class DNNCScorer(BaseScorer):
         utterances = ["what is your name?", "how are you?"]
         labels = [0, 1]
         scorer = DNNCScorer(
-            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
             embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
@@ -119,7 +119,7 @@ class DNNCScorer(BaseScorer):
         self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
-        self._cross_encoder = Ranker(self.cross_encoder_config)
+        self._cross_encoder = Ranker(self.cross_encoder_config, output_range="sigmoid")
         self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -180,7 +180,7 @@ class DNNCScorer(BaseScorer):
 
         flattened_cross_encoder_scores: npt.NDArray[np.float64] = self._cross_encoder.predict(flattened_text_pairs)
         return [
-            flattened_cross_encoder_scores[i : i + self.k].tolist()  # type: ignore[misc]
+            flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
         ]
 

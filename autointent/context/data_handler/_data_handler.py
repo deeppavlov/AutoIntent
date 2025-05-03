@@ -11,7 +11,7 @@ from autointent.configs import DataConfig
 from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
 from autointent.schemas import Tag
 
-from ._stratification import split_dataset
+from ._stratification import create_few_shot_split, split_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -48,9 +48,14 @@ class DataHandler:
         self._n_classes = self.dataset.n_classes
 
         if self.config.scheme == "ho":
-            self._split_ho(self.config.separation_ratio, self.config.validation_size)
+            self._split_ho(
+                self.config.separation_ratio,
+                self.config.validation_size,
+                self.config.is_few_shot_train,
+                self.config.examples_per_intent,
+            )
         elif self.config.scheme == "cv":
-            self._split_cv()
+            self._split_cv(self.config.is_few_shot_train, self.config.examples_per_intent)
 
         self._logger = logger
 
@@ -149,8 +154,8 @@ class DataHandler:
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         """Yield folds for cross-validation."""
-        if self.config.scheme == "ho":
-            msg = "Cannot call cross-validation on hold-out DataHandler"
+        if self.config.scheme != "cv":
+            msg = f"Cannot call cross-validation on {self.config.scheme} DataHandler"
             raise RuntimeError(msg)
 
         for j in range(self.config.n_folds):
@@ -165,14 +170,22 @@ class DataHandler:
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
-    def _split_ho(self, separation_ratio: FloatFromZeroToOne | None, validation_size: FloatFromZeroToOne) -> None:
+    def _split_ho(
+        self,
+        separation_ratio: FloatFromZeroToOne | None,
+        validation_size: FloatFromZeroToOne,
+        is_few_shot: bool,
+        examples_per_intent: int,
+    ) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
         if separation_ratio is not None and Split.TRAIN in self.dataset:
             self._split_train(separation_ratio)
 
         if not has_validation_split:
-            self._split_validation_from_train(validation_size)
+            self._split_validation_from_train(validation_size, is_few_shot, examples_per_intent)
+        elif is_few_shot:
+            self._split_few_shot(examples_per_intent)
 
         for split in self.dataset:
             n_classes_in_split = self.dataset.get_n_classes(split)
@@ -181,6 +194,27 @@ class DataHandler:
                     f"{n_classes_in_split=} for '{split=}' doesn't match initial number of classes ({self._n_classes})"
                 )
                 raise ValueError(message)
+
+    def _split_few_shot(self, examples_per_intent: int) -> None:
+        if Split.TRAIN in self.dataset:
+            self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = create_few_shot_split(
+                self.dataset[Split.TRAIN],
+                self.dataset[Split.VALIDATION],
+                multilabel=self.dataset.multilabel,
+                label_column=self.dataset.label_feature,
+                random_seed=self._seed,
+                examples_per_label=examples_per_intent,
+            )
+        else:
+            for idx in range(2):
+                self.dataset[f"{Split.TRAIN}_{idx}"], self.dataset[f"{Split.VALIDATION}_{idx}"] = create_few_shot_split(
+                    self.dataset[f"{Split.TRAIN}_{idx}"],
+                    self.dataset[f"{Split.VALIDATION}_{idx}"],
+                    multilabel=self.dataset.multilabel,
+                    label_column=self.dataset.label_feature,
+                    random_seed=self._seed,
+                    examples_per_label=examples_per_intent,
+                )
 
     def _split_train(self, ratio: FloatFromZeroToOne) -> None:
         """Split on two sets.
@@ -199,7 +233,7 @@ class DataHandler:
         )
         self.dataset.pop(Split.TRAIN)
 
-    def _split_cv(self) -> None:
+    def _split_cv(self, is_few_shot: bool, examples_per_intent: int) -> None:
         extra_splits = [split_name for split_name in self.dataset if split_name != Split.TEST]
         self.dataset[Split.TRAIN] = concatenate_datasets([self.dataset.pop(split_name) for split_name in extra_splits])
 
@@ -209,17 +243,21 @@ class DataHandler:
                 split=Split.TRAIN,
                 test_size=1 / (self.config.n_folds - j),
                 random_seed=self._seed,
+                is_few_shot=is_few_shot,
+                examples_per_intent=examples_per_intent,
                 allow_oos_in_train=True,
             )
         self.dataset[f"{Split.TRAIN}_{self.config.n_folds - 1}"] = self.dataset.pop(Split.TRAIN)
 
-    def _split_validation_from_train(self, size: float) -> None:
+    def _split_validation_from_train(self, size: float, is_few_shot: bool, examples_per_intent: int) -> None:
         if Split.TRAIN in self.dataset:
             self.dataset[Split.TRAIN], self.dataset[Split.VALIDATION] = split_dataset(
                 self.dataset,
                 split=Split.TRAIN,
                 test_size=size,
                 random_seed=self._seed,
+                is_few_shot=is_few_shot,
+                examples_per_intent=examples_per_intent,
                 allow_oos_in_train=True,
             )
         else:
@@ -229,6 +267,8 @@ class DataHandler:
                     split=f"{Split.TRAIN}_{idx}",
                     test_size=size,
                     random_seed=self._seed,
+                    is_few_shot=is_few_shot,
+                    examples_per_intent=examples_per_intent,
                     allow_oos_in_train=idx == 1,  # for decision node it's ok to have oos in train
                 )
 
