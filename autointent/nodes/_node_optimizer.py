@@ -167,7 +167,7 @@ class NodeOptimizer:
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
         )
-        context.dump()
+        context.dump_optimization_info()
 
         if context.is_ram_to_clear():
             module.clear_cache()
@@ -386,7 +386,7 @@ def load_or_create_study(
             # Calculate remaining trials if n_trials is specified
             remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
 
-        context.load()
+        context.load_optimization_info()
         return study, finished_trials, remaining_trials  # noqa: TRY300
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
