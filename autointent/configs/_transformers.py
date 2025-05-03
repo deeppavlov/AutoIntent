@@ -114,7 +114,6 @@ class EmbedderConfig(HFModelConfig):
         assert_never(prompt_type)
 
 
-
 class CrossEncoderConfig(HFModelConfig):
     model_name: str = Field("cross-encoder/ms-marco-MiniLM-L6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
