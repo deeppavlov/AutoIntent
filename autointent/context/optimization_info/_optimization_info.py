@@ -112,6 +112,21 @@ class OptimizationInfo:
             module_dump_dir: Directory where the module is dumped.
             module: The module instance, if available.
         """
+        is_new_best, old_best_metric_value_idx = self._is_new_best(node_type, metric_value)
+        if is_new_best:
+            if module:
+                self.modules.add_module(node_type, module)
+                if module_dump_dir is not None:
+                    module.dump(module_dump_dir)
+            self.artifacts.add_artifact(node_type, artifact)
+
+            if old_best_metric_value_idx is not None:
+                prev_best_dump = self.trials.get_trials(node_type)[old_best_metric_value_idx].module_dump_dir
+                if prev_best_dump is not None:
+                    shutil.rmtree(prev_best_dump, ignore_errors=True)  # workaround for windows
+        else:
+            module_dump_dir = None
+
         trial = Trial(
             module_name=module_name,
             metric_name=metric_name,
@@ -123,20 +138,15 @@ class OptimizationInfo:
         self.trials.add_trial(node_type, trial)
         logger.debug("module %s fitted and saved to optimization info %s", module_name, json.dumps(trial.model_dump()))
 
-        if self._is_new_best(node_type, metric_value):
-            if module:
-                self.modules.add_module(node_type, module)
-            self.artifacts.add_artifact(node_type, artifact)
-
-    def _is_new_best(self, node_type: str, metric_value: float) -> bool:
+    def _is_new_best(self, node_type: str, metric_value: float) -> tuple[bool, int | None]:
         """Check if the new trial is the best.
 
         Args:
             node_type: Type of the node.
             metric_value: Metric value of the trial.
         """
-        best_metric_value = self._get_best_metric_value(node_type)
-        return best_metric_value is None or metric_value >= best_metric_value
+        best_metric_value, best_metric_value_idx = self._get_best_metric_value(node_type)
+        return best_metric_value is None or metric_value > best_metric_value, best_metric_value_idx
 
     def _get_metrics_values(self, node_type: str) -> list[float]:
         """Retrieve all metric values for a node type.
@@ -146,19 +156,19 @@ class OptimizationInfo:
         """
         return [trial.metric_value for trial in self.trials.get_trials(node_type)]
 
-    def _get_best_metric_value(self, node_type: str) -> float | None:
-        """Retrieve the best metric value for a node type.
+    def _get_best_metric_value(self, node_type: str) -> tuple[float, int] | tuple[None, None]:
+        """Retrieve the best metric value and index for a node type.
 
         Args:
             node_type: Type of the node.
 
         Returns:
-            Best metric value, or None if no trials exist.
+            Best metric value and index, or None if no trials exist.
         """
         metric_values = self._get_metrics_values(node_type)
         if not metric_values:
-            return None
-        return max(metric_values)
+            return None, None
+        return max(metric_values), int(np.argmax(metric_values))
 
     def get_best_embedder(self) -> EmbedderConfig:
         """Retrieve the name of the best embedder from the retriever node.

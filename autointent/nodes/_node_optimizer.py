@@ -152,7 +152,6 @@ class NodeOptimizer:
 
         if dump_dir is not None:
             module_dump_dir = self.get_module_dump_dir(dump_dir, module_name, self._counter)
-            module.dump(module_dump_dir)
         else:
             module_dump_dir = None
 
