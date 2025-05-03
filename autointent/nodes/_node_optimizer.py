@@ -74,7 +74,7 @@ class ParamSpaceFloat(ParamSpace):
             ValueError: If step is provided when log is True
         """
         if info.data.get("log", False) and v is not None:
-            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float`."
+            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float` (https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_float)."
             raise ValueError(msg)
         return v
 
