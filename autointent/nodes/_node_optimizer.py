@@ -2,6 +2,7 @@
 
 import gc
 import itertools as it
+import json
 import logging
 from abc import ABC, abstractmethod
 from copy import deepcopy
@@ -140,7 +141,7 @@ class NodeOptimizer:
         Raises:
             AssertionError: If an invalid sampler type is provided.
         """
-        self._logger.info("Starting %s node optimization...", self.node_info.node_type)
+        self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter: int = 0
             module_name = search_space.pop("module_name")
@@ -163,21 +164,18 @@ class NodeOptimizer:
 
             study, finished_trials, n_trials = load_or_create_study(
                 study_name=f"{self.node_info.node_type}_{module_name}",
-                storage_dir=context.get_dump_dir(),
+                context=context,
                 direction="maximize",
                 sampler=sampler_instance,
                 n_trials=n_trials,
             )
             self._counter = max(self._counter, finished_trials)
 
-            if n_trials == 0:
-                context.load()
-
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
 
             study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs)
-        context.dump()
+
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def objective(
@@ -200,7 +198,7 @@ class NodeOptimizer:
         """
         config = self.suggest(trial, search_space)
 
-        self._logger.debug("Initializing %s module...", module_name)
+        self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(config))
         module = self.node_info.modules_available[module_name].from_context(context, **config)
 
         embedder_config = module.get_embedder_config()
@@ -235,6 +233,7 @@ class NodeOptimizer:
             module_dump_dir,
             module=module if not context.is_ram_to_clear() else None,
         )
+        context.dump()
 
         if context.is_ram_to_clear():
             module.clear_cache()
@@ -416,7 +415,7 @@ def get_storage_url(study_name: str, storage_dir: Path | None) -> str | None:
 
 def load_or_create_study(
     study_name: str,
-    storage_dir: Path | None,
+    context: Context,
     sampler: optuna.samplers.BaseSampler,
     direction: str = "maximize",
     n_trials: int = 10,
@@ -425,7 +424,7 @@ def load_or_create_study(
 
     Args:
         study_name: Name of the study
-        storage_dir: Directory where study databases are stored
+        context: Context object
         direction: Optimization direction (maximize or minimize)
         sampler: Optuna sampler instance
         n_trials: n_trials
@@ -436,7 +435,7 @@ def load_or_create_study(
     remaining_trials = n_trials
     finished_trials = 0
 
-    storage_url = get_storage_url(study_name, storage_dir)
+    storage_url = get_storage_url(study_name, context.get_dump_dir())
 
     try:
         # will catch exception if study does not exist
@@ -451,6 +450,8 @@ def load_or_create_study(
             finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
             remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
+
+        context.load()
         return study, finished_trials, remaining_trials  # noqa: TRY300
     except Exception:  # noqa: BLE001
         # Create a new study if none exists

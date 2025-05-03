@@ -88,14 +88,19 @@ class Context:
             yaml.dump(inference_config, file)
 
     def load(self) -> None:
-        """Load all information about optimization process from disk."""
+        """Restore the context state to resume the optimization process.
+
+        Raises:
+            RuntimeError: If the modules artifacts are not found.
+        """
         self._logger.debug("loading logs...")
         logs_dir = self.logging_config.dirpath
         self.optimization_info.load(logs_dir)
         if not self.optimization_info.artifacts.has_artifacts():
             msg = (
                 "It is impossible to continue from the previous point, "
-                "start again with dump_modules=True settings if you want to resume the run"
+                "start again with dump_modules=True settings if you want to resume the run."
+                "To load optimization info only, use Context.optimization_info.load(logs_dir)."
             )
             raise RuntimeError(msg)
 

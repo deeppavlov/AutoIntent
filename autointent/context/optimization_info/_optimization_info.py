@@ -4,6 +4,7 @@ This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
 
+import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,6 +21,9 @@ from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact
 
 if TYPE_CHECKING:
     from autointent.modules.base import BaseModule
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -88,8 +92,6 @@ class OptimizationInfo:
 
     def __init__(self) -> None:
         """Initialize optimization info."""
-        self._logger = logging.getLogger(__name__)
-
         self.artifacts = Artifacts()
         self.trials = Trials()
         self._trials_best_ids = TrialsIds()
@@ -130,7 +132,7 @@ class OptimizationInfo:
             metrics=metrics,
         )
         self.trials.add_trial(node_type, trial)
-        self._logger.debug("module %s fitted and saved to optimization info", module_name, extra=trial.model_dump())
+        logger.debug("module %s fitted and saved to optimization info %s", module_name, json.dumps(trial.model_dump()))
 
         if module:
             self.modules.add_module(node_type, module)
@@ -246,7 +248,8 @@ class OptimizationInfo:
 
     def dump(self, path: Path) -> None:
         """Dump the optimization information to a file."""
-        Dumper.dump(self, path / "optimization_info")
+        exclude = [ModulesList]
+        Dumper.dump(self, path / "optimization_info", exists_ok=True, exclude=exclude)
 
     def load(self, path: Path) -> None:
         """Load the optimization information from a file."""

@@ -1,9 +1,8 @@
-import inspect
+import importlib
 import json
 import logging
 from pathlib import Path
-from types import UnionType
-from typing import Any, TypeAlias, Union, get_args, get_origin
+from typing import Any, TypeAlias
 
 import joblib
 import numpy as np
@@ -13,7 +12,6 @@ from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.context._utils import NumpyEncoder
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
@@ -36,11 +34,12 @@ class Dumper:
     pydantic_models: str = "pydantic"
 
     @staticmethod
-    def make_subdirectories(path: Path) -> None:
+    def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
         """Make subdirectories for dumping.
 
         Args:
             path: Path to make subdirectories in
+            exists_ok: If True, do not raise an error if the directory already exists
         """
         subdirectories = [
             path / Dumper.tags,
@@ -51,23 +50,27 @@ class Dumper:
             path / Dumper.pydantic_models,
         ]
         for subdir in subdirectories:
-            subdir.mkdir(parents=True, exist_ok=True)
+            subdir.mkdir(parents=True, exist_ok=exists_ok)
 
     @staticmethod
-    def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901
+    def dump(obj: Any, path: Path, exists_ok: bool = False, exclude: list[type[Any]] | None = None) -> None:  # noqa: ANN401, C901
         """Dump modules attributes to filestystem.
 
         Args:
             obj: Object to dump
             path: Path to dump to
+            exists_ok: If True, do not raise an error if the directory already exists
+            exclude: List of types to exclude from dumping
         """
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
 
-        Dumper.make_subdirectories(path)
+        Dumper.make_subdirectories(path, exists_ok)
 
         for key, val in attrs.items():
+            if exclude and isinstance(val, tuple(exclude)):
+                continue
             if isinstance(val, TagsList):
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
@@ -84,9 +87,13 @@ class Dumper:
                 val.save(str(path / Dumper.cross_encoders / key))
             elif isinstance(val, BaseModel):
                 try:
-                    pydantic_path = path / Dumper.pydantic_models / f"{key}.json"
-                    with pydantic_path.open("w", encoding="utf-8") as file:
-                        json.dump(val.model_dump(), file, ensure_ascii=False, indent=4, cls=NumpyEncoder)
+                    class_info = {"name": val.__class__.__name__, "module": val.__class__.__module__}
+                    pydantic_path = path / Dumper.pydantic_models / key
+                    pydantic_path.mkdir(parents=True, exist_ok=exists_ok)
+                    with (pydantic_path / "class_info.json").open("w", encoding="utf-8") as file:
+                        json.dump(class_info, file, ensure_ascii=False, indent=4)
+                    with (pydantic_path / "model_dump.json").open("w", encoding="utf-8") as file:
+                        json.dump(val.model_dump(), file, ensure_ascii=False, indent=4)
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
@@ -100,7 +107,7 @@ class Dumper:
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
     @staticmethod
-    def load(  # noqa: PLR0912, C901, PLR0915
+    def load(  # noqa: C901, PLR0912, PLR0915
         obj: Any,  # noqa: ANN401
         path: Path,
         embedder_config: EmbedderConfig | None = None,
@@ -139,42 +146,34 @@ class Dumper:
                     for cross_encoder_dump in child.iterdir()
                 }
             elif child.name == Dumper.pydantic_models:
-                for model_file in child.iterdir():
-                    with model_file.open("r", encoding="utf-8") as file:
-                        content = json.load(file)
-                    variable_name = model_file.stem
+                for model_dir in child.iterdir():
+                    try:
+                        with (model_dir / "model_dump.json").open("r", encoding="utf-8") as file:
+                            content = json.load(file)
 
-                    # First try to get the type annotation from the class annotations.
-                    model_type = obj.__class__.__annotations__.get(variable_name)
+                        variable_name = model_dir.name
 
-                    # Fallback: inspect __init__ signature if not found in class-level annotations.
-                    if model_type is None:
-                        sig = inspect.signature(obj.__init__)
-                        if variable_name in sig.parameters:
-                            model_type = sig.parameters[variable_name].annotation
+                        with (model_dir / "class_info.json").open("r", encoding="utf-8") as file:
+                            class_info = json.load(file)
 
-                    if model_type is None:
-                        msg = f"No type annotation found for {variable_name}"
-                        logger.error(msg)
-                        continue
-
-                    # If the annotation is a Union, extract the pydantic model type.
-                    if get_origin(model_type) in (UnionType, Union):
-                        for arg in get_args(model_type):
-                            if isinstance(arg, type) and issubclass(arg, BaseModel):
-                                model_type = arg
-                                break
-                        else:
-                            msg = f"No pydantic type found in Union for {variable_name}"
-                            logger.error(msg)
+                        try:
+                            model_type = importlib.import_module(class_info["module"])
+                            model_type = getattr(model_type, class_info["name"])
+                        except (ImportError, AttributeError) as e:
+                            msg = f"Failed to import model type for {variable_name}: {e}"
+                            logger.exception(msg)
                             continue
 
-                    if not (isinstance(model_type, type) and issubclass(model_type, BaseModel)):
-                        msg = f"Type for {variable_name} is not a pydantic model: {model_type}"
-                        logger.error(msg)
+                        try:
+                            pydantic_models[variable_name] = model_type.model_validate(content)
+                        except Exception as e:
+                            msg = f"Failed to reconstruct Pydantic model {variable_name}: {e}"
+                            logger.exception(msg)
+                            continue
+                    except Exception as e:
+                        msg = f"Error loading Pydantic model from {model_dir}: {e}"
+                        logger.exception(msg)
                         continue
-
-                    pydantic_models[variable_name] = model_type(**content)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
