@@ -17,7 +17,7 @@ from autointent._dump_tools import Dumper
 from autointent.configs import EmbedderConfig, InferenceNodeConfig
 from autointent.custom_types import NodeType
 
-from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials, TrialsIds
+from ._data_models import Artifact, Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials
 
 if TYPE_CHECKING:
     from autointent.modules.base import BaseModule
@@ -94,7 +94,6 @@ class OptimizationInfo:
         """Initialize optimization info."""
         self.artifacts = Artifacts()
         self.trials = Trials()
-        self._trials_best_ids = TrialsIds()
         self.modules = ModulesList()
         self.pipeline_metrics: dict[str, float] = {}
 
@@ -137,54 +136,35 @@ class OptimizationInfo:
         if module:
             self.modules.add_module(node_type, module)
 
-        self.artifacts.add_artifact(node_type, artifact)
+        self._store_artifact(node_type, metric_value, artifact)
 
-    def _get_metrics_values(self, node_type: str) -> list[float]:
-        """Retrieve all metric values for a specific node type.
+    def _store_artifact(self, node_type: str, metric_value: float, artifact: Artifact) -> None:
+        """Store the artifact if it's from the best trial.
+
+        Args:
+            node_type: Type of the node.
+            metric_value: Metric value of the trial.
+            artifact: Artifact to store.
+        """
+        # Only store the artifact if it's from the best trial
+        best_metric_value = self._get_best_metric_value(node_type)
+        if best_metric_value is None or metric_value >= best_metric_value:
+            self.artifacts.add_artifact(node_type, artifact)
+
+    def _get_best_metric_value(self, node_type: str) -> float | None:
+        """Retrieve the best metric value for a node type.
 
         Args:
             node_type: Type of the node.
 
         Returns:
-            List of metric values.
+            Best metric value, or None if no trials exist.
         """
-        return [trial.metric_value for trial in self.trials.get_trials(node_type)]
-
-    def _get_best_trial_idx(self, node_type: str) -> int | None:
-        """Retrieve the index of the best trial for a node type.
-
-        Args:
-            node_type: Type of the node.
-
-        Returns:
-            Index of the best trial, or None if no trials exist.
-        """
-        if not self.trials.get_trials(node_type):
+        trials = self.trials.get_trials(node_type)
+        if not trials:
             return None
-        best_idx = self._trials_best_ids.get_best_trial_idx(node_type)
-        if best_idx is not None:
-            return best_idx
-        best_idx = int(np.argmax(self._get_metrics_values(node_type)))
-        self._trials_best_ids.set_best_trial_idx(node_type, best_idx)
-        return best_idx
-
-    def _get_best_artifact(self, node_type: str) -> EmbeddingArtifact | ScorerArtifact | Artifact:
-        """Retrieve the best artifact for a specific node type.
-
-        Args:
-            node_type: Type of the node.
-
-        Returns:
-            The best artifact for the node type.
-
-        Raises:
-            ValueError: If no best trial exists for the node type.
-        """
-        best_idx = self._get_best_trial_idx(node_type)
-        if best_idx is None:
-            msg = f"No best trial for {node_type}"
-            raise ValueError(msg)
-        return self.artifacts.get_best_artifact(node_type, best_idx)
+        metric_values = [trial.metric_value for trial in trials]
+        return max(metric_values)
 
     def get_best_embedder(self) -> EmbedderConfig:
         """Retrieve the name of the best embedder from the retriever node.
@@ -192,7 +172,7 @@ class OptimizationInfo:
         Returns:
             Configuration of the best embedder.
         """
-        best_retriever_artifact: EmbeddingArtifact = self._get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
+        best_retriever_artifact: EmbeddingArtifact = self.artifacts.get_best_artifact(node_type=NodeType.embedding)  # type: ignore[assignment]
         return best_retriever_artifact.config
 
     def get_best_train_scores(self) -> NDArray[np.float64] | None:
@@ -201,7 +181,7 @@ class OptimizationInfo:
         Returns:
             Train scores as a numpy array.
         """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self.artifacts.get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.train_scores
 
     def get_best_validation_scores(self) -> NDArray[np.float64] | None:
@@ -210,7 +190,7 @@ class OptimizationInfo:
         Returns:
             Validation scores as a numpy array.
         """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self.artifacts.get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.validation_scores
 
     def get_best_folded_scores(self) -> list[NDArray[np.float64]] | None:
@@ -219,7 +199,7 @@ class OptimizationInfo:
         Returns:
             Validation scores as a numpy array.
         """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self.artifacts.get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.folded_scores
 
     def get_best_test_scores(self) -> NDArray[np.float64] | None:
@@ -228,7 +208,7 @@ class OptimizationInfo:
         Returns:
             Test scores as a numpy array.
         """
-        best_scorer_artifact: ScorerArtifact = self._get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
+        best_scorer_artifact: ScorerArtifact = self.artifacts.get_best_artifact(node_type=NodeType.scoring)  # type: ignore[assignment]
         return best_scorer_artifact.test_scores
 
     def dump_evaluation_results(self) -> dict[str, Any]:
