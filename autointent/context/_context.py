@@ -128,7 +128,7 @@ class Context:
     def has_saved_modules(self) -> bool:
         """Check if any modules have been saved in RAM."""
         node_types = ["regex", "embedding", "scoring", "decision"]
-        return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
+        return any(self.optimization_info.modules.get(nt) is not None for nt in node_types)
 
     def resolve_embedder(self) -> EmbedderConfig:
         """Resolve the embedder configuration.

@@ -6,8 +6,10 @@ trials, and modules during the pipeline's execution.
 
 import json
 import logging
+import shutil
+import tempfile
 from collections.abc import Generator
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -29,52 +31,39 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ModulesList:
-    """Container for managing lists of modules for each node type.
+    """Container for managing the best module for each node type.
 
     Attributes:
-        regex: List of modules for the regex node.
-        embedding: List of modules for the embedding node.
-        scoring: List of modules for the scoring node.
-        decision: List of modules for the decision node.
+        regex: Best module for the regex node.
+        embedding: Best module for the embedding node.
+        scoring: Best module for the scoring node.
+        decision: Best module for the decision node.
     """
 
-    regex: list["BaseModule"] = field(default_factory=list)
-    embedding: list["BaseModule"] = field(default_factory=list)
-    scoring: list["BaseModule"] = field(default_factory=list)
-    decision: list["BaseModule"] = field(default_factory=list)
+    regex: "BaseModule | None" = None
+    embedding: "BaseModule | None" = None
+    scoring: "BaseModule | None" = None
+    decision: "BaseModule | None" = None
 
-    def get(self, node_type: str) -> list["BaseModule"]:
-        """Retrieve the list of modules for a specific node type.
+    def get(self, node_type: str) -> "BaseModule | None":
+        """Retrieve the module for a specific node type.
 
         Args:
             node_type: The type of node (e.g., "regex", "embedding").
 
         Returns:
-            List of modules for the specified node type.
+            Module for the specified node type, or None if not set.
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]
 
     def add_module(self, node_type: str, module: "BaseModule") -> None:
-        """Add a module to the list for a specific node type.
+        """Set the module for a specific node type.
 
         Args:
             node_type: The type of node.
-            module: The module to add.
+            module: The module to set.
         """
-        self.get(node_type).append(module)
-
-    def model_dump(self) -> dict[str, list["BaseModule"]]:
-        """Dump the modules to a dictionary format.
-
-        Returns:
-            Dictionary representation of the modules.
-        """
-        return {
-            "regex": self.regex,
-            "embedding": self.embedding,
-            "scoring": self.scoring,
-            "decision": self.decision,
-        }
+        setattr(self, node_type, module)
 
 
 class OptimizationInfo:
@@ -134,23 +123,20 @@ class OptimizationInfo:
         self.trials.add_trial(node_type, trial)
         logger.debug("module %s fitted and saved to optimization info %s", module_name, json.dumps(trial.model_dump()))
 
-        if module:
-            self.modules.add_module(node_type, module)
+        if self._is_new_best(node_type, metric_value):
+            if module:
+                self.modules.add_module(node_type, module)
+            self.artifacts.add_artifact(node_type, artifact)
 
-        self._store_artifact(node_type, metric_value, artifact)
-
-    def _store_artifact(self, node_type: str, metric_value: float, artifact: Artifact) -> None:
-        """Store the artifact if it's from the best trial.
+    def _is_new_best(self, node_type: str, metric_value: float) -> bool:
+        """Check if the new trial is the best.
 
         Args:
             node_type: Type of the node.
             metric_value: Metric value of the trial.
-            artifact: Artifact to store.
         """
-        # Only store the artifact if it's from the best trial
         best_metric_value = self._get_best_metric_value(node_type)
-        if best_metric_value is None or metric_value >= best_metric_value:
-            self.artifacts.add_artifact(node_type, artifact)
+        return best_metric_value is None or metric_value >= best_metric_value
 
     def _get_metrics_values(self, node_type: str) -> list[float]:
         """Retrieve all metric values for a node type.
@@ -236,8 +222,24 @@ class OptimizationInfo:
 
     def dump(self, path: Path) -> None:
         """Dump the optimization information to a file."""
-        exclude = [ModulesList]
-        Dumper.dump(self, path / "optimization_info", exists_ok=True, exclude=exclude)
+        exclude = [ModulesList, dict]
+        target_path = path / "optimization_info"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+
+            # Try to save to the temporary directory first
+            try:
+                Dumper.dump(self, temp_path, exists_ok=False, exclude=exclude)
+
+                # If successful, move the contents to the final destination
+                if target_path.exists():
+                    shutil.rmtree(target_path)
+                shutil.move(temp_path, target_path)
+
+            except Exception:
+                logger.exception("Failed to save optimization info")
+                raise
 
     def load(self, path: Path) -> None:
         """Load the optimization information from a file."""
@@ -286,4 +288,10 @@ class OptimizationInfo:
         Returns:
             Dictionary of the best modules for each node type.
         """
-        return {nt: self.modules.get(nt)[idx] for nt, _, idx in self._get_best_trials() if idx is not None}
+        res = {}
+        for node_type in NodeType:
+            module = self.modules.get(node_type)
+            if module is None:
+                continue
+            res[node_type] = module
+        return res
