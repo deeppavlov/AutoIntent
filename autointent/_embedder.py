@@ -16,6 +16,7 @@ import numpy.typing as npt
 import torch
 from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
+from sentence_transformers.similarity_functions import SimilarityFunction
 
 from ._hash import Hasher
 from .configs import EmbedderConfig, TaskTypeEnum
@@ -225,11 +226,11 @@ class Embedder:
         """Calculate similarity between two sets of embeddings.
 
         Args:
-            embeddings1: First set of embeddings.
-            embeddings2: Second set of embeddings.
+            embeddings1: First set of embeddings (size n).
+            embeddings2: Second set of embeddings (size m).
 
         Returns:
-            A numpy array of similarities.
+            A numpy array of similarities (size n x m).
         """
-        result = self.embedding_model.similarity(embeddings1, embeddings2)
-        return result.detach().cpu().numpy().astype(np.float32)
+        similarity_fn = SimilarityFunction.to_similarity_fn(self.config.similarity_fn_name)
+        return similarity_fn(embeddings1, embeddings2).detach().cpu().numpy().astype(np.float32)

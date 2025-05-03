@@ -61,8 +61,8 @@ class EmbedderConfig(HFModelConfig):
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
     passage_prompt: str | None = Field(None, description="Prompt for passage.")
-    similarity_fn_name: str | None = Field(
-        "cosine", description="Name of the similarity function to use (cosine, dot, euclidean, manhattan)."
+    similarity_fn_name: Literal["cosine", "dot", "euclidean", "manhattan"] = Field(
+        "cosine", description="Name of the similarity function to use."
     )
     use_cache: bool = Field(True, description="Whether to use embeddings caching.")
     freeze: bool = Field(True, description="Whether to freeze the model parameters.")
