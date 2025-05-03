@@ -20,6 +20,7 @@ from sentence_transformers import SentenceTransformer
 from ._hash import Hasher
 from .configs import EmbedderConfig, TaskTypeEnum
 
+logger = logging.getLogger(__name__)
 
 def _get_embeddings_path(filename: str) -> Path:
     """Get the path to the embeddings file.
@@ -45,10 +46,13 @@ def _get_latest_commit_hash(model_name: str) -> str:
         model_name: The name of the model to get the latest commit hash for.
 
     Returns:
-        The latest commit hash for the given model name.
+        The latest commit hash for the given model name or the model name if the commit hash is not found.
     """
-    return huggingface_hub.model_info(model_name, revision="main").sha
-
+    commit_hash = huggingface_hub.model_info(model_name, revision="main").sha
+    if commit_hash is None:
+        logger.warning("No commit hash found for model %s", model_name)
+        return model_name
+    return commit_hash
 
 class EmbedderDumpMetadata(TypedDict):
     """Metadata for saving and loading an Embedder instance."""
@@ -86,8 +90,6 @@ class Embedder:
         """
         self.config = embedder_config
 
-        self._logger = logging.getLogger(__name__)
-
     def __hash__(self) -> int:
         """Compute a hash value for the Embedder.
 
@@ -119,7 +121,7 @@ class Embedder:
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
         if hasattr(self, "embedding_model"):
-            self._logger.debug("Clearing embedder %s from memory", self.config.model_name)
+            logger.debug("Clearing embedder %s from memory", self.config.model_name)
             self.embedding_model.cpu()
             del self.embedding_model
             torch.cuda.empty_cache()
@@ -192,7 +194,7 @@ class Embedder:
 
         self._load_model()
 
-        self._logger.debug(
+        logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
             self.config.model_name,
             self.config.batch_size,
