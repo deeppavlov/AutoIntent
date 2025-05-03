@@ -372,8 +372,8 @@ def load_or_create_study(
             finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
             remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
-        if remaining_trials == 0:
-            context.load()
+
+        context.load()
         return study, finished_trials, remaining_trials  # noqa: TRY300
     except Exception:  # noqa: BLE001
         # Create a new study if none exists

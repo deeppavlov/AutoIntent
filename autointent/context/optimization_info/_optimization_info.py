@@ -247,7 +247,8 @@ class OptimizationInfo:
 
     def dump(self, path: Path) -> None:
         """Dump the optimization information to a file."""
-        Dumper.dump(self, path / "optimization_info", exists_ok=True)
+        exclude = [ModulesList]
+        Dumper.dump(self, path / "optimization_info", exists_ok=True, exclude=exclude)
 
     def load(self, path: Path) -> None:
         """Load the optimization information from a file."""

@@ -53,13 +53,14 @@ class Dumper:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
 
     @staticmethod
-    def dump(obj: Any, path: Path, exists_ok: bool = False) -> None:  # noqa: ANN401, C901
+    def dump(obj: Any, path: Path, exists_ok: bool = False, exclude: list[type] | None = None) -> None:  # noqa: ANN401, C901
         """Dump modules attributes to filestystem.
 
         Args:
             obj: Object to dump
             path: Path to dump to
             exists_ok: If True, do not raise an error if the directory already exists
+            exclude: List of types to exclude from dumping
         """
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
@@ -68,6 +69,8 @@ class Dumper:
         Dumper.make_subdirectories(path, exists_ok)
 
         for key, val in attrs.items():
+            if exclude and isinstance(val, tuple(exclude)):
+                continue
             if isinstance(val, TagsList):
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
