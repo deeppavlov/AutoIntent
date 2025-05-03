@@ -97,7 +97,7 @@ class OptimizationInfo:
         metrics: dict[str, float],
         artifact: Artifact,
         module_dump_dir: str | None,
-        module: "BaseModule | None" = None,
+        module: "BaseModule",
     ) -> None:
         """Log optimization results for a module.
 
@@ -114,10 +114,9 @@ class OptimizationInfo:
         """
         is_new_best, old_best_metric_value_idx = self._is_new_best(node_type, metric_value)
         if is_new_best:
-            if module:
-                self.modules.add_module(node_type, module)
-                if module_dump_dir is not None:
-                    module.dump(module_dump_dir)
+            self.modules.add_module(node_type, module)
+            if module_dump_dir is not None:
+                module.dump(module_dump_dir)
             self.artifacts.add_artifact(node_type, artifact)
 
             if old_best_metric_value_idx is not None:
