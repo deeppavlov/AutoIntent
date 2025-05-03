@@ -7,6 +7,7 @@ embedding models and calculating embeddings for input texts.
 import json
 import logging
 import shutil
+from functools import lru_cache
 from pathlib import Path
 from typing import TypedDict
 
@@ -22,6 +23,7 @@ from ._hash import Hasher
 from .configs import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
+
 
 def _get_embeddings_path(filename: str) -> Path:
     """Get the path to the embeddings file.
@@ -40,6 +42,7 @@ def _get_embeddings_path(filename: str) -> Path:
     return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
 
 
+@lru_cache(maxsize=128)
 def _get_latest_commit_hash(model_name: str) -> str:
     """Get the latest commit hash for a given Hugging Face model.
 
@@ -54,6 +57,7 @@ def _get_latest_commit_hash(model_name: str) -> str:
         logger.warning("No commit hash found for model %s", model_name)
         return model_name
     return commit_hash
+
 
 class EmbedderDumpMetadata(TypedDict):
     """Metadata for saving and loading an Embedder instance."""
