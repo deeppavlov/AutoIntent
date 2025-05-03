@@ -226,17 +226,16 @@
                     "title": "Passage Prompt"
                 },
                 "similarity_fn_name": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
                     "default": "cosine",
-                    "description": "Name of the similarity function to use (cosine, dot, euclidean, manhattan).",
-                    "title": "Similarity Fn Name"
+                    "description": "Name of the similarity function to use.",
+                    "enum": [
+                        "cosine",
+                        "dot",
+                        "euclidean",
+                        "manhattan"
+                    ],
+                    "title": "Similarity Fn Name",
+                    "type": "string"
                 },
                 "use_cache": {
                     "default": true,
