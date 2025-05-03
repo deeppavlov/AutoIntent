@@ -265,7 +265,7 @@ class OptimizationInfo:
             res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
         return res  # type: ignore[return-value]
 
-    def _get_best_trials(self) -> Generator[tuple[NodeType, Trial, int], None, None]:
+    def _get_best_trials(self) -> Generator[tuple[NodeType, Trial | None, int | None], None, None]:
         """Retrieve the best trials for all node types.
 
         Yields:
@@ -276,7 +276,7 @@ class OptimizationInfo:
             if not metric_values:
                 yield node_type, None, None
                 continue
-            best_trial_idx = np.argmax(metric_values)
+            best_trial_idx = int(np.argmax(metric_values))
             best_trial = self.trials.get_trials(node_type)[best_trial_idx]
             yield node_type, best_trial, best_trial_idx
 
@@ -286,5 +286,4 @@ class OptimizationInfo:
         Returns:
             Dictionary of the best modules for each node type.
         """
-        res = {nt: self.modules.get(nt)[idx] for nt, _, idx in self._get_best_trials()}
-        return {nt: m for nt, m in res.items() if m is not None}
+        return {nt: self.modules.get(nt)[idx] for nt, _, idx in self._get_best_trials() if idx is not None}
