@@ -158,7 +158,8 @@ class NodeOptimizer:
             else:
                 assert_never(sampler)
 
-            n_trials = None if n_trials is None else min(self._n_possible_combinations(search_space), n_trials)
+            if n_trials and (possible_combinations := self._n_possible_combinations(search_space)):
+                n_trials = min(possible_combinations, n_trials)
 
             study, finished_trials, n_trials = load_or_create_study(
                 study_name=f"{self.node_info.node_type}_{module_name}",
