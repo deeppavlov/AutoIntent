@@ -3,15 +3,16 @@
 import gc
 import itertools as it
 import logging
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 import optuna
 import torch
 from optuna.trial import Trial
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 from typing_extensions import assert_never
 
 from autointent import Dataset
@@ -20,7 +21,19 @@ from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidation
 from autointent.nodes.info import NODES_INFO
 
 
-class ParamSpaceInt(BaseModel):
+class ParamSpace(BaseModel, ABC):
+    """Base class for parameter search space configuration."""
+
+    @abstractmethod
+    def n_possible_values(self) -> int | None:
+        """Calculate the number of possible values in the search space.
+
+        Returns:
+            The number of possible values or None if search space is continuous.
+        """
+
+
+class ParamSpaceInt(ParamSpace):
     """Integer parameter search space configuration."""
 
     low: int = Field(..., description="Lower boundary of the search space.")
@@ -28,8 +41,16 @@ class ParamSpaceInt(BaseModel):
     step: int = Field(1, description="Step size for the search space.")
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
+    def n_possible_values(self) -> int:
+        """Calculate the number of possible values in the search space.
 
-class ParamSpaceFloat(BaseModel):
+        Returns:
+            The number of possible values.
+        """
+        return (self.high - self.low) // self.step + 1
+
+
+class ParamSpaceFloat(ParamSpace):
     """Float parameter search space configuration."""
 
     low: float = Field(..., description="Lower boundary of the search space.")
@@ -37,8 +58,41 @@ class ParamSpaceFloat(BaseModel):
     step: float | None = Field(None, description="Step size for the search space (if applicable).")
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
+    @field_validator("step")
+    @classmethod
+    def validate_step_with_log(cls, v: float | None, info: ValidationInfo) -> float | None:
+        """Validate that step is not used when log is True.
+
+        Args:
+            v: The step value to validate
+            info: Validation info containing other field values
+
+        Returns:
+            The validated step value
+
+        Raises:
+            ValueError: If step is provided when log is True
+        """
+        if info.data.get("log", False) and v is not None:
+            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float` (https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_float)."
+            raise ValueError(msg)
+        return v
+
+    def n_possible_values(self) -> int | None:
+        """Calculate the number of possible values in the search space.
+
+        Returns:
+            The number of possible values or None if search space is continuous.
+        """
+        if self.step is None:
+            return None
+        return int((self.high - self.low) // self.step) + 1
+
 
 logger = logging.getLogger(__name__)
+
+
+ParamSpaceT = TypeVar("ParamSpaceT", bound=ParamSpace)
 
 
 class NodeOptimizer:
@@ -103,6 +157,9 @@ class NodeOptimizer:
                 n_trials = n_trials or 10
             else:
                 assert_never(sampler)
+
+            if n_trials and (possible_combinations := self._n_possible_combinations(search_space)):
+                n_trials = min(possible_combinations, n_trials)
 
             study, finished_trials, n_trials = load_or_create_study(
                 study_name=f"{self.node_info.node_type}_{module_name}",
@@ -205,23 +262,44 @@ class NodeOptimizer:
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif self._is_valid_param_space(param_space, ParamSpaceInt):
+            elif self._parse_param_space(param_space, ParamSpaceInt):
                 res[param_name] = trial.suggest_int(param_name, **param_space)
-            elif self._is_valid_param_space(param_space, ParamSpaceFloat):
+            elif self._parse_param_space(param_space, ParamSpaceFloat):
                 res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
         return res
 
-    def _is_valid_param_space(
-        self, param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
-    ) -> bool:
+    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int | None:
+        """Calculate the number of possible combinations in the search space.
+
+        Args:
+            search_space: The parameter search space.
+
+        Returns:
+            The number of possible combinations or None if search space is continuous.
+        """
+        n_combinations = 1
+        for param_space in search_space.values():
+            if isinstance(param_space, list):
+                n_combinations *= len(param_space)
+            elif param_space_int := self._parse_param_space(param_space, ParamSpaceInt):
+                n_combinations *= param_space_int.n_possible_values()
+            elif param_space_float := self._parse_param_space(param_space, ParamSpaceFloat):
+                n_possible_values = param_space_float.n_possible_values()
+                if n_possible_values is None:
+                    return None
+                n_combinations *= n_possible_values
+            else:
+                assert_never(param_space)
+        return n_combinations
+
+    def _parse_param_space(self, param_space: dict[str, Any], space_type: type[ParamSpaceT]) -> ParamSpaceT | None:
         try:
-            space_type(**param_space)
-            return True  # noqa: TRY300
+            return space_type(**param_space)
         except ValueError:
-            return False
+            return None
 
     def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
         """Creates and returns the path to the module dump directory.
@@ -305,7 +383,7 @@ class NodeOptimizer:
                 continue
             if isinstance(param_space, list):
                 res[param_name] = param_space
-            elif self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+            elif self._parse_param_space(param_space, ParamSpaceInt) or self._parse_param_space(
                 param_space, ParamSpaceFloat
             ):
                 res[param_name] = [param_space["low"], param_space["high"]]
