@@ -89,7 +89,8 @@ def test_inference_on_the_fly(dataset, task_type, project_dir):
     assert prediction == prediction_v2
 
 
-def test_load_with_overrided_params(dataset, project_dir):
+def test_load_with_overrided_params(dataset):
+    project_dir = setup_environment() / "test_inference" / "override"
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -123,7 +124,7 @@ def test_load_with_overrided_params(dataset, project_dir):
 
 
 def test_no_saving(dataset):
-    project_dir = setup_environment()
+    project_dir = setup_environment() / "test_inference" / "no_saving"
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
