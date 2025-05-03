@@ -23,7 +23,7 @@ from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNode
 
 
 class ParamSpace(BaseModel, ABC):
-    """Base class for parameter search space configuration."""
+    """Base class for search space used in optuna."""
 
     @abstractmethod
     def n_possible_values(self) -> int | None:
