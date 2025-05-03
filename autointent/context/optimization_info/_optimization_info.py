@@ -6,6 +6,7 @@ trials, and modules during the pipeline's execution.
 
 import json
 import logging
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -151,6 +152,14 @@ class OptimizationInfo:
         if best_metric_value is None or metric_value >= best_metric_value:
             self.artifacts.add_artifact(node_type, artifact)
 
+    def _get_metrics_values(self, node_type: str) -> list[float]:
+        """Retrieve all metric values for a node type.
+
+        Args:
+            node_type: Type of the node.
+        """
+        return [trial.metric_value for trial in self.trials.get_trials(node_type)]
+
     def _get_best_metric_value(self, node_type: str) -> float | None:
         """Retrieve the best metric value for a node type.
 
@@ -160,10 +169,9 @@ class OptimizationInfo:
         Returns:
             Best metric value, or None if no trials exist.
         """
-        trials = self.trials.get_trials(node_type)
-        if not trials:
+        metric_values = self._get_metrics_values(node_type)
+        if not metric_values:
             return None
-        metric_values = [trial.metric_value for trial in trials]
         return max(metric_values)
 
     def get_best_embedder(self) -> EmbedderConfig:
@@ -244,12 +252,10 @@ class OptimizationInfo:
         Returns:
             List of configurations for inference nodes.
         """
-        trial_ids = [self._get_best_trial_idx(node_type) for node_type in NodeType]
         res = []
-        for idx, node_type in zip(trial_ids, NodeType, strict=True):
-            if idx is None:
+        for node_type, trial, _ in self._get_best_trials():
+            if trial is None:
                 continue
-            trial = self.trials.get_trial(node_type, idx)
             item = {
                 "node_type": node_type.value,
                 "module_name": trial.module_name,
@@ -259,19 +265,20 @@ class OptimizationInfo:
             res.append(item if asdict else InferenceNodeConfig(**item))  # type: ignore[arg-type]
         return res  # type: ignore[return-value]
 
-    def _get_best_module(self, node_type: str) -> "BaseModule | None":
-        """Retrieve the best module for a specific node type.
+    def _get_best_trials(self) -> Generator[tuple[NodeType, Trial, int], None, None]:
+        """Retrieve the best trials for all node types.
 
-        Args:
-            node_type: Type of the node.
-
-        Returns:
-            The best module, or None if no best trial exists.
+        Yields:
+            Tuple of node type, best trial, and best trial index.
         """
-        idx = self._get_best_trial_idx(node_type)
-        if idx is not None:
-            return self.modules.get(node_type)[idx]
-        return None
+        for node_type in NodeType:
+            metric_values = self._get_metrics_values(node_type)
+            if not metric_values:
+                yield node_type, None, None
+                continue
+            best_trial_idx = np.argmax(metric_values)
+            best_trial = self.trials.get_trials(node_type)[best_trial_idx]
+            yield node_type, best_trial, best_trial_idx
 
     def get_best_modules(self) -> dict[NodeType, "BaseModule"]:
         """Retrieve the best modules for all node types.
@@ -279,5 +286,5 @@ class OptimizationInfo:
         Returns:
             Dictionary of the best modules for each node type.
         """
-        res = {nt: self._get_best_module(nt) for nt in NodeType}
+        res = {nt: self.modules.get(nt)[idx] for nt, _, idx in self._get_best_trials()}
         return {nt: m for nt, m in res.items() if m is not None}
