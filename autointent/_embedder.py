@@ -118,10 +118,11 @@ class Embedder:
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
-        self._logger.debug("Clearing embedder %s from memory", self.config.model_name)
-        self.embedding_model.cpu()
-        del self.embedding_model
-        torch.cuda.empty_cache()
+        if hasattr(self, "embedding_model"):
+            self._logger.debug("Clearing embedder %s from memory", self.config.model_name)
+            self.embedding_model.cpu()
+            del self.embedding_model
+            torch.cuda.empty_cache()
 
     def delete(self) -> None:
         """Delete the embedding model and its associated directory."""
