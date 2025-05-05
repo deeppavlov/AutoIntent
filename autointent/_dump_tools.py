@@ -260,9 +260,6 @@ class Dumper:
 
                         # Create model instance
                         model = model_class()
-                        vocab_path = path / Dumper.containers / "vocab.json"
-                        with vocab_path.open("r") as f:
-                            model._vocab = json.load(f) # noqa: SLF001
 
                         # Load state dict
                         model.load_state_dict(torch.load(model_dir / "model.pt"))
