@@ -56,7 +56,7 @@ class BertScorer(BaseScorer):
         seed: int = 0,
     ) -> "BertScorer":
         if classification_model_config is None:
-            classification_model_config = context.resolve_embedder()
+            classification_model_config = context.resolve_transformer()
 
         report_to = context.logging_config.report_to
 

@@ -96,7 +96,7 @@ class BERTLoRAScorer(BertScorer):
         **lora_kwargs: dict[str, Any],
     ) -> "BERTLoRAScorer":
         if classification_model_config is None:
-            classification_model_config = context.resolve_embedder()
+            classification_model_config = context.resolve_transformer()
         return cls(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,

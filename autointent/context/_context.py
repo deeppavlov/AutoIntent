@@ -7,7 +7,7 @@ import yaml
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
+from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, LoggingConfig
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -49,7 +49,7 @@ class Context:
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
-    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig) -> None:
+    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig | HFModelConfig) -> None:
         """Configure the vector index client and embedder.
 
         Args:
@@ -59,6 +59,8 @@ class Context:
             self.embedder_config = config
         elif isinstance(config, CrossEncoderConfig):
             self.cross_encoder_config = config
+        elif isinstance(config, HFModelConfig):
+            self.transformer_config = config
 
     def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
         """Set the datasets for training, validation and testing.
@@ -133,31 +135,40 @@ class Context:
     def resolve_embedder(self) -> EmbedderConfig:
         """Resolve the embedder configuration.
 
-        Returns the best embedder configuration or default configuration.
-
-        Raises:
-            RuntimeError: If embedder configuration cannot be resolved.
+        This method returns the configuration with the following priorities:
+        - the best embedder configuration obtained during embedding node optimization
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.EmbedderConfig`
         """
         try:
             return self.optimization_info.get_best_embedder()
-        except ValueError as e:
+        except ValueError:
             if hasattr(self, "embedder_config"):
                 return self.embedder_config
-            msg = (
-                "Embedder could't be resolved. Either include embedding node into the "
-                "search space or set default config with Context.configure_transformer."
-            )
-            raise RuntimeError(msg) from e
+            return EmbedderConfig()
 
     def resolve_ranker(self) -> CrossEncoderConfig:
         """Resolve the cross-encoder configuration.
 
-        Returns default config if set.
-
-        Raises:
-            RuntimeError: If cross-encoder configuration cannot be resolved.
+        This method returns the configuration with the following priorities:
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.CrossEncoderConfig`
         """
         if hasattr(self, "cross_encoder_config"):
             return self.cross_encoder_config
-        msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."
-        raise RuntimeError(msg)
+        return CrossEncoderConfig()
+
+    def resolve_transformer(self) -> HFModelConfig:
+        """Resolve the transformer configuration.
+
+        This method returns the configuration with the following priorities:
+        - the best transformer configuration obtained during embedding node optimization
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.HFModelConfig`
+        """
+        try:
+            return self.optimization_info.get_best_embedder()
+        except ValueError:
+            if hasattr(self, "transformer_config"):
+                return self.transformer_config
+            return HFModelConfig()
