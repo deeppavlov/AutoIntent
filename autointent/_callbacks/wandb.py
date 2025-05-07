@@ -105,7 +105,7 @@ class WandbCallback(OptimizerCallback):
         }
 
         try:
-            self.wandb.init(config=metrics, **wandb_run_init_args)  # type: ignore[arg-type]
+            self.wandb.init(config=metrics, **wandb_run_init_args)
         except Exception as e:
             if "run config cannot exceed" not in str(e):
                 # https://github.com/deeppavlov/AutoIntent/issues/202
@@ -115,7 +115,7 @@ class WandbCallback(OptimizerCallback):
             logger.warning("If you want to access modules configs in future, address to the individual modules runs")
             self.wandb.init(
                 config={},
-                **wandb_run_init_args,  # type: ignore[arg-type]
+                **wandb_run_init_args,
             )
 
         self.wandb.log(metrics.get("pipeline_metrics", {}))
