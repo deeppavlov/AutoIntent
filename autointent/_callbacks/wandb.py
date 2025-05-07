@@ -97,8 +97,6 @@ class WandbCallback(OptimizerCallback):
         Args:
             metrics: A dictionary of final performance metrics.
         """
-        from wandb.errors.errors import CommError
-
         wandb_run_init_args = {
             "project": self.project_name,
             "group": self.group,
@@ -108,7 +106,7 @@ class WandbCallback(OptimizerCallback):
 
         try:
             self.wandb.init(config=metrics, **wandb_run_init_args)  # type: ignore[arg-type]
-        except CommError as e:
+        except Exception as e:
             if "run config cannot exceed" not in str(e):
                 # https://github.com/deeppavlov/AutoIntent/issues/202
                 raise
