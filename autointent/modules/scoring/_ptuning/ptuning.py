@@ -69,7 +69,7 @@ class PTuningScorer(BertScorer):
             seed=seed,
             report_to=report_to,
         )
-        self._ptuning_config = PromptEncoderConfig(task_type="SEQ_CLS", **ptuning_kwargs)  # type: ignore[arg-type]
+        self._ptuning_config = PromptEncoderConfig(task_type="SEQ_CLS", **ptuning_kwargs)
 
     @classmethod
     def from_context(
@@ -108,7 +108,7 @@ class PTuningScorer(BertScorer):
             **ptuning_kwargs,
         )
 
-    def _initialize_model(self) -> None:
+    def _initialize_model(self) -> Any:  # noqa: ANN401
         """Initialize the model with P-tuning configuration."""
-        super()._initialize_model()
-        self._model = get_peft_model(self._model, self._ptuning_config)
+        model = super()._initialize_model()
+        return get_peft_model(model, self._ptuning_config)

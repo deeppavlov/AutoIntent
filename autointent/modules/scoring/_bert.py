@@ -11,9 +11,6 @@ from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    PreTrainedTokenizerFast,
     Trainer,
     TrainingArguments,
 )
@@ -29,8 +26,8 @@ class BertScorer(BaseScorer):
     name = "bert"
     supports_multiclass = True
     supports_multilabel = True
-    _model: PreTrainedModel
-    _tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast
+    _model: Any  # transformers AutoModel factory returns Any
+    _tokenizer: Any  # transformers AutoTokenizer factory returns Any
 
     def __init__(
         self,
@@ -75,11 +72,11 @@ class BertScorer(BaseScorer):
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {"classification_model_config": self.classification_model_config.model_dump()}
 
-    def _initialize_model(self) -> None:
+    def _initialize_model(self) -> Any:  # noqa: ANN401
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
-        self._model = AutoModelForSequenceClassification.from_pretrained(
+        return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
@@ -99,7 +96,7 @@ class BertScorer(BaseScorer):
 
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
 
-        self._initialize_model()
+        self._model = self._initialize_model()
 
         use_cpu = self.classification_model_config.device == "cpu"
 

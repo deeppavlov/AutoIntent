@@ -10,7 +10,7 @@ import numpy.typing as npt
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
-from transformers import (
+from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     PreTrainedModel,
@@ -116,13 +116,15 @@ class Dumper:
                     if val._is_prompt_learning:  # noqa: SLF001
                         model_path = path / Dumper.peft_models / key
                         model_path.mkdir(parents=True, exist_ok=True)
-                        val.save_pretrained(model_path / "peft") # save peft config and prompt encoder
-                        val.base_model.save_pretrained(model_path / "base_model")  # save bert classifier
+                        # save peft config and prompt encoder
+                        val.save_pretrained(str(model_path / "peft"))
+                        # save bert classifier
+                        val.base_model.save_pretrained(model_path / "base_model")  # type: ignore[attr-defined]
                     else:
                         model_path = path / Dumper.hf_models / key
                         model_path.mkdir(parents=True, exist_ok=True)
                         merged_model: PreTrainedModel = val.merge_and_unload()
-                        merged_model.save_pretrained(model_path)
+                        merged_model.save_pretrained(model_path)  # type: ignore[attr-defined]
                 except Exception as e:
                     msg = f"Error dumping PeftModel {key}: {e}"
                     logger.exception(msg)
@@ -130,7 +132,7 @@ class Dumper:
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(model_path)
+                    val.save_pretrained(model_path)  # type: ignore[attr-defined]
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
@@ -138,7 +140,7 @@ class Dumper:
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(tokenizer_path)
+                    val.save_pretrained(tokenizer_path)  # type: ignore[union-attr]
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)

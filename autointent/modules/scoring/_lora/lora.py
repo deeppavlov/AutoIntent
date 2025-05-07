@@ -77,7 +77,7 @@ class BERTLoRAScorer(BertScorer):
             seed=seed,
             report_to=report_to,
         )
-        self._lora_config = LoraConfig(**lora_kwargs)  # type: ignore[arg-type]
+        self._lora_config = LoraConfig(**lora_kwargs)
 
     @classmethod
     def from_context(
@@ -102,6 +102,6 @@ class BERTLoRAScorer(BertScorer):
             **lora_kwargs,
         )
 
-    def _initialize_model(self) -> None:
-        super()._initialize_model()
-        self._model = get_peft_model(self._model, self._lora_config)
+    def _initialize_model(self) -> Any:  # noqa: ANN401
+        model = super()._initialize_model()
+        return get_peft_model(model, self._lora_config)
