@@ -3,7 +3,6 @@ import pytest
 
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules import TunableDecision
-from tests.conftest import setup_environment
 
 
 @pytest.mark.parametrize(
@@ -41,17 +40,16 @@ def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
 
 
 @pytest.mark.parametrize("fit_fixture", ["multiclass_fit_data", "multilabel_fit_data"])
-def test_dump_load(fit_fixture, request):
+def test_dump_load(fit_fixture, request, tmp_path):
     fit_data = request.getfixturevalue(fit_fixture)
     predictor = TunableDecision()
     predictor.fit(*fit_data)
     predictions = predictor.predict(fit_data[0])
 
-    path = setup_environment() / "tunable_module"
-    predictor.dump(path)
+    predictor.dump(tmp_path)
     del predictor
 
-    predictor = TunableDecision.load(path)
+    predictor = TunableDecision.load(tmp_path)
     assert hasattr(predictor, "thresh")
     assert predictor.thresh is not None
     assert isinstance(predictor.thresh, np.ndarray)
