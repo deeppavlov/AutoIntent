@@ -1,8 +1,13 @@
+import logging
 import os
 from pathlib import Path
 from typing import Any
 
+from wandb.errors.errors import CommError
+
 from autointent._callbacks.base import OptimizerCallback
+
+logger = logging.getLogger(__name__)
 
 
 class WandbCallback(OptimizerCallback):
@@ -94,13 +99,26 @@ class WandbCallback(OptimizerCallback):
         Args:
             metrics: A dictionary of final performance metrics.
         """
-        self.wandb.init(
-            project=self.project_name,
-            group=self.group,
-            name="final_metrics",
-            config=metrics,
-            settings=self.wandb.Settings(x_stats_sampling_interval=self.log_interval_time),
-        )
+        wandb_run_init_args = {
+            "project": self.project_name,
+            "group": self.group,
+            "name": "final_metrics",
+            "settings": self.wandb.Settings(x_stats_sampling_interval=self.log_interval_time),
+        }
+
+        try:
+            self.wandb.init(config=metrics, **wandb_run_init_args)
+        except CommError as e:
+            if "run config cannot exceed" not in str(e):
+                # https://github.com/deeppavlov/AutoIntent/issues/202
+                raise
+            logger.warning("W&B run config is too large, skipping logging modules configs")
+            logger.warning("'final_metrics' will be logged to W&B with pipeline_metrics only")
+            logger.warning("If you want to access modules configs in future, address to the individual modules runs")
+            self.wandb.init(
+                config={},
+                **wandb_run_init_args,
+            )
 
         self.wandb.log(metrics.get("pipeline_metrics", {}))
         self.wandb.finish()
