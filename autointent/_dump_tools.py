@@ -7,8 +7,16 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
+from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
+)
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
@@ -34,6 +42,7 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
+    peft_models = "peft_models"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -52,6 +61,7 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
+            path / Dumper.peft_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
@@ -101,25 +111,34 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
-            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PeftModel):
+                try:
+                    if val._is_prompt_learning:  # noqa: SLF001
+                        model_path = path / Dumper.peft_models / key
+                        model_path.mkdir(parents=True, exist_ok=True)
+                        val.save_pretrained(model_path / "peft") # save peft config and prompt encoder
+                        val.base_model.save_pretrained(model_path / "base_model")  # save bert classifier
+                    else:
+                        model_path = path / Dumper.hf_models / key
+                        model_path.mkdir(parents=True, exist_ok=True)
+                        merged_model: PreTrainedModel = val.merge_and_unload()
+                        merged_model.save_pretrained(model_path)
+                except Exception as e:
+                    msg = f"Error dumping PeftModel {key}: {e}"
+                    logger.exception(msg)
+            elif isinstance(val, PreTrainedModel):
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
                     val.save_pretrained(model_path)
-                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                    with (model_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
-            elif (key == "_tokenizer" or "tokenizer" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PreTrainedTokenizer | PreTrainedTokenizerFast):
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
                 try:
                     val.save_pretrained(tokenizer_path)
-                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                    with (tokenizer_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
@@ -202,29 +221,25 @@ class Dumper:
                         msg = f"Error loading Pydantic model from {model_dir}: {e}"
                         logger.exception(msg)
                         continue
+            elif child.name == Dumper.peft_models:
+                for model_dir in child.iterdir():
+                    try:
+                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")
+                        hf_models[model_dir.name] = PeftModel.from_pretrained(model, model_dir / "peft")
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading PeftModel {model_dir.name}: {e}"
+                        logger.exception(msg)
             elif child.name == Dumper.hf_models:
                 for model_dir in child.iterdir():
                     try:
-                        with (model_dir / "class_info.json").open("r") as f:
-                            class_info = json.load(f)
-
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        model_class = getattr(module, class_info["name"])
-
-                        hf_models[model_dir.name] = model_class.from_pretrained(model_dir)
+                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.hf_tokenizers:
                 for tokenizer_dir in child.iterdir():
                     try:
-                        with (tokenizer_dir / "class_info.json").open("r") as f:
-                            class_info = json.load(f)
-
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        tokenizer_class = getattr(module, class_info["name"])
-
-                        hf_tokenizers[tokenizer_dir.name] = tokenizer_class.from_pretrained(tokenizer_dir)
+                        hf_tokenizers[tokenizer_dir.name] = AutoTokenizer.from_pretrained(tokenizer_dir)
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)

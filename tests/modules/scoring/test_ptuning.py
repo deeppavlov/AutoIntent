@@ -17,7 +17,6 @@ def test_ptuning_scorer_dump_load(dataset):
         classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
-        task_type="SEQ_CLS",
         num_virtual_tokens=10,
         seed=42,
     )
@@ -38,7 +37,6 @@ def test_ptuning_scorer_dump_load(dataset):
             classification_model_config="prajjwal1/bert-tiny",
             num_train_epochs=1,
             batch_size=8,
-            task_type="SEQ_CLS",
             num_virtual_tokens=10,
             seed=42,
         )
@@ -66,7 +64,6 @@ def test_ptuning_prediction(dataset):
         classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
-        task_type="SEQ_CLS",
         num_virtual_tokens=10,
         seed=42,
     )
@@ -106,7 +103,6 @@ def test_ptuning_cache_clearing(dataset):
         classification_model_config="prajjwal1/bert-tiny",
         num_train_epochs=1,
         batch_size=8,
-        task_type="SEQ_CLS",
         num_virtual_tokens=20,
         seed=42,
     )

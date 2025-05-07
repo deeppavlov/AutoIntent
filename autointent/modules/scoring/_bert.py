@@ -11,6 +11,9 @@ from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
     Trainer,
     TrainingArguments,
 )
@@ -26,8 +29,8 @@ class BertScorer(BaseScorer):
     name = "bert"
     supports_multiclass = True
     supports_multilabel = True
-    _model: Any
-    _tokenizer: Any
+    _model: PreTrainedModel
+    _tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast
 
     def __init__(
         self,

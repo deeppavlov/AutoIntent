@@ -48,7 +48,6 @@
       classification_model_config: ["prajjwal1/bert-tiny"]
       num_train_epochs: [1]
       batch_size: [8, 16]
-      task_type: ["SEQ_CLS"]
       num_virtual_tokens: [10, 20]
 - node_type: decision
   target_metric: decision_accuracy
