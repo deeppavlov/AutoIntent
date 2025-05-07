@@ -1,11 +1,13 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
+from pathlib import Path
 from typing import Any
 
 from peft import LoraConfig, get_peft_model
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
+from autointent._dump_tools import Dumper
 from autointent.configs import HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
@@ -105,3 +107,6 @@ class BERTLoRAScorer(BertScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         model = super()._initialize_model()
         return get_peft_model(model, self._lora_config)
+
+    def dump(self, path: str) -> None:
+        Dumper.dump(self, Path(path), exclude=[LoraConfig])

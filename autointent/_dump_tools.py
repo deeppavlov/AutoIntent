@@ -42,7 +42,7 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
-    peft_models = "peft_models"
+    ptuning_models = "ptuning_models"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -61,7 +61,7 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
-            path / Dumper.peft_models,
+            path / Dumper.ptuning_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
@@ -112,15 +112,17 @@ class Dumper:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
             elif isinstance(val, PeftModel):
+                # dumping peft models is a nightmare...
+                # this might break with new versions of peft
                 try:
                     if val._is_prompt_learning:  # noqa: SLF001
-                        model_path = path / Dumper.peft_models / key
+                        # strategy to save prompt learning models: save prompt encoder and bert classifier separately
+                        model_path = path / Dumper.ptuning_models / key
                         model_path.mkdir(parents=True, exist_ok=True)
-                        # save peft config and prompt encoder
                         val.save_pretrained(str(model_path / "peft"))
-                        # save bert classifier
                         val.base_model.save_pretrained(model_path / "base_model")  # type: ignore[attr-defined]
                     else:
+                        # strategy to save lora models: merge adapters and save as usual hugging face model
                         model_path = path / Dumper.hf_models / key
                         model_path.mkdir(parents=True, exist_ok=True)
                         merged_model: PreTrainedModel = val.merge_and_unload()
@@ -223,7 +225,7 @@ class Dumper:
                         msg = f"Error loading Pydantic model from {model_dir}: {e}"
                         logger.exception(msg)
                         continue
-            elif child.name == Dumper.peft_models:
+            elif child.name == Dumper.ptuning_models:
                 for model_dir in child.iterdir():
                     try:
                         model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")

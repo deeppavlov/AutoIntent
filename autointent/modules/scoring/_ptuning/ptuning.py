@@ -1,11 +1,13 @@
 """PTuningScorer class for ptuning-based classification."""
 
+from pathlib import Path
 from typing import Any
 
 from peft import PromptEncoderConfig, get_peft_model
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
+from autointent._dump_tools import Dumper
 from autointent.configs import HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
@@ -112,3 +114,6 @@ class PTuningScorer(BertScorer):
         """Initialize the model with P-tuning configuration."""
         model = super()._initialize_model()
         return get_peft_model(model, self._ptuning_config)
+
+    def dump(self, path: str) -> None:
+        Dumper.dump(self, Path(path), exclude=[PromptEncoderConfig])
