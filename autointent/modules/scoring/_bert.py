@@ -69,10 +69,10 @@ class BertScorer(BaseScorer):
             report_to=report_to,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        return self.classification_model_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"classification_model_config": self.classification_model_config.model_dump()}
 
-    def __initialize_model(self) -> None:
+    def _initialize_model(self) -> None:
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
@@ -96,7 +96,7 @@ class BertScorer(BaseScorer):
 
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
 
-        self.__initialize_model()
+        self._initialize_model()
 
         use_cpu = self.classification_model_config.device == "cpu"
 
@@ -126,7 +126,7 @@ class BertScorer(BaseScorer):
                 save_strategy="no",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to=self.report_to,
+                report_to=self.report_to if self.report_to is not None else "none",
                 use_cpu=use_cpu,
             )
 

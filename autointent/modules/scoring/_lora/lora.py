@@ -107,7 +107,7 @@ class BERTLoRAScorer(BertScorer):
             **lora_kwargs,
         )
 
-    def __initialize_model(self) -> None:
+    def _initialize_model(self) -> None:
         self._model = AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             num_labels=self._n_classes,

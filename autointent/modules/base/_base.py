@@ -138,9 +138,16 @@ class BaseModule(ABC):
             Initialized module
         """
 
-    def get_embedder_config(self) -> dict[str, Any] | None:
-        """Get the config of the embedder."""
-        return None
+    @abstractmethod
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        """Return default params used in ``__init__`` method.
+
+        Some parameters of the module may be inferred using context rather from ``__init__`` method.
+        But they need to be logged for reproducibility during loading from disk.
+
+        Returns:
+            Dictionary of default params
+        """
 
     @staticmethod
     def score_metrics_ho(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:

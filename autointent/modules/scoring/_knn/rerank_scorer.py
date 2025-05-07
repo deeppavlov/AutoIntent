@@ -96,6 +96,12 @@ class RerankScorer(KNNScorer):
             cross_encoder_config=cross_encoder_config,
         )
 
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {
+            "embedder_config": self.embedder_config.model_dump(),
+            "cross_encoder_config": self.cross_encoder_config.model_dump(),
+        }
+
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """Fit the RerankScorer with utterances and labels.
 
