@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 from sklearn.linear_model import LogisticRegression
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -158,8 +159,22 @@ class TestCrossEncoderConfig:
         assert not self.pydantic_model.tokenizer_config.truncation
 
 
-def base_test_dumper(test_class):
-    with tempfile.TemporaryDirectory() as temp_dir:
+@pytest.mark.parametrize(
+    "test_class",
+    [
+        TestSimpleAttributes,
+        TestTags,
+        TestTransformers,
+        TestVectorIndex,
+        TestEmbedder,
+        TestSklearnEstimator,
+        TestRanker,
+        TestEmbedderConfig,
+        TestCrossEncoderConfig,
+    ],
+)
+def test_dumper(test_class):
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         test_obj = test_class()
         test_obj.init_attributes()
 
@@ -169,39 +184,3 @@ def base_test_dumper(test_class):
         loaded_obj = test_class()
         Dumper.load(loaded_obj, Path(temp_dir))
         loaded_obj.check_attributes()
-
-
-def test_simple_attributes_dumper():
-    base_test_dumper(TestSimpleAttributes)
-
-
-def test_tags_dumper():
-    base_test_dumper(TestTags)
-
-
-def test_transformers_dumper():
-    base_test_dumper(TestTransformers)
-
-
-def test_vector_index_dumper():
-    base_test_dumper(TestVectorIndex)
-
-
-def test_embedder_dumper():
-    base_test_dumper(TestEmbedder)
-
-
-def test_sklearn_estimator_dumper():
-    base_test_dumper(TestSklearnEstimator)
-
-
-def test_ranker_dumper():
-    base_test_dumper(TestRanker)
-
-
-def test_pydantic_model_dumper():
-    base_test_dumper(TestEmbedderConfig)
-
-
-def test_cross_encoder_config_dumper():
-    base_test_dumper(TestCrossEncoderConfig)
