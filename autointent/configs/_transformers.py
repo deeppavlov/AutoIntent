@@ -61,9 +61,11 @@ class EmbedderConfig(HFModelConfig):
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
     passage_prompt: str | None = Field(None, description="Prompt for passage.")
-    similarity_fn_name: str | None = Field(
-        "cosine", description="Name of the similarity function to use (cosine, dot, euclidean, manhattan)."
+    similarity_fn_name: Literal["cosine", "dot", "euclidean", "manhattan"] = Field(
+        "cosine", description="Name of the similarity function to use."
     )
+    use_cache: bool = Field(True, description="Whether to use embeddings caching.")
+    freeze: bool = Field(True, description="Whether to freeze the model parameters.")
 
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.
@@ -111,11 +113,12 @@ class EmbedderConfig(HFModelConfig):
             return self.default_prompt
         assert_never(prompt_type)
 
-    use_cache: bool = Field(False, description="Whether to use embeddings caching.")
-
 
 class CrossEncoderConfig(HFModelConfig):
-    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L-6-v2", description="Name of the hugging face model.")
+    model_name: str = Field("cross-encoder/ms-marco-MiniLM-L6-v2", description="Name of the hugging face model.")
     train_head: bool = Field(
         False, description="Whether to train the head of the model. If False, LogReg will be trained."
     )
+    tokenizer_config: TokenizerConfig = Field(
+        default_factory=lambda: TokenizerConfig(max_length=512)
+    )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly

@@ -67,7 +67,7 @@ def test_description_scorer_cross_encoder(dataset, expected_prediction, multilab
     data_handler = DataHandler(dataset)
 
     scorer = DescriptionScorer(
-        cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2", encoder_type="cross", temperature=0.3
+        cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2", encoder_type="cross", temperature=0.3
     )
 
     scorer.fit(

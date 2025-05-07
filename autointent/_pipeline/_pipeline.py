@@ -144,6 +144,14 @@ class Pipeline:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")
+
+        if not context.logging_config.dump_modules:
+            self._logger.warning(
+                "Memory storage is not compatible with resuming optimization. "
+                "Modules from previous runs won't be available. "
+                "Set dump_modules=True in LoggingConfig to enable proper resuming."
+            )
+
         self.context.callback_handler.start_run(
             run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,

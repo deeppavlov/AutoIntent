@@ -2,6 +2,7 @@
 
 import gc
 import itertools as it
+import json
 import logging
 from copy import deepcopy
 from functools import partial
@@ -18,7 +19,7 @@ from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
 from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
-from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, SearchSpaceConfig
+from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
 
 logger = logging.getLogger(__name__)
 
@@ -58,18 +59,18 @@ class NodeOptimizer:
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
 
-    def fit(self, context: Context, sampler: SamplerType = "brute") -> None:
+    def fit(self, context: Context, sampler: SamplerType = "brute", n_jobs: int = 1) -> None:
         """Performs the optimization process for the node.
 
         Args:
             context: The optimization context containing relevant data.
             sampler: The sampling strategy used for optimization.
+            n_jobs: The number of parallel jobs to run during optimization.
 
         Raises:
             AssertionError: If an invalid sampler type is provided.
         """
-        self._logger.info("Starting %s node optimization...", self.node_info.node_type)
-
+        self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
         for search_space in deepcopy(self.modules_search_spaces):
             self._counter: int = 0
             module_name = search_space.pop("module_name")
@@ -87,10 +88,22 @@ class NodeOptimizer:
             else:
                 assert_never(sampler)
 
-            study = optuna.create_study(direction="maximize", sampler=sampler_instance)
+            if n_trials and (possible_combinations := self._n_possible_combinations(search_space)):
+                n_trials = min(possible_combinations, n_trials)
+
+            study, finished_trials, n_trials = load_or_create_study(
+                study_name=f"{self.node_info.node_type}_{module_name}",
+                context=context,
+                direction="maximize",
+                sampler=sampler_instance,
+                n_trials=n_trials,
+            )
+            self._counter = max(self._counter, finished_trials)
+
             optuna.logging.set_verbosity(optuna.logging.WARNING)
             obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
-            study.optimize(obj, n_trials=n_trials)
+
+            study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs)
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
@@ -114,12 +127,9 @@ class NodeOptimizer:
         """
         config = self.suggest(trial, search_space)
 
-        self._logger.debug("Initializing %s module...", module_name)
+        self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(config))
         module = self.node_info.modules_available[module_name].from_context(context, **config)
-
-        embedder_config = module.get_embedder_config()
-        if embedder_config is not None:
-            config["embedder_config"] = embedder_config
+        config.update(module.get_implicit_initialization_params())
 
         context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
 
@@ -135,25 +145,18 @@ class NodeOptimizer:
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
 
-        dump_dir = context.get_dump_dir()
-
-        if dump_dir is not None:
-            module_dump_dir = self.get_module_dump_dir(dump_dir, module_name, self._counter)
-            module.dump(module_dump_dir)
-        else:
-            module_dump_dir = None
-
         context.optimization_info.log_module_optimization(
-            self.node_info.node_type,
-            module_name,
-            config,
-            target_metric,
-            self.target_metric,
-            final_metrics,
-            module.get_assets(),  # retriever name / scores / predictions
-            module_dump_dir,
-            module=module if not context.is_ram_to_clear() else None,
+            node_type=self.node_info.node_type,
+            module_name=module_name,
+            module_params=config,
+            metric_value=target_metric,
+            metric_name=self.target_metric,
+            metrics=final_metrics,
+            artifact=module.get_assets(),  # retriever name / scores / predictions
+            module_dump_dir=self.get_module_dump_dir(context, module_name, self._counter),
+            module=module,
         )
+        context.dump_optimization_info()
 
         if context.is_ram_to_clear():
             module.clear_cache()
@@ -181,35 +184,59 @@ class NodeOptimizer:
         for param_name, param_space in search_space.items():
             if isinstance(param_space, list):
                 res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
-            elif self._is_valid_param_space(param_space, ParamSpaceInt):
+            elif self._parse_param_space(param_space, ParamSpaceInt):
                 res[param_name] = trial.suggest_int(param_name, **param_space)
-            elif self._is_valid_param_space(param_space, ParamSpaceFloat):
+            elif self._parse_param_space(param_space, ParamSpaceFloat):
                 res[param_name] = trial.suggest_float(param_name, **param_space)
             else:
                 msg = f"Unsupported type of param search space: {param_space}"
                 raise TypeError(msg)
         return res
 
-    def _is_valid_param_space(
-        self, param_space: dict[str, Any], space_type: type[ParamSpaceInt | ParamSpaceFloat]
-    ) -> bool:
-        try:
-            space_type(**param_space)
-            return True  # noqa: TRY300
-        except ValueError:
-            return False
+    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int | None:
+        """Calculate the number of possible combinations in the search space.
 
-    def get_module_dump_dir(self, dump_dir: Path, module_name: str, j_combination: int) -> str:
+        Args:
+            search_space: The parameter search space.
+
+        Returns:
+            The number of possible combinations or None if search space is continuous.
+        """
+        n_combinations = 1
+        for param_space in search_space.values():
+            if isinstance(param_space, list):
+                n_combinations *= len(param_space)
+            elif param_space_int := self._parse_param_space(param_space, ParamSpaceInt):
+                n_combinations *= param_space_int.n_possible_values()
+            elif param_space_float := self._parse_param_space(param_space, ParamSpaceFloat):
+                n_possible_values = param_space_float.n_possible_values()
+                if n_possible_values is None:
+                    return None
+                n_combinations *= n_possible_values
+            else:
+                assert_never(param_space)
+        return n_combinations
+
+    def _parse_param_space(self, param_space: dict[str, Any], space_type: type[ParamSpaceT]) -> ParamSpaceT | None:
+        try:
+            return space_type(**param_space)
+        except ValueError:
+            return None
+
+    def get_module_dump_dir(self, context: Context, module_name: str, j_combination: int) -> str | None:
         """Creates and returns the path to the module dump directory.
 
         Args:
-            dump_dir: The base directory for storing module dumps.
+            context: The context object.
             module_name: The name of the module being optimized.
             j_combination: The combination index for the parameters.
 
         Returns:
             The path to the module dump directory.
         """
+        dump_dir = context.get_dump_dir()
+        if dump_dir is None:
+            return None
         dump_dir_ = dump_dir / self.node_info.node_type / module_name / f"comb_{j_combination}"
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
@@ -282,7 +309,7 @@ class NodeOptimizer:
                 continue
             if isinstance(param_space, list):
                 res[param_name] = param_space
-            elif self._is_valid_param_space(param_space, ParamSpaceInt) or self._is_valid_param_space(
+            elif self._parse_param_space(param_space, ParamSpaceInt) or self._parse_param_space(
                 param_space, ParamSpaceFloat
             ):
                 res[param_name] = [param_space["low"], param_space["high"]]
@@ -291,3 +318,78 @@ class NodeOptimizer:
                 raise TypeError(msg)
 
         return res, module_name
+
+
+def get_storage_url(study_name: str, storage_dir: Path | None) -> str | None:
+    """Create SQLite database URL for Optuna study persistence.
+
+    Args:
+        study_name: Name of the study to be used as filename
+        storage_dir: Directory to store the database file
+
+    Returns:
+        SQLite URL for Optuna storage
+    """
+    if storage_dir is None:
+        msg = "Storage directory must be provided for study persistence."
+        logger.warning(msg)
+        return None
+    storage_dir = storage_dir / "optuna_storage"
+    storage_dir.mkdir(parents=True, exist_ok=True)
+    db_path = storage_dir / f"{study_name}.db"
+    return f"sqlite:///{db_path}"
+
+
+def load_or_create_study(
+    study_name: str,
+    context: Context,
+    sampler: optuna.samplers.BaseSampler,
+    direction: str = "maximize",
+    n_trials: int = 10,
+) -> tuple[optuna.Study, int, int]:
+    """Load an existing study or create a new one if it doesn't exist.
+
+    Args:
+        study_name: Name of the study
+        context: Context object
+        direction: Optimization direction (maximize or minimize)
+        sampler: Optuna sampler instance
+        n_trials: n_trials
+
+    Returns:
+        Optuna study instance, number of completed trials, and number trials to run
+    """
+    remaining_trials = n_trials
+    finished_trials = 0
+
+    storage_url = get_storage_url(study_name, context.get_dump_dir())
+
+    try:
+        # will catch exception if study does not exist
+        study = optuna.load_study(study_name=study_name, storage=storage_url, sampler=sampler)  # type: ignore[arg-type]
+
+        if study.trials:
+            logger.info(
+                "Resuming optimization from previous run. %d trials already completed.",
+                len(study.trials),
+            )
+            # Find the highest trial number to continue counting
+            finished_trials = max(t.number for t in study.trials) + 1
+            # Calculate remaining trials if n_trials is specified
+            remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
+
+        context.load_optimization_info()
+        return study, finished_trials, remaining_trials  # noqa: TRY300
+    except Exception:  # noqa: BLE001
+        # Create a new study if none exists
+        return (
+            optuna.create_study(
+                study_name=study_name,
+                storage=storage_url,
+                direction=direction,
+                sampler=sampler,
+                load_if_exists=True,
+            ),
+            finished_trials,
+            remaining_trials,
+        )

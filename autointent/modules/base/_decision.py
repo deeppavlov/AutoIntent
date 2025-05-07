@@ -18,6 +18,9 @@ from autointent.schemas import Tag
 class BaseDecision(BaseModule, ABC):
     """Base class for decision modules."""
 
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {}
+
     @abstractmethod
     def fit(
         self,
