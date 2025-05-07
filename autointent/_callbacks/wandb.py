@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from typing import Any
 
-from wandb.errors.errors import CommError
-
 from autointent._callbacks.base import OptimizerCallback
 
 logger = logging.getLogger(__name__)
@@ -99,6 +97,8 @@ class WandbCallback(OptimizerCallback):
         Args:
             metrics: A dictionary of final performance metrics.
         """
+        from wandb.errors.errors import CommError
+
         wandb_run_init_args = {
             "project": self.project_name,
             "group": self.group,
@@ -107,7 +107,7 @@ class WandbCallback(OptimizerCallback):
         }
 
         try:
-            self.wandb.init(config=metrics, **wandb_run_init_args)
+            self.wandb.init(config=metrics, **wandb_run_init_args)  # type: ignore[arg-type]
         except CommError as e:
             if "run config cannot exceed" not in str(e):
                 # https://github.com/deeppavlov/AutoIntent/issues/202
@@ -117,7 +117,7 @@ class WandbCallback(OptimizerCallback):
             logger.warning("If you want to access modules configs in future, address to the individual modules runs")
             self.wandb.init(
                 config={},
-                **wandb_run_init_args,
+                **wandb_run_init_args,  # type: ignore[arg-type]
             )
 
         self.wandb.log(metrics.get("pipeline_metrics", {}))
