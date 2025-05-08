@@ -1,17 +1,43 @@
 """Schemes."""
 
 import inspect
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from typing import Annotated, Any, Literal, TypeAlias, Union, get_args, get_origin, get_type_hints
+from typing import Annotated, Any, Literal, TypeAlias, TypeVar, Union, get_args, get_origin, get_type_hints
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt, RootModel, ValidationError, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PositiveInt,
+    RootModel,
+    ValidationError,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 from autointent.custom_types import NodeType
 from autointent.modules import BaseModule
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
 
-class ParamSpaceInt(BaseModel):
+class ParamSpace(BaseModel, ABC):
+    """Base class for search space used in optuna."""
+
+    @abstractmethod
+    def n_possible_values(self) -> int | None:
+        """Calculate the number of possible values in the search space.
+
+        Returns:
+            The number of possible values or None if search space is continuous.
+        """
+
+
+ParamSpaceT = TypeVar("ParamSpaceT", bound=ParamSpace)
+
+
+class ParamSpaceInt(ParamSpace):
     """Integer parameter search space configuration."""
 
     low: int = Field(..., description="Lower boundary of the search space.")
@@ -19,14 +45,52 @@ class ParamSpaceInt(BaseModel):
     step: int = Field(1, description="Step size for the search space.")
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
 
+    def n_possible_values(self) -> int:
+        """Calculate the number of possible values in the search space.
 
-class ParamSpaceFloat(BaseModel):
+        Returns:
+            The number of possible values.
+        """
+        return (self.high - self.low) // self.step + 1
+
+
+class ParamSpaceFloat(ParamSpace):
     """Float parameter search space configuration."""
 
     low: float = Field(..., description="Lower boundary of the search space.")
     high: float = Field(..., description="Upper boundary of the search space.")
     step: float | None = Field(None, description="Step size for the search space (if applicable).")
     log: bool = Field(False, description="Indicates whether to use a logarithmic scale.")
+
+    @field_validator("step")
+    @classmethod
+    def validate_step_with_log(cls, v: float | None, info: ValidationInfo) -> float | None:
+        """Validate that step is not used when log is True.
+
+        Args:
+            v: The step value to validate
+            info: Validation info containing other field values
+
+        Returns:
+            The validated step value
+
+        Raises:
+            ValueError: If step is provided when log is True
+        """
+        if info.data.get("log", False) and v is not None:
+            msg = "Step cannot be used when log is True. See optuna docs on `suggest_float` (https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_float)."
+            raise ValueError(msg)
+        return v
+
+    def n_possible_values(self) -> int | None:
+        """Calculate the number of possible values in the search space.
+
+        Returns:
+            The number of possible values or None if search space is continuous.
+        """
+        if self.step is None:
+            return None
+        return int((self.high - self.low) // self.step) + 1
 
 
 def unwrap_annotated(tp: type) -> type:

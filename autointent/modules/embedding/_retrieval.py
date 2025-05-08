@@ -46,7 +46,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         k: PositiveInt = 10,
     ) -> None:
         self.k = k
@@ -61,7 +61,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str,
+        embedder_config: EmbedderConfig | str | None = None,
         k: PositiveInt = 10,
     ) -> "RetrievalAimedEmbedding":
         """Create an instance using a Context object.

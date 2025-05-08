@@ -10,7 +10,7 @@ import json
 import logging
 from pathlib import Path
 from random import shuffle
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 
 import joblib
 import numpy as np
@@ -101,12 +101,14 @@ class Ranker:
         self,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
         classifier_head: LogisticRegressionCV | None = None,
+        output_range: Literal["sigmoid", "tanh"] = "sigmoid",
     ) -> None:
         """Initialize the Ranker.
 
         Args:
             cross_encoder_config: Configuration for the cross-encoder model
             classifier_head: Optional pre-trained classifier head
+            output_range: Range of the output probabilities ([0, 1] for sigmoid, [-1, 1] for tanh)
         """
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
@@ -117,6 +119,7 @@ class Ranker:
         )
         self._train_head = False
         self._clf = classifier_head
+        self.output_range = output_range
 
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
@@ -148,7 +151,7 @@ class Ranker:
                 self.cross_encoder.predict(
                     pairs,
                     batch_size=self.config.batch_size,
-                    activation_fct=nn.Sigmoid(),
+                    activation_fct=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),
                 )
             )
 
@@ -210,7 +213,10 @@ class Ranker:
         features = self._get_features_or_predictions(pairs)
 
         if self._clf is not None:
-            return np.array(self._clf.predict_proba(features)[:, 1])
+            probs = np.array(self._clf.predict_proba(features)[:, 1])
+            if self.output_range == "tanh":
+                probs = probs * 2 - 1
+            return probs
         return features
 
     def rank(

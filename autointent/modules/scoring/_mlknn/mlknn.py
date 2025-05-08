@@ -63,7 +63,7 @@ class MLKnnScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
@@ -84,7 +84,7 @@ class MLKnnScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         s: PositiveFloat = 1.0,
         ignore_first_neighbours: NonNegativeInt = 0,
         embedder_config: EmbedderConfig | str | None = None,
@@ -111,13 +111,8 @@ class MLKnnScorer(BaseScorer):
             ignore_first_neighbours=ignore_first_neighbours,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Get the name of the embedder.
-
-        Returns:
-            Embedder name
-        """
-        return self.embedder_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"embedder_config": self.embedder_config.model_dump()}
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """Fit the scorer by training or loading the vector index and calculating probabilities.

@@ -31,8 +31,8 @@ class InferenceNode:
             config: Config to init from
         """
         node_info = NODES_INFO[config.node_type]
-        module = node_info.modules_available[config.module_name](**config.module_config)
-        module.load(
+        module_cls = node_info.modules_available[config.module_name]
+        module = module_cls.load(
             config.load_path,
             embedder_config=getattr(config, "embedder_config", None),
             cross_encoder_config=getattr(config, "cross_encoder_config", None),

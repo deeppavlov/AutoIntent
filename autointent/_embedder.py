@@ -7,20 +7,25 @@ embedding models and calculating embeddings for input texts.
 import json
 import logging
 import shutil
+from functools import lru_cache
 from pathlib import Path
 from typing import TypedDict
 
+import huggingface_hub
 import numpy as np
 import numpy.typing as npt
 import torch
 from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
+from sentence_transformers.similarity_functions import SimilarityFunction
 
 from ._hash import Hasher
 from .configs import EmbedderConfig, TaskTypeEnum
 
+logger = logging.getLogger(__name__)
 
-def get_embeddings_path(filename: str) -> Path:
+
+def _get_embeddings_path(filename: str) -> Path:
     """Get the path to the embeddings file.
 
     This function constructs the full path to an embeddings file stored
@@ -35,6 +40,23 @@ def get_embeddings_path(filename: str) -> Path:
         The full path to the embeddings file.
     """
     return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
+
+
+@lru_cache(maxsize=128)
+def _get_latest_commit_hash(model_name: str) -> str:
+    """Get the latest commit hash for a given Hugging Face model.
+
+    Args:
+        model_name: The name of the model to get the latest commit hash for.
+
+    Returns:
+        The latest commit hash for the given model name or the model name if the commit hash is not found.
+    """
+    commit_hash = huggingface_hub.model_info(model_name, revision="main").sha
+    if commit_hash is None:
+        logger.warning("No commit hash found for model %s", model_name)
+        return model_name
+    return commit_hash
 
 
 class EmbedderDumpMetadata(TypedDict):
@@ -63,7 +85,6 @@ class Embedder:
 
     _metadata_dict_name: str = "metadata.json"
     _dump_dir: Path | None = None
-    config: EmbedderConfig
     embedding_model: SentenceTransformer
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
@@ -74,16 +95,6 @@ class Embedder:
         """
         self.config = embedder_config
 
-        self.embedding_model = SentenceTransformer(
-            self.config.model_name,
-            device=self.config.device,
-            prompts=embedder_config.get_prompt_config(),
-            similarity_fn_name=self.config.similarity_fn_name,
-            trust_remote_code=self.config.trust_remote_code,
-        )
-
-        self._logger = logging.getLogger(__name__)
-
     def __hash__(self) -> int:
         """Compute a hash value for the Embedder.
 
@@ -91,17 +102,34 @@ class Embedder:
             The hash value of the Embedder.
         """
         hasher = Hasher()
-        for parameter in self.embedding_model.parameters():
-            hasher.update(parameter.detach().cpu().numpy())
+        if self.config.freeze:
+            commit_hash = _get_latest_commit_hash(self.config.model_name)
+            hasher.update(commit_hash)
+        else:
+            self._load_model()
+            for parameter in self.embedding_model.parameters():
+                hasher.update(parameter.detach().cpu().numpy())
         hasher.update(self.config.tokenizer_config.max_length)
         return hasher.intdigest()
 
+    def _load_model(self) -> None:
+        """Load sentence transformers model to device."""
+        if not hasattr(self, "embedding_model"):
+            self.embedding_model = SentenceTransformer(
+                self.config.model_name,
+                device=self.config.device,
+                prompts=self.config.get_prompt_config(),
+                similarity_fn_name=self.config.similarity_fn_name,
+                trust_remote_code=self.config.trust_remote_code,
+            )
+
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
-        self._logger.debug("Clearing embedder %s from memory", self.config.model_name)
-        self.embedding_model.cpu()
-        del self.embedding_model
-        torch.cuda.empty_cache()
+        if hasattr(self, "embedding_model"):
+            logger.debug("Clearing embedder %s from memory", self.config.model_name)
+            self.embedding_model.cpu()
+            del self.embedding_model
+            torch.cuda.empty_cache()
 
     def delete(self) -> None:
         """Delete the embedding model and its associated directory."""
@@ -165,11 +193,13 @@ class Embedder:
             hasher.update(self)
             hasher.update(utterances)
 
-            embeddings_path = get_embeddings_path(hasher.hexdigest())
+            embeddings_path = _get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
-        self._logger.debug(
+        self._load_model()
+
+        logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
             self.config.model_name,
             self.config.batch_size,
@@ -200,11 +230,11 @@ class Embedder:
         """Calculate similarity between two sets of embeddings.
 
         Args:
-            embeddings1: First set of embeddings.
-            embeddings2: Second set of embeddings.
+            embeddings1: First set of embeddings (size n).
+            embeddings2: Second set of embeddings (size m).
 
         Returns:
-            A numpy array of similarities.
+            A numpy array of similarities (size n x m).
         """
-        result = self.embedding_model.similarity(embeddings1, embeddings2)
-        return result.detach().cpu().numpy().astype(np.float32)
+        similarity_fn = SimilarityFunction.to_similarity_fn(self.config.similarity_fn_name)
+        return similarity_fn(embeddings1, embeddings2).detach().cpu().numpy().astype(np.float32)

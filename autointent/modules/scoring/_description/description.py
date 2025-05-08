@@ -76,9 +76,9 @@ class DescriptionScorer(BaseScorer):
         Returns:
             Initialized DescriptionScorer instance
         """
-        if embedder_config is None:
+        if embedder_config is None and encoder_type == "bi":
             embedder_config = context.resolve_embedder()
-        if cross_encoder_config is None:
+        if cross_encoder_config is None and encoder_type == "cross":
             cross_encoder_config = context.resolve_ranker()
 
         return cls(
@@ -88,21 +88,13 @@ class DescriptionScorer(BaseScorer):
             encoder_type=encoder_type,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Get the configuration of the embedder.
-
-        Returns:
-            Embedder configuration
-        """
-        return self.embedder_config.model_dump()
-
-    def get_cross_encoder_config(self) -> dict[str, Any]:
-        """Get the configuration of the cross-encoder.
-
-        Returns:
-            Cross-encoder configuration
-        """
-        return self.cross_encoder_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        res = {}
+        if self._encoder_type == "bi":
+            res["embedder_config"] = self.embedder_config.model_dump()
+        else:
+            res["cross_encoder_config"] = self.cross_encoder_config.model_dump()
+        return res
 
     def fit(
         self,

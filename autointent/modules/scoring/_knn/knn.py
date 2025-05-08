@@ -56,7 +56,7 @@ class KNNScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         weights: WeightType = "distance",
     ) -> None:
@@ -76,7 +76,7 @@ class KNNScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         weights: WeightType = "distance",
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "KNNScorer":
@@ -97,13 +97,8 @@ class KNNScorer(BaseScorer):
             weights=weights,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Get the name of the embedder.
-
-        Returns:
-            Embedder name
-        """
-        return self.embedder_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"embedder_config": self.embedder_config.model_dump()}
 
     def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
         """Fit the scorer by training or loading the vector index.
