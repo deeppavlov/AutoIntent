@@ -484,7 +484,7 @@
                 "train_head": false
             }
         },
-        "hf_model_config": {
+        "transformer_config": {
             "$ref": "#/$defs/HFModelConfig",
             "default": {
                 "model_name": "prajjwal1/bert-tiny",
