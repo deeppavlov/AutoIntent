@@ -8,8 +8,10 @@ from typing import Any, TypeAlias, Union, get_args, get_origin
 import joblib
 import numpy as np
 import numpy.typing as npt
+import torch
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+from torch import nn
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
@@ -35,6 +37,9 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
+    torch_models = "torch_models"
+    vocab = "vocab.json"
+    model_metadata = "model_metadata.json"
 
     @staticmethod
     def make_subdirectories(path: Path) -> None:
@@ -52,6 +57,7 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
+            path / Dumper.torch_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=True)
@@ -70,7 +76,21 @@ class Dumper:
 
         Dumper.make_subdirectories(path)
 
+        if "_model" in attrs and "_n_classes" in attrs and "_multilabel" in attrs:
+            model_metadata = {
+                "n_classes": attrs["_n_classes"],
+                "multilabel": attrs["_multilabel"]
+            }
+            with (path / Dumper.model_metadata).open("w") as f:
+                json.dump(model_metadata, f)
+
+        if "_vocab" in attrs and isinstance(attrs["_vocab"], dict):
+            with (path / Dumper.vocab).open("w") as f:
+                json.dump(attrs["_vocab"], f)
+
         for key, val in attrs.items():
+            if key == "_vocab":
+                continue
             if isinstance(val, TagsList):
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
@@ -115,6 +135,11 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
+            elif key == "_model" and isinstance(val, nn.Module):
+                torch.save(val.state_dict(), path / Dumper.torch_models / f"{key}.pt")
+                class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
+                with (path / Dumper.torch_models / "model_class_info.json").open("w") as f:
+                    json.dump(class_info, f)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -142,6 +167,20 @@ class Dumper:
         pydantic_models: dict[str, Any] = {}
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
+
+        obj_dict = vars(obj)
+
+        vocab_path = path / Dumper.vocab
+        if vocab_path.exists():
+            with vocab_path.open("r") as f:
+                obj_dict["_vocab"] = json.load(f)
+
+        metadata_path = path / Dumper.model_metadata
+        if metadata_path.exists():
+            with metadata_path.open("r") as f:
+                metadata = json.load(f)
+                obj_dict["_n_classes"] = metadata["n_classes"]
+                obj_dict["_multilabel"] = metadata["multilabel"]
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -231,7 +270,7 @@ class Dumper:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
 
-        obj.__dict__.update(
+        obj_dict.update(
             tags
             | simple_attrs
             | arrays
@@ -243,3 +282,16 @@ class Dumper:
             | hf_models
             | hf_tokenizers
         )
+
+        torch_model_dir = path / Dumper.torch_models
+        if torch_model_dir.exists() and "_vocab" in obj_dict:
+            model_path = torch_model_dir / "_model.pt"
+            if model_path.exists():
+                vocab_size = len(obj_dict["_vocab"])
+                method_name = "_RNNScorer__initialize_model"
+                if hasattr(obj, method_name):
+                    initialize_method = getattr(obj, method_name)
+                    initialize_method(vocab_size)
+                    model_state = torch.load(model_path)
+                    obj_dict["_model"].load_state_dict(model_state)
+                    obj_dict["_model"].eval()
