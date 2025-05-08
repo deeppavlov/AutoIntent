@@ -253,6 +253,48 @@
             "title": "EmbedderConfig",
             "type": "object"
         },
+        "HFModelConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "model_name": {
+                    "default": "prajjwal1/bert-tiny",
+                    "description": "Name of the hugging face repository with transformer model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
+                    "title": "Device"
+                },
+                "tokenizer_config": {
+                    "$ref": "#/$defs/TokenizerConfig"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                }
+            },
+            "title": "HFModelConfig",
+            "type": "object"
+        },
         "LoggingConfig": {
             "additionalProperties": false,
             "description": "Configuration for the logging.",
@@ -440,6 +482,20 @@
                 },
                 "trust_remote_code": false,
                 "train_head": false
+            }
+        },
+        "hf_model_config": {
+            "$ref": "#/$defs/HFModelConfig",
+            "default": {
+                "model_name": "prajjwal1/bert-tiny",
+                "batch_size": 32,
+                "device": null,
+                "tokenizer_config": {
+                    "max_length": null,
+                    "padding": true,
+                    "truncation": true
+                },
+                "trust_remote_code": false
             }
         },
         "sampler": {
