@@ -198,6 +198,10 @@ class RNNScorer(BaseScorer):
         if hasattr(self, "_model"):
             del self._model
 
+    @property
+    def device(self) -> str:
+        """Get device used for model computations."""
+        return self._device
 
 class SupervisedRNNClassifier(nn.Module):
     def __init__(
