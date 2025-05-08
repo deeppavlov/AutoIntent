@@ -157,16 +157,7 @@ def test_rnn_scorer_dump_load(dataset):
         scorer_original.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = RNNScorer(
-            embed_dim=64,
-            hidden_dim=128,
-            n_layers=1,
-            rnn_config=RNNConfig(),
-            num_train_epochs=1,
-            batch_size=8
-        )
-        scorer_loaded.device = scorer_loaded._device
-        scorer_loaded.load(str(temp_dir_path))
+        scorer_loaded = RNNScorer.load(str(temp_dir_path))
 
         # Verify model and vocabulary are loaded
         assert hasattr(scorer_loaded, "_model")

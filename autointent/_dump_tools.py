@@ -169,7 +169,6 @@ class Dumper:
                     logger.exception(msg)
             elif key == "_model" and isinstance(val, nn.Module):
                 torch_model_path = path / Dumper.torch_models
-                torch_model_path.mkdir(parents=True, exist_ok=exists_ok)
                 torch.save(val.state_dict(), torch_model_path / f"{key}.pt")
                 class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
                 with (torch_model_path / "model_class_info.json").open("w") as f:
