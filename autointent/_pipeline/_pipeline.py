@@ -68,7 +68,7 @@ class Pipeline:
             self.embedder_config = EmbedderConfig()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
-            self.hf_model_config = HFModelConfig()
+            self.transformer_config = HFModelConfig()
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
@@ -139,7 +139,7 @@ class Pipeline:
         pipeline.set_config(optimization_config.data_config)
         pipeline.set_config(optimization_config.embedder_config)
         pipeline.set_config(optimization_config.cross_encoder_config)
-        pipeline.set_config(optimization_config.hf_model_config)
+        pipeline.set_config(optimization_config.transformer_config)
         return pipeline
 
     def _fit(self, context: Context, sampler: SamplerType) -> None:

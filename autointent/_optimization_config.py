@@ -25,7 +25,7 @@ class OptimizationConfig(BaseModel):
 
     cross_encoder_config: CrossEncoderConfig = CrossEncoderConfig()
 
-    hf_model_config: HFModelConfig = HFModelConfig()
+    transformer_config: HFModelConfig = HFModelConfig()
 
     sampler: SamplerType = "brute"
     """See tutorial on optuna and presets."""
