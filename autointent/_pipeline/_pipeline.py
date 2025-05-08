@@ -14,6 +14,7 @@ from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
+    HFModelConfig,
     InferenceNodeConfig,
     LoggingConfig,
 )
@@ -70,7 +71,9 @@ class Pipeline:
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
-    def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
+    def set_config(
+        self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig | HFModelConfig
+    ) -> None:
         """Set the configuration for the pipeline.
 
         Args:
@@ -84,6 +87,8 @@ class Pipeline:
             self.cross_encoder_config = config
         elif isinstance(config, DataConfig):
             self.data_config = config
+        elif isinstance(config, HFModelConfig):
+            self.transformer_config = config
         else:
             assert_never(config)
 
@@ -133,6 +138,7 @@ class Pipeline:
         pipeline.set_config(optimization_config.data_config)
         pipeline.set_config(optimization_config.embedder_config)
         pipeline.set_config(optimization_config.cross_encoder_config)
+        pipeline.set_config(optimization_config.hf_model_config)
         return pipeline
 
     def _fit(self, context: Context, sampler: SamplerType) -> None:
@@ -198,6 +204,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_transformer(self.embedder_config)
         context.configure_transformer(self.cross_encoder_config)
+        context.configure_transformer(self.transformer_config)
 
         self.validate_modules(dataset, mode=incompatible_search_space)
 
