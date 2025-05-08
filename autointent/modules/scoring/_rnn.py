@@ -203,6 +203,15 @@ class RNNScorer(BaseScorer):
         """Get device used for model computations."""
         return self._device
 
+    @device.setter
+    def device(self, value: str) -> None:
+        """Set device for model computations."""
+        self._device = value
+
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        """Return default params used in ``__init__`` method."""
+        return {"rnn_config": self.rnn_config.model_dump()}
+
 class SupervisedRNNClassifier(nn.Module):
     def __init__(
         self,
