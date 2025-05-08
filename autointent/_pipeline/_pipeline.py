@@ -68,6 +68,7 @@ class Pipeline:
             self.embedder_config = EmbedderConfig()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
+            self.hf_model_config = HFModelConfig()
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
