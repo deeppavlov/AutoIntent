@@ -177,6 +177,12 @@ def evaluate_glueon(train_df: pd.DataFrame, test_df: pd.DataFrame) -> pd.DataFra
     predictions = predictor.predict(test_df)
     return predictions
 
+def evaluate_ludwig(train_df: pd.DataFrame, test_df: pd.DataFrame) -> pd.DataFrame:
+    raise NotImplementedError("Ludwig is not implemented yet.")
+
+def evaluate_tpot(train_df: pd.DataFrame, test_df: pd.DataFrame) -> pd.DataFrame:
+    raise NotImplementedError("TPOT is not implemented yet.")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate AutoML models on a dataset.")
