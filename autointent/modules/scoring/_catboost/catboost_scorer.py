@@ -216,7 +216,7 @@ class CatBoostScorer(BaseScorer):
             y = np.asarray(cast("Sequence[int]", labels), dtype=np.int64)
 
         default_loss = (
-            "MultiLabel"
+            "MultiLogloss"
             if self._multilabel
             else ("MultiClass" if self._n_classes > BINARY_CLASS_THRESHOLD else "Logloss")
         )
