@@ -2,7 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, PositiveInt
 
-from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
+from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, LoggingConfig
 from .custom_types import SamplerType
 
 
@@ -24,6 +24,8 @@ class OptimizationConfig(BaseModel):
     embedder_config: EmbedderConfig = EmbedderConfig()
 
     cross_encoder_config: CrossEncoderConfig = CrossEncoderConfig()
+
+    transformer_config: HFModelConfig = HFModelConfig()
 
     sampler: SamplerType = "brute"
     """See tutorial on optuna and presets."""

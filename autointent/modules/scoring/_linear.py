@@ -90,13 +90,8 @@ class LinearScorer(BaseScorer):
             embedder_config=embedder_config,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Get the name of the embedder.
-
-        Returns:
-            Embedder name
-        """
-        return self.embedder_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"embedder_config": self.embedder_config.model_dump()}
 
     def fit(
         self,

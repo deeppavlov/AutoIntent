@@ -98,7 +98,7 @@ class Dataset(dict[str, HFDataset]):
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
-            repo_name: The name of the Hugging Face repository, like `AutoIntent/clinc150`.
+            repo_name: The name of the Hugging Face repository, like `DeepPavlov/clinc150`.
         """
         from ._reader import DictReader
 

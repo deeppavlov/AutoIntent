@@ -6,15 +6,17 @@ import numpy as np
 import pytest
 
 from autointent.context.data_handler import DataHandler
-from autointent.modules import BertScorer
+from autointent.modules import BERTLoRAScorer
 
 
-def test_bert_scorer_dump_load(dataset):
-    """Test that BertScorer can be saved and loaded while preserving predictions."""
+def test_lora_scorer_dump_load(dataset):
+    """Test that BERTLoRAScorer can be saved and loaded while preserving predictions."""
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer_original = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer_original = BERTLoRAScorer(
+        classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8
+    )
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -27,13 +29,13 @@ def test_bert_scorer_dump_load(dataset):
     predictions_before = scorer_original.predict(test_data)
 
     # Create temp directory and save model
-    temp_dir_path = Path(tempfile.mkdtemp(prefix="bert_scorer_test_"))
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="lora_scorer_test_"))
     try:
         # Save the model
         scorer_original.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = BertScorer.load(str(temp_dir_path))
+        scorer_loaded = BERTLoRAScorer.load(str(temp_dir_path))
 
         # Verify model and tokenizer are loaded
         assert hasattr(scorer_loaded, "_model")
@@ -53,17 +55,17 @@ def test_bert_scorer_dump_load(dataset):
         shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
-def test_bert_prediction(dataset):
-    """Test that the transformer model can fit and make predictions."""
+def test_lora_prediction(dataset):
+    """Test that the lora model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
         "why is there a hold on my american saving bank account",
-        "i am nost sure why my account is blocked",
+        "i am not sure why my account is blocked",
         "why is there a hold on my capital one checking account",
         "i think my account is blocked but i do not know the reason",
         "can you tell me why is my bank account frozen",
@@ -90,11 +92,11 @@ def test_bert_prediction(dataset):
         assert metadata is None
 
 
-def test_bert_cache_clearing(dataset):
-    """Test that the transformer model properly handles cache clearing."""
+def test_lora_cache_clearing(dataset):
+    """Test that the lora model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 

@@ -16,7 +16,7 @@ Let us use small subset of popular `clinc150` dataset for the demonstation.
 # %%
 from autointent import Dataset
 
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 dataset
 
 # %%
@@ -124,7 +124,7 @@ from autointent.configs import LoggingConfig
 from autointent.utils import load_preset
 
 # load data
-dataset = Dataset.from_hub("AutoIntent/clinc150_subset")
+dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # customize search space
 preset = load_preset("light_extra")

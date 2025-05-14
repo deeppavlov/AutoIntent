@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 
 from autointent.context.data_handler import DataHandler
@@ -42,3 +44,10 @@ def test_base_sklearn(dataset):
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)
     assert metadata is None
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        scorer.dump(temp_dir)
+        del scorer
+        new_scorer = SklearnScorer.load(temp_dir)
+        new_predictions = new_scorer.predict(test_data)
+        np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)

@@ -4,6 +4,7 @@ This module provides utilities for splitting datasets into training and testing 
 It includes support for both single-label and multi-label stratified splitting.
 """
 
+import logging
 from collections.abc import Sequence
 
 import numpy as np
@@ -16,6 +17,8 @@ from transformers import set_seed  # type: ignore[attr-defined]
 
 from autointent import Dataset
 from autointent.custom_types import LabelType
+
+logger = logging.getLogger(__name__)
 
 
 class StratifiedSplitter:
@@ -32,6 +35,8 @@ class StratifiedSplitter:
         label_feature: str,
         random_seed: int | None,
         shuffle: bool = True,
+        is_few_shot: bool = False,
+        examples_per_label: int = 8,
     ) -> None:
         """Initialize the StratifiedSplitter.
 
@@ -40,11 +45,15 @@ class StratifiedSplitter:
             label_feature: Name of the feature containing labels for stratification.
             random_seed: Seed for random number generation to ensure reproducibility.
             shuffle: Whether to shuffle the data before splitting.
+            is_few_shot: Whether the dataset is a few-shot dataset.
+            examples_per_label: Number of examples per label for few-shot datasets.
         """
         self.test_size = test_size
         self.label_feature = label_feature
         self.random_seed = random_seed
         self.shuffle = shuffle
+        self.is_few_shot = is_few_shot
+        self.examples_per_label = examples_per_label
 
     def __call__(
         self, dataset: HFDataset, multilabel: bool, allow_oos_in_train: bool | None = None
@@ -71,7 +80,16 @@ class StratifiedSplitter:
             )
             raise ValueError(msg)
         splitter = self._split_allow_oos_in_train if allow_oos_in_train else self._split_disallow_oos_in_train
-        return splitter(dataset, multilabel)
+        train, test = splitter(dataset, multilabel)
+        if self.is_few_shot:
+            train, test = create_few_shot_split(
+                train,
+                test,
+                multilabel=multilabel,
+                label_column=self.label_feature,
+                examples_per_label=self.examples_per_label,
+            )
+        return train, test
 
     def _has_oos_samples(self, dataset: HFDataset) -> bool:
         """Check if the dataset contains out-of-scope samples.
@@ -287,6 +305,8 @@ def split_dataset(
     split: str,
     test_size: float,
     random_seed: int | None,
+    is_few_shot: bool = False,
+    examples_per_intent: int = 8,
     allow_oos_in_train: bool | None = None,
 ) -> tuple[HFDataset, HFDataset]:
     """Split a Dataset object into training and testing subsets.
@@ -296,6 +316,8 @@ def split_dataset(
         split: The specific data split to divide.
         test_size: Proportion of the dataset to include in the test split.
         random_seed: Seed for random number generation.
+        is_few_shot: Whether the dataset is a few-shot dataset.
+        examples_per_intent: Number of examples per label for few-shot datasets.
         allow_oos_in_train: Whether to allow OOS samples in train split.
 
     Returns:
@@ -305,5 +327,74 @@ def split_dataset(
         test_size=test_size,
         label_feature=dataset.label_feature,
         random_seed=random_seed,
+        is_few_shot=is_few_shot,
+        examples_per_label=examples_per_intent,
     )
     return splitter(dataset[split], dataset.multilabel, allow_oos_in_train=allow_oos_in_train)
+
+
+def create_few_shot_split(
+    train_dataset: HFDataset,
+    validation_dataset: HFDataset,
+    label_column: str,
+    examples_per_label: int = 8,
+    multilabel: bool = False,
+    random_seed: int | None = None,
+) -> tuple[HFDataset, HFDataset]:
+    """Create a few-shot dataset split with a specified number of examples per label.
+
+    Args:
+        train_dataset: A Hugging Face dataset or DatasetDict
+        validation_dataset: A Hugging Face dataset or DatasetDict
+        label_column: The name of the column containing labels (default: 'label')
+        examples_per_label: Number of examples to include per label in the train split (default: 8)
+        multilabel: Whether the dataset is multi-label (default: False)
+        random_seed: Random seed for reproducibility (default: 42)
+
+    Returns:
+        A tuple containing the train and validation datasets.
+    """
+    # Add a unique index column to track examples
+    train_dataset = train_dataset.add_column("__index__", list(range(len(train_dataset))))
+    if multilabel:
+        _unique_labels = set()
+        for example in train_dataset:
+            if example[label_column] is not None:
+                _unique_labels.add(tuple(example[label_column]))
+        unique_labels = list(_unique_labels)
+    else:
+        unique_labels = train_dataset.unique(label_column)
+
+    # Create train dataset by sampling examples_per_label for each label
+    train_datasets = []
+    selected_indices = set()
+
+    for label in unique_labels:
+        if multilabel:
+            label_examples = train_dataset.filter(lambda row: tuple(row[label_column]) == label)  # noqa: B023
+        else:
+            label_examples = train_dataset.filter(lambda row: row[label_column] == label)  # noqa: B023
+        label_examples = label_examples.shuffle(seed=random_seed)
+
+        num_to_select = min(examples_per_label, len(label_examples))
+        selected_examples = label_examples.select(range(num_to_select))
+
+        if num_to_select < examples_per_label:
+            msg = (
+                f"Warning: Only {num_to_select} examples available for label '{label}', "
+                f"which is less than the requested {examples_per_label}"
+            )
+            logger.warning(msg)
+
+        train_datasets.append(selected_examples)
+        selected_indices.update([ex["__index__"] for ex in selected_examples])
+
+    # Create validation split with remaining examples
+    extra_validation_dataset = train_dataset.filter(
+        lambda example: example["__index__"] not in selected_indices
+    ).remove_columns("__index__")
+
+    validation_dataset = concatenate_datasets([validation_dataset, extra_validation_dataset])
+    train_dataset = concatenate_datasets(train_datasets).remove_columns("__index__")
+
+    return train_dataset, validation_dataset
