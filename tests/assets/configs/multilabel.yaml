@@ -30,7 +30,7 @@
       learning_rate: [0.05, 0.1]
       depth: [1, 10]
       l2_leaf_reg: [1, 5]
-      loss_function: ["MultiLabel"]
+      loss_function: ["MultiLogloss"]
       random_seed: [42]
       classification_model_config:
         - null
