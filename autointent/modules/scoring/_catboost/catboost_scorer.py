@@ -128,7 +128,6 @@ class CatBoostScorer(BaseScorer):
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {
             "classification_model_config": self.classification_model_config.model_dump(),
-            "encoding": self.encoding,  # type: ignore [attr-defined]
         }
 
     def _load_embedder(self) -> Any:  # noqa: ANN401
