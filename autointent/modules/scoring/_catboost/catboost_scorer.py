@@ -13,7 +13,7 @@ import numpy.typing as npt
 import torch
 from catboost import CatBoostClassifier, Pool  # type: ignore[import-untyped]
 from catboost.text_processing import Dictionary, Tokenizer  # type: ignore[import-untyped]
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer  # type: ignore[attr-defined]
 
 from autointent import Context
 from autointent.configs import EmbedderConfig
