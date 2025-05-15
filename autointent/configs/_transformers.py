@@ -125,9 +125,9 @@ class CrossEncoderConfig(HFModelConfig):
 
 class CNNConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
     max_seq_length: int = Field(128, description="Maximum sequence length.")
     padding_idx: int = Field(0, description="Index used for padding.")
-    unknown_idx: int = Field(1, description="Index used for unknown.")
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
 
     @classmethod
