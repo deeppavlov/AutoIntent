@@ -122,3 +122,20 @@ class CrossEncoderConfig(HFModelConfig):
     tokenizer_config: TokenizerConfig = Field(
         default_factory=lambda: TokenizerConfig(max_length=512)
     )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly
+
+class СNNConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    max_seq_length: int = Field(128, description="Maximum sequence length.")
+    padding_idx: int = Field(0, description="Index used for padding.")
+    unknown_idx: int = Field(1, description="Index used for unknown.")
+    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> "СNNConfig":
+        if values is None:
+            return cls()
+        if isinstance(values, BaseModel):
+            return values  # type: ignore[return-value]
+        if isinstance(values, str):
+            return cls()
+        return cls(**values)

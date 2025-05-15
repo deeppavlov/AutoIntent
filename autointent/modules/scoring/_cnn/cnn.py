@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
+from autointent.configs import CNNConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._cnn.textcnn import TextCNN
@@ -26,20 +27,17 @@ class CNNScorer(BaseScorer):
 
     def __init__(
         self,
-        max_seq_length: int = 50,
         num_train_epochs: int = 3,
-        batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         embed_dim: int = 128,
         kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
-        dropout: float = 0.1
+        dropout: float = 0.1,
+        cnn_config: CNNConfig | str | dict[str, Any] | None = None,
     ) -> None:
-        self.max_seq_length = max_seq_length
         self.num_train_epochs = num_train_epochs
-        self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
@@ -47,16 +45,19 @@ class CNNScorer(BaseScorer):
         self.kernel_sizes = kernel_sizes
         self.num_filters = num_filters
         self.dropout = dropout
+        self.cnn_config = CNNConfig.from_search_config(cnn_config)
 
         # Will be initialized during fit()
         self._model: TextCNN | None = None
         self._vocab: dict[str, int] | None = None
         self._unk_token = "<UNK>"  # noqa: S105
         self._pad_token = "<PAD>"  # noqa: S105
-        self._unk_idx = 1
-        self._pad_idx = 0
         self._n_classes: int = 0
         self._multilabel: bool = False
+        self._pad_idx = self.cnn_config.padding_idx
+        self._unk_idx = self.cnn_config.unknown_idx
+        self.batch_size = self.cnn_config.batch_size
+        self.max_seq_length = self.cnn_config.max_seq_length
 
     @classmethod
     def from_context(
@@ -69,7 +70,8 @@ class CNNScorer(BaseScorer):
         embed_dim: int = 128,
         kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
-        dropout: float = 0.1
+        dropout: float = 0.1,
+        cnn_config: CNNConfig | str | dict[str, Any] | None = None
     ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
@@ -80,8 +82,23 @@ class CNNScorer(BaseScorer):
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,
             num_filters=num_filters,
-            dropout=dropout
+            dropout=dropout,
+            cnn_config=cnn_config
         )
+    
+    def get_embedder_config(self) -> dict[str, Any]:
+        """Get the configuration of the embedder."""
+        config = self.cnn_config.model_dump()
+        config.update({
+            "embed_dim": self.embed_dim,
+            "hidden_dim": self.hidden_dim,
+            "n_layers": self.n_layers,
+            "dropout": self.dropout,
+        })
+        return config
+    
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"cnn_config": self.cnn_config.model_dump()}
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)

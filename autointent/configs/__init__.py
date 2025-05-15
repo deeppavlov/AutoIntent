@@ -10,7 +10,6 @@ __all__ = [
     "EmbedderConfig",
     "HFModelConfig",
     "InferenceNodeConfig",
-    "InferenceNodeConfig",
     "LoggingConfig",
     "TaskTypeEnum",
     "TokenizerConfig",
