@@ -13,4 +13,5 @@ __all__ = [
     "LoggingConfig",
     "TaskTypeEnum",
     "TokenizerConfig",
+    "CNNConfig"
 ]
