@@ -1,3 +1,5 @@
+import tempfile
+
 import numpy as np
 import pytest
 
@@ -10,7 +12,7 @@ def test_base_dnnc(dataset, train_head, pred_score):
     data_handler = DataHandler(dataset)
 
     scorer = DNNCScorer(
-        cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2", "train_head": train_head},
+        cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2", "train_head": train_head},
         embedder_config="sergeyzh/rubert-tiny-turbo",
         k=3,
     )
@@ -31,4 +33,9 @@ def test_base_dnnc(dataset, train_head, pred_score):
     assert "neighbors" in metadata[0]
     assert "scores" in metadata[0]
 
-    scorer.clear_cache()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        scorer.dump(temp_dir)
+        del scorer
+        new_scorer = DNNCScorer.load(temp_dir)
+        new_predictions = new_scorer.predict(test_data)
+        np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)

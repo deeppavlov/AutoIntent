@@ -1,15 +1,14 @@
 """PTuningScorer class for ptuning-based classification."""
 
-from typing import Any
+from pathlib import Path
+from typing import Any, Literal
 
-import torch
-from peft import PromptEncoderConfig, get_peft_model
-from transformers import (
-    AutoModelForSequenceClassification,
-)
+from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType, get_peft_model
+from pydantic import PositiveInt
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
+from autointent._dump_tools import Dumper
 from autointent.configs import HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
@@ -54,20 +53,21 @@ class PTuningScorer(BertScorer):
     """
 
     name = "ptuning"
-    supports_multiclass = True
-    supports_multilabel = True
-    _model: Any
-    _tokenizer: Any
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
-        num_train_epochs: int = 3,
-        batch_size: int = 8,
+        num_train_epochs: PositiveInt = 3,
+        batch_size: PositiveInt = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
-        **ptuning_kwargs: dict[str, Any],
+        encoder_reparameterization_type: Literal["MLP", "LSTM"] = "LSTM",
+        num_virtual_tokens: PositiveInt = 10,
+        encoder_dropout: float = 0.1,
+        encoder_hidden_size: PositiveInt = 128,
+        encoder_num_layers: PositiveInt = 2,
+        **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         super().__init__(
             classification_model_config=classification_model_config,
@@ -77,19 +77,31 @@ class PTuningScorer(BertScorer):
             seed=seed,
             report_to=report_to,
         )
-        self._ptuning_config = PromptEncoderConfig(**ptuning_kwargs)  # type: ignore[arg-type]
-        torch.manual_seed(seed)
+        self._ptuning_config = PromptEncoderConfig(
+            task_type=TaskType.SEQ_CLS,
+            encoder_reparameterization_type=PromptEncoderReparameterizationType(encoder_reparameterization_type),
+            num_virtual_tokens=num_virtual_tokens,
+            encoder_dropout=encoder_dropout,
+            encoder_hidden_size=encoder_hidden_size,
+            encoder_num_layers=encoder_num_layers,
+            **ptuning_kwargs,
+        )
 
     @classmethod
-    def from_context(
+    def from_context(  # noqa: PLR0913
         cls,
         context: Context,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
-        num_train_epochs: int = 3,
-        batch_size: int = 8,
+        num_train_epochs: PositiveInt = 3,
+        batch_size: PositiveInt = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **ptuning_kwargs: dict[str, Any],
+        encoder_reparameterization_type: Literal["MLP", "LSTM"] = "LSTM",
+        num_virtual_tokens: PositiveInt = 10,
+        encoder_dropout: float = 0.1,
+        encoder_hidden_size: PositiveInt = 128,
+        encoder_num_layers: PositiveInt = 2,
+        **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> "PTuningScorer":
         """Create a PTuningScorer instance using a Context object.
 
@@ -100,10 +112,15 @@ class PTuningScorer(BertScorer):
             batch_size: Batch size for training
             learning_rate: Learning rate for training
             seed: Random seed for reproducibility
+            encoder_reparameterization_type: Reparametrization type for the prompt encoder
+            num_virtual_tokens: Number of virtual tokens for the prompt encoder
+            encoder_dropout: Dropout for the prompt encoder
+            encoder_hidden_size: Hidden size for the prompt encoder
+            encoder_num_layers: Number of layers for the prompt encoder
             **ptuning_kwargs: Arguments for PromptEncoderConfig
         """
         if classification_model_config is None:
-            classification_model_config = context.resolve_embedder()
+            classification_model_config = context.resolve_transformer()
 
         report_to = context.logging_config.report_to
 
@@ -114,17 +131,18 @@ class PTuningScorer(BertScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
+            encoder_reparameterization_type=encoder_reparameterization_type,
+            num_virtual_tokens=num_virtual_tokens,
+            encoder_dropout=encoder_dropout,
+            encoder_hidden_size=encoder_hidden_size,
+            encoder_num_layers=encoder_num_layers,
             **ptuning_kwargs,
         )
 
-    def _initialize_model(self) -> None:
+    def _initialize_model(self) -> Any:  # noqa: ANN401
         """Initialize the model with P-tuning configuration."""
-        model_name = self.classification_model_config.model_name
-        self._model = AutoModelForSequenceClassification.from_pretrained(
-            model_name,
-            num_labels=self._n_classes,
-            problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
-            trust_remote_code=self.classification_model_config.trust_remote_code,
-            return_dict=True,
-        )
-        self._model = get_peft_model(self._model, self._ptuning_config)
+        model = super()._initialize_model()
+        return get_peft_model(model, self._ptuning_config)
+
+    def dump(self, path: str) -> None:
+        Dumper.dump(self, Path(path), exclude=[PromptEncoderConfig])

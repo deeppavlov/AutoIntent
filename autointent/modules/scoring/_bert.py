@@ -26,8 +26,8 @@ class BertScorer(BaseScorer):
     name = "bert"
     supports_multiclass = True
     supports_multilabel = True
-    _model: Any
-    _tokenizer: Any
+    _model: Any  # transformers AutoModel factory returns Any
+    _tokenizer: Any  # transformers AutoTokenizer factory returns Any
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class BertScorer(BaseScorer):
         seed: int = 0,
     ) -> "BertScorer":
         if classification_model_config is None:
-            classification_model_config = context.resolve_embedder()
+            classification_model_config = context.resolve_transformer()
 
         report_to = context.logging_config.report_to
 
@@ -69,14 +69,14 @@ class BertScorer(BaseScorer):
             report_to=report_to,
         )
 
-    def get_embedder_config(self) -> dict[str, Any]:
-        return self.classification_model_config.model_dump()
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {"classification_model_config": self.classification_model_config.model_dump()}
 
-    def __initialize_model(self) -> None:
+    def _initialize_model(self) -> Any:  # noqa: ANN401
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
-        self._model = AutoModelForSequenceClassification.from_pretrained(
+        return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
@@ -96,7 +96,7 @@ class BertScorer(BaseScorer):
 
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
 
-        self.__initialize_model()
+        self._model = self._initialize_model()
 
         use_cpu = self.classification_model_config.device == "cpu"
 
@@ -126,7 +126,7 @@ class BertScorer(BaseScorer):
                 save_strategy="no",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to=self.report_to,
+                report_to=self.report_to if self.report_to is not None else "none",
                 use_cpu=use_cpu,
             )
 
