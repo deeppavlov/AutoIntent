@@ -85,7 +85,7 @@ class CNNScorer(BaseScorer):
             dropout=dropout,
             cnn_config=cnn_config
         )
-    
+
     def get_embedder_config(self) -> dict[str, Any]:
         """Get the configuration of the embedder."""
         config = self.cnn_config.model_dump()
@@ -96,7 +96,7 @@ class CNNScorer(BaseScorer):
             "dropout": self.dropout,
         })
         return config
-    
+
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {"cnn_config": self.cnn_config.model_dump()}
 
