@@ -78,18 +78,18 @@ def test_cnn_cache_clearing(dataset):
     with pytest.raises(ValueError, match=r"Model not trained\. Call fit\(\) first\."):
         scorer.predict(test_data)
 
-
 def test_cnn_scorer_dump_load(dataset):
-    """Test that BERTLoRAScorer can be saved and loaded while preserving predictions."""
+    """Test that CNNScorer can be saved and loaded while preserving predictions."""
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer = CNNScorer(
-        num_train_epochs=1,
-        batch_size=8,
-        learning_rate=5e-5
-    )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    scorer_original = CNNScorer(
+            num_train_epochs=1,
+            batch_size=8,
+            learning_rate=5e-5
+        )
+    scorer_original.device = scorer_original._device
+    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
     test_data = [
@@ -98,25 +98,22 @@ def test_cnn_scorer_dump_load(dataset):
     ]
 
     # Get predictions before saving
-    predictions_before = scorer.predict(test_data)
+    predictions_before = scorer_original.predict(test_data)
 
     # Create temp directory and save model
-    temp_dir_path = Path(tempfile.mkdtemp(prefix="lora_scorer_test_"))
+    temp_dir_path = Path(tempfile.mkdtemp(prefix="cnn_scorer_test_"))
     try:
         # Save the model
-        scorer.dump(str(temp_dir_path))
+        scorer_original.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = CNNScorer(
-            num_train_epochs=1,
-            batch_size=8,
-            learning_rate=5e-5
-        )
-        scorer_loaded.load(str(temp_dir_path))
+        scorer_loaded = CNNScorer.load(str(temp_dir_path))
 
-        # Verify model is loaded
+        # Verify model and vocabulary are loaded
         assert hasattr(scorer_loaded, "_model")
         assert scorer_loaded._model is not None
+        assert hasattr(scorer_loaded, "_vocab")
+        assert scorer_loaded._vocab is not None
 
         # Get predictions after loading
         predictions_after = scorer_loaded.predict(test_data)
