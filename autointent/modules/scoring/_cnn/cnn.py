@@ -35,6 +35,7 @@ class CNNScorer(BaseScorer):
         kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
+        batch_size: int = 8,
         cnn_config: CNNConfig | str | dict[str, Any] | None = None,
     ) -> None:
         self.num_train_epochs = num_train_epochs
@@ -56,7 +57,7 @@ class CNNScorer(BaseScorer):
         self._multilabel: bool = False
         self._pad_idx = self.cnn_config.padding_idx
         self._unk_idx = self.cnn_config.unknown_idx
-        self.batch_size = self.cnn_config.batch_size
+        self.batch_size = batch_size
         self.max_seq_length = self.cnn_config.max_seq_length
 
     @classmethod
@@ -85,17 +86,6 @@ class CNNScorer(BaseScorer):
             dropout=dropout,
             cnn_config=cnn_config
         )
-
-    def get_embedder_config(self) -> dict[str, Any]:
-        """Get the configuration of the embedder."""
-        config = self.cnn_config.model_dump()
-        config.update({
-            "embed_dim": self.embed_dim,
-            "hidden_dim": self.hidden_dim,
-            "n_layers": self.n_layers,
-            "dropout": self.dropout,
-        })
-        return config
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {"cnn_config": self.cnn_config.model_dump()}
