@@ -5,6 +5,7 @@ from ._optimization import DataConfig, LoggingConfig
 from ._transformers import CrossEncoderConfig, EmbedderConfig, HFModelConfig, TaskTypeEnum, TokenizerConfig
 
 __all__ = [
+    "CNNConfig",
     "CrossEncoderConfig",
     "DataConfig",
     "EmbedderConfig",
@@ -12,6 +13,5 @@ __all__ = [
     "InferenceNodeConfig",
     "LoggingConfig",
     "TaskTypeEnum",
-    "TokenizerConfig",
-    "CNNConfig"
+    "TokenizerConfig"
 ]
