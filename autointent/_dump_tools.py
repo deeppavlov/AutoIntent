@@ -1,26 +1,34 @@
-import inspect
+import importlib
 import json
 import logging
 from pathlib import Path
-from types import UnionType
-from typing import Any, TypeAlias, Union, get_args, get_origin
+from typing import Any, TypeAlias
 
 import joblib
 import numpy as np
 import numpy.typing as npt
 import torch
+from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 from torch import nn
+from transformers import (  # type: ignore[attr-defined]
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
+)
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | nn.Module  # type: ignore[type-arg]
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)
@@ -37,15 +45,18 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
+    ptuning_models = "ptuning_models"
     torch_models = "torch_models"
-    containers = "containers"
+    vocab = "vocab.json"
+    model_metadata = "model_metadata.json"
 
     @staticmethod
-    def make_subdirectories(path: Path) -> None:
+    def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
         """Make subdirectories for dumping.
 
         Args:
             path: Path to make subdirectories in
+            exists_ok: If True, do not raise an error if the directory already exists
         """
         subdirectories = [
             path / Dumper.tags,
@@ -56,27 +67,45 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
+            path / Dumper.ptuning_models,
             path / Dumper.torch_models,
-            path / Dumper.containers
         ]
         for subdir in subdirectories:
-            subdir.mkdir(parents=True, exist_ok=True)
+            subdir.mkdir(parents=True, exist_ok=exists_ok)
 
     @staticmethod
-    def dump(obj: Any, path: Path) -> None:  # noqa: ANN401, C901, PLR0912, PLR0915
+    def dump(obj: Any, path: Path, exists_ok: bool = False, exclude: list[type[Any]] | None = None) -> None:  # noqa: ANN401, C901, PLR0912, PLR0915
         """Dump modules attributes to filestystem.
 
         Args:
             obj: Object to dump
             path: Path to dump to
+            exists_ok: If True, do not raise an error if the directory already exists
+            exclude: List of types to exclude from dumping
         """
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
 
-        Dumper.make_subdirectories(path)
+        Dumper.make_subdirectories(path, exists_ok)
+
+        if "_model" in attrs and "_n_classes" in attrs and "_multilabel" in attrs:
+            model_metadata = {
+                "n_classes": attrs["_n_classes"],
+                "multilabel": attrs["_multilabel"]
+            }
+            with (path / Dumper.model_metadata).open("w") as f:
+                json.dump(model_metadata, f)
+
+        if "_vocab" in attrs and isinstance(attrs["_vocab"], dict):
+            with (path / Dumper.vocab).open("w") as f:
+                json.dump(attrs["_vocab"], f)
 
         for key, val in attrs.items():
+            if key == "_vocab":
+                continue
+            if isinstance(val, Artifact) or (exclude and isinstance(val, tuple(exclude))):
+                continue
             if isinstance(val, TagsList):
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
@@ -91,50 +120,59 @@ class Dumper:
                 joblib.dump(val, path / Dumper.estimators / key)
             elif isinstance(val, Ranker):
                 val.save(str(path / Dumper.cross_encoders / key))
-            elif isinstance(val, CrossEncoderConfig | EmbedderConfig):
+            elif isinstance(val, BaseModel):
                 try:
-                    pydantic_path = path / Dumper.pydantic_models / f"{key}.json"
-                    with pydantic_path.open("w", encoding="utf-8") as file:
+                    class_info = {"name": val.__class__.__name__, "module": val.__class__.__module__}
+                    pydantic_path = path / Dumper.pydantic_models / key
+                    pydantic_path.mkdir(parents=True, exist_ok=exists_ok)
+                    with (pydantic_path / "class_info.json").open("w", encoding="utf-8") as file:
+                        json.dump(class_info, file, ensure_ascii=False, indent=4)
+                    with (pydantic_path / "model_dump.json").open("w", encoding="utf-8") as file:
                         json.dump(val.model_dump(), file, ensure_ascii=False, indent=4)
                 except Exception as e:
                     msg = f"Error dumping pydantic model {key}: {e}"
                     logging.exception(msg)
-            elif (key == "_model" or "model" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PeftModel):
+                # dumping peft models is a nightmare...
+                # this might break with new versions of peft
+                try:
+                    if val._is_prompt_learning:  # noqa: SLF001
+                        # strategy to save prompt learning models: save prompt encoder and bert classifier separately
+                        model_path = path / Dumper.ptuning_models / key
+                        model_path.mkdir(parents=True, exist_ok=exists_ok)
+                        val.save_pretrained(str(model_path / "peft"))
+                        val.base_model.save_pretrained(model_path / "base_model")  # type: ignore[attr-defined]
+                    else:
+                        # strategy to save lora models: merge adapters and save as usual hugging face model
+                        model_path = path / Dumper.hf_models / key
+                        model_path.mkdir(parents=True, exist_ok=exists_ok)
+                        merged_model: PreTrainedModel = val.merge_and_unload()
+                        merged_model.save_pretrained(model_path)  # type: ignore[attr-defined]
+                except Exception as e:
+                    msg = f"Error dumping PeftModel {key}: {e}"
+                    logger.exception(msg)
+            elif isinstance(val, PreTrainedModel):
                 model_path = path / Dumper.hf_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(model_path)
-                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                    with (model_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
+                    val.save_pretrained(model_path)  # type: ignore[attr-defined]
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
-            elif isinstance(val, nn.Module):
-                model_path = path / Dumper.torch_models / key
-                model_path.mkdir(parents=True, exist_ok=True)
-                try:
-                    torch.save(val.state_dict(), model_path / "model.pt")
-                    class_info = {
-                        "module": val.__class__.__module__,
-                        "name": val.__class__.__name__,
-                    }
-                    with (model_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
-                except Exception as e:
-                    msg = f"Error dumping torch model {key}: {e}"
-                    logger.exception(msg)
-            elif (key == "_tokenizer" or "tokenizer" in key.lower()) and hasattr(val, "save_pretrained"):
+            elif isinstance(val, PreTrainedTokenizer | PreTrainedTokenizerFast):
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    val.save_pretrained(tokenizer_path)
-                    class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                    with (tokenizer_path / "class_info.json").open("w") as f:
-                        json.dump(class_info, f)
+                    val.save_pretrained(tokenizer_path)  # type: ignore[union-attr]
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
+            elif key == "_model" and isinstance(val, nn.Module):
+                torch_model_path = path / Dumper.torch_models
+                torch.save(val.state_dict(), torch_model_path / f"{key}.pt")
+                class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
+                with (torch_model_path / "model_class_info.json").open("w") as f:
+                    json.dump(class_info, f)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -145,7 +183,7 @@ class Dumper:
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
     @staticmethod
-    def load(  # noqa: PLR0912, C901, PLR0915
+    def load(  # noqa: C901, PLR0912, PLR0915
         obj: Any,  # noqa: ANN401
         path: Path,
         embedder_config: EmbedderConfig | None = None,
@@ -162,8 +200,20 @@ class Dumper:
         pydantic_models: dict[str, Any] = {}
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
-        torch_models: dict[str, Any] = {}
-        containers: dict[str, Any] = {}
+
+        obj_dict = vars(obj)
+
+        vocab_path = path / Dumper.vocab
+        if vocab_path.exists():
+            with vocab_path.open("r") as f:
+                obj_dict["_vocab"] = json.load(f)
+
+        metadata_path = path / Dumper.model_metadata
+        if metadata_path.exists():
+            with metadata_path.open("r") as f:
+                metadata = json.load(f)
+                obj_dict["_n_classes"] = metadata["n_classes"]
+                obj_dict["_multilabel"] = metadata["multilabel"]
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -188,99 +238,61 @@ class Dumper:
                     for cross_encoder_dump in child.iterdir()
                 }
             elif child.name == Dumper.pydantic_models:
-                for model_file in child.iterdir():
-                    with model_file.open("r", encoding="utf-8") as file:
-                        content = json.load(file)
-                    variable_name = model_file.stem
+                for model_dir in child.iterdir():
+                    try:
+                        with (model_dir / "model_dump.json").open("r", encoding="utf-8") as file:
+                            content = json.load(file)
 
-                    # First try to get the type annotation from the class annotations.
-                    model_type = obj.__class__.__annotations__.get(variable_name)
+                        variable_name = model_dir.name
 
-                    # Fallback: inspect __init__ signature if not found in class-level annotations.
-                    if model_type is None:
-                        sig = inspect.signature(obj.__init__)
-                        if variable_name in sig.parameters:
-                            model_type = sig.parameters[variable_name].annotation
-                    if model_type is None:
-                        msg = f"No type annotation found for {variable_name}"
-                        logger.error(msg)
-                        continue
+                        with (model_dir / "class_info.json").open("r", encoding="utf-8") as file:
+                            class_info = json.load(file)
 
-                    # If the annotation is a Union, extract the pydantic model type.
-                    if get_origin(model_type) in (UnionType, Union):
-                        for arg in get_args(model_type):
-                            if isinstance(arg, type) and issubclass(arg, BaseModel):
-                                model_type = arg
-                                break
-                        else:
-                            msg = f"No pydantic type found in Union for {variable_name}"
-                            logger.error(msg)
+                        try:
+                            model_type = importlib.import_module(class_info["module"])
+                            model_type = getattr(model_type, class_info["name"])
+                        except (ImportError, AttributeError) as e:
+                            msg = f"Failed to import model type for {variable_name}: {e}"
+                            logger.exception(msg)
                             continue
 
-                    if not (isinstance(model_type, type) and issubclass(model_type, BaseModel)):
-                        msg = f"Type for {variable_name} is not a pydantic model: {model_type}"
-                        logger.error(msg)
+                        try:
+                            pydantic_models[variable_name] = model_type.model_validate(content)
+                        except Exception as e:
+                            msg = f"Failed to reconstruct Pydantic model {variable_name}: {e}"
+                            logger.exception(msg)
+                            continue
+                    except Exception as e:
+                        msg = f"Error loading Pydantic model from {model_dir}: {e}"
+                        logger.exception(msg)
                         continue
-
-                    pydantic_models[variable_name] = model_type(**content)
+            elif child.name == Dumper.ptuning_models:
+                for model_dir in child.iterdir():
+                    try:
+                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")
+                        hf_models[model_dir.name] = PeftModel.from_pretrained(model, model_dir / "peft")
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading PeftModel {model_dir.name}: {e}"
+                        logger.exception(msg)
             elif child.name == Dumper.hf_models:
                 for model_dir in child.iterdir():
                     try:
-                        with (model_dir / "class_info.json").open("r") as f:
-                            class_info = json.load(f)
-
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        model_class = getattr(module, class_info["name"])
-
-                        hf_models[model_dir.name] = model_class.from_pretrained(model_dir)
+                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.hf_tokenizers:
                 for tokenizer_dir in child.iterdir():
                     try:
-                        with (tokenizer_dir / "class_info.json").open("r") as f:
-                            class_info = json.load(f)
-
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        tokenizer_class = getattr(module, class_info["name"])
-
-                        hf_tokenizers[tokenizer_dir.name] = tokenizer_class.from_pretrained(tokenizer_dir)
+                        hf_tokenizers[tokenizer_dir.name] = AutoTokenizer.from_pretrained(tokenizer_dir)
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
-            elif child.name == Dumper.torch_models:
-                for model_dir in child.iterdir():
-                    try:
-                        with (model_dir / "class_info.json").open("r") as f:
-                            class_info = json.load(f)
-
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        model_class = getattr(module, class_info["name"])
-
-                        # Create model instance
-                        model = model_class()
-
-                        # Load state dict
-                        model.load_state_dict(torch.load(model_dir / "model.pt"))
-                        model.eval()
-                        torch_models[model_dir.name] = model
-                    except Exception as e:  # noqa: PERF203
-                        msg = f"Error loading torch model {model_dir.name}: {e}"
-                        logger.exception(msg)
-            elif child.name == Dumper.containers:
-                try:
-                    for container_file in child.iterdir():
-                        with container_file.open("r") as f:
-                            containers[container_file.stem] = json.load(f)
-                except Exception as e:
-                    msg = f"Error loading containers: {e}"
-                    logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
 
-        obj.__dict__.update(
+        obj_dict.update(
             tags
             | simple_attrs
             | arrays
@@ -291,6 +303,19 @@ class Dumper:
             | pydantic_models
             | hf_models
             | hf_tokenizers
-            | torch_models
-            | containers
         )
+
+        torch_model_dir = path / Dumper.torch_models
+        if torch_model_dir.exists() and "_vocab" in obj_dict:
+            model_path = torch_model_dir / "_model.pt"
+            if model_path.exists():
+                vocab_size = len(obj_dict["_vocab"])
+
+                method_name = "_RNNScorer__initialize_model"
+                if hasattr(obj, method_name):
+                    initialize_method = getattr(obj, method_name)
+                    initialize_method(vocab_size)
+
+                    model_state = torch.load(model_path)
+                    obj_dict["_model"].load_state_dict(model_state)
+                    obj_dict["_model"].eval()
