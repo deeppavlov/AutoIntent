@@ -88,7 +88,6 @@ def test_cnn_scorer_dump_load(dataset):
             batch_size=8,
             learning_rate=5e-5
         )
-    scorer_original.device = scorer_original._device
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
