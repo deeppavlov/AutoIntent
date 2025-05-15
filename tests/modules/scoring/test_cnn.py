@@ -14,7 +14,6 @@ def test_cnn_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = CNNScorer(
-        max_seq_length=50,
         num_train_epochs=1,
         batch_size=8,
         learning_rate=5e-5,
@@ -58,7 +57,6 @@ def test_cnn_cache_clearing(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = CNNScorer(
-        max_seq_length=50,
         num_train_epochs=1,
         batch_size=8,
         learning_rate=5e-5
@@ -87,7 +85,6 @@ def test_cnn_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer = CNNScorer(
-        max_seq_length=50,
         num_train_epochs=1,
         batch_size=8,
         learning_rate=5e-5
@@ -111,7 +108,6 @@ def test_cnn_scorer_dump_load(dataset):
 
         # Create a new scorer and load saved model
         scorer_loaded = CNNScorer(
-            max_seq_length=50,
             num_train_epochs=1,
             batch_size=8,
             learning_rate=5e-5
