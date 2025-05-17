@@ -209,8 +209,8 @@ class CatBoostScorer(BaseScorer):
         if self._multilabel:
             y_mat = np.zeros((len(labels), self._n_classes), dtype=np.float32)
             for i, lbls in enumerate(cast("Sequence[Sequence[int]]", labels)):
-                for lbl in lbls:
-                    y_mat[i, lbl] = 1.0
+                for class_i, lbl in enumerate(lbls):
+                    y_mat[i, class_i] = lbl
             y = y_mat
         else:
             y = np.asarray(cast("Sequence[int]", labels), dtype=np.int64)
