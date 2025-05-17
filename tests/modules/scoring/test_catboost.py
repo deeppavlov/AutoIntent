@@ -90,6 +90,72 @@ def test_catboost_prediction(dataset):
         assert metadata is None
 
 
+def test_catboost_prediction_multilabel(dataset):
+    """Test that the transformer model can fit and make predictions."""
+    data_handler = DataHandler(dataset.to_multilabel())
+
+    scorer = CatBoostScorer(
+        classification_model_config="prajjwal1/bert-tiny",
+        iterations=50,
+        learning_rate=0.05,
+        depth=6,
+        l2_leaf_reg=3,
+        eval_metric="Accuracy",
+        random_seed=42,
+        verbose=False,
+    )
+
+    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+
+    test_data = [
+        "why is there a hold on my american saving bank account",
+        "i am nost sure why my account is blocked",
+        "why is there a hold on my capital one checking account",
+        "i think my account is blocked but i do not know the reason",
+        "can you tell me why is my bank account frozen",
+    ]
+
+    predictions = scorer.predict(test_data)
+    assert np.allclose(
+        predictions,
+        np.array(
+            [
+                [
+                    0.22828311,
+                    0.70298906,
+                    0.24396814,
+                    0.2318292,
+                ],
+                [
+                    0.21511787,
+                    0.43272557,
+                    0.28723239,
+                    0.40194354,
+                ],
+                [
+                    0.24727756,
+                    0.65392399,
+                    0.22263033,
+                    0.27726414,
+                ],
+                [
+                    0.26847769,
+                    0.39022974,
+                    0.28379654,
+                    0.4868582,
+                ],
+                [
+                    0.11476477,
+                    0.86928679,
+                    0.11779149,
+                    0.12179479,
+                ],
+            ]
+        ),
+        1e-2,
+    )
+
+
 def test_catboost_without_embedder(dataset):
     """Test that CatBoostScorer works properly without an embedder (using BoW encoding)."""
     data_handler = DataHandler(dataset)
