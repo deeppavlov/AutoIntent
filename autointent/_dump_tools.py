@@ -158,8 +158,8 @@ class Dumper:
                         "name": val.__class__.__name__,
                     }
                     # Save configuration if available
-                    if hasattr(val, 'get_config'):
-                        class_info['config'] = val.get_config()
+                    if hasattr(val, "get_config"):
+                        class_info["config"] = val.get_config()
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
                 except Exception as e:
@@ -280,24 +280,24 @@ class Dumper:
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.torch_models:
-                for model_dir in child.iterdir():
-                    try:
+                try:
+                    for model_dir in child.iterdir():
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
                         module = __import__(class_info["module"], fromlist=[class_info["name"]])
                         model_class = getattr(module, class_info["name"])
-                        config = class_info.get('config', {})
+                        config = class_info.get("config", {})
                         # Initialize model with config if available
                         model = model_class(**config)
                         model.load_state_dict(torch.load(model_dir / "model.pt"))
                         model.eval()
                         torch_models[model_dir.name] = model
-                    except Exception as e:
-                        logger.exception(f"Error loading torch model {model_dir.name}: {e}")
+                except Exception as e:
+                    msg = f"Error loading torch model {model_dir.name}: {e}"
+                    logger.exception(msg)
             elif child.name == Dumper.containers:
                 try:
                     for container_file in child.iterdir():
-                        print(container_file)
                         with container_file.open("r") as f:
                             containers = json.load(f)
                 except Exception as e:
@@ -306,8 +306,6 @@ class Dumper:
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
-
-        print(containers)
 
         obj.__dict__.update(
             tags
