@@ -11,6 +11,7 @@ import torch
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+from torch import nn
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
