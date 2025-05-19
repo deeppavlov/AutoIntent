@@ -37,9 +37,14 @@ def test_dump_load(multilabel_fit_data):
 
     path = setup_environment() / "adaptive_module"
     predictor.dump(path)
+    del predictor
 
-    predictor = AdaptiveDecision()
-    predictor.load(path)
+    predictor = AdaptiveDecision.load(path)
+
+    assert hasattr(predictor, "_r")
+    assert predictor._r is not None
+    assert isinstance(predictor._r, float)
+
     new_preds = predictor.predict(multilabel_fit_data[0])
 
     assert all(p == n for p, n in zip(preds, new_preds, strict=True))

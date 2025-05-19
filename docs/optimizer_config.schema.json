@@ -4,7 +4,7 @@
             "additionalProperties": false,
             "properties": {
                 "model_name": {
-                    "default": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                    "default": "cross-encoder/ms-marco-MiniLM-L6-v2",
                     "description": "Name of the hugging face model.",
                     "title": "Model Name",
                     "type": "string"
@@ -226,6 +226,50 @@
                     "title": "Passage Prompt"
                 },
                 "similarity_fn_name": {
+                    "default": "cosine",
+                    "description": "Name of the similarity function to use.",
+                    "enum": [
+                        "cosine",
+                        "dot",
+                        "euclidean",
+                        "manhattan"
+                    ],
+                    "title": "Similarity Fn Name",
+                    "type": "string"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "freeze": {
+                    "default": true,
+                    "description": "Whether to freeze the model parameters.",
+                    "title": "Freeze",
+                    "type": "boolean"
+                }
+            },
+            "title": "EmbedderConfig",
+            "type": "object"
+        },
+        "HFModelConfig": {
+            "additionalProperties": false,
+            "properties": {
+                "model_name": {
+                    "default": "prajjwal1/bert-tiny",
+                    "description": "Name of the hugging face repository with transformer model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "device": {
                     "anyOf": [
                         {
                             "type": "string"
@@ -234,18 +278,21 @@
                             "type": "null"
                         }
                     ],
-                    "default": "cosine",
-                    "description": "Name of the similarity function to use (cosine, dot, euclidean, manhattan).",
-                    "title": "Similarity Fn Name"
+                    "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
+                    "title": "Device"
                 },
-                "use_cache": {
+                "tokenizer_config": {
+                    "$ref": "#/$defs/TokenizerConfig"
+                },
+                "trust_remote_code": {
                     "default": false,
-                    "description": "Whether to use embeddings caching.",
-                    "title": "Use Cache",
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
                     "type": "boolean"
                 }
             },
-            "title": "EmbedderConfig",
+            "title": "HFModelConfig",
             "type": "object"
         },
         "LoggingConfig": {
@@ -418,13 +465,29 @@
                 "query_prompt": null,
                 "passage_prompt": null,
                 "similarity_fn_name": "cosine",
-                "use_cache": false
+                "use_cache": true,
+                "freeze": true
             }
         },
         "cross_encoder_config": {
             "$ref": "#/$defs/CrossEncoderConfig",
             "default": {
-                "model_name": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+                "model_name": "cross-encoder/ms-marco-MiniLM-L6-v2",
+                "batch_size": 32,
+                "device": null,
+                "tokenizer_config": {
+                    "max_length": 512,
+                    "padding": true,
+                    "truncation": true
+                },
+                "trust_remote_code": false,
+                "train_head": false
+            }
+        },
+        "transformer_config": {
+            "$ref": "#/$defs/HFModelConfig",
+            "default": {
+                "model_name": "prajjwal1/bert-tiny",
                 "batch_size": 32,
                 "device": null,
                 "tokenizer_config": {
@@ -432,8 +495,7 @@
                     "padding": true,
                     "truncation": true
                 },
-                "trust_remote_code": false,
-                "train_head": false
+                "trust_remote_code": false
             }
         },
         "sampler": {

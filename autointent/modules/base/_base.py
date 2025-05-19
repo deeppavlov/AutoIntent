@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
-from typing_extensions import assert_never
+from typing_extensions import Self, assert_never
 
 from autointent._dump_tools import Dumper
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
@@ -83,12 +83,13 @@ class BaseModule(ABC):
         """
         Dumper.dump(self, Path(path))
 
+    @classmethod
     def load(
-        self,
+        cls,
         path: str,
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> None:
+    ) -> Self:
         """Load data from file system.
 
         Args:
@@ -96,7 +97,9 @@ class BaseModule(ABC):
             embedder_config: one can override presaved settings
             cross_encoder_config: one can override presaved settings
         """
-        Dumper.load(self, Path(path), embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
+        instance = cls()
+        Dumper.load(instance, Path(path), embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
+        return instance
 
     @abstractmethod
     def predict(
@@ -138,9 +141,16 @@ class BaseModule(ABC):
             Initialized module
         """
 
-    def get_embedder_config(self) -> dict[str, Any] | None:
-        """Get the config of the embedder."""
-        return None
+    @abstractmethod
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        """Return default params used in ``__init__`` method.
+
+        Some parameters of the module may be inferred using context rather from ``__init__`` method.
+        But they need to be logged for reproducibility during loading from disk.
+
+        Returns:
+            Dictionary of default params
+        """
 
     @staticmethod
     def score_metrics_ho(params: tuple[Any, Any], metrics_dict: dict[str, Any]) -> dict[str, float]:

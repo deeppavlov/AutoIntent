@@ -36,7 +36,7 @@ class DNNCScorer(BaseScorer):
         utterances = ["what is your name?", "how are you?"]
         labels = [0, 1]
         scorer = DNNCScorer(
-            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
             embedder_config="sergeyzh/rubert-tiny-turbo",
             k=5,
         )
@@ -61,7 +61,7 @@ class DNNCScorer(BaseScorer):
 
     def __init__(
         self,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> None:
@@ -77,7 +77,7 @@ class DNNCScorer(BaseScorer):
     def from_context(
         cls,
         context: Context,
-        k: PositiveInt,
+        k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
     ) -> "DNNCScorer":
@@ -101,6 +101,12 @@ class DNNCScorer(BaseScorer):
             cross_encoder_config=cross_encoder_config,
         )
 
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        return {
+            "embedder_config": self.embedder_config.model_dump(),
+            "cross_encoder_config": self.cross_encoder_config.model_dump(),
+        }
+
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """Fit the scorer by training or loading the vector index.
 
@@ -119,7 +125,7 @@ class DNNCScorer(BaseScorer):
         self._vector_index = VectorIndex(self.embedder_config)
         self._vector_index.add(utterances, labels)
 
-        self._cross_encoder = Ranker(self.cross_encoder_config)
+        self._cross_encoder = Ranker(self.cross_encoder_config, output_range="sigmoid")
         self._cross_encoder.fit(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:

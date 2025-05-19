@@ -1,3 +1,5 @@
+import tempfile
+
 import pytest
 
 from autointent.modules import SimpleRegex
@@ -32,3 +34,10 @@ def test_base_regex(partial_match, expected_predictions):
 
     assert "partial_matches" in metadata[0]
     assert "full_matches" in metadata[0]
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        matcher.dump(temp_dir)
+        del matcher
+        new_matcher = SimpleRegex.load(temp_dir)
+        new_predictions = new_matcher.predict(test_data)
+        assert predictions == new_predictions

@@ -14,6 +14,7 @@ from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
     EmbedderConfig,
+    HFModelConfig,
     InferenceNodeConfig,
     LoggingConfig,
 )
@@ -67,10 +68,13 @@ class Pipeline:
             self.embedder_config = EmbedderConfig()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
+            self.transformer_config = HFModelConfig()
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
-    def set_config(self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig) -> None:
+    def set_config(
+        self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig | HFModelConfig
+    ) -> None:
         """Set the configuration for the pipeline.
 
         Args:
@@ -84,6 +88,8 @@ class Pipeline:
             self.cross_encoder_config = config
         elif isinstance(config, DataConfig):
             self.data_config = config
+        elif isinstance(config, HFModelConfig):
+            self.transformer_config = config
         else:
             assert_never(config)
 
@@ -133,6 +139,7 @@ class Pipeline:
         pipeline.set_config(optimization_config.data_config)
         pipeline.set_config(optimization_config.embedder_config)
         pipeline.set_config(optimization_config.cross_encoder_config)
+        pipeline.set_config(optimization_config.transformer_config)
         return pipeline
 
     def _fit(self, context: Context, sampler: SamplerType) -> None:
@@ -144,6 +151,14 @@ class Pipeline:
         """
         self.context = context
         self._logger.info("starting pipeline optimization...")
+
+        if not context.logging_config.dump_modules:
+            self._logger.warning(
+                "Memory storage is not compatible with resuming optimization. "
+                "Modules from previous runs won't be available. "
+                "Set dump_modules=True in LoggingConfig to enable proper resuming."
+            )
+
         self.context.callback_handler.start_run(
             run_name=self.context.logging_config.get_run_name(),
             dirpath=self.context.logging_config.dirpath,
@@ -190,6 +205,7 @@ class Pipeline:
         context.configure_logging(self.logging_config)
         context.configure_transformer(self.embedder_config)
         context.configure_transformer(self.cross_encoder_config)
+        context.configure_transformer(self.transformer_config)
 
         self.validate_modules(dataset, mode=incompatible_search_space)
 

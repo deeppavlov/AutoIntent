@@ -253,13 +253,17 @@ class SimpleRegex(BaseRegex):
         with (dump_dir / "regex_patterns.json").open("w") as file:
             json.dump(serialized, file, indent=4, ensure_ascii=False)
 
+    @classmethod
     def load(
-        self,
+        cls,
         path: str,
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> None:
+    ) -> "SimpleRegex":
+        instance = cls()
+
         with (Path(path) / "regex_patterns.json").open() as file:
             serialized: list[dict[str, Any]] = json.load(file)
 
-        self._compile_regex_patterns(serialized)
+        instance._compile_regex_patterns(serialized)  # noqa: SLF001
+        return instance

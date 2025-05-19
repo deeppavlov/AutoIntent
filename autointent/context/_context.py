@@ -1,6 +1,5 @@
 """Context manager for configuring and managing data handling, vector indexing, and optimization."""
 
-import json
 import logging
 from pathlib import Path
 
@@ -8,9 +7,8 @@ import yaml
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, LoggingConfig
+from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, LoggingConfig
 
-from ._utils import NumpyEncoder
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
 
@@ -51,7 +49,7 @@ class Context:
         self.callback_handler = get_callbacks(config.report_to)
         self.optimization_info = OptimizationInfo()
 
-    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig) -> None:
+    def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig | HFModelConfig) -> None:
         """Configure the vector index client and embedder.
 
         Args:
@@ -61,6 +59,8 @@ class Context:
             self.embedder_config = config
         elif isinstance(config, CrossEncoderConfig):
             self.cross_encoder_config = config
+        elif isinstance(config, HFModelConfig):
+            self.transformer_config = config
 
     def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
         """Set the datasets for training, validation and testing.
@@ -71,21 +71,19 @@ class Context:
         """
         self.data_handler = DataHandler(dataset=dataset, random_seed=self.seed, config=config)
 
+    def dump_optimization_info(self) -> None:
+        """Save optimization info to disk."""
+        self.optimization_info.dump(self.logging_config.dirpath)
+
     def dump(self) -> None:
         """Save all information about optimization process to disk.
 
         Save metrics, hyperparameters, inference, configurations, and datasets to disk.
         """
         self._logger.debug("dumping logs...")
-        optimization_results = self.optimization_info.dump_evaluation_results()
-
         logs_dir = self.logging_config.dirpath
-        logs_dir.mkdir(parents=True, exist_ok=True)
 
-        logs_path = logs_dir / "logs.json"
-        with logs_path.open("w") as file:
-            json.dump(optimization_results, file, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-
+        self.dump_optimization_info()
         self.data_handler.dataset.to_json(logs_dir / "dataset.json")
 
         self._logger.info("logs and other assets are saved to %s", logs_dir)
@@ -94,6 +92,23 @@ class Context:
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
             yaml.dump(inference_config, file)
+
+    def load_optimization_info(self) -> None:
+        """Restore the context state to resume the optimization process.
+
+        Raises:
+            RuntimeError: If the modules artifacts are not found.
+        """
+        self._logger.debug("loading logs...")
+        logs_dir = self.logging_config.dirpath
+        self.optimization_info.load(logs_dir)
+        if not self.optimization_info.artifacts.has_artifacts():
+            msg = (
+                "It is impossible to continue from the previous point, "
+                "start again with dump_modules=True settings if you want to resume the run."
+                "To load optimization info only, use Context.optimization_info.load(logs_dir)."
+            )
+            raise RuntimeError(msg)
 
     def get_dump_dir(self) -> Path | None:
         """Get the directory for saving dumped modules.
@@ -115,36 +130,45 @@ class Context:
     def has_saved_modules(self) -> bool:
         """Check if any modules have been saved in RAM."""
         node_types = ["regex", "embedding", "scoring", "decision"]
-        return any(len(self.optimization_info.modules.get(nt)) > 0 for nt in node_types)
+        return any(self.optimization_info.modules.get(nt) is not None for nt in node_types)
 
     def resolve_embedder(self) -> EmbedderConfig:
         """Resolve the embedder configuration.
 
-        Returns the best embedder configuration or default configuration.
-
-        Raises:
-            RuntimeError: If embedder configuration cannot be resolved.
+        This method returns the configuration with the following priorities:
+        - the best embedder configuration obtained during embedding node optimization
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.EmbedderConfig`
         """
         try:
             return self.optimization_info.get_best_embedder()
-        except ValueError as e:
+        except ValueError:
             if hasattr(self, "embedder_config"):
                 return self.embedder_config
-            msg = (
-                "Embedder could't be resolved. Either include embedding node into the "
-                "search space or set default config with Context.configure_transformer."
-            )
-            raise RuntimeError(msg) from e
+            return EmbedderConfig()
 
     def resolve_ranker(self) -> CrossEncoderConfig:
         """Resolve the cross-encoder configuration.
 
-        Returns default config if set.
-
-        Raises:
-            RuntimeError: If cross-encoder configuration cannot be resolved.
+        This method returns the configuration with the following priorities:
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.CrossEncoderConfig`
         """
         if hasattr(self, "cross_encoder_config"):
             return self.cross_encoder_config
-        msg = "Cross-encoder could't be resolved. Set default config with Context.configure_transformer."
-        raise RuntimeError(msg)
+        return CrossEncoderConfig()
+
+    def resolve_transformer(self) -> HFModelConfig:
+        """Resolve the transformer configuration.
+
+        This method returns the configuration with the following priorities:
+        - the best transformer configuration obtained during embedding node optimization
+        - default configuration preset by user with :py:meth:`Context.configure_transformer`
+        - default configuration preset by AutoIntent in :py:class:`autointent.configs.HFModelConfig`
+        """
+        try:
+            return self.optimization_info.get_best_embedder()
+        except ValueError:
+            if hasattr(self, "transformer_config"):
+                return self.transformer_config
+            return HFModelConfig()

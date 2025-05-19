@@ -84,11 +84,7 @@ To restore, initialize module with the same hyperparams and use load method:
 """
 
 # %%
-loaded_scorer = KNNScorer(
-    embedder_config="sergeyzh/rubert-tiny-turbo",
-    k=5,
-)
-loaded_scorer.load(pathdir)
+loaded_scorer = KNNScorer.load(pathdir)
 loaded_scorer.predict(["hello world!"])
 
 # %% [markdown]
