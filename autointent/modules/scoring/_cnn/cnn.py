@@ -199,3 +199,18 @@ class CNNScorer(BaseScorer):
                 optimizer.step()
 
         self._model.eval()
+
+    def get_implicit_initialization_params(self) -> dict[str, Any]:
+        """Return default params used in initialization."""
+        return {
+            "max_seq_length": self.max_seq_length,
+            "num_train_epochs": self.num_train_epochs,
+            "batch_size": self.batch_size,
+            "learning_rate": self.learning_rate,
+            "seed": self.seed,
+            "report_to": self.report_to,
+            "embed_dim": self.embed_dim,
+            "kernel_sizes": self.kernel_sizes,
+            "num_filters": self.num_filters,
+            "dropout": self.dropout
+        }

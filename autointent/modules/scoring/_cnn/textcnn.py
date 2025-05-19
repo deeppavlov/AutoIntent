@@ -13,47 +13,33 @@ class TextCNN(nn.Module):
         vocab_size: int = 0,
         n_classes: int = 0,
         embed_dim: int = 128,
-        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
+        kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
         padding_idx: int = 0,
         pretrained_embs: torch.Tensor | None = None,
     ) -> None:
-        """Initialize TextCNN model."""
         super().__init__()
 
-        # Register model hyperparameters as buffers
-        self.register_buffer("vocab_size", torch.tensor(vocab_size))
-        self.register_buffer("n_classes", torch.tensor(n_classes))
-        self.register_buffer("embed_dim", torch.tensor(embed_dim))
-        self.register_buffer("kernel_sizes", torch.tensor(kernel_sizes))
-        self.register_buffer("num_filters", torch.tensor(num_filters))
-        self.register_buffer("dropout_rate", torch.tensor(dropout))
-        self.register_buffer("padding_idx", torch.tensor(padding_idx))
+        self.vocab_size = vocab_size
+        self.n_classes = n_classes
+        self.embed_dim = embed_dim
+        self.kernel_sizes = kernel_sizes
+        self.num_filters = num_filters
+        self.dropout_rate = dropout
+        self.padding_idx = padding_idx
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)  # type: ignore[no-untyped-call]
-            # Register pretrained embeddings as buffer if they exist
-            self.register_buffer("pretrained_embs", pretrained_embs)
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
+            self.pretrained_embs = pretrained_embs
         else:
             self.embedding = nn.Embedding(
                 num_embeddings=vocab_size,
                 embedding_dim=embed_dim,
-                padding_idx=padding_idx
+                padding_idx=padding_idx,
             )
-            # Register None for pretrained_embs buffer
-            self.register_buffer("pretrained_embs", None)
-
-        self.convs = nn.ModuleList([
-            nn.Conv1d(
-                in_channels=embed_dim,
-                out_channels=num_filters,
-                kernel_size=k
-            ) for k in kernel_sizes
-        ])
-        self.dropout = nn.Dropout(dropout)
-        self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
+            self.pretrained_embs = None
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
@@ -73,7 +59,7 @@ class TextCNN(nn.Module):
         state_dict = torch.load(model_path)
         self.load_state_dict(state_dict)
 
-    def get_config(self) -> dict:
+    def get_config(self) ->  -> dict[str, int | list[int] | torch.Tensor | None]:
         return {
             "vocab_size": self.vocab_size.item(),
             "n_classes": self.n_classes.item(),
