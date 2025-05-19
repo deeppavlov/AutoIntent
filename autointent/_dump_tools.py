@@ -67,7 +67,7 @@ class Dumper:
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
             path / Dumper.torch_models,
-            path / Dumper.containers
+            path / Dumper.containers,
             path / Dumper.ptuning_models,
         ]
         for subdir in subdirectories:
