@@ -86,6 +86,7 @@ class Dumper:
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
+        containers = {}
 
         Dumper.make_subdirectories(path, exists_ok)
 
@@ -96,6 +97,8 @@ class Dumper:
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
                 simple_attrs[key] = val
+            elif isinstance(val, dict):
+                containers[key] = val
             elif isinstance(val, np.ndarray):
                 arrays[key] = val
             elif isinstance(val, Embedder):
@@ -154,6 +157,9 @@ class Dumper:
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
                     }
+                    # Save configuration if available
+                    if hasattr(val, 'get_config'):
+                        class_info['config'] = val.get_config()
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
                 except Exception as e:
@@ -173,6 +179,9 @@ class Dumper:
 
         with (path / Dumper.simple_attrs).open("w") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
+
+        with (path / Dumper.containers / "containers.json").open("w") as f:
+            json.dump(containers, f, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
@@ -275,31 +284,30 @@ class Dumper:
                     try:
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
-
                         module = __import__(class_info["module"], fromlist=[class_info["name"]])
                         model_class = getattr(module, class_info["name"])
-
-                        # Create model instance
-                        model = model_class()
-
-                        # Load state dict
+                        config = class_info.get('config', {})
+                        # Initialize model with config if available
+                        model = model_class(**config)
                         model.load_state_dict(torch.load(model_dir / "model.pt"))
                         model.eval()
                         torch_models[model_dir.name] = model
-                    except Exception as e:  # noqa: PERF203
-                        msg = f"Error loading torch model {model_dir.name}: {e}"
-                        logger.exception(msg)
+                    except Exception as e:
+                        logger.exception(f"Error loading torch model {model_dir.name}: {e}")
             elif child.name == Dumper.containers:
                 try:
                     for container_file in child.iterdir():
+                        print(container_file)
                         with container_file.open("r") as f:
-                            containers[container_file.stem] = json.load(f)
+                            containers = json.load(f)
                 except Exception as e:
                     msg = f"Error loading containers: {e}"
                     logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
+
+        print(containers)
 
         obj.__dict__.update(
             tags

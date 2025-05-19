@@ -72,3 +72,15 @@ class TextCNN(nn.Module):
         """
         state_dict = torch.load(model_path)
         self.load_state_dict(state_dict)
+
+    def get_config(self) -> dict:
+        return {
+            'vocab_size': self.vocab_size.item(),
+            'n_classes': self.n_classes.item(),
+            'embed_dim': self.embed_dim.item(),
+            'kernel_sizes': self.kernel_sizes.tolist(),
+            'num_filters': self.num_filters.item(),
+            'dropout': self.dropout_rate.item(),
+            'padding_idx': self.padding_idx.item(),
+            'pretrained_embs': self.pretrained_embs,
+        }
