@@ -31,15 +31,23 @@ class TextCNN(nn.Module):
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)
-            self.pretrained_embs = pretrained_embs
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True) # type: ignore[no-untyped-call]
         else:
             self.embedding = nn.Embedding(
                 num_embeddings=vocab_size,
                 embedding_dim=embed_dim,
-                padding_idx=padding_idx,
+                padding_idx=padding_idx
             )
-            self.pretrained_embs = None
+
+        self.convs = nn.ModuleList([
+            nn.Conv1d(
+                in_channels=embed_dim,
+                out_channels=num_filters,
+                kernel_size=k
+            ) for k in kernel_sizes
+        ])
+        self.dropout = nn.Dropout(dropout)
+        self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
