@@ -159,7 +159,7 @@ class Dumper:
                     }
                     # Save configuration if available
                     if hasattr(val, "get_config"):
-                        class_info["config"] = val.get_config()
+                        class_info["config"] = val.get_config()  # type: ignore[operator]
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
                 except Exception as e:
