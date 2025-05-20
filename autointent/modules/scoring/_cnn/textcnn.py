@@ -68,7 +68,7 @@ class TextCNN(nn.Module):
         state_dict = torch.load(model_path)
         self.load_state_dict(state_dict)
 
-    def get_config(self) -> dict[str, int | list[int] | torch.Tensor | None]:
+    def get_config(self) -> dict[str, int | list[int] | torch.Tensor | float | None]:
         return {
             "vocab_size": self.vocab_size,
             "n_classes": self.n_classes,
