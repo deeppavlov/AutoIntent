@@ -76,6 +76,5 @@ class TextCNN(nn.Module):
             "kernel_sizes": self.kernel_sizes,
             "num_filters": self.num_filters,
             "dropout": self.dropout_rate,
-            "padding_idx": self.padding_idx,
-            "pretrained_embs": self.pretrained_embs,
+            "padding_idx": self.padding_idx
         }
