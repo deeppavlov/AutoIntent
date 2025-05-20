@@ -28,6 +28,7 @@ class TextCNN(nn.Module):
         self.num_filters = num_filters
         self.dropout_rate = dropout
         self.padding_idx = padding_idx
+        self.pretrained_embs = pretrained_embs
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
@@ -69,12 +70,12 @@ class TextCNN(nn.Module):
 
     def get_config(self) -> dict[str, int | list[int] | torch.Tensor | None]:
         return {
-            "vocab_size": self.vocab_size.item(),
-            "n_classes": self.n_classes.item(),
-            "embed_dim": self.embed_dim.item(),
-            "kernel_sizes": self.kernel_sizes.tolist(),
-            "num_filters": self.num_filters.item(),
-            "dropout": self.dropout_rate.item(),
-            "padding_idx": self.padding_idx.item(),
+            "vocab_size": self.vocab_size,
+            "n_classes": self.n_classes,
+            "embed_dim": self.embed_dim,
+            "kernel_sizes": self.kernel_sizes,
+            "num_filters": self.num_filters,
+            "dropout": self.dropout_rate,
+            "padding_idx": self.padding_idx,
             "pretrained_embs": self.pretrained_embs,
         }
