@@ -118,6 +118,7 @@ class CatBoostScorer(BaseScorer):
             **catboost_kwargs,
         )
 
+
     def _init_catboost_text_tools(self) -> None:
         if not hasattr(self, "_tokenizer"):
             self._tokenizer = Tokenizer(lowercasing=True, separator_type="BySense", token_types=["Word", "Number"])
@@ -127,7 +128,9 @@ class CatBoostScorer(BaseScorer):
             self._dictionary_fitted = False
 
     def get_embedder_config(self) -> dict[str, Any]:
-        return self.embedder_config.model_dump()
+        if self._use_embedder:
+            return self.embedder_config.model_dump()
+        return {}
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {
@@ -192,9 +195,14 @@ class CatBoostScorer(BaseScorer):
             del self._model
         if hasattr(self, "_embedder"):
             del self._embedder
+        if hasattr(self, "_tokenizer"):
+            del self._tokenizer
+        if hasattr(self, "_dictionary"):
+            del self._dictionary
+        if hasattr(self, "_dictionary_fitted"):
+            del self._dictionary_fitted
 
     def dump(self, path: str) -> None:
-        """Save scorer and all artefacts needed for inference to path."""
         root = Path(path)
         if root.exists():
             shutil.rmtree(root)
@@ -235,15 +243,11 @@ class CatBoostScorer(BaseScorer):
         path: str,
         embedder_config: EmbedderConfig | None = None,
     ) -> "CatBoostScorer":
-        """Load scorer dumped with :pymeth:`dump`."""
         root = Path(path)
         simple_attrs = json.loads((root / "simple_attrs.json").read_text(encoding="utf-8"))
 
-        cfg_dict = embedder_config.model_dump() if embedder_config else simple_attrs["classification_model_config"]
-        cfg = EmbedderConfig.model_validate(cfg_dict)
-
         scorer = cls(
-            embedder_config=cfg,
+            embedder_config=embedder_config,
             iterations=simple_attrs["iterations"],
             learning_rate=simple_attrs["learning_rate"],
             loss_function=simple_attrs["loss_function"],
@@ -256,8 +260,10 @@ class CatBoostScorer(BaseScorer):
         scorer._n_classes = simple_attrs.get("_n_classes")  # noqa: SLF001
         scorer._multilabel = simple_attrs.get("_multilabel")  # noqa: SLF001
 
-        if not scorer._use_embedder:  # noqa: SLF001
-            scorer._init_catboost_text_tools()  # noqa: SLF001
+        if scorer._use_embedder:
+            scorer._embedder = Embedder(scorer.embedder_config)
+        else:
+            scorer._init_catboost_text_tools()
             dict_file = root / "dictionary" / "dictionary.tsv"
             if dict_file.exists():
                 scorer._dictionary.load(str(dict_file))  # noqa: SLF001
