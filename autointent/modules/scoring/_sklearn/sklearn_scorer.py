@@ -53,6 +53,7 @@ class SklearnScorer(BaseScorer):
         >>> probabilities = scorer.predict(test_utterances)
     """
 
+    name = "sklearn"
     supports_multilabel = True
     supports_multiclass = True
 
@@ -79,7 +80,7 @@ class SklearnScorer(BaseScorer):
             raise ValueError(msg)
 
     @property
-    def name(self) -> str:
+    def trial_name(self) -> str:
         return f"sklearn_{self.clf_name}"
 
     @classmethod
