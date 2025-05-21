@@ -89,6 +89,11 @@ class WandbCallback(OptimizerCallback):
         """
         self.wandb.log(metrics)
 
+    def _close_current_run(self) -> None:
+        """Close the current W&B run if open."""
+        if self.wandb.run is not None:
+            self.wandb.finish()
+
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
         """Logs final evaluation metrics to W&B.
 
@@ -97,6 +102,8 @@ class WandbCallback(OptimizerCallback):
         Args:
             metrics: A dictionary of final performance metrics.
         """
+        self._close_current_run()
+
         wandb_run_init_args = {
             "project": self.project_name,
             "group": self.group,
