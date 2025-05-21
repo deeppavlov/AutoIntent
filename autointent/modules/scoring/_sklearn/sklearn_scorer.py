@@ -53,7 +53,6 @@ class SklearnScorer(BaseScorer):
         >>> probabilities = scorer.predict(test_utterances)
     """
 
-    name = "sklearn"
     supports_multilabel = True
     supports_multiclass = True
 
@@ -78,6 +77,10 @@ class SklearnScorer(BaseScorer):
             msg = f"Class {self.clf_name} does not exist in sklearn or does not have predict_proba method"
             logger.error(msg)
             raise ValueError(msg)
+
+    @property
+    def name(self) -> str:
+        return f"sklearn_{self.clf_name}"
 
     @classmethod
     def from_context(
