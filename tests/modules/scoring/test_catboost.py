@@ -55,7 +55,7 @@ def test_catboost_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = CatBoostScorer(
-        classification_model_config="prajjwal1/bert-tiny",
+        embedder_config="prajjwal1/bert-tiny",
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -95,7 +95,7 @@ def test_catboost_prediction_multilabel(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = CatBoostScorer(
-        classification_model_config="prajjwal1/bert-tiny",
+        embedder_config="prajjwal1/bert-tiny",
         iterations=50,
         learning_rate=0.05,
         depth=6,
