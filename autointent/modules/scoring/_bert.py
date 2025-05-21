@@ -76,7 +76,7 @@ class BertScorer(BaseScorer):
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
-        return AutoModelForSequenceClassification.from_pretrained(
+        return AutoModelForSequenceClassification.from_pretrained(  # type: ignore[no-untyped-call]
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
