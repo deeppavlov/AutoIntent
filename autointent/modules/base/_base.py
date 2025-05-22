@@ -32,6 +32,11 @@ class BaseModule(ABC):
     name: str
     """Name of the module."""
 
+    @property
+    def trial_name(self) -> str:
+        """Name of the module for logging."""
+        return self.name
+
     @abstractmethod
     def fit(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
         """Fit the model.

@@ -131,7 +131,7 @@ class NodeOptimizer:
         module = self.node_info.modules_available[module_name].from_context(context, **config)
         config.update(module.get_implicit_initialization_params())
 
-        context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
+        context.callback_handler.start_module(module_name=module.trial_name, num=self._counter, module_kwargs=config)
 
         self._logger.debug("Scoring %s module...", module_name)
 

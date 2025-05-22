@@ -79,6 +79,10 @@ class SklearnScorer(BaseScorer):
             logger.error(msg)
             raise ValueError(msg)
 
+    @property
+    def trial_name(self) -> str:
+        return f"sklearn_{self.clf_name}"
+
     @classmethod
     def from_context(
         cls,

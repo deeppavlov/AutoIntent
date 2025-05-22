@@ -229,7 +229,7 @@ class Dumper:
             elif child.name == Dumper.ptuning_models:
                 for model_dir in child.iterdir():
                     try:
-                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")
+                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")  # type: ignore[no-untyped-call]
                         hf_models[model_dir.name] = PeftModel.from_pretrained(model, model_dir / "peft")
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading PeftModel {model_dir.name}: {e}"
@@ -237,7 +237,7 @@ class Dumper:
             elif child.name == Dumper.hf_models:
                 for model_dir in child.iterdir():
                     try:
-                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)
+                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)  # type: ignore[no-untyped-call]
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)
