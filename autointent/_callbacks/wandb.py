@@ -112,11 +112,13 @@ class WandbCallback(OptimizerCallback):
         }
 
         try:
+            print(metrics)
             self.wandb.init(config=metrics, **wandb_run_init_args)
         except Exception as e:
             if "run config cannot exceed" not in str(e):
                 # https://github.com/deeppavlov/AutoIntent/issues/202
                 raise
+            self._close_current_run()
             logger.warning("W&B run config is too large, skipping logging modules configs")
             logger.warning("'final_metrics' will be logged to W&B with pipeline_metrics only")
             logger.warning("If you want to access modules configs in future, address to the individual modules runs")
