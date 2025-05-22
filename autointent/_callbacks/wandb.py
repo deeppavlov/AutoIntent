@@ -113,7 +113,9 @@ class WandbCallback(OptimizerCallback):
 
         try:
             print(metrics)
-            self.wandb.init(config=metrics, **wandb_run_init_args)
+            config = metrics["config"]
+            self.wandb.init(config=config, **wandb_run_init_args)
+            self.wandb.log(metrics)
         except Exception as e:
             if "run config cannot exceed" not in str(e):
                 # https://github.com/deeppavlov/AutoIntent/issues/202
