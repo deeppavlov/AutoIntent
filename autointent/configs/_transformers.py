@@ -56,7 +56,7 @@ class EmbedderConfig(HFModelConfig):
     default_prompt: str | None = Field(
         None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
     )
-    classifier_prompt: str | None = Field(None, description="Prompt for classifier.")
+    classification_prompt: str | None = Field(None, description="Prompt for classifier.")
     cluster_prompt: str | None = Field(None, description="Prompt for clustering.")
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
@@ -88,7 +88,7 @@ class EmbedderConfig(HFModelConfig):
             prompts[TaskTypeEnum.sts.value] = self.sts_prompt
         return prompts if len(prompts) > 0 else None
 
-    def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+    def get_prompt(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
         """Get the prompt type for the given task type.
 
         Args:
@@ -100,7 +100,7 @@ class EmbedderConfig(HFModelConfig):
         if prompt_type is None:
             return self.default_prompt
         if prompt_type == TaskTypeEnum.classification:
-            return self.classifier_prompt
+            return self.classification_prompt
         if prompt_type == TaskTypeEnum.cluster:
             return self.cluster_prompt
         if prompt_type == TaskTypeEnum.query:
