@@ -404,7 +404,7 @@
                     "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
                     "title": "Default Prompt"
                 },
-                "classifier_prompt": {
+                "classification_prompt": {
                     "anyOf": [
                         {
                             "type": "string"

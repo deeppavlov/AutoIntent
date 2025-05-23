@@ -76,8 +76,8 @@ class EmbedderConfig(HFModelConfig):
         prompts = {}
         if self.default_prompt:
             prompts[TaskTypeEnum.default.value] = self.default_prompt
-        if self.classifier_prompt:
-            prompts[TaskTypeEnum.classification.value] = self.classifier_prompt
+        if self.classification_prompt:
+            prompts[TaskTypeEnum.classification.value] = self.classification_prompt
         if self.cluster_prompt:
             prompts[TaskTypeEnum.cluster.value] = self.cluster_prompt
         if self.query_prompt:
