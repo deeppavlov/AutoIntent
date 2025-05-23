@@ -82,11 +82,10 @@ def test_multiclass_train_test_split_few_shot(dataset_unsplitted, allow_oos_in_t
 
     assert Split.TRAIN in dataset
     assert Split.TEST in dataset
-
     assert dataset[Split.TRAIN].num_rows == train_num_rows
     assert dataset[Split.TEST].num_rows == test_num_rows
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST)
 
     for class_id in range(dataset.get_n_classes(Split.TRAIN)):
-        class_ds = dataset[Split.TRAIN].filter(lambda x: x["label"] == class_id)
+        class_ds = dataset[Split.TRAIN].filter(lambda x: x["label"] == class_id)  # noqa: B023
         assert len(class_ds) <= examples_per_intent
