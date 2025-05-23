@@ -160,7 +160,7 @@
                     "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
                     "title": "Default Prompt"
                 },
-                "classifier_prompt": {
+                "classification_prompt": {
                     "anyOf": [
                         {
                             "type": "string"
@@ -171,7 +171,7 @@
                     ],
                     "default": null,
                     "description": "Prompt for classifier.",
-                    "title": "Classifier Prompt"
+                    "title": "Classification Prompt"
                 },
                 "cluster_prompt": {
                     "anyOf": [
@@ -459,7 +459,7 @@
                 },
                 "trust_remote_code": false,
                 "default_prompt": null,
-                "classifier_prompt": null,
+                "classification_prompt": null,
                 "cluster_prompt": null,
                 "sts_prompt": null,
                 "query_prompt": null,
