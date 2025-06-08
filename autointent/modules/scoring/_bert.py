@@ -6,7 +6,8 @@ from typing import Any
 import numpy as np
 import numpy.typing as npt
 import torch
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
+from sklearn.model_selection import train_test_split
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -37,6 +38,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        val_fraction: float = 0.2,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -44,6 +46,7 @@ class BertScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
+        self.val_fraction = val_fraction
 
     @classmethod
     def from_context(
@@ -54,6 +57,7 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
+        val_fraction: float = 0.2,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -67,6 +71,7 @@ class BertScorer(BaseScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
+            val_fraction=val_fraction,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -90,22 +95,26 @@ class BertScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        if hasattr(self, "_model"):
-            self.clear_cache()
         self._validate_task(labels)
 
+        train_utterances, train_labels, val_utterances, val_labels = train_test_split(
+            utterances, labels, test_size=self.val_fraction
+        )
+
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
-
         self._model = self._initialize_model()
-
-        use_cpu = self.classification_model_config.device == "cpu"
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
                 examples["text"], return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump()
             )
 
-        dataset = Dataset.from_dict({"text": utterances, "labels": labels})
+        dataset = DatasetDict(
+            {
+                "train": Dataset.from_dict({"text": train_utterances, "labels": train_labels}),
+                "validation": Dataset.from_dict({"text": val_utterances, "labels": val_labels}),
+            }
+        )
 
         if self._multilabel:
             # hugging face uses F.binary_cross_entropy_with_logits under the hood
@@ -127,13 +136,14 @@ class BertScorer(BaseScorer):
                 logging_strategy="steps",
                 logging_steps=10,
                 report_to=self.report_to if self.report_to is not None else "none",
-                use_cpu=use_cpu,
+                use_cpu=self.classification_model_config.device == "cpu",
             )
 
             trainer = Trainer(  # type: ignore[no-untyped-call]
                 model=self._model,
                 args=training_args,
-                train_dataset=tokenized_dataset,
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=tokenized_dataset["validation"],
                 tokenizer=self._tokenizer,
                 data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
             )
