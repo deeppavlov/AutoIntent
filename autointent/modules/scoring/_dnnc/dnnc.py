@@ -117,9 +117,6 @@ class DNNCScorer(BaseScorer):
         Raises:
             ValueError: If the vector index mismatches the provided utterances
         """
-        if hasattr(self, "_vector_index"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(self.embedder_config)
@@ -204,7 +201,9 @@ class DNNCScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self._vector_index.clear_ram()
+        if hasattr(self, "_vector_index"):
+            self._vector_index.clear_ram()
+            self._cross_encoder.clear_ram()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]], list[list[float]]]:
         """Predict class scores using vector index and cross-encoder.
