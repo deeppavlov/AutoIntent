@@ -186,7 +186,7 @@ skip_empty = true
 
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 strict = true
 warn_redundant_casts = true
 # align with mypy 2.0 release
