@@ -132,8 +132,9 @@ class BertScorer(BaseScorer):
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
+        metric_name = "f1"
         def compute_metrics(predictions: EvalPrediction) -> dict[str, float]:
-            return {"f1": scoring_f1(predictions.label_ids, predictions.predictions)}
+            return {metric_name: scoring_f1(predictions.label_ids.tolist(), predictions.predictions.tolist())}
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
@@ -142,12 +143,14 @@ class BertScorer(BaseScorer):
                 per_device_train_batch_size=self.batch_size,
                 learning_rate=self.learning_rate,
                 seed=self.seed,
-                save_strategy="no",
+                save_strategy="epoch",
                 eval_strategy="epoch",
                 logging_strategy="steps",
                 logging_steps=10,
                 report_to=self.report_to if self.report_to is not None else "none",
                 use_cpu=self.classification_model_config.device == "cpu",
+                metric_for_best_model=metric_name,
+                load_best_model_at_end=True,
             )
 
             trainer = Trainer(  # type: ignore[no-untyped-call]
@@ -155,7 +158,7 @@ class BertScorer(BaseScorer):
                 args=training_args,
                 train_dataset=tokenized_dataset["train"],
                 eval_dataset=tokenized_dataset["validation"],
-                tokenizer=self._tokenizer,
+                processing_class=self._tokenizer,
                 data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
                 compute_metrics=compute_metrics,
                 callbacks=[
