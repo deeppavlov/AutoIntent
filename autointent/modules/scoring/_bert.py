@@ -97,7 +97,7 @@ class BertScorer(BaseScorer):
     ) -> None:
         self._validate_task(labels)
 
-        train_utterances, train_labels, val_utterances, val_labels = train_test_split(
+        train_utterances, val_utterances, train_labels, val_labels = train_test_split(
             utterances, labels, test_size=self.val_fraction
         )
 
