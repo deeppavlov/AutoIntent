@@ -133,8 +133,9 @@ class BertScorer(BaseScorer):
         tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
         metric_name = "f1"
+
         def compute_metrics(predictions: EvalPrediction) -> dict[str, float]:
-            return {metric_name: scoring_f1(predictions.label_ids.tolist(), predictions.predictions.tolist())}
+            return {metric_name: scoring_f1(predictions.label_ids.tolist(), predictions.predictions.tolist())}  # type: ignore[union-attr]
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
