@@ -12,6 +12,8 @@ from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
+    EarlyStoppingCallback,
+    EvalPrediction,
     Trainer,
     TrainingArguments,
 )
@@ -20,6 +22,7 @@ from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
+from autointent.metrics.scoring import scoring_f1
 from autointent.modules.base import BaseScorer
 
 
@@ -39,6 +42,8 @@ class BertScorer(BaseScorer):
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         val_fraction: float = 0.2,
+        early_stopping_patience: int = 1,
+        early_stopping_threshold: float = 0.0,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -47,6 +52,8 @@ class BertScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self.val_fraction = val_fraction
+        self.early_stopping_patience = early_stopping_patience
+        self.early_stopping_threshold = early_stopping_threshold
 
     @classmethod
     def from_context(
@@ -125,6 +132,9 @@ class BertScorer(BaseScorer):
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
+        def compute_metrics(predictions: EvalPrediction) -> dict[str, float]:
+            return {"f1": scoring_f1(predictions.label_ids, predictions.predictions)}
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
                 output_dir=tmp_dir,
@@ -133,6 +143,7 @@ class BertScorer(BaseScorer):
                 learning_rate=self.learning_rate,
                 seed=self.seed,
                 save_strategy="no",
+                eval_strategy="epoch",
                 logging_strategy="steps",
                 logging_steps=10,
                 report_to=self.report_to if self.report_to is not None else "none",
@@ -146,6 +157,13 @@ class BertScorer(BaseScorer):
                 eval_dataset=tokenized_dataset["validation"],
                 tokenizer=self._tokenizer,
                 data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
+                compute_metrics=compute_metrics,
+                callbacks=[
+                    EarlyStoppingCallback(
+                        early_stopping_patience=self.early_stopping_patience,
+                        early_stopping_threshold=self.early_stopping_threshold,
+                    )
+                ],
             )
 
             trainer.train()  # type: ignore[attr-defined]
