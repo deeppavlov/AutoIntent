@@ -1,8 +1,10 @@
 """BertScorer class for transformer-based classification."""
 
 import tempfile
-from typing import Any
+from collections.abc import Callable
+from typing import Any, Literal
 
+import evaluate
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -22,7 +24,6 @@ from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import HFModelConfig
 from autointent.custom_types import ListOfLabels
-from autointent.metrics.scoring import scoring_f1
 from autointent.modules.base import BaseScorer
 
 
@@ -33,7 +34,7 @@ class BertScorer(BaseScorer):
     _model: Any  # transformers AutoModel factory returns Any
     _tokenizer: Any  # transformers AutoTokenizer factory returns Any
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
@@ -44,6 +45,8 @@ class BertScorer(BaseScorer):
         val_fraction: float = 0.2,
         early_stopping_patience: int = 1,
         early_stopping_threshold: float = 0.0,
+        early_stopping_metric: Literal["f1", "accuracy", "recall", "precision"] = "f1",
+        early_stopping_metric_averaging: Literal["binary", "macro", "micro"] = "macro",  # doesnt affect `accuracy`
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -54,9 +57,11 @@ class BertScorer(BaseScorer):
         self.val_fraction = val_fraction
         self.early_stopping_patience = early_stopping_patience
         self.early_stopping_threshold = early_stopping_threshold
+        self.early_stopping_metric = early_stopping_metric
+        self.early_stopping_metric_averaging = early_stopping_metric_averaging
 
     @classmethod
-    def from_context(
+    def from_context(  # noqa: PLR0913
         cls,
         context: Context,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -67,6 +72,8 @@ class BertScorer(BaseScorer):
         val_fraction: float = 0.2,
         early_stopping_patience: int = 1,
         early_stopping_threshold: float = 0.0,
+        early_stopping_metric: Literal["f1", "accuracy", "recall", "precision"] = "f1",
+        early_stopping_metric_averaging: Literal["binary", "macro", "micro"] = "macro",
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -83,6 +90,8 @@ class BertScorer(BaseScorer):
             val_fraction=val_fraction,
             early_stopping_patience=early_stopping_patience,
             early_stopping_threshold=early_stopping_threshold,
+            early_stopping_metric=early_stopping_metric,
+            early_stopping_metric_averaging=early_stopping_metric_averaging,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -136,11 +145,6 @@ class BertScorer(BaseScorer):
 
         tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
-        metric_name = "eval_f1"
-
-        def compute_metrics(predictions: EvalPrediction) -> dict[str, float]:
-            return {metric_name: scoring_f1(predictions.label_ids.tolist(), predictions.predictions.tolist())}  # type: ignore[union-attr]
-
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
                 output_dir=tmp_dir,
@@ -154,7 +158,7 @@ class BertScorer(BaseScorer):
                 logging_steps=10,
                 report_to=self.report_to if self.report_to is not None else "none",
                 use_cpu=self.classification_model_config.device == "cpu",
-                metric_for_best_model=metric_name,
+                metric_for_best_model=self.early_stopping_metric,
                 load_best_model_at_end=True,
             )
 
@@ -165,7 +169,7 @@ class BertScorer(BaseScorer):
                 eval_dataset=tokenized_dataset["validation"],
                 processing_class=self._tokenizer,
                 data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
-                compute_metrics=compute_metrics,
+                compute_metrics=self._get_compute_metrics(),
                 callbacks=[
                     EarlyStoppingCallback(
                         early_stopping_patience=self.early_stopping_patience,
@@ -177,6 +181,27 @@ class BertScorer(BaseScorer):
             trainer.train()  # type: ignore[attr-defined]
 
         self._model.eval()
+
+    def _get_compute_metrics(self) -> Callable[[EvalPrediction], dict[str, float]]:
+        """Construct callable for computing metrics during transformer training.
+
+        The result of this function is supposed to pass to :py:class:`transformers.Trainer`.
+        """
+        metric_fn = evaluate.load(self.early_stopping_metric)
+
+        compute_kwargs = {}
+
+        if self.early_stopping_metric in ["f1", "recall", "precision"]:
+            compute_kwargs["average"] = self.early_stopping_metric_averaging
+
+        def compute_metrics(output: EvalPrediction) -> dict[str, float]:
+            return metric_fn.compute(
+                predictions=output.predictions.argmax(axis=-1).tolist(),
+                references=output.label_ids,
+                **compute_kwargs,
+            )
+
+        return compute_metrics
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model") or not hasattr(self, "_tokenizer"):
