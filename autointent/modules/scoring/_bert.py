@@ -65,6 +65,8 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         val_fraction: float = 0.2,
+        early_stopping_patience: int = 1,
+        early_stopping_threshold: float = 0.0,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -79,6 +81,8 @@ class BertScorer(BaseScorer):
             seed=seed,
             report_to=report_to,
             val_fraction=val_fraction,
+            early_stopping_patience=early_stopping_patience,
+            early_stopping_threshold=early_stopping_threshold,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
