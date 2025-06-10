@@ -26,7 +26,7 @@ from autointent.schemas import TagsList
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray[Any] | Embedder | VectorIndex | BaseEstimator | Ranker
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)

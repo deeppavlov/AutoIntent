@@ -4,6 +4,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import Self, assert_never
 
+from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
 
@@ -134,8 +135,8 @@ class EarlyStoppingConfig(BaseModel):
             "during training and perofrm early stopping if quality doesn't enhances."
         ),
     )
-    patience: int = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
-    threshold: float = Field(
+    patience: PositiveInt = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
+    threshold: FloatFromZeroToOne = Field(
         0.0,
         description="Minimum quality increment to count it as enhancement. Default: any incremeant is counted",
     )
