@@ -83,9 +83,6 @@ class RetrievalAimedEmbedding(BaseEmbedding):
             utterances: List of text data to index
             labels: List of corresponding labels for the utterances
         """
-        if hasattr(self, "_vector_index"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(
@@ -140,7 +137,8 @@ class RetrievalAimedEmbedding(BaseEmbedding):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self._vector_index.clear_ram()
+        if hasattr(self, "_vector_index"):
+            self._vector_index.clear_ram()
 
     def predict(self, utterances: list[str]) -> list[ListOfLabels]:
         """Predict the nearest neighbors for a list of utterances.

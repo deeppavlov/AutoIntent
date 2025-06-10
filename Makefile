@@ -22,9 +22,10 @@ lint:
 	$(poetry) ruff format
 	$(poetry) ruff check --fix
 
-.PHONY: sync
-sync:
-	poetry sync --extras "dev test typing docs"
+.PHONY: update
+update:
+	rm -f poetry.lock
+	poetry install --extras "dev test typing docs"
 
 .PHONY: docs
 docs:

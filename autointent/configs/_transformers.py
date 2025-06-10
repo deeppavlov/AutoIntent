@@ -4,6 +4,9 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import Self, assert_never
 
+from autointent.custom_types import FloatFromZeroToOne
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
+
 
 class TokenizerConfig(BaseModel):
     padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
@@ -122,3 +125,21 @@ class CrossEncoderConfig(HFModelConfig):
     tokenizer_config: TokenizerConfig = Field(
         default_factory=lambda: TokenizerConfig(max_length=512)
     )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly
+
+
+class EarlyStoppingConfig(BaseModel):
+    val_fraction: float = Field(
+        0.2,
+        description=(
+            "Fraction of train samples to allocate to dev set to monitor quality "
+            "during training and perofrm early stopping if quality doesn't enhances."
+        ),
+    )
+    patience: PositiveInt = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
+    threshold: FloatFromZeroToOne = Field(
+        0.0,
+        description="Minimum quality increment to count it as enhancement. Default: any incremeant is counted",
+    )
+    metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = Field(  # type: ignore[valid-type]
+        "scoring_f1", description="Metric to monitor."
+    )

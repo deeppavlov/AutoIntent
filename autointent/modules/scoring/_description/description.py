@@ -112,11 +112,6 @@ class DescriptionScorer(BaseScorer):
         Raises:
             ValueError: If descriptions contain None values or embeddings mismatch utterances
         """
-        if hasattr(self, "_embedder") and self._embedder is not None:
-            self._embedder.clear_ram()
-        if hasattr(self, "_cross_encoder") and self._cross_encoder is not None:
-            self._cross_encoder.clear_ram()
-
         self._validate_task(labels)
 
         if any(description is None for description in descriptions):

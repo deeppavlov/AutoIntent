@@ -9,7 +9,7 @@ from pydantic import PositiveInt
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
-from autointent.configs import HFModelConfig
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 
@@ -67,6 +67,7 @@ class PTuningScorer(BertScorer):
         encoder_dropout: float = 0.1,
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
+        early_stopping_config: EarlyStoppingConfig | None = None,
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         super().__init__(
@@ -76,6 +77,7 @@ class PTuningScorer(BertScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
+            early_stopping_config=early_stopping_config,
         )
         self._ptuning_config = PromptEncoderConfig(
             task_type=TaskType.SEQ_CLS,

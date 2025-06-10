@@ -125,9 +125,6 @@ class SklearnScorer(BaseScorer):
         Raises:
             ValueError: If the vector index mismatches the provided utterances
         """
-        if hasattr(self, "_clf"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         embedder = Embedder(
@@ -165,4 +162,6 @@ class SklearnScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
-        self._embedder.delete()
+        if hasattr(self, "_clf"):
+            self._embedder.delete()
+            delattr(self, "_clf")

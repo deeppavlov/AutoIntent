@@ -100,7 +100,7 @@ class KNNScorer(BaseScorer):
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {"embedder_config": self.embedder_config.model_dump()}
 
-    def fit(self, utterances: list[str], labels: ListOfLabels, clear_cache: bool = False) -> None:
+    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """Fit the scorer by training or loading the vector index.
 
         Args:
@@ -111,9 +111,6 @@ class KNNScorer(BaseScorer):
         Raises:
             ValueError: If the vector index mismatches the provided utterances
         """
-        if hasattr(self, "_vector_index") and clear_cache:
-            self.clear_cache()
-
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(self.embedder_config)
@@ -147,7 +144,8 @@ class KNNScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self._vector_index.clear_ram()
+        if hasattr(self, "_vector_index"):
+            self._vector_index.clear_ram()
 
     def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
         """Get nearest neighbors for given utterances.

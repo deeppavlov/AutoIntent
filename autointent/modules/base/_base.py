@@ -187,6 +187,7 @@ class BaseModule(ABC):
         all_val_preds = []
 
         for train_utterances, train_labels, val_utterances, val_labels in cv_iterator:
+            self.clear_cache()
             self.fit(train_utterances, train_labels, **fit_kwargs)  # type: ignore[arg-type]
             val_preds = self.predict(val_utterances)
             for name, fn in metrics_dict.items():
