@@ -254,12 +254,24 @@ class NodeOptimizer:
         is_multilabel = dataset.multilabel
 
         filtered_search_space = []
+        if is_multilabel and self.target_metric not in self.node_info.multilabel_available_metrics:
+            handle_message_on_mode(
+                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets."
+            )
+        elif not is_multilabel and self.target_metric not in self.node_info.multiclass_available_metrics:
+            handle_message_on_mode(
+                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets."
+            )
+
+        for metric in self.metrics:
+            if is_multilabel and metric not in self.node_info.multilabel_available_metrics:
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.")
+            elif not is_multilabel and metric not in self.node_info.multiclass_available_metrics:
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.")
 
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space["module_name"]
             module = self.node_info.modules_available[module_name]
-            # todo add check for oos
-
             messages = []
 
             if module_name == "description" and not dataset.has_descriptions:
@@ -273,11 +285,7 @@ class NodeOptimizer:
 
             if len(messages) > 0:
                 msg = "\n".join(messages)
-                if mode == "raise":
-                    self._logger.error(msg)
-                    raise ValueError(msg)
-                if mode == "warning":
-                    self._logger.warning(msg)
+                handle_message_on_mode(mode, msg)
             else:
                 filtered_search_space.append(search_space)
 
@@ -393,3 +401,22 @@ def load_or_create_study(
             finished_trials,
             remaining_trials,
         )
+
+
+def handle_message_on_mode(
+    mode: SearchSpaceValidationMode,
+    message: str,
+) -> None:
+    """Handle messages based on the validation mode.
+
+    Args:
+        mode: The validation mode ("raise" or "warning").
+        message: The message to handle.
+
+    Raises:
+        ValueError: If mode is "raise".
+    """
+    if mode == "raise":
+        raise ValueError(message)
+    elif mode == "warning":
+        logger.warning(message)
