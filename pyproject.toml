@@ -187,7 +187,7 @@ skip_empty = true
 
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 strict = true
 warn_redundant_casts = true
 # align with mypy 2.0 release
@@ -219,7 +219,6 @@ module = [
     "wandb",
     "dspy",
     "dspy.evaluate.auto_evaluation",
-    "evaluate",
 ]
 ignore_missing_imports = true
 
