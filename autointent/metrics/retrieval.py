@@ -539,7 +539,7 @@ def retrieval_ndcg(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE
     query_label_, candidates_labels_ = transform(query_labels, candidates_labels)
 
     ndcg_scores: list[float] = []
-    relevance_scores: npt.NDArray[np.bool] = query_label_[:, None] == candidates_labels_
+    relevance_scores = query_label_[:, None] == candidates_labels_
 
     for rel_scores in relevance_scores:
         cur_dcg = _dcg(rel_scores, k)
