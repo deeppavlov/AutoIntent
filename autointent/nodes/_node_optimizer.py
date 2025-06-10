@@ -241,7 +241,7 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:  # noqa: C901
         """Validates nodes against the dataset.
 
         Args:
@@ -256,18 +256,18 @@ class NodeOptimizer:
         filtered_search_space = []
         if is_multilabel and self.target_metric not in self.node_info.multilabel_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets."
+                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets.", True
             )
         elif not is_multilabel and self.target_metric not in self.node_info.multiclass_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets."
+                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets.", True
             )
 
         for metric in self.metrics:
             if is_multilabel and metric not in self.node_info.multilabel_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.")
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.", True)
             elif not is_multilabel and metric not in self.node_info.multiclass_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.")
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.", True)
 
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space["module_name"]
@@ -406,17 +406,21 @@ def load_or_create_study(
 def handle_message_on_mode(
     mode: SearchSpaceValidationMode,
     message: str,
+    strict: bool = False,
 ) -> None:
     """Handle messages based on the validation mode.
 
     Args:
         mode: The validation mode ("raise" or "warning").
         message: The message to handle.
+        strict: If True always raises an error, even if mode is "warning".
 
     Raises:
         ValueError: If mode is "raise".
     """
     if mode == "raise":
         raise ValueError(message)
-    elif mode == "warning":
+    if mode == "warning":
         logger.warning(message)
+    if strict:
+        raise ValueError(message)
