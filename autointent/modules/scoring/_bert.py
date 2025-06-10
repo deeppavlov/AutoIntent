@@ -4,7 +4,6 @@ import tempfile
 from collections.abc import Callable
 from typing import Any
 
-import evaluate
 import numpy as np
 import numpy.typing as npt
 import torch
@@ -25,6 +24,7 @@ from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.custom_types import ListOfLabels
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
 
 
@@ -191,19 +191,13 @@ class BertScorer(BaseScorer):
         if self.early_stopping_config.metric is None:
             return None
 
-        metric_fn = evaluate.load(self.early_stopping_config.metric)
-
-        compute_kwargs = {}
-
-        if self.early_stopping_config.metric in ["f1", "recall", "precision"]:
-            compute_kwargs["average"] = self.early_stopping_config.averaging
+        metric_name = self.early_stopping_config.metric
+        metric_fn = (SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS)[metric_name]
 
         def compute_metrics(output: EvalPrediction) -> dict[str, float]:
-            return metric_fn.compute(  # type: ignore[no-any-return]
-                predictions=output.predictions.argmax(axis=-1).tolist(),  # type: ignore[union-attr]
-                references=output.label_ids,
-                **compute_kwargs,
-            )
+            return {
+                metric_name: metric_fn(output.label_ids.tolist(), output.predictions.tolist())  # type: ignore[union-attr]
+            }
 
         return compute_metrics
 

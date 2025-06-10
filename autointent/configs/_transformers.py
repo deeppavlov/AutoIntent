@@ -4,6 +4,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import Self, assert_never
 
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
+
 
 class TokenizerConfig(BaseModel):
     padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
@@ -128,5 +130,4 @@ class EarlyStoppingConfig(BaseModel):
     val_fraction: float = 0.2
     patience: int = 1
     threshold: float = 0.0
-    metric: Literal["f1", "accuracy", "recall", "precision"] | None = "f1"
-    averaging: Literal["macro", "micro"] = "macro"  # doesnt affect `accuracy`
+    metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = "scoring_f1"  # type: ignore[valid-type]
