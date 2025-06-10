@@ -195,7 +195,6 @@ warn_unreachable = true
 local_partial_types = true
 plugins = [
     "pydantic.mypy",
-    "numpy.typing.mypy_plugin",
 ]
 mypy_path = "autointent"
 disable_error_code = ["override"]
@@ -220,6 +219,7 @@ module = [
     "wandb",
     "dspy",
     "dspy.evaluate.auto_evaluation",
+    "evaluate",
 ]
 ignore_missing_imports = true
 
