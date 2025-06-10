@@ -47,7 +47,7 @@ Or run a specific test (using `test_bert.py` as an example):
 ```bash
 poetry run pytest tests/modules/scoring/test_bert.py
 ```
-- Check code style
+- Check code style (it also applies formatter)
 ```bash
 make lint
 ```
