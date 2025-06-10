@@ -127,7 +127,18 @@ class CrossEncoderConfig(HFModelConfig):
 
 
 class EarlyStoppingConfig(BaseModel):
-    val_fraction: float = 0.2
-    patience: int = 1
-    threshold: float = 0.0
-    metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = "scoring_f1"  # type: ignore[valid-type]
+    val_fraction: float = Field(
+        0.2,
+        description=(
+            "Fraction of train samples to allocate to dev set to monitor quality "
+            "during training and perofrm early stopping if quality doesn't enhances."
+        ),
+    )
+    patience: int = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
+    threshold: float = Field(
+        0.0,
+        description="Minimum quality increment to count it as enhancement. Default: any incremeant is counted",
+    )
+    metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = Field(  # type: ignore[valid-type]
+        "scoring_f1", description="Metric to monitor."
+    )

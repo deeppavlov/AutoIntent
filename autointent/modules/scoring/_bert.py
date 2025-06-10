@@ -29,6 +29,48 @@ from autointent.modules.base import BaseScorer
 
 
 class BertScorer(BaseScorer):
+    """Scoring module for transformer-based classification using BERT models.
+
+    This module uses a transformer model (like BERT) to perform intent classification.
+    It supports both multiclass and multilabel classification tasks, with options for
+    early stopping and various training configurations.
+
+    Args:
+        classification_model_config: Config of the transformer model (HFModelConfig, str, or dict)
+        num_train_epochs: Number of training epochs (default: 3)
+        batch_size: Batch size for training (default: 8)
+        learning_rate: Learning rate for training (default: 5e-5)
+        seed: Random seed for reproducibility (default: 0)
+        report_to: Reporting tool for training logs (e.g., "wandb", "tensorboard")
+        early_stopping_config: Configuration for early stopping during training
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules import BertScorer
+
+        # Initialize scorer with BERT model
+        scorer = BertScorer(
+            classification_model_config="bert-base-uncased",
+            num_train_epochs=3,
+            batch_size=8,
+            learning_rate=5e-5,
+            seed=42
+        )
+
+        # Training data
+        utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+        labels = [1, 0, 1, 0]
+
+        # Fit the model
+        scorer.fit(utterances, labels)
+
+        # Make predictions
+        test_utterances = ["Good product", "Not worth it"]
+        probabilities = scorer.predict(test_utterances)
+    """
+
     name = "bert"
     supports_multiclass = True
     supports_multilabel = True
