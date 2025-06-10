@@ -2,7 +2,7 @@
 
 import tempfile
 from collections.abc import Callable
-from typing import Any, Literal
+from typing import Any
 
 import evaluate
 import numpy as np
@@ -19,10 +19,11 @@ from transformers import (  # type: ignore[attr-defined]
     Trainer,
     TrainingArguments,
 )
+from transformers.trainer_callback import TrainerCallback
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import HFModelConfig
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -34,7 +35,7 @@ class BertScorer(BaseScorer):
     _model: Any  # transformers AutoModel factory returns Any
     _tokenizer: Any  # transformers AutoTokenizer factory returns Any
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
         num_train_epochs: int = 3,
@@ -42,11 +43,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
-        val_fraction: float = 0.2,
-        early_stopping_patience: int = 1,
-        early_stopping_threshold: float = 0.0,
-        early_stopping_metric: Literal["f1", "accuracy", "recall", "precision"] = "f1",
-        early_stopping_metric_averaging: Literal["binary", "macro", "micro"] = "macro",  # doesnt affect `accuracy`
+        early_stopping_config: EarlyStoppingConfig | None = None,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -54,14 +51,10 @@ class BertScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
-        self.val_fraction = val_fraction
-        self.early_stopping_patience = early_stopping_patience
-        self.early_stopping_threshold = early_stopping_threshold
-        self.early_stopping_metric = early_stopping_metric
-        self.early_stopping_metric_averaging = early_stopping_metric_averaging
+        self.early_stopping_config = early_stopping_config or EarlyStoppingConfig()
 
     @classmethod
-    def from_context(  # noqa: PLR0913
+    def from_context(
         cls,
         context: Context,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -69,11 +62,7 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        val_fraction: float = 0.2,
-        early_stopping_patience: int = 1,
-        early_stopping_threshold: float = 0.0,
-        early_stopping_metric: Literal["f1", "accuracy", "recall", "precision"] = "f1",
-        early_stopping_metric_averaging: Literal["binary", "macro", "micro"] = "macro",
+        early_stopping_config: EarlyStoppingConfig | None = None,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -87,11 +76,7 @@ class BertScorer(BaseScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
-            val_fraction=val_fraction,
-            early_stopping_patience=early_stopping_patience,
-            early_stopping_threshold=early_stopping_threshold,
-            early_stopping_metric=early_stopping_metric,
-            early_stopping_metric_averaging=early_stopping_metric_averaging,
+            early_stopping_config=early_stopping_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -117,12 +102,65 @@ class BertScorer(BaseScorer):
     ) -> None:
         self._validate_task(labels)
 
-        train_utterances, val_utterances, train_labels, val_labels = train_test_split(
-            utterances, labels, test_size=self.val_fraction
-        )
-
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
         self._model = self._initialize_model()
+        tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
+        self._train(tokenized_dataset)
+
+        self._model.eval()
+
+    def _train(self, tokenized_dataset: DatasetDict) -> None:
+        """Perform training with Hugging Face Trainer API.
+
+        Args:
+            tokenized_dataset: output from :py:meth:`BertScorer._get_tokenized_dataset`
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            training_args = TrainingArguments(
+                output_dir=tmp_dir,
+                num_train_epochs=self.num_train_epochs,
+                per_device_train_batch_size=self.batch_size,
+                learning_rate=self.learning_rate,
+                seed=self.seed,
+                save_strategy="epoch",
+                eval_strategy="epoch",
+                logging_strategy="steps",
+                logging_steps=10,
+                report_to=self.report_to if self.report_to is not None else "none",
+                use_cpu=self.classification_model_config.device == "cpu",
+                metric_for_best_model=self.early_stopping_config.metric,
+                load_best_model_at_end=self.early_stopping_config.metric is not None,
+            )
+
+            trainer = Trainer(  # type: ignore[no-untyped-call]
+                model=self._model,
+                args=training_args,
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=tokenized_dataset["validation"],
+                processing_class=self._tokenizer,
+                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
+                compute_metrics=self._get_compute_metrics(),
+                callbacks=self._get_trainer_callbacks(),
+            )
+
+            trainer.train()  # type: ignore[attr-defined]
+
+    def _get_trainer_callbacks(self) -> list[TrainerCallback]:
+        res: list[TrainerCallback] = []
+        if self.early_stopping_config.metric is not None:
+            res.append(
+                EarlyStoppingCallback(
+                    early_stopping_patience=self.early_stopping_config.patience,
+                    early_stopping_threshold=self.early_stopping_config.threshold,
+                )
+            )
+        return res
+
+    def _get_tokenized_dataset(self, utterances: list[str], labels: ListOfLabels) -> DatasetDict:
+        """Build tokenized dataset with "train" and "validation" splits."""
+        train_utterances, val_utterances, train_labels, val_labels = train_test_split(
+            utterances, labels, test_size=self.early_stopping_config.val_fraction
+        )
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
@@ -143,60 +181,26 @@ class BertScorer(BaseScorer):
                 lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns="labels"
             )
 
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
+        return dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            training_args = TrainingArguments(
-                output_dir=tmp_dir,
-                num_train_epochs=self.num_train_epochs,
-                per_device_train_batch_size=self.batch_size,
-                learning_rate=self.learning_rate,
-                seed=self.seed,
-                save_strategy="epoch",
-                eval_strategy="epoch",
-                logging_strategy="steps",
-                logging_steps=10,
-                report_to=self.report_to if self.report_to is not None else "none",
-                use_cpu=self.classification_model_config.device == "cpu",
-                metric_for_best_model=self.early_stopping_metric,
-                load_best_model_at_end=True,
-            )
-
-            trainer = Trainer(  # type: ignore[no-untyped-call]
-                model=self._model,
-                args=training_args,
-                train_dataset=tokenized_dataset["train"],
-                eval_dataset=tokenized_dataset["validation"],
-                processing_class=self._tokenizer,
-                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
-                compute_metrics=self._get_compute_metrics(),
-                callbacks=[
-                    EarlyStoppingCallback(
-                        early_stopping_patience=self.early_stopping_patience,
-                        early_stopping_threshold=self.early_stopping_threshold,
-                    )
-                ],
-            )
-
-            trainer.train()  # type: ignore[attr-defined]
-
-        self._model.eval()
-
-    def _get_compute_metrics(self) -> Callable[[EvalPrediction], dict[str, float]]:
+    def _get_compute_metrics(self) -> Callable[[EvalPrediction], dict[str, float]] | None:
         """Construct callable for computing metrics during transformer training.
 
         The result of this function is supposed to pass to :py:class:`transformers.Trainer`.
         """
-        metric_fn = evaluate.load(self.early_stopping_metric)
+        if self.early_stopping_config.metric is None:
+            return None
+
+        metric_fn = evaluate.load(self.early_stopping_config.metric)
 
         compute_kwargs = {}
 
-        if self.early_stopping_metric in ["f1", "recall", "precision"]:
-            compute_kwargs["average"] = self.early_stopping_metric_averaging
+        if self.early_stopping_config.metric in ["f1", "recall", "precision"]:
+            compute_kwargs["average"] = self.early_stopping_config.averaging
 
         def compute_metrics(output: EvalPrediction) -> dict[str, float]:
-            return metric_fn.compute(
-                predictions=output.predictions.argmax(axis=-1).tolist(),
+            return metric_fn.compute(  # type: ignore[no-any-return]
+                predictions=output.predictions.argmax(axis=-1).tolist(),  # type: ignore[union-attr]
                 references=output.label_ids,
                 **compute_kwargs,
             )

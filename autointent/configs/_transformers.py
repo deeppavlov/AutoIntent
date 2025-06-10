@@ -122,3 +122,11 @@ class CrossEncoderConfig(HFModelConfig):
     tokenizer_config: TokenizerConfig = Field(
         default_factory=lambda: TokenizerConfig(max_length=512)
     )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly
+
+
+class EarlyStoppingConfig(BaseModel):
+    val_fraction: float = 0.2
+    patience: int = 1
+    threshold: float = 0.0
+    metric: Literal["f1", "accuracy", "recall", "precision"] | None = "f1"
+    averaging: Literal["macro", "micro"] = "macro"  # doesnt affect `accuracy`
