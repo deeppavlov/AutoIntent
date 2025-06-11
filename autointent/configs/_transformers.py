@@ -122,3 +122,37 @@ class CrossEncoderConfig(HFModelConfig):
     tokenizer_config: TokenizerConfig = Field(
         default_factory=lambda: TokenizerConfig(max_length=512)
     )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly
+
+
+class LLMConfig(BaseModel):
+    """Configuration for Large Language Models."""
+    
+    model_config = ConfigDict(extra="forbid")
+    
+    base_url: str | None = Field(None, description="Base URL for the LLM API endpoint")
+    model_name: str = Field("gpt-3.5-turbo", description="Name of the LLM model")
+    temperature: float = Field(0.7, ge=0.0, le=2.0, description="Sampling temperature for generation")
+    max_tokens: int = Field(150, gt=0, description="Maximum number of tokens to generate")
+    generation_params: dict[str, Any] = Field(default_factory=dict, description="Additional generation parameters")
+    
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
+        """Create LLMConfig from various input types.
+
+        Args:
+            values: Configuration values. Can be:
+                - None: Use default configuration
+                - str: Use as model_name with default settings
+                - dict: Use as keyword arguments
+                - BaseModel: Return as-is if already a config
+
+        Returns:
+            LLMConfig instance
+        """
+        if values is None:
+            return cls()
+        if isinstance(values, BaseModel):
+            return values  # type: ignore[return-value]
+        if isinstance(values, str):
+            return cls(model_name=values)
+        return cls(**values)
