@@ -20,3 +20,7 @@ class RegexNodeInfo(NodeInfo):
     modules_available: ClassVar[Mapping[str, type[BaseRegex]]] = REGEX_MODULES
 
     node_type = NodeType.regex
+
+    multiclass_available_metrics: ClassVar[Mapping[str, RegexMetricFn]] = REGEX_METRICS
+
+    multilabel_available_metrics: ClassVar[Mapping[str, RegexMetricFn]] = REGEX_METRICS

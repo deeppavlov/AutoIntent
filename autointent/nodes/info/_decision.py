@@ -19,3 +19,7 @@ class DecisionNodeInfo(NodeInfo):
     modules_available: ClassVar[dict[str, type[BaseDecision]]] = DECISION_MODULES
 
     node_type = NodeType.decision
+
+    multiclass_available_metrics = DECISION_METRICS
+
+    multilabel_available_metrics = DECISION_METRICS
