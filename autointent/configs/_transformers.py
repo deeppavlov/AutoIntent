@@ -100,8 +100,6 @@ class EmbedderConfig(HFModelConfig):
         Returns:
             The prompt for the given task type.
         """
-        if prompt_type is None:
-            return self.default_prompt
         if prompt_type == TaskTypeEnum.classification:
             return self.classification_prompt
         if prompt_type == TaskTypeEnum.cluster:
@@ -112,9 +110,7 @@ class EmbedderConfig(HFModelConfig):
             return self.passage_prompt
         if prompt_type == TaskTypeEnum.sts:
             return self.sts_prompt
-        if prompt_type == TaskTypeEnum.default:
-            return self.default_prompt
-        assert_never(prompt_type)
+        return self.default_prompt
 
 
 class CrossEncoderConfig(HFModelConfig):
