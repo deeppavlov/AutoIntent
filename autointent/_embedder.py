@@ -188,17 +188,20 @@ class Embedder:
         Returns:
             A numpy array of embeddings.
         """
+        prompt = self.config.get_prompt(task_type)
+
         if self.config.use_cache:
             hasher = Hasher()
             hasher.update(self)
             hasher.update(utterances)
+            if prompt:
+                hasher.update(prompt)
 
             embeddings_path = _get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
         self._load_model()
-        prompt = self.config.get_prompt(task_type)
 
         logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s, prompt=%s",
