@@ -6,14 +6,12 @@ search_space:
         k:
           low: 1
           high: 20
-        n_trials: 10
         weights: [uniform, distance, closest]
       - module_name: linear
       - module_name: mlknn
         k:
           low: 1
           high: 20
-        n_trials: 10
   - node_type: decision
     target_metric: decision_accuracy
     search_space:
@@ -21,6 +19,5 @@ search_space:
         thresh:
           low: 0.1
           high: 0.9
-        n_trials: 10
       - module_name: argmax
 sampler: random
