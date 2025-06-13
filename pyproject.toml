@@ -45,7 +45,6 @@ dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
     "transformers[torch] (>=4.49.0,<5.0.0)",
     "peft (>= 0.10.0, !=0.15.0, !=0.15.1, <1.0.0)",
-    "codecarbon (==2.6)",
 ]
 
 [project.optional-dependencies]
@@ -87,6 +86,9 @@ dspy = [
 ]
 wandb = [
     "wandb (>=0.19.10,<1.0.0)",
+]
+codecarbon = [
+    "codecarbon (==2.6)",
 ]
 
 [project.urls]
@@ -218,6 +220,7 @@ module = [
     "wandb",
     "dspy",
     "dspy.evaluate.auto_evaluation",
+    "codecarbon",
 ]
 ignore_missing_imports = true
 

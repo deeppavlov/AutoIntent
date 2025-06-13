@@ -17,7 +17,6 @@ from typing_extensions import assert_never
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
-from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
 
@@ -50,7 +49,6 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
-        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -135,13 +133,10 @@ class NodeOptimizer:
 
         self._logger.debug("Scoring %s module...", module_name)
 
-        self.emissions_tracker.start_task("module_scoring")
         quality_metrics = module.score(context, metrics=self.metrics)
-        emissions_metrics = self.emissions_tracker.stop_task()
-        all_metrics = {**quality_metrics, **emissions_metrics}
 
         target_metric = quality_metrics[self.target_metric]
-
+        all_metrics = context.callback_handler.update_metrics(quality_metrics)
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
 

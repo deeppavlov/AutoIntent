@@ -258,7 +258,10 @@ class Pipeline:
                     context.data_handler.test_labels(),
                     predictions,
                 )
-            context.callback_handler.log_final_metrics(context.optimization_info.dump_evaluation_results())
+            all_final_metrics = context.callback_handler.update_final_metrics(
+                context.optimization_info.pipeline_metrics,
+            )
+            context.callback_handler.log_final_metrics(all_final_metrics)
 
         return context
 

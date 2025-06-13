@@ -82,3 +82,31 @@ class CallbackHandler(OptimizerCallback):
         """
         for callback in self.callbacks:
             getattr(callback, event)(**kwargs)
+
+    def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        """Update metrics during training.
+
+        Args:
+            metrics: Metrics to update.
+
+        Returns:
+            Updated metrics.
+        """
+        for callback in self.callbacks:
+            if hasattr(callback, "update_metrics"):
+                metrics = callback.update_metrics(metrics)
+        return metrics
+
+    def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        """Update final metrics.
+
+        Args:
+            metrics: Final metrics to update.
+
+        Returns:
+            Updated final metrics.
+        """
+        for callback in self.callbacks:
+            if hasattr(callback, "update_final_metrics"):
+                metrics = callback.update_final_metrics(metrics)
+        return metrics

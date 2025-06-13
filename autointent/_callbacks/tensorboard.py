@@ -120,3 +120,9 @@ class TensorBoardCallback(OptimizerCallback):
 
     def end_run(self) -> None:
         """Ends the current run. This method is currently a placeholder."""
+
+    def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        return metrics
+
+    def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        return metrics

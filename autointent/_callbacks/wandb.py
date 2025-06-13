@@ -143,3 +143,9 @@ class WandbCallback(OptimizerCallback):
 
         This method is currently a placeholder and does not perform additional operations.
         """
+
+    def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        return metrics
+
+    def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        return metrics

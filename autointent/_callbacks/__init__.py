@@ -2,10 +2,11 @@ from typing import Literal
 
 from autointent._callbacks.base import OptimizerCallback
 from autointent._callbacks.callback_handler import CallbackHandler
+from autointent._callbacks.emissions_tracker import EmissionsTrackerCallback
 from autointent._callbacks.tensorboard import TensorBoardCallback
 from autointent._callbacks.wandb import WandbCallback
 
-REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback]}
+REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback, EmissionsTrackerCallback]}
 
 REPORTERS_NAMES = Literal[tuple(REPORTERS.keys())]  # type: ignore[valid-type]
 
@@ -34,6 +35,7 @@ def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
 __all__ = [
     "REPORTERS_NAMES",
     "CallbackHandler",
+    "EmissionsTrackerCallback",
     "OptimizerCallback",
     "TensorBoardCallback",
     "WandbCallback",
