@@ -84,9 +84,9 @@ class Pipeline:
         elif isinstance(config, DataConfig):
             self.data_config = config
         elif isinstance(config, HFModelConfig):
-            self.hpo_config = config
-        elif isinstance(config, HPOConfig):
             self.transformer_config = config
+        elif isinstance(config, HPOConfig):
+            self.hpo_config = config
         else:
             assert_never(config)
 

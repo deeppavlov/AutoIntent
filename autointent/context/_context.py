@@ -2,9 +2,9 @@
 
 import logging
 from pathlib import Path
-from typing import assert_never
 
 import yaml
+from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
