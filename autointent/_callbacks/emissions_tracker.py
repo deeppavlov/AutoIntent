@@ -17,7 +17,7 @@ class EmissionsTrackerCallback(OptimizerCallback):
 
     current_module_name: str | None = None
 
-    def __init__(self, project_name: str, measure_power_secs: int = 1) -> None:
+    def __init__(self) -> None:
         """Initialize the emission tracker.
 
         Args:
@@ -32,8 +32,9 @@ class EmissionsTrackerCallback(OptimizerCallback):
                 "Please install it with `pip install codecarbon`."
             )
             raise ImportError(msg) from e
+        self.tracker: EmissionsTracker | None = None
+        self.emission_tracker = EmissionsTracker
         logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
-        self.tracker = EmissionsTracker(project_name=project_name, measure_power_secs=measure_power_secs)
 
     def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:  # noqa: ARG002
         """Start tracking emissions for the entire run.
@@ -43,6 +44,8 @@ class EmissionsTrackerCallback(OptimizerCallback):
             dirpath: Path to the directory where the logs will be saved.
             log_interval_time: Sampling interval for the system monitor in seconds.
         """
+        self.tracker = self.emission_tracker(project_name=run_name, measure_power_secs=log_interval_time)
+
         self.tracker.start()
         self.current_module_name = None
 
@@ -79,8 +82,8 @@ class EmissionsTrackerCallback(OptimizerCallback):
         Returns:
             Updated metrics including emissions data.
         """
-        emissions_data = self.tracker.stop()
-        emissions_data_json = json.loads(emissions_data.toJSON())
+        _ = self.tracker.stop()
+        emissions_data_json = json.loads(self.tracker.final_emissions_data.toJSON())
         emissions_data_dict = {
             f"emissions/{k}": v for k, v in emissions_data_json.items() if isinstance(v, int | float)
         }
