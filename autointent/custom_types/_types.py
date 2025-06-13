@@ -115,11 +115,5 @@ SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 - `filter`: drop incompatible modules from search space
 """
 
-SearchSpacePreset = Literal["light", "light_extra", "heavy", "heavy_moderate"]
-"""Some presets that our library supports from lightest to heaviest:
-
-- `light_extra`: just like `light` but tuned with :py:class:`optuna.samplers.RandomSampler`
-- `light`: only light-weight modules tuned with :py:class:`optuna.samplers.TPESampler`
-- `heavy_moderate`: just like `heavy` but tuned with :py:class:`optuna.samplers.RandomSampler`
-- `light`: light-weight modules accompanied with heavy-weight ones tuned with :py:class:`optuna.samplers.TPESampler`
-"""
+SearchSpacePreset = Literal["light", "heavy"]
+"""Some presets that our library supports from lightest to heaviest"""
