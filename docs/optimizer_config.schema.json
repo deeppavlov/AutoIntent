@@ -499,7 +499,7 @@
             }
         },
         "sampler": {
-            "default": "brute",
+            "default": "tpe",
             "enum": [
                 "tpe",
                 "random"
