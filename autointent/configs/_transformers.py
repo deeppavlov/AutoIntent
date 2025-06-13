@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
-from typing_extensions import Self, assert_never
+from typing_extensions import Self
 
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
@@ -91,7 +91,7 @@ class EmbedderConfig(HFModelConfig):
             prompts[TaskTypeEnum.sts.value] = self.sts_prompt
         return prompts if len(prompts) > 0 else None
 
-    def get_prompt(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+    def get_prompt(self, prompt_type: TaskTypeEnum | None) -> str | None:
         """Get the prompt type for the given task type.
 
         Args:
@@ -100,21 +100,17 @@ class EmbedderConfig(HFModelConfig):
         Returns:
             The prompt for the given task type.
         """
-        if prompt_type is None:
-            return self.default_prompt
-        if prompt_type == TaskTypeEnum.classification:
+        if prompt_type == TaskTypeEnum.classification and self.classification_prompt is not None:
             return self.classification_prompt
-        if prompt_type == TaskTypeEnum.cluster:
+        if prompt_type == TaskTypeEnum.cluster and self.classification_prompt is not None:
             return self.cluster_prompt
-        if prompt_type == TaskTypeEnum.query:
+        if prompt_type == TaskTypeEnum.query and self.query_prompt is not None:
             return self.query_prompt
-        if prompt_type == TaskTypeEnum.passage:
+        if prompt_type == TaskTypeEnum.passage and self.passage_prompt is not None:
             return self.passage_prompt
-        if prompt_type == TaskTypeEnum.sts:
+        if prompt_type == TaskTypeEnum.sts and self.sts_prompt is not None:
             return self.sts_prompt
-        if prompt_type == TaskTypeEnum.default:
-            return self.default_prompt
-        assert_never(prompt_type)
+        return self.default_prompt
 
 
 class CrossEncoderConfig(HFModelConfig):
