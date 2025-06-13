@@ -27,7 +27,7 @@ class OptimizationConfig(BaseModel):
 
     transformer_config: HFModelConfig = HFModelConfig()
 
-    sampler: SamplerType = "brute"
+    sampler: SamplerType = "tpe"
     """See tutorial on optuna and presets."""
 
     seed: PositiveInt = 42

@@ -138,7 +138,6 @@ pipeline_optimizer.fit(dataset, sampler="random")
 There are three hyperparameter tuning samplers available:
 
 - "random"
-- "brute"
 - "tpe"
 
 All the samplers are implemented with ![optuna](https://optuna.org/).
