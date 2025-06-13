@@ -13,11 +13,10 @@ from typing import Any
 import optuna
 import torch
 from optuna.trial import Trial
-from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.custom_types import NodeType, SearchSpaceValidationMode
 from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
@@ -63,10 +62,6 @@ class NodeOptimizer:
     def fit(
         self,
         context: Context,
-        sampler: SamplerType = "tpe",
-        n_trials: int | None = None,
-        timeout: float | None = None,
-        n_jobs: int = 1,
     ) -> None:
         """Performs the optimization process for the node.
 
@@ -82,28 +77,38 @@ class NodeOptimizer:
         """
         self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
 
-        n_trials = n_trials or 10
-
-        if sampler == "tpe":
-            sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
-        elif sampler == "random":
+        # TODO use node specific hpo_config
+        if context.hpo_config.sampler == "tpe":
+            sampler_instance = optuna.samplers.TPESampler(
+                seed=context.seed,
+                consider_prior=context.hpo_config.consider_prior,
+                prior_weight=context.hpo_config.prior_weight,
+                n_startup_trials=context.hpo_config.n_startup_trials,
+                n_ei_candidates=context.hpo_config.n_ei_candidates,
+                constant_liar=context.hpo_config.constant_liar,
+            )
+        elif context.hpo_config.sampler == "random":
             sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
-        else:
-            assert_never(sampler)
 
         study, finished_trials, n_trials = load_or_create_study(
             study_name=self.node_info.node_type,
             context=context,
             direction="maximize",
             sampler=sampler_instance,
-            n_trials=n_trials,
+            n_trials=context.hpo_config.n_trials,
         )
         self._counter = finished_trials  # zero if study is newly created
 
         optuna.logging.set_verbosity(optuna.logging.WARNING)
         obj = partial(self.objective, search_space=self.modules_search_spaces, context=context)
 
-        study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs, gc_after_trial=True, timeout=timeout)
+        study.optimize(
+            obj,
+            n_trials=n_trials,
+            n_jobs=context.hpo_config.n_jobs,
+            gc_after_trial=True,
+            timeout=context.hpo_config.timeout,
+        )
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
@@ -197,30 +202,6 @@ class NodeOptimizer:
                 msg = f"Unsupported type of param search space {name}: {param_space}"
                 raise TypeError(msg)
         return res
-
-    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int | None:
-        """Calculate the number of possible combinations in the search space.
-
-        Args:
-            search_space: The parameter search space.
-
-        Returns:
-            The number of possible combinations or None if search space is continuous.
-        """
-        n_combinations = 1
-        for param_space in search_space.values():
-            if isinstance(param_space, list):
-                n_combinations *= len(param_space)
-            elif param_space_int := self._parse_param_space(param_space, ParamSpaceInt):
-                n_combinations *= param_space_int.n_possible_values()
-            elif param_space_float := self._parse_param_space(param_space, ParamSpaceFloat):
-                n_possible_values = param_space_float.n_possible_values()
-                if n_possible_values is None:
-                    return None
-                n_combinations *= n_possible_values
-            else:
-                assert_never(param_space)
-        return n_combinations
 
     def _parse_param_space(self, param_space: dict[str, Any], space_type: type[ParamSpaceT]) -> ParamSpaceT | None:
         try:
@@ -400,7 +381,7 @@ def load_or_create_study(
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
         return (
-            optuna.create_study(
+            optuna.create_study(  # TODO add pruner?
                 study_name=study_name,
                 storage=storage_url,
                 direction=direction,
