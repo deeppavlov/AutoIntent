@@ -44,7 +44,7 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
-        sampler: SamplerType = "brute",
+        sampler: SamplerType = "tpe",
         seed: int | None = 42,
     ) -> None:
         """Initialize the pipeline optimizer.

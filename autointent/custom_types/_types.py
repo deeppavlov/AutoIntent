@@ -89,10 +89,9 @@ class Split:
     INTENTS = "intents"
 
 
-SamplerType = Literal["brute", "tpe", "random"]
+SamplerType = Literal["tpe", "random"]
 """Hyperparameter tuning strategies:
 
-- `brute`: :py:class:`optuna.samplers.BruteForceSampler`
 - `tpe`: :py:class:`optuna.samplers.TPESampler`
 - `random`: :py:class:`optuna.samplers.RandomSampler`
 """

@@ -63,7 +63,7 @@ class NodeOptimizer:
     def fit(
         self,
         context: Context,
-        sampler: SamplerType = "brute",
+        sampler: SamplerType = "tpe",
         n_trials: int | None = None,
         timeout: float | None = None,
         n_jobs: int = 1,
@@ -82,15 +82,12 @@ class NodeOptimizer:
         """
         self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
 
+        n_trials = n_trials or 10
+
         if sampler == "tpe":
             sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
-            n_trials = n_trials or 10
-        elif sampler == "brute":
-            sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
-            n_trials = None
         elif sampler == "random":
             sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
-            n_trials = n_trials or 10
         else:
             assert_never(sampler)
 
@@ -101,7 +98,7 @@ class NodeOptimizer:
             sampler=sampler_instance,
             n_trials=n_trials,
         )
-        self._counter = max(self._counter, finished_trials)
+        self._counter = finished_trials  # zero if study is newly created
 
         optuna.logging.set_verbosity(optuna.logging.WARNING)
         obj = partial(self.objective, search_space=self.modules_search_spaces, context=context)
@@ -364,8 +361,8 @@ def load_or_create_study(
     study_name: str,
     context: Context,
     sampler: optuna.samplers.BaseSampler,
+    n_trials: int,
     direction: str = "maximize",
-    n_trials: int = 10,
 ) -> tuple[optuna.Study, int, int]:
     """Load an existing study or create a new one if it doesn't exist.
 
@@ -396,7 +393,7 @@ def load_or_create_study(
             # Find the highest trial number to continue counting
             finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
-            remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
+            remaining_trials = max(0, n_trials - len(study.trials))
 
         context.load_optimization_info()
         return study, finished_trials, remaining_trials  # noqa: TRY300
