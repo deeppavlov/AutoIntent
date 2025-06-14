@@ -180,6 +180,7 @@ def decision_roc_auc(y_true: ListOfGenericLabels, y_pred: ListOfGenericLabels) -
     if y_pred_.ndim == y_true_.ndim == 1:
         return _decision_roc_auc_multiclass(y_true_, y_pred_)
     if y_pred_.ndim == y_true_.ndim == 2:  # noqa: PLR2004
+        # not working with 1 class in y_true
         return _decision_roc_auc_multilabel(y_true_, y_pred_)
     msg = "Something went wrong with labels dimensions"
     logger.error(msg)

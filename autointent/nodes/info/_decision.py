@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from typing import ClassVar
 
 from autointent.custom_types import NodeType
-from autointent.metrics import DECISION_METRICS, DecisionMetricFn
+from autointent.metrics import DECISION_METRICS, DICISION_METRICS_MULTILABEL, DecisionMetricFn
 from autointent.modules import DECISION_MODULES
 from autointent.modules.base import BaseDecision
 
@@ -22,4 +22,4 @@ class DecisionNodeInfo(NodeInfo):
 
     multiclass_available_metrics = DECISION_METRICS
 
-    multilabel_available_metrics = DECISION_METRICS
+    multilabel_available_metrics = DICISION_METRICS_MULTILABEL

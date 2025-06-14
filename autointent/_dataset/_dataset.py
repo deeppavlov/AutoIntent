@@ -94,20 +94,26 @@ class Dataset(dict[str, HFDataset]):
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_hub(cls, repo_name: str) -> "Dataset":
+    def from_hub(cls, repo_name: str, data_split: str = "default") -> "Dataset":
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
             repo_name: The name of the Hugging Face repository, like `DeepPavlov/clinc150`.
+            data_split: The name of the dataset split to load, defaults to `default`.
         """
         from ._reader import DictReader
 
-        splits = load_dataset(repo_name)
+        splits = load_dataset(repo_name, data_split)
         mapping = dict(**splits)
         if Split.INTENTS in get_dataset_config_names(repo_name):
-            mapping["intents"] = load_dataset(repo_name, Split.INTENTS)[Split.INTENTS].to_list()
+            mapping[Split.INTENTS] = load_dataset(repo_name, name=Split.INTENTS, split=Split.INTENTS).to_list()
 
-        return DictReader().read(mapping)
+        dataset = DictReader().read(mapping)
+        ds_keys = list(dataset.keys())
+        first_split = dataset[ds_keys[0]]
+        if isinstance(first_split.features[dataset.label_feature], Sequence):
+            dataset = dataset.to_multilabel()
+        return dataset
 
     def to_multilabel(self) -> "Dataset":
         """Converts dataset labels to multilabel format."""

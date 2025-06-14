@@ -256,18 +256,34 @@ class NodeOptimizer:
         filtered_search_space = []
         if is_multilabel and self.target_metric not in self.node_info.multilabel_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets.", True
+                mode,
+                f"Target metric '{self.target_metric}' is not available for multilabel datasets. "
+                f"Available metrics: {list(self.node_info.multilabel_available_metrics.keys())}",
+                True,
             )
         elif not is_multilabel and self.target_metric not in self.node_info.multiclass_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets.", True
+                mode,
+                f"Target metric '{self.target_metric}' is not available for multiclass datasets. "
+                f"Available metrics: {list(self.node_info.multiclass_available_metrics.keys())}",
+                True,
             )
 
         for metric in self.metrics:
             if is_multilabel and metric not in self.node_info.multilabel_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.", True)
+                handle_message_on_mode(
+                    mode,
+                    f"Metric '{metric}' is not available for multilabel datasets. "
+                    f"Available metrics: {list(self.node_info.multilabel_available_metrics.keys())}",
+                    True,
+                )
             elif not is_multilabel and metric not in self.node_info.multiclass_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.", True)
+                handle_message_on_mode(
+                    mode,
+                    f"Metric '{metric}' is not available for multiclass datasets. "
+                    f"Available metrics: {list(self.node_info.multiclass_available_metrics.keys())}",
+                    True,
+                )
 
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space["module_name"]

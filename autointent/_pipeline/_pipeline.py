@@ -25,7 +25,7 @@ from autointent.custom_types import (
     SearchSpacePreset,
     SearchSpaceValidationMode,
 )
-from autointent.metrics import DECISION_METRICS
+from autointent.metrics import DECISION_METRICS, DICISION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_preset, load_search_space
 
@@ -253,7 +253,8 @@ class Pipeline:
 
         if test_utterances is not None:
             predictions = self.predict(test_utterances)
-            for metric_name, metric in DECISION_METRICS.items():
+            metrics = DICISION_METRICS_MULTILABEL if context.data_handler.multilabel else DECISION_METRICS
+            for metric_name, metric in metrics.items():
                 context.optimization_info.pipeline_metrics[metric_name] = metric(
                     context.data_handler.test_labels(),
                     predictions,
