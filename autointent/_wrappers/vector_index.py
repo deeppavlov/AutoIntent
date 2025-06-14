@@ -14,7 +14,7 @@ import faiss
 import numpy as np
 import numpy.typing as npt
 
-from autointent import Embedder
+from autointent._wrappers import Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum, TokenizerConfig
 from autointent.custom_types import ListOfLabels
 

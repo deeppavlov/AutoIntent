@@ -17,8 +17,8 @@ class BaseTorchModule(nn.Module, ABC):
             path: path in file system
         """
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def load(cls, path: Path, device: str | None = None) -> Self:
         """Load torch module from disk.
 
