@@ -46,11 +46,6 @@ class CNNScorer(BaseScorer):
         self.num_filters = num_filters
         self.dropout = dropout
 
-        # Will be initialized during fit()
-        self._model: TextCNN | None = None
-        self._n_classes: int = 0
-        self._multilabel: bool = False
-
     @classmethod
     def from_context(
         cls,
@@ -78,7 +73,6 @@ class CNNScorer(BaseScorer):
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], (list, np.ndarray))  # noqa: UP038
 
         # Initialize model
         self._model = TextCNN(
@@ -100,8 +94,8 @@ class CNNScorer(BaseScorer):
         self._train_model(x_tensor, y_tensor)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
-        if self._model is None:
-            msg = "Model not trained. Call fit() first."
+        if not hasattr(self, "_model"):
+            msg = "CNNScorer is not trained. Call fit() first."
             raise ValueError(msg)
 
         x = self._model.text_to_indices(utterances)
@@ -123,12 +117,13 @@ class CNNScorer(BaseScorer):
         return np.concatenate(all_probs, axis=0) if all_probs else np.array([])
 
     def clear_cache(self) -> None:
-        self._model = None
-        torch.cuda.empty_cache()
+        if hasattr(self, "_model"):
+            del self._model
+            torch.cuda.empty_cache()
 
     def _train_model(self, x: torch.Tensor, y: torch.Tensor) -> None:
-        if self._model is None:
-            msg = "Model not initialized"
+        if not hasattr(self, "_model"):
+            msg = "CNNSCorer is not initialized"
             raise ValueError(msg)
 
         dataset = TensorDataset(x, y)
@@ -149,5 +144,4 @@ class CNNScorer(BaseScorer):
         self._model.eval()
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
-        """Return default params used in initialization."""
         return {}
