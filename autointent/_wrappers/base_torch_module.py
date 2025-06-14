@@ -12,7 +12,7 @@ class BaseTorchModule(nn.Module, ABC):
         """Dump torch module to disk.
 
         This method encapsulates all the logic of dumping module's weights and
-        hyperparameters required for initialization from disk and inference.
+        hyperparameters required for initialization from disk and nice inference.
 
         Args:
             path: path in file system
