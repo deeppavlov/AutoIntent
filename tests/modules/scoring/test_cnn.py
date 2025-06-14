@@ -21,7 +21,7 @@ def test_cnn_prediction(dataset):
         embed_dim=128,
         kernel_sizes=(3, 4, 5),
         num_filters=100,
-        dropout=0.1
+        dropout=0.1,
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -57,12 +57,7 @@ def test_cnn_cache_clearing(dataset):
     """Test that the CNN model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = CNNScorer(
-        max_seq_length=50,
-        num_train_epochs=1,
-        batch_size=8,
-        learning_rate=5e-5
-    )
+    scorer = CNNScorer(max_seq_length=50, num_train_epochs=1, batch_size=8, learning_rate=5e-5)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = ["test text"]
@@ -86,12 +81,7 @@ def test_cnn_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer = CNNScorer(
-        max_seq_length=50,
-        num_train_epochs=1,
-        batch_size=8,
-        learning_rate=5e-5
-    )
+    scorer = CNNScorer(max_seq_length=50, num_train_epochs=1, batch_size=8, learning_rate=5e-5)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -110,12 +100,7 @@ def test_cnn_scorer_dump_load(dataset):
         scorer.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = CNNScorer(
-            max_seq_length=50,
-            num_train_epochs=1,
-            batch_size=8,
-            learning_rate=5e-5
-        )
+        scorer_loaded = CNNScorer(max_seq_length=50, num_train_epochs=1, batch_size=8, learning_rate=5e-5)
         scorer_loaded = scorer_loaded.load(str(temp_dir_path))
 
         # Verify model is loaded

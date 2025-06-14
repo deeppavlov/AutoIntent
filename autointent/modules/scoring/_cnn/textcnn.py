@@ -52,21 +52,13 @@ class TextCNN(BaseTorchModule):
 
         if pretrained_embs is not None:
             _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True) # type: ignore[no-untyped-call]
+            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)  # type: ignore[no-untyped-call]
         else:
-            self.embedding = nn.Embedding(
-                num_embeddings=vocab_size,
-                embedding_dim=embed_dim,
-                padding_idx=padding_idx
-            )
+            self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embed_dim, padding_idx=padding_idx)
 
-        self.convs = nn.ModuleList([
-            nn.Conv1d(
-                in_channels=embed_dim,
-                out_channels=num_filters,
-                kernel_size=k
-            ) for k in kernel_sizes
-        ])
+        self.convs = nn.ModuleList(
+            [nn.Conv1d(in_channels=embed_dim, out_channels=num_filters, kernel_size=k) for k in kernel_sizes]
+        )
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
 
@@ -77,7 +69,7 @@ class TextCNN(BaseTorchModule):
         conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
         concatenated: torch.Tensor = torch.cat(conved, dim=1)
         dropped: torch.Tensor = self.dropout(concatenated)
-        return self.fc(dropped) # type: ignore[no-any-return]
+        return self.fc(dropped)  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:
         metadata = {
@@ -87,7 +79,7 @@ class TextCNN(BaseTorchModule):
             "kernel_sizes": self.kernel_sizes,
             "num_filters": self.num_filters,
             "dropout": self.dropout_rate,
-            "padding_idx": self.padding_idx
+            "padding_idx": self.padding_idx,
         }
         with (path / self._metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
