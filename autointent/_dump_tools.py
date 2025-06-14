@@ -7,6 +7,7 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
+from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
@@ -44,6 +45,7 @@ class Dumper:
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
     ptuning_models = "ptuning_models"
+    catboost_models = "catboost_models"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -63,6 +65,7 @@ class Dumper:
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
             path / Dumper.ptuning_models,
+            path / Dumper.catboost_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
@@ -147,6 +150,8 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
+            elif isinstance(val, CatBoostClassifier):
+                val.save_model(str(path / Dumper.catboost_models / "model.cbm"), format="cbm")
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -248,6 +253,9 @@ class Dumper:
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
+            elif child.name == Dumper.catboost_models:
+                cat_model = CatBoostClassifier(str(path / Dumper.catboost_models / "model.cbm"))
+                cat_model.load_model()
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
