@@ -23,7 +23,7 @@ class TextCNNDumpMetadata(TypedDict):
     padding_idx: int
     vocab: dict[str, int]
     max_seq_length: int
-    vocab: dict[str, int]
+    max_vocab_size: int | None
 
 
 class TextCNN(BaseTorchModule):
@@ -115,7 +115,7 @@ class TextCNN(BaseTorchModule):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
-        if self._vocab is None:
+        if not hasattr(self, "_vocab"):
             msg = "Model not initialized. Call build_vocab() first."
             raise ValueError(msg)
 

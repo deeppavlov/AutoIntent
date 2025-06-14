@@ -33,10 +33,9 @@ class BaseTorchModule(nn.Module, ABC):
             device: torch notation for CPU, CUDA, MPS, etc. By default, it is inferred automatically.
         """
 
-
     @property
     def device(self) -> torch.device:
         """Torch device object where this module resides."""
         if not hasattr(self, "_device"):
-            self._device =  next(self.parameters()).device
+            self._device = next(self.parameters()).device
         return self._device

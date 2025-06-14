@@ -100,8 +100,7 @@ def test_cnn_scorer_dump_load(dataset):
         scorer.dump(str(temp_dir_path))
 
         # Create a new scorer and load saved model
-        scorer_loaded = CNNScorer(max_seq_length=50, num_train_epochs=1, batch_size=8, learning_rate=5e-5)
-        scorer_loaded = scorer_loaded.load(str(temp_dir_path))
+        scorer_loaded = CNNScorer.load(str(temp_dir_path))
 
         # Verify model is loaded
         assert hasattr(scorer_loaded, "_model")
