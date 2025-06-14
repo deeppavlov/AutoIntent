@@ -18,12 +18,7 @@ class EmissionsTrackerCallback(OptimizerCallback):
     current_module_name: str | None = None
 
     def __init__(self) -> None:
-        """Initialize the emission tracker.
-
-        Args:
-            project_name: Name of the project to track emissions for.
-            measure_power_secs: How often to measure power consumption in seconds.
-        """
+        """Initialize the emission tracker."""
         try:
             from codecarbon import EmissionsTracker
         except ImportError as e:
@@ -32,7 +27,6 @@ class EmissionsTrackerCallback(OptimizerCallback):
                 "Please install it with `pip install codecarbon`."
             )
             raise ImportError(msg) from e
-        self.tracker: EmissionsTracker | None = None
         self.emission_tracker = EmissionsTracker
         logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
 
