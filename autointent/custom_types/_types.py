@@ -73,7 +73,7 @@ class NodeType(str, Enum):
     decision = "decision"
 
 
-class Split(str, Enum):
+class Split:
     """Enumeration of data splits in the AutoIntent framework.
 
     Attributes:
