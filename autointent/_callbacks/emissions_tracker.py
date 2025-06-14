@@ -24,11 +24,10 @@ class EmissionsTrackerCallback(OptimizerCallback):
         except ImportError as e:
             msg = (
                 "EmissionsTrackerCallback requires the codecarbon package to be installed. "
-                "Please install it with `pip install codecarbon`."
+                "Please install it with `pip install autointent[codecarbon]`."
             )
             raise ImportError(msg) from e
         self.emission_tracker = EmissionsTracker
-        logger.info("Emissions tracking is enabled via TRACK_EMISSIONS environment variable")
 
     def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:  # noqa: ARG002
         """Start tracking emissions for the entire run.
@@ -81,7 +80,7 @@ class EmissionsTrackerCallback(OptimizerCallback):
         emissions_data_dict = {
             f"emissions/{k}": v for k, v in emissions_data_json.items() if isinstance(v, int | float)
         }
-        return emissions_data_dict | metrics
+        return {"emissions": emissions_data_dict} | metrics
 
     def log_value(self, **kwargs: dict[str, Any]) -> None:
         pass
