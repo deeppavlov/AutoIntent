@@ -67,15 +67,14 @@ class OptimizerCallback(ABC):
             metrics: Final metrics.
         """
 
-    @abstractmethod
     def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
         """Update metrics during training.
 
         Args:
             metrics: Metrics to update.
         """
+        return metrics
 
-    @abstractmethod
     def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
         """Update final metrics.
 
@@ -85,3 +84,4 @@ class OptimizerCallback(ABC):
         Returns:
             Updated final metrics.
         """
+        return metrics

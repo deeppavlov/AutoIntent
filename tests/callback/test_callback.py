@@ -42,6 +42,14 @@ class DummyCallback(OptimizerCallback):
     def log_final_metrics(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("log_final_metrics", kwargs))
 
+    def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        self.history.append(("update_metrics", metrics))
+        return metrics
+
+    def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        self.history.append(("update_final_metrics", metrics))
+        return metrics
+
 
 def test_pipeline_callbacks(dataset):
     project_dir = setup_environment()
