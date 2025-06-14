@@ -128,3 +128,19 @@ def test_dump_modules(dataset, task_type):
     context.dump()
 
     assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    ["multiclass", "multilabel"],
+)
+def test_optimization_validation_metric_names(dataset, task_type):
+    search_space = get_search_space(task_type)
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    if task_type == "multiclass":
+        dataset = dataset.to_multilabel()
+
+    with pytest.raises(ValueError, match="Target metric .*"):
+        pipeline_optimizer.fit(dataset, incompatible_search_space="raise")

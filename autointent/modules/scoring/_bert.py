@@ -1,28 +1,76 @@
 """BertScorer class for transformer-based classification."""
 
 import tempfile
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 import torch
-from datasets import Dataset
+from datasets import Dataset, DatasetDict
+from sklearn.model_selection import train_test_split
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
+    EarlyStoppingCallback,
+    EvalPrediction,
     Trainer,
     TrainingArguments,
 )
+from transformers.trainer_callback import TrainerCallback
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import HFModelConfig
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.custom_types import ListOfLabels
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
 
 
 class BertScorer(BaseScorer):
+    """Scoring module for transformer-based classification using BERT models.
+
+    This module uses a transformer model (like BERT) to perform intent classification.
+    It supports both multiclass and multilabel classification tasks, with options for
+    early stopping and various training configurations.
+
+    Args:
+        classification_model_config: Config of the transformer model (HFModelConfig, str, or dict)
+        num_train_epochs: Number of training epochs (default: 3)
+        batch_size: Batch size for training (default: 8)
+        learning_rate: Learning rate for training (default: 5e-5)
+        seed: Random seed for reproducibility (default: 0)
+        report_to: Reporting tool for training logs (e.g., "wandb", "tensorboard")
+        early_stopping_config: Configuration for early stopping during training
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules import BertScorer
+
+        # Initialize scorer with BERT model
+        scorer = BertScorer(
+            classification_model_config="bert-base-uncased",
+            num_train_epochs=3,
+            batch_size=8,
+            learning_rate=5e-5,
+            seed=42
+        )
+
+        # Training data
+        utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+        labels = [1, 0, 1, 0]
+
+        # Fit the model
+        scorer.fit(utterances, labels)
+
+        # Make predictions
+        test_utterances = ["Good product", "Not worth it"]
+        probabilities = scorer.predict(test_utterances)
+    """
+
     name = "bert"
     supports_multiclass = True
     supports_multilabel = True
@@ -37,6 +85,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        early_stopping_config: EarlyStoppingConfig | None = None,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -44,6 +93,7 @@ class BertScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
+        self.early_stopping_config = early_stopping_config or EarlyStoppingConfig()
 
     @classmethod
     def from_context(
@@ -54,6 +104,7 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
+        early_stopping_config: EarlyStoppingConfig | None = None,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -67,6 +118,7 @@ class BertScorer(BaseScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
+            early_stopping_config=early_stopping_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -90,22 +142,79 @@ class BertScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        if hasattr(self, "_model"):
-            self.clear_cache()
         self._validate_task(labels)
 
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
-
         self._model = self._initialize_model()
+        tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
+        self._train(tokenized_dataset)
 
-        use_cpu = self.classification_model_config.device == "cpu"
+        self._model.eval()
+
+    def _train(self, tokenized_dataset: DatasetDict) -> None:
+        """Perform training with Hugging Face Trainer API.
+
+        Args:
+            tokenized_dataset: output from :py:meth:`BertScorer._get_tokenized_dataset`
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            training_args = TrainingArguments(
+                output_dir=tmp_dir,
+                num_train_epochs=self.num_train_epochs,
+                per_device_train_batch_size=self.batch_size,
+                learning_rate=self.learning_rate,
+                seed=self.seed,
+                save_strategy="epoch",
+                eval_strategy="epoch",
+                logging_strategy="steps",
+                logging_steps=10,
+                report_to=self.report_to if self.report_to is not None else "none",
+                use_cpu=self.classification_model_config.device == "cpu",
+                metric_for_best_model=self.early_stopping_config.metric,
+                load_best_model_at_end=self.early_stopping_config.metric is not None,
+            )
+
+            trainer = Trainer(  # type: ignore[no-untyped-call]
+                model=self._model,
+                args=training_args,
+                train_dataset=tokenized_dataset["train"],
+                eval_dataset=tokenized_dataset["validation"],
+                processing_class=self._tokenizer,
+                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
+                compute_metrics=self._get_compute_metrics(),
+                callbacks=self._get_trainer_callbacks(),
+            )
+
+            trainer.train()  # type: ignore[attr-defined]
+
+    def _get_trainer_callbacks(self) -> list[TrainerCallback]:
+        res: list[TrainerCallback] = []
+        if self.early_stopping_config.metric is not None:
+            res.append(
+                EarlyStoppingCallback(
+                    early_stopping_patience=self.early_stopping_config.patience,
+                    early_stopping_threshold=self.early_stopping_config.threshold,
+                )
+            )
+        return res
+
+    def _get_tokenized_dataset(self, utterances: list[str], labels: ListOfLabels) -> DatasetDict:
+        """Build tokenized dataset with "train" and "validation" splits."""
+        train_utterances, val_utterances, train_labels, val_labels = train_test_split(
+            utterances, labels, test_size=self.early_stopping_config.val_fraction
+        )
 
         def tokenize_function(examples: dict[str, Any]) -> dict[str, Any]:
             return self._tokenizer(  # type: ignore[no-any-return]
                 examples["text"], return_tensors="pt", **self.classification_model_config.tokenizer_config.model_dump()
             )
 
-        dataset = Dataset.from_dict({"text": utterances, "labels": labels})
+        dataset = DatasetDict(
+            {
+                "train": Dataset.from_dict({"text": train_utterances, "labels": train_labels}),
+                "validation": Dataset.from_dict({"text": val_utterances, "labels": val_labels}),
+            }
+        )
 
         if self._multilabel:
             # hugging face uses F.binary_cross_entropy_with_logits under the hood
@@ -114,33 +223,25 @@ class BertScorer(BaseScorer):
                 lambda example: {"label": torch.tensor(example["labels"], dtype=torch.float)}, remove_columns="labels"
             )
 
-        tokenized_dataset = dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
+        return dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            training_args = TrainingArguments(
-                output_dir=tmp_dir,
-                num_train_epochs=self.num_train_epochs,
-                per_device_train_batch_size=self.batch_size,
-                learning_rate=self.learning_rate,
-                seed=self.seed,
-                save_strategy="no",
-                logging_strategy="steps",
-                logging_steps=10,
-                report_to=self.report_to if self.report_to is not None else "none",
-                use_cpu=use_cpu,
-            )
+    def _get_compute_metrics(self) -> Callable[[EvalPrediction], dict[str, float]] | None:
+        """Construct callable for computing metrics during transformer training.
 
-            trainer = Trainer(  # type: ignore[no-untyped-call]
-                model=self._model,
-                args=training_args,
-                train_dataset=tokenized_dataset,
-                tokenizer=self._tokenizer,
-                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
-            )
+        The result of this function is supposed to pass to :py:class:`transformers.Trainer`.
+        """
+        if self.early_stopping_config.metric is None:
+            return None
 
-            trainer.train()  # type: ignore[attr-defined]
+        metric_name = self.early_stopping_config.metric
+        metric_fn = (SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS)[metric_name]
 
-        self._model.eval()
+        def compute_metrics(output: EvalPrediction) -> dict[str, float]:
+            return {
+                metric_name: metric_fn(output.label_ids.tolist(), output.predictions.tolist())  # type: ignore[union-attr]
+            }
+
+        return compute_metrics
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model") or not hasattr(self, "_tokenizer"):

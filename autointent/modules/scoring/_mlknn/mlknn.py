@@ -125,9 +125,6 @@ class MLKnnScorer(BaseScorer):
             TypeError: If the labels are not multi-label
             ValueError: If the vector index mismatches the provided utterances
         """
-        if hasattr(self, "_vector_index"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         self._vector_index = VectorIndex(
@@ -249,7 +246,14 @@ class MLKnnScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""
-        self._vector_index.clear_ram()
+        if hasattr(self, "_vector_index"):
+            self._vector_index.clear_ram()
+            delattr(self, "_prior_prob_true")
+            delattr(self, "_prior_prob_false")
+            delattr(self, "_cond_prob_true")
+            delattr(self, "_cond_prob_false")
+            delattr(self, "_features")
+            delattr(self, "_labels")
 
     def _predict(
         self,

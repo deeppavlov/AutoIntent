@@ -72,7 +72,16 @@ class StratifiedSplitter:
             ValueError: If OOS samples are present but allow_oos_in_train is not specified.
         """
         if not self._has_oos_samples(dataset):
-            return self._split_without_oos(dataset, multilabel, self.test_size)
+            train, test = self._split_without_oos(dataset, multilabel, self.test_size)
+            if self.is_few_shot:
+                train, test = create_few_shot_split(
+                    train,
+                    test,
+                    multilabel=multilabel,
+                    label_column=self.label_feature,
+                    examples_per_label=self.examples_per_label,
+                )
+            return train, test
         if allow_oos_in_train is None:
             msg = (
                 "Error while splitting dataset. It contains OOS samples, "

@@ -136,7 +136,7 @@ def test_pipeline_callbacks(dataset):
                 "module_kwargs": {
                     "embedder_config": {
                         "batch_size": 32,
-                        "classifier_prompt": None,
+                        "classification_prompt": None,
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,
@@ -173,7 +173,7 @@ def test_pipeline_callbacks(dataset):
                 "module_kwargs": {
                     "embedder_config": {
                         "batch_size": 32,
-                        "classifier_prompt": None,
+                        "classification_prompt": None,
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,
@@ -210,7 +210,7 @@ def test_pipeline_callbacks(dataset):
                 "module_kwargs": {
                     "embedder_config": {
                         "batch_size": 32,
-                        "classifier_prompt": None,
+                        "classification_prompt": None,
                         "cluster_prompt": None,
                         "default_prompt": None,
                         "device": None,

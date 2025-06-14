@@ -17,3 +17,7 @@ class NodeInfo:
     """Available modules for the node."""
     node_type: NodeType
     """Node type."""
+    multiclass_available_metrics: ClassVar[Mapping[str, METRIC_FN]]
+    """Available metrics for multiclass classification."""
+    multilabel_available_metrics: ClassVar[Mapping[str, METRIC_FN]]
+    """Available metrics for multilabel classification."""

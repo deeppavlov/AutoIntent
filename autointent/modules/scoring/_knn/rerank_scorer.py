@@ -109,18 +109,16 @@ class RerankScorer(KNNScorer):
             utterances: List of utterances to fit the scorer
             labels: List of labels corresponding to the utterances
         """
-        if hasattr(self, "_scorer"):
-            self.clear_cache()
-
         self._scorer = Ranker(self.cross_encoder_config, output_range="tanh")
         self._scorer.fit(utterances, labels)
 
-        super().fit(utterances, labels, clear_cache=False)
+        super().fit(utterances, labels)
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the scorer and vector index."""
-        self._scorer.clear_ram()
-        super().clear_cache()
+        if hasattr(self, "_scorer"):
+            self._scorer.clear_ram()
+            super().clear_cache()
 
     def _predict(self, utterances: list[str]) -> tuple[npt.NDArray[Any], list[list[str]]]:
         """Predict the scores and neighbors for given utterances.

@@ -188,10 +188,14 @@ class Embedder:
         Returns:
             A numpy array of embeddings.
         """
+        prompt = self.config.get_prompt(task_type)
+
         if self.config.use_cache:
             hasher = Hasher()
             hasher.update(self)
             hasher.update(utterances)
+            if prompt:
+                hasher.update(prompt)
 
             embeddings_path = _get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
@@ -200,11 +204,12 @@ class Embedder:
         self._load_model()
 
         logger.debug(
-            "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s",
+            "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s, prompt=%s",
             self.config.model_name,
             self.config.batch_size,
             str(self.config.tokenizer_config.max_length),
             self.config.device,
+            prompt,
         )
 
         if self.config.tokenizer_config.max_length is not None:
@@ -215,7 +220,7 @@ class Embedder:
             convert_to_numpy=True,
             batch_size=self.config.batch_size,
             normalize_embeddings=True,
-            prompt=self.config.get_prompt_type(task_type),
+            prompt=prompt,
         )
 
         if self.config.use_cache:

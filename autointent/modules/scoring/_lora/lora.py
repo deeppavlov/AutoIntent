@@ -8,7 +8,7 @@ from peft import LoraConfig, get_peft_model
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
-from autointent.configs import HFModelConfig
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 
@@ -71,6 +71,9 @@ class BERTLoRAScorer(BertScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
+        # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
+        early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
+
         super().__init__(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
@@ -78,6 +81,7 @@ class BERTLoRAScorer(BertScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=report_to,
+            early_stopping_config=early_stopping_config,
         )
         self._lora_config = LoraConfig(**lora_kwargs)
 

@@ -131,16 +131,16 @@ class NodeOptimizer:
         module = self.node_info.modules_available[module_name].from_context(context, **config)
         config.update(module.get_implicit_initialization_params())
 
-        context.callback_handler.start_module(module_name=module_name, num=self._counter, module_kwargs=config)
+        context.callback_handler.start_module(module_name=module.trial_name, num=self._counter, module_kwargs=config)
 
         self._logger.debug("Scoring %s module...", module_name)
 
         self.emissions_tracker.start_task("module_scoring")
-        final_metrics = module.score(context, metrics=self.metrics)
+        quality_metrics = module.score(context, metrics=self.metrics)
         emissions_metrics = self.emissions_tracker.stop_task()
-        all_metrics = {**final_metrics, **emissions_metrics}
+        all_metrics = {**quality_metrics, **emissions_metrics}
 
-        target_metric = final_metrics[self.target_metric]
+        target_metric = quality_metrics[self.target_metric]
 
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
@@ -151,7 +151,7 @@ class NodeOptimizer:
             module_params=config,
             metric_value=target_metric,
             metric_name=self.target_metric,
-            metrics=final_metrics,
+            metrics=quality_metrics,
             artifact=module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir=self.get_module_dump_dir(context, module_name, self._counter),
             module=module,
@@ -241,7 +241,7 @@ class NodeOptimizer:
         dump_dir_.mkdir(parents=True, exist_ok=True)
         return str(dump_dir_)
 
-    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
+    def validate_nodes_with_dataset(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:  # noqa: C901
         """Validates nodes against the dataset.
 
         Args:
@@ -254,12 +254,24 @@ class NodeOptimizer:
         is_multilabel = dataset.multilabel
 
         filtered_search_space = []
+        if is_multilabel and self.target_metric not in self.node_info.multilabel_available_metrics:
+            handle_message_on_mode(
+                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets.", True
+            )
+        elif not is_multilabel and self.target_metric not in self.node_info.multiclass_available_metrics:
+            handle_message_on_mode(
+                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets.", True
+            )
+
+        for metric in self.metrics:
+            if is_multilabel and metric not in self.node_info.multilabel_available_metrics:
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.", True)
+            elif not is_multilabel and metric not in self.node_info.multiclass_available_metrics:
+                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.", True)
 
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space["module_name"]
             module = self.node_info.modules_available[module_name]
-            # todo add check for oos
-
             messages = []
 
             if module_name == "description" and not dataset.has_descriptions:
@@ -273,11 +285,7 @@ class NodeOptimizer:
 
             if len(messages) > 0:
                 msg = "\n".join(messages)
-                if mode == "raise":
-                    self._logger.error(msg)
-                    raise ValueError(msg)
-                if mode == "warning":
-                    self._logger.warning(msg)
+                handle_message_on_mode(mode, msg)
             else:
                 filtered_search_space.append(search_space)
 
@@ -393,3 +401,26 @@ def load_or_create_study(
             finished_trials,
             remaining_trials,
         )
+
+
+def handle_message_on_mode(
+    mode: SearchSpaceValidationMode,
+    message: str,
+    strict: bool = False,
+) -> None:
+    """Handle messages based on the validation mode.
+
+    Args:
+        mode: The validation mode ("raise" or "warning").
+        message: The message to handle.
+        strict: If True always raises an error, even if mode is "warning".
+
+    Raises:
+        ValueError: If mode is "raise".
+    """
+    if mode == "raise":
+        raise ValueError(message)
+    if mode == "warning":
+        logger.warning(message)
+    if strict:
+        raise ValueError(message)

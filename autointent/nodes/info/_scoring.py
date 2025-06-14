@@ -19,3 +19,6 @@ class ScoringNodeInfo(NodeInfo):
     modules_available: ClassVar[Mapping[str, type[BaseScorer]]] = SCORING_MODULES
 
     node_type = NodeType.scoring
+
+    multiclass_available_metrics: ClassVar[Mapping[str, ScoringMetricFn]] = SCORING_METRICS_MULTICLASS
+    multilabel_available_metrics: ClassVar[Mapping[str, ScoringMetricFn]] = SCORING_METRICS_MULTILABEL

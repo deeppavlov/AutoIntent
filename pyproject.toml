@@ -10,7 +10,6 @@ authors = [
 maintainers = [
     { name = "Alexeev Ilya", email = "ilya_alekseev_2016@list.ru" },
     { name = "Solomatin Roman", email = "risolomatin@gmail.com" },
-    { name = "Sergeenko Egor", email = "es.egor.sergeenko@gmail.com" },
 ]
 readme = "README.md"
 keywords = ["nlp", "dialog-systems", "transformers", "auto-ml"]
@@ -196,7 +195,6 @@ warn_unreachable = true
 local_partial_types = true
 plugins = [
     "pydantic.mypy",
-    "numpy.typing.mypy_plugin",
 ]
 mypy_path = "autointent"
 disable_error_code = ["override"]
