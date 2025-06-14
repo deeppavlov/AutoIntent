@@ -7,8 +7,6 @@ from typing_extensions import Self
 
 
 class BaseTorchModule(nn.Module, ABC):
-    _device: torch.device
-
     @abstractmethod
     def dump(self, path: Path) -> None:
         """Dump torch module to disk.
@@ -36,6 +34,4 @@ class BaseTorchModule(nn.Module, ABC):
     @property
     def device(self) -> torch.device:
         """Torch device object where this module resides."""
-        if not hasattr(self, "_device"):
-            self._device = next(self.parameters()).device
-        return self._device
+        return next(self.parameters()).device

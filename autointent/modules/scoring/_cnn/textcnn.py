@@ -141,16 +141,24 @@ class TextCNN(BaseTorchModule):
         with (path / self._metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
 
+        # Move model to CPU before saving state dict
+        device = self.device
+        self.cpu()
         torch.save(self.state_dict(), path / self._state_dict_name)
+        self.to(device)  # Move back to original device
 
     @classmethod
     def load(cls, path: Path, device: str | None = None) -> "TextCNN":
         with (path / cls._metadata_dict_name).open() as file:
             metadata: TextCNNDumpMetadata = json.load(file)
         device = device or detect_device()
+
+        # Create instance and load state dict on CPU
         instance = cls(**metadata)
-        instance = instance.to(device)  # Move to device before loading state dict
-        state_dict = torch.load(path / cls._state_dict_name, map_location=device)
+        state_dict = torch.load(path / cls._state_dict_name, map_location="cpu")
         instance.load_state_dict(state_dict)
+
+        # Move to target device after loading
+        instance = instance.to(device)
         instance.eval()
         return instance
