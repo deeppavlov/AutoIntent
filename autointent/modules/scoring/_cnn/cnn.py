@@ -33,9 +33,9 @@ class CNNScorer(BaseScorer):
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
         embed_dim: int = 128,
-        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
+        kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
-        dropout: float = 0.1
+        dropout: float = 0.1,
     ) -> None:
         self.max_seq_length = max_seq_length
         self.num_train_epochs = num_train_epochs
@@ -67,9 +67,9 @@ class CNNScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         embed_dim: int = 128,
-        kernel_sizes: list[int] = [3, 4, 5], # noqa: B006
+        kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
-        dropout: float = 0.1
+        dropout: float = 0.1,
     ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
@@ -80,12 +80,12 @@ class CNNScorer(BaseScorer):
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,
             num_filters=num_filters,
-            dropout=dropout
+            dropout=dropout,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         self._validate_task(labels)
-        self._multilabel = isinstance(labels[0], (list, np.ndarray)) # noqa: UP038
+        self._multilabel = isinstance(labels[0], (list, np.ndarray))  # noqa: UP038
 
         # Build vocabulary and tokenize
         self._build_vocab(utterances)
@@ -93,9 +93,7 @@ class CNNScorer(BaseScorer):
         # Convert text to padded indices
         x = self._text_to_indices(utterances)
         x_tensor = torch.tensor(x, dtype=torch.long)
-        y_tensor = torch.tensor(
-            labels, dtype=torch.long if not self._multilabel else torch.float
-        )
+        y_tensor = torch.tensor(labels, dtype=torch.long if not self._multilabel else torch.float)
 
         # Initialize model
         if self._vocab is None:
@@ -109,7 +107,7 @@ class CNNScorer(BaseScorer):
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,
             dropout=self.dropout,
-            padding_idx=self._pad_idx
+            padding_idx=self._pad_idx,
         )
 
         # Training
@@ -184,9 +182,7 @@ class CNNScorer(BaseScorer):
         dataset = TensorDataset(x, y)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
-        criterion = (
-            nn.CrossEntropyLoss() if not self._multilabel else nn.BCEWithLogitsLoss()
-        )
+        criterion = nn.CrossEntropyLoss() if not self._multilabel else nn.BCEWithLogitsLoss()
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self.learning_rate)
 
         self._model.train()
@@ -202,15 +198,4 @@ class CNNScorer(BaseScorer):
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Return default params used in initialization."""
-        return {
-            "max_seq_length": self.max_seq_length,
-            "num_train_epochs": self.num_train_epochs,
-            "batch_size": self.batch_size,
-            "learning_rate": self.learning_rate,
-            "seed": self.seed,
-            "report_to": self.report_to,
-            "embed_dim": self.embed_dim,
-            "kernel_sizes": self.kernel_sizes,
-            "num_filters": self.num_filters,
-            "dropout": self.dropout
-        }
+        return {}

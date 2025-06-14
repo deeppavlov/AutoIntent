@@ -1,12 +1,32 @@
 """TextCNN model for text classification."""
 
+import json
+from pathlib import Path
+from typing import TypedDict
+
 import torch
 import torch.nn.functional as F  # noqa: N812
 from torch import nn
 
+from autointent._utils import detect_device
+from autointent._wrappers import BaseTorchModule
 
-class TextCNN(nn.Module):
+
+class TextCNNDumpMetadata(TypedDict):
+    vocab_size: int
+    n_classes: int
+    embed_dim: int
+    kernel_sizes: list[int]
+    num_filters: int
+    dropout: float
+    padding_idx: int
+
+
+class TextCNN(BaseTorchModule):
     """TextCNN model implementation."""
+
+    _metadata_dict_name = "metadata.json"
+    _state_dict_name = "state_dict.pt"
 
     def __init__(
         self,
@@ -59,17 +79,8 @@ class TextCNN(nn.Module):
         dropped: torch.Tensor = self.dropout(concatenated)
         return self.fc(dropped) # type: ignore[no-any-return]
 
-    def load(self, model_path: str) -> None:
-        """Load model from saved state.
-
-        Args:
-            model_path: Path to the saved model state dictionary.
-        """
-        state_dict = torch.load(model_path)
-        self.load_state_dict(state_dict)
-
-    def get_config(self) -> dict[str, int | list[int] | torch.Tensor | float | None]:
-        return {
+    def dump(self, path: Path) -> None:
+        metadata = {
             "vocab_size": self.vocab_size,
             "n_classes": self.n_classes,
             "embed_dim": self.embed_dim,
@@ -78,3 +89,18 @@ class TextCNN(nn.Module):
             "dropout": self.dropout_rate,
             "padding_idx": self.padding_idx
         }
+        with (path / self._metadata_dict_name).open("w") as file:
+            json.dump(metadata, file, indent=4)
+
+        torch.save(self.state_dict(), path / self._state_dict_name)
+
+    @classmethod
+    def load(cls, path: Path, device: str | None = None) -> "TextCNN":
+        with (path / cls._metadata_dict_name).open() as file:
+            metadata: TextCNNDumpMetadata = json.load(file)
+        instance = cls(**metadata)
+        state_dict = torch.load(path / cls._state_dict_name)
+        instance.load_state_dict(state_dict)
+        device = device or detect_device()
+        instance.eval().to(device)
+        return instance

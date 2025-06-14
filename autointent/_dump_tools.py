@@ -7,7 +7,6 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
-import torch
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
@@ -21,6 +20,7 @@ from transformers import (  # type: ignore[attr-defined]
 )
 
 from autointent import Embedder, Ranker, VectorIndex
+from autointent._wrappers import BaseTorchModule
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
@@ -46,7 +46,6 @@ class Dumper:
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
     torch_models = "torch_models"
-    containers = "containers"
     ptuning_models = "ptuning_models"
 
     @staticmethod
@@ -67,7 +66,6 @@ class Dumper:
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
             path / Dumper.torch_models,
-            path / Dumper.containers,
             path / Dumper.ptuning_models,
         ]
         for subdir in subdirectories:
@@ -148,20 +146,17 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
-            elif isinstance(val, nn.Module):
+            elif isinstance(val, BaseTorchModule):
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
-                    torch.save(val.state_dict(), model_path / "model.pt")
                     class_info = {
                         "module": val.__class__.__module__,
                         "name": val.__class__.__name__,
                     }
-                    # Save configuration if available
-                    if hasattr(val, "get_config"):
-                        class_info["config"] = val.get_config()  # type: ignore[operator]
                     with (model_path / "class_info.json").open("w") as f:
                         json.dump(class_info, f)
+                    val.dump(model_path)
                 except Exception as e:
                     msg = f"Error dumping torch model {key}: {e}"
                     logger.exception(msg)
@@ -179,9 +174,6 @@ class Dumper:
 
         with (path / Dumper.simple_attrs).open("w") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
-
-        with (path / Dumper.containers / "containers.json").open("w") as f:
-            json.dump(containers, f, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
 
@@ -204,7 +196,6 @@ class Dumper:
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
         torch_models: dict[str, Any] = {}
-        containers: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -260,7 +251,7 @@ class Dumper:
             elif child.name == Dumper.ptuning_models:
                 for model_dir in child.iterdir():
                     try:
-                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model") # type: ignore[no-untyped-call]
+                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")  # type: ignore[no-untyped-call]
                         hf_models[model_dir.name] = PeftModel.from_pretrained(model, model_dir / "peft")
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading PeftModel {model_dir.name}: {e}"
@@ -268,7 +259,7 @@ class Dumper:
             elif child.name == Dumper.hf_models:
                 for model_dir in child.iterdir():
                     try:
-                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir) # type: ignore[no-untyped-call]
+                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)  # type: ignore[no-untyped-call]
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)
@@ -284,24 +275,12 @@ class Dumper:
                     for model_dir in child.iterdir():
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
-                        module = __import__(class_info["module"], fromlist=[class_info["name"]])
-                        model_class = getattr(module, class_info["name"])
-                        config = class_info.get("config", {})
-                        # Initialize model with config if available
-                        model = model_class(**config)
-                        model.load_state_dict(torch.load(model_dir / "model.pt"))
-                        model.eval()
+                        module = importlib.import_module(class_info["module"])
+                        model_class: BaseTorchModule = getattr(module, class_info["name"])
+                        model = model_class.load(path)
                         torch_models[model_dir.name] = model
                 except Exception as e:
                     msg = f"Error loading torch model {model_dir.name}: {e}"
-                    logger.exception(msg)
-            elif child.name == Dumper.containers:
-                try:
-                    for container_file in child.iterdir():
-                        with container_file.open("r") as f:
-                            containers = json.load(f)
-                except Exception as e:
-                    msg = f"Error loading containers: {e}"
                     logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
@@ -319,5 +298,4 @@ class Dumper:
             | hf_models
             | hf_tokenizers
             | torch_models
-            | containers
         )

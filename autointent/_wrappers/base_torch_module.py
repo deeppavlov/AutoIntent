@@ -27,5 +27,5 @@ class BaseTorchModule(nn.Module, ABC):
 
         Args:
             path: path in file system
-            device: torch notation for CPU, CUDA, MPS, etc.
+            device: torch notation for CPU, CUDA, MPS, etc. By default, it is inferred automatically.
         """
