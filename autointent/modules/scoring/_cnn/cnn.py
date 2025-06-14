@@ -1,7 +1,5 @@
 """CNNScorer class for scoring."""
 
-import re
-from collections import Counter
 from typing import Any
 
 import numpy as np
@@ -50,11 +48,6 @@ class CNNScorer(BaseScorer):
 
         # Will be initialized during fit()
         self._model: TextCNN | None = None
-        self._vocab: dict[str, int] | None = None
-        self._unk_token = "<UNK>"  # noqa: S105
-        self._pad_token = "<PAD>"  # noqa: S105
-        self._unk_idx = 1
-        self._pad_idx = 0
         self._n_classes: int = 0
         self._multilabel: bool = False
 
@@ -87,28 +80,21 @@ class CNNScorer(BaseScorer):
         self._validate_task(labels)
         self._multilabel = isinstance(labels[0], (list, np.ndarray))  # noqa: UP038
 
-        # Build vocabulary and tokenize
-        self._build_vocab(utterances)
-
-        # Convert text to padded indices
-        x = self._text_to_indices(utterances)
-        x_tensor = torch.tensor(x, dtype=torch.long)
-        y_tensor = torch.tensor(labels, dtype=torch.long if not self._multilabel else torch.float)
-
         # Initialize model
-        if self._vocab is None:
-            msg = "Vocabulary not built"
-            raise ValueError(msg)
-
         self._model = TextCNN(
-            vocab_size=len(self._vocab),
             n_classes=self._n_classes,
             embed_dim=self.embed_dim,
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,
             dropout=self.dropout,
-            padding_idx=self._pad_idx,
+            max_seq_length=self.max_seq_length,
         )
+
+        # Build vocabulary and convert text to indices
+        self._model.build_vocab(utterances)
+        x = self._model.text_to_indices(utterances)
+        x_tensor = torch.tensor(x, dtype=torch.long)
+        y_tensor = torch.tensor(labels, dtype=torch.long if not self._multilabel else torch.float)
 
         # Training
         self._train_model(x_tensor, y_tensor)
@@ -118,8 +104,8 @@ class CNNScorer(BaseScorer):
             msg = "Model not trained. Call fit() first."
             raise ValueError(msg)
 
-        x = self._text_to_indices(utterances)
-        x_tensor = torch.tensor(x, dtype=torch.long)
+        x = self._model.text_to_indices(utterances)
+        x_tensor = torch.tensor(x, dtype=torch.long, device=self._model.device)
 
         self._model.eval()
         all_probs: list[npt.NDArray[Any]] = []
@@ -135,40 +121,6 @@ class CNNScorer(BaseScorer):
                 all_probs.append(probs)
 
         return np.concatenate(all_probs, axis=0) if all_probs else np.array([])
-
-    def _build_vocab(self, utterances: list[str]) -> None:
-        """Build vocabulary from training utterances."""
-        word_counts: Counter[str] = Counter()
-        for utterance in utterances:
-            words = re.findall(r"\w+", utterance.lower())
-            word_counts.update(words)
-
-        # Create vocabulary with special tokens
-        self._vocab = {self._pad_token: self._pad_idx, self._unk_token: self._unk_idx}
-
-        # Convert Counter to list of (word, count) tuples sorted by frequency
-        sorted_words = word_counts.most_common()
-        for word, _ in sorted_words:
-            if word not in self._vocab:
-                self._vocab[word] = len(self._vocab)
-
-    def _text_to_indices(self, utterances: list[str]) -> list[list[int]]:
-        """Convert utterances to padded sequences of word indices."""
-        if self._vocab is None:
-            msg = "Vocabulary not built"
-            raise ValueError(msg)
-
-        sequences: list[list[int]] = []
-        for utterance in utterances:
-            words = re.findall(r"\w+", utterance.lower())
-            # Convert words to indices, using UNK for unknown words
-            seq = [self._vocab.get(word, self._unk_idx) for word in words]
-            # Truncate if too long
-            seq = seq[: self.max_seq_length]
-            # Pad if too short
-            seq = seq + [self._pad_idx] * (self.max_seq_length - len(seq))
-            sequences.append(seq)
-        return sequences
 
     def clear_cache(self) -> None:
         self._model = None

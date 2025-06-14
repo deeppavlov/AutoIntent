@@ -1,11 +1,14 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+import torch
 from torch import nn
 from typing_extensions import Self
 
 
 class BaseTorchModule(nn.Module, ABC):
+    _device: torch.device
+
     @abstractmethod
     def dump(self, path: Path) -> None:
         """Dump torch module to disk.
@@ -29,3 +32,11 @@ class BaseTorchModule(nn.Module, ABC):
             path: path in file system
             device: torch notation for CPU, CUDA, MPS, etc. By default, it is inferred automatically.
         """
+
+
+    @property
+    def device(self) -> torch.device:
+        """Torch device object where this module resides."""
+        if not hasattr(self, "_device"):
+            self._device =  next(self.parameters()).device
+        return self._device

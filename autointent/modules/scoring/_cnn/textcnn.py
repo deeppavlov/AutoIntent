@@ -1,6 +1,8 @@
 """TextCNN model for text classification."""
 
 import json
+import re
+from collections import Counter
 from pathlib import Path
 from typing import TypedDict
 
@@ -13,13 +15,15 @@ from autointent._wrappers import BaseTorchModule
 
 
 class TextCNNDumpMetadata(TypedDict):
-    vocab_size: int
     n_classes: int
     embed_dim: int
     kernel_sizes: list[int]
     num_filters: int
     dropout: float
     padding_idx: int
+    vocab: dict[str, int]
+    max_seq_length: int
+    vocab: dict[str, int]
 
 
 class TextCNN(BaseTorchModule):
@@ -30,40 +34,91 @@ class TextCNN(BaseTorchModule):
 
     def __init__(
         self,
-        vocab_size: int = 0,
-        n_classes: int = 0,
+        n_classes: int,
         embed_dim: int = 128,
         kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
         padding_idx: int = 0,
-        pretrained_embs: torch.Tensor | None = None,
+        max_seq_length: int = 50,
+        vocab: dict[str, int] | None = None,
+        max_vocab_size: int | None = None,
     ) -> None:
         super().__init__()
 
-        self.vocab_size = vocab_size
         self.n_classes = n_classes
         self.embed_dim = embed_dim
         self.kernel_sizes = kernel_sizes
         self.num_filters = num_filters
         self.dropout_rate = dropout
         self.padding_idx = padding_idx
-        self.pretrained_embs = pretrained_embs
+        self.max_seq_length = max_seq_length
 
-        if pretrained_embs is not None:
-            _, embed_dim = pretrained_embs.shape
-            self.embedding = nn.Embedding.from_pretrained(pretrained_embs, freeze=True)  # type: ignore[no-untyped-call]
-        else:
-            self.embedding = nn.Embedding(num_embeddings=vocab_size, embedding_dim=embed_dim, padding_idx=padding_idx)
+        # Vocabulary management
+        self._unk_token = "<UNK>"  # noqa: S105
+        self._pad_token = "<PAD>"  # noqa: S105
+        self._unk_idx = 1
+        self._pad_idx = padding_idx
+        self.max_vocab_size = max_vocab_size
 
+        if vocab is not None:
+            self._vocab = vocab
+            self.embedding = nn.Embedding(
+                num_embeddings=len(self._vocab), embedding_dim=self.embed_dim, padding_idx=self.padding_idx
+            )
+
+        # Initialize other layers
         self.convs = nn.ModuleList(
             [nn.Conv1d(in_channels=embed_dim, out_channels=num_filters, kernel_size=k) for k in kernel_sizes]
         )
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
 
+    def build_vocab(self, utterances: list[str]) -> None:
+        """Build vocabulary from training utterances."""
+        if hasattr(self, "_vocab"):
+            msg = "Vocab is already built."
+            raise RuntimeError(msg)
+
+        word_counts: Counter[str] = Counter()
+        for utterance in utterances:
+            words = re.findall(r"\w+", utterance.lower())
+            word_counts.update(words)
+
+        # Create vocabulary with special tokens
+        self._vocab = {self._pad_token: self._pad_idx, self._unk_token: self._unk_idx}
+
+        # Convert Counter to list of (word, count) tuples sorted by frequency
+        sorted_words = word_counts.most_common(self.max_vocab_size)
+        for word, _ in sorted_words:
+            if word not in self._vocab:
+                self._vocab[word] = len(self._vocab)
+
+        # Update vocab_size and initialize embedding layer
+        self.embedding = nn.Embedding(
+            num_embeddings=len(self._vocab), embedding_dim=self.embed_dim, padding_idx=self.padding_idx
+        )
+
+    def text_to_indices(self, utterances: list[str]) -> list[list[int]]:
+        """Convert utterances to padded sequences of word indices."""
+        sequences: list[list[int]] = []
+        for utterance in utterances:
+            words = re.findall(r"\w+", utterance.lower())
+            # Convert words to indices, using UNK for unknown words
+            seq = [self._vocab.get(word, self._unk_idx) for word in words]
+            # Truncate if too long
+            seq = seq[: self.max_seq_length]
+            # Pad if too short
+            seq = seq + [self._pad_idx] * (self.max_seq_length - len(seq))
+            sequences.append(seq)
+        return sequences
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
+        if self._vocab is None:
+            msg = "Model not initialized. Call build_vocab() first."
+            raise ValueError(msg)
+
         embedded: torch.Tensor = self.embedding(x)
         embedded = embedded.permute(0, 2, 1)
         conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
@@ -72,14 +127,16 @@ class TextCNN(BaseTorchModule):
         return self.fc(dropped)  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:
-        metadata = {
-            "vocab_size": self.vocab_size,
+        metadata: TextCNNDumpMetadata = {
             "n_classes": self.n_classes,
             "embed_dim": self.embed_dim,
             "kernel_sizes": self.kernel_sizes,
             "num_filters": self.num_filters,
             "dropout": self.dropout_rate,
             "padding_idx": self.padding_idx,
+            "vocab": self._vocab,
+            "max_seq_length": self.max_seq_length,
+            "max_vocab_size": self.max_vocab_size,
         }
         with (path / self._metadata_dict_name).open("w") as file:
             json.dump(metadata, file, indent=4)
@@ -90,9 +147,10 @@ class TextCNN(BaseTorchModule):
     def load(cls, path: Path, device: str | None = None) -> "TextCNN":
         with (path / cls._metadata_dict_name).open() as file:
             metadata: TextCNNDumpMetadata = json.load(file)
-        instance = cls(**metadata)
-        state_dict = torch.load(path / cls._state_dict_name)
-        instance.load_state_dict(state_dict)
         device = device or detect_device()
-        instance.eval().to(device)
+        instance = cls(**metadata)
+        instance = instance.to(device)  # Move to device before loading state dict
+        state_dict = torch.load(path / cls._state_dict_name, map_location=device)
+        instance.load_state_dict(state_dict)
+        instance.eval()
         return instance

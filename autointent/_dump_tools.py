@@ -277,7 +277,7 @@ class Dumper:
                             class_info = json.load(f)
                         module = importlib.import_module(class_info["module"])
                         model_class: BaseTorchModule = getattr(module, class_info["name"])
-                        model = model_class.load(path)
+                        model = model_class.load(model_dir)
                         torch_models[model_dir.name] = model
                 except Exception as e:
                     msg = f"Error loading torch model {model_dir.name}: {e}"
