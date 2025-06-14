@@ -1,5 +1,6 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
-
+import logging
+from enum import StrEnum
 from typing import Any, cast
 
 import numpy as np
@@ -14,6 +15,16 @@ from autointent.modules.base import BaseScorer
 
 BINARY_CLASS_THRESHOLD = 2
 
+logger = logging.getLogger(__name__)
+
+
+class FeaturesType(StrEnum):
+    """Type of features used in CatBoostScorer."""
+
+    TEXT = "text"
+    EMBEDDING = "embedding"
+    BOTH = "both"
+
 
 class CatBoostScorer(BaseScorer):
     """CatBoost scorer using either external embeddings or CatBoost's own BoW encoding.
@@ -22,6 +33,12 @@ class CatBoostScorer(BaseScorer):
         embedder_config: Config of the base transformer model (HFModelConfig, str, or dict)
             If None (default) the scorer relies on CatBoost's own Bag-of-Words encoding,
             otherwise the provided embedder is used.
+        features_type: Type of features used in CatBoost. Can be one of:
+            - "text": Use only text features (CatBoost's BoW encoding).
+            - "embedding": Use only embedding features.
+            - "both": Use both text and embedding features.
+        use_embedding_features: If True, the model uses CatBoost `embedding_features` otherwise
+            each number will be in separate column.
         loss_function: CatBoost loss function.  If None, an appropriate loss is
             chosen automatically from the task type.
         verbose: If True, CatBoost prints training progress.
@@ -43,6 +60,7 @@ class CatBoostScorer(BaseScorer):
         eval_metric="Accuracy",
         random_seed=42,
         verbose=False,
+        features_type="text",  # or "embedding" or "both"
     )
     utterances = ["hello", "goodbye", "allo", "sayonara"]
     labels = [0, 1, 0, 1]
@@ -64,16 +82,24 @@ class CatBoostScorer(BaseScorer):
 
     _model: CatBoostClassifier
 
+    encoder_features_types = (FeaturesType.EMBEDDING, FeaturesType.BOTH)
+
     def __init__(
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        use_embedder: bool = True,
+        features_type: FeaturesType = FeaturesType.BOTH,
+        use_embedding_features: bool = True,
         loss_function: str | None = None,
         verbose: bool = False,
         **catboost_kwargs: dict[str, Any],
     ) -> None:
-        self.use_embedder = use_embedder
-        if self.use_embedder:
+        self.features_type = features_type
+        self.use_embedding_features = use_embedding_features
+        if features_type == FeaturesType.TEXT and use_embedding_features:
+            msg = "Only catbooost text features will be used, `use_embedding_features` is ignored."
+            logger.warning(msg)
+
+        if self.features_type in self.encoder_features_types:
             self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
             self._embedder = Embedder(self.embedder_config)
         self.loss_function = loss_function
@@ -85,7 +111,8 @@ class CatBoostScorer(BaseScorer):
         cls,
         context: Context,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        use_embedder: bool = True,
+        features_type: FeaturesType = FeaturesType.BOTH,
+        use_embedding_features: bool = True,
         loss_function: str | None = None,
         verbose: bool = False,
         **catboost_kwargs: dict[str, Any],
@@ -96,49 +123,31 @@ class CatBoostScorer(BaseScorer):
             embedder_config=embedder_config,
             loss_function=loss_function,
             verbose=verbose,
-            use_embedder=use_embedder,
+            features_type=features_type,
             **catboost_kwargs,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {
-            "embedder_config": self.embedder_config.model_dump() if self.use_embedder else None,
+            "embedder_config": self.embedder_config.model_dump()
+            if self.features_type in self.encoder_features_types
+            else None,
         }
 
-    def _prepare_embedding_dataset(
+    def _prepare_data_for_fit(
         self,
         utterances: list[str],
-        labels: ListOfLabels | None,
     ) -> pd.DataFrame:
-        encoded_utterances = self._embedder.embed(utterances, TaskTypeEnum.classification)
-        return pd.DataFrame(
-            {
-                "text": utterances,
-                "embedding": encoded_utterances.tolist(),
-                "label": labels,
-            }
-        )
-
-    def _prepare_text_dataset(
-        self,
-        utterances: list[str],
-        labels: ListOfLabels | None,
-    ) -> pd.DataFrame:
-        return pd.DataFrame(
-            {
-                "text": utterances,
-                "label": labels,
-            }
-        )
-
-    def prepare_data_for_fit(
-        self,
-        utterances: list[str],
-        labels: ListOfLabels | None,  # None for predict
-    ) -> pd.DataFrame:
-        if self.use_embedder:
-            return self._prepare_embedding_dataset(utterances, labels)
-        return self._prepare_text_dataset(utterances, labels)
+        if self.features_type in self.encoder_features_types:
+            encoded_utterances = self._embedder.embed(utterances, TaskTypeEnum.classification).tolist()
+            if self.use_embedding_features:
+                data = pd.DataFrame({"embedding": encoded_utterances})
+            else:
+                data = pd.DataFrame(encoded_utterances)
+            if self.features_type == FeaturesType.BOTH:
+                data["text"] = utterances
+            return data
+        return pd.DataFrame({"text": utterances})
 
     def fit(
         self,
@@ -149,7 +158,7 @@ class CatBoostScorer(BaseScorer):
             self.clear_cache()
         self._validate_task(labels)
 
-        dataset = self.prepare_data_for_fit(utterances, labels)
+        dataset = self._prepare_data_for_fit(utterances)
 
         default_loss = (
             "MultiLogloss"
@@ -157,7 +166,16 @@ class CatBoostScorer(BaseScorer):
             else ("MultiClass" if self._n_classes > BINARY_CLASS_THRESHOLD else "Logloss")
         )
 
-        extra_params = {"text_features": ["text"]} if not self.use_embedder else {"embedding_features": ["embedding"]}
+        extra_params = {}
+        if self.features_type == FeaturesType.EMBEDDING:
+            if self.use_embedding_features:  # to not raise error if embedding witout embedding_features
+                extra_params["embedding_features"] = ["embedding"]
+        elif self.features_type in {FeaturesType.TEXT, FeaturesType.BOTH}:
+            extra_params["text_features"] = ["text"]
+            if self.features_type == FeaturesType.BOTH and self.use_embedding_features:
+                extra_params["embedding_features"] = ["embedding"]
+        else:
+            raise ValueError(f"Unsupported features type: {self.features_type}")
         self.catboost_kwargs.update(extra_params)
 
         self._model = CatBoostClassifier(
@@ -165,13 +183,13 @@ class CatBoostScorer(BaseScorer):
             verbose=self.verbose,
             **self.catboost_kwargs,
         )
-        self._model.fit(dataset)
+        self._model.fit(dataset, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[np.float64]:
         if getattr(self, "_model", None) is None:
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
-        data = self.prepare_data_for_fit(utterances, None)
+        data = self._prepare_data_for_fit(utterances)
         return cast("npt.NDArray[np.float64]", self._model.predict_proba(data))
 
     def clear_cache(self) -> None:
