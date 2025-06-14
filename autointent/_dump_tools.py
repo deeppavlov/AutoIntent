@@ -84,7 +84,6 @@ class Dumper:
         attrs: dict[str, ModuleAttributes] = vars(obj)
         simple_attrs = {}
         arrays: dict[str, npt.NDArray[Any]] = {}
-        containers = {}
 
         Dumper.make_subdirectories(path, exists_ok)
 
@@ -95,8 +94,6 @@ class Dumper:
                 val.dump(path / Dumper.tags / key)
             elif isinstance(val, ModuleSimpleAttributes):
                 simple_attrs[key] = val
-            elif isinstance(val, dict):
-                containers[key] = val
             elif isinstance(val, np.ndarray):
                 arrays[key] = val
             elif isinstance(val, Embedder):
