@@ -1,7 +1,7 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
 
 import logging
-from enum import StrEnum
+from enum import Enum
 from typing import Any, cast
 
 import numpy as np
@@ -19,7 +19,7 @@ BINARY_CLASS_THRESHOLD = 2
 logger = logging.getLogger(__name__)
 
 
-class FeaturesType(StrEnum):
+class FeaturesType(str, Enum):
     """Type of features used in CatBoostScorer."""
 
     TEXT = "text"
