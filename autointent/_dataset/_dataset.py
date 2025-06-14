@@ -102,7 +102,7 @@ class Dataset(dict[str, HFDataset]):
         """
         from ._reader import DictReader
 
-        splits = load_dataset(repo_name)
+        splits = load_dataset(repo_name, "default")
         mapping = dict(**splits)
         if Split.INTENTS in get_dataset_config_names(repo_name):
             mapping["intents"] = load_dataset(repo_name, Split.INTENTS)[Split.INTENTS].to_list()
