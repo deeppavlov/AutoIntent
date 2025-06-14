@@ -176,7 +176,8 @@ class CatBoostScorer(BaseScorer):
             if self.features_type == FeaturesType.BOTH and self.use_embedding_features:
                 extra_params["embedding_features"] = ["embedding"]
         else:
-            raise ValueError(f"Unsupported features type: {self.features_type}")
+            msg = f"Unsupported features type: {self.features_type}"
+            raise ValueError(msg)
         self.catboost_kwargs.update(extra_params)
 
         self._model = CatBoostClassifier(

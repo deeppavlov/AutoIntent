@@ -119,7 +119,6 @@ def test_catboost_features_types(dataset, features_type, use_embedding_features)
     ]
 
     predictions = scorer.predict(test_data)
-    print(predictions)
     assert predictions.shape[0] == len(test_data)
     assert predictions.shape[1] == len(set(data_handler.train_labels(0)))
     assert 0.0 <= np.min(predictions) <= np.max(predictions) <= 1.0
