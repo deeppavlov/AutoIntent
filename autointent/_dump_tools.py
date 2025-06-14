@@ -254,8 +254,8 @@ class Dumper:
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.catboost_models:
-                cat_model = CatBoostClassifier(str(path / Dumper.catboost_models / "model.cbm"))
-                cat_model.load_model()
+                cat_model = CatBoostClassifier()
+                cat_model.load_model(str(path / Dumper.catboost_models / "model.cbm"))
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)

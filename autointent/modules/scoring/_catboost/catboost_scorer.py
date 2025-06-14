@@ -1,4 +1,5 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
+
 import logging
 from enum import StrEnum
 from typing import Any, cast
@@ -60,7 +61,7 @@ class CatBoostScorer(BaseScorer):
         eval_metric="Accuracy",
         random_seed=42,
         verbose=False,
-        features_type="text",  # or "embedding" or "both"
+        features_type="embedding",  # or "text" or "both"
     )
     utterances = ["hello", "goodbye", "allo", "sayonara"]
     labels = [0, 1, 0, 1]
@@ -71,8 +72,8 @@ class CatBoostScorer(BaseScorer):
 
     .. testoutput::
 
-        [[0.50525691 0.49474309]
-         [0.50525691 0.49474309]]
+        [[0.41493207 0.58506793]
+         [0.55036046 0.44963954]]
 
     """
 
