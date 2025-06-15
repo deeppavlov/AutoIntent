@@ -34,7 +34,6 @@ class PTuningScorer(BertScorer):
             classification_model_config="prajjwal1/bert-tiny",
             num_train_epochs=3,
             batch_size=8,
-            task_type="SEQ_CLS",
             num_virtual_tokens=10,
             seed=42,
             training_arguments={"logging_strategy": "no"},
