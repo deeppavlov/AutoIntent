@@ -138,7 +138,7 @@ class BertScorer(BaseScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
-            **training_arguments,
+            training_arguments=training_arguments,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
