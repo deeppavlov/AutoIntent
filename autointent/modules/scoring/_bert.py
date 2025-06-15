@@ -103,6 +103,7 @@ class BertScorer(BaseScorer):
             per_device_train_batch_size=self.batch_size,
             learning_rate=self.learning_rate,
             seed=self.seed,
+            save_strategy=self.training_arguments.get("save_strategy", "best"),
             report_to=self.report_to if self.report_to is not None else "none",
             use_cpu=self.classification_model_config.device == "cpu",
             metric_for_best_model=self.early_stopping_config.metric,
