@@ -36,7 +36,8 @@ class PTuningScorer(BertScorer):
             batch_size=8,
             task_type="SEQ_CLS",
             num_virtual_tokens=10,
-            seed=42
+            seed=42,
+            training_arguments={"logging_strategy": "no"},
         )
         utterances = ["hello", "goodbye", "allo", "sayonara"]
         labels = [0, 1, 0, 1]
@@ -68,6 +69,7 @@ class PTuningScorer(BertScorer):
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
         early_stopping_config: EarlyStoppingConfig | None = None,
+        training_arguments: dict[str, Any] | None = None,
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         super().__init__(
@@ -88,6 +90,7 @@ class PTuningScorer(BertScorer):
             encoder_num_layers=encoder_num_layers,
             **ptuning_kwargs,
         )
+        self.training_arguments = training_arguments or {}
 
     @classmethod
     def from_context(  # noqa: PLR0913
@@ -103,7 +106,8 @@ class PTuningScorer(BertScorer):
         encoder_dropout: float = 0.1,
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
-        **ptuning_kwargs: Any,  # noqa: ANN401
+        training_arguments: dict[str, Any] | None = None,
+        **ptuning_kwargs: dict[str, Any],
     ) -> "PTuningScorer":
         """Create a PTuningScorer instance using a Context object.
 
@@ -119,6 +123,7 @@ class PTuningScorer(BertScorer):
             encoder_dropout: Dropout for the prompt encoder
             encoder_hidden_size: Hidden size for the prompt encoder
             encoder_num_layers: Number of layers for the prompt encoder
+            training_arguments: Additional training arguments, if any
             **ptuning_kwargs: Arguments for PromptEncoderConfig
         """
         if classification_model_config is None:
@@ -138,6 +143,7 @@ class PTuningScorer(BertScorer):
             encoder_dropout=encoder_dropout,
             encoder_hidden_size=encoder_hidden_size,
             encoder_num_layers=encoder_num_layers,
+            training_arguments=training_arguments,
             **ptuning_kwargs,
         )
 

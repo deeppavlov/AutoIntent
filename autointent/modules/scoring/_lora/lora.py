@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, PeftMixedModel, PeftModel, get_peft_model
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -39,6 +39,7 @@ class BERTLoRAScorer(BertScorer):
             seed=42,
             r=8,  # LoRA rank
             lora_alpha=16,  # LoRA alpha
+            training_arguments={"logging_strategy": "no"},
         )
 
         # Training data
@@ -69,7 +70,8 @@ class BERTLoRAScorer(BertScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
-        **lora_kwargs: Any,  # noqa: ANN401
+        training_arguments: dict[str, Any] | None = None,
+        **lora_kwargs: dict[str, Any],
     ) -> None:
         # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
         early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
@@ -82,6 +84,7 @@ class BERTLoRAScorer(BertScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
+            training_arguments=training_arguments,
         )
         self._lora_config = LoraConfig(**lora_kwargs)
 
@@ -94,7 +97,8 @@ class BERTLoRAScorer(BertScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        **lora_kwargs: Any,  # noqa: ANN401
+        training_arguments: dict[str, Any] = {},
+        **lora_kwargs: dict[str, Any],
     ) -> "BERTLoRAScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -105,6 +109,7 @@ class BERTLoRAScorer(BertScorer):
             learning_rate=learning_rate,
             seed=seed,
             report_to=context.logging_config.report_to,
+            training_arguments=training_arguments,
             **lora_kwargs,
         )
 

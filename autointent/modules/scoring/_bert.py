@@ -56,7 +56,8 @@ class BertScorer(BaseScorer):
             num_train_epochs=3,
             batch_size=8,
             learning_rate=5e-5,
-            seed=42
+            seed=42,
+            training_arguments={"logging_strategy": "no"},
         )
 
         # Training data
@@ -86,6 +87,7 @@ class BertScorer(BaseScorer):
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         early_stopping_config: EarlyStoppingConfig | None = None,
+        training_arguments: dict[str, Any] | None = None,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -94,6 +96,7 @@ class BertScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self.early_stopping_config = early_stopping_config or EarlyStoppingConfig()
+        self.training_arguments = training_arguments
 
     @classmethod
     def from_context(
@@ -105,6 +108,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         early_stopping_config: EarlyStoppingConfig | None = None,
+        training_arguments: dict[str, Any] | None = None,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -119,6 +123,7 @@ class BertScorer(BaseScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
+            **training_arguments,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -164,14 +169,11 @@ class BertScorer(BaseScorer):
                 per_device_train_batch_size=self.batch_size,
                 learning_rate=self.learning_rate,
                 seed=self.seed,
-                save_strategy="epoch",
-                eval_strategy="epoch",
-                logging_strategy="steps",
-                logging_steps=10,
                 report_to=self.report_to if self.report_to is not None else "none",
                 use_cpu=self.classification_model_config.device == "cpu",
                 metric_for_best_model=self.early_stopping_config.metric,
                 load_best_model_at_end=self.early_stopping_config.metric is not None,
+                **self.training_arguments,
             )
 
             trainer = Trainer(  # type: ignore[no-untyped-call]
