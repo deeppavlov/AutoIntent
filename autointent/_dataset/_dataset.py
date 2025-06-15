@@ -133,7 +133,7 @@ class Dataset(dict[str, HFDataset]):
         path = Path(filepath)
         if not path.parent.exists():
             path.parent.mkdir(parents=True)
-        with path.open("w") as file:
+        with path.open("w", encoding="utf-8") as file:
             json.dump(self.to_dict(), file, indent=4, ensure_ascii=False)
 
     def push_to_hub(self, repo_name: str, private: bool = False) -> None:
