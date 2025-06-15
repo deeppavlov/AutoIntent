@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any
 
-from peft import LoraConfig, PeftMixedModel, PeftModel, get_peft_model
+from peft import LoraConfig, get_peft_model
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
@@ -97,7 +97,7 @@ class BERTLoRAScorer(BertScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        training_arguments: dict[str, Any] = {},
+        training_arguments: dict[str, Any] | None = None,
         **lora_kwargs: dict[str, Any],
     ) -> "BERTLoRAScorer":
         if classification_model_config is None:

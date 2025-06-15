@@ -106,6 +106,7 @@ class PTuningScorer(BertScorer):
         encoder_dropout: float = 0.1,
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
+        early_stopping_config: EarlyStoppingConfig | None = None,
         training_arguments: dict[str, Any] | None = None,
         **ptuning_kwargs: dict[str, Any],
     ) -> "PTuningScorer":
@@ -123,6 +124,7 @@ class PTuningScorer(BertScorer):
             encoder_dropout: Dropout for the prompt encoder
             encoder_hidden_size: Hidden size for the prompt encoder
             encoder_num_layers: Number of layers for the prompt encoder
+            early_stopping_config: Configuration for early stopping during training
             training_arguments: Additional training arguments, if any
             **ptuning_kwargs: Arguments for PromptEncoderConfig
         """
@@ -144,6 +146,7 @@ class PTuningScorer(BertScorer):
             encoder_hidden_size=encoder_hidden_size,
             encoder_num_layers=encoder_num_layers,
             training_arguments=training_arguments,
+            early_stopping_config=early_stopping_config,
             **ptuning_kwargs,
         )
 
