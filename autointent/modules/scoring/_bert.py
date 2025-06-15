@@ -96,7 +96,20 @@ class BertScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self.early_stopping_config = early_stopping_config or EarlyStoppingConfig()
-        self.training_arguments = training_arguments
+        self.training_arguments = training_arguments or {}
+        # init here for faster validation
+        self.training_args = TrainingArguments(
+            num_train_epochs=self.num_train_epochs,
+            per_device_train_batch_size=self.batch_size,
+            learning_rate=self.learning_rate,
+            seed=self.seed,
+            report_to=self.report_to if self.report_to is not None else "none",
+            use_cpu=self.classification_model_config.device == "cpu",
+            metric_for_best_model=self.early_stopping_config.metric,
+            load_best_model_at_end=self.early_stopping_config.metric is not None,
+            **self.training_arguments,
+        )
+
 
     @classmethod
     def from_context(
@@ -163,22 +176,11 @@ class BertScorer(BaseScorer):
             tokenized_dataset: output from :py:meth:`BertScorer._get_tokenized_dataset`
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
-            training_args = TrainingArguments(
-                output_dir=tmp_dir,
-                num_train_epochs=self.num_train_epochs,
-                per_device_train_batch_size=self.batch_size,
-                learning_rate=self.learning_rate,
-                seed=self.seed,
-                report_to=self.report_to if self.report_to is not None else "none",
-                use_cpu=self.classification_model_config.device == "cpu",
-                metric_for_best_model=self.early_stopping_config.metric,
-                load_best_model_at_end=self.early_stopping_config.metric is not None,
-                **self.training_arguments,
-            )
+            self.training_args.output_dir = tmp_dir
 
             trainer = Trainer(  # type: ignore[no-untyped-call]
                 model=self._model,
-                args=training_args,
+                args=self.training_args,
                 train_dataset=tokenized_dataset["train"],
                 eval_dataset=tokenized_dataset["validation"],
                 processing_class=self._tokenizer,
@@ -187,7 +189,7 @@ class BertScorer(BaseScorer):
                 callbacks=self._get_trainer_callbacks(),
             )
 
-            trainer.train()  # type: ignore[attr-defined]
+            _ = trainer.train()  # type: ignore[attr-defined]
 
     def _get_trainer_callbacks(self) -> list[TrainerCallback]:
         res: list[TrainerCallback] = []
