@@ -86,7 +86,7 @@ class BERTLoRAScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             training_arguments=training_arguments,
         )
-        self._lora_config = LoraConfig(**lora_kwargs)
+        self._lora_config = LoraConfig(**lora_kwargs)  # type: ignore[arg-type]
 
     @classmethod
     def from_context(
