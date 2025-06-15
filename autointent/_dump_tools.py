@@ -169,7 +169,7 @@ class Dumper:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
 
-        with (path / Dumper.simple_attrs).open("w") as file:
+        with (path / Dumper.simple_attrs).open("w", encoding="utf-8") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)

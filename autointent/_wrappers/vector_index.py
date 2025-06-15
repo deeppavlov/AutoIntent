@@ -191,7 +191,7 @@ class VectorIndex:
         self.dump_dir = dir_path
 
         data = VectorIndexData(texts=self.texts, labels=self.labels)
-        with (self.dump_dir / self._data_file).open("w") as file:
+        with (self.dump_dir / self._data_file).open("w", encoding="utf-8") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
         metadata = VectorIndexMetadata(
@@ -202,7 +202,7 @@ class VectorIndex:
             embedder_use_cache=self.embedder.config.use_cache,
         )
 
-        with (self.dump_dir / self._meta_data_file).open("w") as file:
+        with (self.dump_dir / self._meta_data_file).open("w", encoding="utf-8") as file:
             json.dump(metadata, file, indent=4, ensure_ascii=False)
 
     @classmethod
