@@ -73,9 +73,7 @@ def test_rnn_device(dataset):
     data_handler = DataHandler(dataset)
 
     # Force CPU
-    scorer = RNNScorer(
-        embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1, device="cpu"
-    )
+    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1, device="cpu")
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -91,9 +89,7 @@ def test_rnn_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer_original = RNNScorer(
-        embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1
-    )
+    scorer_original = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1)
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
