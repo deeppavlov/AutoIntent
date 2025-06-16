@@ -14,6 +14,7 @@ from autointent.configs import VocabConfig
 
 
 class TextCNNDumpMetadata(BaseModel):
+    embed_dim: int
     n_classes: int
     kernel_sizes: list[int]
     num_filters: int
@@ -48,10 +49,7 @@ class TextCNN(BaseTorchModuleWithVocab):
 
         # Initialize other layers
         self.convs = nn.ModuleList(
-            [
-                nn.Conv1d(in_channels=self.embed_dim, out_channels=num_filters, kernel_size=k)
-                for k in kernel_sizes
-            ]
+            [nn.Conv1d(in_channels=self.embed_dim, out_channels=num_filters, kernel_size=k) for k in kernel_sizes]
         )
         self.dropout = nn.Dropout(dropout)
         self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
@@ -71,6 +69,7 @@ class TextCNN(BaseTorchModuleWithVocab):
 
     def dump(self, path: Path) -> None:
         metadata = TextCNNDumpMetadata(
+            embed_dim=self.embed_dim,
             n_classes=self.n_classes,
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,

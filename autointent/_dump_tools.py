@@ -54,7 +54,6 @@ class Dumper:
     torch_models = "torch_models"
     ptuning_models = "ptuning_models"
     vocab = "vocab.json"
-    model_metadata = "model_metadata.json"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -94,11 +93,6 @@ class Dumper:
         arrays: dict[str, npt.NDArray[Any]] = {}
 
         Dumper.make_subdirectories(path, exists_ok)
-
-        if "_model" in attrs and "_n_classes" in attrs and "_multilabel" in attrs:
-            model_metadata = {"n_classes": attrs["_n_classes"], "multilabel": attrs["_multilabel"]}
-            with (path / Dumper.model_metadata).open("w") as f:
-                json.dump(model_metadata, f)
 
         if "_vocab" in attrs and isinstance(attrs["_vocab"], dict):
             with (path / Dumper.vocab).open("w") as f:

@@ -85,7 +85,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
-        early_stopping_config: EarlyStoppingConfig | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -93,7 +93,7 @@ class BertScorer(BaseScorer):
         self.learning_rate = learning_rate
         self.seed = seed
         self.report_to = report_to
-        self.early_stopping_config = early_stopping_config or EarlyStoppingConfig()
+        self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
 
     @classmethod
     def from_context(
@@ -104,7 +104,7 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        early_stopping_config: EarlyStoppingConfig | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> "BertScorer":
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
@@ -122,7 +122,10 @@ class BertScorer(BaseScorer):
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
-        return {"classification_model_config": self.classification_model_config.model_dump()}
+        return {
+            "classification_model_config": self.classification_model_config.model_dump(),
+            "early_stopping_config": self.early_stopping_config.model_dump(),
+        }
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
         label2id = {i: i for i in range(self._n_classes)}

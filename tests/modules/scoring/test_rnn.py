@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import RNNConfig
+from autointent.configs import TorchTrainingConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import RNNScorer
 
@@ -14,10 +14,7 @@ def test_rnn_prediction(dataset):
     """Test that the RNN model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(
-        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
-    )
-    scorer.device = scorer._device
+    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1))
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
@@ -53,10 +50,7 @@ def test_rnn_cache_clearing(dataset):
     """Test that the RNN model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(
-        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
-    )
-    scorer.device = scorer._device
+    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1))
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = ["test text"]
@@ -71,7 +65,7 @@ def test_rnn_cache_clearing(dataset):
     assert not hasattr(scorer, "_model") or scorer._model is None
 
     # Should raise exception after clearing cache
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match=r"Scorer is not trained.*"):
         scorer.predict(test_data)
 
 
@@ -80,30 +74,17 @@ def test_rnn_device(dataset):
     data_handler = DataHandler(dataset)
 
     # Force CPU
-    scorer_cpu = RNNScorer(
-        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(device="cpu"), num_train_epochs=1, batch_size=8
+    scorer = RNNScorer(
+        embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1, device="cpu")
     )
-    scorer_cpu.device = scorer_cpu._device
 
-    scorer_cpu.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = ["test account freeze"]
-    predictions_cpu = scorer_cpu.predict(test_data)
+    scorer.predict(test_data)
 
     # Ensure model is on CPU
-    assert next(scorer_cpu._model.parameters()).device.type == "cpu"
-
-    # Test with default device
-    scorer_default = RNNScorer(
-        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
-    )
-    scorer_default.device = scorer_default._device
-
-    scorer_default.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
-    predictions_default = scorer_default.predict(test_data)
-
-    # Both models should produce valid predictions
-    assert predictions_cpu.shape == predictions_default.shape
+    assert next(scorer._model.parameters()).device.type == "cpu"
 
 
 def test_rnn_scorer_dump_load(dataset):
@@ -112,9 +93,8 @@ def test_rnn_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer_original = RNNScorer(
-        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
+        embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1)
     )
-    scorer_original.device = scorer_original._device
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -138,8 +118,7 @@ def test_rnn_scorer_dump_load(dataset):
         # Verify model and vocabulary are loaded
         assert hasattr(scorer_loaded, "_model")
         assert scorer_loaded._model is not None
-        assert hasattr(scorer_loaded, "_vocab")
-        assert scorer_loaded._vocab is not None
+        assert scorer_loaded.vocab_config.vocab is not None
 
         # Get predictions after loading
         predictions_after = scorer_loaded.predict(test_data)

@@ -5,9 +5,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import VocabConfig
+from autointent.configs import TorchTrainingConfig, VocabConfig
 from autointent.context.data_handler import DataHandler
-from autointent.modules.scoring._cnn import CNNScorer
+from autointent.modules.scoring import CNNScorer
 
 
 def test_cnn_prediction(dataset):
@@ -15,13 +15,8 @@ def test_cnn_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = CNNScorer(
-        num_train_epochs=1,
-        batch_size=8,
-        learning_rate=5e-5,
-        kernel_sizes=(3, 4, 5),
-        num_filters=100,
-        dropout=0.1,
-        embed_dim=128,
+        embed_dim=8,
+        torch_config=TorchTrainingConfig(num_training_epochs=1),
         vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -59,7 +54,9 @@ def test_cnn_cache_clearing(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = CNNScorer(
-        vocab_config=VocabConfig(max_seq_length=50), num_train_epochs=1, batch_size=8, learning_rate=5e-5
+        embed_dim=8,
+        torch_config=TorchTrainingConfig(num_training_epochs=1),
+        vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -75,7 +72,7 @@ def test_cnn_cache_clearing(dataset):
     assert not hasattr(scorer, "_model") or scorer._model is None
 
     # После очистки кэша предсказания должны вызывать ошибку
-    with pytest.raises(ValueError, match=r"CNNScorer is not trained\. Call fit\(\) first\."):
+    with pytest.raises(RuntimeError, match=r"Scorer is not trained.*"):
         scorer.predict(test_data)
 
 
@@ -85,7 +82,9 @@ def test_cnn_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer = CNNScorer(
-        vocab_config=VocabConfig(max_seq_length=50), num_train_epochs=1, batch_size=8, learning_rate=5e-5
+        embed_dim=8,
+        torch_config=TorchTrainingConfig(num_training_epochs=1),
+        vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 

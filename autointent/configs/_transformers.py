@@ -28,8 +28,10 @@ class HFModelConfig(BaseModel):
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
         """Validate the model configuration.
 
+        This classmethod is used to parse dictionaries that occur in search space configurations.
+
         Args:
-            values: Model configuration values. If a string is provided, it is converted to a dictionary.
+            values: Model configuration values.
 
         Returns:
             Model configuration.
@@ -123,24 +125,6 @@ class CrossEncoderConfig(HFModelConfig):
     )  # this is because sentence-transformers doesn't allow you to customize tokenizer settings properly
 
 
-class RNNConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
-    max_seq_length: int = Field(128, description="Maximum sequence length.")
-    padding_idx: int = Field(0, description="Index used for padding.")
-    batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
-
-    @classmethod
-    def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> "RNNConfig":
-        if values is None:
-            return cls()
-        if isinstance(values, BaseModel):
-            return values  # type: ignore[return-value]
-        if isinstance(values, str):
-            return cls()
-        return cls(**values)
-
-
 class EarlyStoppingConfig(BaseModel):
     val_fraction: float = Field(
         0.2,
@@ -157,3 +141,21 @@ class EarlyStoppingConfig(BaseModel):
     metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = Field(  # type: ignore[valid-type]
         "scoring_f1", description="Metric to monitor."
     )
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | BaseModel | None) -> Self:
+        """Validate the model configuration.
+
+        This classmethod is used to parse dictionaries that occur in search space configurations.
+
+        Args:
+            values: Model configuration values.
+
+        Returns:
+            Model configuration.
+        """
+        if values is None:
+            return cls()
+        if isinstance(values, BaseModel):
+            return values  # type: ignore[return-value]
+        return cls(**values)

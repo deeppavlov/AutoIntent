@@ -2,16 +2,15 @@
 
 from ._inference_node import InferenceNodeConfig
 from ._optimization import DataConfig, HPOConfig, LoggingConfig
+from ._torch import TorchTrainingConfig, VocabConfig
 from ._transformers import (
     CrossEncoderConfig,
     EarlyStoppingConfig,
     EmbedderConfig,
     HFModelConfig,
-    RNNConfig,
     TaskTypeEnum,
     TokenizerConfig,
 )
-from ._vocab import VocabConfig
 
 __all__ = [
     "CrossEncoderConfig",
@@ -22,8 +21,8 @@ __all__ = [
     "HPOConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
-    "RNNConfig",
     "TaskTypeEnum",
     "TokenizerConfig",
+    "TorchTrainingConfig",
     "VocabConfig",
 ]
