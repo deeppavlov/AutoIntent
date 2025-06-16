@@ -13,8 +13,8 @@ from ._sklearn import SklearnScorer
 __all__ = [
     "BERTLoRAScorer",
     "BertScorer",
-    "CatBoostScorer",
     "CNNScorer",
+    "CatBoostScorer",
     "DNNCScorer",
     "DescriptionScorer",
     "KNNScorer",
