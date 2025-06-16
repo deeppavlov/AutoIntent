@@ -178,9 +178,9 @@ def test_dumper(test_class):
         test_obj = test_class()
         test_obj.init_attributes()
 
-        Dumper.dump(test_obj, Path(temp_dir))
+        Dumper.dump(test_obj, Path(temp_dir), raise_errors=True)
         del test_obj
 
         loaded_obj = test_class()
-        Dumper.load(loaded_obj, Path(temp_dir))
+        Dumper.load(loaded_obj, Path(temp_dir), raise_errors=True)
         loaded_obj.check_attributes()
