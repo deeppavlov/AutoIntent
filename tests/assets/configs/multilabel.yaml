@@ -32,6 +32,12 @@
       batch_size: [8]
       learning_rate: [5.0e-5]
       seed: [0]
+    - module_name: cnn
+      dropout: [0.1, 0.3, 0.5]
+      num_train_epochs: [10]
+      embed_dim: [128]
+      kernel_sizes: [[3, 4, 5]]
+      num_filters: [100]
     - module_name: ptuning
       classification_model_config: ["prajjwal1/bert-tiny"]
       num_train_epochs: [1]

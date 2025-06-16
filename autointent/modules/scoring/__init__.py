@@ -1,4 +1,5 @@
 from ._bert import BertScorer
+from ._cnn import CNNScorer
 from ._description import DescriptionScorer
 from ._dnnc import DNNCScorer
 from ._knn import KNNScorer, RerankScorer
@@ -12,6 +13,7 @@ from ._sklearn import SklearnScorer
 __all__ = [
     "BERTLoRAScorer",
     "BertScorer",
+    "CNNScorer",
     "DNNCScorer",
     "DescriptionScorer",
     "KNNScorer",

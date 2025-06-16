@@ -19,8 +19,8 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.similarity_functions import SimilarityFunction
 
-from ._hash import Hasher
-from .configs import EmbedderConfig, TaskTypeEnum
+from autointent._hash import Hasher
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
