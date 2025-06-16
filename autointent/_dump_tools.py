@@ -90,10 +90,7 @@ class Dumper:
         Dumper.make_subdirectories(path, exists_ok)
 
         if "_model" in attrs and "_n_classes" in attrs and "_multilabel" in attrs:
-            model_metadata = {
-                "n_classes": attrs["_n_classes"],
-                "multilabel": attrs["_multilabel"]
-            }
+            model_metadata = {"n_classes": attrs["_n_classes"], "multilabel": attrs["_multilabel"]}
             with (path / Dumper.model_metadata).open("w") as f:
                 json.dump(model_metadata, f)
 

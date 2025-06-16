@@ -140,6 +140,7 @@ class RNNConfig(BaseModel):
             return cls()
         return cls(**values)
 
+
 class EarlyStoppingConfig(BaseModel):
     val_fraction: float = Field(
         0.2,

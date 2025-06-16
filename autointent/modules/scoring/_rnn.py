@@ -80,12 +80,14 @@ class RNNScorer(BaseScorer):
     def get_embedder_config(self) -> dict[str, Any]:
         """Get the configuration of the embedder."""
         config = self.rnn_config.model_dump()
-        config.update({
-            "embed_dim": self.embed_dim,
-            "hidden_dim": self.hidden_dim,
-            "n_layers": self.n_layers,
-            "dropout": self.dropout,
-        })
+        config.update(
+            {
+                "embed_dim": self.embed_dim,
+                "hidden_dim": self.hidden_dim,
+                "n_layers": self.n_layers,
+                "dropout": self.dropout,
+            }
+        )
         return config
 
     def __initialize_model(self, vocab_size: int) -> None:
@@ -211,6 +213,7 @@ class RNNScorer(BaseScorer):
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Return default params used in ``__init__`` method."""
         return {"rnn_config": self.rnn_config.model_dump()}
+
 
 class SupervisedRNNClassifier(nn.Module):
     def __init__(

@@ -15,12 +15,7 @@ def test_rnn_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = RNNScorer(
-        embed_dim=64,
-        hidden_dim=128,
-        n_layers=1,
-        rnn_config=RNNConfig(),
-        num_train_epochs=1,
-        batch_size=8
+        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
     )
     scorer.device = scorer._device
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -59,12 +54,7 @@ def test_rnn_cache_clearing(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = RNNScorer(
-        embed_dim=64,
-        hidden_dim=128,
-        n_layers=1,
-        rnn_config=RNNConfig(),
-        num_train_epochs=1,
-        batch_size=8
+        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
     )
     scorer.device = scorer._device
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -91,12 +81,7 @@ def test_rnn_device(dataset):
 
     # Force CPU
     scorer_cpu = RNNScorer(
-        embed_dim=64,
-        hidden_dim=128,
-        n_layers=1,
-        rnn_config=RNNConfig(device="cpu"),
-        num_train_epochs=1,
-        batch_size=8
+        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(device="cpu"), num_train_epochs=1, batch_size=8
     )
     scorer_cpu.device = scorer_cpu._device
 
@@ -110,12 +95,7 @@ def test_rnn_device(dataset):
 
     # Test with default device
     scorer_default = RNNScorer(
-        embed_dim=64,
-        hidden_dim=128,
-        n_layers=1,
-        rnn_config=RNNConfig(),
-        num_train_epochs=1,
-        batch_size=8
+        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
     )
     scorer_default.device = scorer_default._device
 
@@ -125,18 +105,14 @@ def test_rnn_device(dataset):
     # Both models should produce valid predictions
     assert predictions_cpu.shape == predictions_default.shape
 
+
 def test_rnn_scorer_dump_load(dataset):
     """Test that RNNScorer can be saved and loaded while preserving predictions."""
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
     scorer_original = RNNScorer(
-        embed_dim=64,
-        hidden_dim=128,
-        n_layers=1,
-        rnn_config=RNNConfig(),
-        num_train_epochs=1,
-        batch_size=8
+        embed_dim=64, hidden_dim=128, n_layers=1, rnn_config=RNNConfig(), num_train_epochs=1, batch_size=8
     )
     scorer_original.device = scorer_original._device
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
