@@ -61,6 +61,7 @@ def test_catboost_prediction_multilabel(dataset):
         eval_metric="Accuracy",
         random_seed=42,
         verbose=False,
+        val_fraction=None,
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))

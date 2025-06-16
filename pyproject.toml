@@ -220,6 +220,7 @@ module = [
     "wandb",
     "dspy",
     "dspy.evaluate.auto_evaluation",
+    "catboost",
 ]
 ignore_missing_imports = true
 

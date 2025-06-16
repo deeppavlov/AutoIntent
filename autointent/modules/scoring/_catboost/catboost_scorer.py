@@ -11,10 +11,8 @@ from catboost import CatBoostClassifier  # type: ignore[import-untyped]
 
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
-from autointent.custom_types import ListOfLabels
+from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
-
-BINARY_CLASS_THRESHOLD = 2
 
 logger = logging.getLogger(__name__)
 
@@ -32,43 +30,54 @@ class CatBoostScorer(BaseScorer):
 
     Args:
         embedder_config: Config of the base transformer model (HFModelConfig, str, or dict)
-            If None (default) the scorer relies on CatBoost's own Bag-of-Words encoding,
-            otherwise the provided embedder is used.
+                If None (default) the scorer relies on CatBoost's own Bag-of-Words encoding,
+                otherwise the provided embedder is used.
+
         features_type: Type of features used in CatBoost. Can be one of:
-            - "text": Use only text features (CatBoost's BoW encoding).
-            - "embedding": Use only embedding features.
-            - "both": Use both text and embedding features.
+                - "text": Use only text features (CatBoost's BoW encoding).
+                - "embedding": Use only embedding features.
+                - "both": Use both text and embedding features.
+
         use_embedding_features: If True, the model uses CatBoost `embedding_features` otherwise
-            each number will be in separate column.
+                each number will be in separate column.
+
         loss_function: CatBoost loss function.  If None, an appropriate loss is
-            chosen automatically from the task type.
+                chosen automatically from the task type.
+
         verbose: If True, CatBoost prints training progress.
+
+        val_fraction: fraction of training data used for early stopping. Set to None to disaple early stopping.
+
+        early_stopping_rounds: number of iterations without metric increasing waiting for early stopping.
+                Ignored when ``val_fraction`` is ``None``.
+
         **catboost_kwargs: Any additional keyword arguments forwarded to
-            :class:`catboost.CatBoostClassifier`.
+                :class:`catboost.CatBoostClassifier`. Please refer to
+                `catboost's documentation <https://catboost.ai/docs/en/concepts/python-reference_catboostclassifier>`_
 
     Example:
     -------
+
     .. testcode::
 
-    from autointent.modules import CatBoostScorer
+        from autointent.modules import CatBoostScorer
 
-
-    scorer = CatBoostScorer(
-        iterations=50,
-        learning_rate=0.05,
-        depth=6,
-        l2_leaf_reg=3,
-        eval_metric="Accuracy",
-        random_seed=42,
-        verbose=False,
-        features_type="embedding",  # or "text" or "both"
-    )
-    utterances = ["hello", "goodbye", "allo", "sayonara"]
-    labels = [0, 1, 0, 1]
-    scorer.fit(utterances, labels)
-    test_utterances = ["hi", "bye"]
-    probabilities = scorer.predict(test_utterances)
-    print(probabilities)
+        scorer = CatBoostScorer(
+            iterations=50,
+            learning_rate=0.05,
+            depth=6,
+            l2_leaf_reg=3,
+            eval_metric="Accuracy",
+            random_seed=42,
+            verbose=False,
+            features_type="embedding",  # or "text" or "both"
+        )
+        utterances = ["hello", "goodbye", "allo", "sayonara"]
+        labels = [0, 1, 0, 1]
+        scorer.fit(utterances, labels)
+        test_utterances = ["hi", "bye"]
+        probabilities = scorer.predict(test_utterances)
+        print(probabilities)
 
     .. testoutput::
 
@@ -92,8 +101,12 @@ class CatBoostScorer(BaseScorer):
         use_embedding_features: bool = True,
         loss_function: str | None = None,
         verbose: bool = False,
+        val_fraction: float = 0.2,
+        early_stopping_rounds: int = 100,
         **catboost_kwargs: dict[str, Any],
     ) -> None:
+        self.val_fraction = val_fraction
+        self.early_stopping_rounds = early_stopping_rounds
         self.features_type = features_type
         self.use_embedding_features = use_embedding_features
         if features_type == FeaturesType.TEXT and use_embedding_features:
@@ -117,6 +130,8 @@ class CatBoostScorer(BaseScorer):
         use_embedding_features: bool = True,
         loss_function: str | None = None,
         verbose: bool = False,
+        val_fraction: FloatFromZeroToOne | None = 0.2,
+        early_stopping_rounds: int = 100,
         **catboost_kwargs: dict[str, Any],
     ) -> "CatBoostScorer":
         if embedder_config is None:
@@ -127,6 +142,8 @@ class CatBoostScorer(BaseScorer):
             verbose=verbose,
             features_type=features_type,
             use_embedding_features=use_embedding_features,
+            val_fraction=val_fraction,
+            early_stopping_rounds=early_stopping_rounds,
             **catboost_kwargs,
         )
 
@@ -149,13 +166,15 @@ class CatBoostScorer(BaseScorer):
                 data = pd.DataFrame(np.array(encoded_utterances))
             if self.features_type == FeaturesType.BOTH:
                 data["text"] = utterances
-            return data
-        return pd.DataFrame({"text": utterances})
+        else:
+            data = pd.DataFrame({"text": utterances})
+
+        return data
 
     def get_extra_params(self) -> dict[str, Any]:
         extra_params = {}
         if self.features_type == FeaturesType.EMBEDDING:
-            if self.use_embedding_features:  # to not raise error if embedding witout embedding_features
+            if self.use_embedding_features:  # to not raise error if embedding without embedding_features
                 extra_params["embedding_features"] = ["embedding"]
         elif self.features_type in {FeaturesType.TEXT, FeaturesType.BOTH}:
             extra_params["text_features"] = ["text"]
@@ -171,24 +190,24 @@ class CatBoostScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
-        if getattr(self, "_model", None) is not None:
-            self.clear_cache()
         self._validate_task(labels)
 
         dataset = self._prepare_data_for_fit(utterances)
 
         default_loss = (
-            "MultiLogloss"
-            if self._multilabel
-            else ("MultiClass" if self._n_classes > BINARY_CLASS_THRESHOLD else "Logloss")
+            "MultiLogloss" if self._multilabel else ("MultiClass" if self._n_classes > 2 else "Logloss")  # noqa: PLR2004
         )
 
         self._model = CatBoostClassifier(
             loss_function=self.loss_function or default_loss,
             verbose=self.verbose,
+            allow_writing_files=False,
+            eval_fraction=self.val_fraction,
             **self.catboost_kwargs,
         )
-        self._model.fit(dataset, labels)
+        self._model.fit(
+            dataset, labels, early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None
+        )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[np.float64]:
         if getattr(self, "_model", None) is None:
