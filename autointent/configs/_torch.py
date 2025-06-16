@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Self
 
 from autointent._callbacks import REPORTERS_NAMES
@@ -28,6 +28,7 @@ class FromDictMixin:
 
 
 class VocabConfig(BaseModel, FromDictMixin):
+    model_config = ConfigDict(extra="forbid")
     padding_idx: int = 0
     max_seq_length: int = 50
     vocab: dict[str, int] | None = None
@@ -35,6 +36,7 @@ class VocabConfig(BaseModel, FromDictMixin):
 
 
 class TorchTrainingConfig(BaseModel, FromDictMixin):
+    model_config = ConfigDict(extra="forbid")
     num_train_epochs: int = 3
     batch_size: int = 8
     learning_rate: float = 5e-5

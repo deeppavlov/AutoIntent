@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import TorchTrainingConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import RNNScorer
 
@@ -14,7 +13,7 @@ def test_rnn_prediction(dataset):
     """Test that the RNN model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1))
+    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
@@ -50,7 +49,7 @@ def test_rnn_cache_clearing(dataset):
     """Test that the RNN model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1))
+    scorer = RNNScorer(embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = ["test text"]
@@ -75,7 +74,7 @@ def test_rnn_device(dataset):
 
     # Force CPU
     scorer = RNNScorer(
-        embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1, device="cpu")
+        embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1, device="cpu"
     )
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -93,7 +92,7 @@ def test_rnn_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer_original = RNNScorer(
-        embed_dim=8, hidden_dim=8, n_layers=1, torch_config=TorchTrainingConfig(num_training_epochs=1)
+        embed_dim=8, hidden_dim=8, n_layers=1, num_train_epochs=1
     )
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 

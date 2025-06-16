@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import TorchTrainingConfig, VocabConfig
+from autointent.configs import VocabConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import CNNScorer
 
@@ -16,7 +16,7 @@ def test_cnn_prediction(dataset):
 
     scorer = CNNScorer(
         embed_dim=8,
-        torch_config=TorchTrainingConfig(num_training_epochs=1),
+        num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -55,7 +55,7 @@ def test_cnn_cache_clearing(dataset):
 
     scorer = CNNScorer(
         embed_dim=8,
-        torch_config=TorchTrainingConfig(num_training_epochs=1),
+        num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
@@ -83,7 +83,7 @@ def test_cnn_scorer_dump_load(dataset):
     # Create and train scorer
     scorer = CNNScorer(
         embed_dim=8,
-        torch_config=TorchTrainingConfig(num_training_epochs=1),
+        num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))

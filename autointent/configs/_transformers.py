@@ -9,6 +9,7 @@ from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTI
 
 
 class TokenizerConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
     truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
@@ -126,6 +127,8 @@ class CrossEncoderConfig(HFModelConfig):
 
 
 class EarlyStoppingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     val_fraction: float = Field(
         0.2,
         description=(
