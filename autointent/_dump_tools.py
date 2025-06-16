@@ -257,7 +257,7 @@ class Dumper:
                 try:
                     cat_model = CatBoostClassifier()
                     cat_model.load_model(str(path / Dumper.catboost_models / "model.cbm"))
-                except Exception as e:  # noqa: PERF203
+                except Exception as e:
                     msg = f"Error loading CatBoost model: {e}"
                     logger.exception(msg)
             else:
