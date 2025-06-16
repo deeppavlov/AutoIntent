@@ -65,6 +65,7 @@ class BaseTorchScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
+            self._model.vocab_config.vocab = None
             del self._model
             torch.cuda.empty_cache()
 

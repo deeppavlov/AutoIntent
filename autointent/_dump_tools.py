@@ -26,10 +26,10 @@ from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
-ModuleAttributes: TypeAlias = (  # type: ignore[type-arg]
+ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes
     | TagsList
-    | np.ndarray
+    | np.ndarray  # type: ignore[type-arg]
     | Embedder
     | VectorIndex
     | BaseEstimator
