@@ -280,7 +280,7 @@ class Ranker:
         """
         clf = joblib.load(path / cls._classifier_file_name)
 
-        with (path / cls._metadata_file_name).open() as file:
+        with (path / cls._metadata_file_name).open(encoding="utf-8") as file:
             metadata: CrossEncoderMetadata = json.load(file)
 
         if override_config is not None:

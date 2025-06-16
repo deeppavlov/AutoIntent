@@ -4,6 +4,7 @@ import gc
 import itertools as it
 import json
 import logging
+import os
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
@@ -12,11 +13,10 @@ from typing import Any
 import optuna
 import torch
 from optuna.trial import Trial
-from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent.context import Context
-from autointent.custom_types import NodeType, SamplerType, SearchSpaceValidationMode
+from autointent.custom_types import NodeType, SearchSpaceValidationMode
 from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
@@ -59,59 +59,63 @@ class NodeOptimizer:
         self.validate_search_space(search_space)
         self.modules_search_spaces = search_space
 
-    def fit(self, context: Context, sampler: SamplerType = "brute", n_jobs: int = 1) -> None:
+    def fit(
+        self,
+        context: Context,
+    ) -> None:
         """Performs the optimization process for the node.
 
         Args:
             context: The optimization context containing relevant data.
             sampler: The sampling strategy used for optimization.
+            n_trials: Number of optuna trials.
+            timeout: Number of secords for optimizing the whole node.
             n_jobs: The number of parallel jobs to run during optimization.
 
         Raises:
             AssertionError: If an invalid sampler type is provided.
         """
         self._logger.info("Starting %s node optimization...", self.node_info.node_type.value)
-        for search_space in deepcopy(self.modules_search_spaces):
-            self._counter: int = 0
-            module_name = search_space.pop("module_name")
-            n_trials = search_space.pop("n_trials", None)
 
-            if sampler == "tpe":
-                sampler_instance = optuna.samplers.TPESampler(seed=context.seed)
-                n_trials = n_trials or 10
-            elif sampler == "brute":
-                sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
-                n_trials = None
-            elif sampler == "random":
-                sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
-                n_trials = n_trials or 10
-            else:
-                assert_never(sampler)
-
-            if n_trials and (possible_combinations := self._n_possible_combinations(search_space)):
-                n_trials = min(possible_combinations, n_trials)
-
-            study, finished_trials, n_trials = load_or_create_study(
-                study_name=f"{self.node_info.node_type}_{module_name}",
-                context=context,
-                direction="maximize",
-                sampler=sampler_instance,
-                n_trials=n_trials,
+        # TODO use node specific hpo_config
+        if context.hpo_config.sampler == "tpe":
+            sampler_instance = optuna.samplers.TPESampler(
+                seed=context.seed,
+                consider_prior=context.hpo_config.consider_prior,
+                prior_weight=context.hpo_config.prior_weight,
+                n_startup_trials=context.hpo_config.n_startup_trials,
+                n_ei_candidates=context.hpo_config.n_ei_candidates,
+                constant_liar=context.hpo_config.constant_liar,
             )
-            self._counter = max(self._counter, finished_trials)
+        elif context.hpo_config.sampler == "random":
+            sampler_instance = optuna.samplers.RandomSampler(seed=context.seed)  # type: ignore[assignment]
 
-            optuna.logging.set_verbosity(optuna.logging.WARNING)
-            obj = partial(self.objective, module_name=module_name, search_space=search_space, context=context)
+        study, finished_trials, n_trials = load_or_create_study(
+            study_name=self.node_info.node_type,
+            context=context,
+            direction="maximize",
+            sampler=sampler_instance,
+            n_trials=context.hpo_config.n_trials,
+        )
+        self._counter = finished_trials  # zero if study is newly created
 
-            study.optimize(obj, n_trials=n_trials, n_jobs=n_jobs)
+        optuna.logging.set_verbosity(optuna.logging.WARNING)
+        obj = partial(self.objective, search_space=self.modules_search_spaces, context=context)
+
+        study.optimize(
+            obj,
+            n_trials=n_trials,
+            n_jobs=context.hpo_config.n_jobs,
+            gc_after_trial=True,
+            timeout=context.hpo_config.timeout,
+        )
 
         self._logger.info("%s node optimization is finished!", self.node_info.node_type)
 
     def objective(
         self,
         trial: Trial,
-        module_name: str,
-        search_space: dict[str, ParamSpaceInt | ParamSpaceFloat | list[Any]],
+        search_space: list[dict[str, Any]],
         context: Context,
     ) -> float:
         """Defines the objective function for optimization.
@@ -125,13 +129,17 @@ class NodeOptimizer:
         Returns:
             The value of the target metric for the given trial.
         """
-        config = self.suggest(trial, search_space)
+        module_name, module_hyperparams = self._suggest_module_and_hyperparams(trial, search_space)
 
-        self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(config))
-        module = self.node_info.modules_available[module_name].from_context(context, **config)
-        config.update(module.get_implicit_initialization_params())
+        self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(module_hyperparams))
+        module = self.node_info.modules_available[module_name].from_context(context, **module_hyperparams)
+        module_hyperparams.update(module.get_implicit_initialization_params())
 
-        context.callback_handler.start_module(module_name=module.trial_name, num=self._counter, module_kwargs=config)
+        context.callback_handler.start_module(
+            module_name=module.trial_name,
+            num=self._counter,
+            module_kwargs=module_hyperparams,
+        )
 
         self._logger.debug("Scoring %s module...", module_name)
 
@@ -148,7 +156,7 @@ class NodeOptimizer:
         context.optimization_info.log_module_optimization(
             node_type=self.node_info.node_type,
             module_name=module_name,
-            module_params=config,
+            module_params=module_hyperparams,
             metric_value=target_metric,
             metric_name=self.target_metric,
             metrics=quality_metrics,
@@ -166,56 +174,34 @@ class NodeOptimizer:
         self._counter += 1
         return target_metric
 
-    def suggest(self, trial: Trial, search_space: dict[str, Any | list[Any]]) -> dict[str, Any]:
-        """Suggests parameter values based on the search space.
+    def _suggest_module_and_hyperparams(
+        self, trial: Trial, search_space: list[dict[str, Any]]
+    ) -> tuple[str, dict[str, Any]]:
+        """Sample module name and its hyperparams from given search space."""
+        n_modules = len(search_space)
+        id_module_chosen = trial.suggest_categorical("module_idx", list(range(n_modules)))
+        module_chosen = deepcopy(search_space[id_module_chosen])
+        module_name = module_chosen.pop("module_name")
+        module_config = self._suggest_hyperparams(trial, f"{module_name}_{id_module_chosen}", module_chosen)
+        return module_name, module_config
 
-        Args:
-            trial: The Optuna trial instance.
-            search_space: A dictionary defining the parameter search space.
-
-        Returns:
-            A dictionary containing the suggested parameter values.
-
-        Raises:
-            TypeError: If an unsupported parameter search space type is encountered.
-        """
+    def _suggest_hyperparams(
+        self, trial: Trial, module_name: str, search_space: dict[str, Any | list[Any]]
+    ) -> dict[str, Any]:
         res: dict[str, Any] = {}
 
         for param_name, param_space in search_space.items():
+            name = f"{module_name}_{param_name}"
             if isinstance(param_space, list):
-                res[param_name] = trial.suggest_categorical(param_name, choices=param_space)
+                res[param_name] = trial.suggest_categorical(name, choices=param_space)
             elif self._parse_param_space(param_space, ParamSpaceInt):
-                res[param_name] = trial.suggest_int(param_name, **param_space)
+                res[param_name] = trial.suggest_int(name, **param_space)
             elif self._parse_param_space(param_space, ParamSpaceFloat):
-                res[param_name] = trial.suggest_float(param_name, **param_space)
+                res[param_name] = trial.suggest_float(name, **param_space)
             else:
-                msg = f"Unsupported type of param search space: {param_space}"
+                msg = f"Unsupported type of param search space {name}: {param_space}"
                 raise TypeError(msg)
         return res
-
-    def _n_possible_combinations(self, search_space: dict[str, Any]) -> int | None:
-        """Calculate the number of possible combinations in the search space.
-
-        Args:
-            search_space: The parameter search space.
-
-        Returns:
-            The number of possible combinations or None if search space is continuous.
-        """
-        n_combinations = 1
-        for param_space in search_space.values():
-            if isinstance(param_space, list):
-                n_combinations *= len(param_space)
-            elif param_space_int := self._parse_param_space(param_space, ParamSpaceInt):
-                n_combinations *= param_space_int.n_possible_values()
-            elif param_space_float := self._parse_param_space(param_space, ParamSpaceFloat):
-                n_possible_values = param_space_float.n_possible_values()
-                if n_possible_values is None:
-                    return None
-                n_combinations *= n_possible_values
-            else:
-                assert_never(param_space)
-        return n_combinations
 
     def _parse_param_space(self, param_space: dict[str, Any], space_type: type[ParamSpaceT]) -> ParamSpaceT | None:
         try:
@@ -294,6 +280,10 @@ class NodeOptimizer:
     def validate_search_space(self, search_space: list[dict[str, Any]]) -> None:
         """Check if search space is configured correctly."""
         validated_search_space = SearchSpaceConfig(search_space).model_dump()
+
+        if not bool(int(os.getenv("AUTOINTENT_EXTRA_VALIDATION", "0"))):
+            return
+
         for module_search_space in validated_search_space:
             module_search_space_no_optuna, module_name = self._reformat_search_space(deepcopy(module_search_space))
 
@@ -352,8 +342,8 @@ def load_or_create_study(
     study_name: str,
     context: Context,
     sampler: optuna.samplers.BaseSampler,
+    n_trials: int,
     direction: str = "maximize",
-    n_trials: int = 10,
 ) -> tuple[optuna.Study, int, int]:
     """Load an existing study or create a new one if it doesn't exist.
 
@@ -384,14 +374,14 @@ def load_or_create_study(
             # Find the highest trial number to continue counting
             finished_trials = max(t.number for t in study.trials) + 1
             # Calculate remaining trials if n_trials is specified
-            remaining_trials = n_trials if n_trials is None else max(0, n_trials - len(study.trials))
+            remaining_trials = max(0, n_trials - len(study.trials))
 
         context.load_optimization_info()
         return study, finished_trials, remaining_trials  # noqa: TRY300
     except Exception:  # noqa: BLE001
         # Create a new study if none exists
         return (
-            optuna.create_study(
+            optuna.create_study(  # TODO add pruner?
                 study_name=study_name,
                 storage=storage_url,
                 direction=direction,

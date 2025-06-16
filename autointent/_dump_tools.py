@@ -11,6 +11,7 @@ from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
+from torch import nn
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -20,6 +21,7 @@ from transformers import (  # type: ignore[attr-defined]
 )
 
 from autointent import Embedder, Ranker, VectorIndex
+from autointent._wrappers import BaseTorchModule
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
@@ -27,7 +29,7 @@ from autointent.schemas import TagsList
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
 ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker  # type: ignore[type-arg]
+    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | nn.Module  # type: ignore[type-arg]
 )
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,7 @@ class Dumper:
     pydantic_models: str = "pydantic"
     hf_models = "hf_models"
     hf_tokenizers = "hf_tokenizers"
+    torch_models = "torch_models"
     ptuning_models = "ptuning_models"
     catboost_models = "catboost_models"
 
@@ -64,6 +67,7 @@ class Dumper:
             path / Dumper.pydantic_models,
             path / Dumper.hf_models,
             path / Dumper.hf_tokenizers,
+            path / Dumper.torch_models,
             path / Dumper.ptuning_models,
             path / Dumper.catboost_models,
         ]
@@ -142,6 +146,20 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
+            elif isinstance(val, BaseTorchModule):
+                model_path = path / Dumper.torch_models / key
+                model_path.mkdir(parents=True, exist_ok=True)
+                try:
+                    class_info = {
+                        "module": val.__class__.__module__,
+                        "name": val.__class__.__name__,
+                    }
+                    with (model_path / "class_info.json").open("w") as f:
+                        json.dump(class_info, f)
+                    val.dump(model_path)
+                except Exception as e:
+                    msg = f"Error dumping torch model {key}: {e}"
+                    logger.exception(msg)
             elif isinstance(val, PreTrainedTokenizer | PreTrainedTokenizerFast):
                 tokenizer_path = path / Dumper.hf_tokenizers / key
                 tokenizer_path.mkdir(parents=True, exist_ok=True)
@@ -156,7 +174,7 @@ class Dumper:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
 
-        with (path / Dumper.simple_attrs).open("w") as file:
+        with (path / Dumper.simple_attrs).open("w", encoding="utf-8") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
@@ -180,12 +198,13 @@ class Dumper:
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
         catboost_models: dict[str, Any] = {}
+        torch_models: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
                 tags = {tags_dump.name: TagsList.load(tags_dump) for tags_dump in child.iterdir()}
             elif child.name == Dumper.simple_attrs:
-                with child.open() as file:
+                with child.open(encoding="utf-8") as file:
                     simple_attrs = json.load(file)
             elif child.name == Dumper.arrays:
                 arrays = dict(np.load(child))
@@ -263,6 +282,18 @@ class Dumper:
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading CatBoost model: {e}"
                         logger.exception(msg)
+            elif child.name == Dumper.torch_models:
+                try:
+                    for model_dir in child.iterdir():
+                        with (model_dir / "class_info.json").open("r") as f:
+                            class_info = json.load(f)
+                        module = importlib.import_module(class_info["module"])
+                        model_class: BaseTorchModule = getattr(module, class_info["name"])
+                        model = model_class.load(model_dir)
+                        torch_models[model_dir.name] = model
+                except Exception as e:
+                    msg = f"Error loading torch model {model_dir.name}: {e}"
+                    logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
@@ -279,4 +310,5 @@ class Dumper:
             | hf_models
             | hf_tokenizers
             | catboost_models
+            | torch_models
         )

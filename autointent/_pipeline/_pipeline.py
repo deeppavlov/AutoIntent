@@ -3,7 +3,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, get_args
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import yaml
@@ -15,13 +15,13 @@ from autointent.configs import (
     DataConfig,
     EmbedderConfig,
     HFModelConfig,
+    HPOConfig,
     InferenceNodeConfig,
     LoggingConfig,
 )
 from autointent.custom_types import (
     ListOfGenericLabels,
     NodeType,
-    SamplerType,
     SearchSpacePreset,
     SearchSpaceValidationMode,
 )
@@ -44,7 +44,6 @@ class Pipeline:
     def __init__(
         self,
         nodes: list[NodeOptimizer] | list[InferenceNode],
-        sampler: SamplerType = "brute",
         seed: int | None = 42,
     ) -> None:
         """Initialize the pipeline optimizer.
@@ -57,11 +56,6 @@ class Pipeline:
         self._logger = logging.getLogger(__name__)
         self.nodes = {node.node_type: node for node in nodes}
         self._seed = seed
-        if sampler not in get_args(SamplerType):
-            msg = f"Sampler should be one of {get_args(SamplerType)}"
-            raise ValueError(msg)
-
-        self._sampler = sampler
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig()
@@ -69,11 +63,12 @@ class Pipeline:
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
             self.transformer_config = HFModelConfig()
+            self.hpo_config = HPOConfig()
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
     def set_config(
-        self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig | HFModelConfig
+        self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig | HFModelConfig | HPOConfig
     ) -> None:
         """Set the configuration for the pipeline.
 
@@ -90,6 +85,8 @@ class Pipeline:
             self.data_config = config
         elif isinstance(config, HFModelConfig):
             self.transformer_config = config
+        elif isinstance(config, HPOConfig):
+            self.hpo_config = config
         else:
             assert_never(config)
 
@@ -126,13 +123,12 @@ class Pipeline:
             if isinstance(config, dict):
                 dict_params = config
             else:
-                with Path(config).open() as file:
+                with Path(config).open(encoding="utf-8") as file:
                     dict_params = yaml.safe_load(file)
             optimization_config = OptimizationConfig(**dict_params)
 
         pipeline = cls(
             [NodeOptimizer(**node) for node in optimization_config.search_space],
-            optimization_config.sampler,
             optimization_config.seed,
         )
         pipeline.set_config(optimization_config.logging_config)
@@ -140,9 +136,10 @@ class Pipeline:
         pipeline.set_config(optimization_config.embedder_config)
         pipeline.set_config(optimization_config.cross_encoder_config)
         pipeline.set_config(optimization_config.transformer_config)
+        pipeline.set_config(optimization_config.hpo_config)
         return pipeline
 
-    def _fit(self, context: Context, sampler: SamplerType) -> None:
+    def _fit(self, context: Context) -> None:
         """Optimize the pipeline.
 
         Args:
@@ -167,7 +164,7 @@ class Pipeline:
         for node_type in NodeType:
             node_optimizer = self.nodes.get(node_type, None)
             if node_optimizer is not None:
-                node_optimizer.fit(context, sampler)  # type: ignore[union-attr]
+                node_optimizer.fit(context)  # type: ignore[union-attr]
         self.context.callback_handler.end_run()
 
     def _is_inference(self) -> bool:
@@ -182,7 +179,6 @@ class Pipeline:
         self,
         dataset: Dataset,
         refit_after: bool = False,
-        sampler: SamplerType | None = None,
         incompatible_search_space: SearchSpaceValidationMode = "filter",
     ) -> Context:
         """Optimize the pipeline from dataset.
@@ -206,6 +202,7 @@ class Pipeline:
         context.configure_transformer(self.embedder_config)
         context.configure_transformer(self.cross_encoder_config)
         context.configure_transformer(self.transformer_config)
+        context.configure_hpo(self.hpo_config)
 
         self.validate_modules(dataset, mode=incompatible_search_space)
 
@@ -221,10 +218,7 @@ class Pipeline:
                 "Change settings in LoggerConfig to obtain different behavior."
             )
 
-        if sampler is None:
-            sampler = self._sampler
-
-        self._fit(context, sampler)
+        self._fit(context)
 
         if context.logging_config.clear_ram and context.logging_config.dump_modules:
             nodes_configs = context.optimization_info.get_inference_nodes_config()
@@ -336,7 +330,7 @@ class Pipeline:
             embedder_config: one can override presaved settings
             cross_encoder_config: one can override presaved settings
         """
-        with (Path(path) / "inference_config.yaml").open() as file:
+        with (Path(path) / "inference_config.yaml").open(encoding="utf-8") as file:
             inference_nodes_configs: list[dict[str, Any]] = yaml.safe_load(file)
 
         inference_config = [

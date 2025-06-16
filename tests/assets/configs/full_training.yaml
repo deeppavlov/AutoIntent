@@ -14,7 +14,7 @@ search_space:
     target_metric: decision_accuracy
     search_space:
       - module_name: argmax
-sampler: brute
+sampler: tpe
 data_config:
   scheme: ho
   n_folds: 3
