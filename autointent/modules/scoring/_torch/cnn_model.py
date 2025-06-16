@@ -63,6 +63,7 @@ class TextCNN(BaseTorchModuleWithVocab):
         embedded = embedded.permute(0, 2, 1)  # (B, H, T)
 
         # list of (B, H)
+        # TODO ignore padded tokens
         conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
         concatenated: torch.Tensor = torch.cat(conved, dim=1)  # (B, H)
         dropped: torch.Tensor = self.dropout(concatenated)

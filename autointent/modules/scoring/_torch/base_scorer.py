@@ -74,6 +74,7 @@ class BaseTorchScorer(BaseScorer):
             msg = "Scorer is not initialized"
             raise ValueError(msg)
 
+        # TODO add early stopping
         dataset = TensorDataset(x, y)
         dataloader = DataLoader(dataset, batch_size=self.torch_config.batch_size, shuffle=True)
 

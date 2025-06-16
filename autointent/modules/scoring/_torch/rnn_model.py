@@ -46,6 +46,7 @@ class TextRNN(BaseTorchModuleWithVocab):
         embedded = self.embedding(text)  # (B, T, H)
         outputs, _ = self.rnn(embedded)  # (B, T, H)
         # (B, H), rightmost token's embedding
+        # TODO ignore padded tokens
         return self.fc(outputs[:, -1])  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:

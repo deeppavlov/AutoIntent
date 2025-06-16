@@ -53,7 +53,6 @@ class Dumper:
     hf_tokenizers = "hf_tokenizers"
     torch_models = "torch_models"
     ptuning_models = "ptuning_models"
-    vocab = "vocab.json"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -221,13 +220,6 @@ class Dumper:
         hf_tokenizers: dict[str, Any] = {}
         torch_models: dict[str, Any] = {}
 
-        obj_dict = vars(obj)
-
-        vocab_path = path / Dumper.vocab
-        if vocab_path.exists():
-            with vocab_path.open("r") as f:
-                obj_dict["_vocab"] = json.load(f)
-
         for child in path.iterdir():
             if child.name == Dumper.tags:
                 tags = {tags_dump.name: TagsList.load(tags_dump) for tags_dump in child.iterdir()}
@@ -328,7 +320,7 @@ class Dumper:
                 if raise_errors:
                     raise ValueError(msg)
 
-        obj_dict.update(
+        obj.__dict__.update(
             tags
             | simple_attrs
             | arrays
