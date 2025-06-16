@@ -106,6 +106,7 @@ class CatBoostScorer(BaseScorer):
         self.loss_function = loss_function
         self.verbose = verbose
         self.catboost_kwargs = catboost_kwargs or {}
+        self.catboost_kwargs |= self.get_extra_params()
 
     @classmethod
     def from_context(
@@ -125,6 +126,7 @@ class CatBoostScorer(BaseScorer):
             loss_function=loss_function,
             verbose=verbose,
             features_type=features_type,
+            use_embedding_features=use_embedding_features,
             **catboost_kwargs,
         )
 
@@ -144,11 +146,25 @@ class CatBoostScorer(BaseScorer):
             if self.use_embedding_features:
                 data = pd.DataFrame({"embedding": encoded_utterances})
             else:
-                data = pd.DataFrame(encoded_utterances)
+                data = pd.DataFrame(np.array(encoded_utterances))
             if self.features_type == FeaturesType.BOTH:
                 data["text"] = utterances
             return data
         return pd.DataFrame({"text": utterances})
+
+    def get_extra_params(self) -> dict[str, Any]:
+        extra_params = {}
+        if self.features_type == FeaturesType.EMBEDDING:
+            if self.use_embedding_features:  # to not raise error if embedding witout embedding_features
+                extra_params["embedding_features"] = ["embedding"]
+        elif self.features_type in {FeaturesType.TEXT, FeaturesType.BOTH}:
+            extra_params["text_features"] = ["text"]
+            if self.features_type == FeaturesType.BOTH and self.use_embedding_features:
+                extra_params["embedding_features"] = ["embedding"]
+        else:
+            msg = f"Unsupported features type: {self.features_type}"
+            raise ValueError(msg)
+        return extra_params
 
     def fit(
         self,
@@ -166,19 +182,6 @@ class CatBoostScorer(BaseScorer):
             if self._multilabel
             else ("MultiClass" if self._n_classes > BINARY_CLASS_THRESHOLD else "Logloss")
         )
-
-        extra_params = {}
-        if self.features_type == FeaturesType.EMBEDDING:
-            if self.use_embedding_features:  # to not raise error if embedding witout embedding_features
-                extra_params["embedding_features"] = ["embedding"]
-        elif self.features_type in {FeaturesType.TEXT, FeaturesType.BOTH}:
-            extra_params["text_features"] = ["text"]
-            if self.features_type == FeaturesType.BOTH and self.use_embedding_features:
-                extra_params["embedding_features"] = ["embedding"]
-        else:
-            msg = f"Unsupported features type: {self.features_type}"
-            raise ValueError(msg)
-        self.catboost_kwargs.update(extra_params)
 
         self._model = CatBoostClassifier(
             loss_function=self.loss_function or default_loss,
