@@ -95,5 +95,5 @@ class JsonReader(BaseReader):
         Returns:
             DatasetReader: A validated dataset representation.
         """
-        with Path(filepath).open() as file:
+        with Path(filepath).open(encoding="utf-8") as file:
             return DatasetReader.model_validate(json.load(file))

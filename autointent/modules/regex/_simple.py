@@ -262,7 +262,7 @@ class SimpleRegex(BaseRegex):
     ) -> "SimpleRegex":
         instance = cls()
 
-        with (Path(path) / "regex_patterns.json").open() as file:
+        with (Path(path) / "regex_patterns.json").open(encoding="utf-8") as file:
             serialized: list[dict[str, Any]] = json.load(file)
 
         instance._compile_regex_patterns(serialized)  # noqa: SLF001

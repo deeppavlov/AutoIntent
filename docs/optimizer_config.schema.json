@@ -295,6 +295,79 @@
             "title": "HFModelConfig",
             "type": "object"
         },
+        "HPOConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for hyperparameter optimization using Optuna.\n\nFor more detailed information about the TPE sampler and its parameters,\nrefer to Optuna's documentation of `TPESampler\n<https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html>`_,\n`study.optimize\n<https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize>`_,\n`RandomSampler <https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html>`_.",
+            "properties": {
+                "sampler": {
+                    "default": "tpe",
+                    "description": "Optuna sampler. One of 'tpe', 'random'.",
+                    "enum": [
+                        "tpe",
+                        "random"
+                    ],
+                    "title": "Sampler",
+                    "type": "string"
+                },
+                "n_trials": {
+                    "default": 15,
+                    "description": "Number of trials to run in the optimization process. This is the total number of different hyperparameter combinations that will be evaluated.",
+                    "title": "N Trials",
+                    "type": "integer"
+                },
+                "timeout": {
+                    "anyOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Time limit in seconds for the optimization process. If None, the optimization will run until n_trials is reached.",
+                    "title": "Timeout"
+                },
+                "n_jobs": {
+                    "default": 1,
+                    "description": "Number of parallel jobs to run. Set to -1 to use all available CPU cores.",
+                    "title": "N Jobs",
+                    "type": "integer"
+                },
+                "n_startup_trials": {
+                    "default": 10,
+                    "description": "Number of initial trials to run using random sampling before switching to TPE algorithm. This helps in better initialization of the TPE algorithm.",
+                    "title": "N Startup Trials",
+                    "type": "integer"
+                },
+                "consider_prior": {
+                    "default": true,
+                    "description": "Whether to use Gaussian (normal) distribution as prior for integer and float parameter spaces. This helps in better initialization of the TPE algorithm's parameter distributions.",
+                    "title": "Consider Prior",
+                    "type": "boolean"
+                },
+                "prior_weight": {
+                    "default": 1,
+                    "description": "Weight of the prior distribution in the TPE algorithm. Higher values make the algorithm more conservative in exploring new regions.",
+                    "title": "Prior Weight",
+                    "type": "integer"
+                },
+                "n_ei_candidates": {
+                    "default": 24,
+                    "description": "Number of candidates to sample for expected improvement calculation in TPE algorithm. Higher values may lead to better exploration but slower optimization.",
+                    "title": "N Ei Candidates",
+                    "type": "integer"
+                },
+                "constant_liar": {
+                    "default": false,
+                    "description": "Whether to use constant liar strategy for parallel optimization. If True, the algorithm will penalize running trials to avoid suggesting parameter configurations that are too close to currently running trials.",
+                    "title": "Constant Liar",
+                    "type": "boolean"
+                }
+            },
+            "title": "HPOConfig",
+            "type": "object"
+        },
         "LoggingConfig": {
             "additionalProperties": false,
             "description": "Configuration for the logging.",
@@ -498,15 +571,19 @@
                 "trust_remote_code": false
             }
         },
-        "sampler": {
-            "default": "brute",
-            "enum": [
-                "brute",
-                "tpe",
-                "random"
-            ],
-            "title": "Sampler",
-            "type": "string"
+        "hpo_config": {
+            "$ref": "#/$defs/HPOConfig",
+            "default": {
+                "sampler": "tpe",
+                "n_trials": 15,
+                "timeout": null,
+                "n_jobs": 1,
+                "n_startup_trials": 10,
+                "consider_prior": true,
+                "prior_weight": 1,
+                "n_ei_candidates": 24,
+                "constant_liar": false
+            }
         },
         "seed": {
             "default": 42,
