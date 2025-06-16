@@ -1,6 +1,6 @@
 from .ranker import Ranker
 from .embedder import Embedder
 from .vector_index import VectorIndex
-from .base_torch_module import BaseTorchModule
+from .base_torch_module import BaseTorchModuleWithVocab
 
-__all__ = ["BaseTorchModule", "Embedder", "Ranker", "VectorIndex"]
+__all__ = ["BaseTorchModuleWithVocab", "Embedder", "Ranker", "VectorIndex"]

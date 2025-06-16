@@ -7,11 +7,9 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
-import torch
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
-from torch import nn
 from transformers import (  # type: ignore[attr-defined]
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -21,15 +19,22 @@ from transformers import (  # type: ignore[attr-defined]
 )
 
 from autointent import Embedder, Ranker, VectorIndex
-from autointent._wrappers import BaseTorchModule
+from autointent._wrappers import BaseTorchModuleWithVocab
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 
-ModuleAttributes: TypeAlias = (
-    ModuleSimpleAttributes | TagsList | np.ndarray | Embedder | VectorIndex | BaseEstimator | Ranker | nn.Module  # type: ignore[type-arg]
+ModuleAttributes: TypeAlias = (  # type: ignore[type-arg]
+    ModuleSimpleAttributes
+    | TagsList
+    | np.ndarray
+    | Embedder
+    | VectorIndex
+    | BaseEstimator
+    | Ranker
+    | BaseTorchModuleWithVocab
 )
 
 logger = logging.getLogger(__name__)
@@ -48,7 +53,6 @@ class Dumper:
     hf_tokenizers = "hf_tokenizers"
     torch_models = "torch_models"
     ptuning_models = "ptuning_models"
-    torch_models = "torch_models"
     vocab = "vocab.json"
     model_metadata = "model_metadata.json"
 
@@ -71,7 +75,6 @@ class Dumper:
             path / Dumper.hf_tokenizers,
             path / Dumper.torch_models,
             path / Dumper.ptuning_models,
-            path / Dumper.torch_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
@@ -159,7 +162,7 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF model {key}: {e}"
                     logger.exception(msg)
-            elif isinstance(val, BaseTorchModule):
+            elif isinstance(val, BaseTorchModuleWithVocab):
                 model_path = path / Dumper.torch_models / key
                 model_path.mkdir(parents=True, exist_ok=True)
                 try:
@@ -181,12 +184,6 @@ class Dumper:
                 except Exception as e:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
-            elif key == "_model" and isinstance(val, nn.Module):
-                torch_model_path = path / Dumper.torch_models
-                torch.save(val.state_dict(), torch_model_path / f"{key}.pt")
-                class_info = {"module": val.__class__.__module__, "name": val.__class__.__name__}
-                with (torch_model_path / "model_class_info.json").open("w") as f:
-                    json.dump(class_info, f)
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -222,13 +219,6 @@ class Dumper:
         if vocab_path.exists():
             with vocab_path.open("r") as f:
                 obj_dict["_vocab"] = json.load(f)
-
-        metadata_path = path / Dumper.model_metadata
-        if metadata_path.exists():
-            with metadata_path.open("r") as f:
-                metadata = json.load(f)
-                obj_dict["_n_classes"] = metadata["n_classes"]
-                obj_dict["_multilabel"] = metadata["multilabel"]
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -309,7 +299,7 @@ class Dumper:
                         with (model_dir / "class_info.json").open("r") as f:
                             class_info = json.load(f)
                         module = importlib.import_module(class_info["module"])
-                        model_class: BaseTorchModule = getattr(module, class_info["name"])
+                        model_class: BaseTorchModuleWithVocab = getattr(module, class_info["name"])
                         model = model_class.load(model_dir)
                         torch_models[model_dir.name] = model
                 except Exception as e:
@@ -332,18 +322,3 @@ class Dumper:
             | hf_tokenizers
             | torch_models
         )
-
-        torch_model_dir = path / Dumper.torch_models
-        if torch_model_dir.exists() and "_vocab" in obj_dict:
-            model_path = torch_model_dir / "_model.pt"
-            if model_path.exists():
-                vocab_size = len(obj_dict["_vocab"])
-
-                method_name = "_RNNScorer__initialize_model"
-                if hasattr(obj, method_name):
-                    initialize_method = getattr(obj, method_name)
-                    initialize_method(vocab_size)
-
-                    model_state = torch.load(model_path)
-                    obj_dict["_model"].load_state_dict(model_state)
-                    obj_dict["_model"].eval()

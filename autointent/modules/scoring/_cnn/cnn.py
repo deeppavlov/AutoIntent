@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
+from autointent.configs import VocabConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._cnn.textcnn import TextCNN
@@ -24,7 +25,6 @@ class CNNScorer(BaseScorer):
 
     def __init__(
         self,
-        max_seq_length: int = 50,
         num_train_epochs: int = 3,
         batch_size: int = 8,
         learning_rate: float = 5e-5,
@@ -34,8 +34,9 @@ class CNNScorer(BaseScorer):
         kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
+        vocab_config: VocabConfig | dict[str, Any] | None = None,
     ) -> None:
-        self.max_seq_length = max_seq_length
+        self.vocab_config = VocabConfig.from_search_config(vocab_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
@@ -58,6 +59,7 @@ class CNNScorer(BaseScorer):
         kernel_sizes: list[int] = [3, 4, 5],  # noqa: B006
         num_filters: int = 100,
         dropout: float = 0.1,
+        vocab_config: VocabConfig | dict[str, Any] | None = None,
     ) -> "CNNScorer":
         return cls(
             num_train_epochs=num_train_epochs,
@@ -69,6 +71,7 @@ class CNNScorer(BaseScorer):
             kernel_sizes=kernel_sizes,
             num_filters=num_filters,
             dropout=dropout,
+            vocab_config=vocab_config,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -81,7 +84,7 @@ class CNNScorer(BaseScorer):
             kernel_sizes=self.kernel_sizes,
             num_filters=self.num_filters,
             dropout=self.dropout,
-            max_seq_length=self.max_seq_length,
+            vocab_config=self.vocab_config,
         )
 
         # Build vocabulary and convert text to indices

@@ -1,7 +1,7 @@
 """Dataclasses for the configuration of the :class:`autointent.Embedder` and other objects."""
 
 from ._inference_node import InferenceNodeConfig
-from ._optimization import DataConfig, LoggingConfig
+from ._optimization import DataConfig, HPOConfig, LoggingConfig
 from ._transformers import (
     CrossEncoderConfig,
     EarlyStoppingConfig,
@@ -11,6 +11,7 @@ from ._transformers import (
     TaskTypeEnum,
     TokenizerConfig,
 )
+from ._vocab import VocabConfig
 
 __all__ = [
     "CrossEncoderConfig",
@@ -24,4 +25,5 @@ __all__ = [
     "RNNConfig",
     "TaskTypeEnum",
     "TokenizerConfig",
+    "VocabConfig",
 ]
