@@ -47,6 +47,7 @@ class CatBoostScorer(BaseScorer):
         verbose: If True, CatBoost prints training progress.
 
         val_fraction: fraction of training data used for early stopping. Set to None to disaple early stopping.
+                Note: early stopping is not supported with multilabel classification.
 
         early_stopping_rounds: number of iterations without metric increasing waiting for early stopping.
                 Ignored when ``val_fraction`` is ``None``.
@@ -197,6 +198,11 @@ class CatBoostScorer(BaseScorer):
         default_loss = (
             "MultiLogloss" if self._multilabel else ("MultiClass" if self._n_classes > 2 else "Logloss")  # noqa: PLR2004
         )
+
+        if self._multilabel:
+            self.val_fraction = None
+            msg = "Disabling early stopping in CatBoostClassifier as it is not supported with multi-label task."
+            logger.warning(msg)
 
         self._model = CatBoostClassifier(
             loss_function=self.loss_function or default_loss,
