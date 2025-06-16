@@ -7,7 +7,7 @@ from typing import Any, cast
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-from catboost import CatBoostClassifier  # type: ignore[import-untyped]
+from catboost import CatBoostClassifier
 
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
@@ -101,7 +101,7 @@ class CatBoostScorer(BaseScorer):
         use_embedding_features: bool = True,
         loss_function: str | None = None,
         verbose: bool = False,
-        val_fraction: float = 0.2,
+        val_fraction: float | None = 0.2,
         early_stopping_rounds: int = 100,
         **catboost_kwargs: dict[str, Any],
     ) -> None:

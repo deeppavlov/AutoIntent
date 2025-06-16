@@ -36,7 +36,7 @@
       l2_leaf_reg: [1, 5]
       eval_metric: ["Accuracy"]
       random_seed: [42]
-      classification_model_config:
+      embedder_config:
         - null
         - model_name: prajjwal1/bert-tiny
     - module_name: bert
