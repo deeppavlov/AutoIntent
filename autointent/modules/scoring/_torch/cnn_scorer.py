@@ -5,7 +5,7 @@ from typing import Any
 from autointent import Context
 from autointent.configs import TorchTrainingConfig, VocabConfig
 
-from .base import BaseTorchScorer
+from .base_scorer import BaseTorchScorer
 from .cnn_model import TextCNN
 
 
@@ -41,7 +41,8 @@ class CNNScorer(BaseTorchScorer):
         torch_config: TorchTrainingConfig | dict[str, Any] | None = None,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
     ) -> "CNNScorer":
-        torch_config.report_to = context.logging_config.report_to
+        torch_config = TorchTrainingConfig.from_search_config(torch_config)
+        torch_config.report_to = context.logging_config.report_to  # type: ignore[assignment]
         return cls(
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,

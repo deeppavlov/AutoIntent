@@ -65,6 +65,10 @@ class BaseTorchModuleWithVocab(nn.Module, ABC):
 
     def text_to_indices(self, utterances: list[str]) -> list[list[int]]:
         """Convert utterances to padded sequences of word indices."""
+        if self.vocab_config.vocab is None:
+            msg = "Vocab is not built."
+            raise RuntimeError(msg)
+
         sequences: list[list[int]] = []
         for utterance in utterances:
             words = re.findall(r"\w+", utterance.lower())
@@ -76,6 +80,17 @@ class BaseTorchModuleWithVocab(nn.Module, ABC):
             seq = seq + [self.vocab_config.padding_idx] * (self.vocab_config.max_seq_length - len(seq))
             sequences.append(seq)
         return sequences
+
+    @abstractmethod
+    def forward(self, text: torch.Tensor) -> torch.Tensor:
+        """Compute sentence embeddings for given text.
+
+        Args:
+            text: torch tensor of shape (B, T), token ids
+
+        Returns:
+            embeddings of shape (B, H)
+        """
 
     @abstractmethod
     def dump(self, path: Path) -> None:

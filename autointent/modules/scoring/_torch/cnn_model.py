@@ -55,15 +55,16 @@ class TextCNN(BaseTorchModuleWithVocab):
         self.fc = nn.Linear(num_filters * len(kernel_sizes), n_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the model."""
         if self.vocab_config.vocab is None:
             msg = "Model not initialized. Call build_vocab() first."
             raise ValueError(msg)
 
-        embedded: torch.Tensor = self.embedding(x)
-        embedded = embedded.permute(0, 2, 1)
+        embedded: torch.Tensor = self.embedding(x)  # (B, T, H)
+        embedded = embedded.permute(0, 2, 1)  # (B, H, T)
+
+        # list of (B, H)
         conved: list[torch.Tensor] = [F.relu(conv(embedded)).max(dim=2)[0] for conv in self.convs]
-        concatenated: torch.Tensor = torch.cat(conved, dim=1)
+        concatenated: torch.Tensor = torch.cat(conved, dim=1)  # (B, H)
         dropped: torch.Tensor = self.dropout(concatenated)
         return self.fc(dropped)  # type: ignore[no-any-return]
 

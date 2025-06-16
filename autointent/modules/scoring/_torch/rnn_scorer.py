@@ -3,7 +3,7 @@ from typing import Any
 from autointent import Context
 from autointent.configs import TorchTrainingConfig, VocabConfig
 
-from .base import BaseTorchScorer
+from .base_scorer import BaseTorchScorer
 from .rnn_model import TextRNN
 
 
@@ -41,7 +41,8 @@ class RNNScorer(BaseTorchScorer):
         vocab_config: VocabConfig | dict[str, Any] | None = None,
     ) -> "RNNScorer":
         """Create a RNNScorer from context."""
-        torch_config.report_to = context.logging_config.report_to
+        torch_config = TorchTrainingConfig.from_search_config(torch_config)
+        torch_config.report_to = context.logging_config.report_to  # type: ignore[assignment]
 
         return cls(
             embed_dim=embed_dim,

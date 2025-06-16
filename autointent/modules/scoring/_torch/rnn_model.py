@@ -42,10 +42,11 @@ class TextRNN(BaseTorchModuleWithVocab):
         self.rnn = nn.LSTM(embed_dim, hidden_dim, num_layers=n_layers, batch_first=True, dropout=dropout)
         self.fc = nn.Linear(hidden_dim, n_classes)
 
-    def forward(self, text: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        embedded = self.embedding(text)
-        outputs, _ = self.rnn(embedded)
-        return self.fc(outputs[:, -1])
+    def forward(self, text: torch.Tensor) -> torch.Tensor:
+        embedded = self.embedding(text)  # (B, T, H)
+        outputs, _ = self.rnn(embedded)  # (B, T, H)
+        # (B, H), rightmost token's embedding
+        return self.fc(outputs[:, -1])  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:
         metadata = TextRNNDumpMetadata(
