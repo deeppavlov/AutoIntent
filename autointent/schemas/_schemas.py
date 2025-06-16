@@ -38,7 +38,7 @@ class TagsList(list[Tag]):
     @classmethod
     def load(cls, path: Path) -> "TagsList":
         """Load pydantic model from file system."""
-        with path.open() as file:
+        with path.open(encoding="utf-8") as file:
             serialized: list[dict[str, Any]] = json.load(file)
         parsed = [Tag(**t) for t in serialized]
         return cls(parsed)

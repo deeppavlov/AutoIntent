@@ -123,7 +123,7 @@ class Pipeline:
             if isinstance(config, dict):
                 dict_params = config
             else:
-                with Path(config).open() as file:
+                with Path(config).open(encoding="utf-8") as file:
                     dict_params = yaml.safe_load(file)
             optimization_config = OptimizationConfig(**dict_params)
 
@@ -330,7 +330,7 @@ class Pipeline:
             embedder_config: one can override presaved settings
             cross_encoder_config: one can override presaved settings
         """
-        with (Path(path) / "inference_config.yaml").open() as file:
+        with (Path(path) / "inference_config.yaml").open(encoding="utf-8") as file:
             inference_nodes_configs: list[dict[str, Any]] = yaml.safe_load(file)
 
         inference_config = [

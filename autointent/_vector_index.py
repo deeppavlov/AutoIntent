@@ -221,7 +221,7 @@ class VectorIndex:
             embedder_batch_size: Batch size for the embedding model.
             embedder_use_cache: Whether to use caching for the embedding model.
         """
-        with (dir_path / cls._meta_data_file).open() as file:
+        with (dir_path / cls._meta_data_file).open(encoding="utf-8") as file:
             metadata: VectorIndexMetadata = json.load(file)
 
         instance = cls(
@@ -234,7 +234,7 @@ class VectorIndex:
             )
         )
 
-        with (dir_path / cls._data_file).open() as file:
+        with (dir_path / cls._data_file).open(encoding="utf-8") as file:
             data: VectorIndexData = json.load(file)
 
         instance.add(**data)
