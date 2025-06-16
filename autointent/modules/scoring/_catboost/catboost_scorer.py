@@ -114,13 +114,10 @@ class CatBoostScorer(BaseScorer):
             msg = "Only catbooost text features will be used, `use_embedding_features` is ignored."
             logger.warning(msg)
 
-        if self.features_type in self.encoder_features_types:
-            self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
-            self._embedder = Embedder(self.embedder_config)
+        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.loss_function = loss_function
         self.verbose = verbose
         self.catboost_kwargs = catboost_kwargs or {}
-        self.catboost_kwargs |= self.get_extra_params()
 
     @classmethod
     def from_context(
@@ -193,6 +190,9 @@ class CatBoostScorer(BaseScorer):
     ) -> None:
         self._validate_task(labels)
 
+        if self.features_type in self.encoder_features_types:
+            self._embedder = Embedder(self.embedder_config)
+
         dataset = self._prepare_data_for_fit(utterances)
 
         default_loss = (
@@ -210,6 +210,7 @@ class CatBoostScorer(BaseScorer):
             allow_writing_files=False,
             eval_fraction=self.val_fraction,
             **self.catboost_kwargs,
+            **self.get_extra_params(),
         )
         self._model.fit(
             dataset, labels, early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None
