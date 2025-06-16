@@ -151,7 +151,7 @@ class Dumper:
                     msg = f"Error dumping HF tokenizer {key}: {e}"
                     logger.exception(msg)
             elif isinstance(val, CatBoostClassifier):
-                val.save_model(str(path / Dumper.catboost_models / "model.cbm"), format="cbm")
+                val.save_model(str(path / Dumper.catboost_models / key), format="cbm")
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -179,6 +179,7 @@ class Dumper:
         pydantic_models: dict[str, Any] = {}
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
+        catboost_models: dict[str, Any] = {}
 
         for child in path.iterdir():
             if child.name == Dumper.tags:
@@ -254,12 +255,14 @@ class Dumper:
                         msg = f"Error loading HF tokenizer {tokenizer_dir.name}: {e}"
                         logger.exception(msg)
             elif child.name == Dumper.catboost_models:
-                try:
-                    cat_model = CatBoostClassifier()
-                    cat_model.load_model(str(path / Dumper.catboost_models / "model.cbm"))
-                except Exception as e:
-                    msg = f"Error loading CatBoost model: {e}"
-                    logger.exception(msg)
+                for model_file in child.iterdir():
+                    try:
+                        model = CatBoostClassifier()
+                        model.load_model(str(path / Dumper.catboost_models / model_file))
+                        catboost_models[model_file.name] = model
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading CatBoost model: {e}"
+                        logger.exception(msg)
             else:
                 msg = f"Found unexpected child {child}"
                 logger.error(msg)
@@ -275,4 +278,5 @@ class Dumper:
             | pydantic_models
             | hf_models
             | hf_tokenizers
+            | catboost_models
         )
