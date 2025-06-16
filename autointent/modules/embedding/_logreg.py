@@ -81,7 +81,8 @@ class LogregAimedEmbedding(BaseEmbedding):
 
     def clear_cache(self) -> None:
         """Clear embedder from memory."""
-        self._embedder.clear_ram()
+        if hasattr(self, "_embedder"):
+            self._embedder.clear_ram()
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
         """Train the logistic regression model using the provided utterances and labels.
@@ -90,9 +91,6 @@ class LogregAimedEmbedding(BaseEmbedding):
             utterances: List of text data to index
             labels: List of corresponding labels for the utterances
         """
-        if hasattr(self, "_embedder"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         self._embedder = Embedder(

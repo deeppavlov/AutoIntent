@@ -225,7 +225,6 @@ class OptimizationInfo:
             "pipeline_metrics": self.pipeline_metrics,
             "metrics": node_wise_metrics,
             "configs": self.trials.model_dump(),
-            "artifacts": self.artifacts.model_dump(),
         }
 
     def dump(self, path: Path) -> None:

@@ -32,13 +32,13 @@ class TagsList(list[Tag]):
 
     def dump(self, path: Path) -> None:
         serialized = [v.model_dump(mode="json") for v in self]
-        with path.open("w") as file:
+        with path.open("w", encoding="utf-8") as file:
             json.dump(serialized, file, indent=4, ensure_ascii=False)
 
     @classmethod
     def load(cls, path: Path) -> "TagsList":
         """Load pydantic model from file system."""
-        with path.open() as file:
+        with path.open(encoding="utf-8") as file:
             serialized: list[dict[str, Any]] = json.load(file)
         parsed = [Tag(**t) for t in serialized]
         return cls(parsed)

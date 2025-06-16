@@ -107,9 +107,6 @@ class LinearScorer(BaseScorer):
         Raises:
             ValueError: If the vector index mismatches the provided utterances
         """
-        if hasattr(self, "_clf"):
-            self.clear_cache()
-
         self._validate_task(labels)
 
         embedder = Embedder(
@@ -145,4 +142,6 @@ class LinearScorer(BaseScorer):
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
-        self._embedder.clear_ram()
+        if hasattr(self, "_clf"):
+            self._embedder.clear_ram()
+            delattr(self, "_clf")

@@ -2,7 +2,10 @@ from enum import Enum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
-from typing_extensions import Self, assert_never
+from typing_extensions import Self
+
+from autointent.custom_types import FloatFromZeroToOne
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
 
 class TokenizerConfig(BaseModel):
@@ -56,7 +59,7 @@ class EmbedderConfig(HFModelConfig):
     default_prompt: str | None = Field(
         None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
     )
-    classifier_prompt: str | None = Field(None, description="Prompt for classifier.")
+    classification_prompt: str | None = Field(None, description="Prompt for classifier.")
     cluster_prompt: str | None = Field(None, description="Prompt for clustering.")
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
@@ -76,8 +79,8 @@ class EmbedderConfig(HFModelConfig):
         prompts = {}
         if self.default_prompt:
             prompts[TaskTypeEnum.default.value] = self.default_prompt
-        if self.classifier_prompt:
-            prompts[TaskTypeEnum.classification.value] = self.classifier_prompt
+        if self.classification_prompt:
+            prompts[TaskTypeEnum.classification.value] = self.classification_prompt
         if self.cluster_prompt:
             prompts[TaskTypeEnum.cluster.value] = self.cluster_prompt
         if self.query_prompt:
@@ -88,7 +91,7 @@ class EmbedderConfig(HFModelConfig):
             prompts[TaskTypeEnum.sts.value] = self.sts_prompt
         return prompts if len(prompts) > 0 else None
 
-    def get_prompt_type(self, prompt_type: TaskTypeEnum | None) -> str | None:  # noqa: PLR0911
+    def get_prompt(self, prompt_type: TaskTypeEnum | None) -> str | None:
         """Get the prompt type for the given task type.
 
         Args:
@@ -97,21 +100,17 @@ class EmbedderConfig(HFModelConfig):
         Returns:
             The prompt for the given task type.
         """
-        if prompt_type is None:
-            return self.default_prompt
-        if prompt_type == TaskTypeEnum.classification:
-            return self.classifier_prompt
-        if prompt_type == TaskTypeEnum.cluster:
+        if prompt_type == TaskTypeEnum.classification and self.classification_prompt is not None:
+            return self.classification_prompt
+        if prompt_type == TaskTypeEnum.cluster and self.classification_prompt is not None:
             return self.cluster_prompt
-        if prompt_type == TaskTypeEnum.query:
+        if prompt_type == TaskTypeEnum.query and self.query_prompt is not None:
             return self.query_prompt
-        if prompt_type == TaskTypeEnum.passage:
+        if prompt_type == TaskTypeEnum.passage and self.passage_prompt is not None:
             return self.passage_prompt
-        if prompt_type == TaskTypeEnum.sts:
+        if prompt_type == TaskTypeEnum.sts and self.sts_prompt is not None:
             return self.sts_prompt
-        if prompt_type == TaskTypeEnum.default:
-            return self.default_prompt
-        assert_never(prompt_type)
+        return self.default_prompt
 
 
 class CrossEncoderConfig(HFModelConfig):
@@ -141,3 +140,19 @@ class RNNConfig(BaseModel):
             return cls()
         return cls(**values)
 
+class EarlyStoppingConfig(BaseModel):
+    val_fraction: float = Field(
+        0.2,
+        description=(
+            "Fraction of train samples to allocate to dev set to monitor quality "
+            "during training and perofrm early stopping if quality doesn't enhances."
+        ),
+    )
+    patience: PositiveInt = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
+    threshold: FloatFromZeroToOne = Field(
+        0.0,
+        description="Minimum quality increment to count it as enhancement. Default: any incremeant is counted",
+    )
+    metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = Field(  # type: ignore[valid-type]
+        "scoring_f1", description="Metric to monitor."
+    )

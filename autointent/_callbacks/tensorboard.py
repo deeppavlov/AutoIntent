@@ -16,7 +16,7 @@ class TensorBoardCallback(OptimizerCallback):
         Raises an ImportError if neither are installed.
         """
         try:
-            from torch.utils.tensorboard import SummaryWriter
+            from torch.utils.tensorboard import SummaryWriter  # type: ignore[attr-defined]
 
             self.writer = SummaryWriter
         except ImportError:

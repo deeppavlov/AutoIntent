@@ -4,7 +4,7 @@ import os
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import DataConfig, LoggingConfig
+from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from tests.conftest import get_search_space, setup_environment
 
 
@@ -63,8 +63,9 @@ def test_bayes(dataset, sampler):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
+    pipeline_optimizer.set_config(HPOConfig(sampler=sampler))
 
-    pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
+    pipeline_optimizer.fit(dataset, refit_after=False)
 
 
 @pytest.mark.parametrize(
@@ -128,3 +129,19 @@ def test_dump_modules(dataset, task_type):
     context.dump()
 
     assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
+
+
+@pytest.mark.parametrize(
+    "task_type",
+    ["multiclass", "multilabel"],
+)
+def test_optimization_validation_metric_names(dataset, task_type):
+    search_space = get_search_space(task_type)
+
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+
+    if task_type == "multiclass":
+        dataset = dataset.to_multilabel()
+
+    with pytest.raises(ValueError, match="Target metric .*"):
+        pipeline_optimizer.fit(dataset, incompatible_search_space="raise")

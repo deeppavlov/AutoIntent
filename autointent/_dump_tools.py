@@ -177,7 +177,7 @@ class Dumper:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
 
-        with (path / Dumper.simple_attrs).open("w") as file:
+        with (path / Dumper.simple_attrs).open("w", encoding="utf-8") as file:
             json.dump(simple_attrs, file, ensure_ascii=False, indent=4)
 
         np.savez(path / Dumper.arrays, allow_pickle=False, **arrays)
@@ -219,7 +219,7 @@ class Dumper:
             if child.name == Dumper.tags:
                 tags = {tags_dump.name: TagsList.load(tags_dump) for tags_dump in child.iterdir()}
             elif child.name == Dumper.simple_attrs:
-                with child.open() as file:
+                with child.open(encoding="utf-8") as file:
                     simple_attrs = json.load(file)
             elif child.name == Dumper.arrays:
                 arrays = dict(np.load(child))
@@ -269,7 +269,7 @@ class Dumper:
             elif child.name == Dumper.ptuning_models:
                 for model_dir in child.iterdir():
                     try:
-                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")
+                        model = AutoModelForSequenceClassification.from_pretrained(model_dir / "base_model")  # type: ignore[no-untyped-call]
                         hf_models[model_dir.name] = PeftModel.from_pretrained(model, model_dir / "peft")
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading PeftModel {model_dir.name}: {e}"
@@ -277,7 +277,7 @@ class Dumper:
             elif child.name == Dumper.hf_models:
                 for model_dir in child.iterdir():
                     try:
-                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)
+                        hf_models[model_dir.name] = AutoModelForSequenceClassification.from_pretrained(model_dir)  # type: ignore[no-untyped-call]
                     except Exception as e:  # noqa: PERF203
                         msg = f"Error loading HF model {model_dir.name}: {e}"
                         logger.exception(msg)

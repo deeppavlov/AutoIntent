@@ -1,7 +1,7 @@
 """Retrieval node info."""
 
 from collections.abc import Mapping
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from autointent.custom_types import NodeType
 from autointent.metrics import (
@@ -31,3 +31,11 @@ class EmbeddingNodeInfo(NodeInfo):
     modules_available: ClassVar[Mapping[str, type[BaseEmbedding]]] = EMBEDDING_MODULES
 
     node_type = NodeType.embedding
+
+    multiclass_available_metrics: ClassVar[Mapping[str, RetrievalMetricFn | ScoringMetricFn]] = cast(
+        Mapping[str, RetrievalMetricFn | ScoringMetricFn], RETRIEVAL_METRICS_MULTICLASS | SCORING_METRICS_MULTICLASS
+    )
+
+    multilabel_available_metrics: ClassVar[Mapping[str, RetrievalMetricFn | ScoringMetricFn]] = cast(
+        Mapping[str, RetrievalMetricFn | ScoringMetricFn], RETRIEVAL_METRICS_MULTILABEL | SCORING_METRICS_MULTILABEL
+    )

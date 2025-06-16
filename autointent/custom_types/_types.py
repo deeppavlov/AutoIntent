@@ -89,10 +89,9 @@ class Split:
     INTENTS = "intents"
 
 
-SamplerType = Literal["brute", "tpe", "random"]
+SamplerType = Literal["tpe", "random"]
 """Hyperparameter tuning strategies:
 
-- `brute`: :py:class:`optuna.samplers.BruteForceSampler`
 - `tpe`: :py:class:`optuna.samplers.TPESampler`
 - `random`: :py:class:`optuna.samplers.RandomSampler`
 """
@@ -116,13 +115,5 @@ SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 - `filter`: drop incompatible modules from search space
 """
 
-SearchSpacePreset = Literal["light", "light_moderate", "light_extra", "heavy", "heavy_moderate", "heavy_extra"]
-"""Some presets that our library supports from lightest to heaviest:
-
-- `light_extra`: just like `light` but tuned with :py:class:`optuna.samplers.RandomSampler`
-- `light`: only light-weight modules tuned with :py:class:`optuna.samplers.TPESampler`
-- `light_moderate`: just like `light` but tuned with :py:class:`optuna.samplers.BruteForceSampler`
-- `heavy_moderate`: just like `heavy` but tuned with :py:class:`optuna.samplers.RandomSampler`
-- `light`: light-weight modules accompanied with heavy-weight ones tuned with :py:class:`optuna.samplers.TPESampler`
-- `heavy_extra`: just like `light` but tuned with :py:class:`optuna.samplers.BruteForceSampler`
-"""
+SearchSpacePreset = Literal["light", "heavy"]
+"""Some presets that our library supports from lightest to heaviest"""
