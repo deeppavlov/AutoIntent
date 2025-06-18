@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 T = TypeVar("T", bound=BaseModel)
+"""Type variable for Pydantic models used in structured output generation."""
 
 
 class Generator:
@@ -35,8 +36,16 @@ class Generator:
         "stop": None,
         "temperature": 0.7,
     }
+    """Default generation parameters for API requests."""
 
     def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
+        """Initialize the Generator with API configuration.
+
+        Args:
+            base_url: OpenAI API compatible server URL.
+            model_name: Name of the language model to use.
+            **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
+        """
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
         if model_name is None:
@@ -104,6 +113,15 @@ class Generator:
     async def _get_structured_output_openai_async(
         self, messages: list[Message], output_model: type[T]
     ) -> tuple[T | None, str | None, str | None]:
+        """Get structured output using OpenAI's beta parse endpoint asynchronously.
+
+        Args:
+            messages: List of messages to send to the model.
+            output_model: Pydantic model class to parse the response into.
+
+        Returns:
+            Tuple of (parsed_result, error_message, raw_response).
+        """
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -204,6 +222,15 @@ class Generator:
     def _get_structured_output_openai_sync(
         self, messages: list[Message], output_model: type[T]
     ) -> tuple[T | None, str | None, str | None]:
+        """Get structured output using OpenAI's beta parse endpoint synchronously.
+
+        Args:
+            messages: List of messages to send to the model.
+            output_model: Pydantic model class to parse the response into.
+
+        Returns:
+            Tuple of (parsed_result, error_message, raw_response).
+        """
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
