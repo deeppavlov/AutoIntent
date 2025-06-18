@@ -7,6 +7,7 @@ from typing import Any, TypeAlias
 import joblib
 import numpy as np
 import numpy.typing as npt
+from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
@@ -53,6 +54,7 @@ class Dumper:
     hf_tokenizers = "hf_tokenizers"
     torch_models = "torch_models"
     ptuning_models = "ptuning_models"
+    catboost_models = "catboost_models"
 
     @staticmethod
     def make_subdirectories(path: Path, exists_ok: bool = False) -> None:
@@ -73,6 +75,7 @@ class Dumper:
             path / Dumper.hf_tokenizers,
             path / Dumper.torch_models,
             path / Dumper.ptuning_models,
+            path / Dumper.catboost_models,
         ]
         for subdir in subdirectories:
             subdir.mkdir(parents=True, exist_ok=exists_ok)
@@ -188,6 +191,8 @@ class Dumper:
                     logger.exception(msg)
                     if raise_errors:
                         raise
+            elif isinstance(val, CatBoostClassifier):
+                val.save_model(str(path / Dumper.catboost_models / key), format="cbm")
             else:
                 msg = f"Attribute {key} of type {type(val)} cannot be dumped to file system."
                 logger.error(msg)
@@ -218,6 +223,7 @@ class Dumper:
         pydantic_models: dict[str, Any] = {}
         hf_models: dict[str, Any] = {}
         hf_tokenizers: dict[str, Any] = {}
+        catboost_models: dict[str, Any] = {}
         torch_models: dict[str, Any] = {}
 
         for child in path.iterdir():
@@ -300,6 +306,15 @@ class Dumper:
                         logger.exception(msg)
                         if raise_errors:
                             raise
+            elif child.name == Dumper.catboost_models:
+                for model_file in child.iterdir():
+                    try:
+                        model = CatBoostClassifier()
+                        model.load_model(str(path / Dumper.catboost_models / model_file))
+                        catboost_models[model_file.name] = model
+                    except Exception as e:  # noqa: PERF203
+                        msg = f"Error loading CatBoost model: {e}"
+                        logger.exception(msg)
             elif child.name == Dumper.torch_models:
                 try:
                     for model_dir in child.iterdir():
@@ -331,5 +346,6 @@ class Dumper:
             | pydantic_models
             | hf_models
             | hf_tokenizers
+            | catboost_models
             | torch_models
         )
