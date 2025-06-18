@@ -2,7 +2,7 @@ from typing import Any
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import TorchTrainingConfig, VocabConfig
+from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
 from .base_scorer import BaseTorchScorer
 from .rnn_model import TextRNN
@@ -26,6 +26,7 @@ class RNNScorer(BaseTorchScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         device: str | None = None,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> None:
         """Initialize the RNN scorer."""
         torch_config = TorchTrainingConfig(
@@ -37,7 +38,9 @@ class RNNScorer(BaseTorchScorer):
         )
         if device is not None:
             torch_config.device = device
-        super().__init__(torch_config=torch_config, vocab_config=vocab_config)
+        super().__init__(
+            torch_config=torch_config, vocab_config=vocab_config, early_stopping_config=early_stopping_config
+        )
 
         self.embed_dim = embed_dim
         self.hidden_dim = hidden_dim
@@ -45,7 +48,7 @@ class RNNScorer(BaseTorchScorer):
         self.dropout = dropout
 
     @classmethod
-    def from_context(
+    def from_context(  # noqa: PLR0913
         cls,
         context: Context,
         embed_dim: int = 128,
@@ -57,6 +60,7 @@ class RNNScorer(BaseTorchScorer):
         learning_rate: float = 5e-5,
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> "RNNScorer":
         """Create a RNNScorer from context."""
         return cls(
@@ -71,6 +75,7 @@ class RNNScorer(BaseTorchScorer):
             report_to=context.logging_config.report_to,
             device=context.transformer_config.device,
             vocab_config=vocab_config,
+            early_stopping_config=early_stopping_config,
         )
 
     def _init_model(self) -> TextRNN:

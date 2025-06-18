@@ -4,7 +4,7 @@ from typing import Any
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.configs import TorchTrainingConfig, VocabConfig
+from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
 from .base_scorer import BaseTorchScorer
 from .cnn_model import TextCNN
@@ -28,6 +28,7 @@ class CNNScorer(BaseTorchScorer):
         report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         device: str | None = None,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> None:
         torch_config = TorchTrainingConfig(
             num_train_epochs=num_train_epochs,
@@ -38,7 +39,9 @@ class CNNScorer(BaseTorchScorer):
         )
         if device is not None:
             torch_config.device = device
-        super().__init__(torch_config=torch_config, vocab_config=vocab_config)
+        super().__init__(
+            torch_config=torch_config, vocab_config=vocab_config, early_stopping_config=early_stopping_config
+        )
 
         self.embed_dim = embed_dim
         self.kernel_sizes = kernel_sizes
@@ -46,7 +49,7 @@ class CNNScorer(BaseTorchScorer):
         self.dropout = dropout
 
     @classmethod
-    def from_context(
+    def from_context(  # noqa: PLR0913
         cls,
         context: Context,
         embed_dim: int = 128,
@@ -58,6 +61,7 @@ class CNNScorer(BaseTorchScorer):
         learning_rate: float = 5e-5,
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> "CNNScorer":
         return cls(
             embed_dim=embed_dim,
@@ -71,6 +75,7 @@ class CNNScorer(BaseTorchScorer):
             seed=seed,
             report_to=context.logging_config.report_to,
             device=context.transformer_config.device,
+            early_stopping_config=early_stopping_config,
         )
 
     def _init_model(self) -> TextCNN:
