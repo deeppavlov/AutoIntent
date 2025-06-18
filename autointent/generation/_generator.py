@@ -37,10 +37,11 @@ class Generator:
     }
 
     def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
-        if not base_url:
-            base_url = os.environ["OPENAI_BASE_URL"]
-        if not model_name:
-            model_name = os.environ["OPENAI_MODEL_NAME"]
+        base_url = base_url or os.getenv("OPENAI_BASE_URL")
+        model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
+        if model_name is None:
+            msg = "Specify model_name arg or OPENAI_MODEL_NAME environment variable"
+            raise ValueError(msg)
         self.model_name = model_name
         self.client = openai.OpenAI(base_url=base_url)
         self.async_client = openai.AsyncOpenAI(base_url=base_url)
