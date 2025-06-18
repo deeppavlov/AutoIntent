@@ -133,7 +133,7 @@ class Generator:
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )
-            content = response.choices[0].message.content
+            content: str = response.choices[0].message.content  # type: ignore[assignment]
             res = output_model.model_validate_json(content)
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
@@ -230,7 +230,7 @@ class Generator:
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )
-            content = response.choices[0].message.content
+            content: str = response.choices[0].message.content  # type: ignore[assignment]
             res = output_model.model_validate_json(content)
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
