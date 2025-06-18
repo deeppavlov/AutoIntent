@@ -85,9 +85,8 @@ class Generator:
         )
         return response.choices[0].message.content  # type: ignore[return-value]
 
-    def _create_retry_messages(self, error_message: str, raw: str | None, output_model: type[T]) -> list[Message]:
+    def _create_retry_messages(self, error_message: str, raw: str | None) -> list[Message]:
         """Create a follow-up message for retry with error details and schema."""
-        json_schema = output_model.model_json_schema()
         res: list[Message] = []
         if raw is not None:
             res.append({"role": Role.ASSISTANT, "content": raw})
@@ -96,9 +95,6 @@ class Generator:
                 "role": "user",
                 "content": dedent(
                     f"""The previous response failed validation with the following error: {error_message}
-
-                Please provide a valid JSON response that conforms to this schema:
-                {json_schema}
 
                 Make sure to:
                 1. Follow the exact schema structure
@@ -207,7 +203,7 @@ class Generator:
                 logger.exception(msg)
                 raise RuntimeError(msg)
 
-            current_messages.extend(self._create_retry_messages(error, raw, output_model))
+            current_messages.extend(self._create_retry_messages(error, raw))
 
         if res is None:
             msg = (
@@ -316,7 +312,7 @@ class Generator:
                 logger.exception(msg)
                 raise RuntimeError(msg)
 
-            current_messages.extend(self._create_retry_messages(error, raw, output_model))
+            current_messages.extend(self._create_retry_messages(error, raw))
 
         if res is None:
             msg = (
