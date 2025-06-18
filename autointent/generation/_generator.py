@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 from typing_extensions import assert_never
 
-from autointent.generation.chat_templates import Message
+from autointent.generation.chat_templates import Message, Role
 
 logger = logging.getLogger(__name__)
 
@@ -76,13 +76,17 @@ class Generator:
         )
         return response.choices[0].message.content  # type: ignore[return-value]
 
-    def _create_retry_message(self, error_message: str, output_model: type[T]) -> Message:
+    def _create_retry_messages(self, error_message: str, raw: str | None, output_model: type[T]) -> list[Message]:
         """Create a follow-up message for retry with error details and schema."""
         json_schema = output_model.model_json_schema()
-        return {
-            "role": "user",
-            "content": dedent(
-                f"""The previous response failed validation with the following error: {error_message}
+        res: list[Message] = []
+        if raw is not None:
+            res.append({"role": Role.ASSISTANT, "content": raw})
+        res.append(
+            {
+                "role": "user",
+                "content": dedent(
+                    f"""The previous response failed validation with the following error: {error_message}
 
                 Please provide a valid JSON response that conforms to this schema:
                 {json_schema}
@@ -92,14 +96,17 @@ class Generator:
                 2. Use the correct data types for each field
                 3. Include all required fields
                 4. Ensure the response is valid JSON"""
-            ),
-        }
+                ),
+            }
+        )
+        return res
 
     async def _get_structured_output_openai_async(
         self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None]:
+    ) -> tuple[T | None, str | None, str | None]:
         res: T | None = None
         msg: str | None = None
+        raw: str | None = None
 
         try:
             response = await self.async_client.beta.chat.completions.parse(
@@ -108,6 +115,7 @@ class Generator:
                 response_format=output_model,
                 **self.generation_params,
             )
+            raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
@@ -117,14 +125,15 @@ class Generator:
                 msg = "For some reason output wasn't parsed."
                 logger.warning(msg)
 
-        return res, msg
+        return res, msg, raw
 
     async def _get_structured_output_vllm_async(
         self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None]:
+    ) -> tuple[T | None, str | None, str | None]:
         """https://docs.vllm.ai/en/v0.8.2/features/structured_outputs.html."""
         res: T | None = None
         msg: str | None = None
+        raw: str | None = None
 
         try:
             json_schema = output_model.model_json_schema()
@@ -134,13 +143,13 @@ class Generator:
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )
-            content: str = response.choices[0].message.content  # type: ignore[assignment]
-            res = output_model.model_validate_json(content)
+            raw = response.choices[0].message.content
+            res = output_model.model_validate_json(raw)  # type: ignore[arg-type]
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
 
-        return res, msg
+        return res, msg, raw
 
     async def get_structured_output_async(
         self,
@@ -166,9 +175,9 @@ class Generator:
 
         for _ in range(max_retries + 1):
             if backend == "openai":
-                res, error = await self._get_structured_output_openai_async(current_messages, output_model)
+                res, error, raw = await self._get_structured_output_openai_async(current_messages, output_model)
             elif backend == "vllm":
-                res, error = await self._get_structured_output_vllm_async(current_messages, output_model)
+                res, error, raw = await self._get_structured_output_vllm_async(current_messages, output_model)
             else:
                 assert_never(backend)
 
@@ -180,7 +189,7 @@ class Generator:
                 logger.exception(msg)
                 raise RuntimeError(msg)
 
-            current_messages.append(self._create_retry_message(error, output_model))
+            current_messages.extend(self._create_retry_messages(error, raw, output_model))
 
         if res is None:
             msg = (
@@ -194,9 +203,10 @@ class Generator:
 
     def _get_structured_output_openai_sync(
         self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None]:
+    ) -> tuple[T | None, str | None, str | None]:
         res: T | None = None
         msg: str | None = None
+        raw: str | None = None
 
         try:
             response = self.client.beta.chat.completions.parse(
@@ -205,6 +215,7 @@ class Generator:
                 response_format=output_model,
                 **self.generation_params,
             )
+            raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
@@ -214,14 +225,15 @@ class Generator:
                 msg = "For some reason output wasn't parsed."
                 logger.warning(msg)
 
-        return res, msg
+        return res, msg, raw
 
     def _get_structured_output_vllm_sync(
         self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None]:
+    ) -> tuple[T | None, str | None, str | None]:
         """https://docs.vllm.ai/en/v0.8.2/features/structured_outputs.html."""
         res: T | None = None
         msg: str | None = None
+        raw: str | None = None
 
         try:
             json_schema = output_model.model_json_schema()
@@ -231,13 +243,13 @@ class Generator:
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )
-            content: str = response.choices[0].message.content  # type: ignore[assignment]
-            res = output_model.model_validate_json(content)
+            raw = response.choices[0].message.content
+            res = output_model.model_validate_json(raw)  # type: ignore[arg-type]
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
 
-        return res, msg
+        return res, msg, raw
 
     def get_structured_output_sync(
         self,
@@ -263,9 +275,9 @@ class Generator:
 
         for _ in range(max_retries + 1):
             if backend == "openai":
-                res, error = self._get_structured_output_openai_sync(current_messages, output_model)
+                res, error, raw = self._get_structured_output_openai_sync(current_messages, output_model)
             elif backend == "vllm":
-                res, error = self._get_structured_output_vllm_sync(current_messages, output_model)
+                res, error, raw = self._get_structured_output_vllm_sync(current_messages, output_model)
             else:
                 assert_never(backend)
 
@@ -277,7 +289,7 @@ class Generator:
                 logger.exception(msg)
                 raise RuntimeError(msg)
 
-            current_messages.append(self._create_retry_message(error, output_model))
+            current_messages.extend(self._create_retry_messages(error, raw, output_model))
 
         if res is None:
             msg = (
