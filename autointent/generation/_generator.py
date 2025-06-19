@@ -20,6 +20,20 @@ T = TypeVar("T", bound=BaseModel)
 """Type variable for Pydantic models used in structured output generation."""
 
 
+class RetriesExceededError(RuntimeError):
+    """Exception raised when LLM call fails after all retry attempts."""
+
+    def __init__(self, max_retries: int, messages: list[Message]) -> None:
+        """Initialize the error with retry count and messages.
+
+        Args:
+            max_retries: Maximum number of retry attempts that were made
+            messages: Messages that were sent to the LLM
+        """
+        msg = f"LLM call failed after {max_retries + 1} attempts. Messages: {messages}"
+        super().__init__(msg)
+
+
 class Generator:
     """Wrapper class for accessing OpenAI API.
 
@@ -206,12 +220,8 @@ class Generator:
             current_messages.extend(self._create_retry_messages(error, raw))
 
         if res is None:
-            msg = (
-                f"Failed to generate valid structured output after {max_retries + 1} attempts.\n"
-                f"Messages: {current_messages}"
-            )
             logger.exception(msg)
-            raise RuntimeError(msg)
+            raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         return res
 
@@ -315,11 +325,7 @@ class Generator:
             current_messages.extend(self._create_retry_messages(error, raw))
 
         if res is None:
-            msg = (
-                f"Failed to generate valid structured output after {max_retries + 1} attempts.\n"
-                f"Messages: {current_messages}"
-            )
             logger.exception(msg)
-            raise RuntimeError(msg)
+            raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         return res

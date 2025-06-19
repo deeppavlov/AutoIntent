@@ -1,15 +1,19 @@
 """LLMDescriptionScorer class for scoring utterances based on intent descriptions using LLM."""
 
+import asyncio
 import logging
+from functools import partial
 from textwrap import dedent
-from typing import Any
+from typing import Any, Literal
 
+import aiometer
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, Field, PositiveFloat
+from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
+from typing_extensions import assert_never
 
 from autointent import Context
-from autointent.generation import Generator
+from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Message, Role
 
 from .base import BaseDescriptionScorer
@@ -51,6 +55,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
     Args:
         generator_config: Configuration for the Generator instance
         temperature: Temperature parameter for scaling logits, defaults to 1.0
+        max_concurrent: if not None, performs async calls to LLM
     """
 
     name = "description_llm"
@@ -59,9 +64,19 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         self,
         generator_config: dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
+        max_concurrent: PositiveInt | None = 15,
+        max_per_second: PositiveInt = 10,
+        max_retries: PositiveInt = 3,
+        backend: Literal["openai", "vllm"] = "openai",
     ) -> None:
-        super().__init__(temperature)
+        super().__init__(temperature=temperature)
+
         self.generator_config = generator_config or {}
+        self.max_concurrent = max_concurrent
+        self.max_per_second = max_per_second
+        self.max_retries = max_retries
+        self.backend = backend
+
         self._generator: Generator | None = None
         self._description_texts: list[str] | None = None
 
@@ -71,20 +86,18 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         context: Context,
         temperature: PositiveFloat = 1.0,
         generator_config: dict[str, Any] | None = None,
+        max_concurrent: PositiveInt | None = 15,
+        max_per_second: PositiveInt = 10,
+        max_retries: PositiveInt = 3,
+        backend: Literal["openai", "vllm"] = "openai",
     ) -> "LLMDescriptionScorer":
-        """Create a LLMDescriptionScorer instance using a Context object.
-
-        Args:
-            context: Context containing configurations and utilities
-            temperature: Temperature parameter for scaling logits
-            generator_config: Configuration for the Generator instance
-
-        Returns:
-            Initialized LLMDescriptionScorer instance
-        """
         return cls(
             temperature=temperature,
             generator_config=generator_config,
+            max_concurrent=max_concurrent,
+            max_per_second=max_per_second,
+            max_retries=max_retries,
+            backend=backend
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -100,6 +113,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         """
         self._generator = Generator(**self.generator_config)
         self._description_texts = descriptions
+        self._event_loop = asyncio.get_event_loop()
 
     def _create_prompt(self, utterance: str, descriptions: list[str]) -> list[Message]:
         """Create a prompt for the LLM to categorize intent descriptions.
@@ -137,6 +151,33 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
         return [Message(role=Role.USER, content=content)]
 
+    def _process_utterance_sync(self, utterance: str) -> IntentCategorization | RetriesExceededError:
+        try:
+            messages = self._create_prompt(utterance, self._description_texts)
+
+            return self._generator.get_structured_output_sync(
+                messages=messages,
+                output_model=IntentCategorization,
+                backend=self.backend,
+                max_retries=self.max_retries,
+            )
+        except RetriesExceededError as e:
+            return e
+
+
+    async def _process_utterance_async(self, utterance: str) -> IntentCategorization | RetriesExceededError:
+        try:
+            messages = self._create_prompt(utterance, self._description_texts)
+
+            return await self._generator.get_structured_output_async(
+                messages=messages,
+                output_model=IntentCategorization,
+                backend=self.backend,
+                max_retries=self.max_retries,
+            )
+        except RetriesExceededError as e:
+            return e
+
     def _compute_similarities(self, utterances: list[str]) -> NDArray[np.float64]:
         """Compute similarities using LLM categorization approach.
 
@@ -159,20 +200,18 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
         similarities = np.zeros((len(utterances), len(self._description_texts)), dtype=np.float64)
 
-        for i, utterance in enumerate(utterances):
-            try:
-                # Create prompt for this utterance
-                messages = self._create_prompt(utterance, self._description_texts)
+        if self.max_concurrent is None:
+            categorizations = map(self._process_utterance_sync, utterances)
+        else:
+            task = aiometer.run_all(
+                [partial(self._process_utterance_async, utt) for utt in utterances],
+                max_at_once=self.max_concurrent,
+                max_per_second=self.max_per_second,
+            )
+            categorizations = self._event_loop.run_until_complete(task)
 
-                # Get structured output from LLM
-                categorization = self._generator.get_structured_output_sync(
-                    messages=messages,
-                    output_model=IntentCategorization,
-                    backend="openai",
-                    max_retries=3,
-                )
-
-                # Assign probabilities based on categorization using indices
+        for i, categorization in enumerate(categorizations):
+            if isinstance(categorization, IntentCategorization):
                 for j in range(len(self._description_texts)):
                     # Convert 1-based indices to 0-based
                     if (j + 1) in categorization.most_probable:
@@ -182,11 +221,12 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
                     else:
                         similarities[i, j] = 0.0
 
-            except Exception as e:  # noqa: BLE001, PERF203
-                # If LLM fails, assign uniform probabilities as fallback
+            elif isinstance(categorization, RetriesExceededError):
                 similarities[i, :] = 1.0 / len(self._description_texts)
-                msg = f"LLM categorization failed for utterance '{utterance}': {e}"
+                msg = f"LLM categorization failed for utterance '{utterances[i]}'"
                 logger.warning(msg)
+            else:
+                assert_never(categorization)
 
         return similarities
 
@@ -194,3 +234,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         """Clear cached data in memory used by the generator."""
         # Generator doesn't have a clear_ram method, so we just set it to None
         self._generator = None
+        if hasattr(self, "_event_loop"):
+            self._event_loop.close()
+            delattr(self, "_event_loop")
