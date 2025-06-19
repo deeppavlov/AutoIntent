@@ -120,7 +120,8 @@ class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
     dir_or_file_name = "estimators"
 
     @staticmethod
-    def dump(obj: BaseEstimator, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+    def dump(obj: BaseEstimator, path: Path, exists_ok: bool) -> None:
+        path.parent.mkdir(parents=True, exist_ok=exists_ok)
         joblib.dump(obj, path)
 
     @staticmethod

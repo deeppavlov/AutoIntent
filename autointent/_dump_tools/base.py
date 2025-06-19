@@ -31,14 +31,14 @@ T = TypeVar("T")
 class BaseObjectDumper(ABC, Generic[T]):
     dir_or_file_name: str
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def dump(obj: T, path: Path, exists_ok: bool) -> None: ...
 
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def load(path: Path, **kwargs: Any) -> T: ...  # noqa: ANN401
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def check_isinstance(cls, obj: Any) -> bool: ...  # noqa: ANN401

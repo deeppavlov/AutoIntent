@@ -7,6 +7,7 @@ import numpy.typing as npt
 
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
+from autointent.schemas import TagsList
 
 from .base import BaseObjectDumper, ModuleAttributes, ModuleSimpleAttributes
 from .unit_dumpers import (
@@ -101,7 +102,7 @@ class Dumper:
                 continue
 
             # Handle simple attributes and arrays separately
-            if isinstance(val, ModuleSimpleAttributes):
+            if isinstance(val, ModuleSimpleAttributes) and not isinstance(val, TagsList):
                 simple_attrs[key] = val
             elif isinstance(val, np.ndarray):
                 arrays[key] = val
