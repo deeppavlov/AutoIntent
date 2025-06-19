@@ -41,8 +41,8 @@ class TagsListDumper(BaseObjectDumper[TagsList]):
         return TagsList.load(path)
 
     @classmethod
-    def get_type(cls) -> type[TagsList]:
-        return TagsList
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, TagsList)
 
 
 class SimpleAttributesDumper(BaseObjectDumper[dict[str, ModuleSimpleAttributes]]):
@@ -56,11 +56,13 @@ class SimpleAttributesDumper(BaseObjectDumper[dict[str, ModuleSimpleAttributes]]
     @staticmethod
     def load(path: Path, **kwargs: Any) -> dict[str, ModuleSimpleAttributes]:  # noqa: ANN401, ARG004
         with path.open(encoding="utf-8") as file:
-            return json.load(file)
+            return json.load(file)  # type: ignore[no-any-return]
 
     @classmethod
-    def get_type(cls) -> type[dict[str, ModuleSimpleAttributes]]:
-        return dict[str, ModuleSimpleAttributes]
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401, ARG003
+        # This dumper is used for collections of simple attributes, not individual objects
+        # It should not match individual objects in the main loop
+        return False
 
 
 class ArraysDumper(BaseObjectDumper[dict[str, npt.NDArray[Any]]]):
@@ -75,8 +77,10 @@ class ArraysDumper(BaseObjectDumper[dict[str, npt.NDArray[Any]]]):
         return dict(np.load(path))
 
     @classmethod
-    def get_type(cls) -> type[dict[str, npt.NDArray[Any]]]:
-        return dict[str, npt.NDArray[Any]]
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401, ARG003
+        # This dumper is used for collections of arrays, not individual objects
+        # It should not match individual objects in the main loop
+        return False
 
 
 class EmbedderDumper(BaseObjectDumper[Embedder]):
@@ -92,8 +96,8 @@ class EmbedderDumper(BaseObjectDumper[Embedder]):
         return Embedder.load(path, override_config=embedder_config)
 
     @classmethod
-    def get_type(cls) -> type[Embedder]:
-        return Embedder
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, Embedder)
 
 
 class VectorIndexDumper(BaseObjectDumper[VectorIndex]):
@@ -108,8 +112,8 @@ class VectorIndexDumper(BaseObjectDumper[VectorIndex]):
         return VectorIndex.load(path)
 
     @classmethod
-    def get_type(cls) -> type[VectorIndex]:
-        return VectorIndex
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, VectorIndex)
 
 
 class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
@@ -124,8 +128,8 @@ class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
         return joblib.load(path)
 
     @classmethod
-    def get_type(cls) -> type[BaseEstimator]:
-        return BaseEstimator
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, BaseEstimator)
 
 
 class RankerDumper(BaseObjectDumper[Ranker]):
@@ -141,8 +145,8 @@ class RankerDumper(BaseObjectDumper[Ranker]):
         return Ranker.load(path, override_config=cross_encoder_config)
 
     @classmethod
-    def get_type(cls) -> type[Ranker]:
-        return Ranker
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, Ranker)
 
 
 class PydanticModelDumper(BaseObjectDumper[BaseModel]):
@@ -167,11 +171,11 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
 
         model_type = importlib.import_module(class_info["module"])
         model_type = getattr(model_type, class_info["name"])
-        return model_type.model_validate(content)
+        return model_type.model_validate(content)  # type: ignore[no-any-return]
 
     @classmethod
-    def get_type(cls) -> type[BaseModel]:
-        return BaseModel
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, BaseModel)
 
 
 class PeftModelDumper(BaseObjectDumper[PeftModel]):
@@ -203,13 +207,13 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-untyped-call]
+            return AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-untyped-call,no-any-return]
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
     @classmethod
-    def get_type(cls) -> type[PeftModel]:
-        return PeftModel
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, PeftModel)
 
 
 class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
@@ -222,11 +226,11 @@ class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401, ARG004
-        return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-untyped-call]
+        return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-untyped-call,no-any-return]
 
     @classmethod
-    def get_type(cls) -> type[PreTrainedModel]:
-        return PreTrainedModel
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, PreTrainedModel)
 
 
 class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokenizerFast]):
@@ -239,11 +243,11 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
-        return AutoTokenizer.from_pretrained(path)
+        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
-    def get_type(cls) -> type[PreTrainedTokenizer | PreTrainedTokenizerFast]:
-        return PreTrainedTokenizer | PreTrainedTokenizerFast
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, PreTrainedTokenizer | PreTrainedTokenizerFast)
 
 
 class TorchModelDumper(BaseObjectDumper[BaseTorchModuleWithVocab]):
@@ -269,8 +273,8 @@ class TorchModelDumper(BaseObjectDumper[BaseTorchModuleWithVocab]):
         return model_class.load(path)
 
     @classmethod
-    def get_type(cls) -> type[BaseTorchModuleWithVocab]:
-        return BaseTorchModuleWithVocab
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, BaseTorchModuleWithVocab)
 
 
 class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
@@ -287,6 +291,5 @@ class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
         return model
 
     @classmethod
-    def get_type(cls) -> type[CatBoostClassifier]:
-        return CatBoostClassifier
-
+    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        return isinstance(obj, CatBoostClassifier)

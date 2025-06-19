@@ -29,6 +29,7 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
+
 class Dumper:
     # List of all available dumper classes
     _DUMPER_CLASSES: ClassVar[list[type[BaseObjectDumper[Any]]]] = [
@@ -51,7 +52,7 @@ class Dumper:
     def _get_dumper_for_object(obj: Any) -> type[BaseObjectDumper[Any]] | None:  # noqa: ANN401
         """Get the appropriate dumper class for an object."""
         for dumper_class in Dumper._DUMPER_CLASSES:
-            if isinstance(obj, dumper_class.get_type()):
+            if dumper_class.check_isinstance(obj):
                 return dumper_class
         return None
 
@@ -123,7 +124,7 @@ class Dumper:
         **kwargs: Any,  # noqa: ANN401
     ) -> dict[str, T]:
         """Load all objects from a directory using the specified dumper."""
-        res = {}
+        res: dict[str, T] = {}
         if not path.exists():
             return res
 
@@ -139,24 +140,23 @@ class Dumper:
         return res
 
     @staticmethod
-    def _load_objects_from_file(
+    def _load_object_from_file(
         path: Path,
-        dumper_class: type[BaseObjectDumper[T]],
+        dumper_class: type[BaseObjectDumper[dict[str, Any]]],
         raise_errors: bool,
         **kwargs: Any,  # noqa: ANN401
-    ) -> dict[str, T]:
+    ) -> dict[str, Any]:
         """Load objects from a single file using the specified dumper."""
-        if not path.exists():
-            return {}
-
-        try:
-            return dumper_class.load(path, **kwargs)
-        except Exception as e:
-            msg = f"Error loading from {path} using {dumper_class.__name__}: {e}"
-            logger.exception(msg)
-            if raise_errors:
-                raise
-            return {}
+        res = {}
+        if path.exists():
+            try:
+                res = dumper_class.load(path, **kwargs)
+            except Exception as e:
+                msg = f"Error loading from {path} using {dumper_class.__name__}: {e}"
+                logger.exception(msg)
+                if raise_errors:
+                    raise
+        return res
 
     @staticmethod
     def load(
@@ -169,23 +169,22 @@ class Dumper:
         """Load attributes from file system."""
         loaded_attrs: dict[str, Any] = {}
 
-        # Load complex objects using their respective dumpers
-        dumper_configs = {
-            RankerDumper: {"cross_encoder_config": cross_encoder_config},
-            EmbedderDumper: {"embedder_config": embedder_config},
-        }
-
         for dumper_class in Dumper._DUMPER_CLASSES:
             if dumper_class in [SimpleAttributesDumper, ArraysDumper]:
-                dumper_func = Dumper._load_objects_from_file
+                dumper_func = Dumper._load_object_from_file
             else:
                 dumper_func = Dumper._load_objects_from_directory
 
             dir_path = path / dumper_class.dir_or_file_name
-            kwargs = dumper_configs.get(dumper_class, {})
 
             try:
-                objects = dumper_func(dir_path, dumper_class, raise_errors, **kwargs)
+                objects = dumper_func(
+                    dir_path,
+                    dumper_class,
+                    raise_errors,
+                    cross_encoder_config=cross_encoder_config,
+                    embedder_config=embedder_config,
+                )
                 loaded_attrs.update(objects)
             except Exception as e:
                 msg = f"Error loading objects from {dir_path} using {dumper_class.__name__}: {e}"

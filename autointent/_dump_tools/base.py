@@ -41,4 +41,4 @@ class BaseObjectDumper(ABC, Generic[T]):
 
     @abstractmethod
     @classmethod
-    def get_type(cls) -> type[T]: ...
+    def check_isinstance(cls, obj: Any) -> bool: ...  # noqa: ANN401
