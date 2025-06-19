@@ -29,7 +29,6 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
-
 class Dumper:
     # List of all available dumper classes
     _DUMPER_CLASSES: ClassVar[list[type[BaseObjectDumper[Any]]]] = [
