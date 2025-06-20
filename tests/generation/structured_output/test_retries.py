@@ -4,7 +4,6 @@ import os
 from typing import Literal
 
 import pytest
-from openai import APIConnectionError, BadRequestError
 from pydantic import BaseModel, Field, model_validator
 
 from autointent.generation import Generator
@@ -42,62 +41,45 @@ def generator():
     not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
     reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
 )
-@pytest.mark.parametrize("backend", ["openai", "vllm"])
 class TestStructuredOutput:
     """Test structured output functionality for different backends."""
 
-    def test_structured_output_sync_success_with_enough_retries(self, generator, backend):
+    def test_structured_output_sync_success_with_enough_retries(self, generator):
         """Test structured output sync that succeeds with enough retries."""
-        try:
-            result = generator.get_structured_output_sync(
-                messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
-                output_model=Person,
-                backend=backend,
-                max_retries=5,
-            )
+        result = generator.get_structured_output_sync(
+            messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+            output_model=Person,
+            max_retries=5,
+        )
 
-            assert isinstance(result, Person)
-        except (APIConnectionError, BadRequestError):
-            pytest.skip(f"{backend} backend not available for testing")
+        assert isinstance(result, Person)
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_success_with_enough_retries(self, generator, backend):
+    async def test_structured_output_async_success_with_enough_retries(self, generator):
         """Test structured output async that succeeds with enough retries."""
-        try:
-            result = await generator.get_structured_output_async(
+        result = await generator.get_structured_output_async(
+            messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+            output_model=Person,
+            max_retries=5,
+        )
+
+        assert isinstance(result, Person)
+
+    def test_structured_output_sync_failure_with_insufficient_retries(self, generator):
+        """Test structured output sync that fails with insufficient retries."""
+        with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
+            generator.get_structured_output_sync(
                 messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
                 output_model=Person,
-                backend=backend,
-                max_retries=5,
+                max_retries=2,
             )
 
-            assert isinstance(result, Person)
-        except (APIConnectionError, BadRequestError):
-            pytest.skip(f"{backend} backend not available for testing")
-
-    def test_structured_output_sync_failure_with_insufficient_retries(self, generator, backend):
-        """Test structured output sync that fails with insufficient retries."""
-        try:
-            with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
-                generator.get_structured_output_sync(
-                    messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
-                    output_model=Person,
-                    backend=backend,
-                    max_retries=2,
-                )
-        except (APIConnectionError, BadRequestError):
-            pytest.skip(f"{backend} backend not available for testing")
-
     @pytest.mark.asyncio
-    async def test_structured_output_async_failure_with_insufficient_retries(self, generator, backend):
+    async def test_structured_output_async_failure_with_insufficient_retries(self, generator):
         """Test structured output async that fails with insufficient retries."""
-        try:
-            with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
-                await generator.get_structured_output_async(
-                    messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
-                    output_model=Person,
-                    backend=backend,
-                    max_retries=2,
-                )
-        except (APIConnectionError, BadRequestError):
-            pytest.skip(f"{backend} backend not available for testing")
+        with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
+            await generator.get_structured_output_async(
+                messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+                output_model=Person,
+                max_retries=2,
+            )
