@@ -102,15 +102,15 @@ class Generator:
             res.append({"role": Role.ASSISTANT, "content": raw})
         res.append(
             {
-                "role": "user",
+                "role": Role.USER,
                 "content": dedent(
                     f"""The previous response failed validation with the following error: {error_message}
 
-                Make sure to:
-                1. Follow the exact schema structure
-                2. Use the correct data types for each field
-                3. Include all required fields
-                4. Ensure the response is valid JSON"""
+                    Make sure to:
+                    1. Follow the exact schema structure
+                    2. Use the correct data types for each field
+                    3. Include all required fields
+                    4. Ensure the response is valid JSON"""
                 ),
             }
         )
