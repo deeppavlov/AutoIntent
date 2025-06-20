@@ -38,49 +38,6 @@ def _get_structured_output_cache_path(dirname: str) -> Path:
     return Path(user_cache_dir("autointent")) / "structured_outputs" / dirname
 
 
-def _allows_extra_fields(model_class: type[BaseModel]) -> bool:
-    """Check if a Pydantic model allows extra fields.
-
-    Args:
-        model_class: The Pydantic model class to check.
-
-    Returns:
-        True if the model allows extra fields, False otherwise.
-    """
-    config = getattr(model_class, "model_config", None)
-    if config is None:
-        return False
-
-    if hasattr(config, "extra"):
-        return config.extra in ("allow", "ignore")
-
-    return False
-
-
-def _add_cache_source_to_model(model: T, cache_path: Path) -> T:
-    """Add cache source information to a model if it allows extra fields.
-
-    Args:
-        model: The Pydantic model instance to add cache source to.
-        cache_path: The path to the cache file.
-
-    Returns:
-        The same model instance with cache source field added if allowed.
-    """
-    if not _allows_extra_fields(type(model)):
-        logger.debug("Model does not allow extra fields, returning original model")
-        return model
-
-    try:
-        model.__cache_source = str(cache_path)  # noqa: SLF001
-        logger.debug("Added cache source field to model: %s", str(cache_path))
-    except (AttributeError, ValidationError):
-        logger.debug("Failed to add cache source field, returning original model")
-        return model
-
-    return model
-
-
 class StructuredOutputCache:
     """Cache for structured output results."""
 
@@ -139,7 +96,7 @@ class StructuredOutputCache:
 
                 if isinstance(cached_data, output_model):
                     logger.debug("Using cached structured output for key: %s", cache_key)
-                    return _add_cache_source_to_model(cached_data, cache_path)
+                    return cached_data
 
                 logger.warning("Cached data type mismatch, removing invalid cache")
                 cache_path.unlink()
