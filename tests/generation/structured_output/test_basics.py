@@ -26,6 +26,7 @@ def generator():
     """Create a generator instance for testing."""
     return Generator(max_tokens=1000, use_cache=False)
 
+
 @pytest.mark.skipif(
     not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
     reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
