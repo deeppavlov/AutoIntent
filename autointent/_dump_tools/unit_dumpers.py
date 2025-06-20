@@ -284,6 +284,7 @@ class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
 
     @staticmethod
     def dump(obj: CatBoostClassifier, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+        path.parent.mkdir(parents=True, exist_ok=True)
         obj.save_model(str(path), format="cbm")
 
     @staticmethod
