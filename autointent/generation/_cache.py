@@ -1,6 +1,5 @@
-"""Wrapper class for accessing OpenAI API."""
+"""Helpers for caching structured outputs from LLM."""
 
-import importlib
 import json
 import logging
 from pathlib import Path
@@ -10,6 +9,7 @@ from appdirs import user_cache_dir
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
+from autointent._dump_tools import PydanticModelDumper
 from autointent._hash import Hasher
 from autointent.generation.chat_templates import Message
 
@@ -38,34 +38,47 @@ def _get_structured_output_cache_path(filename: str) -> Path:
     return Path(user_cache_dir("autointent")) / "structured_outputs" / f"{filename}.pkl"
 
 
-# temporary dumper until #234 is merged
-class PydanticModelDumper:
-    dir_or_file_name = "pydantic"
+def _allows_extra_fields(model_class: type[BaseModel]) -> bool:
+    """Check if a Pydantic model allows extra fields.
 
-    @staticmethod
-    def dump(obj: BaseModel, path: Path, exists_ok: bool) -> None:
-        class_info = {"name": obj.__class__.__name__, "module": obj.__class__.__module__}
-        path.mkdir(parents=True, exist_ok=exists_ok)
-        with (path / "class_info.json").open("w", encoding="utf-8") as file:
-            json.dump(class_info, file, ensure_ascii=False, indent=4)
-        with (path / "model_dump.json").open("w", encoding="utf-8") as file:
-            json.dump(obj.model_dump(), file, ensure_ascii=False, indent=4)
+    Args:
+        model_class: The Pydantic model class to check.
 
-    @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
-        with (path / "model_dump.json").open("r", encoding="utf-8") as file:
-            content = json.load(file)
+    Returns:
+        True if the model allows extra fields, False otherwise.
+    """
+    config = getattr(model_class, "model_config", None)
+    if config is None:
+        return False
 
-        with (path / "class_info.json").open("r", encoding="utf-8") as file:
-            class_info = json.load(file)
+    if hasattr(config, "extra"):
+        return config.extra in ("allow", "ignore")
 
-        model_type = importlib.import_module(class_info["module"])
-        model_type = getattr(model_type, class_info["name"])
-        return model_type.model_validate(content)  # type: ignore[no-any-return]
+    return False
 
-    @classmethod
-    def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, BaseModel)
+
+def _add_cache_source_to_model(model: T, cache_path: Path) -> T:
+    """Add cache source information to a model if it allows extra fields.
+
+    Args:
+        model: The Pydantic model instance to add cache source to.
+        cache_path: The path to the cache file.
+
+    Returns:
+        The same model instance with cache source field added if allowed.
+    """
+    if not _allows_extra_fields(type(model)):
+        logger.debug("Model does not allow extra fields, returning original model")
+        return model
+
+    try:
+        model.__cache_source = str(cache_path)  # noqa: SLF001
+        logger.debug("Added cache source field to model: %s", str(cache_path))
+    except (AttributeError, ValidationError):
+        logger.debug("Failed to add cache source field, returning original model")
+        return model
+
+    return model
 
 
 class StructuredOutputCache:
@@ -126,7 +139,7 @@ class StructuredOutputCache:
 
                 if isinstance(cached_data, output_model):
                     logger.debug("Using cached structured output for key: %s", cache_key)
-                    return cached_data
+                    return _add_cache_source_to_model(cached_data, cache_path)
 
                 logger.warning("Cached data type mismatch, removing invalid cache")
                 cache_path.unlink()
