@@ -36,11 +36,6 @@ class IntentCategorization(BaseModel):
             "List of indices (1-based) of intent descriptions that are promising but not confident (probability 0.5)"
         )
     )
-    unlikely: list[int] = Field(
-        description=(
-            "List of indices (1-based) of intent descriptions that are not sufficiently probable (probability 0.0)"
-        )
-    )
 
 
 class LLMDescriptionScorer(BaseDescriptionScorer):
@@ -97,12 +92,11 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             max_concurrent=max_concurrent,
             max_per_second=max_per_second,
             max_retries=max_retries,
-            backend=backend
+            backend=backend,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
-        """Get implicit initialization parameters for this scorer."""
-        return {"generator_config": self.generator_config}
+        return {}
 
     def _fit_implementation(self, utterances: list[str], descriptions: list[str]) -> None:
         """Fit the LLM scorer by initializing the generator and storing descriptions.
@@ -125,27 +119,38 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         Returns:
             List of messages for the LLM
         """
-        descriptions_text = "\n".join(f"{i+1}. {desc}" for i, desc in enumerate(descriptions))
+        descriptions_text = "\n".join(
+            f"<description_{i+1}>\n{desc}\n</description_{i+1}>" for i, desc in enumerate(descriptions)
+        )
 
         content = dedent(
             f"""You are an expert at categorizing text samples into intent categories.
 
             Given a text sample and a list of possible intent descriptions,\
-            categorize each intent description into one of three categories:
+            categorize each intent description into one of two categories:
 
             1. **Most Probable**: Intent descriptions that are most likely to correspond to the text sample
             2. **Promising**: Intent descriptions that are promising but you're not fully confident about
-            3. **Unlikely**: Intent descriptions that are not sufficiently probable to correspond to the text sample
 
-            Text Sample: "{utterance}"
+            <text_sample>
+            {utterance}
+            </text_sample>
 
-            Possible Intent Descriptions:
+            <possible_intent_descriptions>
             {descriptions_text}
+            </possible_intent_descriptions>
 
+            <instructions>
             Please categorize each intent description into the appropriate category\
             based on how well it matches the text sample.
 
-            IMPORTANT: Use the numbers (1, 2, 3, etc.) that correspond to each description's position in the list above.
+            IMPORTANT:
+            - Use the numbers (1, 2, 3, etc.) that correspond to each description's position in the list above.
+            - You can skip putting intents to an "unlikely" category.\
+            If an intent is not explicitly categorized as "most_probable" or "promising",\
+            it is automatically assumed to be unlikely.
+            - Only include intents in the categories if you have confidence in their classification.
+            </instructions>
             """
         )
 
@@ -163,7 +168,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             )
         except RetriesExceededError as e:
             return e
-
 
     async def _process_utterance_async(self, utterance: str) -> IntentCategorization | RetriesExceededError:
         try:
