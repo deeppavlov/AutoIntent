@@ -21,21 +21,21 @@ T = TypeVar("T", bound=BaseModel)
 """Type variable for Pydantic models used in structured output generation."""
 
 
-def _get_structured_output_cache_path(filename: str) -> Path:
+def _get_structured_output_cache_path(dirname: str) -> Path:
     """Get the path to the structured output cache file.
 
-    This function constructs the full path to a cache file stored
+    This function constructs the full path to a cache directory stored
     in a specific directory under the user's home directory. The cache
-    file is named based on the provided filename, with the `.pkl` extension
+    directory is named based on the provided dirname.
     added.
 
     Args:
-        filename: The name of the cache file (without extension).
+        dirname: The name of the cache file (without extension).
 
     Returns:
         The full path to the cache file.
     """
-    return Path(user_cache_dir("autointent")) / "structured_outputs" / f"{filename}.pkl"
+    return Path(user_cache_dir("autointent")) / "structured_outputs" / dirname
 
 
 def _allows_extra_fields(model_class: type[BaseModel]) -> bool:
