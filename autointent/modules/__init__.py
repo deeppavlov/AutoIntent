@@ -15,12 +15,14 @@ from .regex import SimpleRegex
 from .scoring import (
     BERTLoRAScorer,
     BertScorer,
+    BiEncoderDescriptionScorer,
     CatBoostScorer,
     CNNScorer,
-    DescriptionScorer,
+    CrossEncoderDescriptionScorer,
     DNNCScorer,
     KNNScorer,
     LinearScorer,
+    LLMDescriptionScorer,
     MLKnnScorer,
     PTuningScorer,
     RerankScorer,
@@ -47,7 +49,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         DNNCScorer,
         KNNScorer,
         LinearScorer,
-        DescriptionScorer,
+        BiEncoderDescriptionScorer, CrossEncoderDescriptionScorer, LLMDescriptionScorer,
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,
@@ -64,26 +66,4 @@ DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
 )
 
 
-__all__ = [
-    "AdaptiveDecision",
-    "ArgmaxDecision",
-    "BaseDecision",
-    "BaseEmbedding",
-    "BaseModule",
-    "BaseRegex",
-    "BaseScorer",
-    "CatBoostScorer",
-    "DNNCScorer",
-    "DescriptionScorer",
-    "JinoosDecision",
-    "KNNScorer",
-    "LinearScorer",
-    "LogregAimedEmbedding",
-    "MLKnnScorer",
-    "RerankScorer",
-    "RetrievalAimedEmbedding",
-    "SimpleRegex",
-    "SklearnScorer",
-    "ThresholdDecision",
-    "TunableDecision",
-]
+__all__ = []
