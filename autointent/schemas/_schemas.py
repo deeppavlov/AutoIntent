@@ -31,6 +31,7 @@ class TagsList(list[Tag]):
         super().__init__(tags)
 
     def dump(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
         serialized = [v.model_dump(mode="json") for v in self]
         with path.open("w", encoding="utf-8") as file:
             json.dump(serialized, file, indent=4, ensure_ascii=False)
