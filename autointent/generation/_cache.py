@@ -93,7 +93,7 @@ class StructuredOutputCache:
         Returns:
             Cache key as a hexadecimal string.
         """
-        hasher = Hasher()
+        hasher = Hasher(strict=True)
         hasher.update(json.dumps(messages))
         hasher.update(json.dumps(output_model.model_json_schema()))
         hasher.update(backend)

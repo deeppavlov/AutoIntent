@@ -38,6 +38,12 @@ def generator():
     return Generator(max_tokens=1000)
 
 
+@pytest.fixture
+def generator_no_cache():
+    """Create a generator instance for testing."""
+    return Generator(max_tokens=1000, use_cache=False)
+
+
 @pytest.mark.skipif(
     not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
     reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
@@ -96,11 +102,11 @@ class TestStructuredOutput:
         except (APIConnectionError, BadRequestError):
             pytest.skip(f"{backend} backend not available for testing")
 
-    def test_structured_output_sync_failure_with_insufficient_retries(self, generator, backend):
+    def test_structured_output_sync_failure_with_insufficient_retries(self, generator_no_cache, backend):
         """Test structured output sync that fails with insufficient retries."""
         try:
             with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
-                generator.get_structured_output_sync(
+                generator_no_cache.get_structured_output_sync(
                     messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
                     output_model=Person,
                     backend=backend,
@@ -110,11 +116,11 @@ class TestStructuredOutput:
             pytest.skip(f"{backend} backend not available for testing")
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_failure_with_insufficient_retries(self, generator, backend):
+    async def test_structured_output_async_failure_with_insufficient_retries(self, generator_no_cache, backend):
         """Test structured output async that fails with insufficient retries."""
         try:
             with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
-                await generator.get_structured_output_async(
+                await generator_no_cache.get_structured_output_async(
                     messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
                     output_model=Person,
                     backend=backend,
