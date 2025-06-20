@@ -50,6 +50,7 @@ class SimpleAttributesDumper(BaseObjectDumper[dict[str, ModuleSimpleAttributes]]
 
     @staticmethod
     def dump(obj: dict[str, ModuleSimpleAttributes], path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+        path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w", encoding="utf-8") as file:
             json.dump(obj, file, ensure_ascii=False, indent=4)
 
@@ -120,8 +121,8 @@ class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
     dir_or_file_name = "estimators"
 
     @staticmethod
-    def dump(obj: BaseEstimator, path: Path, exists_ok: bool) -> None:
-        path.parent.mkdir(parents=True, exist_ok=exists_ok)
+    def dump(obj: BaseEstimator, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+        path.parent.mkdir(parents=True, exist_ok=True)
         joblib.dump(obj, path)
 
     @staticmethod
