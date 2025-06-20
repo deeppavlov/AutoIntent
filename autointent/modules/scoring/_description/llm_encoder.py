@@ -72,9 +72,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         self.max_retries = max_retries
         self.backend = backend
 
-        self._generator: Generator | None = None
-        self._description_texts: list[str] | None = None
-
     @classmethod
     def from_context(
         cls,
@@ -194,12 +191,8 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         Raises:
             RuntimeError: If generator or description texts are not initialized
         """
-        if self._generator is None:
-            error_text = "Generator is not initialized. Call fit() before predict()."
-            raise RuntimeError(error_text)
-
-        if self._description_texts is None:
-            error_text = "Description texts are not initialized. Call fit() before predict()."
+        if not hasattr(self, "_generator") or not hasattr(self, "_description_texts"):
+            error_text = "Scorer is not initialized. Call fit() before predict()."
             raise RuntimeError(error_text)
 
         similarities = np.zeros((len(utterances), len(self._description_texts)), dtype=np.float64)
@@ -212,7 +205,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
                 max_at_once=self.max_concurrent,
                 max_per_second=self.max_per_second,
             )
-            categorizations = self._event_loop.run_until_complete(task)
+            categorizations = self._event_loop.run_until_complete(task)  # type: ignore[arg-type]
 
         for i, categorization in enumerate(categorizations):
             if isinstance(categorization, IntentCategorization):
@@ -237,7 +230,8 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the generator."""
         # Generator doesn't have a clear_ram method, so we just set it to None
-        self._generator = None
+        if hasattr(self, "_generator"):
+            delattr(self, "_generator")
         if hasattr(self, "_event_loop"):
             self._event_loop.close()
             delattr(self, "_event_loop")

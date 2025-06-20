@@ -49,7 +49,9 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         DNNCScorer,
         KNNScorer,
         LinearScorer,
-        BiEncoderDescriptionScorer, CrossEncoderDescriptionScorer, LLMDescriptionScorer,
+        BiEncoderDescriptionScorer,
+        CrossEncoderDescriptionScorer,
+        LLMDescriptionScorer,
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,
@@ -64,6 +66,3 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
 DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
     [ArgmaxDecision, JinoosDecision, ThresholdDecision, TunableDecision, AdaptiveDecision],
 )
-
-
-__all__ = []

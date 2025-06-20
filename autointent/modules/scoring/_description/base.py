@@ -63,8 +63,8 @@ class BaseDescriptionScorer(BaseScorer, ABC):
             Temperature-scaled probabilities
         """
         if self._multilabel:
-            return scipy.special.expit(similarities / self.temperature)
-        return scipy.special.softmax(similarities / self.temperature, axis=1)
+            return scipy.special.expit(similarities / self.temperature)  # type: ignore[no-any-return]
+        return scipy.special.softmax(similarities / self.temperature, axis=1)  # type: ignore[no-any-return]
 
     def fit(
         self,
