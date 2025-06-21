@@ -13,7 +13,12 @@ search_space:
         k:
           low: 1
           high: 20
-      - module_name: description
+      - module_name: description_bi
+        temperature:
+          low: 0.01
+          high: 10
+          log: true
+      - module_name: description_cross
         temperature:
           low: 0.01
           high: 10

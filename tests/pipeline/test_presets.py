@@ -14,7 +14,7 @@ def test_presets(dataset, preset):
 
     pipeline_optimizer = Pipeline.from_preset(preset)
 
-    if preset in ["heavy_extra", "light", "heavy"]:
+    if preset in ["heavy"]:
         return
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
