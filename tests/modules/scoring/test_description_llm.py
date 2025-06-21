@@ -7,9 +7,7 @@ from autointent.context.data_handler import DataHandler
 from autointent.modules import LLMDescriptionScorer
 
 
-@pytest.mark.parametrize(
-    "multilabel", [True, False]
-)
+@pytest.mark.parametrize("multilabel", [True, False])
 def test_description_scorer_llm(dataset, multilabel):
     if multilabel:
         dataset = dataset.to_multilabel()

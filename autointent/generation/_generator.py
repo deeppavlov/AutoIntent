@@ -27,7 +27,7 @@ T = TypeVar("T", bound=BaseModel)
 class GeneratorDumpData(TypedDict):
     use_cache: bool
     model_name: str
-    base_url: str
+    base_url: str | None
     generation_params: dict[str, Any]
 
 
@@ -391,6 +391,6 @@ class Generator:
         with (path / cls._dump_data_filename).open(encoding="utf-8") as file:
             data: GeneratorDumpData = json.load(file)
 
-        generation_params = data.pop("generation_params")
+        generation_params = data.pop("generation_params")  # type: ignore[misc]
 
         return cls(**data, **generation_params)
