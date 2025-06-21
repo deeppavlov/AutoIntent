@@ -1,5 +1,5 @@
 from collections import defaultdict
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -243,8 +243,8 @@ async def test_generate_intent_descriptions_empty_utterances_patterns():
     mock_create.assert_called_once_with(
         messages=[
             {
-                 "role": "system",
-                 "content": prompt.system_text,
+                "role": "system",
+                "content": prompt.system_text,
             },
             {
                 "role": "user",

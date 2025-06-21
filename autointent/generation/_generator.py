@@ -67,11 +67,11 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = self.client.chat.completions.create(
-            messages=messages,  # type: ignore[arg-type]
+            messages=messages,  # type: ignore[call-overload]
             model=self.model_name,
             **self.generation_params,
         )
-        return response.choices[0].message.content  # type: ignore[return-value]
+        return response.choices[0].message.content  # type: ignore[no-any-return]
 
     async def get_chat_completion_async(self, messages: list[Message]) -> str:
         """Prompt LLM and return its answer asynchronously.
@@ -80,11 +80,15 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = await self.async_client.chat.completions.create(
-            messages=messages,  # type: ignore[arg-type]
+            messages=messages,  # type: ignore[call-overload]
             model=self.model_name,
             **self.generation_params,
         )
-        return response.choices[0].message.content  # type: ignore[return-value]
+
+        if response is None or not response.choices:
+            msg = "No response received from the model."
+            raise RuntimeError(msg)
+        return response.choices[0].message.content  # type: ignore[no-any-return]
 
     def _create_retry_messages(self, error_message: str, raw: str | None) -> list[Message]:
         """Create a follow-up message for retry with error details and schema."""
@@ -128,7 +132,7 @@ class Generator:
                 model=self.model_name,
                 messages=messages,  # type: ignore[arg-type]
                 response_format=output_model,
-                **self.generation_params,
+                **self.generation_params,  # type: ignore[arg-type]
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -154,7 +158,7 @@ class Generator:
             json_schema = output_model.model_json_schema()
             response = await self.async_client.chat.completions.create(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,  # type: ignore[call-overload]
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )
@@ -245,7 +249,7 @@ class Generator:
                 model=self.model_name,
                 messages=messages,  # type: ignore[arg-type]
                 response_format=output_model,
-                **self.generation_params,
+                **self.generation_params,  # type: ignore[arg-type]
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -271,7 +275,7 @@ class Generator:
             json_schema = output_model.model_json_schema()
             response = self.client.chat.completions.create(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,  # type: ignore[call-overload]
                 extra_body={"guided_json": json_schema},
                 **self.generation_params,
             )

@@ -60,14 +60,9 @@ async def create_intent_description(
     intent_name = intent_name if intent_name is not None else ""
     utterances = random.sample(utterances, min(5, len(utterances)))
 
-    result = await client.get_chat_completion_async(
+    return await client.get_chat_completion_async(
         messages=prompt.to_messages(intent_name, utterances),
     )
-
-    if not isinstance(result, str):
-        error_text = f"Unexpected response type: expected str, got {type(result).__name__}"
-        raise TypeError(error_text)
-    return result
 
 
 async def generate_intent_descriptions(
