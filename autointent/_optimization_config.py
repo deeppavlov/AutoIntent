@@ -2,8 +2,7 @@ from typing import Any
 
 from pydantic import BaseModel, PositiveInt
 
-from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, LoggingConfig
-from .custom_types import SamplerType
+from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, HPOConfig, LoggingConfig
 
 
 class OptimizationConfig(BaseModel):
@@ -27,7 +26,6 @@ class OptimizationConfig(BaseModel):
 
     transformer_config: HFModelConfig = HFModelConfig()
 
-    sampler: SamplerType = "brute"
-    """See tutorial on optuna and presets."""
+    hpo_config: HPOConfig = HPOConfig()
 
     seed: PositiveInt = 42

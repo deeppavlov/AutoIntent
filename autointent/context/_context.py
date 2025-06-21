@@ -4,10 +4,11 @@ import logging
 from pathlib import Path
 
 import yaml
+from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, LoggingConfig
+from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, HPOConfig, LoggingConfig
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -45,9 +46,12 @@ class Context:
         Args:
             config: Logging configuration settings.
         """
-        self.logging_config = config
-        self.callback_handler = get_callbacks(config.report_to)
-        self.optimization_info = OptimizationInfo()
+        if isinstance(config, LoggingConfig):
+            self.logging_config = config
+            self.callback_handler = get_callbacks(config.report_to)
+            self.optimization_info = OptimizationInfo()
+        else:
+            assert_never(config)
 
     def configure_transformer(self, config: EmbedderConfig | CrossEncoderConfig | HFModelConfig) -> None:
         """Configure the vector index client and embedder.
@@ -61,6 +65,14 @@ class Context:
             self.cross_encoder_config = config
         elif isinstance(config, HFModelConfig):
             self.transformer_config = config
+        else:
+            assert_never(config)
+
+    def configure_hpo(self, config: HPOConfig) -> None:
+        if isinstance(config, HPOConfig):
+            self.hpo_config = config
+        else:
+            assert_never(config)
 
     def set_dataset(self, dataset: Dataset, config: DataConfig) -> None:
         """Set the datasets for training, validation and testing.

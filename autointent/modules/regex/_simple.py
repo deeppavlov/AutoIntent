@@ -250,7 +250,7 @@ class SimpleRegex(BaseRegex):
 
         dump_dir = Path(path)
         dump_dir.mkdir(parents=True, exist_ok=True)
-        with (dump_dir / "regex_patterns.json").open("w") as file:
+        with (dump_dir / "regex_patterns.json").open("w", encoding="utf-8") as file:
             json.dump(serialized, file, indent=4, ensure_ascii=False)
 
     @classmethod
@@ -262,7 +262,7 @@ class SimpleRegex(BaseRegex):
     ) -> "SimpleRegex":
         instance = cls()
 
-        with (Path(path) / "regex_patterns.json").open() as file:
+        with (Path(path) / "regex_patterns.json").open(encoding="utf-8") as file:
             serialized: list[dict[str, Any]] = json.load(file)
 
         instance._compile_regex_patterns(serialized)  # noqa: SLF001

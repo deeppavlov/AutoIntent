@@ -19,8 +19,8 @@ from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.similarity_functions import SimilarityFunction
 
-from ._hash import Hasher
-from .configs import EmbedderConfig, TaskTypeEnum
+from autointent._hash import Hasher
+from autointent.configs import EmbedderConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -164,7 +164,7 @@ class Embedder:
             path: Path to the directory where the model is stored.
             override_config: one can override presaved settings
         """
-        with (Path(path) / cls._metadata_dict_name).open() as file:
+        with (Path(path) / cls._metadata_dict_name).open(encoding="utf-8") as file:
             metadata: EmbedderDumpMetadata = json.load(file)
 
         if override_config is not None:

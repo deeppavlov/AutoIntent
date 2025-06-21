@@ -15,6 +15,8 @@ from .regex import SimpleRegex
 from .scoring import (
     BERTLoRAScorer,
     BertScorer,
+    CatBoostScorer,
+    CNNScorer,
     DescriptionScorer,
     DNNCScorer,
     KNNScorer,
@@ -22,6 +24,7 @@ from .scoring import (
     MLKnnScorer,
     PTuningScorer,
     RerankScorer,
+    RNNScorer,
     SklearnScorer,
 )
 
@@ -40,6 +43,7 @@ EMBEDDING_MODULES: dict[str, type[BaseEmbedding]] = _create_modules_dict(
 
 SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
+        CatBoostScorer,
         DNNCScorer,
         KNNScorer,
         LinearScorer,
@@ -48,8 +52,10 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         SklearnScorer,
         MLKnnScorer,
         BertScorer,
+        CNNScorer,
         BERTLoRAScorer,
         PTuningScorer,
+        RNNScorer,
     ]
 )
 
@@ -66,6 +72,7 @@ __all__ = [
     "BaseModule",
     "BaseRegex",
     "BaseScorer",
+    "CatBoostScorer",
     "DNNCScorer",
     "DescriptionScorer",
     "JinoosDecision",

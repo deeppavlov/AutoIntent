@@ -29,6 +29,16 @@
     - module_name: sklearn
       clf_name: [RandomForestClassifier]
       n_estimators: [5, 10]
+    - module_name: catboost
+      iterations: [50, 100]
+      learning_rate: [0.05, 0.1]
+      depth: [1, 10]
+      l2_leaf_reg: [1, 5]
+      eval_metric: ["Accuracy"]
+      random_seed: [42]
+      features_type: ["embedding"]
+      embedder_config:
+        - model_name: prajjwal1/bert-tiny
     - module_name: bert
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0
@@ -36,6 +46,12 @@
       batch_size: [8, 16]
       learning_rate: [5.0e-5]
       seed: [0]
+    - module_name: cnn
+      dropout: [0.1, 0.3, 0.5]
+      num_train_epochs: [10]
+      embed_dim: [128]
+      kernel_sizes: [[3, 4, 5]]
+      num_filters: [100]
     - module_name: lora
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0

@@ -5,7 +5,7 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 from autointent._callbacks import REPORTERS_NAMES
-from autointent.custom_types import FloatFromZeroToOne, ValidationScheme
+from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
 
 from ._name import get_run_name
 
@@ -87,3 +87,76 @@ class LoggingConfig(BaseModel):
         if self.run_name is None:
             self.run_name = get_run_name()
         return self.run_name
+
+
+class HPOConfig(BaseModel):
+    """Configuration for hyperparameter optimization using Optuna.
+
+    For more detailed information about the TPE sampler and its parameters,
+    refer to Optuna's documentation of `TPESampler
+    <https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html>`_,
+    `study.optimize
+    <https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize>`_,
+    `RandomSampler <https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html>`_.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    # optuna generic
+    sampler: SamplerType = Field(default="tpe", description="Optuna sampler. One of 'tpe', 'random'.")
+    n_trials: int = Field(
+        15,  # small value for tests
+        description=(
+            "Number of trials to run in the optimization process. "
+            "This is the total number of different hyperparameter combinations that will be evaluated."
+        ),
+    )
+    timeout: float | None = Field(
+        None,
+        description=(
+            "Time limit in seconds for the optimization process. "
+            "If None, the optimization will run until n_trials is reached."
+        ),
+    )
+    n_jobs: int = Field(
+        1,
+        description="Number of parallel jobs to run. Set to -1 to use all available CPU cores.",
+    )
+
+    # tpe sampler specific
+    n_startup_trials: int = Field(
+        10,  # small value for tests
+        description=(
+            "Number of initial trials to run using random sampling before switching to TPE algorithm. "
+            "This helps in better initialization of the TPE algorithm."
+        ),
+    )
+    consider_prior: bool = Field(
+        True,
+        description=(
+            "Whether to use Gaussian (normal) distribution as prior for integer and float parameter spaces. "
+            "This helps in better initialization of the TPE algorithm's parameter distributions."
+        ),
+    )
+    prior_weight: int = Field(
+        1,
+        description=(
+            "Weight of the prior distribution in the TPE algorithm. "
+            "Higher values make the algorithm more conservative in exploring new regions."
+        ),
+    )
+    n_ei_candidates: int = Field(
+        24,
+        description=(
+            "Number of candidates to sample for expected improvement calculation in TPE algorithm. "
+            "Higher values may lead to better exploration but slower optimization."
+        ),
+    )
+    constant_liar: bool = Field(
+        False,
+        description=(
+            "Whether to use constant liar strategy for parallel optimization. "
+            "If True, the algorithm will penalize running trials to avoid suggesting parameter configurations "
+            "that are too close to currently running trials."
+        ),
+    )
