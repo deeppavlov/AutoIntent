@@ -71,16 +71,6 @@ class Dataset(dict[str, HFDataset]):
         """Returns the number of classes in the dataset."""
         return len(self.intents)
 
-    def is_multilabel_format(self) -> bool:
-        """Checks if the dataset is in multilabel format.
-
-        Returns:
-            bool: True if the dataset is multilabel, False otherwise.
-        """
-        ds_keys = list(self.keys())
-        first_split = self[ds_keys[0]]
-        return isinstance(first_split.features[self.label_feature], Sequence)
-
     @classmethod
     def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
         """Creates a dataset from a dictionary mapping.
@@ -90,11 +80,7 @@ class Dataset(dict[str, HFDataset]):
         """
         from ._reader import DictReader
 
-        dataset = DictReader().read(mapping)
-
-        if dataset.is_multilabel_format():
-            dataset = dataset.to_multilabel()
-        return dataset
+        return DictReader().read(mapping)
 
     @classmethod
     def from_json(cls, filepath: str | Path) -> "Dataset":
@@ -105,10 +91,7 @@ class Dataset(dict[str, HFDataset]):
         """
         from ._reader import JsonReader
 
-        dataset = JsonReader().read(filepath)
-        if dataset.is_multilabel_format():
-            dataset = dataset.to_multilabel()
-        return dataset
+        return JsonReader().read(filepath)
 
     @classmethod
     def from_hub(cls, repo_name: str, data_split: str = "default") -> "Dataset":
@@ -125,10 +108,7 @@ class Dataset(dict[str, HFDataset]):
         if Split.INTENTS in get_dataset_config_names(repo_name):
             mapping[Split.INTENTS] = load_dataset(repo_name, name=Split.INTENTS, split=Split.INTENTS).to_list()
 
-        dataset = DictReader().read(mapping)
-        if dataset.is_multilabel_format():
-            dataset = dataset.to_multilabel()
-        return dataset
+        return DictReader().read(mapping)
 
     def to_multilabel(self) -> "Dataset":
         """Converts dataset labels to multilabel format."""
