@@ -12,6 +12,8 @@ from typing_extensions import assert_never
 
 from autointent.generation.chat_templates import Message, Role
 
+from ._cache import StructuredOutputCache
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()
@@ -52,12 +54,19 @@ class Generator:
     }
     """Default generation parameters for API requests."""
 
-    def __init__(self, base_url: str | None = None, model_name: str | None = None, **generation_params: Any) -> None:  # noqa: ANN401
+    def __init__(
+        self,
+        base_url: str | None = None,
+        model_name: str | None = None,
+        use_cache: bool = True,
+        **generation_params: Any,  # noqa: ANN401
+    ) -> None:
         """Initialize the Generator with API configuration.
 
         Args:
             base_url: OpenAI API compatible server URL.
             model_name: Name of the language model to use.
+            use_cache: Whether to use caching for structured outputs.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
@@ -72,6 +81,7 @@ class Generator:
             **self._default_generation_params,
             **generation_params,
         }  #  https://stackoverflow.com/a/65539348
+        self.cache = StructuredOutputCache(use_cache=use_cache)
 
     def get_chat_completion(self, messages: list[Message]) -> str:
         """Prompt LLM and return its answer.
@@ -106,15 +116,15 @@ class Generator:
             res.append({"role": Role.ASSISTANT, "content": raw})
         res.append(
             {
-                "role": "user",
+                "role": Role.USER,
                 "content": dedent(
                     f"""The previous response failed validation with the following error: {error_message}
 
-                Make sure to:
-                1. Follow the exact schema structure
-                2. Use the correct data types for each field
-                3. Include all required fields
-                4. Ensure the response is valid JSON"""
+                    Make sure to:
+                    1. Follow the exact schema structure
+                    2. Use the correct data types for each field
+                    3. Include all required fields
+                    4. Ensure the response is valid JSON"""
                 ),
             }
         )
@@ -198,6 +208,11 @@ class Generator:
         Returns:
             Parsed response as an instance of the provided Pydantic model.
         """
+        # Check cache first
+        cached_result = self.cache.get(messages, output_model, backend, self.generation_params)
+        if cached_result is not None:
+            return cached_result
+
         current_messages = messages.copy()
         res: T | None = None
 
@@ -222,6 +237,9 @@ class Generator:
         if res is None:
             logger.exception(msg)
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
+
+        # Cache the successful result
+        self.cache.set(messages, output_model, backend, self.generation_params, res)
 
         return res
 
@@ -303,6 +321,11 @@ class Generator:
         Returns:
             Parsed response as an instance of the provided Pydantic model.
         """
+        # Check cache first
+        cached_result = self.cache.get(messages, output_model, backend, self.generation_params)
+        if cached_result is not None:
+            return cached_result
+
         current_messages = messages.copy()
         res: T | None = None
 
@@ -327,5 +350,8 @@ class Generator:
         if res is None:
             logger.exception(msg)
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
+
+        # Cache the successful result
+        self.cache.set(messages, output_model, backend, self.generation_params, res)
 
         return res
