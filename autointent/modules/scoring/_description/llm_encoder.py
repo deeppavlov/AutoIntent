@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from functools import partial
+from pathlib import Path
 from textwrap import dedent
 from typing import Any, Literal
 
@@ -13,6 +14,8 @@ from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
 from autointent import Context
+from autointent._dump_tools import Dumper
+from autointent.configs._transformers import CrossEncoderConfig, EmbedderConfig
 from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Message, Role
 
@@ -107,7 +110,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         """
         self._generator = Generator(**self.generator_config)
         self._description_texts = descriptions
-        self._event_loop = asyncio.get_event_loop()
+        self._init_event_loop()
 
     def _create_prompt(self, utterance: str, descriptions: list[str]) -> list[Message]:
         """Create a prompt for the LLM to categorize intent descriptions.
@@ -194,7 +197,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         Raises:
             RuntimeError: If generator or description texts are not initialized
         """
-        if not hasattr(self, "_generator") or not hasattr(self, "_description_texts"):
+        if not (hasattr(self, "_generator") and hasattr(self, "_description_texts")):
             error_text = "Scorer is not initialized. Call fit() before predict()."
             raise RuntimeError(error_text)
 
@@ -238,3 +241,24 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         if hasattr(self, "_event_loop"):
             self._event_loop.close()
             delattr(self, "_event_loop")
+
+    def _init_event_loop(self) -> None:
+        if self.max_concurrent is not None:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+            self._event_loop = loop
+
+    def dump(self, path: str) -> None:
+        Dumper.dump(self, Path(path), exclude=[asyncio.BaseEventLoop])
+
+    @classmethod
+    def load(
+        cls,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> "LLMDescriptionScorer":
+        instance = super().load(path=path, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
+        instance._init_event_loop()  # noqa: SLF001
+        return instance

@@ -9,7 +9,7 @@ from appdirs import user_cache_dir
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
-from autointent._dump_tools import PydanticModelDumper
+from autointent._dump_tools.unit_dumpers import PydanticModelDumper
 from autointent._hash import Hasher
 from autointent.generation.chat_templates import Message
 
