@@ -3,6 +3,7 @@
 See :ref:`data-aug-tuts`.
 """
 
-from ._generator import Generator
+from ._cache import StructuredOutputCache
+from ._generator import Generator, RetriesExceededError
 
-__all__ = ["Generator"]
+__all__ = ["Generator", "RetriesExceededError"]

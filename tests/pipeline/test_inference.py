@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from autointent import Pipeline
@@ -13,7 +15,19 @@ def project_dir(task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["regex", "multiclass", "multilabel", "description"],
+    [
+        "regex",
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_inference_from_config(dataset, task_type, project_dir):
     search_space = get_search_space(task_type)
@@ -54,7 +68,19 @@ def test_inference_from_config(dataset, task_type, project_dir):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["regex", "multiclass", "multilabel", "description"],
+    [
+        "regex",
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_inference_on_the_fly(dataset, task_type, project_dir):
     search_space = get_search_space(task_type)

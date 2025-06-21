@@ -70,7 +70,18 @@ def test_bayes(dataset, sampler):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_cv(dataset, task_type):
     project_dir = setup_environment()
@@ -92,7 +103,18 @@ def test_cv(dataset, task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_no_context_optimization(dataset, task_type):
     project_dir = setup_environment()
@@ -112,7 +134,18 @@ def test_no_context_optimization(dataset, task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_dump_modules(dataset, task_type):
     project_dir = setup_environment()

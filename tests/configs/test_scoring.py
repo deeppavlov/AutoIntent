@@ -34,7 +34,7 @@ def valid_scoring_config():
                 "ignore_first_neighbours": [0, 1],
             },
             {
-                "module_name": "description",
+                "module_name": "description_bi",
                 "embedder_config": ["sentence-transformers/all-MiniLM-L6-v2"],
                 "temperature": [0.5, 1.0],
             },

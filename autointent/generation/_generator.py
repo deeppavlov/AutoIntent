@@ -1,8 +1,11 @@
 """Wrapper class for accessing OpenAI API."""
 
+import json
 import logging
 import os
+from pathlib import Path
 from textwrap import dedent
+from typing import Any, ClassVar, Literal, TypedDict, TypeVar
 from typing import Any, Literal, TypeVar
 
 import openai
@@ -22,6 +25,27 @@ T = TypeVar("T", bound=BaseModel)
 """Type variable for Pydantic models used in structured output generation."""
 
 
+class GeneratorDumpData(TypedDict):
+    use_cache: bool
+    model_name: str
+    base_url: str | None
+    generation_params: dict[str, Any]
+
+
+class RetriesExceededError(RuntimeError):
+    """Exception raised when LLM call fails after all retry attempts."""
+
+    def __init__(self, max_retries: int, messages: list[Message]) -> None:
+        """Initialize the error with retry count and messages.
+
+        Args:
+            max_retries: Maximum number of retry attempts that were made
+            messages: Messages that were sent to the LLM
+        """
+        msg = f"LLM call failed after {max_retries + 1} attempts. Messages: {messages}"
+        super().__init__(msg)
+
+
 class Generator:
     """Wrapper class for accessing OpenAI API.
 
@@ -31,6 +55,8 @@ class Generator:
         model_name: Name of LLM. Omit this to infer ``OPENAI_MODEL_NAME`` from environment.
         **generation_params: kwargs that will be sent with a request to the endpoint.
     """
+
+    _dump_data_filename = "init_params.json"
 
     def __init__(
         self,
@@ -51,14 +77,20 @@ class Generator:
         """
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
+
         if model_name is None:
             msg = "Specify model_name arg or OPENAI_MODEL_NAME environment variable"
             raise ValueError(msg)
+
         self.model_name = model_name
+        self.base_url = base_url
+        self.use_cache = use_cache
+
         self.client = openai.OpenAI(base_url=base_url, **(client_params or {}))
         self.async_client = openai.AsyncOpenAI(base_url=base_url, **(client_params or {}))
         self.generation_params = generation_params
         self.cache = StructuredOutputCache(use_cache=use_cache)
+
 
     def get_chat_completion(self, messages: list[Message]) -> str:
         """Prompt LLM and return its answer.
@@ -221,7 +253,7 @@ class Generator:
                 f"Messages: {current_messages}"
             )
             logger.exception(msg)
-            raise RuntimeError(msg)
+            raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
         self.cache.set(messages, output_model, backend, self.generation_params, res)
@@ -333,14 +365,33 @@ class Generator:
             current_messages.extend(self._create_retry_messages(error, raw))
 
         if res is None:
-            msg = (
-                f"Failed to generate valid structured output after {max_retries + 1} attempts.\n"
-                f"Messages: {current_messages}"
-            )
+            msg = "Structured output returned None but no error was caught."
             logger.exception(msg)
-            raise RuntimeError(msg)
+            raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
         self.cache.set(messages, output_model, backend, self.generation_params, res)
 
         return res
+
+    def dump(self, path: Path, exist_ok: bool = True) -> None:
+        data: GeneratorDumpData = {
+            "base_url": self.base_url,
+            "generation_params": self.generation_params,
+            "model_name": self.model_name,
+            "use_cache": self.use_cache,
+        }
+
+        path.mkdir(exist_ok=exist_ok, parents=True)
+
+        with (path / self._dump_data_filename).open("w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def load(cls, path: Path) -> "Generator":
+        with (path / cls._dump_data_filename).open(encoding="utf-8") as file:
+            data: GeneratorDumpData = json.load(file)
+
+        generation_params = data.pop("generation_params")  # type: ignore[misc]
+
+        return cls(**data, **generation_params)

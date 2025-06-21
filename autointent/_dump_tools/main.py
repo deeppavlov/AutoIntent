@@ -10,6 +10,7 @@ from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
 
 from .base import BaseObjectDumper, ModuleAttributes, ModuleSimpleAttributes
+from .generator_dumper import GeneratorDumper
 from .unit_dumpers import (
     ArraysDumper,
     CatBoostDumper,
@@ -46,6 +47,7 @@ class Dumper:
         HFTokenizerDumper,
         TorchModelDumper,
         CatBoostDumper,
+        GeneratorDumper,
     ]
 
     @staticmethod
