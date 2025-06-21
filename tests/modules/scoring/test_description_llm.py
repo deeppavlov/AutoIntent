@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import numpy as np
@@ -7,6 +8,10 @@ from autointent.context.data_handler import DataHandler
 from autointent.modules import LLMDescriptionScorer
 
 
+@pytest.mark.skipif(
+    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
+    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
+)
 @pytest.mark.parametrize("multilabel", [True, False])
 def test_description_scorer_llm(dataset, multilabel):
     if multilabel:
