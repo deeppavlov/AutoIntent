@@ -3,7 +3,7 @@
 import logging
 import os
 from textwrap import dedent
-from typing import Any, ClassVar, Literal, TypeVar
+from typing import Any, Literal, TypeVar
 
 import openai
 from dotenv import load_dotenv
@@ -32,20 +32,13 @@ class Generator:
         **generation_params: kwargs that will be sent with a request to the endpoint.
     """
 
-    _default_generation_params: ClassVar[dict[str, Any]] = {
-        "max_tokens": 150,
-        "n": 1,
-        "stop": None,
-        "temperature": 0.7,
-    }
-    """Default generation parameters for API requests."""
-
     def __init__(
         self,
         base_url: str | None = None,
         model_name: str | None = None,
         use_cache: bool = True,
-        **generation_params: Any,  # noqa: ANN401
+        client_params: dict[str, Any] | None = None,
+        **generation_params: dict[str, Any],
     ) -> None:
         """Initialize the Generator with API configuration.
 
@@ -53,6 +46,7 @@ class Generator:
             base_url: OpenAI API compatible server URL.
             model_name: Name of the language model to use.
             use_cache: Whether to use caching for structured outputs.
+            client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
@@ -61,12 +55,9 @@ class Generator:
             msg = "Specify model_name arg or OPENAI_MODEL_NAME environment variable"
             raise ValueError(msg)
         self.model_name = model_name
-        self.client = openai.OpenAI(base_url=base_url)
-        self.async_client = openai.AsyncOpenAI(base_url=base_url)
-        self.generation_params = {
-            **self._default_generation_params,
-            **generation_params,
-        }  #  https://stackoverflow.com/a/65539348
+        self.client = openai.OpenAI(base_url=base_url, **(client_params or {}))
+        self.async_client = openai.AsyncOpenAI(base_url=base_url, **(client_params or {}))
+        self.generation_params = generation_params
         self.cache = StructuredOutputCache(use_cache=use_cache)
 
     def get_chat_completion(self, messages: list[Message]) -> str:
