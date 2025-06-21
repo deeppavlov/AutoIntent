@@ -27,7 +27,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
 
     def __init__(
         self,
-        embedder_config: EmbedderConfig | str | dict[str, Any],
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
     ) -> None:
         super().__init__(temperature)

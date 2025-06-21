@@ -27,7 +27,7 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
 
     def __init__(
         self,
-        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any],
+        cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
     ) -> None:
         super().__init__(temperature)
