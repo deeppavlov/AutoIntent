@@ -49,8 +49,11 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
     Args:
         generator_config: Configuration for the Generator instance
-        temperature: Temperature parameter for scaling logits, defaults to 1.0
-        max_concurrent: if not None, performs async calls to LLM
+        temperature: Temperature parameter for scaling classifier logits, defaults to 1.0
+        max_concurrent: Maximum number of concurrent async calls to LLM, defaults to 15
+        max_per_second: Maximum number of API calls per second, defaults to 10
+        max_retries: Maximum number of retry attempts for failed validations, defaults to 3
+        backend: Backend to use for structured output, either "openai" or "vllm", defaults to "openai"
     """
 
     name = "description_llm"
