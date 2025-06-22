@@ -10,7 +10,6 @@
   target_metric: scoring_roc_auc
   search_space:
     - module_name: knn
-      n_trials: 3
       k:
         low: 5
         high: 10

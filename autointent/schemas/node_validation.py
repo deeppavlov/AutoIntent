@@ -18,7 +18,7 @@ from pydantic import (
 )
 
 from autointent.custom_types import NodeType
-from autointent.modules import BaseModule
+from autointent.modules.base import BaseModule
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
 
 

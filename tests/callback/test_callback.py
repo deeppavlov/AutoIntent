@@ -5,7 +5,7 @@ import numpy as np
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
-from autointent.configs import DataConfig, LoggingConfig
+from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from tests.conftest import setup_environment
 
 
@@ -41,6 +41,14 @@ class DummyCallback(OptimizerCallback):
 
     def log_final_metrics(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("log_final_metrics", kwargs))
+
+    def update_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        self.history.append(("update_metrics", metrics))
+        return metrics
+
+    def update_final_metrics(self, metrics: dict[str, Any]) -> dict[str, Any]:
+        self.history.append(("update_final_metrics", metrics))
+        return metrics
 
 
 def test_pipeline_callbacks(dataset):
@@ -87,159 +95,423 @@ def test_pipeline_callbacks(dataset):
     context.configure_logging(LoggingConfig(run_name="dummy_run_name", project_dir=project_dir, dump_modules=False))
     context.callback_handler = CallbackHandler([DummyCallback])
     context.set_dataset(dataset, DataConfig(scheme="ho"))
+    context.configure_hpo(HPOConfig(n_trials=10))
 
-    pipeline_optimizer._fit(context, "brute")
+    pipeline_optimizer._fit(context)
 
     dummy_callback = context.callback_handler.callbacks[0]
 
-    assert len(dummy_callback.history) == 23
+    assert len(dummy_callback.history) == 122
     assert dummy_callback.history[0][0] == "start_run"
     assert "run_name" in dummy_callback.history[0][1]
     assert dummy_callback.history[1:] == [
         (
             "start_module",
             {
-                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 5},
                 "module_name": "retrieval",
                 "num": 0,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "retrieval_hit_rate": 1.0,
-                }
-            },
-        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
             {
-                "module_kwargs": {"embedder_config": "sergeyzh/rubert-tiny-turbo", "k": 10},
                 "module_name": "retrieval",
                 "num": 1,
+                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "retrieval_hit_rate": 1.0,
-                }
-            },
-        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
             {
-                "module_kwargs": {
-                    "embedder_config": {
-                        "batch_size": 32,
-                        "classification_prompt": None,
-                        "cluster_prompt": None,
-                        "default_prompt": None,
-                        "device": None,
-                        "freeze": True,
-                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "passage_prompt": None,
-                        "query_prompt": None,
-                        "sts_prompt": None,
-                        "use_cache": True,
-                        "similarity_fn_name": "cosine",
-                        "trust_remote_code": False,
-                    },
-                    "k": 1,
-                    "weights": "uniform",
-                },
-                "module_name": "knn",
-                "num": 0,
+                "module_name": "retrieval",
+                "num": 2,
+                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 1.0,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
             {
-                "module_kwargs": {
-                    "embedder_config": {
-                        "batch_size": 32,
-                        "classification_prompt": None,
-                        "cluster_prompt": None,
-                        "default_prompt": None,
-                        "device": None,
-                        "freeze": True,
-                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "passage_prompt": None,
-                        "query_prompt": None,
-                        "sts_prompt": None,
-                        "use_cache": True,
-                        "similarity_fn_name": "cosine",
-                        "trust_remote_code": False,
-                    },
-                    "k": 1,
-                    "weights": "distance",
-                },
-                "module_name": "knn",
-                "num": 1,
+                "module_name": "retrieval",
+                "num": 3,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 1.0,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
             {
-                "module_kwargs": {
-                    "embedder_config": {
-                        "batch_size": 32,
-                        "classification_prompt": None,
-                        "cluster_prompt": None,
-                        "default_prompt": None,
-                        "device": None,
-                        "freeze": True,
-                        "tokenizer_config": {"max_length": None, "truncation": True, "padding": True},
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "passage_prompt": None,
-                        "query_prompt": None,
-                        "sts_prompt": None,
-                        "use_cache": True,
-                        "similarity_fn_name": "cosine",
-                        "trust_remote_code": False,
-                    },
-                },
+                "module_name": "retrieval",
+                "num": 4,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "retrieval",
+                "num": 5,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "retrieval",
+                "num": 6,
+                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "retrieval",
+                "num": 7,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "retrieval",
+                "num": 8,
+                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "retrieval",
+                "num": 9,
+                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+            },
+        ),
+        ("update_metrics", {"retrieval_hit_rate": 1.0}),
+        ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
                 "module_name": "linear",
                 "num": 0,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
             },
         ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "scoring_accuracy": 0.75,
-                    "scoring_roc_auc": 1.0,
-                }
-            },
-        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
         ("end_module", {}),
-        ("start_module", {"module_kwargs": {"thresh": 0.5}, "module_name": "threshold", "num": 0}),
+        (
+            "start_module",
+            {
+                "module_name": "knn",
+                "num": 1,
+                "module_kwargs": {
+                    "k": 1,
+                    "weights": "uniform",
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    },
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 2,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 3,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 4,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "knn",
+                "num": 5,
+                "module_kwargs": {
+                    "k": 1,
+                    "weights": "distance",
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    },
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 6,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "knn",
+                "num": 7,
+                "module_kwargs": {
+                    "k": 1,
+                    "weights": "uniform",
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    },
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 8,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        (
+            "start_module",
+            {
+                "module_name": "linear",
+                "num": 9,
+                "module_kwargs": {
+                    "embedder_config": {
+                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "batch_size": 32,
+                        "device": None,
+                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
+                        "trust_remote_code": False,
+                        "default_prompt": None,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "sts_prompt": None,
+                        "query_prompt": None,
+                        "passage_prompt": None,
+                        "similarity_fn_name": "cosine",
+                        "use_cache": True,
+                        "freeze": True,
+                    }
+                },
+            },
+        ),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
         (
             "log_metric",
             {
@@ -253,7 +525,65 @@ def test_pipeline_callbacks(dataset):
             },
         ),
         ("end_module", {}),
-        ("start_module", {"module_kwargs": {}, "module_name": "argmax", "num": 0}),
+        ("start_module", {"module_name": "threshold", "num": 1, "module_kwargs": {"thresh": 0.5}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 1.0,
+                "decision_f1": 1.0,
+                "decision_precision": 1.0,
+                "decision_recall": 1.0,
+                "decision_roc_auc": 1.0,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 1.0,
+                    "decision_f1": 1.0,
+                    "decision_precision": 1.0,
+                    "decision_recall": 1.0,
+                    "decision_roc_auc": 1.0,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "threshold", "num": 2, "module_kwargs": {"thresh": 0.5}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 1.0,
+                "decision_f1": 1.0,
+                "decision_precision": 1.0,
+                "decision_recall": 1.0,
+                "decision_roc_auc": 1.0,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 1.0,
+                    "decision_f1": 1.0,
+                    "decision_precision": 1.0,
+                    "decision_recall": 1.0,
+                    "decision_roc_auc": 1.0,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 3, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
         (
             "log_metric",
             {
@@ -263,6 +593,150 @@ def test_pipeline_callbacks(dataset):
                     "decision_precision": 0.55,
                     "decision_recall": 0.8,
                     "decision_roc_auc": 0.8428571428571429,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 4, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 5, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "threshold", "num": 6, "module_kwargs": {"thresh": 0.5}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 1.0,
+                "decision_f1": 1.0,
+                "decision_precision": 1.0,
+                "decision_recall": 1.0,
+                "decision_roc_auc": 1.0,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 1.0,
+                    "decision_f1": 1.0,
+                    "decision_precision": 1.0,
+                    "decision_recall": 1.0,
+                    "decision_roc_auc": 1.0,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 7, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "argmax", "num": 8, "module_kwargs": {}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.5,
+                "decision_f1": 0.6133333333333333,
+                "decision_precision": 0.55,
+                "decision_recall": 0.8,
+                "decision_roc_auc": 0.8428571428571429,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.5,
+                    "decision_f1": 0.6133333333333333,
+                    "decision_precision": 0.55,
+                    "decision_recall": 0.8,
+                    "decision_roc_auc": 0.8428571428571429,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_name": "threshold", "num": 9, "module_kwargs": {"thresh": 0.5}}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 1.0,
+                "decision_f1": 1.0,
+                "decision_precision": 1.0,
+                "decision_recall": 1.0,
+                "decision_roc_auc": 1.0,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 1.0,
+                    "decision_f1": 1.0,
+                    "decision_precision": 1.0,
+                    "decision_recall": 1.0,
+                    "decision_roc_auc": 1.0,
                 }
             },
         ),

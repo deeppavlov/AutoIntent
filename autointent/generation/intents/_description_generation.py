@@ -9,9 +9,8 @@ import asyncio
 import random
 from collections import defaultdict
 
-from openai import AsyncOpenAI
-
 from autointent import Dataset
+from autointent.generation import Generator
 from autointent.generation.chat_templates import PromptDescription
 from autointent.schemas import Intent, Sample
 
@@ -41,12 +40,10 @@ def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:
 
 
 async def create_intent_description(
-    client: AsyncOpenAI,
+    client: Generator,
     intent_name: str | None,
     utterances: list[str],
-    regex_patterns: list[str],
     prompt: PromptDescription,
-    model_name: str,
 ) -> str:
     """Generate a description for a specific intent using an OpenAI model.
 
@@ -54,42 +51,25 @@ async def create_intent_description(
         client: OpenAI client instance for model communication.
         intent_name: Name of the intent to describe (empty string if None).
         utterances: Example utterances related to the intent.
-        regex_patterns: Regular expression patterns associated with the intent.
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
-        model_name: Identifier of the OpenAI model to use.
 
     Raises:
         TypeError: If the model response is not a string.
     """
     intent_name = intent_name if intent_name is not None else ""
     utterances = random.sample(utterances, min(5, len(utterances)))
-    regex_patterns = random.sample(regex_patterns, min(3, len(regex_patterns)))
 
-    content = prompt.text.format(
-        intent_name=intent_name,
-        user_utterances="\n".join(utterances),
-        regex_patterns="\n".join(regex_patterns),
+    return await client.get_chat_completion_async(
+        messages=prompt.to_messages(intent_name, utterances),
     )
-    chat_completion = await client.chat.completions.create(
-        messages=[{"role": "user", "content": content}],
-        model=model_name,
-        temperature=0.2,
-    )
-    result = chat_completion.choices[0].message.content
-
-    if not isinstance(result, str):
-        error_text = f"Unexpected response type: expected str, got {type(result).__name__}"
-        raise TypeError(error_text)
-    return result
 
 
 async def generate_intent_descriptions(
-    client: AsyncOpenAI,
+    client: Generator,
     intent_utterances: dict[int, list[str]],
     intents: list[Intent],
     prompt: PromptDescription,
-    model_name: str,
 ) -> list[Intent]:
     """Generate descriptions for multiple intents using an OpenAI model.
 
@@ -99,22 +79,18 @@ async def generate_intent_descriptions(
         intents: List of intents needing descriptions.
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
-        model_name: Name of the OpenAI model to use.
     """
     tasks = []
     for intent in intents:
         if intent.description is not None:
             continue
         utterances = intent_utterances.get(intent.id, [])
-        regex_patterns = intent.regex_full_match + intent.regex_partial_match
         task = asyncio.create_task(
             create_intent_description(
                 client=client,
                 intent_name=intent.name,
                 utterances=utterances,
-                regex_patterns=regex_patterns,
                 prompt=prompt,
-                model_name=model_name,
             ),
         )
         tasks.append((intent, task))
@@ -127,8 +103,7 @@ async def generate_intent_descriptions(
 
 def generate_descriptions(
     dataset: Dataset,
-    client: AsyncOpenAI,
-    model_name: str,
+    client: Generator,
     prompt: PromptDescription | None = None,
 ) -> Dataset:
     """Add LLM-generated text descriptions to dataset's intents.
@@ -138,7 +113,6 @@ def generate_descriptions(
         client: OpenAI client for generating descriptions.
         prompt: Template for model prompt with placeholders for intent_name,
                user_utterances, and regex_patterns.
-        model_name: OpenAI model identifier for generating descriptions.
 
     See :ref:`intent_description_generation` tutorial.
     """
@@ -149,6 +123,6 @@ def generate_descriptions(
     if prompt is None:
         prompt = PromptDescription()
     dataset.intents = asyncio.run(
-        generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt, model_name),
+        generate_intent_descriptions(client, intent_utterances, dataset.intents, prompt),
     )
     return dataset

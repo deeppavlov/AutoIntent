@@ -59,6 +59,7 @@ Note: If mypy shows different errors locally compared to github actions, you sho
 ```bash
 make update
 ```
+But it still doesn't guarantee that the local type checker will give the same errors as CI. This is because CI is configured to check on Python 3.10 and your local python version is probably the latest one.
 
 ## Building Documentation
 

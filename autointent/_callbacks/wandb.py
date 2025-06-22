@@ -112,7 +112,7 @@ class WandbCallback(OptimizerCallback):
         }
 
         try:
-            config = metrics["configs"]
+            config = metrics.get("configs")
             self.wandb.init(config=config, **wandb_run_init_args)
             self.wandb.log(metrics)
         except Exception as e:

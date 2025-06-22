@@ -1,0 +1,18 @@
+- node_type: embedding
+  target_metric: retrieval_hit_rate
+  search_space:
+    - module_name: retrieval
+      k: [10]
+      embedder_config:
+        - model_name: sentence-transformers/all-MiniLM-L6-v2
+          device: cpu
+- node_type: scoring
+  target_metric: scoring_roc_auc
+  search_space:
+    - module_name: description_llm
+      temperature: [1.0, 0.5, 0.1, 0.05]
+      generator_config: [{"temperature": 0}]
+- node_type: decision
+  target_metric: decision_accuracy
+  search_space:
+    - module_name: argmax

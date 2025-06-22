@@ -9,6 +9,7 @@ from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTI
 
 
 class TokenizerConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
     truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
@@ -28,8 +29,10 @@ class HFModelConfig(BaseModel):
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
         """Validate the model configuration.
 
+        This classmethod is used to parse dictionaries that occur in search space configurations.
+
         Args:
-            values: Model configuration values. If a string is provided, it is converted to a dictionary.
+            values: Model configuration values.
 
         Returns:
             Model configuration.
@@ -124,6 +127,8 @@ class CrossEncoderConfig(HFModelConfig):
 
 
 class EarlyStoppingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     val_fraction: float = Field(
         0.2,
         description=(
@@ -139,3 +144,21 @@ class EarlyStoppingConfig(BaseModel):
     metric: Literal[tuple((SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS).keys())] | None = Field(  # type: ignore[valid-type]
         "scoring_f1", description="Metric to monitor."
     )
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | BaseModel | None) -> Self:
+        """Validate the model configuration.
+
+        This classmethod is used to parse dictionaries that occur in search space configurations.
+
+        Args:
+            values: Model configuration values.
+
+        Returns:
+            Model configuration.
+        """
+        if values is None:
+            return cls()
+        if isinstance(values, BaseModel):
+            return values  # type: ignore[return-value]
+        return cls(**values)

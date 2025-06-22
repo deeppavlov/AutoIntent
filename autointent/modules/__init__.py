@@ -15,13 +15,18 @@ from .regex import SimpleRegex
 from .scoring import (
     BERTLoRAScorer,
     BertScorer,
-    DescriptionScorer,
+    BiEncoderDescriptionScorer,
+    CatBoostScorer,
+    CNNScorer,
+    CrossEncoderDescriptionScorer,
     DNNCScorer,
     KNNScorer,
     LinearScorer,
+    LLMDescriptionScorer,
     MLKnnScorer,
     PTuningScorer,
     RerankScorer,
+    RNNScorer,
     SklearnScorer,
 )
 
@@ -40,43 +45,24 @@ EMBEDDING_MODULES: dict[str, type[BaseEmbedding]] = _create_modules_dict(
 
 SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
+        CatBoostScorer,
         DNNCScorer,
         KNNScorer,
         LinearScorer,
-        DescriptionScorer,
+        BiEncoderDescriptionScorer,
+        CrossEncoderDescriptionScorer,
+        LLMDescriptionScorer,
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,
         BertScorer,
+        CNNScorer,
         BERTLoRAScorer,
         PTuningScorer,
+        RNNScorer,
     ]
 )
 
 DECISION_MODULES: dict[str, type[BaseDecision]] = _create_modules_dict(
     [ArgmaxDecision, JinoosDecision, ThresholdDecision, TunableDecision, AdaptiveDecision],
 )
-
-
-__all__ = [
-    "AdaptiveDecision",
-    "ArgmaxDecision",
-    "BaseDecision",
-    "BaseEmbedding",
-    "BaseModule",
-    "BaseRegex",
-    "BaseScorer",
-    "DNNCScorer",
-    "DescriptionScorer",
-    "JinoosDecision",
-    "KNNScorer",
-    "LinearScorer",
-    "LogregAimedEmbedding",
-    "MLKnnScorer",
-    "RerankScorer",
-    "RetrievalAimedEmbedding",
-    "SimpleRegex",
-    "SklearnScorer",
-    "ThresholdDecision",
-    "TunableDecision",
-]

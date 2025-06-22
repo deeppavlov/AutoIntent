@@ -20,7 +20,7 @@ def setup_logging(level: LogLevel | str, log_filename: Path | str | None = None)
         log_filename: specify location of logfile, omit extension as suffix ``.log.jsonl`` will be appended.
     """
     config_file = ires.files("autointent._logging").joinpath("config.yaml")
-    with config_file.open() as f_in:
+    with config_file.open(encoding="utf-8") as f_in:
         config = yaml.safe_load(f_in)
 
     level = LogLevel(level)

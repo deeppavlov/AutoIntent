@@ -4,7 +4,7 @@ import os
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import DataConfig, LoggingConfig
+from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from tests.conftest import get_search_space, setup_environment
 
 
@@ -63,13 +63,25 @@ def test_bayes(dataset, sampler):
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
+    pipeline_optimizer.set_config(HPOConfig(sampler=sampler))
 
-    pipeline_optimizer.fit(dataset, refit_after=False, sampler=sampler)
+    pipeline_optimizer.fit(dataset, refit_after=False)
 
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_cv(dataset, task_type):
     project_dir = setup_environment()
@@ -91,7 +103,18 @@ def test_cv(dataset, task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_no_context_optimization(dataset, task_type):
     project_dir = setup_environment()
@@ -111,7 +134,18 @@ def test_no_context_optimization(dataset, task_type):
 
 @pytest.mark.parametrize(
     "task_type",
-    ["multiclass", "multilabel", "description"],
+    [
+        "multiclass",
+        "multilabel",
+        "description_no_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.skipif(
+                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
+                reason="LLM HTTP server is not available.",
+            ),
+        ),
+    ],
 )
 def test_dump_modules(dataset, task_type):
     project_dir = setup_environment()
