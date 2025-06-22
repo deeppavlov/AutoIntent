@@ -94,19 +94,20 @@ class Dataset(dict[str, HFDataset]):
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_hub(cls, repo_name: str, data_split: str = "default") -> "Dataset":
+    def from_hub(cls, repo_name: str, data_split: str = "default", intent_subset_name: str = Split.INTENTS) -> "Dataset":
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
             repo_name: The name of the Hugging Face repository, like `DeepPavlov/clinc150`.
             data_split: The name of the dataset split to load, defaults to `default`.
+            intent_subset_name: The name of the intent subset to load, defaults to `intents`.
         """
         from ._reader import DictReader
 
         splits = load_dataset(repo_name, data_split)
         mapping = dict(**splits)
-        if Split.INTENTS in get_dataset_config_names(repo_name):
-            mapping[Split.INTENTS] = load_dataset(repo_name, name=Split.INTENTS, split=Split.INTENTS).to_list()
+        if intent_subset_name in get_dataset_config_names(repo_name):
+            mapping[Split.INTENTS] = load_dataset(repo_name, name=intent_subset_name, split=Split.INTENTS).to_list()
 
         return DictReader().read(mapping)
 
