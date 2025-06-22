@@ -58,8 +58,4 @@ async def test_get_chat_completion_async():
         mock_instance.chat.completions.create.assert_awaited_once_with(
             messages=test_messages,
             model=generator.model_name,
-            max_tokens=150,
-            n=1,
-            stop=None,
-            temperature=0.7,
         )

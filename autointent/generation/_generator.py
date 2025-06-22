@@ -5,8 +5,7 @@ import logging
 import os
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, ClassVar, Literal, TypedDict, TypeVar
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal, TypedDict, TypeVar
 
 import openai
 from dotenv import load_dotenv
@@ -90,7 +89,6 @@ class Generator:
         self.async_client = openai.AsyncOpenAI(base_url=base_url, **(client_params or {}))
         self.generation_params = generation_params
         self.cache = StructuredOutputCache(use_cache=use_cache)
-
 
     def get_chat_completion(self, messages: list[Message]) -> str:
         """Prompt LLM and return its answer.
@@ -195,7 +193,7 @@ class Generator:
                 **self.generation_params,
             )
             raw = response.choices[0].message.content
-            res = output_model.model_validate_json(raw)  # type: ignore[arg-type]
+            res = output_model.model_validate_json(raw)
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
@@ -312,7 +310,7 @@ class Generator:
                 **self.generation_params,
             )
             raw = response.choices[0].message.content
-            res = output_model.model_validate_json(raw)  # type: ignore[arg-type]
+            res = output_model.model_validate_json(raw)
         except (ValidationError, ValueError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
