@@ -94,7 +94,9 @@ class Dataset(dict[str, HFDataset]):
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_hub(cls, repo_name: str, data_split: str = "default", intent_subset_name: str = Split.INTENTS) -> "Dataset":
+    def from_hub(
+        cls, repo_name: str, data_split: str = "default", intent_subset_name: str = Split.INTENTS
+    ) -> "Dataset":
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
