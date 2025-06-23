@@ -48,6 +48,28 @@ class StructuredOutputCache:
             use_cache: Whether to use caching.
         """
         self.use_cache = use_cache
+        self._memory_cache: dict[str, BaseModel] = {}
+
+        if self.use_cache:
+            self._load_existing_cache()
+
+    def _load_existing_cache(self) -> None:
+        """Load all existing cache items from disk into memory."""
+        cache_dir = Path(user_cache_dir("autointent")) / "structured_outputs"
+
+        if not cache_dir.exists():
+            return
+
+        for cache_file in cache_dir.iterdir():
+            if cache_file.is_file():
+                try:
+                    cached_data = PydanticModelDumper.load(cache_file)
+                    if isinstance(cached_data, BaseModel):
+                        self._memory_cache[cache_file.name] = cached_data
+                        logger.debug("Loaded cached item into memory: %s", cache_file.name)
+                except (ValidationError, ImportError) as e:
+                    logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
+                    cache_file.unlink(missing_ok=True)
 
     def _get_cache_key(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> str:
         """Generate a cache key for the given parameters.
@@ -81,6 +103,18 @@ class StructuredOutputCache:
             return None
 
         cache_key = self._get_cache_key(messages, output_model, generation_params)
+
+        # First check in-memory cache
+        if cache_key in self._memory_cache:
+            cached_data = self._memory_cache[cache_key]
+            if isinstance(cached_data, output_model):
+                logger.debug("Using cached structured output from memory for key: %s", cache_key)
+                return cached_data
+            # Type mismatch, remove from memory cache
+            del self._memory_cache[cache_key]
+            logger.warning("Cached data type mismatch in memory, removing invalid cache")
+
+        # Fallback to disk cache
         cache_path = _get_structured_output_cache_path(cache_key)
 
         if cache_path.exists():
@@ -88,13 +122,15 @@ class StructuredOutputCache:
                 cached_data = PydanticModelDumper.load(cache_path)
 
                 if isinstance(cached_data, output_model):
-                    logger.debug("Using cached structured output for key: %s", cache_key)
+                    logger.debug("Using cached structured output from disk for key: %s", cache_key)
+                    # Add to memory cache for future access
+                    self._memory_cache[cache_key] = cached_data
                     return cached_data
 
-                logger.warning("Cached data type mismatch, removing invalid cache")
+                logger.warning("Cached data type mismatch on disk, removing invalid cache")
                 cache_path.unlink()
             except (ValidationError, ImportError) as e:
-                logger.warning("Failed to load cached structured output: %s", e)
+                logger.warning("Failed to load cached structured output from disk: %s", e)
                 cache_path.unlink(missing_ok=True)
 
         return None
@@ -113,8 +149,12 @@ class StructuredOutputCache:
             return
 
         cache_key = self._get_cache_key(messages, output_model, generation_params)
-        cache_path = _get_structured_output_cache_path(cache_key)
 
+        # Store in memory cache
+        self._memory_cache[cache_key] = result
+
+        # Store in disk cache
+        cache_path = _get_structured_output_cache_path(cache_key)
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         PydanticModelDumper.dump(result, cache_path, exists_ok=True)
-        logger.debug("Cached structured output for key: %s", cache_key)
+        logger.debug("Cached structured output for key: %s (memory and disk)", cache_key)
