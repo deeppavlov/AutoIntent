@@ -50,14 +50,13 @@ class StructuredOutputCache:
         self.use_cache = use_cache
 
     def _get_cache_key(
-        self, messages: list[Message], output_model: type[T], backend: str, generation_params: dict[str, Any]
+        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
     ) -> str:
         """Generate a cache key for the given parameters.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
 
         Returns:
@@ -66,19 +65,17 @@ class StructuredOutputCache:
         hasher = Hasher(strict=True)
         hasher.update(json.dumps(messages))
         hasher.update(json.dumps(output_model.model_json_schema()))
-        hasher.update(backend)
         hasher.update(json.dumps(generation_params))
         return hasher.hexdigest()
 
     def get(
-        self, messages: list[Message], output_model: type[T], backend: str, generation_params: dict[str, Any]
+        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
     ) -> T | None:
         """Get cached result if available.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
 
         Returns:
@@ -87,7 +84,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return None
 
-        cache_key = self._get_cache_key(messages, output_model, backend, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params)
         cache_path = _get_structured_output_cache_path(cache_key)
 
         if cache_path.exists():
@@ -107,7 +104,7 @@ class StructuredOutputCache:
         return None
 
     def set(
-        self, messages: list[Message], output_model: type[T], backend: str, generation_params: dict[str, Any], result: T
+        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T
     ) -> None:
         """Cache the result.
 
@@ -121,7 +118,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return
 
-        cache_key = self._get_cache_key(messages, output_model, backend, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params)
         cache_path = _get_structured_output_cache_path(cache_key)
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)

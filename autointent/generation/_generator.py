@@ -5,12 +5,11 @@ import logging
 import os
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Literal, TypedDict, TypeVar
+from typing import Any, TypedDict, TypeVar
 
 import openai
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
-from typing_extensions import assert_never
 
 from autointent.generation.chat_templates import Message, Role
 
@@ -176,35 +175,10 @@ class Generator:
 
         return res, msg, raw
 
-    async def _get_structured_output_vllm_async(
-        self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None, str | None]:
-        """https://docs.vllm.ai/en/v0.8.2/features/structured_outputs.html."""
-        res: T | None = None
-        msg: str | None = None
-        raw: str | None = None
-
-        try:
-            json_schema = output_model.model_json_schema()
-            response = await self.async_client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,  # type: ignore[call-overload]
-                extra_body={"guided_json": json_schema},
-                **self.generation_params,
-            )
-            raw = response.choices[0].message.content
-            res = output_model.model_validate_json(raw)
-        except (ValidationError, ValueError) as e:
-            msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
-            logger.warning(msg)
-
-        return res, msg, raw
-
     async def get_structured_output_async(
         self,
         messages: list[Message],
         output_model: type[T],
-        backend: Literal["openai", "vllm"] = "openai",
         max_retries: int = 3,
     ) -> T:
         """Prompt LLM and return structured output parsed into the provided Pydantic model asynchronously.
@@ -212,15 +186,13 @@ class Generator:
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output. Options: "openai" (uses beta.chat.completions.parse)
-                    or "vllm" (uses guided_json with regular completions).
             max_retries: Maximum number of retry attempts for failed validations.
 
         Returns:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = self.cache.get(messages, output_model, backend, self.generation_params)
+        cached_result = self.cache.get(messages, output_model, self.generation_params)
         if cached_result is not None:
             return cached_result
 
@@ -228,12 +200,7 @@ class Generator:
         res: T | None = None
 
         for _ in range(max_retries + 1):
-            if backend == "openai":
-                res, error, raw = await self._get_structured_output_openai_async(current_messages, output_model)
-            elif backend == "vllm":
-                res, error, raw = await self._get_structured_output_vllm_async(current_messages, output_model)
-            else:
-                assert_never(backend)
+            res, error, raw = await self._get_structured_output_openai_async(current_messages, output_model)
 
             if res is not None:
                 break
@@ -254,7 +221,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        self.cache.set(messages, output_model, backend, self.generation_params, res)
+        self.cache.set(messages, output_model, self.generation_params, res)
 
         return res
 
@@ -293,35 +260,10 @@ class Generator:
 
         return res, msg, raw
 
-    def _get_structured_output_vllm_sync(
-        self, messages: list[Message], output_model: type[T]
-    ) -> tuple[T | None, str | None, str | None]:
-        """https://docs.vllm.ai/en/v0.8.2/features/structured_outputs.html."""
-        res: T | None = None
-        msg: str | None = None
-        raw: str | None = None
-
-        try:
-            json_schema = output_model.model_json_schema()
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,  # type: ignore[call-overload]
-                extra_body={"guided_json": json_schema},
-                **self.generation_params,
-            )
-            raw = response.choices[0].message.content
-            res = output_model.model_validate_json(raw)
-        except (ValidationError, ValueError) as e:
-            msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
-            logger.warning(msg)
-
-        return res, msg, raw
-
     def get_structured_output_sync(
         self,
         messages: list[Message],
         output_model: type[T],
-        backend: Literal["openai", "vllm"] = "openai",
         max_retries: int = 3,
     ) -> T:
         """Prompt LLM and return structured output parsed into the provided Pydantic model.
@@ -329,15 +271,13 @@ class Generator:
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output. Options: "openai" (uses beta.chat.completions.parse)
-                    or "vllm" (uses guided_json with regular completions).
             max_retries: Maximum number of retry attempts for failed validations.
 
         Returns:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = self.cache.get(messages, output_model, backend, self.generation_params)
+        cached_result = self.cache.get(messages, output_model, self.generation_params)
         if cached_result is not None:
             return cached_result
 
@@ -345,12 +285,7 @@ class Generator:
         res: T | None = None
 
         for _ in range(max_retries + 1):
-            if backend == "openai":
-                res, error, raw = self._get_structured_output_openai_sync(current_messages, output_model)
-            elif backend == "vllm":
-                res, error, raw = self._get_structured_output_vllm_sync(current_messages, output_model)
-            else:
-                assert_never(backend)
+            res, error, raw = self._get_structured_output_openai_sync(current_messages, output_model)
 
             if res is not None:
                 break
@@ -368,7 +303,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        self.cache.set(messages, output_model, backend, self.generation_params, res)
+        self.cache.set(messages, output_model, self.generation_params, res)
 
         return res
 

@@ -69,7 +69,6 @@ async def test_cache_hit(generator_with_cache, generator_without_cache):
     cached_res = generator_with_cache.cache.get(
         messages=messages,
         output_model=SimpleModel,
-        backend="openai",
         generation_params=generator_with_cache.generation_params,
     )
     assert isinstance(cached_res, SimpleModel)
