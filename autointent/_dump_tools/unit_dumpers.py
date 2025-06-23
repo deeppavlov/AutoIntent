@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from typing import Any, TypeVar
 
+import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
@@ -164,12 +165,35 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
             json.dump(obj.model_dump(), file, ensure_ascii=False, indent=4)
 
     @staticmethod
+    async def dump_async(obj: BaseModel, path: Path, exists_ok: bool) -> None:
+        class_info = {"name": obj.__class__.__name__, "module": obj.__class__.__module__}
+        path.mkdir(parents=True, exist_ok=exists_ok)
+        async with aiofiles.open(path / "class_info.json", mode="w", encoding="utf-8") as file:
+            await file.write(json.dumps(class_info, ensure_ascii=False, indent=4))
+        async with aiofiles.open(path / "model_dump.json", mode="w", encoding="utf-8") as file:
+            await file.write(json.dumps(obj.model_dump(), ensure_ascii=False, indent=4))
+
+    @staticmethod
     def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
         with (path / "model_dump.json").open("r", encoding="utf-8") as file:
             content = json.load(file)
 
         with (path / "class_info.json").open("r", encoding="utf-8") as file:
             class_info = json.load(file)
+
+        model_type = importlib.import_module(class_info["module"])
+        model_type = getattr(model_type, class_info["name"])
+        return model_type.model_validate(content)  # type: ignore[no-any-return]
+
+    @staticmethod
+    async def load_async(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
+        async with aiofiles.open(path / "model_dump.json", encoding="utf-8") as file:
+            content_str = await file.read()
+            content = json.loads(content_str)
+
+        async with aiofiles.open(path / "class_info.json", encoding="utf-8") as file:
+            class_info_str = await file.read()
+            class_info = json.loads(class_info_str)
 
         model_type = importlib.import_module(class_info["module"])
         model_type = getattr(model_type, class_info["name"])

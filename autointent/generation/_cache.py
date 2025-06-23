@@ -88,23 +88,16 @@ class StructuredOutputCache:
         hasher.update(json.dumps(generation_params))
         return hasher.hexdigest()
 
-    def get(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> T | None:
-        """Get cached result if available.
+    def _check_memory_cache(self, cache_key: str, output_model: type[T]) -> T | None:
+        """Check if the result is available in memory cache.
 
         Args:
-            messages: List of messages to send to the model.
+            cache_key: The cache key to look up.
             output_model: Pydantic model class to parse the response into.
-            generation_params: Generation parameters.
 
         Returns:
-            Cached result if available, None otherwise.
+            Cached result if available and valid, None otherwise.
         """
-        if not self.use_cache:
-            return None
-
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
-
-        # First check in-memory cache
         if cache_key in self._memory_cache:
             cached_data = self._memory_cache[cache_key]
             if isinstance(cached_data, output_model):
@@ -113,8 +106,18 @@ class StructuredOutputCache:
             # Type mismatch, remove from memory cache
             del self._memory_cache[cache_key]
             logger.warning("Cached data type mismatch in memory, removing invalid cache")
+        return None
 
-        # Fallback to disk cache
+    def _load_from_disk(self, cache_key: str, output_model: type[T]) -> T | None:
+        """Load cached result from disk.
+
+        Args:
+            cache_key: The cache key to look up.
+            output_model: Pydantic model class to parse the response into.
+
+        Returns:
+            Cached result if available and valid, None otherwise.
+        """
         cache_path = _get_structured_output_cache_path(cache_key)
 
         if cache_path.exists():
@@ -135,6 +138,41 @@ class StructuredOutputCache:
 
         return None
 
+    def _save_to_disk(self, cache_key: str, result: T) -> None:
+        """Save result to disk cache.
+
+        Args:
+            cache_key: The cache key to use.
+            result: The result to cache.
+        """
+        cache_path = _get_structured_output_cache_path(cache_key)
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        PydanticModelDumper.dump(result, cache_path, exists_ok=True)
+
+    def get(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> T | None:
+        """Get cached result if available.
+
+        Args:
+            messages: List of messages to send to the model.
+            output_model: Pydantic model class to parse the response into.
+            generation_params: Generation parameters.
+
+        Returns:
+            Cached result if available, None otherwise.
+        """
+        if not self.use_cache:
+            return None
+
+        cache_key = self._get_cache_key(messages, output_model, generation_params)
+
+        # First check in-memory cache
+        memory_result = self._check_memory_cache(cache_key, output_model)
+        if memory_result is not None:
+            return memory_result
+
+        # Fallback to disk cache
+        return self._load_from_disk(cache_key, output_model)
+
     def set(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T) -> None:
         """Cache the result.
 
@@ -154,7 +192,96 @@ class StructuredOutputCache:
         self._memory_cache[cache_key] = result
 
         # Store in disk cache
+        self._save_to_disk(cache_key, result)
+        logger.debug("Cached structured output for key: %s (memory and disk)", cache_key)
+
+    async def _load_from_disk_async(self, cache_key: str, output_model: type[T]) -> T | None:
+        """Load cached result from disk asynchronously.
+
+        Args:
+            cache_key: The cache key to look up.
+            output_model: Pydantic model class to parse the response into.
+
+        Returns:
+            Cached result if available and valid, None otherwise.
+        """
+        cache_path = _get_structured_output_cache_path(cache_key)
+
+        if cache_path.exists():
+            try:
+                cached_data = await PydanticModelDumper.load_async(cache_path)
+
+                if isinstance(cached_data, output_model):
+                    logger.debug("Using cached structured output from disk for key: %s", cache_key)
+                    # Add to memory cache for future access
+                    self._memory_cache[cache_key] = cached_data
+                    return cached_data
+
+                logger.warning("Cached data type mismatch on disk, removing invalid cache")
+                cache_path.unlink()
+            except (ValidationError, ImportError) as e:
+                logger.warning("Failed to load cached structured output from disk: %s", e)
+                cache_path.unlink(missing_ok=True)
+
+        return None
+
+    async def _save_to_disk_async(self, cache_key: str, result: T) -> None:
+        """Save result to disk cache asynchronously.
+
+        Args:
+            cache_key: The cache key to use.
+            result: The result to cache.
+        """
         cache_path = _get_structured_output_cache_path(cache_key)
         cache_path.parent.mkdir(parents=True, exist_ok=True)
-        PydanticModelDumper.dump(result, cache_path, exists_ok=True)
+        await PydanticModelDumper.dump_async(result, cache_path, exists_ok=True)
+
+    async def get_async(
+        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
+    ) -> T | None:
+        """Get cached result if available (async version).
+
+        Args:
+            messages: List of messages to send to the model.
+            output_model: Pydantic model class to parse the response into.
+            generation_params: Generation parameters.
+
+        Returns:
+            Cached result if available, None otherwise.
+        """
+        if not self.use_cache:
+            return None
+
+        cache_key = self._get_cache_key(messages, output_model, generation_params)
+
+        # First check in-memory cache
+        memory_result = self._check_memory_cache(cache_key, output_model)
+        if memory_result is not None:
+            return memory_result
+
+        # Fallback to disk cache
+        return await self._load_from_disk_async(cache_key, output_model)
+
+    async def set_async(
+        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T
+    ) -> None:
+        """Cache the result (async version).
+
+        Args:
+            messages: List of messages to send to the model.
+            output_model: Pydantic model class to parse the response into.
+            backend: Backend to use for structured output.
+            generation_params: Generation parameters.
+            result: The result to cache.
+        """
+        if not self.use_cache:
+            return
+
+        cache_key = self._get_cache_key(messages, output_model, generation_params)
+
+        # Store in memory cache
+        self._memory_cache[cache_key] = result
+
+        # Store in disk cache
+        await self._save_to_disk_async(cache_key, result)
         logger.debug("Cached structured output for key: %s (memory and disk)", cache_key)
