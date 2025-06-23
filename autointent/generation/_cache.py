@@ -49,9 +49,7 @@ class StructuredOutputCache:
         """
         self.use_cache = use_cache
 
-    def _get_cache_key(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
-    ) -> str:
+    def _get_cache_key(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> str:
         """Generate a cache key for the given parameters.
 
         Args:
@@ -68,9 +66,7 @@ class StructuredOutputCache:
         hasher.update(json.dumps(generation_params))
         return hasher.hexdigest()
 
-    def get(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
-    ) -> T | None:
+    def get(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> T | None:
         """Get cached result if available.
 
         Args:
@@ -103,9 +99,7 @@ class StructuredOutputCache:
 
         return None
 
-    def set(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T
-    ) -> None:
+    def set(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T) -> None:
         """Cache the result.
 
         Args:

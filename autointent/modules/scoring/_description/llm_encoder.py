@@ -5,7 +5,7 @@ import logging
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Literal
+from typing import Any
 
 import aiometer
 import numpy as np
@@ -68,7 +68,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         max_concurrent: PositiveInt | None = 15,
         max_per_second: PositiveInt = 10,
         max_retries: PositiveInt = 3,
-        backend: Literal["openai", "vllm"] = "openai",
     ) -> None:
         super().__init__(temperature=temperature)
 
@@ -76,7 +75,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         self.max_concurrent = max_concurrent
         self.max_per_second = max_per_second
         self.max_retries = max_retries
-        self.backend = backend
 
     @classmethod
     def from_context(
@@ -87,7 +85,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         max_concurrent: PositiveInt | None = 15,
         max_per_second: PositiveInt = 10,
         max_retries: PositiveInt = 3,
-        backend: Literal["openai", "vllm"] = "openai",
     ) -> "LLMDescriptionScorer":
         return cls(
             temperature=temperature,
@@ -95,7 +92,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             max_concurrent=max_concurrent,
             max_per_second=max_per_second,
             max_retries=max_retries,
-            backend=backend,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -166,7 +162,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             return self._generator.get_structured_output_sync(
                 messages=messages,
                 output_model=IntentCategorization,
-                backend=self.backend,
                 max_retries=self.max_retries,
             )
         except RetriesExceededError as e:
@@ -179,7 +174,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             return await self._generator.get_structured_output_async(
                 messages=messages,
                 output_model=IntentCategorization,
-                backend=self.backend,
                 max_retries=self.max_retries,
             )
         except RetriesExceededError as e:
