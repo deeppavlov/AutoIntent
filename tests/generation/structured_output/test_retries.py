@@ -6,7 +6,7 @@ from typing import Literal
 import pytest
 from pydantic import BaseModel, Field, model_validator
 
-from autointent.generation import Generator
+from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Role
 
 
@@ -67,7 +67,7 @@ class TestStructuredOutput:
 
     def test_structured_output_sync_failure_with_insufficient_retries(self, generator):
         """Test structured output sync that fails with insufficient retries."""
-        with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
+        with pytest.raises(RetriesExceededError):
             generator.get_structured_output_sync(
                 messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
                 output_model=Person,
@@ -77,7 +77,7 @@ class TestStructuredOutput:
     @pytest.mark.asyncio
     async def test_structured_output_async_failure_with_insufficient_retries(self, generator):
         """Test structured output async that fails with insufficient retries."""
-        with pytest.raises(RuntimeError, match="Failed to generate valid structured output after 3 attempts"):
+        with pytest.raises(RetriesExceededError):
             await generator.get_structured_output_async(
                 messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
                 output_model=Person,
