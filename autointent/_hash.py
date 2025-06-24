@@ -15,14 +15,13 @@ class Hasher:
     hashing embeddings from :py:class:`autointent.Embedder`.
     """
 
-    def __init__(self, strict: bool = False) -> None:
+    def __init__(self) -> None:
         """Initialize the Hasher instance and sets up the internal xxhash state.
 
         This state will be used for progressively hashing values using the
         `update` method and obtaining the final digest using `hexdigest`.
         """
         self._state = xxhash.xxh64()
-        self.strict = strict
 
     def hash(self, value: Any) -> int:  # noqa: ANN401
         """Generate a hash for the given value using xxhash.
@@ -33,11 +32,6 @@ class Hasher:
         Returns:
             The resulting hash digest as a hexadecimal string.
         """
-        if hasattr(value, "__hash__") and value.__hash__ not in {None, object.__hash__}:
-            return hash(value)
-        if self.strict:
-            msg = "Object is not hashable."
-            raise ValueError(msg)
         return xxhash.xxh64(pickle.dumps(value)).intdigest()
 
     def update(self, value: Any) -> None:  # noqa: ANN401
