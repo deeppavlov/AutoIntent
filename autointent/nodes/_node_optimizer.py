@@ -431,6 +431,7 @@ def handle_message_on_mode(
     if strict:
         raise ValueError(message)
 
+
 # TODO research on possibility to use custom pruner
 def _check_duplicate(trial: Trial) -> float | None:
     completed_trials = trial.study.get_trials(states=[optuna.trial.TrialState.COMPLETE], deepcopy=False)
