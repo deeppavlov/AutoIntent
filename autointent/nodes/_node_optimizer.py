@@ -129,6 +129,11 @@ class NodeOptimizer:
         """
         module_name, module_hyperparams = self._suggest_module_and_hyperparams(trial, search_space)
 
+        if prev_metric := _check_duplicate(trial):
+            msg = f"Duplicated trial with {module_name=}, {prev_metric=}, {module_hyperparams=}"
+            logger.debug(msg)
+            return prev_metric
+
         self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(module_hyperparams))
         module = self.node_info.modules_available[module_name].from_context(context, **module_hyperparams)
         module_hyperparams.update(module.get_implicit_initialization_params())
@@ -425,3 +430,13 @@ def handle_message_on_mode(
         logger.warning(message)
     if strict:
         raise ValueError(message)
+
+# TODO research on possibility to use custom pruner
+def _check_duplicate(trial: Trial) -> float | None:
+    completed_trials = trial.study.get_trials(states=[optuna.trial.TrialState.COMPLETE], deepcopy=False)
+
+    previous_trial = next(
+        (completed_trial for completed_trial in completed_trials if completed_trial.params == trial.params), None
+    )
+
+    return previous_trial.value if previous_trial is not None else None
