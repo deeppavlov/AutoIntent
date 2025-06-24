@@ -2,6 +2,7 @@
 
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -41,14 +42,19 @@ def _get_structured_output_cache_path(dirname: str) -> Path:
 class StructuredOutputCache:
     """Cache for structured output results."""
 
-    def __init__(self, use_cache: bool = True) -> None:
+    def __init__(self, use_cache: bool = True, max_workers: int | None = None, batch_size: int = 100) -> None:
         """Initialize the cache.
 
         Args:
             use_cache: Whether to use caching.
+            max_workers: Maximum number of worker threads for parallel loading.
+                        If None, uses min(32, os.cpu_count() + 4).
+            batch_size: Number of cache files to process in each batch.
         """
         self.use_cache = use_cache
         self._memory_cache: dict[str, BaseModel] = {}
+        self.max_workers = max_workers
+        self.batch_size = batch_size
 
         if self.use_cache:
             self._load_existing_cache()
@@ -60,16 +66,61 @@ class StructuredOutputCache:
         if not cache_dir.exists():
             return
 
-        for cache_file in cache_dir.iterdir():
-            if cache_file.is_file():
-                try:
-                    cached_data = PydanticModelDumper.load(cache_file)
-                    if isinstance(cached_data, BaseModel):
-                        self._memory_cache[cache_file.name] = cached_data
-                        logger.debug("Loaded cached item into memory: %s", cache_file.name)
-                except (ValidationError, ImportError) as e:
-                    logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
-                    cache_file.unlink(missing_ok=True)
+        # Get all cache files to process
+        cache_files = [f for f in cache_dir.iterdir() if f.is_file()]
+
+        if not cache_files:
+            return
+
+        logger.debug("Loading %d cache files in batches of %d", len(cache_files), self.batch_size)
+
+        # Process cache files in batches to avoid resource exhaustion
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            self._load_cache_batch(executor, cache_files)
+
+        logger.debug("Finished loading cache, %d items in memory", len(self._memory_cache))
+
+    def _load_cache_batch(self, executor: ThreadPoolExecutor, cache_files: list[Path]) -> None:
+        """Load cache files in batches using the provided executor.
+
+        Args:
+            executor: ThreadPoolExecutor to use for parallel processing.
+            cache_files: List of cache files to load.
+        """
+        for i in range(0, len(cache_files), self.batch_size):
+            batch = cache_files[i : i + self.batch_size]
+
+            # Submit batch of cache loading tasks
+            futures = [executor.submit(self._load_single_cache_file, cache_file) for cache_file in batch]
+
+            # Process completed tasks in this batch
+            for future in as_completed(futures):
+                result = future.result()
+                if result is not None:
+                    filename, cached_data = result
+                    self._memory_cache[filename] = cached_data
+                    logger.debug("Loaded cached item into memory: %s", filename)
+
+    def _load_single_cache_file(self, cache_file: Path) -> tuple[str, BaseModel] | None:
+        """Load a single cache file and return the result.
+
+        Args:
+            cache_file: Path to the cache file to load.
+
+        Returns:
+            Tuple of (filename, cached_data) if successful, None if failed.
+        """
+        try:
+            cached_data = PydanticModelDumper.load(cache_file)
+            if isinstance(cached_data, BaseModel):
+                return cache_file.name, cached_data
+            logger.warning("Cached data is not a BaseModel, removing invalid cache: %s", cache_file.name)
+            cache_file.unlink(missing_ok=True)
+        except (ValidationError, ImportError) as e:
+            logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
+            cache_file.unlink(missing_ok=True)
+
+        return None
 
     def _get_cache_key(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> str:
         """Generate a cache key for the given parameters.
