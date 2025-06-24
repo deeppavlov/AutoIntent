@@ -112,13 +112,11 @@ class StructuredOutputCache:
         """
         try:
             cached_data = PydanticModelDumper.load(cache_file)
-            if isinstance(cached_data, BaseModel):
-                return cache_file.name, cached_data
-            logger.warning("Cached data is not a BaseModel, removing invalid cache: %s", cache_file.name)
-            cache_file.unlink(missing_ok=True)
         except (ValidationError, ImportError) as e:
             logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
             cache_file.unlink(missing_ok=True)
+        else:
+            return cache_file.name, cached_data
 
         return None
 
