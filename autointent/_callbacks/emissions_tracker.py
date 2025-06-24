@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class EmissionsTrackerCallback(OptimizerCallback):
     """Class for tracking energy consumption and carbon emissions."""
 
-    name = "emissions_tracker"
+    name = "codecarbon"
 
     current_module_name: str | None = None
 
