@@ -421,7 +421,7 @@
                                 "enum": [
                                     "wandb",
                                     "tensorboard",
-                                    "emissions_tracker"
+                                    "codecarbon"
                                 ],
                                 "type": "string"
                             },
