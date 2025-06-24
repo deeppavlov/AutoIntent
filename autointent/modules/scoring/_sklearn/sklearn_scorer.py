@@ -128,7 +128,7 @@ class SklearnScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        embedder = Embedder(embedder_config=self.embedder_config        )
+        embedder = Embedder(embedder_config=self.embedder_config)
         features = embedder.embed(utterances, TaskTypeEnum.classification)
 
         clf = MultiOutputClassifier(self._base_clf) if self._multilabel else self._base_clf
