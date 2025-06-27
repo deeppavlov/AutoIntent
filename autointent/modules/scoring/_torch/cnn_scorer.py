@@ -3,7 +3,6 @@
 from typing import Any
 
 from autointent import Context
-from autointent._callbacks import REPORTERS_NAMES
 from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
 from .base_scorer import BaseTorchScorer
@@ -25,7 +24,6 @@ class CNNScorer(BaseTorchScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 42,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
         device: str | None = None,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
@@ -35,7 +33,6 @@ class CNNScorer(BaseTorchScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            report_to=report_to,
         )
         if device is not None:
             torch_config.device = device
@@ -73,7 +70,6 @@ class CNNScorer(BaseTorchScorer):
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            report_to=context.logging_config.report_to,
             device=context.transformer_config.device,
             early_stopping_config=early_stopping_config,
         )

@@ -3,7 +3,6 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Self
 
-from autointent._callbacks import REPORTERS_NAMES
 from autointent._utils import detect_device
 
 
@@ -41,5 +40,4 @@ class TorchTrainingConfig(BaseModel, FromDictMixin):
     batch_size: int = 8
     learning_rate: float = 5e-5
     seed: int = 42
-    report_to: REPORTERS_NAMES | None = None  # type: ignore  # noqa: PGH003
     device: str = Field(default_factory=detect_device)
