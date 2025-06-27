@@ -95,7 +95,7 @@ class Embedder:
         """
         self.config = embedder_config
 
-    def __hash__(self) -> int:
+    def _get_hash(self) -> int:
         """Compute a hash value for the Embedder.
 
         Returns:
@@ -191,14 +191,16 @@ class Embedder:
         prompt = self.config.get_prompt(task_type)
 
         if self.config.use_cache:
+            logger.debug("Using cached embeddings for %s", self.config.model_name)
             hasher = Hasher()
-            hasher.update(self)
+            hasher.update(self._get_hash())
             hasher.update(utterances)
             if prompt:
                 hasher.update(prompt)
 
             embeddings_path = _get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
+                logger.debug("loading embeddings from %s", str(embeddings_path))
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
         self._load_model()
