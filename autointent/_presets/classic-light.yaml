@@ -13,24 +13,6 @@ search_space:
         k:
           low: 1
           high: 20
-      - module_name: description_bi
-        temperature:
-          low: 0.01
-          high: 10
-          log: true
-      - module_name: description_cross
-        temperature:
-          low: 0.01
-          high: 10
-          log: true
-      - module_name: rerank
-        k:
-          low: 10
-          high: 40
-        m:
-          low: 1
-          high: 10
-        weights: [uniform, distance, closest]
   - node_type: decision
     target_metric: decision_accuracy
     search_space:
@@ -44,5 +26,5 @@ search_space:
       - module_name: adaptive
 hpo_config:
   sampler: tpe
-  n_trials: 128 # dont know yet if its good
-  n_startup_trials: 32
+  n_trials: 20
+  n_startup_trials: 10
