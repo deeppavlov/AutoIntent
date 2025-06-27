@@ -81,6 +81,8 @@ class BaseTorchScorer(BaseScorer):
         return self._predict_tensors(x_tensor)
 
     def clear_cache(self) -> None:
+        self.vocab_config.vocab = None
+
         if hasattr(self, "_model"):
             logger.debug("Clearing model and CUDA cache.")
             self._model.vocab_config.vocab = None
