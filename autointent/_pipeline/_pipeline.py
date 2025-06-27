@@ -380,9 +380,11 @@ class Pipeline:
 
         context.data_handler.prepare_for_refit()
 
+        scoring_module.clear_cache()
         scoring_module.fit(*scoring_module.get_train_data(context))
         scores = scoring_module.predict(context.data_handler.train_utterances(1))
 
+        decision_module.clear_cache()
         decision_module.fit(scores, context.data_handler.train_labels(1), context.data_handler.tags)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
