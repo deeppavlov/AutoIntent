@@ -19,3 +19,8 @@ hpo_config:
   sampler: tpe
   n_trials: 30
   n_startup_trials: 10
+cross_encoder_config:
+  model_name: BAAI/bge-reranker-v2-m3
+  train_head: true
+embedder_config:
+  model_name: intfloat/multilingual-e5-large-instruct

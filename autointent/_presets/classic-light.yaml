@@ -28,3 +28,5 @@ hpo_config:
   sampler: tpe
   n_trials: 20
   n_startup_trials: 10
+embedder_config:
+  model_name: intfloat/multilingual-e5-large-instruct
