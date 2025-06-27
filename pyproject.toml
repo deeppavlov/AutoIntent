@@ -56,6 +56,7 @@ dev = [
     "ipykernel (>=6.29.5,<7.0.0)",
     "ipywidgets (>=8.1.5,<9.0.0)",
     "ruff (==0.8.4)",
+    "sentencepiece (>=0.2.0,<0.3.0)",
 ]
 test = [
     "pytest (>=8.3.2,<9.0.0)",
@@ -155,6 +156,7 @@ testpaths = [
 pythonpath = "autointent"
 # `--cov` option breaks pycharm's test debugger
 addopts = """
+    -m "not transformers"
     -ra
     --reruns 3
     --only-rerun requests.exceptions.ReadTimeout
@@ -165,6 +167,9 @@ addopts = """
     --durations 5
     --reruns-delay 10
 """
+markers = [
+    "transformers: qwen and deberta are too memory-consuming"
+]
 # --reruns 3 -> # Retry failed tests 3 times
 # requests.exceptions.ReadTimeout -> # HF Read timed out
 # huggingface_hub.errors.HfHubHTTPError -> # HF is unavailable
