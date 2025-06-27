@@ -171,7 +171,7 @@ class BertScorer(BaseScorer):
                 eval_strategy="epoch",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to=self.report_to if self.report_to is not None else "none",
+                report_to="none",
                 use_cpu=self.classification_model_config.device == "cpu",
                 metric_for_best_model=self.early_stopping_config.metric,
                 load_best_model_at_end=self.early_stopping_config.metric is not None,

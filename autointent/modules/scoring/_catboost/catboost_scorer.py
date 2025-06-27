@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from catboost import CatBoostClassifier
+from pydantic import PositiveInt
 
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum
@@ -104,10 +105,14 @@ class CatBoostScorer(BaseScorer):
         verbose: bool = False,
         val_fraction: float | None = 0.2,
         early_stopping_rounds: int = 100,
+        iterations: int = 1000,
+        depth: int = 6,
         **catboost_kwargs: dict[str, Any],
     ) -> None:
         self.val_fraction = val_fraction
         self.early_stopping_rounds = early_stopping_rounds
+        self.iterations = iterations
+        self.depth = depth
         self.features_type = features_type
         self.use_embedding_features = use_embedding_features
         if features_type == FeaturesType.TEXT and use_embedding_features:
@@ -129,7 +134,9 @@ class CatBoostScorer(BaseScorer):
         loss_function: str | None = None,
         verbose: bool = False,
         val_fraction: FloatFromZeroToOne | None = 0.2,
-        early_stopping_rounds: int = 100,
+        early_stopping_rounds: PositiveInt = 100,
+        iterations: PositiveInt = 1000,
+        depth: PositiveInt= 6,
         **catboost_kwargs: dict[str, Any],
     ) -> "CatBoostScorer":
         if embedder_config is None:
@@ -142,6 +149,8 @@ class CatBoostScorer(BaseScorer):
             use_embedding_features=use_embedding_features,
             val_fraction=val_fraction,
             early_stopping_rounds=early_stopping_rounds,
+            iterations=iterations,
+            depth=depth,
             **catboost_kwargs,
         )
 
@@ -205,6 +214,8 @@ class CatBoostScorer(BaseScorer):
             logger.warning(msg)
 
         self._model = CatBoostClassifier(
+            iterations=self.iterations,
+            depth=self.depth,
             loss_function=self.loss_function or default_loss,
             verbose=self.verbose,
             allow_writing_files=False,

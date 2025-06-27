@@ -104,7 +104,7 @@ class BaseTorchScorer(BaseScorer):
         train_dataloader = DataLoader(train_dataset, batch_size=self.torch_config.batch_size, shuffle=True)
 
         criterion = nn.CrossEntropyLoss() if not self._multilabel else nn.BCEWithLogitsLoss()
-        optimizer = torch.optim.Adam(self._model.parameters(), lr=self.torch_config.learning_rate)
+        optimizer = torch.optim.AdamW(self._model.parameters(), lr=self.torch_config.learning_rate)
 
         self._model.to(self.torch_config.device)
         logger.debug("Model moved to device: %s", self.torch_config.device)
@@ -197,7 +197,7 @@ class BaseTorchScorer(BaseScorer):
             logger.debug("No improvement. Patience counter increased to %d.", patience_counter)
 
         # Early stopping check
-        should_stop = patience_counter >= self.early_stopping_config.patience
+        should_stop = patience_counter > self.early_stopping_config.patience
         if should_stop:
             logger.debug("Patience exceeded. Should stop training.")
 

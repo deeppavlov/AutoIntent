@@ -136,7 +136,7 @@ class EarlyStoppingConfig(BaseModel):
             "during training and perofrm early stopping if quality doesn't enhances."
         ),
     )
-    patience: PositiveInt = Field(1, description="Maximum number of epoches to wait for quality to enhance.")
+    patience: PositiveInt = Field(3, description="Maximum number of epoches to wait for quality to enhance.")
     threshold: FloatFromZeroToOne = Field(
         0.0,
         description="Minimum quality increment to count it as enhancement. Default: any incremeant is counted",

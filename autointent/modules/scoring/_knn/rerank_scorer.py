@@ -38,7 +38,7 @@ class RerankScorer(KNNScorer):
         self,
         k: PositiveInt = 5,
         weights: WeightType = "distance",
-        use_crosencoder_scores: bool = False,
+        use_cross_encoder_scores: bool = False,
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
@@ -52,7 +52,7 @@ class RerankScorer(KNNScorer):
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
 
         self.m = k if m is None else m
-        self.use_crosencoder_scores = use_crosencoder_scores
+        self.use_cross_encoder_scores = use_cross_encoder_scores
 
         if self.m < 0 or not isinstance(self.m, int):
             msg = "`m` argument of `RerankScorer` must be a positive int"
@@ -67,7 +67,7 @@ class RerankScorer(KNNScorer):
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
-        use_crosencoder_scores: bool = False,
+        use_cross_encoder_scores: bool = False,
     ) -> "RerankScorer":
         """Create a RerankScorer instance from a given context.
 
@@ -79,7 +79,7 @@ class RerankScorer(KNNScorer):
             embedder_config: Config of the embedder used for vectorization,
                 or None to use the best existing embedder
             m: Number of top-ranked neighbors to consider, or None to use k
-            use_crosencoder_scores: use crosencoder scores for the output probability vector computation
+            use_cross_encoder_scores: use crosencoder scores for the output probability vector computation
         """
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -91,7 +91,7 @@ class RerankScorer(KNNScorer):
             k=k,
             weights=weights,
             m=m,
-            use_crosencoder_scores=use_crosencoder_scores,
+            use_cross_encoder_scores=use_cross_encoder_scores,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
         )
@@ -145,7 +145,7 @@ class RerankScorer(KNNScorer):
             for dst, src in zip([labels, neighbours], [query_labels, query_docs], strict=True):
                 dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
 
-            if self.use_crosencoder_scores:
+            if self.use_cross_encoder_scores:
                 distances.append([rank["score"] for rank in cur_ranks])
             else:
                 distances.append([query_distances[rank["corpus_id"]] for rank in cur_ranks])

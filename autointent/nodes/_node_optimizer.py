@@ -65,10 +65,6 @@ class NodeOptimizer:
 
         Args:
             context: The optimization context containing relevant data.
-            sampler: The sampling strategy used for optimization.
-            n_trials: Number of optuna trials.
-            timeout: Number of secords for optimizing the whole node.
-            n_jobs: The number of parallel jobs to run during optimization.
 
         Raises:
             AssertionError: If an invalid sampler type is provided.

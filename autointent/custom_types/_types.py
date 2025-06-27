@@ -115,5 +115,16 @@ SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 - `filter`: drop incompatible modules from search space
 """
 
-SearchSpacePreset = Literal["light", "heavy"]
-"""Some presets that our library supports from lightest to heaviest"""
+SearchSpacePreset = Literal[
+    "classic-heavy",
+    "classic-light",
+    "classic-medium",
+    "nn-heavy",
+    "nn-medium",
+    "transformers-heavy",
+    "transformers-light",
+    "transformers-no-hpo",
+    "zero-shot-openai",
+    "zero-shot-transformers",
+]
+"""Some presets that our library supports."""
