@@ -1,6 +1,6 @@
 search_space:
   - node_type: scoring
-    target_metric: scoring_roc_auc
+    target_metric: scoring_f1
     search_space:
       - module_name: cnn
         dropout:
