@@ -11,22 +11,6 @@ search_space:
           low: 1.0e-5
           high: 1.0e-4
           log: True
-      - module_name: lora
-        classification_model_config:
-          - model_name: Qwen/Qwen3-Embedding-4B
-        target_modules: [[q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]]
-        num_train_epochs: [15]
-        batch_size: [32, 64, 128]
-        learning_rate:
-          low: 5.0e-4
-          high: 1.0e-3
-          log: True
-        seed: [0]
-        lora_alpha: [32]
-        r: [16, 64, 128]
-        lora_dropout:
-          low: 0.15
-          high: 0.25
   - node_type: decision
     target_metric: decision_accuracy
     search_space:
