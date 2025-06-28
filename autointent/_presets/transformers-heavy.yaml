@@ -6,7 +6,7 @@ search_space:
         classification_model_config:
           - model_name: microsoft/deberta-v3-large
         num_train_epochs: [30]
-        batch_size: [32, 64, 128]
+        batch_size: [32, 64]
         learning_rate:
           low: 1.0e-5
           high: 1.0e-4
