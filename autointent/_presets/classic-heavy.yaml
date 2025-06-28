@@ -12,15 +12,6 @@ search_space:
         k:
           low: 1
           high: 20
-      - module_name: rerank
-        use_cross_encoder_scores: [true, false]
-        k:
-          low: 10
-          high: 40
-        m:
-          low: 1
-          high: 10
-        weights: [uniform, distance, closest]
       - module_name: catboost
         depth: [3, 6, 10]
       - module_name: sklearn
