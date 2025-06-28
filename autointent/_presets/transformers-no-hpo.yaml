@@ -6,7 +6,7 @@ search_space:
         classification_model_config:
           - model_name: microsoft/deberta-v3-small
         num_train_epochs: [30]
-        batch_size: [128]
+        batch_size: [96]
         learning_rate: [7.0e-5]
   - node_type: decision
     target_metric: decision_accuracy
