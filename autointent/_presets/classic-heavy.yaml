@@ -14,6 +14,7 @@ search_space:
           high: 20
       - module_name: catboost
         depth: [3, 6, 10]
+        features_type: ["text", "embedding", "both"]
       - module_name: sklearn
         clf_name: [RandomForestClassifier]
         n_estimators: [200, 300, 500]
@@ -37,6 +38,3 @@ hpo_config:
   n_startup_trials: 20
 embedder_config:
   model_name: intfloat/multilingual-e5-large-instruct
-cross_encoder_config:
-  model_name: BAAI/bge-reranker-v2-m3
-  train_head: true
