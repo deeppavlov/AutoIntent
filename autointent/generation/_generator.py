@@ -9,6 +9,7 @@ from typing import Any, TypedDict, TypeVar
 
 import openai
 from dotenv import load_dotenv
+from openai import LengthFinishReasonError
 from pydantic import BaseModel, ValidationError
 
 from autointent.generation.chat_templates import Message, Role
@@ -165,7 +166,7 @@ class Generator:
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
-        except (ValidationError, ValueError) as e:
+        except (ValidationError, ValueError, LengthFinishReasonError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
         else:
@@ -250,7 +251,7 @@ class Generator:
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
-        except (ValidationError, ValueError) as e:
+        except (ValidationError, ValueError, LengthFinishReasonError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
         else:
