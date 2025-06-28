@@ -233,7 +233,6 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         if hasattr(self, "_generator"):
             delattr(self, "_generator")
         if hasattr(self, "_event_loop"):
-            self._event_loop.close()
             delattr(self, "_event_loop")
 
     def _init_event_loop(self) -> None:
