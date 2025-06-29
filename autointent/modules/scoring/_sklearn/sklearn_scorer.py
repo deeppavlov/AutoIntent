@@ -156,5 +156,6 @@ class SklearnScorer(BaseScorer):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         if hasattr(self, "_clf"):
-            self._embedder.delete()
             delattr(self, "_clf")
+        if hasattr(self, "_embedder"):
+            self._embedder.delete()
