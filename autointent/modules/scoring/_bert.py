@@ -109,15 +109,12 @@ class BertScorer(BaseScorer):
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
 
-        report_to = context.logging_config.report_to
-
         return cls(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
-            report_to=report_to,
             early_stopping_config=early_stopping_config,
         )
 
@@ -172,7 +169,7 @@ class BertScorer(BaseScorer):
                 eval_strategy="epoch",
                 logging_strategy="steps",
                 logging_steps=10,
-                report_to="none",
+                report_to=self.report_to,
                 fp16=self.classification_model_config.fp16,
                 bf16=self.classification_model_config.bf16,
                 use_cpu=self.classification_model_config.device == "cpu",
