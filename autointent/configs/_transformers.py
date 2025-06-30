@@ -22,6 +22,8 @@ class HFModelConfig(BaseModel):
     )
     batch_size: PositiveInt = Field(32, description="Batch size for model inference.")
     device: str | None = Field(None, description="Torch notation for CPU or CUDA.")
+    bf16: bool = Field(False, description="Whether to use mixed precision training (not all devices support this).")
+    fp16: bool = Field(False, description="Whether to use mixed precision training (not all devices support this).")
     tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
     trust_remote_code: bool = Field(False, description="Whether to trust the remote code when loading the model.")
 
