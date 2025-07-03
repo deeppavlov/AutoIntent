@@ -15,9 +15,13 @@ import huggingface_hub
 import numpy as np
 import numpy.typing as npt
 import torch
-from appdirs import user_cache_dir
-from sentence_transformers import SentenceTransformer
+#from appdirs import user_cache_dir
+from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments, InputExample
 from sentence_transformers.similarity_functions import SimilarityFunction
+from sentence_transformers.losses import BatchAllTripletLoss
+from sentence_transformers.training_args import BatchSamplers
+from datasets import Dataset
+
 
 from autointent._hash import Hasher
 from autointent.configs import EmbedderConfig, TaskTypeEnum
@@ -122,7 +126,43 @@ class Embedder:
                 similarity_fn_name=self.config.similarity_fn_name,
                 trust_remote_code=self.config.trust_remote_code,
             )
+    def train(self, utterances: list[str], labels: list[int], **kwargs) -> None:
+        """Train the embedding model"""
+        self._load_model()
 
+        tr_ds = Dataset.from_dict({
+        "text": utterances,
+        "label": labels
+        })
+
+        loss = BatchAllTripletLoss(
+            model=self.embedding_model, 
+            margin=kwargs.get("margin", 0.5)
+        )
+        
+        args = SentenceTransformerTrainingArguments(
+            save_strategy="no",
+            output_dir=kwargs['out_dir'],
+            num_train_epochs=kwargs['epoch_num'],
+            per_device_train_batch_size=self.config.batch_size,
+            learning_rate=kwargs.get("learning_rate", 2e-5),
+            warmup_ratio=kwargs.get("warmup_ratio", 0.1),
+            fp16=kwargs.get("fp16", True),
+            bf16=kwargs.get("bf16", False),
+            batch_sampler=BatchSamplers.NO_DUPLICATES,
+        )
+
+        trainer = SentenceTransformerTrainer(
+            model=self.embedding_model,
+            args=args,
+            train_dataset=tr_ds,
+            loss=loss,
+        )
+        
+        trainer.train()
+    
+        self.embedding_model.save(kwargs['out_dir'])
+        
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
         if hasattr(self, "embedding_model"):
