@@ -15,7 +15,7 @@ import huggingface_hub
 import numpy as np
 import numpy.typing as npt
 import torch
-#from appdirs import user_cache_dir
+from appdirs import user_cache_dir
 from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments, InputExample
 from sentence_transformers.similarity_functions import SimilarityFunction
 from sentence_transformers.losses import BatchAllTripletLoss
