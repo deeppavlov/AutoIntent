@@ -233,7 +233,7 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return AutoModelForSequenceClassification.from_pretrained(lora_path)
+            return AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-any-return]
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
@@ -252,7 +252,7 @@ class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401, ARG004
-        return AutoModelForSequenceClassification.from_pretrained(path)
+        return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
