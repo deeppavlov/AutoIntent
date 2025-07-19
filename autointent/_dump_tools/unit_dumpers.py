@@ -228,12 +228,12 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
-            model = AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")  # type: ignore[no-untyped-call]
+            model = AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
             return PeftModel.from_pretrained(model, ptuning_path / "peft")
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-untyped-call,no-any-return]
+            return AutoModelForSequenceClassification.from_pretrained(lora_path)
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
@@ -252,7 +252,7 @@ class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401, ARG004
-        return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-untyped-call,no-any-return]
+        return AutoModelForSequenceClassification.from_pretrained(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
@@ -269,7 +269,7 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
-        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return]
+        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401

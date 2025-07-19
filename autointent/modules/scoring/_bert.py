@@ -128,7 +128,7 @@ class BertScorer(BaseScorer):
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
-        return AutoModelForSequenceClassification.from_pretrained(  # type: ignore[no-untyped-call]
+        return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
@@ -144,7 +144,7 @@ class BertScorer(BaseScorer):
     ) -> None:
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)  # type: ignore[no-untyped-call]
         self._model = self._initialize_model()
         tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
         self._train(tokenized_dataset)
