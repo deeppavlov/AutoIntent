@@ -29,6 +29,18 @@
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
                 },
+                "bf16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Bf16",
+                    "type": "boolean"
+                },
+                "fp16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Fp16",
+                    "type": "boolean"
+                },
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
                 },
@@ -137,6 +149,18 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
+                },
+                "bf16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Bf16",
+                    "type": "boolean"
+                },
+                "fp16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Fp16",
+                    "type": "boolean"
                 },
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
@@ -281,6 +305,18 @@
                     "default": null,
                     "description": "Torch notation for CPU or CUDA.",
                     "title": "Device"
+                },
+                "bf16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Bf16",
+                    "type": "boolean"
+                },
+                "fp16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Fp16",
+                    "type": "boolean"
                 },
                 "tokenizer_config": {
                     "$ref": "#/$defs/TokenizerConfig"
@@ -527,6 +563,8 @@
                 "model_name": "sentence-transformers/all-MiniLM-L6-v2",
                 "batch_size": 32,
                 "device": null,
+                "bf16": false,
+                "fp16": false,
                 "tokenizer_config": {
                     "max_length": null,
                     "padding": true,
@@ -550,6 +588,8 @@
                 "model_name": "cross-encoder/ms-marco-MiniLM-L6-v2",
                 "batch_size": 32,
                 "device": null,
+                "bf16": false,
+                "fp16": false,
                 "tokenizer_config": {
                     "max_length": 512,
                     "padding": true,
@@ -565,6 +605,8 @@
                 "model_name": "prajjwal1/bert-tiny",
                 "batch_size": 32,
                 "device": null,
+                "bf16": false,
+                "fp16": false,
                 "tokenizer_config": {
                     "max_length": null,
                     "padding": true,
