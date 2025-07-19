@@ -44,7 +44,7 @@ def valid_scoring_config():
                 "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 "k": [5],
                 "weights": ["distance"],
-                "use_crosencoder_scores": [True, False],
+                "use_cross_encoder_scores": [True, False],
             },
             {
                 "module_name": "sklearn",

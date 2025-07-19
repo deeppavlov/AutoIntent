@@ -23,7 +23,7 @@
       k: [ 5, 10 ]
       weights: [uniform, distance, closest]
       m: [ 2, 3 ]
-      use_crosencoder_scores: [true, false]
+      use_cross_encoder_scores: [true, false]
       cross_encoder_config:
         - cross-encoder/ms-marco-MiniLM-L6-v2
     - module_name: sklearn
