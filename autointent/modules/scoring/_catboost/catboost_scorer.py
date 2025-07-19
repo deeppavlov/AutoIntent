@@ -136,7 +136,7 @@ class CatBoostScorer(BaseScorer):
         val_fraction: FloatFromZeroToOne | None = 0.2,
         early_stopping_rounds: PositiveInt = 100,
         iterations: PositiveInt = 1000,
-        depth: PositiveInt= 6,
+        depth: PositiveInt = 6,
         **catboost_kwargs: dict[str, Any],
     ) -> "CatBoostScorer":
         if embedder_config is None:

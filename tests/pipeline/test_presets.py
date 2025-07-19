@@ -7,27 +7,21 @@ from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from tests.conftest import setup_environment
 
 
-@pytest.mark.parametrize("preset", [
-    "classic-heavy",
-    "classic-light",
-    "classic-medium",
-    "nn-heavy",
-    "nn-medium",
-    pytest.param(
-        "transformers-heavy",
-        marks=pytest.mark.transformers
-    ),
-    pytest.param(
-        "transformers-light",
-        marks=pytest.mark.transformers
-    ),
-    pytest.param(
-        "transformers-no-hpo",
-        marks=pytest.mark.transformers
-    ),
-    "zero-shot-openai",
-    "zero-shot-transformers",
-])
+@pytest.mark.parametrize(
+    "preset",
+    [
+        "classic-heavy",
+        "classic-light",
+        "classic-medium",
+        "nn-heavy",
+        "nn-medium",
+        pytest.param("transformers-heavy", marks=pytest.mark.transformers),
+        pytest.param("transformers-light", marks=pytest.mark.transformers),
+        pytest.param("transformers-no-hpo", marks=pytest.mark.transformers),
+        "zero-shot-openai",
+        "zero-shot-transformers",
+    ],
+)
 def test_presets(dataset, preset):
     project_dir = setup_environment()
 
