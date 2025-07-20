@@ -192,8 +192,8 @@ class BertScorer(BaseScorer):
                 callbacks=self._get_trainer_callbacks(),
             )
             if not self.print_progress:
-                trainer.remove_callback(PrinterCallback)
-                trainer.remove_callback(ProgressCallback)
+                trainer.remove_callback(PrinterCallback)  # type: ignore[attr-defined]
+                trainer.remove_callback(ProgressCallback)  # type: ignore[attr-defined]
 
             trainer.train()  # type: ignore[attr-defined]
 
