@@ -2,7 +2,7 @@
 
 import tempfile
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import numpy.typing as npt
@@ -15,6 +15,8 @@ from transformers import (  # type: ignore[attr-defined]
     DataCollatorWithPadding,
     EarlyStoppingCallback,
     EvalPrediction,
+    PrinterCallback,
+    ProgressCallback,
     Trainer,
     TrainingArguments,
 )
@@ -84,8 +86,9 @@ class BertScorer(BaseScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore  # noqa: PGH003
+        report_to: REPORTERS_NAMES | Literal["none"] = "none",  # type: ignore  # noqa: PGH003
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
+        print_progress: bool = False,
     ) -> None:
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
@@ -94,6 +97,7 @@ class BertScorer(BaseScorer):
         self.seed = seed
         self.report_to = report_to
         self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
+        self.print_progress = print_progress
 
     @classmethod
     def from_context(
@@ -187,6 +191,9 @@ class BertScorer(BaseScorer):
                 compute_metrics=self._get_compute_metrics(),
                 callbacks=self._get_trainer_callbacks(),
             )
+            if not self.print_progress:
+                trainer.remove_callback(PrinterCallback)
+                trainer.remove_callback(ProgressCallback)
 
             trainer.train()  # type: ignore[attr-defined]
 
