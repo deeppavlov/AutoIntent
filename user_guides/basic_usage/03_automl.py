@@ -31,7 +31,7 @@ AutoIntent provides default search spaces. One can utilize them by constructing 
 """
 
 # %%
-pipeline = Pipeline.from_preset("light_extra")
+pipeline = Pipeline.from_preset("classic-light")
 
 # %% [markdown]
 """
@@ -43,7 +43,7 @@ from pprint import pprint
 
 from autointent.utils import load_preset
 
-preset = load_preset("light_extra")
+preset = load_preset("classic-light")
 pprint(preset)
 
 # %% [markdown]
@@ -52,7 +52,7 @@ Search space is allowed to customize:
 """
 
 # %%
-preset["search_space"][0]["search_space"][0]["k"] = [1, 3]
+preset["search_space"][0]["search_space"][0]["k"]["hight"] = 10
 custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
@@ -84,7 +84,7 @@ One can specify what embedding model and cross-encoder model want to use along w
 # %%
 from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
 
-custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny", device="cpu"))
+custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny"))
 custom_pipeline.set_config(
     CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", tokenizer_config=TokenizerConfig(max_length=8))
 )
@@ -127,7 +127,7 @@ from autointent.utils import load_preset
 dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
 # customize search space
-preset = load_preset("light_extra")
+preset = load_preset("classic-light")
 
 # make pipeline
 custom_pipeline = Pipeline.from_optimization_config(preset)

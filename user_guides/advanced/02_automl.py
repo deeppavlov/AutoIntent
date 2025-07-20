@@ -131,7 +131,7 @@ dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 from autointent import Pipeline
 
 pipeline_optimizer = Pipeline.from_search_space(search_space)
-pipeline_optimizer.fit(dataset, sampler="random")
+pipeline_optimizer.fit(dataset)
 
 # %% [markdown]
 """
