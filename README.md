@@ -34,3 +34,7 @@ pipeline = Pipeline.from_preset("light")
 pipeline.fit(dataset)
 pipeline.predict(["show me my latest transactions"])
 ```
+
+## Disclaimer
+
+This project is in an development phase. Bugs and breaking changes are expected. Contributions and feedback are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
