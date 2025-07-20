@@ -49,24 +49,19 @@ To load a dataset from the file system into Python, the :meth:`autointent.Datase
 AutoML goes brrr...
 -------------------
 
-Once the data is ready, you can start building the optimal classifier from the command line:
-
-.. code-block:: bash
-
-    autointent data.train_path="path/to/your/data.json"
-
-This command will start the hyperparameter search in the default :ref:`search space <key-search-space>`.
-
-As a result, a ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference.
-
-Similar actions but in a limited mode can be started using the Python API:
+Once the data is ready, you can start building the optimal classifier:
 
 .. code-block:: python
 
     from autointent import PipelineOptimizer
 
-    pipeline_optimizer = PipelineOptimizer.default(multilabel=False)
+    pipeline_optimizer = PipelineOptimizer.from_preset("classic-light")
     pipeline_optimizer.fit(dataset)
+
+This code starts the hyperparameter search with preset :ref:`search space <key-search-space>`.
+
+As a result, ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference.
+
 
 Inference
 ---------
