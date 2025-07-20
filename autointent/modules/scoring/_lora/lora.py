@@ -78,7 +78,7 @@ class BERTLoRAScorer(BertScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
-            print_progress=print_progress
+            print_progress=print_progress,
         )
         self._lora_config = LoraConfig(**lora_kwargs)
 
