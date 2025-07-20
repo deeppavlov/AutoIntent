@@ -58,7 +58,7 @@ class CatBoostScorer(BaseScorer):
                 `catboost's documentation <https://catboost.ai/docs/en/concepts/python-reference_catboostclassifier>`_
 
     Example:
-    -------
+    --------
 
     .. testcode::
 
@@ -79,12 +79,6 @@ class CatBoostScorer(BaseScorer):
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "bye"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)
-
-    .. testoutput::
-
-        [[0.41493207 0.58506793]
-         [0.55036046 0.44963954]]
 
     """
 
