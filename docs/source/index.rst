@@ -1,13 +1,15 @@
 AutoIntent documentation
 ========================
 
-**AutoIntent** is an open source tool for automatic configuration of a text classification pipeline for intent prediction.
+**AutoIntent** is an open source tool for automatic configuration of text classification pipelines, with specialized support for intent prediction.
 
 .. note::
 
    This project is under active development.
 
-The task of intent detection is one of the main subtasks in creating task-oriented dialogue systems, along with scriptwriting and slot filling. AutoIntent project offers users the following:
+The task of intent detection is one of the main subtasks in creating task-oriented dialogue systems, along with scriptwriting and slot filling. While AutoIntent is particularly well-suited for intent detection, it can be applied to any text classification problem, including sentiment analysis, topic classification, document categorization, and other NLP tasks.
+
+AutoIntent project offers users the following:
 
 - A convenient library of methods for intent classification that can be used in a sklearn-like "fit-predict" format.
 - An AutoML approach to creating classifiers, where the only thing needed is to upload a set of labeled data.
@@ -36,33 +38,34 @@ Example of building an intent classifier in a couple of lines of code:
    for match in glob("vector_db*"):
       shutil.rmtree(match)
 
-Documentation Contents
-----------------------
+Documentation Guide
+-------------------
 
-:doc:`Quickstart <quickstart>`
-..............................
+Getting Started
+...............
 
-It is recommended to begin with the :doc:`quickstart` page. It contains overview of our capabilities and basic instructions for working with our library.
+:doc:`🚀 Quickstart <quickstart>`
+   Jump right in! Install AutoIntent and build your first text classifier in minutes. Perfect for users who want to get up and running quickly with practical examples.
 
-:doc:`Key Concepts <concepts>`
-..............................
+:doc:`📚 Key Concepts <concepts>`
+   Essential terminology and concepts used throughout AutoIntent. Understanding these will help you navigate the documentation and make the most of the library's features.
 
-Key terms and concepts we use throughout our documentation.
+In-Depth Learning
+.................
 
-:doc:`User Guides<user_guides>`
-................................
+:doc:`📖 User Guides <user_guides>`
+   Comprehensive tutorials and examples that walk you through AutoIntent's capabilities step-by-step. These hands-on guides cover everything from basic usage to advanced techniques.
 
-A series of notebooks that demonstrate in detail and comprehensively the capabilities of our library and how to use it.
+:doc:`🎓 Learn AutoIntent <learn/index>`
+   Dive deeper into the theory behind AutoIntent. Learn about dialogue systems, AutoML principles, and the science that powers intelligent text classification.
 
-:doc:`API Reference <autoapi/autointent/index>`
-...............................................
+Reference
+.........
 
-Pay special attention to the sections :doc:`autoapi/autointent/modules/index` and :doc:`autoapi/autointent/metrics/index`.
-
-:doc:`Learn AutoIntent<learn/index>`
-....................................
-
-Some theoretical background on dialogue systems and auto ML.
+:doc:`🔧 API Reference <autoapi/autointent/index>`
+   Complete technical documentation for all classes, methods, and functions. Essential reference for developers integrating AutoIntent into their applications.
+   
+   Key sections: :doc:`Modules <autoapi/autointent/modules/index>` | :doc:`Metrics <autoapi/autointent/metrics/index>`
 
 
 .. toctree::
