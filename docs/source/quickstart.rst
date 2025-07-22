@@ -55,7 +55,7 @@ Here's a complete example that demonstrates AutoIntent's capabilities:
 
 .. testcode:: python
 
-    from autointent import Dataset, PipelineOptimizer
+    from autointent import Dataset, Pipeline
 
     # Prepare your data
     data = {
@@ -65,7 +65,13 @@ Here's a complete example that demonstrates AutoIntent's capabilities:
             {"utterance": "What's my current balance?", "label": 0},
             {"utterance": "I need to send money to my friend", "label": 1},
             {"utterance": "Can you help me make a payment?", "label": 1},
-            {"utterance": "Show me my transaction history", "label": 0}
+            {"utterance": "Show me my transaction history", "label": 0},
+            {"utterance": "Can you show me my account details?", "label": 0},
+            {"utterance": "I want to send funds to someone", "label": 1},
+            {"utterance": "What is my available balance?", "label": 0},
+            {"utterance": "How can I make a transfer?", "label": 1},
+            {"utterance": "Please help me with a payment", "label": 1},
+            {"utterance": "I need to view my recent transactions", "label": 0}
         ],
         "validation": [
             {"utterance": "Display my account info", "label": 0},
@@ -77,7 +83,7 @@ Here's a complete example that demonstrates AutoIntent's capabilities:
     dataset = Dataset.from_dict(data)
 
     # Initialize and train the AutoML pipeline
-    pipeline = PipelineOptimizer.from_preset("classic-light")
+    pipeline = Pipeline.from_preset("classic-light")
     pipeline.fit(dataset)
 
     # Make predictions on new data
@@ -149,16 +155,16 @@ AutoIntent provides several preset configurations optimized for different scenar
 
 .. code-block:: python
 
-    from autointent import PipelineOptimizer
+    from autointent import Pipeline
 
     # Our quick and accurate SoTA
-    pipeline = PipelineOptimizer.from_preset("classic-light")
+    pipeline = Pipeline.from_preset("classic-light")
 
     # If you have more training time
-    pipeline = PipelineOptimizer.from_preset("classic-heavy")
+    pipeline = Pipeline.from_preset("classic-heavy")
 
     # Experimental preset with fine-tuning methods
-    pipeline = PipelineOptimizer.from_preset("transformers-light")
+    pipeline = Pipeline.from_preset("transformers-light")
 
     # Train the pipeline
     pipeline.fit(dataset)
@@ -182,17 +188,12 @@ Once trained, use your pipeline for inference:
 
 .. code-block:: python
 
-    # Single prediction
-    result = pipeline.predict(["I want to check my balance"])
-    print(result)  # [0]
-
     # Batch predictions
     results = pipeline.predict([
         "What's my account balance?",
         "Transfer $100 to John",
         "Show me recent transactions"
     ])
-    print(results)  # [0, 1, 0]
 
 
 Direct Module Usage
