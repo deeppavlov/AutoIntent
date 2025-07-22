@@ -43,4 +43,3 @@ This is similar to random search over a subset, but during the search, we attemp
 
 This approach is more sophisticated and can lead to better results by intelligently exploring the hyperparameter space.
 
-The implementation of Bayesian optimization is planned for release v0.1.0.
