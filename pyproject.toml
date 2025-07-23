@@ -145,6 +145,10 @@ max-args = 10
 convention = "google"
 
 
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.16.1"
+
 [build-system]
 requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
