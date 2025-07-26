@@ -178,8 +178,8 @@ Available Presets
 - ``nn-heavy``: Comprehensive neural network optimization
 - ``transformers-light``: Transformer models with limited search
 - ``transformers-no-hpo``: Transformer models without hyperparameter optimization
-- ``zero-shot-openai``: Zero-shot classification using OpenAI models
-- ``zero-shot-transformers``: Zero-shot classification using transformer models
+- ``zero-shot-llm``: Zero-shot classification using OpenAI models
+- ``zero-shot-encoders``: Zero-shot classification using transformer models
 
 Making Predictions
 -------------------

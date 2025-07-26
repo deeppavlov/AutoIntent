@@ -18,8 +18,8 @@ from tests.conftest import setup_environment
         pytest.param("transformers-heavy", marks=pytest.mark.transformers),
         pytest.param("transformers-light", marks=pytest.mark.transformers),
         pytest.param("transformers-no-hpo", marks=pytest.mark.transformers),
-        "zero-shot-openai",
-        "zero-shot-transformers",
+        "zero-shot-llm",
+        "zero-shot-encoders",
     ],
 )
 def test_presets(dataset, preset):
@@ -27,7 +27,7 @@ def test_presets(dataset, preset):
 
     pipeline_optimizer = Pipeline.from_preset(preset)
 
-    if preset == "zero-shot-openai" and not (os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_MODEL_NAME")):
+    if preset == "zero-shot-llm" and not (os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_MODEL_NAME")):
         pytest.skip(reason="OpenAI API key or model name is missing.")
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))

@@ -124,7 +124,7 @@ SearchSpacePreset = Literal[
     "transformers-heavy",
     "transformers-light",
     "transformers-no-hpo",
-    "zero-shot-openai",
-    "zero-shot-transformers",
+    "zero-shot-llm",
+    "zero-shot-encoders",
 ]
 """Some presets that our library supports."""

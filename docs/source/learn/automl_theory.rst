@@ -173,7 +173,7 @@ AutoIntent provides presets that balance different objectives:
    pipeline_heavy = Pipeline.from_preset("classic-heavy")    # Performance-focused
    
    # Different model types  
-   pipeline_zero_shot = Pipeline.from_preset("zero-shot-transformers")  # No training data
+   pipeline_zero_shot = Pipeline.from_preset("zero-shot-encoders")  # No training data
 
 Bayesian Optimization Theory
 -----------------------------
