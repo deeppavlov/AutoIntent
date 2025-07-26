@@ -25,16 +25,12 @@ This is one of the ways to solve the problem of an overwhelming number of combin
 
 This algorithm checks fewer combinations, which speeds up the process. To implement such an algorithm, it is necessary to be able to evaluate the quality of not only the final prediction of the entire pipeline but also its intermediate predictions. The main drawback of this approach is that the decisions made are optimal only locally, not globally. The metrics for evaluating intermediate predictions are only a proxy signal for the quality of the final prediction.
 
-This approach has been available in our library since release v0.0.1.
-
 Random Search
 -------------
 
 A simpler strategy is to take a random subset of the full search space (random grid search). A straightforward strategy is to iterate through all combinations in random order until a certain time budget is exhausted.
 
 This approach is less intelligent than the greedy strategy because, at any moment during the random combination search, poor embedders or any other bad parameters might keep appearing, despite they have been tested already. The greedy strategy would have eliminated such embedders at the beginning and not revisited them. On the other hand, random search, by its nature, does not rely on any local decisions.
-
-The implementation of this optimization method is planned for release v0.1.0.
 
 Bayesian Optimization
 ---------------------

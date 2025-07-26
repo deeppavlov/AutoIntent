@@ -242,13 +242,11 @@ Next Steps
 
 - **Concepts**: Learn about :doc:`concepts` and AutoIntent's architecture
 - **Tutorials**: Follow our step-by-step guides in :doc:`user_guides`
-- **Advanced Usage**: Explore custom configurations and advanced features
-- **Examples**: Check out real-world examples in our `GitHub repository <https://github.com/voorhs/AutoIntent>`_
+- **Background**: Learn the AutoML and intent classification from the theoretical perspective at :doc:`learn/index` page.
 
 🛠️ **Need Help?**
 
-- Report issues on our `GitHub Issues <https://github.com/voorhs/AutoIntent/issues>`_
-- Join our community discussions
-- Check out the full API reference
+- Report issues on our `GitHub Issues <https://github.com/DeepPavlov/AutoIntent/issues>`_
+- Check out the full :doc:`API reference <autoapi/autointent/index>`
 
 Happy intent classification! 🎯
