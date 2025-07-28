@@ -14,6 +14,13 @@ class TokenizerConfig(BaseModel):
     truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
 
+class EmbedderFineTuningConfig(BaseModel):
+    epoch_num: int
+    margin: float = Field(default=0.5)
+    learning_rate: float = Field(default=2e-5)
+    warmup_ratio: float = Field(default=0.1)
+    fp16: bool = Field(default=True)
+    bf16: bool = Field(default=False)
 
 class HFModelConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
