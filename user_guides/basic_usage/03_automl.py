@@ -57,7 +57,7 @@ custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
-See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
+See tutorial %mddoclink(notebook,advanced.03_search_space_configuration) on how the search space is structured.
 """
 
 # %% [markdown]
@@ -69,6 +69,7 @@ The important thing is what assets you want to save during the pipeline auto-con
 
 # %%
 from pathlib import Path
+
 from autointent.configs import LoggingConfig
 
 logging_config = LoggingConfig(project_dir=Path.cwd() / "runs", dump_modules=False, clear_ram=False)
@@ -82,7 +83,7 @@ One can specify what embedding model and cross-encoder model want to use along w
 """
 
 # %%
-from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, TokenizerConfig
 
 custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny"))
 custom_pipeline.set_config(
