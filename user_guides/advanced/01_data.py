@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Data (advanced)
+# Data
 
 This chapter covers advanced data handling techniques in AutoIntent that go beyond basic dataset creation. You'll learn how to handle out-of-scope samples, enrich your data with intent metadata, and leverage advanced features for robust intent classification systems.
 """
