@@ -248,7 +248,7 @@ print("  Input: 'hello world!'")
 print(f"  Prediction: {scores[0]}")
 
 # Display additional metadata if available
-print(f"  Similar examples found: {len(meta[0]["neighbors"])}")
+print(f"  Similar examples found: {len(meta[0]['neighbors'])}")
 
 # %% [markdown]
 """
