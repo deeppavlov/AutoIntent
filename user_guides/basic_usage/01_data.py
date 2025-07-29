@@ -38,8 +38,8 @@ data = {
     "test": [
         {"utterance": "How much money is in my account?", "label": 0},
         {"utterance": "Transfer funds to my savings", "label": 1},
-        {"utterance": "Undo my recent payment", "label": 2}
-    ]
+        {"utterance": "Undo my recent payment", "label": 2},
+    ],
 }
 
 # Load the data into AutoIntent
@@ -128,7 +128,7 @@ banking_data = {
     "validation": [
         {"utterance": "Display my balance", "label": 0},
         {"utterance": "Send $50 to John", "label": 1},
-        {"utterance": "Stop my last transaction", "label": 2}
+        {"utterance": "Stop my last transaction", "label": 2},
     ],
     "test": [
         {"utterance": "Show me my current balance", "label": 0},
