@@ -60,16 +60,16 @@ AutoIntent's architecture centers around transformer-based text embeddings, prov
 
 .. _concepts-multiclass-multilabel:
 
-Classification Paradigms
-========================
+Multi- vs. Single-label classification
+======================================
 
 AutoIntent supports various classification scenarios through its flexible decision module:
 
 **🏷️ Multi-Class Classification**
-   Traditional single-label classification where each input belongs to exactly one class. Uses argmax or threshold-based decisions on predicted probabilities.
+   Each input gets assigned to exactly one category - like sorting emails into "Spam", "Work", or "Personal" folders. Common examples include sentiment analysis (positive/negative/neutral) or determining user intent where each message has a single purpose. The model picks the single best match from all possible categories.
 
 **🔖 Multi-Label Classification** 
-   Each input can belong to multiple classes simultaneously. Employs adaptive thresholding strategies that can be sample-specific or learned globally across the dataset.
+   Each input can belong to multiple categories at once - like tagging a news article as both "Politics" and "Economics". Essential for scenarios like multi-intent messages ("book a flight and check weather"), content tagging, or any situation where multiple labels can apply simultaneously. The model almost independently decides whether each possible category fits or not.
 
 
 .. _concepts-oos:
