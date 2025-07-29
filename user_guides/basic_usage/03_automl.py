@@ -26,7 +26,7 @@ from autointent import Dataset
 
 # Load the dataset from Hugging Face hub
 dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
-print(f"Dataset contains {len(dataset.splits)} splits")
+print(f"Dataset contains {len(dataset)} splits")
 dataset
 
 # %% [markdown]
@@ -36,7 +36,7 @@ Let's examine the structure of our dataset by looking at a sample utterance:
 
 # %%
 sample = dataset["train_0"][0]
-print(f"Sample utterance: '{sample['text']}'")
+print(f"Sample utterance: '{sample['utterance']}'")
 print(f"Intent label: '{sample['label']}'")
 sample
 
@@ -210,7 +210,7 @@ Or one can dump only the configured pipeline to any desired location (by default
 """
 
 # %%
-custom_pipeline.dump()
+pipeline.dump()
 
 # %% [markdown]
 """

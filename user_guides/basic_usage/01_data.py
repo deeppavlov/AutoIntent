@@ -34,7 +34,11 @@ data = {
         {"utterance": "Reverse the payment I just made", "label": 2},
         {"utterance": "Stop this transfer", "label": 2},
     ],
-    "validation": [{"utterance": "Display my balance", "label": 0}, {"utterance": "Send money to John", "label": 1}],
+    "validation": [
+        {"utterance": "Display my balance", "label": 0},
+        {"utterance": "Send money to John", "label": 1},
+        {"utterance": "Cancel the last payment", "label": 2},
+    ],
     "test": [
         {"utterance": "How much money is in my account?", "label": 0},
         {"utterance": "Transfer funds to my savings", "label": 1},
@@ -176,8 +180,9 @@ print(f"Training samples: {len(dataset_from_hub['train'])}")
 
 # View the first few samples
 print("\nFirst 3 training samples:")
-for i, sample in enumerate(dataset_from_hub["train"][:3]):
-    print(f"{i+1}. '{sample['utterance']}' → label {sample['label']}")
+train_split = dataset_from_hub["train"][:3]
+for i, (utterance, label) in enumerate(zip(train_split["utterance"], train_split["label"], strict=True)):
+    print(f"{i+1}. '{utterance}' → label {label}")
 
 # %% [markdown]
 """

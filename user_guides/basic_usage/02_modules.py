@@ -241,17 +241,14 @@ Many modules provide detailed prediction metadata that's valuable for understand
 # %%
 # Get detailed prediction information
 print("🔍 Analyzing prediction with metadata...")
-metadata_result = loaded_scorer.predict_with_metadata(["hello world!"])
+scores, meta = loaded_scorer.predict_with_metadata(["hello world!"])
 
 print("Detailed prediction analysis:")
 print("  Input: 'hello world!'")
-print(f"  Prediction: {metadata_result[0]['prediction']}")
+print(f"  Prediction: {scores[0]}")
 
 # Display additional metadata if available
-if "score" in metadata_result[0]:
-    print(f"  Confidence: {metadata_result[0]['score']:.4f}")
-if "neighbors" in metadata_result[0]:
-    print(f"  Similar examples found: {len(metadata_result[0]['neighbors'])}")
+print(f"  Similar examples found: {len(meta[0]["neighbors"])}")
 
 # %% [markdown]
 """

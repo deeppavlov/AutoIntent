@@ -67,18 +67,6 @@ print(f"Available splits: {list(dataset_with_oos.keys())}")
 
 # %% [markdown]
 """
-Notice that AutoIntent automatically creates an `oos` split for samples without labels:
-"""
-
-# %%
-# Examine the OOS split
-print(f"OOS training samples: {len(dataset_with_oos['oos'])}")
-print("\nExample OOS samples:")
-for i, sample in enumerate(dataset_with_oos["oos"][:3]):
-    print(f"{i+1}. '{sample['utterance']}'")
-
-# %% [markdown]
-"""
 ### Advanced OOS Strategies
 
 For robust systems, you'll want to carefully curate your OOS samples:
@@ -110,7 +98,6 @@ sophisticated_oos_data = {
 }
 
 sophisticated_dataset = Dataset.from_dict(sophisticated_oos_data)
-print(f"Sophisticated OOS dataset created with {len(sophisticated_dataset['oos'])} OOS samples")
 
 # %% [markdown]
 """
@@ -181,8 +168,8 @@ Let's examine what each metadata field does and how AutoIntent modules use them:
 # Examine the intent metadata
 print("Intent metadata breakdown:\n")
 for intent in rich_dataset.intents:
-    print(f"🎯 Intent: {intent['name']} (ID: {intent['id']})")
-    print(f"   Description: {intent['description']}")
+    print(f"🎯 Intent: {intent.name} (ID: {intent.id})")
+    print(f"   Description: {intent.description}")
     print()
 
 # %% [markdown]
@@ -211,16 +198,16 @@ dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 # Dataset analysis
 print("📊 Dataset Analysis")
 print(f"Dataset splits: {list(dataset.keys())}")
-print(f"Total training samples: {len(dataset['train'])}")
+print(f"Total training samples: {len(dataset['train_0']) + len(dataset['train_1'])}")
 print(f"Number of intents: {len(dataset.intents)}")
 
 # Examine class distribution
 from collections import Counter
 
-label_counts = Counter(dataset["train"]["label"])
+label_counts = Counter(dataset["train_0"]["label"])
 print("\nClass distribution (top 5):")
 for label, count in label_counts.most_common(5):
-    intent_name = dataset.intents[label]["name"]
+    intent_name = dataset.intents[label].name
     print(f"  {intent_name} (label {label}): {count} samples")
 
 # %% [markdown]
@@ -232,7 +219,7 @@ You can process your datasets using the underlying Hugging Face datasets functio
 
 # %%
 # Example: Filter samples by length
-short_utterances = dataset["train"].filter(lambda x: len(x["utterance"].split()) <= 5)
+short_utterances = dataset["train_0"].filter(lambda x: len(x["utterance"].split()) <= 5)
 print(f"Short utterances (≤5 words): {len(short_utterances)} samples")
 
 
@@ -242,7 +229,7 @@ def add_utterance_length(example):
     return example
 
 
-enriched_train = dataset["train"].map(add_utterance_length)
+enriched_train = dataset["train_0"].map(add_utterance_length)
 print(f"Added utterance_length feature to {len(enriched_train)} samples")
 
 # Show example with new feature
