@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Working with data
+# Data
 
 In this chapter you will learn how to work with intent classification data in AutoIntent. We'll cover creating datasets, loading data from different sources, and manipulating your data for optimal results.
 """

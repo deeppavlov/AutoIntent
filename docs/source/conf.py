@@ -50,7 +50,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_multiversion",
     "sphinx.ext.napoleon",
-    "sphinx_toolbox.collapse"
+    "sphinx_toolbox.collapse",
 ]
 
 templates_path = ["_templates"]

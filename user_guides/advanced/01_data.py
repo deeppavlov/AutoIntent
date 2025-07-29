@@ -1,6 +1,6 @@
 # %% [markdown]
 """
-# Working with data (advanced)
+# Data (advanced)
 
 This chapter covers advanced data handling techniques in AutoIntent that go beyond basic dataset creation. You'll learn how to handle out-of-scope samples, enrich your data with intent metadata, and leverage advanced features for robust intent classification systems.
 """
@@ -256,6 +256,7 @@ print(f"Sample: '{sample['utterance']}' (length: {sample['utterance_length']} wo
 For advanced experimentation, you might want to create custom data splits:
 """
 
+
 # %%
 # Example: Create a custom split based on utterance characteristics
 def create_length_based_splits(dataset_split, short_threshold=5, long_threshold=10):
@@ -289,9 +290,9 @@ You now understand advanced data handling in AutoIntent, including:
 - ✅ Advanced dataset manipulation and analysis techniques
 
 **What's next:**
-- Explore %mddoclink(notebook,advanced.02_automl) for advanced AutoML techniques
+- Explore %mddoclink(notebook,advanced.03_automl) for advanced AutoML techniques
 - Learn about %mddoclink(rst,augmentation_tutorials.index) to expand your datasets
-- See %mddoclink(notebook,advanced.03_reporting) for comprehensive model evaluation
+- See %mddoclink(notebook,advanced.04_reporting) for comprehensive model evaluation
 
 **Pro tip**: Start with a small, well-curated dataset with good intent descriptions, then scale up using AutoIntent's optimization capabilities to find the best approach for your specific use case.
 """
