@@ -181,7 +181,7 @@ class BertScorer(BaseScorer):
                 load_best_model_at_end=self.early_stopping_config.metric is not None,
             )
 
-            trainer = Trainer(  # type: ignore[no-untyped-call]
+            trainer = Trainer(
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset["train"],
@@ -192,10 +192,10 @@ class BertScorer(BaseScorer):
                 callbacks=self._get_trainer_callbacks(),
             )
             if not self.print_progress:
-                trainer.remove_callback(PrinterCallback)  # type: ignore[attr-defined]
-                trainer.remove_callback(ProgressCallback)  # type: ignore[attr-defined]
+                trainer.remove_callback(PrinterCallback)
+                trainer.remove_callback(ProgressCallback)
 
-            trainer.train()  # type: ignore[attr-defined]
+            trainer.train()
 
     def _get_trainer_callbacks(self) -> list[TrainerCallback]:
         res: list[TrainerCallback] = []
