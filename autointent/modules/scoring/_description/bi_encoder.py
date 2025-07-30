@@ -13,14 +13,45 @@ from .base import BaseDescriptionScorer
 
 
 class BiEncoderDescriptionScorer(BaseDescriptionScorer):
-    """Bi-encoder description scorer that embeds utterances and descriptions separately.
+    """Bi-encoder description scorer for zero-shot intent classification.
 
-    This scorer uses a bi-encoder architecture where both utterances and descriptions
-    are embedded separately, then cosine similarity is computed between them.
+    This scorer uses a bi-encoder architecture where utterances and intent descriptions
+    are embedded separately using the same encoder model, then cosine similarity is
+    computed between utterance embeddings and description embeddings. This is a
+    zero-shot approach that doesn't require training examples, only intent descriptions.
+
+    The bi-encoder approach is efficient for inference as descriptions are embedded
+    once during fitting, and only utterances need to be embedded during prediction.
 
     Args:
-        embedder_config: Config of the embedder model
-        temperature: Temperature parameter for scaling logits, defaults to 1.0
+        embedder_config: Configuration for the embedder model (HuggingFace model name or config)
+        temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules.scoring import BiEncoderDescriptionScorer
+
+        # Initialize bi-encoder scorer
+        scorer = BiEncoderDescriptionScorer(
+            embedder_config="sentence-transformers/all-MiniLM-L6-v2",
+            temperature=0.8
+        )
+
+        # Zero-shot classification with intent descriptions
+        descriptions = [
+            "User wants to book or reserve transportation like flights, trains, or hotels",
+            "User wants to cancel an existing booking or reservation",
+            "User asks about weather conditions or forecasts"
+        ]
+
+        # Fit using descriptions only (zero-shot approach)
+        scorer.fit([], [], descriptions)
+
+        # Make predictions on new utterances
+        test_utterances = ["Reserve a hotel room", "Delete my booking"]
+        probabilities = scorer.predict(test_utterances)
     """
 
     name = "description_bi"
