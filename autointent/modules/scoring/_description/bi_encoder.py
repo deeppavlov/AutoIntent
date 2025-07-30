@@ -26,6 +26,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
     Args:
         embedder_config: Configuration for the embedder model (HuggingFace model name or config)
         temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+        multilabel: Flag indicating classification task type
 
     Example:
     --------
@@ -60,8 +61,9 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
+        multilabel: bool = False,
     ) -> None:
-        super().__init__(temperature)
+        super().__init__(temperature=temperature, multilabel=multilabel)
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self._embedder: Embedder | None = None
         self._description_vectors: NDArray[Any] | None = None
@@ -86,16 +88,13 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
 
-        return cls(
-            temperature=temperature,
-            embedder_config=embedder_config,
-        )
+        return cls(temperature=temperature, embedder_config=embedder_config, multilabel=context.is_multilabel())
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Get implicit initialization parameters for this scorer."""
         return {"embedder_config": self.embedder_config.model_dump()}
 
-    def _fit_implementation(self, utterances: list[str], descriptions: list[str]) -> None:
+    def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the bi-encoder by embedding descriptions.
 
         Args:

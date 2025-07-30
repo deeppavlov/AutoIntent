@@ -28,6 +28,7 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
     Args:
         cross_encoder_config: Configuration for the cross-encoder model (HuggingFace model name or config)
         temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+        multilabel: Flag indicating classification task type
 
     Example:
     --------
@@ -48,8 +49,8 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
             "User asks about weather conditions or forecasts"
         ]
 
-         # Fit using descriptions only (zero-shot approach)
-         scorer.fit([], [], descriptions)
+        # Fit using descriptions only (zero-shot approach)
+        scorer.fit([], [], descriptions)
 
         # Make predictions on new utterances
         test_utterances = ["Reserve a hotel room", "Delete my booking"]
@@ -62,8 +63,9 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
         self,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         temperature: PositiveFloat = 1.0,
+        multilabel: bool = False,
     ) -> None:
-        super().__init__(temperature)
+        super().__init__(temperature=temperature, multilabel=multilabel)
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self._cross_encoder: Ranker | None = None
         self._description_texts: list[str] | None = None
@@ -89,15 +91,14 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
             cross_encoder_config = context.resolve_ranker()
 
         return cls(
-            temperature=temperature,
-            cross_encoder_config=cross_encoder_config,
+            temperature=temperature, cross_encoder_config=cross_encoder_config, multilabel=context.is_multilabel()
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Get implicit initialization parameters for this scorer."""
         return {"cross_encoder_config": self.cross_encoder_config.model_dump()}
 
-    def _fit_implementation(self, utterances: list[str], descriptions: list[str]) -> None:
+    def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the cross-encoder by storing descriptions.
 
         Args:

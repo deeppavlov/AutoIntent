@@ -62,6 +62,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         max_concurrent: Maximum number of concurrent async calls to LLM (default: 15)
         max_per_second: Maximum number of API calls per second for rate limiting (default: 10)
         max_retries: Maximum number of retry attempts for failed API calls (default: 3)
+        multilabel: Flag indicating classification task type
 
     Example:
     --------
@@ -84,8 +85,8 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             "User asks about weather conditions or forecasts"
         ]
 
-         # Fit using descriptions only (zero-shot approach)
-         scorer.fit([], [], descriptions)
+        # Fit using descriptions only (zero-shot approach)
+        scorer.fit([], [], descriptions)
 
         # Make predictions on new utterances
         test_utterances = ["Reserve a hotel room", "Delete my booking"]
@@ -101,8 +102,9 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         max_concurrent: PositiveInt | None = 15,
         max_per_second: PositiveInt = 10,
         max_retries: PositiveInt = 3,
+        multilabel: bool = False,
     ) -> None:
-        super().__init__(temperature=temperature)
+        super().__init__(temperature=temperature, multilabel=multilabel)
 
         self.generator_config = generator_config or {}
         self.max_concurrent = max_concurrent
@@ -125,12 +127,13 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             max_concurrent=max_concurrent,
             max_per_second=max_per_second,
             max_retries=max_retries,
+            multilabel=context.is_multilabel(),
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         return {}
 
-    def _fit_implementation(self, utterances: list[str], descriptions: list[str]) -> None:
+    def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the LLM scorer by initializing the generator and storing descriptions.
 
         Args:
