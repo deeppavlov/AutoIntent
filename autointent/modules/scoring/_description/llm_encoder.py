@@ -131,7 +131,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
-        return {}
+        return {"multilabel": self._multilabel}
 
     def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the LLM scorer by initializing the generator and storing descriptions.

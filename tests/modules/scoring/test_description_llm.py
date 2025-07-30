@@ -18,7 +18,7 @@ def test_description_scorer_llm(dataset, multilabel):
         dataset = dataset.to_multilabel()
     data_handler = DataHandler(dataset)
 
-    scorer = LLMDescriptionScorer(temperature=0.3, generator_config={"temperature": 0})
+    scorer = LLMDescriptionScorer(temperature=0.3, generator_config={"temperature": 0}, multilabel=multilabel)
 
     scorer.fit(
         data_handler.train_utterances(0),

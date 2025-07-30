@@ -96,7 +96,7 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Get implicit initialization parameters for this scorer."""
-        return {"cross_encoder_config": self.cross_encoder_config.model_dump()}
+        return {"cross_encoder_config": self.cross_encoder_config.model_dump(), "multilabel": self._multilabel}
 
     def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the cross-encoder by storing descriptions.

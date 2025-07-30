@@ -92,7 +92,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
         """Get implicit initialization parameters for this scorer."""
-        return {"embedder_config": self.embedder_config.model_dump()}
+        return {"embedder_config": self.embedder_config.model_dump(), "multilabel": self._multilabel}
 
     def _fit_implementation(self, descriptions: list[str]) -> None:
         """Fit the bi-encoder by embedding descriptions.
