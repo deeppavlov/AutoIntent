@@ -46,13 +46,73 @@ class RetriesExceededError(RuntimeError):
 
 
 class Generator:
-    """Wrapper class for accessing OpenAI API.
+    """Wrapper class for accessing OpenAI-compatible API endpoints for LLM generation.
+
+    This class provides a unified interface for interacting with OpenAI-compatible APIs,
+    supporting both synchronous and asynchronous operations. It includes built-in caching,
+    retry logic for structured output, and automatic environment variable detection.
+
+    The Generator can work with various OpenAI-compatible services including:
+    - OpenAI's official API
+    - Azure OpenAI
+    - Local inference servers (vLLM, Ollama, etc.)
+    - Other OpenAI-compatible endpoints
+
+    Environment Variables:
+        The following environment variables can be used for configuration:
+
+        **OPENAI_API_KEY** (required):
+            API key for authentication with the OpenAI-compatible service.
+            This is required for most API endpoints.
+
+        **OPENAI_BASE_URL** (optional):
+            Base URL for the API endpoint. If not provided, defaults to OpenAI's API.
+            - https://api.openai.com/v1 (OpenAI official)
+            - https://your-org.openai.azure.com (Azure OpenAI)
+            - http://localhost:8000/v1 (local vLLM server)
+
+        **OPENAI_MODEL_NAME** (optional):
+            Default model name to use if not specified in the constructor.
+            Examples: "gpt-4o-mini", "gpt-3.5-turbo", "claude-3-haiku"
 
     Args:
-        base_url: HTTP-endpoint for sending API requests to OpenAI API compatible server.
-            Omit this to infer ``OPENAI_BASE_URL`` from environment.
-        model_name: Name of LLM. Omit this to infer ``OPENAI_MODEL_NAME`` from environment.
-        **generation_params: kwargs that will be sent with a request to the endpoint.
+        base_url: HTTP endpoint for API requests. If None, uses OPENAI_BASE_URL environment variable.
+        model_name: Name of the language model. If None, uses OPENAI_MODEL_NAME environment variable.
+        use_cache: Whether to enable caching for structured outputs (default: True).
+        client_params: Additional parameters passed to the OpenAI client constructor.
+        **generation_params: Additional parameters passed to the chat completion API calls.
+
+    Example:
+    --------
+    .. code-block::
+
+        import os
+        from autointent.generation import Generator
+
+        # Method 1: Using environment variables
+        # Set these in your environment or .env file:
+        # OPENAI_API_KEY=your-api-key-here
+        # OPENAI_MODEL_NAME=gpt-4o-mini
+        # OPENAI_BASE_URL=https://api.openai.com/v1  # optional
+
+        generator = Generator()
+
+        # Method 2: Explicit configuration
+        generator = Generator(
+            base_url="https://api.openai.com/v1",
+            model_name="gpt-4o-mini",
+            temperature=0.7,
+            max_tokens=1000
+        )
+
+        # Basic chat completion
+        from autointent.generation.chat_templates import Message, Role
+
+        messages = [{"role": Role.USER, "content": "Hello, how are you?"}]
+        response = generator.get_chat_completion(messages)
+
+    Raises:
+        ValueError: If model_name is not provided and OPENAI_MODEL_NAME is not set.
     """
 
     _dump_data_filename = "init_params.json"
