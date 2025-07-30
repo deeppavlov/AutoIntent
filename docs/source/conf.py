@@ -51,6 +51,7 @@ extensions = [
     "sphinx_multiversion",
     "sphinx.ext.napoleon",
     "sphinx_toolbox.collapse",
+    "sphinx_llms_txt",
 ]
 
 templates_path = ["_templates"]
