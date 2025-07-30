@@ -42,21 +42,54 @@ class IntentCategorization(BaseModel):
 
 
 class LLMDescriptionScorer(BaseDescriptionScorer):
-    """LLM-based description scorer that uses structured output to categorize intents.
+    """LLM-based description scorer for zero-shot intent classification using structured output.
 
-    This scorer uses a language model with structured output to categorize intent descriptions
-    into three categories based on their probability to correspond to a given text sample:
-    - Most probable (probability 1.0)
-    - Promising but not confident (probability 0.5)
-    - Unlikely (probability 0.0)
+    This scorer uses a Large Language Model (LLM) with structured output to perform
+    zero-shot intent classification. The LLM is prompted to categorize intent descriptions
+    into three probability levels for each utterance:
+    - Most probable (probability 1.0): Intents that are most likely to match the utterance
+    - Promising (probability 0.5): Intents that are plausible but less confident
+    - Unlikely (probability 0.0): All other intents (implicit)
+
+    This approach leverages the reasoning capabilities of LLMs to understand complex
+    relationships between utterances and intent descriptions, potentially achieving
+    high accuracy for nuanced classification tasks. However, it requires API access
+    to LLM services and can be slower and more expensive than encoder-based methods.
 
     Args:
-        generator_config: Configuration for the Generator instance
-        temperature: Temperature parameter for scaling classifier logits, defaults to 1.0
-        max_concurrent: Maximum number of concurrent async calls to LLM, defaults to 15
-        max_per_second: Maximum number of API calls per second, defaults to 10
-        max_retries: Maximum number of retry attempts for failed validations, defaults to 3
-        backend: Backend to use for structured output, either "openai" or "vllm", defaults to "openai"
+        generator_config: Configuration for the Generator instance (LLM model settings)
+        temperature: Temperature parameter for scaling classifier logits (default: 1.0)
+        max_concurrent: Maximum number of concurrent async calls to LLM (default: 15)
+        max_per_second: Maximum number of API calls per second for rate limiting (default: 10)
+        max_retries: Maximum number of retry attempts for failed API calls (default: 3)
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules.scoring import LLMDescriptionScorer
+
+        # Initialize LLM scorer with OpenAI GPT
+        scorer = LLMDescriptionScorer(
+            temperature=1.0,
+            max_concurrent=10,
+            max_per_second=5,
+            max_retries=2
+        )
+
+        # Zero-shot classification with intent descriptions
+        descriptions = [
+            "User wants to book or reserve transportation like flights, trains, or hotels",
+            "User wants to cancel an existing booking or reservation",
+            "User asks about weather conditions or forecasts"
+        ]
+
+         # Fit using descriptions only (zero-shot approach)
+         scorer.fit([], [], descriptions)
+
+        # Make predictions on new utterances
+        test_utterances = ["Reserve a hotel room", "Delete my booking"]
+        probabilities = scorer.predict(test_utterances)
     """
 
     name = "description_llm"
