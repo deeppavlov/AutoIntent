@@ -65,7 +65,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
     Example:
     --------
-    .. testcode::
+    .. code-block::
 
         from autointent.modules.scoring import LLMDescriptionScorer
 
