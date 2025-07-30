@@ -13,14 +13,47 @@ from .base import BaseDescriptionScorer
 
 
 class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
-    """Cross-encoder description scorer that directly computes similarity between pairs.
+    """Cross-encoder description scorer for zero-shot intent classification.
 
     This scorer uses a cross-encoder architecture that directly computes similarity
-    between each utterance-description pair.
+    scores between each utterance-description pair by passing them together through
+    a transformer model. Unlike bi-encoders that embed texts separately, cross-encoders
+    can capture more complex interactions between utterances and descriptions, often
+    leading to higher accuracy at the cost of computational efficiency.
+
+    This is a zero-shot approach that doesn't require training examples, only intent
+    descriptions. The cross-encoder processes each utterance-description pair separately
+    during inference, making it more computationally intensive but potentially more accurate.
 
     Args:
-        cross_encoder_config: Config of the cross-encoder model
-        temperature: Temperature parameter for scaling logits, defaults to 1.0
+        cross_encoder_config: Configuration for the cross-encoder model (HuggingFace model name or config)
+        temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules.scoring import CrossEncoderDescriptionScorer
+
+        # Initialize cross-encoder scorer
+        scorer = CrossEncoderDescriptionScorer(
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            temperature=1.2
+        )
+
+        # Zero-shot classification with intent descriptions
+        descriptions = [
+            "User wants to book or reserve transportation like flights, trains, or hotels",
+            "User wants to cancel an existing booking or reservation",
+            "User asks about weather conditions or forecasts"
+        ]
+
+         # Fit using descriptions only (zero-shot approach)
+         scorer.fit([], [], descriptions)
+
+        # Make predictions on new utterances
+        test_utterances = ["Reserve a hotel room", "Delete my booking"]
+        probabilities = scorer.predict(test_utterances)
     """
 
     name = "description_cross"
