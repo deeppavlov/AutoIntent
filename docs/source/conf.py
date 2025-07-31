@@ -12,13 +12,12 @@ from pathlib import Path
 
 from sphinx.application import Sphinx
 
-from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
-
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
 
 from docs_utils.skip_members import skip_member  # noqa: E402
+from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
 from docs_utils.versions_generator import generate_versions_json  # noqa: E402
 
 project = "AutoIntent"
