@@ -1,0 +1,116 @@
+autointent.modules.scoring.BertScorer
+=====================================
+
+.. py:class:: autointent.modules.scoring.BertScorer(classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, report_to = 'none', early_stopping_config = None, print_progress = False)
+
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
+
+
+   Scoring module for transformer-based classification using BERT models.
+
+   This module uses a transformer model (like BERT) to perform intent classification.
+   It supports both multiclass and multilabel classification tasks, with options for
+   early stopping and various training configurations.
+
+   :param classification_model_config: Config of the transformer model (HFModelConfig, str, or dict)
+   :param num_train_epochs: Number of training epochs (default: 3)
+   :param batch_size: Batch size for training (default: 8)
+   :param learning_rate: Learning rate for training (default: 5e-5)
+   :param seed: Random seed for reproducibility (default: 0)
+   :param report_to: Reporting tool for training logs (e.g., "wandb", "tensorboard")
+   :param early_stopping_config: Configuration for early stopping during training
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules import BertScorer
+
+       # Initialize scorer with BERT model
+       scorer = BertScorer(
+           classification_model_config="bert-base-uncased",
+           num_train_epochs=3,
+           batch_size=8,
+           learning_rate=5e-5,
+           seed=42
+       )
+
+       # Training data
+       utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+       labels = [1, 0, 1, 0]
+
+       # Fit the model
+       scorer.fit(utterances, labels)
+
+       # Make predictions
+       test_utterances = ["Good product", "Not worth it"]
+       probabilities = scorer.predict(test_utterances)
+
+
+   .. py:attribute:: name
+      :value: 'bert'
+
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+
+   .. py:attribute:: classification_model_config
+
+
+   .. py:attribute:: num_train_epochs
+      :value: 3
+
+
+
+   .. py:attribute:: batch_size
+      :value: 8
+
+
+
+   .. py:attribute:: learning_rate
+      :value: 5e-05
+
+
+
+   .. py:attribute:: seed
+      :value: 0
+
+
+
+   .. py:attribute:: report_to
+      :value: 'none'
+
+
+
+   .. py:attribute:: early_stopping_config
+
+
+   .. py:attribute:: print_progress
+      :value: False
+
+
+
+   .. py:method:: from_context(context, classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, early_stopping_config = None)
+      :classmethod:
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+
+   .. py:method:: fit(utterances, labels)
+
+
+   .. py:method:: predict(utterances)
+
+
+   .. py:method:: clear_cache()
+

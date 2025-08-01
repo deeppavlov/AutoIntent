@@ -52,6 +52,12 @@ autointent.configs.LoggingConfig
       :value: None
 
 
+
+   .. py:attribute:: log_interval_time
+      :type:  float
+      :value: None
+
+
       List of callbacks to report to. If None, no callbacks will be used
 
 

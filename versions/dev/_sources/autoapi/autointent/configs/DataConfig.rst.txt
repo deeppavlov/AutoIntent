@@ -45,3 +45,19 @@ autointent.configs.DataConfig
 
       Set to float to prevent data leak between scoring and decision nodes.
 
+
+   .. py:attribute:: is_few_shot_train
+      :type:  bool
+      :value: None
+
+
+      Whether to use few-shot training.
+
+
+   .. py:attribute:: examples_per_intent
+      :type:  pydantic.PositiveInt
+      :value: None
+
+
+      Number of examples per intent for few-shot validation. If None, all examples will be used.
+

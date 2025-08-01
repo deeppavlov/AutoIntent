@@ -1,7 +1,7 @@
 autointent.generation.intents.generate_descriptions
 ===================================================
 
-.. py:function:: autointent.generation.intents.generate_descriptions(dataset, client, model_name, prompt = None)
+.. py:function:: autointent.generation.intents.generate_descriptions(dataset, client, prompt = None)
 
    Add LLM-generated text descriptions to dataset's intents.
 
@@ -9,7 +9,6 @@ autointent.generation.intents.generate_descriptions
    :param client: OpenAI client for generating descriptions.
    :param prompt: Template for model prompt with placeholders for intent_name,
                   user_utterances, and regex_patterns.
-   :param model_name: OpenAI model identifier for generating descriptions.
 
    See :ref:`intent_description_generation` tutorial.
 

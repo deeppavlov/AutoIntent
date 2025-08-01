@@ -1,0 +1,101 @@
+autointent.modules.SklearnScorer
+================================
+
+.. py:class:: autointent.modules.SklearnScorer(clf_name = 'LogisticRegression', embedder_config = None, **clf_args)
+
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
+
+
+   Scoring module for classification using sklearn classifiers.
+
+   This module uses embeddings generated from a transformer model to train
+   chosen sklearn classifier for intent classification.
+
+   :param clf_name: Name of the sklearn classifier to use
+   :param embedder_config: Config of the embedder model
+   :param \*\*clf_args: Arguments for the chosen sklearn classifier
+
+   .. rubric:: Examples
+
+   >>> from autointent.modules.scoring import SklearnScorer
+   >>> utterances = ["hello", "how are you?"]
+   >>> labels = [0, 1]
+   >>> scorer = SklearnScorer(
+   ...     clf_name="LogisticRegression",
+   ...     embedder_config="sergeyzh/rubert-tiny-turbo",
+   ... )
+   >>> scorer.fit(utterances, labels)
+   >>> test_utterances = ["hi", "what's up?"]
+   >>> probabilities = scorer.predict(test_utterances)
+
+
+   .. py:attribute:: name
+      :value: 'sklearn'
+
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+
+   .. py:attribute:: embedder_config
+
+
+   .. py:attribute:: clf_name
+      :value: 'LogisticRegression'
+
+
+
+   .. py:property:: trial_name
+      :type: str
+
+
+
+   .. py:method:: from_context(context, clf_name = 'LogisticRegression', embedder_config = None, **clf_args)
+      :classmethod:
+
+
+      Create a SklearnScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param clf_name: Name of the sklearn classifier to use
+      :param embedder_config: Config of the embedder, or None to use the best embedder
+      :param \*\*clf_args: Arguments for the chosen sklearn classifier
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Train the chosen sklearn classifier.
+
+      :param utterances: List of training utterances
+      :param labels: List of labels corresponding to the utterances
+
+      :raises ValueError: If the vector index mismatches the provided utterances
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict probabilities for the given utterances.
+
+      :param utterances: List of query utterances
+
+      :returns: Array of predicted probabilities for each class
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the embedder.
+
+

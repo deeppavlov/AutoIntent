@@ -22,6 +22,19 @@ Submodules
    /autoapi/autointent/generation/utterances/index
 
 
+Exceptions
+----------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/RetriesExceededError
+
+.. autoapisummary::
+
+   autointent.generation.RetriesExceededError
+
+
 Classes
 -------
 

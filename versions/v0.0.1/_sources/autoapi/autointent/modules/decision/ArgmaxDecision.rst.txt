@@ -35,28 +35,20 @@ autointent.modules.decision.ArgmaxDecision
       :value: 'argmax'
 
 
-      Name of the module.
-
 
    .. py:attribute:: supports_oos
       :value: False
 
-
-      Whether the module supports oos data
 
 
    .. py:attribute:: supports_multilabel
       :value: False
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: supports_multiclass
       :value: True
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:method:: from_context(context)

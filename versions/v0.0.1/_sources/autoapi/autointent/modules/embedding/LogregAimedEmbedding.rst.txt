@@ -1,7 +1,7 @@
 autointent.modules.embedding.LogregAimedEmbedding
 =================================================
 
-.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config, cv = 3)
+.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config = None, cv = 3)
 
    Bases: :py:obj:`autointent.modules.base.BaseEmbedding`
 
@@ -32,28 +32,20 @@ autointent.modules.embedding.LogregAimedEmbedding
       :value: 'logreg_embedding'
 
 
-      Name of the module.
-
 
    .. py:attribute:: supports_multiclass
       :value: True
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:attribute:: supports_multilabel
       :value: True
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: supports_oos
       :value: False
 
-
-      Whether the module supports oos data
 
 
    .. py:attribute:: embedder_config
@@ -64,7 +56,7 @@ autointent.modules.embedding.LogregAimedEmbedding
 
 
 
-   .. py:method:: from_context(context, embedder_config, cv = 3)
+   .. py:method:: from_context(context, embedder_config = None, cv = 3)
       :classmethod:
 
 

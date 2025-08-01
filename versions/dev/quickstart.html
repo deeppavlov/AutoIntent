@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Quickstart &#8212; AutoIntent 0.1.0 documentation</title>
+    <title>Quickstart &#8212; AutoIntent 0.2.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/documentation_options.js?v=938c9ccc"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="AutoIntent documentation" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.0" />
+  <meta name="docsearch:version" content="0.2.0" />
   </head>
   
   
@@ -188,7 +188,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -249,7 +249,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -322,7 +322,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -374,7 +374,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -445,95 +445,233 @@
                   
   <section id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading">#</a></h1>
+<p>Welcome to AutoIntent! This guide will get you up and running with intent classification in just a few minutes.</p>
+<section id="what-is-autointent">
+<h2>What is AutoIntent?<a class="headerlink" href="#what-is-autointent" title="Link to this heading">#</a></h2>
+<p>AutoIntent is a powerful AutoML library for intent classification that automatically finds the best model architecture and hyperparameters for your text classification tasks. Whether you’re building chatbots or text analysis pipelines, AutoIntent simplifies the process of creating high-performance intent classifiers.</p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>✨ <strong>AutoML Pipeline</strong>: Automated model selection and hyperparameter optimization</p></li>
+<li><p>🔧 <strong>Modular Design</strong>: Use individual components or the full pipeline</p></li>
+<li><p>📊 <strong>Multiple Algorithms</strong>: Support for classical neural networks, transformers, and traditional ML methods</p></li>
+<li><p>📈 <strong>Experiment Tracking</strong>: Built-in support for Weights &amp; Biases, TensorBoard and CodeCarbon</p></li>
+</ul>
+</section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
-<p>AutoIntent can be installed using the package manager <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<section id="basic-installation">
+<h3>Basic Installation<a class="headerlink" href="#basic-installation" title="Link to this heading">#</a></h3>
+<p>AutoIntent is compatible with Python 3.10+. For core functionality:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>autointent
+</pre></div>
+</div>
+</section>
+<section id="with-experiment-tracking">
+<h3>With Experiment Tracking<a class="headerlink" href="#with-experiment-tracking" title="Link to this heading">#</a></h3>
+<p>To include experiment tracking capabilities:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>autointent<span class="o">[</span>wandb,codecarbon<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="development-installation">
+<h3>Development Installation<a class="headerlink" href="#development-installation" title="Link to this heading">#</a></h3>
+<p>To install the latest development version:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/voorhs/AutoIntent.git
 <span class="nb">cd</span><span class="w"> </span>AutoIntent
 pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
-<p>The library is compatible with Python 3.10+.</p>
+</section>
+</section>
+<section id="quick-example">
+<h2>Quick Example<a class="headerlink" href="#quick-example" title="Link to this heading">#</a></h2>
+<p>Here’s a complete example that demonstrates AutoIntent’s capabilities:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Prepare your data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to check my account balance&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How do I transfer money?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s my current balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need to send money to my friend&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you help me make a payment?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Show me my transaction history&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you show me my account details?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to send funds to someone&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What is my available balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How can I make a transfer?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Please help me with a payment&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need to view my recent transactions&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Display my account info&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to transfer funds&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="c1"># Load data into AutoIntent</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Initialize and train the AutoML pipeline</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+<span class="c1"># Make predictions on new data</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
+    <span class="s2">&quot;What is my available balance?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Transfer money to John&quot;</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>That’s it! AutoIntent will automatically find the best model for your data.</p>
 </section>
 <section id="data-format">
 <h2>Data Format<a class="headerlink" href="#data-format" title="Link to this heading">#</a></h2>
-<p>To work with AutoIntent, you need to format your training data in a specific way. You need to provide a training split containing samples with utterances and labels, as shown below:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;train&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;utterance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello!&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
+<p>AutoIntent expects your data in a simple dictionary format with train/validation/test splits:</p>
+<section id="single-label-classification">
+<h3>Single-Label Classification<a class="headerlink" href="#single-label-classification" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, how are you?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Book a flight to Paris&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather like?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi there!&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional but highly recommended</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Good morning&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>For a multilabel dataset, the <code class="docutils literal notranslate"><span class="pre">label</span></code> field should be a list of integers representing the corresponding class labels.</p>
-<p>To use it with our Python API, you can use our <a class="reference internal" href="autoapi/autointent/Dataset.html#autointent.Dataset" title="autointent.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.Dataset</span></code></a> object.</p>
+</section>
+<section id="multi-label-classification">
+<h3>Multi-Label Classification<a class="headerlink" href="#multi-label-classification" title="Link to this heading">#</a></h3>
+<p>For multi-label tasks, use lists of 0s and 1s:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Book urgent flight to Paris&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]},</span>  <span class="c1"># booking=1, weather=0, urgent=1</span>
+        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="loading-data">
+<h3>Loading Data<a class="headerlink" href="#loading-data" title="Link to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]})</span>
-</pre></div>
-</div>
-<p>To load a dataset from the file system into Python, the <a class="reference internal" href="autoapi/autointent/Dataset.html#autointent.Dataset.from_json" title="autointent.Dataset.from_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autointent.Dataset.from_json()</span></code></a> method exists:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;/path/to/json&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="automl-goes-brrr">
-<h2>AutoML goes brrr…<a class="headerlink" href="#automl-goes-brrr" title="Link to this heading">#</a></h2>
-<p>Once the data is ready, you can start building the optimal classifier from the command line:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autointent<span class="w"> </span>data.train_path<span class="o">=</span><span class="s2">&quot;path/to/your/data.json&quot;</span>
-</pre></div>
-</div>
-<p>This command will start the hyperparameter search in the default <a class="reference internal" href="concepts.html#key-search-space"><span class="std std-ref">search space</span></a>.</p>
-<p>As a result, a <code class="docutils literal notranslate"><span class="pre">runs</span></code> folder will be created in the current working directory, which will save the selected classifier ready for inference.</p>
-<p>Similar actions but in a limited mode can be started using the Python API:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineOptimizer</span>
+<span class="c1"># From dictionary</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-<span class="n">pipeline_optimizer</span> <span class="o">=</span> <span class="n">PipelineOptimizer</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">multilabel</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">pipeline_optimizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="c1"># From JSON file</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;/path/to/your/data.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># From Hugging Face Hub</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;your-username/your-dataset&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="inference">
-<h2>Inference<a class="headerlink" href="#inference" title="Link to this heading">#</a></h2>
-<p>To apply the built classifier to new data, you can use our Python API:</p>
+</section>
+<section id="automl-training">
+<h2>AutoML Training<a class="headerlink" href="#automl-training" title="Link to this heading">#</a></h2>
+<p>AutoIntent provides several preset configurations optimized for different scenarios:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;path/to/run/directory&quot;</span><span class="p">)</span>
-<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="s2">&quot;hello world&quot;</span><span class="p">]</span>
-<span class="n">prediction</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">utterances</span><span class="p">)</span>
+<span class="c1"># Our quick and accurate SoTA</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+
+<span class="c1"># If you have more training time</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-heavy&quot;</span><span class="p">)</span>
+
+<span class="c1"># Experimental preset with fine-tuning methods</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;transformers-light&quot;</span><span class="p">)</span>
+
+<span class="c1"># Train the pipeline</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="available-presets">
+<h3>Available Presets<a class="headerlink" href="#available-presets" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">classic-light</span></code>: Fast training with traditional ML methods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">classic-heavy</span></code>: Comprehensive search with traditional methods</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn-medium</span></code>: Classic neural network-based approaches (RNN, CNN)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nn-heavy</span></code>: Comprehensive neural network optimization</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transformers-light</span></code>: Transformer models with limited search</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transformers-no-hpo</span></code>: Transformer models without hyperparameter optimization</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zero-shot-llm</span></code>: Zero-shot classification using OpenAI models</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zero-shot-encoders</span></code>: Zero-shot classification using transformer models</p></li>
+</ul>
+</section>
+</section>
+<section id="making-predictions">
+<h2>Making Predictions<a class="headerlink" href="#making-predictions" title="Link to this heading">#</a></h2>
+<p>Once trained, use your pipeline for inference:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Batch predictions</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
+    <span class="s2">&quot;What&#39;s my account balance?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Transfer $100 to John&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Show me recent transactions&quot;</span>
+<span class="p">])</span>
 </pre></div>
 </div>
 </section>
-<section id="modular-approach">
-<h2>Modular Approach<a class="headerlink" href="#modular-approach" title="Link to this heading">#</a></h2>
-<p>If there is no need to iterate over pipelines and hyperparameters, you can import classification methods directly.</p>
+<section id="direct-module-usage">
+<h2>Direct Module Usage<a class="headerlink" href="#direct-module-usage" title="Link to this heading">#</a></h2>
+<p>For more control, use individual components without AutoML:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNScorer</span>
 
-<span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_name</span><span class="o">=</span><span class="s2">&quot;sergeyzh/rubert-tiny-turbo&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Initialize a specific scorer</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>
+
+<span class="c1"># Train on your data</span>
 <span class="n">train_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;why is there a hold on my american saving bank account&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;i am not sure why my account is blocked&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;why is there a hold on my capital one checking account&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Check my account balance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Transfer money to account&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Show transaction history&quot;</span>
 <span class="p">]</span>
-<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
 <span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_utterances</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)</span>
-<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;i think my account is blocked but i do not know the reason&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;can you tell me why is my bank account frozen&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-<span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
+
+<span class="c1"># Make predictions</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
+    <span class="s2">&quot;What&#39;s my current balance?&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Send money to my friend&quot;</span>
+<span class="p">])</span>
 </pre></div>
 </div>
-</section>
-<section id="further-reading">
-<h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">#</a></h2>
+<section id="available-modules">
+<h3>Available Modules<a class="headerlink" href="#available-modules" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Get familiar with <a class="reference internal" href="concepts.html"><span class="doc">Key Concepts</span></a>.</p></li>
-<li><p>Check out the guide on basic Python API Usage: <a class="reference internal" href="user_guides/index_basic_usage.html"><span class="doc">Basic Usage</span></a></p></li>
+<li><p><strong>Scoring</strong>: <a class="reference internal" href="autoapi/autointent/modules/KNNScorer.html#autointent.modules.KNNScorer" title="autointent.modules.KNNScorer"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.KNNScorer</span></code></a>, <a class="reference internal" href="autoapi/autointent/modules/BertScorer.html#autointent.modules.BertScorer" title="autointent.modules.BertScorer"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.BertScorer</span></code></a>, <a class="reference internal" href="autoapi/autointent/modules/SklearnScorer.html#autointent.modules.SklearnScorer" title="autointent.modules.SklearnScorer"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.SklearnScorer</span></code></a>, <a class="reference internal" href="autoapi/autointent/modules/CatBoostScorer.html#autointent.modules.CatBoostScorer" title="autointent.modules.CatBoostScorer"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.CatBoostScorer</span></code></a></p></li>
+<li><p><strong>Decision</strong>: <a class="reference internal" href="autoapi/autointent/modules/ArgmaxDecision.html#autointent.modules.ArgmaxDecision" title="autointent.modules.ArgmaxDecision"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.ArgmaxDecision</span></code></a>,  <a class="reference internal" href="autoapi/autointent/modules/TunableDecision.html#autointent.modules.TunableDecision" title="autointent.modules.TunableDecision"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.TunableDecision</span></code></a>, <a class="reference internal" href="autoapi/autointent/modules/AdaptiveDecision.html#autointent.modules.AdaptiveDecision" title="autointent.modules.AdaptiveDecision"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.modules.AdaptiveDecision</span></code></a></p></li>
 </ul>
+<p>See more at API reference  <a class="reference internal" href="autoapi/autointent/modules/index.html"><span class="doc">Modules</span></a>.</p>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>🚀 <strong>Ready to dive deeper?</strong></p>
+<ul class="simple">
+<li><p><strong>Concepts</strong>: Learn about <a class="reference internal" href="concepts.html"><span class="doc">Key Concepts</span></a> and AutoIntent’s architecture</p></li>
+<li><p><strong>Tutorials</strong>: Follow our step-by-step guides in <a class="reference internal" href="user_guides.html"><span class="doc">User Guides</span></a></p></li>
+<li><p><strong>Background</strong>: Learn the AutoML and intent classification from the theoretical perspective at <a class="reference internal" href="learn/index.html"><span class="doc">Learn</span></a> page.</p></li>
+</ul>
+<p>🛠️ <strong>Need Help?</strong></p>
+<ul class="simple">
+<li><p>Report issues on our <a class="reference external" href="https://github.com/DeepPavlov/AutoIntent/issues">GitHub Issues</a></p></li>
+<li><p>Check out the full <a class="reference internal" href="autoapi/autointent/index.html"><span class="doc">API reference</span></a></p></li>
+</ul>
+<p>Happy intent classification! 🎯</p>
 </section>
 </section>
 
@@ -584,12 +722,31 @@ pip<span class="w"> </span>install<span class="w"> </span>.
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-format">Data Format</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automl-goes-brrr">AutoML goes brrr…</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inference">Inference</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modular-approach">Modular Approach</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading">Further Reading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-autointent">What is AutoIntent?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-installation">Basic Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#with-experiment-tracking">With Experiment Tracking</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-installation">Development Installation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-example">Quick Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-format">Data Format</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-label-classification">Single-Label Classification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-label-classification">Multi-Label Classification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-data">Loading Data</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automl-training">AutoML Training</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-presets">Available Presets</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-predictions">Making Predictions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-module-usage">Direct Module Usage</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-modules">Available Modules</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
 </ul>
   </nav></div>
 

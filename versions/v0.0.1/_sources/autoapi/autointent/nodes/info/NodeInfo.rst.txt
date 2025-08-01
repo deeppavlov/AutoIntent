@@ -23,3 +23,15 @@ autointent.nodes.info.NodeInfo
 
       Node type.
 
+
+   .. py:attribute:: multiclass_available_metrics
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.METRIC_FN]]
+
+      Available metrics for multiclass classification.
+
+
+   .. py:attribute:: multilabel_available_metrics
+      :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.METRIC_FN]]
+
+      Available metrics for multilabel classification.
+

@@ -9,20 +9,11 @@ autointent.Embedder
    embedding models, as well as calculating embeddings for input texts.
 
 
-   .. py:attribute:: config
-      :type:  autointent.configs.EmbedderConfig
-
-
    .. py:attribute:: embedding_model
       :type:  sentence_transformers.SentenceTransformer
 
 
-   .. py:method:: __hash__()
-
-      Compute a hash value for the Embedder.
-
-      :returns: The hash value of the Embedder.
-
+   .. py:attribute:: config
 
 
    .. py:method:: clear_ram()
@@ -64,5 +55,16 @@ autointent.Embedder
       :param task_type: Type of task for which embeddings are calculated.
 
       :returns: A numpy array of embeddings.
+
+
+
+   .. py:method:: similarity(embeddings1, embeddings2)
+
+      Calculate similarity between two sets of embeddings.
+
+      :param embeddings1: First set of embeddings (size n).
+      :param embeddings2: Second set of embeddings (size m).
+
+      :returns: A numpy array of similarities (size n x m).
 
 

@@ -55,3 +55,17 @@ autointent.context.optimization_info.ScorerArtifact
       :value: None
 
 
+
+   .. py:method:: model_dump(**kwargs)
+
+      Convert the model to a dictionary, converting numpy arrays to lists.
+
+
+
+   .. py:method:: model_validate(obj)
+      :classmethod:
+
+
+      Convert lists back to numpy arrays during validation.
+
+

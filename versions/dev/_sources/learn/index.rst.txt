@@ -1,5 +1,5 @@
-Learn AutoIntent
-================
+Learn
+=====
 
 .. toctree::
     :glob:

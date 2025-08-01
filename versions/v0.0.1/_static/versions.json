@@ -1,9 +1,13 @@
 [
     {
-        "name": "v0.1.0 (stable)",
-        "version": "v0.1.0",
-        "url": "https://deeppavlov.github.io/AutoIntent/versions/v0.1.0/",
+        "name": "v0.2.0 (stable)",
+        "version": "v0.2.0",
+        "url": "https://deeppavlov.github.io/AutoIntent/versions/v0.2.0/",
         "preferred": true
+    },
+    {
+        "version": "v0.1.0",
+        "url": "https://deeppavlov.github.io/AutoIntent/versions/v0.1.0/"
     },
     {
         "version": "v0.0.1",

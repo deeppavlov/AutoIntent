@@ -25,3 +25,13 @@ autointent.nodes.info.DecisionNodeInfo
 
       Node type.
 
+
+   .. py:attribute:: multiclass_available_metrics
+
+      Available metrics for multiclass classification.
+
+
+   .. py:attribute:: multilabel_available_metrics
+
+      Available metrics for multilabel classification.
+

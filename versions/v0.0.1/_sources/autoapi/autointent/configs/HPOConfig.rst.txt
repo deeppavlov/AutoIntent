@@ -1,0 +1,76 @@
+autointent.configs.HPOConfig
+============================
+
+.. py:class:: autointent.configs.HPOConfig(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for hyperparameter optimization using Optuna.
+
+   For more detailed information about the TPE sampler and its parameters,
+   refer to Optuna's documentation of `TPESampler
+   <https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html>`_,
+   `study.optimize
+   <https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize>`_,
+   `RandomSampler <https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html>`_.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: sampler
+      :type:  autointent.custom_types.SamplerType
+      :value: None
+
+
+
+   .. py:attribute:: n_trials
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: timeout
+      :type:  float | None
+      :value: None
+
+
+
+   .. py:attribute:: n_jobs
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: n_startup_trials
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: consider_prior
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: prior_weight
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: n_ei_candidates
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: constant_liar
+      :type:  bool
+      :value: None
+
+

@@ -1,11 +1,11 @@
 autointent.utils.load_search_space
 ==================================
 
-.. py:function:: autointent.utils.load_search_space(path)
+.. py:function:: autointent.utils.load_search_space(path_or_str)
 
    Load hyperparameters search space from file.
 
-   :param path: Path to the search space file.
+   :param path_or_str: Path to the search space file or string representation of the search space.
 
    :returns: List of dictionaries representing the search space.
 

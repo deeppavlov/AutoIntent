@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Learn AutoIntent &#8212; AutoIntent 0.1.0 documentation</title>
+    <title>Learn &#8212; AutoIntent 0.2.0 documentation</title>
   
   
   
@@ -40,28 +40,30 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'learn/index';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
     <link rel="icon" href="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-white.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Dialogue Systems" href="dialogue_systems.html" />
+    <link rel="next" title="AutoML and Hyperparameter Optimization" href="automl_theory.html" />
     <link rel="prev" title="Intent Description Generation" href="../augmentation_tutorials/intent_description.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.0" />
+  <meta name="docsearch:version" content="0.2.0" />
   </head>
   
   
@@ -188,7 +190,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -249,7 +251,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -318,7 +320,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -370,7 +372,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -385,8 +387,10 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="automl_theory.html">AutoML and Hyperparameter Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems Theory and Practice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_embeddings.html">Text Embeddings and Representation Learning</a></li>
 </ul>
 </div>
 </nav></div>
@@ -427,7 +431,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Learn AutoIntent</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Learn</span></li>
   </ul>
 </nav>
 </div>
@@ -444,13 +448,15 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="learn-autointent">
-<h1>Learn AutoIntent<a class="headerlink" href="#learn-autointent" title="Link to this heading">#</a></h1>
+  <section id="learn">
+<h1>Learn<a class="headerlink" href="#learn" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="automl_theory.html">AutoML and Hyperparameter Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems Theory and Practice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_embeddings.html">Text Embeddings and Representation Learning</a></li>
 </ul>
 </div>
 </section>
@@ -475,11 +481,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="dialogue_systems.html"
+       href="automl_theory.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Dialogue Systems</p>
+        <p class="prev-next-title">AutoML and Hyperparameter Optimization</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

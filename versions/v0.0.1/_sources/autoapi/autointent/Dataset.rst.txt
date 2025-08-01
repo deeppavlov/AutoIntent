@@ -74,13 +74,15 @@ autointent.Dataset
 
 
 
-   .. py:method:: from_hub(repo_name)
+   .. py:method:: from_hub(repo_name, data_split = 'default', intent_subset_name = Split.INTENTS)
       :classmethod:
 
 
       Loads a dataset from the Hugging Face Hub.
 
-      :param repo_name: The name of the Hugging Face repository, like `AutoIntent/clinc150`.
+      :param repo_name: The name of the Hugging Face repository, like `DeepPavlov/clinc150`.
+      :param data_split: The name of the dataset split to load, defaults to `default`.
+      :param intent_subset_name: The name of the intent subset to load, defaults to `intents`.
 
 
 

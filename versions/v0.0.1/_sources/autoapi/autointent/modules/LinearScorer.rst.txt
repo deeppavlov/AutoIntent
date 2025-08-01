@@ -1,0 +1,108 @@
+autointent.modules.LinearScorer
+===============================
+
+.. py:class:: autointent.modules.LinearScorer(embedder_config = None, cv = 3, seed = 0)
+
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
+
+
+   Scoring module for linear classification using logistic regression.
+
+   This module uses embeddings generated from a transformer model to train a
+   logistic regression classifier for intent classification.
+
+   :param embedder_config: Config of the embedder model
+   :param cv: Number of cross-validation folds, defaults to 3
+   :param seed: Random seed for reproducibility, defaults to 0
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules import LinearScorer
+       scorer = LinearScorer(
+           embedder_config="sergeyzh/rubert-tiny-turbo", cv=2
+       )
+       utterances = ["hello", "goodbye", "allo", "sayonara"]
+       labels = [0, 1, 0, 1]
+       scorer.fit(utterances, labels)
+       test_utterances = ["hi", "bye"]
+       probabilities = scorer.predict(test_utterances)
+       print(probabilities)
+
+   .. testoutput::
+
+       [[0.50000032 0.49999968]
+        [0.50000032 0.49999968]]
+
+
+
+   .. py:attribute:: name
+      :value: 'linear'
+
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+
+   .. py:attribute:: cv
+      :value: 3
+
+
+
+   .. py:attribute:: seed
+      :value: 0
+
+
+
+   .. py:attribute:: embedder_config
+
+
+   .. py:method:: from_context(context, cv = 3, embedder_config = None)
+      :classmethod:
+
+
+      Create a LinearScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param cv: Number of cross-validation folds, defaults to 3
+      :param embedder_config: Config of the embedder, or None to use the best embedder
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Train the logistic regression classifier.
+
+      :param utterances: List of training utterances
+      :param labels: List of labels corresponding to the utterances
+
+      :raises ValueError: If the vector index mismatches the provided utterances
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict probabilities for the given utterances.
+
+      :param utterances: List of query utterances
+
+      :returns: Array of predicted probabilities for each class
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the embedder.
+
+

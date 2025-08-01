@@ -1,7 +1,7 @@
 autointent.modules.scoring.MLKnnScorer
 ======================================
 
-.. py:class:: autointent.modules.scoring.MLKnnScorer(k, embedder_config = None, s = 1.0, ignore_first_neighbours = 0)
+.. py:class:: autointent.modules.scoring.MLKnnScorer(k = 5, embedder_config = None, s = 1.0, ignore_first_neighbours = 0)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -44,24 +44,20 @@ autointent.modules.scoring.MLKnnScorer
       :value: 'mlknn'
 
 
-      Name of the module.
-
 
    .. py:attribute:: supports_multiclass
       :value: False
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:attribute:: supports_multilabel
       :value: True
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: k
+      :value: 5
+
 
 
    .. py:attribute:: embedder_config
@@ -77,7 +73,7 @@ autointent.modules.scoring.MLKnnScorer
 
 
 
-   .. py:method:: from_context(context, k, s = 1.0, ignore_first_neighbours = 0, embedder_config = None)
+   .. py:method:: from_context(context, k = 5, s = 1.0, ignore_first_neighbours = 0, embedder_config = None)
       :classmethod:
 
 
@@ -93,12 +89,7 @@ autointent.modules.scoring.MLKnnScorer
 
 
 
-   .. py:method:: get_embedder_config()
-
-      Get the name of the embedder.
-
-      :returns: Embedder name
-
+   .. py:method:: get_implicit_initialization_params()
 
 
    .. py:method:: fit(utterances, labels)

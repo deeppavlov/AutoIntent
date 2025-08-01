@@ -1,7 +1,7 @@
 autointent.modules.scoring.DNNCScorer
 =====================================
 
-.. py:class:: autointent.modules.scoring.DNNCScorer(k, cross_encoder_config = None, embedder_config = None)
+.. py:class:: autointent.modules.scoring.DNNCScorer(k = 5, cross_encoder_config = None, embedder_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -24,7 +24,7 @@ autointent.modules.scoring.DNNCScorer
        utterances = ["what is your name?", "how are you?"]
        labels = [0, 1]
        scorer = DNNCScorer(
-           cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+           cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
            embedder_config="sergeyzh/rubert-tiny-turbo",
            k=5,
        )
@@ -44,7 +44,7 @@ autointent.modules.scoring.DNNCScorer
       :value: 'dnnc'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_multilabel
@@ -68,9 +68,11 @@ autointent.modules.scoring.DNNCScorer
 
 
    .. py:attribute:: k
+      :value: 5
 
 
-   .. py:method:: from_context(context, k, cross_encoder_config = None, embedder_config = None)
+
+   .. py:method:: from_context(context, k = 5, cross_encoder_config = None, embedder_config = None)
       :classmethod:
 
 
@@ -80,6 +82,17 @@ autointent.modules.scoring.DNNCScorer
       :param cross_encoder_config: Config of the cross-encoder model
       :param k: Number of nearest neighbors to retrieve
       :param embedder_config: Config of the embedder model, or None to use the best embedder
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+      Return default params used in ``__init__`` method.
+
+      Some parameters of the module may be inferred using context rather from ``__init__`` method.
+      But they need to be logged for reproducibility during loading from disk.
+
+      :returns: Dictionary of default params
 
 
 

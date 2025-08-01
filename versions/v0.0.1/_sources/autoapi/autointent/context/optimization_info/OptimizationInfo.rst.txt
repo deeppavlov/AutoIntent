@@ -39,7 +39,7 @@ autointent.context.optimization_info.OptimizationInfo
       :type:  dict[str, float]
 
 
-   .. py:method:: log_module_optimization(node_type, module_name, module_params, metric_value, metric_name, metrics, artifact, module_dump_dir, module = None)
+   .. py:method:: log_module_optimization(node_type, module_name, module_params, metric_value, metric_name, metrics, artifact, module_dump_dir, module)
 
       Log optimization results for a module.
 
@@ -100,6 +100,18 @@ autointent.context.optimization_info.OptimizationInfo
       Dump evaluation results for all nodes.
 
       :returns: Dictionary containing metrics and configurations for all nodes.
+
+
+
+   .. py:method:: dump(path)
+
+      Dump the optimization information to a file.
+
+
+
+   .. py:method:: load(path)
+
+      Load the optimization information from a file.
 
 
 

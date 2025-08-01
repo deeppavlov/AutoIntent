@@ -26,18 +26,17 @@ autointent.nodes.NodeOptimizer
    .. py:attribute:: modules_search_spaces
 
 
-   .. py:method:: fit(context, sampler = 'brute')
+   .. py:method:: fit(context)
 
       Performs the optimization process for the node.
 
       :param context: The optimization context containing relevant data.
-      :param sampler: The sampling strategy used for optimization.
 
       :raises AssertionError: If an invalid sampler type is provided.
 
 
 
-   .. py:method:: objective(trial, module_name, search_space, context)
+   .. py:method:: objective(trial, search_space, context)
 
       Defines the objective function for optimization.
 
@@ -50,24 +49,11 @@ autointent.nodes.NodeOptimizer
 
 
 
-   .. py:method:: suggest(trial, search_space)
-
-      Suggests parameter values based on the search space.
-
-      :param trial: The Optuna trial instance.
-      :param search_space: A dictionary defining the parameter search space.
-
-      :returns: A dictionary containing the suggested parameter values.
-
-      :raises TypeError: If an unsupported parameter search space type is encountered.
-
-
-
-   .. py:method:: get_module_dump_dir(dump_dir, module_name, j_combination)
+   .. py:method:: get_module_dump_dir(context, module_name, j_combination)
 
       Creates and returns the path to the module dump directory.
 
-      :param dump_dir: The base directory for storing module dumps.
+      :param context: The context object.
       :param module_name: The name of the module being optimized.
       :param j_combination: The combination index for the parameters.
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>AutoML &#8212; AutoIntent 0.1.0 documentation</title>
+    <title>AutoML Pipeline Configuration &#8212; AutoIntent 0.2.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Modules" href="user_guides.basic_usage.02_modules.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.0" />
+  <meta name="docsearch:version" content="0.2.0" />
   </head>
   
   
@@ -191,7 +191,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -252,7 +252,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -325,7 +325,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -377,7 +377,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -392,17 +392,18 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index_basic_usage.html">Basic Usage</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.01_data.html">Working with data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.01_data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.02_modules.html">Modules</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">AutoML</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">AutoML Pipeline Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.04_inference.html">Inference Pipeline</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="index_advanced_usage.html">Advanced Usage</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.01_data.html">Working with data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_automl.html">AutoML Customization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_reporting.html">Run reporting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_logging.html">Logging to stdout and file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.01_data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_embedder_configuration.html">Embedder Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_automl.html">AutoML Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_reporting.html">Run reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.05_logging.html">Logging to stdout and file</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../augmentation_tutorials/index.html">Data augmentation tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -457,7 +458,7 @@
     
     <li class="breadcrumb-item"><a href="index_basic_usage.html" class="nav-link">Basic Usage</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">AutoML</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">AutoML Pipeline Configuration</span></li>
   </ul>
 </nav>
 </div>
@@ -474,8 +475,9 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="AutoML">
-<h1>AutoML<a class="headerlink" href="#AutoML" title="Link to this heading">#</a></h1>
+  <section id="AutoML-Pipeline-Configuration">
+<h1>AutoML Pipeline Configuration<a class="headerlink" href="#AutoML-Pipeline-Configuration" title="Link to this heading">#</a></h1>
+<p>AutoML (Automated Machine Learning) in AutoIntent allows you to automatically find the best configuration for your intent classification pipeline. Instead of manually tuning hyperparameters and selecting components, AutoML explores different combinations to find the optimal setup for your specific dataset.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -489,22 +491,39 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/.cache/pypoetry/virtualenvs/autointent-FDypUDHQ-py3.10/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div></div>
 </div>
-<p>In this tutorial we will walk through pipeline auto configuration process.</p>
-<p>Let us use small subset of popular <code class="docutils literal notranslate"><span class="pre">clinc150</span></code> dataset for the demonstation.</p>
+<p>In this tutorial, we’ll walk through the pipeline auto-configuration process step by step. We’ll learn how to:</p>
+<ul class="simple">
+<li><p>Use predefined search spaces and presets</p></li>
+<li><p>Customize search configurations</p></li>
+<li><p>Set up logging and validation strategies</p></li>
+<li><p>Run the optimization process</p></li>
+<li><p>Save and load optimized pipelines</p></li>
+</ul>
+<p>Let’s start by loading a small subset of the popular <code class="docutils literal notranslate"><span class="pre">clinc150</span></code> dataset for demonstration.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="c1"># Load the dataset from Hugging Face hub</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits&quot;</span><span class="p">)</span>
 <span class="n">dataset</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Dataset contains 5 splits
+</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -534,13 +553,26 @@
  })}
 </pre></div></div>
 </div>
+<p>Let’s examine the structure of our dataset by looking at a sample utterance:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample utterance: &#39;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;utterance&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intent label: &#39;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="n">sample</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Sample utterance: &#39;do they take reservations at mcdonalds&#39;
+Intent label: &#39;0&#39;
+</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -558,11 +590,11 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;light_extra&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>One can explore its contents:</p>
+<p>You can inspect the structure and default values of any preset:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -571,7 +603,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_preset</span>
 
-<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;light_extra&quot;</span><span class="p">)</span>
+<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -581,81 +613,108 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;sampler&#39;: &#39;random&#39;,
+{&#39;embedder_config&#39;: {&#39;model_name&#39;: &#39;intfloat/multilingual-e5-large-instruct&#39;},
+ &#39;hpo_config&#39;: {&#39;n_startup_trials&#39;: 10, &#39;n_trials&#39;: 20, &#39;sampler&#39;: &#39;tpe&#39;},
  &#39;search_space&#39;: [{&#39;node_type&#39;: &#39;scoring&#39;,
                    &#39;search_space&#39;: [{&#39;k&#39;: {&#39;high&#39;: 20, &#39;low&#39;: 1},
                                      &#39;module_name&#39;: &#39;knn&#39;,
-                                     &#39;n_trials&#39;: 10,
                                      &#39;weights&#39;: [&#39;uniform&#39;,
                                                  &#39;distance&#39;,
                                                  &#39;closest&#39;]},
                                     {&#39;module_name&#39;: &#39;linear&#39;},
                                     {&#39;k&#39;: {&#39;high&#39;: 20, &#39;low&#39;: 1},
-                                     &#39;module_name&#39;: &#39;mlknn&#39;,
-                                     &#39;n_trials&#39;: 10}],
-                   &#39;target_metric&#39;: &#39;scoring_roc_auc&#39;},
+                                     &#39;module_name&#39;: &#39;mlknn&#39;}],
+                   &#39;target_metric&#39;: &#39;scoring_f1&#39;},
                   {&#39;node_type&#39;: &#39;decision&#39;,
                    &#39;search_space&#39;: [{&#39;module_name&#39;: &#39;threshold&#39;,
-                                     &#39;n_trials&#39;: 10,
                                      &#39;thresh&#39;: {&#39;high&#39;: 0.9, &#39;low&#39;: 0.1}},
-                                    {&#39;module_name&#39;: &#39;argmax&#39;}],
+                                    {&#39;module_name&#39;: &#39;argmax&#39;},
+                                    {&#39;module_name&#39;: &#39;jinoos&#39;},
+                                    {&#39;module_name&#39;: &#39;tunable&#39;},
+                                    {&#39;module_name&#39;: &#39;adaptive&#39;}],
                    &#39;target_metric&#39;: &#39;decision_accuracy&#39;}]}
 </pre></div></div>
 </div>
-<p>Search space is allowed to customize:</p>
+<section id="Customizing-Search-Spaces">
+<h3>Customizing Search Spaces<a class="headerlink" href="#Customizing-Search-Spaces" title="Link to this heading">#</a></h3>
+<p>The search space can be customized to fit your specific needs. For example, you can modify hyperparameter ranges:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preset</span><span class="p">[</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: modify the maximum k value for KNN-based components</span>
+<span class="n">preset</span><span class="p">[</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;k&quot;</span><span class="p">][</span><span class="s2">&quot;high&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">custom_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_optimization_config</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>See tutorial <a class="reference external" href="../user_guides/user_guides.advanced.02_search_space_configuration.py">02_search_space_configuration</a> on how the search space is structured.</p>
+<p>See tutorial <a class="reference external" href="../user_guides/user_guides.advanced.03_search_space_configuration.py">03_search_space_configuration</a> on how the search space is structured.</p>
 </section>
-<section id="Logging-Settings">
-<h2>Logging Settings<a class="headerlink" href="#Logging-Settings" title="Link to this heading">#</a></h2>
-<p>The important thing is what assets you want to save during the pipeline auto-configuration process. You can control it with <a class="reference external" href="../autoapi/autointent/configs/LoggingConfig.html#autointent.configs.LoggingConfig">LoggingConfig</a>:</p>
+</section>
+<section id="Logging-and-Storage-Configuration">
+<h2>Logging and Storage Configuration<a class="headerlink" href="#Logging-and-Storage-Configuration" title="Link to this heading">#</a></h2>
+<p>During the AutoML process, you’ll want to control what artifacts are saved and where they’re stored. The <a class="reference external" href="../autoapi/autointent/configs/LoggingConfig.html#autointent.configs.LoggingConfig">LoggingConfig</a> allows you to specify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">project_dir</span></code>: Directory where results will be saved</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dump_modules</span></code>: Whether to save trained model files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">clear_ram</span></code>: Whether to clear models from memory after training to save RAM</p></li>
+</ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingConfig</span>
 
-<span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">(</span><span class="n">project_dir</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;runs&quot;</span><span class="p">,</span> <span class="n">dump_modules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">clear_ram</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">(</span>
+    <span class="n">project_dir</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;runs&quot;</span><span class="p">,</span>  <span class="c1"># Save results to &#39;runs&#39; directory</span>
+    <span class="n">dump_modules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Don&#39;t save large model files</span>
+    <span class="n">clear_ram</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Keep models in memory for inference</span>
+<span class="p">)</span>
 <span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </section>
-<section id="Default-Transformers">
-<h2>Default Transformers<a class="headerlink" href="#Default-Transformers" title="Link to this heading">#</a></h2>
-<p>One can specify what embedding model and cross-encoder model want to use along with default settings:</p>
+<section id="Model-Configuration">
+<h2>Model Configuration<a class="headerlink" href="#Model-Configuration" title="Link to this heading">#</a></h2>
+<p>You can specify which transformer models to use for text embeddings and cross-encoding. This is useful when you want to:</p>
+<ul class="simple">
+<li><p>Use smaller/faster models for experimentation</p></li>
+<li><p>Apply domain-specific pre-trained models</p></li>
+<li><p>Control model parameters like tokenizer settings</p></li>
+</ul>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbedderConfig</span><span class="p">,</span> <span class="n">CrossEncoderConfig</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrossEncoderConfig</span><span class="p">,</span> <span class="n">EmbedderConfig</span><span class="p">,</span> <span class="n">TokenizerConfig</span>
 
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">EmbedderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;prajjwal1/bert-tiny&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">))</span>
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">CrossEncoderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;cross-encoder/ms-marco-MiniLM-L2-v2&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+<span class="c1"># Configure embedding model (used for vector representations)</span>
+<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">EmbedderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;prajjwal1/bert-tiny&quot;</span><span class="p">))</span>
+
+<span class="c1"># Configure cross-encoder model (used for scoring text pairs)</span>
+<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span>
+    <span class="n">CrossEncoderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;cross-encoder/ms-marco-MiniLM-L2-v2&quot;</span><span class="p">,</span> <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<p>See the docs for <a class="reference external" href="../autoapi/autointent/configs/EmbedderConfig.html#autointent.configs.EmbedderConfig">EmbedderConfig</a> and <a class="reference external" href="../autoapi/autointent/configs/CrossEncoderConfig.html#autointent.configs.CrossEncoderConfig">CrossEncoderConfig</a> for options available to customize.</p>
+<p>See the documentation for <a class="reference external" href="../autoapi/autointent/configs/EmbedderConfig.html#autointent.configs.EmbedderConfig">EmbedderConfig</a> and <a class="reference external" href="../autoapi/autointent/configs/CrossEncoderConfig.html#autointent.configs.CrossEncoderConfig">CrossEncoderConfig</a> for all available customization options.</p>
 </section>
-<section id="Cross-Validation-vs-Hold-Out-Validation">
-<h2>Cross-Validation vs Hold-Out Validation<a class="headerlink" href="#Cross-Validation-vs-Hold-Out-Validation" title="Link to this heading">#</a></h2>
-<p>If you have lots of training and evaluation data, you can use default hold-out validation strategy. If not, you can choose cross-validation and spend a little more time but utilize the full amount of available data for better hyperparameter tuning.</p>
-<p>This behavior is controlled with <a class="reference external" href="../autoapi/autointent/configs/DataConfig.html#autointent.configs.DataConfig">DataConfig</a>:</p>
+<section id="Validation-Strategy">
+<h2>Validation Strategy<a class="headerlink" href="#Validation-Strategy" title="Link to this heading">#</a></h2>
+<p>Choose between two validation approaches based on your dataset size:</p>
+<p><strong>Hold-out validation</strong> (default): Uses separate train/validation splits. Best when you have plenty of data.</p>
+<p><strong>Cross-validation</strong>: Splits data into k folds for more robust evaluation. Better for smaller datasets as it uses all data for both training and validation.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
 
+<span class="c1"># Use 3-fold cross-validation for better performance on small datasets</span>
 <span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">DataConfig</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span> <span class="n">n_folds</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -664,6 +723,7 @@
 </section>
 <section id="Complete-Example">
 <h2>Complete Example<a class="headerlink" href="#Complete-Example" title="Link to this heading">#</a></h2>
+<p>Let’s put everything together in a comprehensive example that demonstrates the full AutoML workflow:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -672,55 +732,64 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_preset</span>
 
-<span class="c1"># load data</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="c1"># Step 1: Load your dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded dataset with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits&quot;</span><span class="p">)</span>
 
-<span class="c1"># customize search space</span>
-<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;light_extra&quot;</span><span class="p">)</span>
+<span class="c1"># Step 2: Load and customize a preset configuration</span>
+<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="c1"># You can modify the preset here if needed</span>
+<span class="c1"># preset[&quot;search_space&quot;][0][&quot;search_space&quot;][0][&quot;k&quot;][&quot;high&quot;] = 5</span>
 
-<span class="c1"># make pipeline</span>
-<span class="n">custom_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_optimization_config</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
+<span class="c1"># Step 3: Create pipeline from the configuration</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_optimization_config</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
 
-<span class="c1"># custom settings</span>
-<span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">()</span>
+<span class="c1"># Step 4: Configure logging and storage</span>
+<span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">(</span>
+    <span class="n">dump_modules</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Save trained models for later use</span>
+    <span class="n">clear_ram</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Keep models in memory for immediate inference</span>
+<span class="p">)</span>
+<span class="n">pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
 
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
+<span class="c1"># Step 5: Run AutoML optimization</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting AutoML optimization...&quot;</span><span class="p">)</span>
+<span class="n">context</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ AutoML optimization completed!&quot;</span><span class="p">)</span>
 
-<span class="c1"># start auto-configuration</span>
-<span class="n">context</span> <span class="o">=</span> <span class="n">custom_pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-
-<span class="c1"># inference on-the-fly</span>
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;hello world!&quot;</span><span class="p">])</span>
+<span class="c1"># Step 6: Test the optimized pipeline</span>
+<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hello world!&quot;</span><span class="p">,</span> <span class="s2">&quot;I want to transfer money&quot;</span><span class="p">,</span> <span class="s2">&quot;book a flight&quot;</span><span class="p">]</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predictions: </span><span class="si">{</span><span class="n">predictions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Loaded dataset with 5 splits
+Starting AutoML optimization...
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-[I 2025-03-08 22:27:31,124] A new study created in memory with name: no-name-c9c772b6-dee6-46e1-a6fd-20719feaaaa6
+[I 2025-08-01 04:36:23,850] A new study created in RDB with name: scoring
 &#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-&#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-/home/runner/.cache/pypoetry/virtualenvs/autointent-FDypUDHQ-py3.10/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, len(result))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/autointent/modules/decision/_jinoos.py:150: RuntimeWarning: invalid value encountered in scalar divide
+  accuracy_oos = correct_oos / total_oos
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[None]
+✅ AutoML optimization completed!
+Predictions: [2, 1, None]
 </pre></div></div>
 </div>
 </section>
@@ -736,22 +805,13 @@
 </div>
 </div>
 <p>Or one can dump only the configured pipeline to any desired location (by default <code class="docutils literal notranslate"><span class="pre">LoggingConfig.dirpath</span></code>):</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">custom_pipeline</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info._data_models.ScorerArtifact&#39;&gt; cannot be dumped to file system.
-Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info._data_models.DecisionArtifact&#39;&gt; cannot be dumped to file system.
-</pre></div></div>
 </div>
 </section>
 <section id="Load-Pipeline-for-Inference">
@@ -825,10 +885,13 @@ Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info.
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-Space">Search Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Logging-Settings">Logging Settings</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Default-Transformers">Default Transformers</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Cross-Validation-vs-Hold-Out-Validation">Cross-Validation vs Hold-Out Validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Search-Space">Search Space</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Customizing-Search-Spaces">Customizing Search Spaces</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Logging-and-Storage-Configuration">Logging and Storage Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Model-Configuration">Model Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Validation-Strategy">Validation Strategy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Complete-Example">Complete Example</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Dump-Results">Dump Results</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Load-Pipeline-for-Inference">Load Pipeline for Inference</a></li>

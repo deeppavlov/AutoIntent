@@ -1,0 +1,122 @@
+autointent.modules.KNNScorer
+============================
+
+.. py:class:: autointent.modules.KNNScorer(k = 5, embedder_config = None, weights = 'distance')
+
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
+
+
+   K-nearest neighbors (KNN) scorer for intent classification.
+
+   This module uses a vector index to retrieve nearest neighbors for query utterances
+   and applies a weighting strategy to compute class probabilities.
+
+   :param embedder_config: Config of the embedder used for vectorization
+   :param k: Number of closest neighbors to consider during inference
+   :param weights: Weighting strategy:
+
+                   - "uniform": Equal weight for all neighbors
+                   - "distance": Weight inversely proportional to distance
+                   - "closest": Only the closest neighbor of each class is weighted
+
+   Examples:
+   --------
+
+   .. testcode::
+
+       from autointent.modules.scoring import KNNScorer
+       utterances = ["hello", "how are you?"]
+       labels = [0, 1]
+       scorer = KNNScorer(
+           embedder_config="sergeyzh/rubert-tiny-turbo",
+           k=5,
+       )
+       scorer.fit(utterances, labels)
+       test_utterances = ["hi", "what's up?"]
+       probabilities = scorer.predict(test_utterances)
+
+
+
+   .. py:attribute:: name
+      :value: 'knn'
+
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+
+   .. py:attribute:: embedder_config
+
+
+   .. py:attribute:: k
+      :value: 5
+
+
+
+   .. py:attribute:: weights
+      :value: 'distance'
+
+
+
+   .. py:method:: from_context(context, k = 5, weights = 'distance', embedder_config = None)
+      :classmethod:
+
+
+      Create a KNNScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param k: Number of closest neighbors to consider during inference
+      :param weights: Weighting strategy for scoring
+      :param embedder_config: Config of the embedder, or None to use the best embedder
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Fit the scorer by training or loading the vector index.
+
+      :param utterances: List of training utterances
+      :param labels: List of labels corresponding to the utterances
+      :param clear_cache: Whether to clear the vector index cache before fitting
+
+      :raises ValueError: If the vector index mismatches the provided utterances
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict class probabilities for the given utterances.
+
+      :param utterances: List of query utterances
+
+      :returns: Array of predicted probabilities for each class
+
+
+
+   .. py:method:: predict_with_metadata(utterances)
+
+      Predict class probabilities along with metadata for the given utterances.
+
+      :param utterances: List of query utterances
+
+      :returns:     - Array of predicted probabilities
+                    - List of metadata with neighbor information
+      :rtype: Tuple containing
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the vector index.
+
+

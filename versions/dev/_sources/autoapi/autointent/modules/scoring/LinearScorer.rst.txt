@@ -13,7 +13,6 @@ autointent.modules.scoring.LinearScorer
 
    :param embedder_config: Config of the embedder model
    :param cv: Number of cross-validation folds, defaults to 3
-   :param n_jobs: Number of parallel jobs for cross-validation, defaults to None
    :param seed: Random seed for reproducibility, defaults to 0
 
    Example:
@@ -42,7 +41,7 @@ autointent.modules.scoring.LinearScorer
       :value: 'linear'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_multiclass
@@ -72,22 +71,26 @@ autointent.modules.scoring.LinearScorer
    .. py:attribute:: embedder_config
 
 
-   .. py:method:: from_context(context, embedder_config = None)
+   .. py:method:: from_context(context, cv = 3, embedder_config = None)
       :classmethod:
 
 
       Create a LinearScorer instance using a Context object.
 
       :param context: Context containing configurations and utilities
+      :param cv: Number of cross-validation folds, defaults to 3
       :param embedder_config: Config of the embedder, or None to use the best embedder
 
 
 
-   .. py:method:: get_embedder_config()
+   .. py:method:: get_implicit_initialization_params()
 
-      Get the name of the embedder.
+      Return default params used in ``__init__`` method.
 
-      :returns: Embedder name
+      Some parameters of the module may be inferred using context rather from ``__init__`` method.
+      But they need to be logged for reproducibility during loading from disk.
+
+      :returns: Dictionary of default params
 
 
 

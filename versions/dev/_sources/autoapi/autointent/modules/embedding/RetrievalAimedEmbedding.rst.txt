@@ -1,7 +1,7 @@
 autointent.modules.embedding.RetrievalAimedEmbedding
 ====================================================
 
-.. py:class:: autointent.modules.embedding.RetrievalAimedEmbedding(embedder_config, k = 10)
+.. py:class:: autointent.modules.embedding.RetrievalAimedEmbedding(embedder_config = None, k = 10)
 
    Bases: :py:obj:`autointent.modules.base.BaseEmbedding`
 
@@ -34,7 +34,7 @@ autointent.modules.embedding.RetrievalAimedEmbedding
       :value: 'retrieval'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_multiclass
@@ -66,7 +66,7 @@ autointent.modules.embedding.RetrievalAimedEmbedding
    .. py:attribute:: embedder_config
 
 
-   .. py:method:: from_context(context, embedder_config, k = 10)
+   .. py:method:: from_context(context, embedder_config = None, k = 10)
       :classmethod:
 
 

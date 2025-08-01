@@ -16,7 +16,7 @@ autointent.modules.regex.SimpleRegex
       :value: 'simple'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_multiclass
@@ -139,6 +139,8 @@ autointent.modules.regex.SimpleRegex
 
 
    .. py:method:: load(path, embedder_config = None, cross_encoder_config = None)
+      :classmethod:
+
 
       Load data from file system.
 

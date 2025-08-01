@@ -3,10 +3,11 @@ autointent.configs.EmbedderConfig
 
 .. py:class:: autointent.configs.EmbedderConfig(/, **data)
 
-   Bases: :py:obj:`STModelConfig`
+   Bases: :py:obj:`HFModelConfig`
 
 
-   Usage docs: https://docs.pydantic.dev/2.10/concepts/models/
+   !!! abstract "Usage Documentation"
+       [Models](../concepts/models.md)
 
    A base class for creating Pydantic models.
 
@@ -98,7 +99,7 @@ autointent.configs.EmbedderConfig
 
 
 
-   .. py:attribute:: classifier_prompt
+   .. py:attribute:: classification_prompt
       :type:  str | None
       :value: None
 
@@ -128,6 +129,24 @@ autointent.configs.EmbedderConfig
 
 
 
+   .. py:attribute:: similarity_fn_name
+      :type:  Literal['cosine', 'dot', 'euclidean', 'manhattan']
+      :value: None
+
+
+
+   .. py:attribute:: use_cache
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: freeze
+      :type:  bool
+      :value: None
+
+
+
    .. py:method:: get_prompt_config()
 
       Get the prompt config for the given prompt type.
@@ -136,18 +155,12 @@ autointent.configs.EmbedderConfig
 
 
 
-   .. py:method:: get_prompt_type(prompt_type)
+   .. py:method:: get_prompt(prompt_type)
 
       Get the prompt type for the given task type.
 
       :param prompt_type: Task type for which to get the prompt.
 
       :returns: The prompt for the given task type.
-
-
-
-   .. py:attribute:: use_cache
-      :type:  bool
-      :value: None
 
 

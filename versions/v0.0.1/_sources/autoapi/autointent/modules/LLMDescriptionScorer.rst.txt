@@ -1,0 +1,102 @@
+autointent.modules.LLMDescriptionScorer
+=======================================
+
+.. py:class:: autointent.modules.LLMDescriptionScorer(generator_config = None, temperature = 1.0, max_concurrent = 15, max_per_second = 10, max_retries = 3, multilabel = False)
+
+   Bases: :py:obj:`autointent.modules.scoring._description.base.BaseDescriptionScorer`
+
+
+   LLM-based description scorer for zero-shot intent classification using structured output.
+
+   This scorer uses a Large Language Model (LLM) with structured output to perform
+   zero-shot intent classification. The LLM is prompted to categorize intent descriptions
+   into three probability levels for each utterance:
+   - Most probable (probability 1.0): Intents that are most likely to match the utterance
+   - Promising (probability 0.5): Intents that are plausible but less confident
+   - Unlikely (probability 0.0): All other intents (implicit)
+
+   This approach leverages the reasoning capabilities of LLMs to understand complex
+   relationships between utterances and intent descriptions, potentially achieving
+   high accuracy for nuanced classification tasks. However, it requires API access
+   to LLM services and can be slower and more expensive than encoder-based methods.
+
+   :param generator_config: Configuration for the Generator instance (LLM model settings)
+   :param temperature: Temperature parameter for scaling classifier logits (default: 1.0)
+   :param max_concurrent: Maximum number of concurrent async calls to LLM (default: 15)
+   :param max_per_second: Maximum number of API calls per second for rate limiting (default: 10)
+   :param max_retries: Maximum number of retry attempts for failed API calls (default: 3)
+   :param multilabel: Flag indicating classification task type
+
+   Example:
+   --------
+   .. code-block::
+
+       from autointent.modules.scoring import LLMDescriptionScorer
+
+       # Initialize LLM scorer with OpenAI GPT
+       scorer = LLMDescriptionScorer(
+           temperature=1.0,
+           max_concurrent=10,
+           max_per_second=5,
+           max_retries=2
+       )
+
+       # Zero-shot classification with intent descriptions
+       descriptions = [
+           "User wants to book or reserve transportation like flights, trains, or hotels",
+           "User wants to cancel an existing booking or reservation",
+           "User asks about weather conditions or forecasts"
+       ]
+
+       # Fit using descriptions only (zero-shot approach)
+       scorer.fit([], [], descriptions)
+
+       # Make predictions on new utterances
+       test_utterances = ["Reserve a hotel room", "Delete my booking"]
+       probabilities = scorer.predict(test_utterances)
+
+
+   .. py:attribute:: name
+      :value: 'description_llm'
+
+
+
+   .. py:attribute:: generator_config
+
+
+   .. py:attribute:: max_concurrent
+      :value: 15
+
+
+
+   .. py:attribute:: max_per_second
+      :value: 10
+
+
+
+   .. py:attribute:: max_retries
+      :value: 3
+
+
+
+   .. py:method:: from_context(context, temperature = 1.0, generator_config = None, max_concurrent = 15, max_per_second = 10, max_retries = 3)
+      :classmethod:
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the generator.
+
+
+
+   .. py:method:: dump(path)
+
+
+   .. py:method:: load(path, embedder_config = None, cross_encoder_config = None)
+      :classmethod:
+
+

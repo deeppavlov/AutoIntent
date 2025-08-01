@@ -36,12 +36,12 @@ autointent.OptimizationConfig
       :type:  autointent.configs.CrossEncoderConfig
 
 
-   .. py:attribute:: sampler
-      :type:  autointent.custom_types.SamplerType
-      :value: 'brute'
+   .. py:attribute:: transformer_config
+      :type:  autointent.configs.HFModelConfig
 
 
-      See tutorial on optuna and presets.
+   .. py:attribute:: hpo_config
+      :type:  autointent.configs.HPOConfig
 
 
    .. py:attribute:: seed

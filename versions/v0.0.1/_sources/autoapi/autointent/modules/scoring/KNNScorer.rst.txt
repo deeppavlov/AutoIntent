@@ -1,7 +1,7 @@
 autointent.modules.scoring.KNNScorer
 ====================================
 
-.. py:class:: autointent.modules.scoring.KNNScorer(k, embedder_config = None, weights = 'distance')
+.. py:class:: autointent.modules.scoring.KNNScorer(k = 5, embedder_config = None, weights = 'distance')
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -41,27 +41,23 @@ autointent.modules.scoring.KNNScorer
       :value: 'knn'
 
 
-      Name of the module.
-
 
    .. py:attribute:: supports_multilabel
       :value: True
 
-
-      Whether the module supports multilabel classification
 
 
    .. py:attribute:: supports_multiclass
       :value: True
 
 
-      Whether the module supports multiclass classification
-
 
    .. py:attribute:: embedder_config
 
 
    .. py:attribute:: k
+      :value: 5
+
 
 
    .. py:attribute:: weights
@@ -69,7 +65,7 @@ autointent.modules.scoring.KNNScorer
 
 
 
-   .. py:method:: from_context(context, k, weights = 'distance', embedder_config = None)
+   .. py:method:: from_context(context, k = 5, weights = 'distance', embedder_config = None)
       :classmethod:
 
 
@@ -82,15 +78,10 @@ autointent.modules.scoring.KNNScorer
 
 
 
-   .. py:method:: get_embedder_config()
-
-      Get the name of the embedder.
-
-      :returns: Embedder name
+   .. py:method:: get_implicit_initialization_params()
 
 
-
-   .. py:method:: fit(utterances, labels, clear_cache = False)
+   .. py:method:: fit(utterances, labels)
 
       Fit the scorer by training or loading the vector index.
 

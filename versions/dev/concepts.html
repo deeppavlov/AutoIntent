@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Key Concepts &#8212; AutoIntent 0.1.0 documentation</title>
+    <title>Key Concepts &#8212; AutoIntent 0.2.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/documentation_options.js?v=938c9ccc"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="Quickstart" href="quickstart.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.0" />
+  <meta name="docsearch:version" content="0.2.0" />
   </head>
   
   
@@ -188,7 +188,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -249,7 +249,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -322,7 +322,7 @@
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="learn/index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -374,7 +374,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -445,21 +445,95 @@
                   
   <section id="key-concepts">
 <h1>Key Concepts<a class="headerlink" href="#key-concepts" title="Link to this heading">#</a></h1>
-<section id="optimization-search-space">
-<span id="key-search-space"></span><h2>Optimization Search Space<a class="headerlink" href="#optimization-search-space" title="Link to this heading">#</a></h2>
-<p>The automatic selection of a classifier occurs through the iteration of hyperparameters within a certain <em>search space</em>. Conceptually, this search space is a dictionary where the keys are the names of the hyperparameters, and the values are lists. The hyperparameters act as the coordinate “axes” of the search space, and the values in the lists act as points on this axis.</p>
+<p>This page introduces the fundamental concepts that underpin AutoIntent’s design and functionality. Understanding these concepts will help you effectively use the framework and make informed decisions about your text classification projects.</p>
+<section id="three-stage-pipeline-architecture">
+<span id="concepts-pipeline"></span><h2>Three-Stage Pipeline Architecture<a class="headerlink" href="#three-stage-pipeline-architecture" title="Link to this heading">#</a></h2>
+<p>AutoIntent organizes text classification into a modular three-stage pipeline, providing clear separation of concerns and flexibility in optimization:</p>
+<dl class="simple">
+<dt><strong>🔤 Embedding Stage</strong></dt><dd><p>Transforms raw text into dense vector representations using pre-trained transformer models. This stage handles the computationally intensive text encoding and can be optimized independently from downstream classification tasks.</p>
+</dd>
+<dt><strong>📊 Scoring Stage</strong></dt><dd><p>Processes embeddings to predict class probabilities. This stage supports diverse approaches from classical machine learning (KNN, logistic regression) to deep learning models (BERT fine-tuning, CNNs). All models operate on pre-computed embeddings for efficiency.</p>
+</dd>
+<dt><strong>⚖️ Decision Stage</strong></dt><dd><p>Converts predicted probabilities into final classifications by applying thresholds and decision rules. This stage is crucial for multi-label classification and out-of-scope detection scenarios.</p>
+</dd>
+</dl>
+<p>This modular design enables efficient experimentation, allows reusing expensive embedding computations across different models, and supports deployment on CPU-only systems.</p>
 </section>
-<section id="classification-stages">
-<span id="key-stages"></span><h2>Classification Stages<a class="headerlink" href="#classification-stages" title="Link to this heading">#</a></h2>
-<p>Intent classification can be divided into two stages: scoring and decision. Scoring involves predicting the probabilities of the presence of each intent in a given utterance. Prediction involves forming the final decision based on the provided probabilities.</p>
+<section id="automl-optimization-strategy">
+<span id="concepts-automl"></span><h2>AutoML Optimization Strategy<a class="headerlink" href="#automl-optimization-strategy" title="Link to this heading">#</a></h2>
+<p>AutoIntent employs a hierarchical optimization approach that balances exploration with computational efficiency:</p>
+<dl class="simple">
+<dt><strong>🔧 Module-Level Optimization</strong></dt><dd><p>Components are optimized sequentially: embedding → scoring → decision. Each stage builds upon the best model from the previous stage, creating a cohesive pipeline while preventing combinatorial explosion.</p>
+</dd>
+<dt><strong>🤖 Model-Level Optimization</strong></dt><dd><p>Within each module, both model architectures and hyperparameters are jointly optimized using Optuna’s Tree-structured Parzen Estimators and random sampling.</p>
+</dd>
+<dt><strong>🗺️ Search Space Configuration</strong></dt><dd><p>Optimization behavior is controlled through dictionary-like search spaces that define:</p>
+<ul class="simple">
+<li><p>Available model types and their hyperparameter ranges</p></li>
+<li><p>Optimization budget and resource constraints</p></li>
+<li><p>Cross-validation and evaluation strategies</p></li>
+</ul>
+</dd>
+</dl>
 </section>
-<section id="out-of-domain-utterances">
-<span id="key-oos"></span><h2>Out-of-domain utterances<a class="headerlink" href="#out-of-domain-utterances" title="Link to this heading">#</a></h2>
-<p>If we want to detect out-of-domain examples, it is necessary to set a probability threshold during the decision stage, at which the presence of some known intent can be asserted.</p>
+<section id="embedding-centric-design">
+<span id="concepts-embedding-centric"></span><h2>Embedding-Centric Design<a class="headerlink" href="#embedding-centric-design" title="Link to this heading">#</a></h2>
+<p>AutoIntent’s architecture centers around transformer-based text embeddings, providing several key advantages:</p>
+<dl class="simple">
+<dt><strong>⚡ Pre-computed Embeddings</strong></dt><dd><p>Text is encoded once and reused across all scoring models, dramatically reducing computational overhead during hyperparameter optimization and enabling efficient experimentation.</p>
+</dd>
+<dt><strong>🤗 Model Repository Integration</strong></dt><dd><p>Seamless access to thousands of pre-trained models from Hugging Face Hub, with intelligent selection strategies based on retrieval metrics or downstream task performance.</p>
+</dd>
+<dt><strong>🚀 Deployment Flexibility</strong></dt><dd><p>Separation of embedding generation from classification enables deploying lightweight classifiers on resource-constrained systems while leveraging powerful transformer representations.</p>
+</dd>
+</dl>
 </section>
-<section id="nodes-and-modules">
-<span id="key-nodes-modules"></span><h2>Nodes and Modules<a class="headerlink" href="#nodes-and-modules" title="Link to this heading">#</a></h2>
-<p>The scoring or decision model, along with its hyperparameters that need to be iterated, is called an <em>optimization module</em>. A set of modules related to one optimization stage (scoring or decision) is called an <em>optimization node</em>.</p>
+<section id="multi-vs-single-label-classification">
+<span id="concepts-multiclass-multilabel"></span><h2>Multi- vs. Single-label classification<a class="headerlink" href="#multi-vs-single-label-classification" title="Link to this heading">#</a></h2>
+<p>AutoIntent supports various classification scenarios through its flexible decision module:</p>
+<dl class="simple">
+<dt><strong>🏷️ Multi-Class Classification</strong></dt><dd><p>Each input gets assigned to exactly one category - like sorting emails into “Spam”, “Work”, or “Personal” folders. Common examples include sentiment analysis (positive/negative/neutral) or determining user intent where each message has a single purpose. The model picks the single best match from all possible categories.</p>
+</dd>
+<dt><strong>🔖 Multi-Label Classification</strong></dt><dd><p>Each input can belong to multiple categories at once - like tagging a news article as both “Politics” and “Economics”. Essential for scenarios like multi-intent messages (“book a flight and check weather”), content tagging, or any situation where multiple labels can apply simultaneously. The model almost independently decides whether each possible category fits or not.</p>
+</dd>
+</dl>
+</section>
+<section id="out-of-scope-detection">
+<span id="concepts-oos"></span><h2>Out-of-Scope Detection<a class="headerlink" href="#out-of-scope-detection" title="Link to this heading">#</a></h2>
+<p>A critical capability for production text classification systems, especially in conversational AI:</p>
+<dl class="simple">
+<dt><strong>📏 Confidence Thresholding</strong></dt><dd><p>Uses predicted probability scores to identify inputs that don’t belong to any known class. Threshold values can be tuned automatically to balance precision and recall.</p>
+</dd>
+<dt><strong>🔗 Integration with Multi-Label</strong></dt><dd><p>OOS detection works seamlessly with multi-label scenarios, enabling detection of completely unknown inputs vs. partial matches to known classes.</p>
+</dd>
+</dl>
+</section>
+<section id="optimization-presets">
+<span id="concepts-presets"></span><h2>Optimization Presets<a class="headerlink" href="#optimization-presets" title="Link to this heading">#</a></h2>
+<p>AutoIntent provides predefined optimization strategies that balance quality, speed, and resource consumption:</p>
+<dl class="simple">
+<dt><strong>⚡ Zero-Shot Presets</strong></dt><dd><p>Leverage class descriptions and large language models for classification without training data. Ideal for rapid prototyping and cold-start scenarios.</p>
+</dd>
+<dt><strong>📈 Classic Presets</strong></dt><dd><p>Focus on traditional ML approaches (KNN, linear models, tree-based methods) operating on transformer embeddings. Offer excellent balance of performance and efficiency.</p>
+</dd>
+<dt><strong>🧠 Neural Network Presets</strong></dt><dd><p>Include deep learning approaches like CNN, RNN, and transformer fine-tuning. Provide highest potential performance at increased computational cost.</p>
+</dd>
+<dt><strong>🪜 Computational Tiers</strong></dt><dd><p>Each preset family offers light, medium, and heavy variants that trade optimization time for potential performance improvements.</p>
+</dd>
+</dl>
+</section>
+<section id="modular-architecture">
+<span id="concepts-modularity"></span><h2>Modular Architecture<a class="headerlink" href="#modular-architecture" title="Link to this heading">#</a></h2>
+<p>AutoIntent’s design emphasizes modularity and extensibility:</p>
+<dl class="simple">
+<dt><strong>🧩 Plugin Architecture</strong></dt><dd><p>Each component (embedding models, scoring methods, decision strategies) implements a common interface, enabling easy addition of new approaches without modifying core framework code.</p>
+</dd>
+<dt><strong>⚙️ Configuration-Driven</strong></dt><dd><p>All aspects of optimization can be controlled through declarative configuration files, supporting reproducible experiments and easy sharing of optimization strategies.</p>
+</dd>
+<dt><strong>🔧 Extensibility</strong></dt><dd><p>Framework can be extended with custom embedding models, scoring algorithms, and decision strategies while maintaining compatibility with the AutoML optimization pipeline.</p>
+</dd>
+</dl>
+<p>This modular design ensures that AutoIntent can evolve with advances in NLP research while maintaining stability and backward compatibility for existing users.</p>
 </section>
 </section>
 
@@ -510,10 +584,13 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-search-space">Optimization Search Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classification-stages">Classification Stages</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#out-of-domain-utterances">Out-of-domain utterances</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nodes-and-modules">Nodes and Modules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-stage-pipeline-architecture">Three-Stage Pipeline Architecture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automl-optimization-strategy">AutoML Optimization Strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#embedding-centric-design">Embedding-Centric Design</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-vs-single-label-classification">Multi- vs. Single-label classification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#out-of-scope-detection">Out-of-Scope Detection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-presets">Optimization Presets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modular-architecture">Modular Architecture</a></li>
 </ul>
   </nav></div>
 

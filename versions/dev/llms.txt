@@ -1,0 +1,30 @@
+# AutoIntent
+
+> AutoIntent is an open source tool for automatic configuration of text classification pipelines, with specialized support for intent prediction.
+
+## Docs
+
+- [AutoIntent documentation](/index.html)
+- [Quickstart](/quickstart.html)
+- [Key Concepts](/concepts.html)
+- [User Guides](/user_guides.html)
+- [Basic Usage](/user_guides/index_basic_usage.html)
+- [Data](/user_guides/user_guides.basic_usage.01_data.html)
+- [Advanced Usage](/user_guides/index_advanced_usage.html)
+- [Data](/user_guides/user_guides.advanced.01_data.html)
+- [Embedder Configuration](/user_guides/user_guides.advanced.02_embedder_configuration.html)
+- [AutoML Customization](/user_guides/user_guides.advanced.03_automl.html)
+- [Run reporting](/user_guides/user_guides.advanced.04_reporting.html)
+- [Logging to stdout and file](/user_guides/user_guides.advanced.05_logging.html)
+- [Modules](/user_guides/user_guides.basic_usage.02_modules.html)
+- [AutoML Pipeline Configuration](/user_guides/user_guides.basic_usage.03_automl.html)
+- [Inference Pipeline](/user_guides/user_guides.basic_usage.04_inference.html)
+- [Data augmentation tutorials](/augmentation_tutorials/index.html)
+- [Balancing Datasets with DatasetBalancer](/augmentation_tutorials/balancer.html)
+- [DSPY Augmentation](/augmentation_tutorials/dspy_augmentation.html)
+- [Intent Description Generation](/augmentation_tutorials/intent_description.html)
+- [Learn](/learn/index.html)
+- [AutoML and Hyperparameter Optimization](/learn/automl_theory.html)
+- [Dialogue Systems Theory and Practice](/learn/dialogue_systems.html)
+- [Optimization](/learn/optimization.html)
+- [Text Embeddings and Representation Learning](/learn/text_embeddings.html)

@@ -1,0 +1,75 @@
+autointent.modules.BERTLoRAScorer
+=================================
+
+.. py:class:: autointent.modules.BERTLoRAScorer(classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, report_to = 'none', print_progress = False, **lora_kwargs)
+
+   Bases: :py:obj:`autointent.modules.scoring._bert.BertScorer`
+
+
+   BERTLoRAScorer class for transformer-based classification with LoRA (Low-Rank Adaptation).
+
+   :param classification_model_config: Config of the base transformer model (HFModelConfig, str, or dict)
+   :param num_train_epochs: Number of training epochs (default: 3)
+   :param batch_size: Batch size for training (default: 8)
+   :param learning_rate: Learning rate for training (default: 5e-5)
+   :param seed: Random seed for reproducibility (default: 0)
+   :param report_to: Reporting tool for training logs
+   :param \*\*lora_kwargs: Arguments for `LoraConfig <https://huggingface.co/docs/peft/package_reference/lora#peft.LoraConfig>`_
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules import BERTLoRAScorer
+
+       # Initialize scorer with LoRA configuration
+       scorer = BERTLoRAScorer(
+           classification_model_config="bert-base-uncased",
+           num_train_epochs=3,
+           batch_size=8,
+           learning_rate=5e-5,
+           seed=42,
+           r=8,  # LoRA rank
+           lora_alpha=16,  # LoRA alpha
+       )
+
+       # Training data
+       utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+       labels = [1, 0, 1, 0]  # Binary classification
+
+       # Fit the model
+       scorer.fit(utterances, labels)
+
+       # Make predictions
+       test_utterances = ["Good product", "Not worth it"]
+       probabilities = scorer.predict(test_utterances)
+
+
+
+   .. py:attribute:: name
+      :value: 'lora'
+
+
+      Name of the module to reference in search space configuration.
+
+
+   .. py:method:: from_context(context, classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, **lora_kwargs)
+      :classmethod:
+
+
+      Initialize self from context.
+
+      :param context: Context to init from
+      :param \*\*kwargs: Additional kwargs
+
+      :returns: Initialized module
+
+
+
+   .. py:method:: dump(path)
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
+

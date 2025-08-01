@@ -1,7 +1,7 @@
 autointent.modules.embedding.LogregAimedEmbedding
 =================================================
 
-.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config, cv = 3)
+.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config = None, cv = 3)
 
    Bases: :py:obj:`autointent.modules.base.BaseEmbedding`
 
@@ -32,7 +32,7 @@ autointent.modules.embedding.LogregAimedEmbedding
       :value: 'logreg_embedding'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_multiclass
@@ -64,7 +64,7 @@ autointent.modules.embedding.LogregAimedEmbedding
 
 
 
-   .. py:method:: from_context(context, embedder_config, cv = 3)
+   .. py:method:: from_context(context, embedder_config = None, cv = 3)
       :classmethod:
 
 

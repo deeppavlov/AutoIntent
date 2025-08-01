@@ -1,7 +1,7 @@
 autointent.Ranker
 =================
 
-.. py:class:: autointent.Ranker(cross_encoder_config, classifier_head = None)
+.. py:class:: autointent.Ranker(cross_encoder_config, classifier_head = None, output_range = 'sigmoid')
 
    Cross-encoder for Natural Language Inference (NLI).
 
@@ -16,6 +16,11 @@ autointent.Ranker
 
    .. py:attribute:: cross_encoder
       :type:  sentence_transformers.CrossEncoder
+
+
+   .. py:attribute:: output_range
+      :value: 'sigmoid'
+
 
 
    .. py:method:: fit(utterances, labels)

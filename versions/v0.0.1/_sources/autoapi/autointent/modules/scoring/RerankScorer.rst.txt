@@ -1,7 +1,7 @@
 autointent.modules.scoring.RerankScorer
 =======================================
 
-.. py:class:: autointent.modules.scoring.RerankScorer(k, weights, m = None, rank_threshold_cutoff = None, cross_encoder_config = None, embedder_config = None)
+.. py:class:: autointent.modules.scoring.RerankScorer(k = 5, weights = 'distance', use_cross_encoder_scores = False, m = None, cross_encoder_config = None, embedder_config = None)
 
    Bases: :py:obj:`autointent.modules.scoring._knn.knn.KNNScorer`
 
@@ -19,7 +19,6 @@ autointent.modules.scoring.RerankScorer
                    - "closest": Only the closest neighbor of each class is weighted
    :param cross_encoder_config: Config of the cross-encoder model used for re-ranking
    :param m: Number of top-ranked neighbors to consider, or None to use k
-   :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
 
 
    .. py:attribute:: name
@@ -31,14 +30,16 @@ autointent.modules.scoring.RerankScorer
 
 
    .. py:attribute:: m
-
-
-   .. py:attribute:: rank_threshold_cutoff
-      :value: None
+      :value: 5
 
 
 
-   .. py:method:: from_context(context, k, weights = 'distance', m = None, cross_encoder_config = None, embedder_config = None, rank_threshold_cutoff = None)
+   .. py:attribute:: use_cross_encoder_scores
+      :value: False
+
+
+
+   .. py:method:: from_context(context, k = 5, weights = 'distance', m = None, cross_encoder_config = None, embedder_config = None, use_cross_encoder_scores = False)
       :classmethod:
 
 
@@ -51,8 +52,11 @@ autointent.modules.scoring.RerankScorer
       :param embedder_config: Config of the embedder used for vectorization,
                               or None to use the best existing embedder
       :param m: Number of top-ranked neighbors to consider, or None to use k
-      :param rank_threshold_cutoff: Rank threshold cutoff for re-ranking, or None
+      :param use_cross_encoder_scores: use crosencoder scores for the output probability vector computation
 
+
+
+   .. py:method:: get_implicit_initialization_params()
 
 
    .. py:method:: fit(utterances, labels)

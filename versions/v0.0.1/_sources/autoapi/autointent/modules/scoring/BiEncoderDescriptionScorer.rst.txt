@@ -1,0 +1,82 @@
+autointent.modules.scoring.BiEncoderDescriptionScorer
+=====================================================
+
+.. py:class:: autointent.modules.scoring.BiEncoderDescriptionScorer(embedder_config = None, temperature = 1.0, multilabel = False)
+
+   Bases: :py:obj:`autointent.modules.scoring._description.base.BaseDescriptionScorer`
+
+
+   Bi-encoder description scorer for zero-shot intent classification.
+
+   This scorer uses a bi-encoder architecture where utterances and intent descriptions
+   are embedded separately using the same encoder model, then cosine similarity is
+   computed between utterance embeddings and description embeddings. This is a
+   zero-shot approach that doesn't require training examples, only intent descriptions.
+
+   The bi-encoder approach is efficient for inference as descriptions are embedded
+   once during fitting, and only utterances need to be embedded during prediction.
+
+   :param embedder_config: Configuration for the embedder model (HuggingFace model name or config)
+   :param temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+   :param multilabel: Flag indicating classification task type
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules.scoring import BiEncoderDescriptionScorer
+
+       # Initialize bi-encoder scorer
+       scorer = BiEncoderDescriptionScorer(
+           embedder_config="sentence-transformers/all-MiniLM-L6-v2",
+           temperature=0.8
+       )
+
+       # Zero-shot classification with intent descriptions
+       descriptions = [
+           "User wants to book or reserve transportation like flights, trains, or hotels",
+           "User wants to cancel an existing booking or reservation",
+           "User asks about weather conditions or forecasts"
+       ]
+
+       # Fit using descriptions only (zero-shot approach)
+       scorer.fit([], [], descriptions)
+
+       # Make predictions on new utterances
+       test_utterances = ["Reserve a hotel room", "Delete my booking"]
+       probabilities = scorer.predict(test_utterances)
+
+
+   .. py:attribute:: name
+      :value: 'description_bi'
+
+
+
+   .. py:attribute:: embedder_config
+
+
+   .. py:method:: from_context(context, temperature = 1.0, embedder_config = None)
+      :classmethod:
+
+
+      Create a BiEncoderDescriptionScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param temperature: Temperature parameter for scaling logits
+      :param embedder_config: Config of the embedder model. If None, the best embedder is used
+
+      :returns: Initialized BiEncoderDescriptionScorer instance
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+      Get implicit initialization parameters for this scorer.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the embedder.
+
+

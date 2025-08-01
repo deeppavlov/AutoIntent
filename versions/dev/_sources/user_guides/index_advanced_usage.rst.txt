@@ -3,6 +3,7 @@ Advanced Usage
 
 .. nbgallery::
    user_guides.advanced.01_data.py
-   user_guides.advanced.02_automl.py
-   user_guides.advanced.03_reporting.py
-   user_guides.advanced.04_logging.py
+   user_guides.advanced.02_embedder_configuration.py
+   user_guides.advanced.03_automl.py
+   user_guides.advanced.04_reporting.py
+   user_guides.advanced.05_logging.py

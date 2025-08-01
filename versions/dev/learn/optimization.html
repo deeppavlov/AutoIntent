@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Optimization &#8212; AutoIntent 0.1.0 documentation</title>
+    <title>Optimization &#8212; AutoIntent 0.2.0 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/documentation_options.js?v=938c9ccc"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -50,18 +50,18 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
     <link rel="icon" href="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-white.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="autointent" href="../autoapi/autointent/index.html" />
-    <link rel="prev" title="Dialogue Systems" href="dialogue_systems.html" />
+    <link rel="next" title="Text Embeddings and Representation Learning" href="text_embeddings.html" />
+    <link rel="prev" title="Dialogue Systems Theory and Practice" href="dialogue_systems.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.1.0" />
+  <meta name="docsearch:version" content="0.2.0" />
   </head>
   
   
@@ -188,7 +188,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -249,7 +249,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -322,7 +322,7 @@
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
-    Learn AutoIntent
+    Learn
   </a>
 </li>
 
@@ -374,7 +374,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -389,8 +389,10 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="automl_theory.html">AutoML and Hyperparameter Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems Theory and Practice</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_embeddings.html">Text Embeddings and Representation Learning</a></li>
 </ul>
 </div>
 </nav></div>
@@ -432,7 +434,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Learn AutoIntent</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Learn</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Optimization</span></li>
   </ul>
@@ -456,7 +458,7 @@
 <p>In this section, you will learn how hyperparameter optimization works in our library.</p>
 <section id="pipeline">
 <h2>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading">#</a></h2>
-<p>The entire process of configuring a classifier in our library is divided into sequential steps (<a class="reference internal" href="../concepts.html#key-stages"><span class="std std-ref">and that’s why</span></a>):</p>
+<p>The entire process of configuring a classifier in our library is divided into sequential steps (<a class="reference internal" href="../concepts.html#concepts-pipeline"><span class="std std-ref">and that’s why</span></a>):</p>
 <ol class="arabic simple">
 <li><p>Selecting an embedder (EmbeddingNode)</p></li>
 <li><p>Selecting a classifier (ScoringNode)</p></li>
@@ -473,19 +475,16 @@
 <li><p>Iterate through the hyperparameters of the decision rule and fix the best one.</p></li>
 </ol>
 <p>This algorithm checks fewer combinations, which speeds up the process. To implement such an algorithm, it is necessary to be able to evaluate the quality of not only the final prediction of the entire pipeline but also its intermediate predictions. The main drawback of this approach is that the decisions made are optimal only locally, not globally. The metrics for evaluating intermediate predictions are only a proxy signal for the quality of the final prediction.</p>
-<p>This approach has been available in our library since release v0.0.1.</p>
 </section>
 <section id="random-search">
 <h2>Random Search<a class="headerlink" href="#random-search" title="Link to this heading">#</a></h2>
 <p>A simpler strategy is to take a random subset of the full search space (random grid search). A straightforward strategy is to iterate through all combinations in random order until a certain time budget is exhausted.</p>
 <p>This approach is less intelligent than the greedy strategy because, at any moment during the random combination search, poor embedders or any other bad parameters might keep appearing, despite they have been tested already. The greedy strategy would have eliminated such embedders at the beginning and not revisited them. On the other hand, random search, by its nature, does not rely on any local decisions.</p>
-<p>The implementation of this optimization method is planned for release v0.1.0.</p>
 </section>
 <section id="bayesian-optimization">
 <h2>Bayesian Optimization<a class="headerlink" href="#bayesian-optimization" title="Link to this heading">#</a></h2>
 <p>This is similar to random search over a subset, but during the search, we attempt to model the probabilistic space of hyperparameters. This allows us to avoid repeating hyperparameter values that have previously performed poorly. The search itself aims to balance exploration and exploitation.</p>
 <p>This approach is more sophisticated and can lead to better results by intelligently exploring the hyperparameter space.</p>
-<p>The implementation of Bayesian optimization is planned for release v0.1.0.</p>
 </section>
 </section>
 
@@ -505,15 +504,15 @@
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Dialogue Systems</p>
+        <p class="prev-next-title">Dialogue Systems Theory and Practice</p>
       </div>
     </a>
     <a class="right-next"
-       href="../autoapi/autointent/index.html"
+       href="text_embeddings.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">autointent</p>
+        <p class="prev-next-title">Text Embeddings and Representation Learning</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

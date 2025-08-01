@@ -1,0 +1,66 @@
+autointent.modules.scoring.PTuningScorer
+========================================
+
+.. py:class:: autointent.modules.scoring.PTuningScorer(classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, report_to = 'none', encoder_reparameterization_type = 'LSTM', num_virtual_tokens = 10, encoder_dropout = 0.1, encoder_hidden_size = 128, encoder_num_layers = 2, early_stopping_config = None, print_progress = False, **ptuning_kwargs)
+
+   Bases: :py:obj:`autointent.modules.scoring._bert.BertScorer`
+
+
+   PEFT P-tuning scorer.
+
+   :param classification_model_config: Config of the base transformer model (HFModelConfig, str, or dict)
+   :param num_train_epochs: Number of training epochs
+   :param batch_size: Batch size for training
+   :param learning_rate: Learning rate for training
+   :param seed: Random seed for reproducibility
+   :param report_to: Reporting tool for training logs
+   :param \*\*ptuning_kwargs: Arguments for `PromptEncoderConfig <https://huggingface.co/docs/peft/package_reference/p_tuning#peft.PromptEncoderConfig>`_
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules import PTuningScorer
+       scorer = PTuningScorer(
+           classification_model_config="prajjwal1/bert-tiny",
+           num_train_epochs=3,
+           batch_size=8,
+           num_virtual_tokens=10,
+           seed=42
+       )
+       utterances = ["hello", "goodbye", "allo", "sayonara"]
+       labels = [0, 1, 0, 1]
+       scorer.fit(utterances, labels)
+       test_utterances = ["hi", "bye"]
+       probabilities = scorer.predict(test_utterances)
+
+
+
+   .. py:attribute:: name
+      :value: 'ptuning'
+
+
+
+   .. py:method:: from_context(context, classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, encoder_reparameterization_type = 'LSTM', num_virtual_tokens = 10, encoder_dropout = 0.1, encoder_hidden_size = 128, encoder_num_layers = 2, **ptuning_kwargs)
+      :classmethod:
+
+
+      Create a PTuningScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param classification_model_config: Config of the base model, or None to use the best embedder
+      :param num_train_epochs: Number of training epochs
+      :param batch_size: Batch size for training
+      :param learning_rate: Learning rate for training
+      :param seed: Random seed for reproducibility
+      :param encoder_reparameterization_type: Reparametrization type for the prompt encoder
+      :param num_virtual_tokens: Number of virtual tokens for the prompt encoder
+      :param encoder_dropout: Dropout for the prompt encoder
+      :param encoder_hidden_size: Hidden size for the prompt encoder
+      :param encoder_num_layers: Number of layers for the prompt encoder
+      :param \*\*ptuning_kwargs: Arguments for PromptEncoderConfig
+
+
+
+   .. py:method:: dump(path)
+

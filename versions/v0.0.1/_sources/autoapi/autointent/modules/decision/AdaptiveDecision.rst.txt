@@ -41,28 +41,20 @@ autointent.modules.decision.AdaptiveDecision
       :value: True
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: supports_multiclass
       :value: False
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:attribute:: supports_oos
       :value: False
 
 
-      Whether the module supports oos data
-
 
    .. py:attribute:: name
       :value: 'adaptive'
 
-
-      Name of the module.
 
 
    .. py:attribute:: search_space

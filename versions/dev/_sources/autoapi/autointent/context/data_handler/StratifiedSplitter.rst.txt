@@ -1,7 +1,7 @@
 autointent.context.data_handler.StratifiedSplitter
 ==================================================
 
-.. py:class:: autointent.context.data_handler.StratifiedSplitter(test_size, label_feature, random_seed, shuffle = True)
+.. py:class:: autointent.context.data_handler.StratifiedSplitter(test_size, label_feature, random_seed, shuffle = True, is_few_shot = False, examples_per_label = 8)
 
    A class for stratified splitting of datasets.
 
@@ -21,6 +21,16 @@ autointent.context.data_handler.StratifiedSplitter
 
    .. py:attribute:: shuffle
       :value: True
+
+
+
+   .. py:attribute:: is_few_shot
+      :value: False
+
+
+
+   .. py:attribute:: examples_per_label
+      :value: 8
 
 
 

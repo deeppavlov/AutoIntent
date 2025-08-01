@@ -62,7 +62,7 @@ autointent.modules.decision.AdaptiveDecision
       :value: 'adaptive'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: search_space

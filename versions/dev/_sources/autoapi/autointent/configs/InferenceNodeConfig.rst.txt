@@ -1,53 +1,27 @@
 autointent.configs.InferenceNodeConfig
 ======================================
 
-.. py:class:: autointent.configs.InferenceNodeConfig
+.. py:class:: autointent.configs.InferenceNodeConfig(node_type, module_name, module_config, load_path, embedder_config = None, cross_encoder_config = None)
 
    Configuration for the inference node.
 
 
    .. py:attribute:: node_type
-      :type:  autointent.custom_types.NodeType
-
-      Type of the node.
 
 
    .. py:attribute:: module_name
-      :type:  str
-
-      Name of module which is specified as :py:attr:`autointent.modules.base.BaseModule.name`.
 
 
    .. py:attribute:: module_config
-      :type:  dict[str, Any]
-
-      Hyperparameters of underlying module.
 
 
    .. py:attribute:: load_path
-      :type:  str
-
-      Path to the module dump.
-
-
-   .. py:attribute:: embedder_config
-      :type:  autointent.configs._transformers.EmbedderConfig | None
-      :value: None
-
-
-      One can override presaved embedder config while loading from file system.
-
-
-   .. py:attribute:: cross_encoder_config
-      :type:  autointent.configs._transformers.CrossEncoderConfig | None
-      :value: None
-
-
-      One can override presaved cross encoder config while loading from file system.
 
 
    .. py:method:: asdict()
 
-      Convert config to dict format.
+      Convert the InferenceNodeConfig to a dictionary.
+
+      :returns: A dictionary representation of the InferenceNodeConfig.
 
 

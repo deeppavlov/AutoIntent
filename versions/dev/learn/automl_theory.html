@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>AutoML and Hyperparameter Optimization &#8212; AutoIntent 0.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'learn/automl_theory';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-white.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dialogue Systems Theory and Practice" href="dialogue_systems.html" />
+    <link rel="prev" title="Learn" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.2.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-light.svg" class="logo__image only-light" alt=""/>
+    <img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-dark.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">AutoIntent</p>
+  
+</a></div>
+    
+      <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../concepts.html">
+    Key Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guides.html">
+    User Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Learn
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../autoapi/autointent/index.html">
+    autointent
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../concepts.html">
+    Key Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guides.html">
+    User Guides
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Learn
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../autoapi/autointent/index.html">
+    autointent
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">AutoML and Hyperparameter Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dialogue_systems.html">Dialogue Systems Theory and Practice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimization.html">Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text_embeddings.html">Text Embeddings and Representation Learning</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Learn</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">AutoML and Hyperparameter Optimization</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="automl-and-hyperparameter-optimization">
+<h1>AutoML and Hyperparameter Optimization<a class="headerlink" href="#automl-and-hyperparameter-optimization" title="Link to this heading">#</a></h1>
+<p>This section provides a deep dive into the theoretical foundations of automated machine learning (AutoML) and hyperparameter optimization as implemented in AutoIntent.</p>
+<section id="the-hyperparameter-optimization-problem">
+<h2>The Hyperparameter Optimization Problem<a class="headerlink" href="#the-hyperparameter-optimization-problem" title="Link to this heading">#</a></h2>
+<p><strong>The Core Problem</strong></p>
+<p>Hyperparameter optimization is about finding the best configuration of settings that maximizes model performance. Think of it as searching through all possible combinations of hyperparameters (like learning rates, model sizes, regularization strengths) to find the combination that gives the best results on validation data.</p>
+<p>The performance metric is typically estimated through cross-validation to avoid overfitting - we want configurations that work well on unseen data, not just the training data.</p>
+<p><strong>The Challenge of Combinatorial Explosion</strong></p>
+<p>In AutoIntent’s three-stage pipeline, the total search space grows multiplicatively across all stages. If we have:</p>
+<ul class="simple">
+<li><p>10 different embedding models to choose from</p></li>
+<li><p>20 different scoring configurations</p></li>
+<li><p>5 different decision strategies</p></li>
+</ul>
+<p>Then we have 10 × 20 × 5 = 1,000 total combinations. In realistic scenarios, this can easily exceed 1,000,000 configurations, making it impossible to test every combination within reasonable time and computational budgets.</p>
+</section>
+<section id="hierarchical-optimization-strategy">
+<h2>Hierarchical Optimization Strategy<a class="headerlink" href="#hierarchical-optimization-strategy" title="Link to this heading">#</a></h2>
+<p>AutoIntent addresses combinatorial explosion through a <strong>hierarchical greedy optimization</strong> approach that optimizes modules sequentially.</p>
+<p><strong>Sequential Module Optimization</strong></p>
+<p>The optimization proceeds in three stages, where each stage builds on the results of the previous one:</p>
+<ol class="arabic simple">
+<li><p><strong>Embedding Optimization</strong>: First, find the best embedding model configuration by testing different models and settings, evaluating them using retrieval or classification metrics.</p></li>
+<li><p><strong>Scoring Optimization</strong>: Using the best embedding model from step 1, now optimize the scoring module by testing different classifiers (KNN, linear, neural networks, etc.) with various hyperparameters.</p></li>
+<li><p><strong>Decision Optimization</strong>: Using the best embedding and scoring combination from steps 1-2, optimize the decision module by finding optimal thresholds and decision strategies for final predictions.</p></li>
+</ol>
+<p><strong>Proxy Metrics</strong></p>
+<p>Each stage uses specialized proxy metrics that correlate with final performance:</p>
+<ul class="simple">
+<li><p><strong>Embedding Stage</strong>: Retrieval metrics (NDCG, hit rate) or lightweight classification accuracy</p></li>
+<li><p><strong>Scoring Stage</strong>: Classification metrics (F1, ROC-AUC) on validation data</p></li>
+<li><p><strong>Decision Stage</strong>: Threshold-specific metrics for multi-label/OOS scenarios</p></li>
+</ul>
+<p><strong>Trade-offs</strong></p>
+<ul class="simple">
+<li><p>✅ <strong>Computational Efficiency</strong>: Instead of testing all possible combinations (which grows exponentially), we only test combinations within each stage separately, making optimization much faster and more manageable.</p></li>
+<li><p>✅ <strong>Parallelization</strong>: Each stage can be parallelized independently, allowing multiple configurations to be tested simultaneously.</p></li>
+<li><p>⚠️ <strong>Local Optimality</strong>: May miss globally optimal combinations due to greedy choices - the best embedding might work better with a different scorer than the one we pick, but we won’t discover this combination.</p></li>
+</ul>
+</section>
+<section id="tree-structured-parzen-estimators-tpe">
+<h2>Tree-Structured Parzen Estimators (TPE)<a class="headerlink" href="#tree-structured-parzen-estimators-tpe" title="Link to this heading">#</a></h2>
+<p>AutoIntent uses Optuna’s TPE algorithm for sophisticated hyperparameter optimization within each module. This is a form of Bayesian optimization that learns from previous trials to make smarter choices about which hyperparameters to try next.</p>
+<p><strong>How TPE Works</strong></p>
+<p>TPE builds two separate models:</p>
+<ul class="simple">
+<li><p><strong>Good Configuration Model</strong>: Learns the distribution of hyperparameters that led to good performance (typically the top 25% of trials)</p></li>
+<li><p><strong>Bad Configuration Model</strong>: Learns the distribution of hyperparameters that led to poor performance (the remaining 75% of trials)</p></li>
+</ul>
+<p>The algorithm then suggests new hyperparameters by finding configurations that are likely under the “good” model but unlikely under the “bad” model. This naturally balances exploration (trying untested areas) with exploitation (focusing on promising regions).</p>
+<p><strong>Benefits of TPE</strong></p>
+<ul class="simple">
+<li><p><strong>Smart Sampling</strong>: After initial random trials, TPE makes increasingly informed decisions about which hyperparameters to try</p></li>
+<li><p><strong>Handles Different Parameter Types</strong>: Works well with categorical, continuous, and integer parameters</p></li>
+<li><p><strong>Robust to Noisy Evaluations</strong>: Can handle situations where the same hyperparameters might give slightly different results due to randomness</p></li>
+<li><p><strong>No Prior Knowledge Required</strong>: Works without needing to specify complex relationships between parameters</p></li>
+</ul>
+</section>
+<section id="search-space-design">
+<h2>Search Space Design<a class="headerlink" href="#search-space-design" title="Link to this heading">#</a></h2>
+<p><strong>Parameter Types</strong></p>
+<p>AutoIntent supports various hyperparameter types with appropriate sampling strategies:</p>
+<p>AutoIntent supports several types of hyperparameters, each requiring different optimization strategies:</p>
+<p><strong>Categorical Parameters</strong>: These are discrete choices from a fixed set of options, like choosing between different model types (“knn”, “linear”, “bert”) or activation functions (“relu”, “tanh”, “sigmoid”). The optimizer samples uniformly from the available choices.</p>
+<p><strong>Continuous Parameters</strong>: These are real-valued parameters like learning rates, regularization strengths, or temperature values. The optimizer can sample from uniform distributions (for parameters like dropout rates between 0.0 and 1.0) or log-uniform distributions (for parameters like learning rates that work better on logarithmic scales).</p>
+<p><strong>Integer Parameters</strong>: These are whole number parameters like the number of neighbors in KNN, hidden dimensions in neural networks, or batch sizes. The optimizer can specify step sizes and bounds to ensure valid configurations.</p>
+<p><strong>Conditional Parameters</strong>: Some parameters only make sense when certain other parameters have specific values. For example, LoRA-specific parameters (like lora_alpha and lora_r) only apply when the model type is “lora”. AutoIntent handles these dependencies automatically in the search space configuration.</p>
+<p><strong>Search Space Configuration</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">search_space</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">node_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scoring</span>
+<span class="w">    </span><span class="nt">target_metric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scoring_f1</span>
+<span class="w">    </span><span class="nt">search_space</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">module_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">knn</span>
+<span class="w">        </span><span class="nt">k</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">          </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="w">        </span><span class="nt">weights</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">uniform</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">distance</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">closest</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">module_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linear</span>
+<span class="w">        </span><span class="nt">cv</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">10</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="cross-validation-and-data-splitting">
+<h2>Cross-Validation and Data Splitting<a class="headerlink" href="#cross-validation-and-data-splitting" title="Link to this heading">#</a></h2>
+<p><strong>Validation Schemes</strong></p>
+<p>AutoIntent supports multiple validation strategies to ensure robust hyperparameter selection:</p>
+<p><strong>Hold-out Validation (HO)</strong></p>
+<p>Split data into training and validation sets once. Train the model on the training set and evaluate performance on the validation set. This gives a single performance score for each hyperparameter configuration.</p>
+<p><strong>Cross-Validation (CV)</strong></p>
+<p>Split data into K folds (typically 3-5). For each fold, train on the remaining folds and validate on the current fold. Average the performance scores across all K folds to get a more robust estimate of how well the hyperparameters work.</p>
+<p><strong>Stratified Splitting</strong></p>
+<p>For imbalanced datasets, AutoIntent uses stratified sampling to maintain class distributions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
+
+<span class="n">data_config</span> <span class="o">=</span> <span class="n">DataConfig</span><span class="p">(</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span>           <span class="c1"># Cross-validation</span>
+    <span class="n">n_folds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>             <span class="c1"># 5-fold CV</span>
+    <span class="n">validation_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>   <span class="c1"># 20% for validation in HO</span>
+    <span class="n">separation_ratio</span><span class="o">=</span><span class="mf">0.5</span>   <span class="c1"># Prevent data leakage between modules</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Data Leakage Prevention</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">separation_ratio</span></code> parameter prevents information leakage between scoring and decision modules by using different data subsets for each stage.</p>
+<p><strong>Hyperparameter Bounds</strong></p>
+<p>Search spaces include reasonable bounds to prevent extreme configurations:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">learning_rate</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-5</span><span class="w">    </span><span class="c1"># Prevent too slow learning</span>
+<span class="w">  </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-2</span><span class="w">   </span><span class="c1"># Prevent instability</span>
+<span class="w">  </span><span class="nt">log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">      </span><span class="c1"># Log-uniform sampling</span>
+</pre></div>
+</div>
+</section>
+<section id="multi-objective-optimization-considerations">
+<h2>Multi-Objective Optimization Considerations<a class="headerlink" href="#multi-objective-optimization-considerations" title="Link to this heading">#</a></h2>
+<p>While AutoIntent primarily optimizes single metrics, it considers multiple objectives implicitly:</p>
+<p><strong>Performance vs. Efficiency Trade-offs</strong></p>
+<ul class="simple">
+<li><p><strong>Model size</strong>: Smaller models for deployment efficiency</p></li>
+<li><p><strong>Training time</strong>: Faster models for rapid iteration</p></li>
+<li><p><strong>Inference speed</strong>: Optimized for production latency</p></li>
+</ul>
+<p><strong>Presets as Multi-Objective Solutions</strong></p>
+<p>AutoIntent provides presets that balance different objectives:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Different computational budgets</span>
+<span class="n">pipeline_light</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>    <span class="c1"># Speed-focused</span>
+<span class="n">pipeline_heavy</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-heavy&quot;</span><span class="p">)</span>    <span class="c1"># Performance-focused</span>
+
+<span class="c1"># Different model types</span>
+<span class="n">pipeline_zero_shot</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;zero-shot-encoders&quot;</span><span class="p">)</span>  <span class="c1"># No training data</span>
+</pre></div>
+</div>
+</section>
+<section id="bayesian-optimization-theory">
+<h2>Bayesian Optimization Theory<a class="headerlink" href="#bayesian-optimization-theory" title="Link to this heading">#</a></h2>
+<p><strong>Gaussian Process Surrogate Models</strong></p>
+<p>While TPE uses tree-structured models, the general Bayesian optimization framework uses Gaussian Processes as surrogate models. These are probabilistic models that learn to predict performance based on previous trials, including uncertainty estimates about unexplored regions of the hyperparameter space.</p>
+<p><strong>Exploration vs. Exploitation</strong></p>
+<p>Bayesian optimization balances:</p>
+<ul class="simple">
+<li><p><strong>Exploitation</strong>: Sampling near known good configurations</p></li>
+<li><p><strong>Exploration</strong>: Sampling in uncertain regions of the space</p></li>
+</ul>
+<p>The acquisition function mathematically encodes this trade-off.</p>
+<p><strong>Convergence Properties</strong></p>
+<p>TPE and related algorithms have theoretical guarantees for convergence to global optima under certain conditions, though practical performance depends on:</p>
+<ul class="simple">
+<li><p>Search space dimensionality</p></li>
+<li><p>Function smoothness</p></li>
+<li><p>Available computational budget</p></li>
+</ul>
+</section>
+<section id="practical-optimization-strategies">
+<h2>Practical Optimization Strategies<a class="headerlink" href="#practical-optimization-strategies" title="Link to this heading">#</a></h2>
+<p><strong>Budget Allocation</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hpo_config</span> <span class="o">=</span> <span class="n">HPOConfig</span><span class="p">(</span>
+    <span class="n">sampler</span><span class="o">=</span><span class="s2">&quot;tpe&quot;</span><span class="p">,</span>
+    <span class="n">n_trials</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>              <span class="c1"># Total optimization budget</span>
+    <span class="n">n_startup_trials</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>      <span class="c1"># Random initialization</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>             <span class="c1"># 1-hour time limit</span>
+    <span class="n">n_jobs</span><span class="o">=</span><span class="mi">4</span>                  <span class="c1"># Parallel trials</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Warm Starting</strong></p>
+<p>AutoIntent can resume interrupted optimization. This is the approximate code we use for creating optuna studies:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Optimization state is automatically saved</span>
+<span class="n">study</span> <span class="o">=</span> <span class="n">optuna</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span>
+    <span class="n">study_name</span><span class="o">=</span><span class="s2">&quot;intent_classification&quot;</span><span class="p">,</span>
+    <span class="n">storage</span><span class="o">=</span><span class="s2">&quot;sqlite:///optuna.db&quot;</span><span class="p">,</span>
+    <span class="n">load_if_exists</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="advanced-topics">
+<h2>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Link to this heading">#</a></h2>
+<p><strong>Meta-Learning</strong></p>
+<p>AutoIntent’s presets can be viewed as meta-learning solutions - configurations that work well across diverse datasets based on empirical analysis.</p>
+<p><strong>Neural Architecture Search (NAS)</strong></p>
+<p>While not fully implemented, AutoIntent’s modular design supports architecture search within model families (e.g., different CNN configurations).</p>
+<p><strong>Automated Feature Engineering</strong></p>
+<p>AutoIntent’s embedding-centric design can be seen as automated feature engineering - the system automatically learns relevant representations through selecting best fitting embedding model.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Learn</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="dialogue_systems.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dialogue Systems Theory and Practice</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-hyperparameter-optimization-problem">The Hyperparameter Optimization Problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hierarchical-optimization-strategy">Hierarchical Optimization Strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tree-structured-parzen-estimators-tpe">Tree-Structured Parzen Estimators (TPE)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#search-space-design">Search Space Design</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-validation-and-data-splitting">Cross-Validation and Data Splitting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-objective-optimization-considerations">Multi-Objective Optimization Considerations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bayesian-optimization-theory">Bayesian Optimization Theory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-optimization-strategies">Practical Optimization Strategies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-topics">Advanced Topics</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, DeepPavlov.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

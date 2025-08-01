@@ -48,6 +48,9 @@ autointent.context.Context
 
 
 
+   .. py:method:: configure_hpo(config)
+
+
    .. py:method:: set_dataset(dataset, config)
 
       Set the datasets for training, validation and testing.
@@ -57,11 +60,25 @@ autointent.context.Context
 
 
 
+   .. py:method:: dump_optimization_info()
+
+      Save optimization info to disk.
+
+
+
    .. py:method:: dump()
 
       Save all information about optimization process to disk.
 
       Save metrics, hyperparameters, inference, configurations, and datasets to disk.
+
+
+
+   .. py:method:: load_optimization_info()
+
+      Restore the context state to resume the optimization process.
+
+      :raises RuntimeError: If the modules artifacts are not found.
 
 
 
@@ -95,9 +112,10 @@ autointent.context.Context
 
       Resolve the embedder configuration.
 
-      Returns the best embedder configuration or default configuration.
-
-      :raises RuntimeError: If embedder configuration cannot be resolved.
+      This method returns the configuration with the following priorities:
+      - the best embedder configuration obtained during embedding node optimization
+      - default configuration preset by user with :py:meth:`Context.configure_transformer`
+      - default configuration preset by AutoIntent in :py:class:`autointent.configs.EmbedderConfig`
 
 
 
@@ -105,8 +123,19 @@ autointent.context.Context
 
       Resolve the cross-encoder configuration.
 
-      Returns default config if set.
+      This method returns the configuration with the following priorities:
+      - default configuration preset by user with :py:meth:`Context.configure_transformer`
+      - default configuration preset by AutoIntent in :py:class:`autointent.configs.CrossEncoderConfig`
 
-      :raises RuntimeError: If cross-encoder configuration cannot be resolved.
+
+
+   .. py:method:: resolve_transformer()
+
+      Resolve the transformer configuration.
+
+      This method returns the configuration with the following priorities:
+      - the best transformer configuration obtained during embedding node optimization
+      - default configuration preset by user with :py:meth:`Context.configure_transformer`
+      - default configuration preset by AutoIntent in :py:class:`autointent.configs.HFModelConfig`
 
 

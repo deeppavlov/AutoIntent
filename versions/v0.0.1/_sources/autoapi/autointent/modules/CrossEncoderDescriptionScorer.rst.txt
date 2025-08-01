@@ -1,0 +1,84 @@
+autointent.modules.CrossEncoderDescriptionScorer
+================================================
+
+.. py:class:: autointent.modules.CrossEncoderDescriptionScorer(cross_encoder_config = None, temperature = 1.0, multilabel = False)
+
+   Bases: :py:obj:`autointent.modules.scoring._description.base.BaseDescriptionScorer`
+
+
+   Cross-encoder description scorer for zero-shot intent classification.
+
+   This scorer uses a cross-encoder architecture that directly computes similarity
+   scores between each utterance-description pair by passing them together through
+   a transformer model. Unlike bi-encoders that embed texts separately, cross-encoders
+   can capture more complex interactions between utterances and descriptions, often
+   leading to higher accuracy at the cost of computational efficiency.
+
+   This is a zero-shot approach that doesn't require training examples, only intent
+   descriptions. The cross-encoder processes each utterance-description pair separately
+   during inference, making it more computationally intensive but potentially more accurate.
+
+   :param cross_encoder_config: Configuration for the cross-encoder model (HuggingFace model name or config)
+   :param temperature: Temperature parameter for scaling logits before softmax/sigmoid (default: 1.0)
+   :param multilabel: Flag indicating classification task type
+
+   Example:
+   --------
+   .. testcode::
+
+       from autointent.modules.scoring import CrossEncoderDescriptionScorer
+
+       # Initialize cross-encoder scorer
+       scorer = CrossEncoderDescriptionScorer(
+           cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+           temperature=1.2
+       )
+
+       # Zero-shot classification with intent descriptions
+       descriptions = [
+           "User wants to book or reserve transportation like flights, trains, or hotels",
+           "User wants to cancel an existing booking or reservation",
+           "User asks about weather conditions or forecasts"
+       ]
+
+       # Fit using descriptions only (zero-shot approach)
+       scorer.fit([], [], descriptions)
+
+       # Make predictions on new utterances
+       test_utterances = ["Reserve a hotel room", "Delete my booking"]
+       probabilities = scorer.predict(test_utterances)
+
+
+   .. py:attribute:: name
+      :value: 'description_cross'
+
+
+
+   .. py:attribute:: cross_encoder_config
+
+
+   .. py:method:: from_context(context, temperature = 1.0, cross_encoder_config = None)
+      :classmethod:
+
+
+      Create a CrossEncoderDescriptionScorer instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param temperature: Temperature parameter for scaling logits
+      :param cross_encoder_config: Config of the cross-encoder model. If None, the default config is used
+
+      :returns: Initialized CrossEncoderDescriptionScorer instance
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+      Get implicit initialization parameters for this scorer.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cached data in memory used by the cross-encoder.
+
+

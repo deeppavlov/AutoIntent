@@ -12,8 +12,6 @@ autointent.Hasher
 
 
    .. py:method:: hash(value)
-      :classmethod:
-
 
       Generate a hash for the given value using xxhash.
 

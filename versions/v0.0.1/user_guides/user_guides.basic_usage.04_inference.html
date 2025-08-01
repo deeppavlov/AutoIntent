@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -61,7 +61,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Advanced Usage" href="index_advanced_usage.html" />
-    <link rel="prev" title="AutoML" href="user_guides.basic_usage.03_automl.html" />
+    <link rel="prev" title="AutoML Pipeline Configuration" href="user_guides.basic_usage.03_automl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -252,7 +252,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -377,7 +377,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -392,17 +392,18 @@
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="index_basic_usage.html">Basic Usage</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.01_data.html">Working with data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.01_data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.02_modules.html">Modules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.03_automl.html">AutoML</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.basic_usage.03_automl.html">AutoML Pipeline Configuration</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Inference Pipeline</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="index_advanced_usage.html">Advanced Usage</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.01_data.html">Working with data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_automl.html">AutoML Customization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_reporting.html">Run reporting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_logging.html">Logging to stdout and file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.01_data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.02_embedder_configuration.html">Embedder Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.03_automl.html">AutoML Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.04_reporting.html">Run reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guides.advanced.05_logging.html">Logging to stdout and file</a></li>
 </ul>
 </details></li>
 </ul>
@@ -507,7 +508,7 @@
     <span class="p">},</span>
 <span class="p">]</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_search_space</span><span class="p">(</span><span class="n">search_space</span><span class="p">)</span>
 <span class="n">context</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;hello, world!&quot;</span><span class="p">])</span>
@@ -519,16 +520,15 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/.cache/pypoetry/virtualenvs/autointent-FDypUDHQ-py3.10/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
-/home/runner/work/AutoIntent/AutoIntent/autointent/nodes/_node_optimizer.py:99: ExperimentalWarning: BruteForceSampler is experimental (supported from v3.1.0). The interface can change in the future.
-  sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
-[I 2025-03-08 22:15:27,618] A new study created in memory with name: no-name-8a324ed4-5bd3-4bae-8b4e-492a7d759e9e
-/home/runner/work/AutoIntent/AutoIntent/autointent/nodes/_node_optimizer.py:99: ExperimentalWarning: BruteForceSampler is experimental (supported from v3.1.0). The interface can change in the future.
-  sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
+Memory storage is not compatible with resuming optimization. Modules from previous runs won&#39;t be available. Set dump_modules=True in LoggingConfig to enable proper resuming.
+Storage directory must be provided for study persistence.
+[I 2025-08-01 04:45:03,888] A new study created in memory with name: scoring
+Storage directory must be provided for study persistence.
 &#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-/home/runner/.cache/pypoetry/virtualenvs/autointent-FDypUDHQ-py3.10/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, len(result))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, result.shape[0])
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -564,7 +564,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Pipeline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingConfig</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_search_space</span><span class="p">(</span><span class="n">search_space</span><span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">LoggingConfig</span><span class="p">(</span><span class="n">dump_modules</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear_ram</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </pre></div>
@@ -586,16 +586,9 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/home/runner/work/AutoIntent/AutoIntent/autointent/nodes/_node_optimizer.py:99: ExperimentalWarning: BruteForceSampler is experimental (supported from v3.1.0). The interface can change in the future.
-  sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
-Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info._data_models.ScorerArtifact&#39;&gt; cannot be dumped to file system.
-/home/runner/work/AutoIntent/AutoIntent/autointent/nodes/_node_optimizer.py:99: ExperimentalWarning: BruteForceSampler is experimental (supported from v3.1.0). The interface can change in the future.
-  sampler_instance = optuna.samplers.BruteForceSampler(seed=context.seed)  # type: ignore[assignment]
-Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info._data_models.DecisionArtifact&#39;&gt; cannot be dumped to file system.
 &#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info._data_models.DecisionArtifact&#39;&gt; cannot be dumped to file system.
-/home/runner/.cache/pypoetry/virtualenvs/autointent-FDypUDHQ-py3.10/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
-  _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, len(result))
+/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, result.shape[0])
 </pre></div></div>
 </div>
 <p>This command saves all results to the run’s directory:</p>
@@ -614,7 +607,7 @@ Attribute _artifact of type &lt;class &#39;autointent.context.optimization_info.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-PosixPath(&#39;/tmp/tmpgmvqaei_/ecad794b32f377cbce927c6cb58a4d5b2d261c9c/docs/source/user_guides/runs/attractive_quagga_03-08-2025_22-15-35&#39;)
+PosixPath(&#39;/tmp/tmpcrm_xvgw/ecad794b32f377cbce927c6cb58a4d5b2d261c9c/docs/source/user_guides/runs/funny_dinosaur_08-01-2025_04-45-13&#39;)
 </pre></div></div>
 </div>
 <p>After that, you can load pipeline for inference:</p>
@@ -658,7 +651,7 @@ PosixPath(&#39;/tmp/tmpgmvqaei_/ecad794b32f377cbce927c6cb58a4d5b2d261c9c/docs/so
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">AutoML</p>
+        <p class="prev-next-title">AutoML Pipeline Configuration</p>
       </div>
     </a>
     <a class="right-next"

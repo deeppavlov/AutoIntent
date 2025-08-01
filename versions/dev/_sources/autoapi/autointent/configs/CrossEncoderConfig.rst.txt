@@ -3,10 +3,11 @@ autointent.configs.CrossEncoderConfig
 
 .. py:class:: autointent.configs.CrossEncoderConfig(/, **data)
 
-   Bases: :py:obj:`STModelConfig`
+   Bases: :py:obj:`HFModelConfig`
 
 
-   Usage docs: https://docs.pydantic.dev/2.10/concepts/models/
+   !!! abstract "Usage Documentation"
+       [Models](../concepts/models.md)
 
    A base class for creating Pydantic models.
 
@@ -94,6 +95,12 @@ autointent.configs.CrossEncoderConfig
 
    .. py:attribute:: train_head
       :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: tokenizer_config
+      :type:  TokenizerConfig
       :value: None
 
 

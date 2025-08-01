@@ -1,7 +1,7 @@
 autointent.Pipeline
 ===================
 
-.. py:class:: autointent.Pipeline(nodes, sampler = 'brute', seed = 42)
+.. py:class:: autointent.Pipeline(nodes, seed = 42)
 
    Pipeline optimizer class.
 
@@ -48,7 +48,7 @@ autointent.Pipeline
 
 
 
-   .. py:method:: fit(dataset, refit_after = False, sampler = None, incompatible_search_space = 'filter')
+   .. py:method:: fit(dataset, refit_after = False, incompatible_search_space = 'filter')
 
       Optimize the pipeline from dataset.
 

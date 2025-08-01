@@ -35,7 +35,7 @@ autointent.modules.decision.ArgmaxDecision
       :value: 'argmax'
 
 
-      Name of the module.
+      Name of the module to reference in search space configuration.
 
 
    .. py:attribute:: supports_oos

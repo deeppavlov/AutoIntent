@@ -50,14 +50,14 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
     <link rel="icon" href="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-white.svg"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="autointent.modules.scoring.DescriptionScorer" href="DescriptionScorer.html" />
+    <link rel="next" title="autointent.modules.scoring.BertScorer" href="BertScorer.html" />
     <link rel="prev" title="autointent.modules.regex.SimpleRegex" href="../regex/SimpleRegex.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -249,7 +249,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -374,7 +374,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -391,10 +391,16 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/InferenceNodeConfig.html">autointent.configs.InferenceNodeConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/DataConfig.html">autointent.configs.DataConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/HPOConfig.html">autointent.configs.HPOConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/LoggingConfig.html">autointent.configs.LoggingConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/TorchTrainingConfig.html">autointent.configs.TorchTrainingConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/VocabConfig.html">autointent.configs.VocabConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/CrossEncoderConfig.html">autointent.configs.CrossEncoderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/EarlyStoppingConfig.html">autointent.configs.EarlyStoppingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/HFModelConfig.html">autointent.configs.HFModelConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/TaskTypeEnum.html">autointent.configs.TaskTypeEnum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../configs/TokenizerConfig.html">autointent.configs.TokenizerConfig</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../context/index.html">autointent.context</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -456,6 +462,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../generation/utterances/UtteranceEvolver.html">autointent.generation.utterances.UtteranceEvolver</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../generation/RetriesExceededError.html">autointent.generation.RetriesExceededError</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../generation/Generator.html">autointent.generation.Generator</a></li>
 </ul>
 </details></li>
@@ -577,15 +584,51 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">autointent.modules.scoring</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="DescriptionScorer.html">autointent.modules.scoring.DescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BertScorer.html">autointent.modules.scoring.BertScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CatBoostScorer.html">autointent.modules.scoring.CatBoostScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BiEncoderDescriptionScorer.html">autointent.modules.scoring.BiEncoderDescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CrossEncoderDescriptionScorer.html">autointent.modules.scoring.CrossEncoderDescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="LLMDescriptionScorer.html">autointent.modules.scoring.LLMDescriptionScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="DNNCScorer.html">autointent.modules.scoring.DNNCScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="KNNScorer.html">autointent.modules.scoring.KNNScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RerankScorer.html">autointent.modules.scoring.RerankScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="LinearScorer.html">autointent.modules.scoring.LinearScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="BERTLoRAScorer.html">autointent.modules.scoring.BERTLoRAScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="MLKnnScorer.html">autointent.modules.scoring.MLKnnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="PTuningScorer.html">autointent.modules.scoring.PTuningScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="SklearnScorer.html">autointent.modules.scoring.SklearnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CNNScorer.html">autointent.modules.scoring.CNNScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RNNScorer.html">autointent.modules.scoring.RNNScorer</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../BaseDecision.html">autointent.modules.BaseDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BaseEmbedding.html">autointent.modules.BaseEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BaseModule.html">autointent.modules.BaseModule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BaseRegex.html">autointent.modules.BaseRegex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BaseScorer.html">autointent.modules.BaseScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../AdaptiveDecision.html">autointent.modules.AdaptiveDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ArgmaxDecision.html">autointent.modules.ArgmaxDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../JinoosDecision.html">autointent.modules.JinoosDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ThresholdDecision.html">autointent.modules.ThresholdDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../TunableDecision.html">autointent.modules.TunableDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LogregAimedEmbedding.html">autointent.modules.LogregAimedEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../RetrievalAimedEmbedding.html">autointent.modules.RetrievalAimedEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../SimpleRegex.html">autointent.modules.SimpleRegex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BERTLoRAScorer.html">autointent.modules.BERTLoRAScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BertScorer.html">autointent.modules.BertScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../BiEncoderDescriptionScorer.html">autointent.modules.BiEncoderDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CatBoostScorer.html">autointent.modules.CatBoostScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CNNScorer.html">autointent.modules.CNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../CrossEncoderDescriptionScorer.html">autointent.modules.CrossEncoderDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DNNCScorer.html">autointent.modules.DNNCScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../KNNScorer.html">autointent.modules.KNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LinearScorer.html">autointent.modules.LinearScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../LLMDescriptionScorer.html">autointent.modules.LLMDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../MLKnnScorer.html">autointent.modules.MLKnnScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../PTuningScorer.html">autointent.modules.PTuningScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../RerankScorer.html">autointent.modules.RerankScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../RNNScorer.html">autointent.modules.RNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../SklearnScorer.html">autointent.modules.SklearnScorer</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../nodes/index.html">autointent.nodes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -602,6 +645,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../schemas/index.html">autointent.schemas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../schemas/node_validation/index.html">autointent.schemas.node_validation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/ParamSpace.html">autointent.schemas.node_validation.ParamSpace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/ParamSpaceInt.html">autointent.schemas.node_validation.ParamSpaceInt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/ParamSpaceFloat.html">autointent.schemas.node_validation.ParamSpaceFloat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/DecisionNodeValidator.html">autointent.schemas.node_validation.DecisionNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/EmbeddingNodeValidator.html">autointent.schemas.node_validation.EmbeddingNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/ScoringNodeValidator.html">autointent.schemas.node_validation.ScoringNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/RegexNodeValidator.html">autointent.schemas.node_validation.RegexNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/SearchSpaceConfig.html">autointent.schemas.node_validation.SearchSpaceConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/OptimizationSearchSpaceConfig.html">autointent.schemas.node_validation.OptimizationSearchSpaceConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/unwrap_annotated.html">autointent.schemas.node_validation.unwrap_annotated</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/type_matches.html">autointent.schemas.node_validation.type_matches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/get_optuna_class.html">autointent.schemas.node_validation.get_optuna_class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../schemas/node_validation/generate_models_and_union_type_for_classes.html">autointent.schemas.node_validation.generate_models_and_union_type_for_classes</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Intent.html">autointent.schemas.Intent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Sample.html">autointent.schemas.Sample</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../schemas/Tag.html">autointent.schemas.Tag</a></li>
@@ -698,8 +757,20 @@
 </div>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="DescriptionScorer.html#autointent.modules.scoring.DescriptionScorer" title="autointent.modules.scoring.DescriptionScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DescriptionScorer</span></code></a></p></td>
-<td><p>Scoring module that scores utterances based on similarity to intent descriptions.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="BertScorer.html#autointent.modules.scoring.BertScorer" title="autointent.modules.scoring.BertScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BertScorer</span></code></a></p></td>
+<td><p>Scoring module for transformer-based classification using BERT models.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="CatBoostScorer.html#autointent.modules.scoring.CatBoostScorer" title="autointent.modules.scoring.CatBoostScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CatBoostScorer</span></code></a></p></td>
+<td><p>CatBoost scorer using either external embeddings or CatBoost's own BoW encoding.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="BiEncoderDescriptionScorer.html#autointent.modules.scoring.BiEncoderDescriptionScorer" title="autointent.modules.scoring.BiEncoderDescriptionScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BiEncoderDescriptionScorer</span></code></a></p></td>
+<td><p>Bi-encoder description scorer for zero-shot intent classification.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="CrossEncoderDescriptionScorer.html#autointent.modules.scoring.CrossEncoderDescriptionScorer" title="autointent.modules.scoring.CrossEncoderDescriptionScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossEncoderDescriptionScorer</span></code></a></p></td>
+<td><p>Cross-encoder description scorer for zero-shot intent classification.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="LLMDescriptionScorer.html#autointent.modules.scoring.LLMDescriptionScorer" title="autointent.modules.scoring.LLMDescriptionScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LLMDescriptionScorer</span></code></a></p></td>
+<td><p>LLM-based description scorer for zero-shot intent classification using structured output.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="DNNCScorer.html#autointent.modules.scoring.DNNCScorer" title="autointent.modules.scoring.DNNCScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DNNCScorer</span></code></a></p></td>
 <td><p>Scoring module for intent classification using discriminative nearest neighbor classification.</p></td>
@@ -713,11 +784,23 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="LinearScorer.html#autointent.modules.scoring.LinearScorer" title="autointent.modules.scoring.LinearScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearScorer</span></code></a></p></td>
 <td><p>Scoring module for linear classification using logistic regression.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="MLKnnScorer.html#autointent.modules.scoring.MLKnnScorer" title="autointent.modules.scoring.MLKnnScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLKnnScorer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="BERTLoRAScorer.html#autointent.modules.scoring.BERTLoRAScorer" title="autointent.modules.scoring.BERTLoRAScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BERTLoRAScorer</span></code></a></p></td>
+<td><p>BERTLoRAScorer class for transformer-based classification with LoRA (Low-Rank Adaptation).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="MLKnnScorer.html#autointent.modules.scoring.MLKnnScorer" title="autointent.modules.scoring.MLKnnScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MLKnnScorer</span></code></a></p></td>
 <td><p>Multi-label k-nearest neighbors (ML-KNN) scorer.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="PTuningScorer.html#autointent.modules.scoring.PTuningScorer" title="autointent.modules.scoring.PTuningScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PTuningScorer</span></code></a></p></td>
+<td><p>PEFT P-tuning scorer.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="SklearnScorer.html#autointent.modules.scoring.SklearnScorer" title="autointent.modules.scoring.SklearnScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SklearnScorer</span></code></a></p></td>
 <td><p>Scoring module for classification using sklearn classifiers.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="CNNScorer.html#autointent.modules.scoring.CNNScorer" title="autointent.modules.scoring.CNNScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CNNScorer</span></code></a></p></td>
+<td><p>Convolutional Neural Network (CNN) scorer for intent classification.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="RNNScorer.html#autointent.modules.scoring.RNNScorer" title="autointent.modules.scoring.RNNScorer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNScorer</span></code></a></p></td>
+<td><p>Recurrent Neural Network (RNN) scorer for intent classification.</p></td>
 </tr>
 </tbody>
 </table>
@@ -745,11 +828,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="DescriptionScorer.html"
+       href="BertScorer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">autointent.modules.scoring.DescriptionScorer</p>
+        <p class="prev-next-title">autointent.modules.scoring.BertScorer</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.1.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -58,7 +58,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="autointent.metrics" href="../metrics/index.html" />
-    <link rel="prev" title="autointent.generation.utterances.UtteranceEvolver" href="utterances/UtteranceEvolver.html" />
+    <link rel="prev" title="autointent.generation.RetriesExceededError" href="RetriesExceededError.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -249,7 +249,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
       
@@ -374,7 +374,7 @@
           
           
           
-          <a href="https://huggingface.co/AutoIntent" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
+          <a href="https://huggingface.co/DeepPavlov" title="HuggingFace" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/hf-logo.svg" class="icon-link-image" alt="HuggingFace"/></a>
         </li>
 </ul></div>
         
@@ -391,10 +391,16 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../configs/InferenceNodeConfig.html">autointent.configs.InferenceNodeConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/DataConfig.html">autointent.configs.DataConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/HPOConfig.html">autointent.configs.HPOConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/LoggingConfig.html">autointent.configs.LoggingConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/TorchTrainingConfig.html">autointent.configs.TorchTrainingConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/VocabConfig.html">autointent.configs.VocabConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/CrossEncoderConfig.html">autointent.configs.CrossEncoderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/EarlyStoppingConfig.html">autointent.configs.EarlyStoppingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/EmbedderConfig.html">autointent.configs.EmbedderConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/HFModelConfig.html">autointent.configs.HFModelConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/TaskTypeEnum.html">autointent.configs.TaskTypeEnum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../configs/TokenizerConfig.html">autointent.configs.TokenizerConfig</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../context/index.html">autointent.context</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -456,6 +462,7 @@
 <li class="toctree-l3"><a class="reference internal" href="utterances/UtteranceEvolver.html">autointent.generation.utterances.UtteranceEvolver</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="RetriesExceededError.html">autointent.generation.RetriesExceededError</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">autointent.generation.Generator</a></li>
 </ul>
 </details></li>
@@ -577,15 +584,51 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../modules/scoring/index.html">autointent.modules.scoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/DescriptionScorer.html">autointent.modules.scoring.DescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/BertScorer.html">autointent.modules.scoring.BertScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/CatBoostScorer.html">autointent.modules.scoring.CatBoostScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/BiEncoderDescriptionScorer.html">autointent.modules.scoring.BiEncoderDescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/CrossEncoderDescriptionScorer.html">autointent.modules.scoring.CrossEncoderDescriptionScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/LLMDescriptionScorer.html">autointent.modules.scoring.LLMDescriptionScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/DNNCScorer.html">autointent.modules.scoring.DNNCScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/KNNScorer.html">autointent.modules.scoring.KNNScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/RerankScorer.html">autointent.modules.scoring.RerankScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/LinearScorer.html">autointent.modules.scoring.LinearScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/BERTLoRAScorer.html">autointent.modules.scoring.BERTLoRAScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/MLKnnScorer.html">autointent.modules.scoring.MLKnnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/PTuningScorer.html">autointent.modules.scoring.PTuningScorer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../modules/scoring/SklearnScorer.html">autointent.modules.scoring.SklearnScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/CNNScorer.html">autointent.modules.scoring.CNNScorer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/scoring/RNNScorer.html">autointent.modules.scoring.RNNScorer</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BaseDecision.html">autointent.modules.BaseDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BaseEmbedding.html">autointent.modules.BaseEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BaseModule.html">autointent.modules.BaseModule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BaseRegex.html">autointent.modules.BaseRegex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BaseScorer.html">autointent.modules.BaseScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/AdaptiveDecision.html">autointent.modules.AdaptiveDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/ArgmaxDecision.html">autointent.modules.ArgmaxDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/JinoosDecision.html">autointent.modules.JinoosDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/ThresholdDecision.html">autointent.modules.ThresholdDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/TunableDecision.html">autointent.modules.TunableDecision</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/LogregAimedEmbedding.html">autointent.modules.LogregAimedEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/RetrievalAimedEmbedding.html">autointent.modules.RetrievalAimedEmbedding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/SimpleRegex.html">autointent.modules.SimpleRegex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BERTLoRAScorer.html">autointent.modules.BERTLoRAScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BertScorer.html">autointent.modules.BertScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/BiEncoderDescriptionScorer.html">autointent.modules.BiEncoderDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/CatBoostScorer.html">autointent.modules.CatBoostScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/CNNScorer.html">autointent.modules.CNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/CrossEncoderDescriptionScorer.html">autointent.modules.CrossEncoderDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/DNNCScorer.html">autointent.modules.DNNCScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/KNNScorer.html">autointent.modules.KNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/LinearScorer.html">autointent.modules.LinearScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/LLMDescriptionScorer.html">autointent.modules.LLMDescriptionScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/MLKnnScorer.html">autointent.modules.MLKnnScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/PTuningScorer.html">autointent.modules.PTuningScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/RerankScorer.html">autointent.modules.RerankScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/RNNScorer.html">autointent.modules.RNNScorer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/SklearnScorer.html">autointent.modules.SklearnScorer</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../nodes/index.html">autointent.nodes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -602,6 +645,22 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../schemas/index.html">autointent.schemas</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../schemas/node_validation/index.html">autointent.schemas.node_validation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/ParamSpace.html">autointent.schemas.node_validation.ParamSpace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/ParamSpaceInt.html">autointent.schemas.node_validation.ParamSpaceInt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/ParamSpaceFloat.html">autointent.schemas.node_validation.ParamSpaceFloat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/DecisionNodeValidator.html">autointent.schemas.node_validation.DecisionNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/EmbeddingNodeValidator.html">autointent.schemas.node_validation.EmbeddingNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/ScoringNodeValidator.html">autointent.schemas.node_validation.ScoringNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/RegexNodeValidator.html">autointent.schemas.node_validation.RegexNodeValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/SearchSpaceConfig.html">autointent.schemas.node_validation.SearchSpaceConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/OptimizationSearchSpaceConfig.html">autointent.schemas.node_validation.OptimizationSearchSpaceConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/unwrap_annotated.html">autointent.schemas.node_validation.unwrap_annotated</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/type_matches.html">autointent.schemas.node_validation.type_matches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/get_optuna_class.html">autointent.schemas.node_validation.get_optuna_class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../schemas/node_validation/generate_models_and_union_type_for_classes.html">autointent.schemas.node_validation.generate_models_and_union_type_for_classes</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Intent.html">autointent.schemas.Intent</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Sample.html">autointent.schemas.Sample</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../schemas/Tag.html">autointent.schemas.Tag</a></li>
@@ -694,21 +753,90 @@
 <h1>autointent.generation.Generator<a class="headerlink" href="#autointent-generation-generator" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="autointent.generation.Generator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autointent.generation.</span></span><span class="sig-name descname"><span class="pre">Generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">generation_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator" title="Link to this definition">#</a></dt>
-<dd><p>Wrapper class for accessing OpenAI API.</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autointent.generation.</span></span><span class="sig-name descname"><span class="pre">Generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">generation_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper class for accessing OpenAI-compatible API endpoints for LLM generation.</p>
+<p>This class provides a unified interface for interacting with OpenAI-compatible APIs,
+supporting both synchronous and asynchronous operations. It includes built-in caching,
+retry logic for structured output, and automatic environment variable detection.</p>
+<p>The Generator can work with various OpenAI-compatible services including:
+- OpenAI’s official API
+- Azure OpenAI
+- Local inference servers (vLLM, Ollama, etc.)
+- Other OpenAI-compatible endpoints</p>
+<dl>
+<dt>Environment Variables:</dt><dd><p>The following environment variables can be used for configuration:</p>
+<dl class="simple">
+<dt><strong>OPENAI_API_KEY</strong> (required):</dt><dd><p>API key for authentication with the OpenAI-compatible service.
+This is required for most API endpoints.</p>
+</dd>
+<dt><strong>OPENAI_BASE_URL</strong> (optional):</dt><dd><p>Base URL for the API endpoint. If not provided, defaults to OpenAI’s API.
+- <a class="reference external" href="https://api.openai.com/v1">https://api.openai.com/v1</a> (OpenAI official)
+- <a class="reference external" href="https://your-org.openai.azure.com">https://your-org.openai.azure.com</a> (Azure OpenAI)
+- <a class="reference external" href="http://localhost:8000/v1">http://localhost:8000/v1</a> (local vLLM server)</p>
+</dd>
+<dt><strong>OPENAI_MODEL_NAME</strong> (optional):</dt><dd><p>Default model name to use if not specified in the constructor.
+Examples: “gpt-4o-mini”, “gpt-3.5-turbo”, “claude-3-haiku”</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – HTTP-endpoint for sending API requests to OpenAI API compatible server.
-Omit this to infer <code class="docutils literal notranslate"><span class="pre">OPENAI_BASE_URL</span></code> from environment.</p></li>
-<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – Name of LLM. Omit this to infer <code class="docutils literal notranslate"><span class="pre">OPENAI_MODEL_NAME</span></code> from environment.</p></li>
-<li><p><strong>**generation_params</strong> (<em>Any</em>) – kwargs that will be sent with a request to the endpoint.</p></li>
+<li><p><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – HTTP endpoint for API requests. If None, uses OPENAI_BASE_URL environment variable.</p></li>
+<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – Name of the language model. If None, uses OPENAI_MODEL_NAME environment variable.</p></li>
+<li><p><strong>use_cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – Whether to enable caching for structured outputs (default: True).</p></li>
+<li><p><strong>client_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>Any</em><em>] </em><em>| </em><em>None</em>) – Additional parameters passed to the OpenAI client constructor.</p></li>
+<li><p><strong>**generation_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – Additional parameters passed to the chat completion API calls.</p></li>
 </ul>
+</dd>
+</dl>
+<section id="example">
+<h2>Example:<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autointent.generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+
+<span class="c1"># Method 1: Using environment variables</span>
+<span class="c1"># Set these in your environment or .env file:</span>
+<span class="c1"># OPENAI_API_KEY=your-api-key-here</span>
+<span class="c1"># OPENAI_MODEL_NAME=gpt-4o-mini</span>
+<span class="c1"># OPENAI_BASE_URL=https://api.openai.com/v1  # optional</span>
+
+<span class="n">generator</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span>
+
+<span class="c1"># Method 2: Explicit configuration</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;https://api.openai.com/v1&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">1000</span>
+<span class="p">)</span>
+
+<span class="c1"># Basic chat completion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autointent.generation.chat_templates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">Role</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">Role</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, how are you?&quot;</span><span class="p">}]</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">get_chat_completion</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">raises ValueError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If model_name is not provided and OPENAI_MODEL_NAME is not set.</p>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.generation.Generator.model_name">
-<span class="sig-name descname"><span class="pre">model_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#autointent.generation.Generator.model_name" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">model_name</span></span><a class="headerlink" href="#autointent.generation.Generator.model_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.generation.Generator.base_url">
+<span class="sig-name descname"><span class="pre">base_url</span></span><a class="headerlink" href="#autointent.generation.Generator.base_url" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.generation.Generator.use_cache">
+<span class="sig-name descname"><span class="pre">use_cache</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#autointent.generation.Generator.use_cache" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -724,6 +852,11 @@ Omit this to infer <code class="docutils literal notranslate"><span class="pre">
 <dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.generation.Generator.generation_params">
 <span class="sig-name descname"><span class="pre">generation_params</span></span><a class="headerlink" href="#autointent.generation.Generator.generation_params" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autointent.generation.Generator.cache">
+<span class="sig-name descname"><span class="pre">cache</span></span><a class="headerlink" href="#autointent.generation.Generator.cache" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -754,6 +887,78 @@ Omit this to infer <code class="docutils literal notranslate"><span class="pre">
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.generation.Generator.get_structured_output_async">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_structured_output_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator.get_structured_output_async" title="Link to this definition">#</a></dt>
+<dd><p>Prompt LLM and return structured output parsed into the provided Pydantic model asynchronously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="chat_templates/Message.html#autointent.generation.chat_templates.Message" title="autointent.generation.chat_templates.Message"><em>autointent.generation.chat_templates.Message</em></a><em>]</em>) – List of messages to send to the model.</p></li>
+<li><p><strong>output_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a><em>[</em><em>T</em><em>]</em>) – Pydantic model class to parse the response into.</p></li>
+<li><p><strong>max_retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Maximum number of retry attempts for failed validations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed response as an instance of the provided Pydantic model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>T</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.generation.Generator.get_structured_output_sync">
+<span class="sig-name descname"><span class="pre">get_structured_output_sync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator.get_structured_output_sync" title="Link to this definition">#</a></dt>
+<dd><p>Prompt LLM and return structured output parsed into the provided Pydantic model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>messages</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="chat_templates/Message.html#autointent.generation.chat_templates.Message" title="autointent.generation.chat_templates.Message"><em>autointent.generation.chat_templates.Message</em></a><em>]</em>) – List of messages to send to the model.</p></li>
+<li><p><strong>output_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a><em>[</em><em>T</em><em>]</em>) – Pydantic model class to parse the response into.</p></li>
+<li><p><strong>max_retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Maximum number of retry attempts for failed validations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed response as an instance of the provided Pydantic model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>T</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.generation.Generator.dump">
+<span class="sig-name descname"><span class="pre">dump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exist_ok</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator.dump" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><em>pathlib.Path</em></a>)</p></li>
+<li><p><strong>exist_ok</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autointent.generation.Generator.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.generation.Generator.load" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><em>pathlib.Path</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#autointent.generation.Generator" title="autointent.generation.Generator">Generator</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </dd></dl>
 
 </section>
@@ -769,12 +974,12 @@ Omit this to infer <code class="docutils literal notranslate"><span class="pre">
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="utterances/UtteranceEvolver.html"
+       href="RetriesExceededError.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">autointent.generation.utterances.UtteranceEvolver</p>
+        <p class="prev-next-title">autointent.generation.RetriesExceededError</p>
       </div>
     </a>
     <a class="right-next"
@@ -807,11 +1012,18 @@ Omit this to infer <code class="docutils literal notranslate"><span class="pre">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator"><code class="docutils literal notranslate"><span class="pre">Generator</span></code></a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.model_name"><code class="docutils literal notranslate"><span class="pre">model_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.base_url"><code class="docutils literal notranslate"><span class="pre">base_url</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.use_cache"><code class="docutils literal notranslate"><span class="pre">use_cache</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.client"><code class="docutils literal notranslate"><span class="pre">client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.async_client"><code class="docutils literal notranslate"><span class="pre">async_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.generation_params"><code class="docutils literal notranslate"><span class="pre">generation_params</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.cache"><code class="docutils literal notranslate"><span class="pre">cache</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.get_chat_completion"><code class="docutils literal notranslate"><span class="pre">get_chat_completion()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.get_chat_completion_async"><code class="docutils literal notranslate"><span class="pre">get_chat_completion_async()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.get_structured_output_async"><code class="docutils literal notranslate"><span class="pre">get_structured_output_async()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.get_structured_output_sync"><code class="docutils literal notranslate"><span class="pre">get_structured_output_sync()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.dump"><code class="docutils literal notranslate"><span class="pre">dump()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#autointent.generation.Generator.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
 </ul>
 </li>
 </ul>

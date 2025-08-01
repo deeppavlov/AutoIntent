@@ -1,0 +1,106 @@
+autointent.modules.AdaptiveDecision
+===================================
+
+.. py:class:: autointent.modules.AdaptiveDecision(search_space = None)
+
+   Bases: :py:obj:`autointent.modules.base.BaseDecision`
+
+
+   Decision for multi-label classification using adaptive thresholds.
+
+   The AdaptiveDecision calculates optimal thresholds based on the given
+   scores and labels, ensuring the best performance on multi-label data.
+
+   :param search_space: List of threshold scaling factors to search for optimal performance.
+                        Defaults to a range between 0 and 1
+
+   Examples:
+   --------
+   .. testcode::
+
+       from autointent.modules.decision import AdaptiveDecision
+       import numpy as np
+       scores = np.array([[0.8, 0.1, 0.4], [0.2, 0.9, 0.5]])
+       labels = [[1, 0, 0], [0, 1, 0]]
+       predictor = AdaptiveDecision()
+       predictor.fit(scores, labels)
+       decisions = predictor.predict(scores)
+       print(decisions)
+
+   .. testoutput::
+
+       [[1, 0, 1], [0, 1, 1]]
+
+
+
+   .. py:attribute:: tags
+      :type:  list[autointent.schemas.Tag] | None
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :value: False
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: supports_oos
+      :value: False
+
+
+      Whether the module supports oos data
+
+
+   .. py:attribute:: name
+      :value: 'adaptive'
+
+
+      Name of the module to reference in search space configuration.
+
+
+   .. py:attribute:: search_space
+      :value: None
+
+
+
+   .. py:method:: from_context(context, search_space = None)
+      :classmethod:
+
+
+      Create an AdaptiveDecision instance using a Context object.
+
+      :param context: Context containing configurations and utilities
+      :param search_space: List of threshold scaling factors, or None for default
+
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+
+      Fit the predictor by optimizing the threshold scaling factor.
+
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+      :param labels: List of true multi-label targets
+      :param tags: List of Tag objects for mutually exclusive classes, or None
+
+      :raises WrongClassificationError: If used on non-multi-label data
+
+
+
+   .. py:method:: predict(scores)
+
+      Predict labels for the given scores.
+
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+
+      :returns: Array of shape (n_samples, n_classes) with predicted binary labels
+
+      :raises MismatchNumClassesError: If the number of classes does not match the trained predictor
+
+
