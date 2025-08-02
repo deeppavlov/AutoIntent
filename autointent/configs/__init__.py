@@ -17,6 +17,7 @@ __all__ = [
     "CrossEncoderConfig",
     "DataConfig",
     "EarlyStoppingConfig",
+    "EmbedderFineTuningConfig",
     "EmbedderConfig",
     "HFModelConfig",
     "HPOConfig",

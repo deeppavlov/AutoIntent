@@ -2,7 +2,6 @@ from autointent.context.data_handler import DataHandler
 from autointent._wrappers.embedder import Embedder
 from autointent.configs._transformers import HFModelConfig, EmbedderConfig, EmbedderFineTuningConfig
 import numpy as np
-import pytest
 
 def test_model_updates_after_training(dataset):
     """Test that model weights actually change after training"""
