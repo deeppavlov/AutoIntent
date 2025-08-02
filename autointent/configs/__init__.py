@@ -6,6 +6,7 @@ from ._torch import TorchTrainingConfig, VocabConfig
 from ._transformers import (
     CrossEncoderConfig,
     EarlyStoppingConfig,
+    EmbedderFineTuningConfig,
     EmbedderConfig,
     HFModelConfig,
     TaskTypeEnum,
