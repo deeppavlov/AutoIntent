@@ -1,7 +1,9 @@
-from autointent.context.data_handler import DataHandler
-from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import HFModelConfig, EmbedderConfig, EmbedderFineTuningConfig
 import numpy as np
+
+from autointent._wrappers.embedder import Embedder
+from autointent.configs._transformers import EmbedderConfig, EmbedderFineTuningConfig, HFModelConfig
+from autointent.context.data_handler import DataHandler
+
 
 def test_model_updates_after_training(dataset):
     """Test that model weights actually change after training"""
@@ -48,7 +50,6 @@ def test_model_updates_after_training(dataset):
 
     weights_changed = any(
         not np.allclose(orig, trained, atol=1e-6)
-        for orig, trained in zip(original_weights, trained_weights)
+        for orig, trained in zip(original_weights, trained_weights, strict=True)
     )
-    
     assert weights_changed, "Model weights should change after training"

@@ -7,25 +7,24 @@ embedding models and calculating embeddings for input texts.
 import json
 import logging
 import shutil
+import tempfile
 from functools import lru_cache
 from pathlib import Path
 from typing import TypedDict
-import tempfile
 
 import huggingface_hub
 import numpy as np
 import numpy.typing as npt
 import torch
 from appdirs import user_cache_dir
-from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
-from sentence_transformers.similarity_functions import SimilarityFunction
-from sentence_transformers.losses import BatchAllTripletLoss
-from sentence_transformers.training_args import BatchSamplers
 from datasets import Dataset
-
+from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
+from sentence_transformers.losses import BatchAllTripletLoss
+from sentence_transformers.similarity_functions import SimilarityFunction
+from sentence_transformers.training_args import BatchSamplers
 
 from autointent._hash import Hasher
-from autointent.configs import EmbedderConfig, TaskTypeEnum, EmbedderFineTuningConfig
+from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +127,7 @@ class Embedder:
                 trust_remote_code=self.config.trust_remote_code,
             )
     def train(self, utterances: list[str], labels: list[int], config: EmbedderFineTuningConfig) -> None:
-        """Train the embedding model"""
+        """Train the embedding model."""
         self._load_model()
 
         tr_ds = Dataset.from_dict({
@@ -137,7 +136,7 @@ class Embedder:
         })
 
         loss = BatchAllTripletLoss(
-            model=self.embedding_model, 
+            model=self.embedding_model,
             margin=config.margin
         )
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -159,9 +158,9 @@ class Embedder:
                 train_dataset=tr_ds,
                 loss=loss,
             )
-            
+
             trainer.train()
-        
+
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
         if hasattr(self, "embedding_model"):
