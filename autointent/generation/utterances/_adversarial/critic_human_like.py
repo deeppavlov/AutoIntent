@@ -10,8 +10,10 @@ from autointent.generation.chat_templates import Message, Role
 
 class CriticResponse(BaseModel):
     """Structured answer."""
+
     reasoning: str
     label: Literal["human", "generated"]
+
 
 class CriticHumanLike:
     """A simple critic class that classifies user utterances as either 'human' or 'generated'.
@@ -19,7 +21,7 @@ class CriticHumanLike:
     using an LLM-based binary classifier prompt.
     """
 
-    def __init__(self, generator: Generator, max_retries: int = 3)-> None:
+    def __init__(self, generator: Generator, max_retries: int = 3) -> None:
         """Initialize the CriticFirst.
 
         Args:
@@ -28,6 +30,7 @@ class CriticHumanLike:
         """
         self.generator = generator
         self.max_retries = max_retries
+
     def build_classification_prompt(self, example: str, intent_name: str) -> Message:
         """Args.
 
@@ -67,17 +70,14 @@ class CriticHumanLike:
         """
         message = self.build_classification_prompt(utterance, intent_name)
         response = self.generator.get_structured_output_sync(
-            messages=[message],
-            output_model=CriticResponse,
-            max_retries=self.max_retries
+            messages=[message], output_model=CriticResponse, max_retries=self.max_retries
         )
         return response.label == "human"
+
     async def is_human_async(self, utterance: str, intent_name: str) -> bool:
         message = self.build_classification_prompt(utterance, intent_name)
 
         response = await self.generator.get_structured_output_async(
-            messages=[message],
-            output_model=CriticResponse,
-            max_retries=self.max_retries
+            messages=[message], output_model=CriticResponse, max_retries=self.max_retries
         )
         return response.label == "human"

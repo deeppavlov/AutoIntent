@@ -65,7 +65,7 @@ Reference
 :doc:`🔧 API Reference <autoapi/autointent/index>`
    Complete technical documentation for all classes, methods, and functions. Essential reference for developers integrating AutoIntent into their applications.
    
-   Key sections: :doc:`Modules <autoapi/autointent/modules/index>` | :doc:`Metrics <autoapi/autointent/metrics/index>`
+   Key section: :doc:`Modules <autoapi/autointent/modules/index>`
 
 
 .. toctree::

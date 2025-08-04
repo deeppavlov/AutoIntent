@@ -22,7 +22,7 @@ class HumanUtteranceGenerator:
     to bypass a critic that identifies machine-generated text.
     """
 
-    def __init__(self, generator: Generator, critic: CriticHumanLike, async_mode: bool = False)-> None:
+    def __init__(self, generator: Generator, critic: CriticHumanLike, async_mode: bool = False) -> None:
         """Initialize the HumanUtteranceGeneratoror.
 
         Args:
@@ -35,11 +35,7 @@ class HumanUtteranceGenerator:
         self.async_mode = async_mode
 
     def augment(
-            self,
-            dataset: Dataset,
-            split_name: str = Split.TRAIN,
-            update_split: bool = True,
-            n_final_per_class: int = 5
+        self, dataset: Dataset, split_name: str = Split.TRAIN, update_split: bool = True, n_final_per_class: int = 5
     ) -> list[Sample]:
         """Generate human-like utterances for each intent by iteratively refining machine-generated candidates.
 
@@ -55,10 +51,10 @@ class HumanUtteranceGenerator:
         if self.async_mode:
             return asyncio.run(
                 self.augment_async(
-                dataset=dataset,
-                split_name=split_name,
-                update_split=update_split,
-                n_final_per_class=n_final_per_class
+                    dataset=dataset,
+                    split_name=split_name,
+                    update_split=update_split,
+                    n_final_per_class=n_final_per_class,
                 )
             )
         original_split = dataset[split_name]
@@ -89,10 +85,7 @@ class HumanUtteranceGenerator:
                     prompt = self._build_adversarial_prompt(intent_name, seed_examples, rejected)
                     generated = self.generator.get_chat_completion([prompt]).strip()
                     if self.critic.is_human(generated, intent_name):
-                        new_samples.append({
-                            Dataset.label_feature: intent_id,
-                            Dataset.utterance_feature: generated
-                        })
+                        new_samples.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: generated})
                         generated_count += 1
                         break
                     rejected.append(generated)
@@ -103,12 +96,8 @@ class HumanUtteranceGenerator:
         return [Sample(**sample) for sample in new_samples]
 
     async def augment_async(
-        self,
-        dataset: Dataset,
-        split_name: str = Split.TRAIN,
-        update_split: bool = True,
-        n_final_per_class: int = 5
-        ) -> list[Sample]:
+        self, dataset: Dataset, split_name: str = Split.TRAIN, update_split: bool = True, n_final_per_class: int = 5
+    ) -> list[Sample]:
         original_split = dataset[split_name]
         id_to_name = {intent.id: intent.name for intent in dataset.intents}
         new_samples = []
@@ -135,10 +124,7 @@ class HumanUtteranceGenerator:
                     prompt = self._build_adversarial_prompt(intent_name, seed_examples, rejected)
                     generated = (await self.generator.get_chat_completion_async([prompt])).strip()
                     if await self.critic.is_human_async(generated, intent_name):
-                        new_samples.append({
-                            Dataset.label_feature: intent_id,
-                            Dataset.utterance_feature: generated
-                        })
+                        new_samples.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: generated})
                         generated_count += 1
                         break
                     rejected.append(generated)
@@ -148,6 +134,7 @@ class HumanUtteranceGenerator:
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
         return [Sample(**sample) for sample in new_samples]
+
     def _build_adversarial_prompt(self, intent_name: str, seed_examples: list[str], rejected: list[str]) -> Message:
         """Build a few-shot prompt.
 
@@ -175,4 +162,3 @@ class HumanUtteranceGenerator:
             "IMPORTANT: You must modify the original utterance."
         )
         return Message(role=Role.USER, content=content)
-

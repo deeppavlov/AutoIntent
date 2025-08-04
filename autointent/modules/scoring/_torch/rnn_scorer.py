@@ -8,7 +8,56 @@ from .rnn_model import TextRNN
 
 
 class RNNScorer(BaseTorchScorer):
-    """Scorer based on RNN model for text classification."""
+    """Recurrent Neural Network (RNN) scorer for intent classification.
+
+    This module uses an RNN architecture to perform intent classification on text data.
+    It builds a vocabulary from input text, converts text to indices, and trains an RNN
+    model with multiple recurrent layers for sequential feature extraction. The RNN
+    processes text sequentially, making it well-suited for capturing temporal dependencies
+    in language. Supports both multiclass and multilabel classification tasks.
+
+    Args:
+        embed_dim: Dimensionality of word embeddings (default: 128)
+        hidden_dim: Dimensionality of hidden states in RNN layers (default: 512)
+        n_layers: Number of recurrent layers (default: 2)
+        dropout: Dropout rate for regularization (default: 0.1)
+        num_train_epochs: Number of training epochs (default: 3)
+        batch_size: Batch size for training (default: 8)
+        learning_rate: Learning rate for training (default: 5e-5)
+        seed: Random seed for reproducibility (default: 42)
+        device: Device for training ('cpu', 'cuda', etc.), auto-detected if None
+        vocab_config: Configuration for vocabulary building
+        early_stopping_config: Configuration for early stopping during training
+
+    Example:
+    --------
+    .. testcode::
+
+        from autointent.modules.scoring import RNNScorer
+
+        # Initialize RNN scorer with custom parameters
+        scorer = RNNScorer(
+            embed_dim=16,
+            hidden_dim=16,
+            n_layers=1,
+            dropout=0.2,
+            num_train_epochs=1,
+            batch_size=2,
+            learning_rate=1e-4,
+            seed=42
+        )
+
+        # Training data
+        utterances = ["This is great!", "I didn't like it", "Awesome product", "Poor quality"]
+        labels = [1, 0, 1, 0]
+
+        # Fit the model
+        scorer.fit(utterances, labels)
+
+        # Make predictions
+        test_utterances = ["Good product", "Not worth it"]
+        probabilities = scorer.predict(test_utterances)
+    """
 
     name = "rnn"
 

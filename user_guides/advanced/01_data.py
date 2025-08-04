@@ -1,240 +1,285 @@
 # %% [markdown]
 """
-# Working with data
+# Data
 
-This chapter is a more detailed version of data chapter from basic user guide about how to manipulate intent classification data with AutoIntent.
+This chapter covers advanced data handling techniques in AutoIntent that go beyond basic dataset creation. You'll learn how to handle out-of-scope samples, enrich your data with intent metadata, and leverage advanced features for robust intent classification systems.
+"""
+
+# %% [markdown]
+"""
+**Prerequisites**: Complete the %mddoclink(notebook,basic_usage.01_data) tutorial first.
 """
 
 # %%
 import datasets
-import huggingface_hub
 
 from autointent import Dataset
 
 # %%
-datasets.logging.disable_progress_bar()  # disable tqdm outputs
+datasets.logging.disable_progress_bar()  # disable tqdm outputs for cleaner output
 
 # %% [markdown]
 """
-## Creating a dataset
+## Handling Out-of-Scope (OOS) Samples
 
-To create a dataset, you need to provide a training split containing samples with utterances and labels, as shown below:
+Out-of-scope detection is crucial for robust intent classification systems. Users often say things that don't match any of your predefined intents, and your system needs to handle these gracefully.
 
-```json
-{
+### What are Out-of-Scope Samples?
+
+Out-of-scope (OOS) samples are utterances that don't belong to any of your defined intent classes. For example, in a banking chatbot, "What's the weather like?" would be out-of-scope.
+"""
+
+# %%
+# Create a dataset with out-of-scope samples
+banking_with_oos = {
     "train": [
-        {
-            "utterance": "Hello!",
-            "label": 0
-        },
-        "...",
-    ]
-}
-```
-
-For a multilabel dataset, the `label` field should be a list of integers representing the corresponding class labels.
-
-### Handling out-of-scope samples
-
-To indicate that a sample is out-of-scope (see %mddoclink(rst,concepts)), omit the `label` field from the sample dictionary. For example:
-
-```json
-{
-    "train": [
-        {
-            "utterance": "OOS request"
-        },
-        "...",
-    ]
-}
-```
-
-### Validation and test splits
-
-By default, a portion of the training split will be allocated for validation and testing.
-However, you can also specify a test split explicitly:
-
-```json
-{
-    "train": [
-        {
-            "utterance": "Hello!",
-            "label": 0
-        },
-        "...",
+        # In-domain samples
+        {"utterance": "What's my account balance?", "label": 0},
+        {"utterance": "Check my current balance", "label": 0},
+        {"utterance": "I want to transfer money to my friend", "label": 1},
+        {"utterance": "How do I send funds to someone?", "label": 1},
+        {"utterance": "Cancel my last transaction", "label": 2},
+        {"utterance": "Reverse the payment I just made", "label": 2},
+        # Out-of-scope samples (no label field)
+        {"utterance": "What's the weather like today?"},
+        {"utterance": "Tell me a joke"},
+        {"utterance": "How do I cook pasta?"},
+        {"utterance": "What time is it?"},
+        {"utterance": "I love pizza"},
     ],
     "test": [
-        {
-            "utterance": "Hi!",
-            "label": 0
-        },
-        "...",
-    ]
+        {"utterance": "Show me my current balance", "label": 0},
+        {"utterance": "Transfer $100 to my savings", "label": 1},
+        {"utterance": "Stop my recent payment", "label": 2},
+        {"utterance": "What's your favorite movie?"},  # OOS
+        {"utterance": "How's the traffic today?"},  # OOS
+    ],
+    "intents": [
+        {"id": 0, "name": "balance_inquiry"},
+        {"id": 1, "name": "money_transfer"},
+        {"id": 2, "name": "transaction_cancellation"},
+    ],
 }
-```
 
-### Adding metadata to intents
+dataset_with_oos = Dataset.from_dict(banking_with_oos)
+print("✅ Dataset with OOS samples created")
+print(f"Available splits: {list(dataset_with_oos.keys())}")
 
-You can add metadata to intents in your dataset, such as
-regular expressions, intent names, descriptions, or tags, using the `intents` field:
+# %% [markdown]
+"""
+### Advanced OOS Strategies
 
-```json
-{
+For robust systems, you'll want to carefully curate your OOS samples:
+
+1. **Domain-adjacent samples**: Include utterances that are close to your domain but still out-of-scope
+2. **Common conversational patterns**: Add greetings, small talk, and common user behaviors
+3. **Edge cases**: Include borderline cases that might confuse your model
+"""
+
+# %%
+# Example of well-curated OOS samples for a banking domain
+sophisticated_oos_data = {
     "train": [
-        {
-            "utterance": "Hello!",
-            "label": 0
-        },
-        "...",
+        # In-scope samples
+        {"utterance": "What's my account balance?", "label": 0},
+        {"utterance": "I want to transfer money", "label": 1},
+        # Sophisticated out-of-scope samples
+        {"utterance": "Hello, how are you?"},  # Greeting
+        {"utterance": "Thanks for your help!"},  # Courtesy
+        {"utterance": "What other services do you offer?"},  # Domain-adjacent
+        {"utterance": "I'm having trouble with the app"},  # Technical support (different domain)
+        {"utterance": "Can you recommend a good investment?"},  # Financial advice (borderline)
+        {"utterance": "What are your business hours?"},  # Information request (different domain)
+    ],
+    "intents": [
+        {"id": 0, "name": "balance_inquiry"},
+        {"id": 1, "name": "money_transfer"},
+    ],
+}
+
+sophisticated_dataset = Dataset.from_dict(sophisticated_oos_data)
+
+# %% [markdown]
+"""
+## Enriching Data with Intent Metadata
+
+Intent metadata allows you to provide additional information about your intents that can be leveraged by various AutoIntent modules for improved performance.
+"""
+
+# %% [markdown]
+"""
+### Intent Metadata Example
+
+Here's an example showing how to add metadata to your intents:
+"""
+
+# %%
+# Create a dataset with rich intent metadata
+comprehensive_banking_data = {
+    "train": [
+        {"utterance": "What's my account balance?", "label": 0},
+        {"utterance": "Check my current balance", "label": 0},
+        {"utterance": "How much money do I have?", "label": 0},
+        {"utterance": "I want to transfer money", "label": 1},
+        {"utterance": "Send funds to my friend", "label": 1},
+        {"utterance": "Make a payment to someone", "label": 1},
+        {"utterance": "Cancel my last transaction", "label": 2},
+        {"utterance": "Reverse this payment", "label": 2},
+        {"utterance": "Stop my transfer", "label": 2},
+        {"utterance": "I need help with my account", "label": 3},
+        {"utterance": "Can someone assist me?", "label": 3},
+        {"utterance": "I have a question about my account", "label": 3},
     ],
     "intents": [
         {
             "id": 0,
-            "name": "greeting",
-            "tags": ["conversation_start"],
-            "regex_partial_match": ["\bhello\b"],
-            "regex_full_match": ["^hello$"],
-            "description": "User wants to initiate a conversation with a greeting."
+            "name": "balance_inquiry",
+            "description": "User wants to check their account balance or available funds",
         },
-        "...",
-    ]
+        {
+            "id": 1,
+            "name": "money_transfer",
+            "description": "User wants to transfer money or make a payment to another person or account",
+        },
+        {
+            "id": 2,
+            "name": "transaction_cancellation",
+            "description": "User wants to cancel, reverse, or stop a transaction or payment",
+        },
+        {
+            "id": 3,
+            "name": "general_help",
+            "description": "User is requesting general assistance or has a question",
+        },
+    ],
 }
-```
 
-- `name`: A human-readable representation of the intent.
-- `tags`: Used in multilabel scenarios to predict the most probable class listed in a specific %mddoclink(class,schemas,Tag).
-- `regex_partial_match` and `regex_full_match`: Used by the %mddoclink(class,modules.regex,RegExp) module to predict intents based on provided patterns.
-- `description`: Used by the %mddoclink(class,modules.scoring,DescriptionScorer) to calculate scores based on the similarity between an utterance and intent descriptions.
-
-All fields in the `intents` list are optional except for `id`.
-"""
+rich_dataset = Dataset.from_dict(comprehensive_banking_data)
+print("✅ Dataset with rich intent metadata created")
 
 # %% [markdown]
 """
-## Loading a dataset
+### Understanding Intent Metadata Fields
 
-There are three main ways to load your dataset:
-
-1. From a Python dictionary.
-2. From a JSON file.
-3. Directly from the Hugging Face Hub.
-"""
-
-# %% [markdown]
-"""
-### Creating a dataset from a Python dictionary
-
-One can load data into Python using our %mddoclink(class,,Dataset) object.
+Let's examine what each metadata field does and how AutoIntent modules use them:
 """
 
 # %%
-dataset = Dataset.from_dict(
-    {
-        "train": [
-            {
-                "utterance": "Please help me with my card. It won't activate.",
-                "label": 0,
-            },
-            {
-                "utterance": "I tried but am unable to activate my card.",
-                "label": 0,
-            },
-            {
-                "utterance": "I want to open an account for my children.",
-                "label": 1,
-            },
-            {
-                "utterance": "How old do you need to be to use the bank's services?",
-                "label": 1,
-            },
-        ],
-        "test": [
-            {
-                "utterance": "I want to start using my card.",
-                "label": 0,
-            },
-            {
-                "utterance": "How old do I need to be?",
-                "label": 1,
-            },
-        ],
-        "intents": [
-            {
-                "id": 0,
-                "name": "activate_my_card",
-            },
-            {
-                "id": 1,
-                "name": "age_limit",
-            },
-        ],
-    },
-)
+# Examine the intent metadata
+print("Intent metadata breakdown:\n")
+for intent in rich_dataset.intents:
+    print(f"🎯 Intent: {intent.name} (ID: {intent.id})")
+    print(f"   Description: {intent.description}")
+    print()
 
 # %% [markdown]
 """
-### Loading a dataset from a file
+### How Modules Use Intent Metadata
 
-The AutoIntent library includes sample datasets.
+- **`name`**: Human-readable intent names for interpretability and debugging, also can be used by AutoIntent augmentation methods
+- **`description`**: Used by %mddoclink(class,modules.scoring,BiEncoderDescriptionScorer), %mddoclink(class,modules.scoring,CrossEncoderDescriptionScorer), %mddoclink(class,modules.scoring,LLMDescriptionScorer) to calculate semantic similarity between utterances and intent descriptions
+
+**Pro tip**: Well-crafted descriptions significantly improve performance for description-based scoring modules, especially with limited training data.
 """
-
-# %%
-path_to_dataset = huggingface_hub.hf_hub_download(
-    repo_id="DeepPavlov/clinc150_subset",
-    filename="clinc_subset.json",
-    repo_type="dataset",
-)
-dataset = Dataset.from_json(path_to_dataset)
 
 # %% [markdown]
 """
-### Loading a dataset from the Hugging Face Hub
+## Advanced Dataset Manipulation
 
-If your dataset on the Hugging Face Hub matches the required format, you can load it directly using its repository ID:
+### Working with Large Datasets
+
+For systems with large datasets, you'll want efficient ways to manipulate and analyze your data:
 """
 
 # %%
+# Load a larger dataset for demonstration
 dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
 
-# %% [markdown]
-"""
-### Accessing dataset splits
+# Dataset analysis
+print("📊 Dataset Analysis")
+print(f"Dataset splits: {list(dataset.keys())}")
+print(f"Total training samples: {len(dataset['train_0']) + len(dataset['train_1'])}")
+print(f"Number of intents: {len(dataset.intents)}")
 
-The %mddoclink(class,,Dataset) class organizes your data as a dictionary of [datasets.Dataset](https://huggingface.co/docs/datasets/v2.1.0/en/package_reference/main_classes#datasets.Dataset).
-For example, after initialization, an `oos` key may be added if OOS samples are provided.
-"""
+# Examine class distribution
+from collections import Counter
 
-# %%
-dataset["train_0"]
-
-# %% [markdown]
-"""
-### Working with dataset splits
-
-Each split in the %mddoclink(class,,Dataset) class is an instance of [datasets.Dataset](https://huggingface.co/docs/datasets/en/package_reference/main_classes#datasets.Dataset),
-so you can work with them accordingly.
-"""
-
-# %%
-dataset["train_0"][:5]  # get first 5 train samples
+label_counts = Counter(dataset["train_0"]["label"])
+print("\nClass distribution (top 5):")
+for label, count in label_counts.most_common(5):
+    intent_name = dataset.intents[label].name
+    print(f"  {intent_name} (label {label}): {count} samples")
 
 # %% [markdown]
 """
-### Working with intents
+### Custom Data Processing
 
-Metadata that you added to intents in your dataset is stored in %mddoclink(method,Dataset,intents) attribute.
+You can process your datasets using the underlying Hugging Face datasets functionality:
 """
 
 # %%
-dataset.intents[:3]
+# Example: Filter samples by length
+short_utterances = dataset["train_0"].filter(lambda x: len(x["utterance"].split()) <= 5)
+print(f"Short utterances (≤5 words): {len(short_utterances)} samples")
+
+
+# Example: Add computed features
+def add_utterance_length(example):
+    example["utterance_length"] = len(example["utterance"].split())
+    return example
+
+
+enriched_train = dataset["train_0"].map(add_utterance_length)
+print(f"Added utterance_length feature to {len(enriched_train)} samples")
+
+# Show example with new feature
+sample = enriched_train[0]
+print(f"Sample: '{sample['utterance']}' (length: {sample['utterance_length']} words)")
 
 # %% [markdown]
 """
-### Pushing dataset to the Hugging Face Hub
+### Creating Custom Splits
 
-To share your dataset on the Hugging Face Hub, use method %mddoclink(method,Dataset,push_to_hub).
-Ensure that you are logged in using the `huggingface-cli` tool:
+For advanced experimentation, you might want to create custom data splits:
 """
 
+
 # %%
-# dataset.push_to_hub("<repo_id>")
+# Example: Create a custom split based on utterance characteristics
+def create_length_based_splits(dataset_split, short_threshold=5, long_threshold=10):
+    """Split data based on utterance length for targeted evaluation."""
+
+    def is_short(example):
+        return len(example["utterance"].split()) <= short_threshold
+
+    def is_long(example):
+        return len(example["utterance"].split()) >= long_threshold
+
+    short_split = dataset_split.filter(is_short)
+    long_split = dataset_split.filter(is_long)
+
+    return short_split, long_split
+
+
+short_test, long_test = create_length_based_splits(dataset["test"])
+print("Custom splits created:")
+print(f"  Short utterances: {len(short_test)} samples")
+print(f"  Long utterances: {len(long_test)} samples")
+
+# %% [markdown]
+"""
+## Next Steps
+
+You now understand advanced data handling in AutoIntent, including:
+
+- ✅ Out-of-scope sample handling for robust intent classification
+- ✅ Intent metadata for improved model performance
+- ✅ Advanced dataset manipulation and analysis techniques
+
+**What's next:**
+- Explore %mddoclink(notebook,advanced.03_automl) for advanced AutoML techniques
+- Learn about %mddoclink(rst,augmentation_tutorials.index) to expand your datasets
+- See %mddoclink(notebook,advanced.04_reporting) for comprehensive model evaluation
+
+**Pro tip**: Start with a small, well-curated dataset with good intent descriptions, then scale up using AutoIntent's optimization capabilities to find the best approach for your specific use case.
+"""

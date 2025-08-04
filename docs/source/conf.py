@@ -12,13 +12,12 @@ from pathlib import Path
 
 from sphinx.application import Sphinx
 
-from docs.source.docs_utils.tutorials import generate_tutorial_links_for_notebook_creation
-
 conf_dir = os.path.dirname(os.path.abspath(__file__))  # noqa: PTH100, PTH120
 
 sys.path.insert(0, conf_dir)
 
 from docs_utils.skip_members import skip_member  # noqa: E402
+from docs_utils.tutorials import generate_tutorial_links_for_notebook_creation  # noqa: E402
 from docs_utils.versions_generator import generate_versions_json  # noqa: E402
 
 project = "AutoIntent"
@@ -51,6 +50,7 @@ extensions = [
     "sphinx_multiversion",
     "sphinx.ext.napoleon",
     "sphinx_toolbox.collapse",
+    "sphinx_llms_txt",
 ]
 
 templates_path = ["_templates"]
@@ -186,6 +186,7 @@ smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and up
 
 repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
 
+llms_txt_exclude = ["autoapi*"]
 
 def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)

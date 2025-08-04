@@ -19,7 +19,9 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
         dataset = dataset.to_multilabel()
     data_handler = DataHandler(dataset)
 
-    scorer = BiEncoderDescriptionScorer(embedder_config="sergeyzh/rubert-tiny-turbo", temperature=0.3)
+    scorer = BiEncoderDescriptionScorer(
+        embedder_config="sergeyzh/rubert-tiny-turbo", temperature=0.3, multilabel=multilabel
+    )
 
     scorer.fit(
         data_handler.train_utterances(0),

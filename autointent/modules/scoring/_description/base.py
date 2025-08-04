@@ -22,13 +22,15 @@ class BaseDescriptionScorer(BaseScorer, ABC):
 
     Args:
         temperature: Temperature parameter for scaling logits, defaults to 1.0
+        multilabe: Flag indicating classification task type
     """
 
     supports_multiclass = True
     supports_multilabel = True
 
-    def __init__(self, temperature: PositiveFloat = 1.0) -> None:
+    def __init__(self, temperature: PositiveFloat = 1.0, multilabel: bool = False) -> None:
         self.temperature = temperature
+        self._multilabel = multilabel
         self._validate_temperature()
 
     def _validate_temperature(self) -> None:
@@ -82,16 +84,14 @@ class BaseDescriptionScorer(BaseScorer, ABC):
         Raises:
             ValueError: If descriptions contain None values
         """
-        self._validate_task(labels)
         self._validate_descriptions(descriptions)
-        self._fit_implementation(utterances, descriptions)
+        self._fit_implementation(descriptions)
 
     @abstractmethod
-    def _fit_implementation(self, utterances: list[str], descriptions: list[str]) -> None:
+    def _fit_implementation(self, descriptions: list[str]) -> None:
         """Implementation-specific fitting logic.
 
         Args:
-            utterances: List of utterances to process
             descriptions: List of intent descriptions
         """
 

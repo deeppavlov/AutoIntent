@@ -33,7 +33,7 @@ The ``module_name`` field specifies the name of the module. You can explore the 
 """
 
 # %%
-from autointent.modules import SCORING_MODULES, DECISION_MODULES, EMBEDDING_MODULES, REGEX_MODULES
+from autointent.modules import DECISION_MODULES, EMBEDDING_MODULES, REGEX_MODULES, SCORING_MODULES
 
 print(list(SCORING_MODULES.keys()))
 print(list(DECISION_MODULES.keys()))
@@ -140,7 +140,7 @@ There are three hyperparameter tuning samplers available:
 - "random"
 - "tpe"
 
-All the samplers are implemented with ![optuna](https://optuna.org/).
+All the samplers are implemented with [optuna](https://optuna.org/).
 """
 
 # %% [markdown]

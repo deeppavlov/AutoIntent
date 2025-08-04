@@ -1,6 +1,8 @@
 # %% [markdown]
 """
-# AutoML
+# AutoML Pipeline Configuration
+
+AutoML (Automated Machine Learning) in AutoIntent allows you to automatically find the best configuration for your intent classification pipeline. Instead of manually tuning hyperparameters and selecting components, AutoML explores different combinations to find the optimal setup for your specific dataset.
 """
 
 # %%
@@ -8,20 +10,35 @@ from autointent import Pipeline
 
 # %% [markdown]
 """
-In this tutorial we will walk through pipeline auto configuration process.
+In this tutorial, we'll walk through the pipeline auto-configuration process step by step. We'll learn how to:
 
-Let us use small subset of popular `clinc150` dataset for the demonstation.
+- Use predefined search spaces and presets
+- Customize search configurations
+- Set up logging and validation strategies
+- Run the optimization process
+- Save and load optimized pipelines
+
+Let's start by loading a small subset of the popular `clinc150` dataset for demonstration.
 """
 
 # %%
 from autointent import Dataset
 
+# Load the dataset from Hugging Face hub
 dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
+print(f"Dataset contains {len(dataset)} splits")
 dataset
 
-# %%
-dataset["train_0"][0]
+# %% [markdown]
+"""
+Let's examine the structure of our dataset by looking at a sample utterance:
+"""
 
+# %%
+sample = dataset["train_0"][0]
+print(f"Sample utterance: '{sample['utterance']}'")
+print(f"Intent label: '{sample['label']}'")
+sample
 
 # %% [markdown]
 """
@@ -35,7 +52,7 @@ pipeline = Pipeline.from_preset("classic-light")
 
 # %% [markdown]
 """
-One can explore its contents:
+You can inspect the structure and default values of any preset:
 """
 
 # %%
@@ -48,64 +65,86 @@ pprint(preset)
 
 # %% [markdown]
 """
-Search space is allowed to customize:
+### Customizing Search Spaces
+
+The search space can be customized to fit your specific needs. For example, you can modify hyperparameter ranges:
 """
 
 # %%
-preset["search_space"][0]["search_space"][0]["k"]["hight"] = 10
+# Example: modify the maximum k value for KNN-based components
+preset["search_space"][0]["search_space"][0]["k"]["high"] = 10
 custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
-See tutorial %mddoclink(notebook,advanced.02_search_space_configuration) on how the search space is structured.
+See tutorial %mddoclink(notebook,advanced.03_search_space_configuration) on how the search space is structured.
 """
 
 # %% [markdown]
 """
-## Logging Settings
+## Logging and Storage Configuration
 
-The important thing is what assets you want to save during the pipeline auto-configuration process. You can control it with %mddoclink(class,configs,LoggingConfig):
+During the AutoML process, you'll want to control what artifacts are saved and where they're stored. The %mddoclink(class,configs,LoggingConfig) allows you to specify:
+
+- `project_dir`: Directory where results will be saved
+- `dump_modules`: Whether to save trained model files
+- `clear_ram`: Whether to clear models from memory after training to save RAM
 """
 
 # %%
 from pathlib import Path
+
 from autointent.configs import LoggingConfig
 
-logging_config = LoggingConfig(project_dir=Path.cwd() / "runs", dump_modules=False, clear_ram=False)
+logging_config = LoggingConfig(
+    project_dir=Path.cwd() / "runs",  # Save results to 'runs' directory
+    dump_modules=False,  # Don't save large model files
+    clear_ram=False,  # Keep models in memory for inference
+)
 custom_pipeline.set_config(logging_config)
 
 # %% [markdown]
 """
-## Default Transformers
+## Model Configuration
 
-One can specify what embedding model and cross-encoder model want to use along with default settings:
+You can specify which transformer models to use for text embeddings and cross-encoding. This is useful when you want to:
+
+- Use smaller/faster models for experimentation
+- Apply domain-specific pre-trained models
+- Control model parameters like tokenizer settings
 """
 
 # %%
-from autointent.configs import EmbedderConfig, CrossEncoderConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, TokenizerConfig
 
+# Configure embedding model (used for vector representations)
 custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny"))
+
+# Configure cross-encoder model (used for scoring text pairs)
 custom_pipeline.set_config(
     CrossEncoderConfig(model_name="cross-encoder/ms-marco-MiniLM-L2-v2", tokenizer_config=TokenizerConfig(max_length=8))
 )
 
 # %% [markdown]
 """
-See the docs for %mddoclink(class,configs,EmbedderConfig) and %mddoclink(class,configs,CrossEncoderConfig) for options available to customize.
+See the documentation for %mddoclink(class,configs,EmbedderConfig) and %mddoclink(class,configs,CrossEncoderConfig) for all available customization options.
 """
 
 # %% [markdown]
 """
-## Cross-Validation vs Hold-Out Validation
+## Validation Strategy
 
-If you have lots of training and evaluation data, you can use default hold-out validation strategy. If not, you can choose cross-validation and spend a little more time but utilize the full amount of available data for better hyperparameter tuning.
+Choose between two validation approaches based on your dataset size:
 
-This behavior is controlled with %mddoclink(class,configs,DataConfig):
+**Hold-out validation** (default): Uses separate train/validation splits. Best when you have plenty of data.
+
+**Cross-validation**: Splits data into k folds for more robust evaluation. Better for smaller datasets as it uses all data for both training and validation.
 """
 
 # %%
 from autointent.configs import DataConfig
 
+# Use 3-fold cross-validation for better performance on small datasets
 custom_pipeline.set_config(DataConfig(scheme="cv", n_folds=3))
 
 # %% [markdown]
@@ -116,6 +155,8 @@ See the docs for %mddoclink(class,configs,DataConfig) for other options availabl
 # %% [markdown]
 """
 ## Complete Example
+
+Let's put everything together in a comprehensive example that demonstrates the full AutoML workflow:
 """
 
 # %%
@@ -123,25 +164,34 @@ from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig
 from autointent.utils import load_preset
 
-# load data
+# Step 1: Load your dataset
 dataset = Dataset.from_hub("DeepPavlov/clinc150_subset")
+print(f"Loaded dataset with {len(dataset)} splits")
 
-# customize search space
+# Step 2: Load and customize a preset configuration
 preset = load_preset("classic-light")
+# You can modify the preset here if needed
+# preset["search_space"][0]["search_space"][0]["k"]["high"] = 5
 
-# make pipeline
-custom_pipeline = Pipeline.from_optimization_config(preset)
+# Step 3: Create pipeline from the configuration
+pipeline = Pipeline.from_optimization_config(preset)
 
-# custom settings
-logging_config = LoggingConfig()
+# Step 4: Configure logging and storage
+logging_config = LoggingConfig(
+    dump_modules=True,  # Save trained models for later use
+    clear_ram=False,  # Keep models in memory for immediate inference
+)
+pipeline.set_config(logging_config)
 
-custom_pipeline.set_config(logging_config)
+# Step 5: Run AutoML optimization
+print("Starting AutoML optimization...")
+context = pipeline.fit(dataset)
+print("✅ AutoML optimization completed!")
 
-# start auto-configuration
-context = custom_pipeline.fit(dataset)
-
-# inference on-the-fly
-custom_pipeline.predict(["hello world!"])
+# Step 6: Test the optimized pipeline
+test_utterances = ["hello world!", "I want to transfer money", "book a flight"]
+predictions = pipeline.predict(test_utterances)
+print(f"Predictions: {predictions}")
 
 # %% [markdown]
 """
@@ -159,7 +209,7 @@ Or one can dump only the configured pipeline to any desired location (by default
 """
 
 # %%
-custom_pipeline.dump()
+pipeline.dump()
 
 # %% [markdown]
 """
