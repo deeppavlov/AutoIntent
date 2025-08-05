@@ -18,6 +18,7 @@ from ._types import (
     SimpleLabelWithOOS,
     Split,
     ValidationScheme,
+    VectorIndexBackend,
     WeightType,
 )
 
@@ -39,5 +40,6 @@ __all__ = [
     "SimpleLabelWithOOS",
     "Split",
     "ValidationScheme",
+    "VectorIndexBackend",
     "WeightType",
 ]

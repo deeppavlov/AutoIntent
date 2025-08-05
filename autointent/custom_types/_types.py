@@ -128,3 +128,6 @@ SearchSpacePreset = Literal[
     "zero-shot-encoders",
 ]
 """Some presets that our library supports."""
+
+
+VectorIndexBackend = Literal["faiss", "opensearch"]

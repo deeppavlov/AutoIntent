@@ -11,6 +11,7 @@ from ._transformers import (
     TaskTypeEnum,
     TokenizerConfig,
 )
+from ._vector_index import VectorIndexConfig
 
 __all__ = [
     "CrossEncoderConfig",
@@ -24,5 +25,6 @@ __all__ = [
     "TaskTypeEnum",
     "TokenizerConfig",
     "TorchTrainingConfig",
+    "VectorIndexConfig",
     "VocabConfig",
 ]
