@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 from collections import defaultdict
 
@@ -12,6 +13,8 @@ from autointent.generation.chat_templates._evolution_templates_schemas import Me
 from autointent.schemas import Sample
 
 from .critic_human_like import CriticHumanLike
+
+logger = logging.getLogger(__name__)
 
 
 class HumanUtteranceGenerator:
@@ -67,6 +70,7 @@ class HumanUtteranceGenerator:
 
         for intent_id, intent_name in id_to_name.items():
             if intent_name is None:
+                logger.warning("Intent with id %s has no name! Skipping it...", intent_id)
                 continue
             generated_count = 0
             attempt = 0
@@ -108,6 +112,7 @@ class HumanUtteranceGenerator:
 
         for intent_id, intent_name in id_to_name.items():
             if intent_name is None:
+                logger.warning("Intent with id %s has no name! Skipping it...", intent_id)
                 continue
             generated_count = 0
             attempt = 0
