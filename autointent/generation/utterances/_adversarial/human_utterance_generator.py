@@ -2,7 +2,9 @@ import asyncio
 import logging
 import random
 from collections import defaultdict
+from functools import partial
 
+import aiometer
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
@@ -15,8 +17,6 @@ from autointent.schemas import Sample
 from .critic_human_like import CriticHumanLike
 
 logger = logging.getLogger(__name__)
-
-
 class HumanUtteranceGenerator:
     """Generator of human-like utterances.
 
@@ -110,29 +110,38 @@ class HumanUtteranceGenerator:
         for sample in original_split:
             class_to_samples[sample["label"]].append(sample["utterance"])
 
-        for intent_id, intent_name in id_to_name.items():
+
+        async def generate_one(intent_id: str, intent_name: str) -> list[dict]:
             if intent_name is None:
                 logger.warning("Intent with id %s has no name! Skipping it...", intent_id)
-                continue
-            generated_count = 0
-            attempt = 0
-            seed_utterances = class_to_samples.get(intent_id, [])
-            if not seed_utterances:
-                continue
-
-            while generated_count < n_final_per_class and attempt < n_final_per_class * 3:
-                attempt += 1
+            generated = []
+            attempts = 0
+            seed_utterances = class_to_samples[intent_id]
+            while len(generated) < n_final_per_class and attempts < n_final_per_class * 3:
+                attempts += 1
                 seed_examples = random.sample(seed_utterances, k=min(3, len(seed_utterances)))
-                rejected: list[str] = []
+                rejected = []
 
                 for _ in range(3):
                     prompt = self._build_adversarial_prompt(intent_name, seed_examples, rejected)
-                    generated = (await self.generator.get_chat_completion_async([prompt])).strip()
-                    if await self.critic.is_human_async(generated, intent_name):
-                        new_samples.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: generated})
-                        generated_count += 1
+                    utterance = (await self.generator.get_chat_completion_async([prompt])).strip()
+                    if await self.critic.is_human_async(utterance, intent_name):
+                        generated.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: utterance})
                         break
-                    rejected.append(generated)
+                    rejected.append(utterance)
+            return generated
+        tasks = [
+        partial(generate_one, intent_id, intent_name)
+        for intent_id, intent_name in id_to_name.items()
+          if class_to_samples.get(intent_id) and intent_name is not None
+        ]
+
+        results = await aiometer.run_all(
+            tasks, max_at_once=5, max_per_second=10
+        )
+
+        for result in results:
+            new_samples.extend(result)
 
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
