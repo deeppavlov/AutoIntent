@@ -9,11 +9,7 @@ def test_model_updates_after_training(dataset):
     """Test that model weights actually change after training"""
     data_handler = DataHandler(dataset)
 
-    hf_config = HFModelConfig(
-    model_name="intfloat/multilingual-e5-small",
-    batch_size=8,
-    trust_remote_code=True
-    )
+    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=8, trust_remote_code=True)
 
     embedder_config = EmbedderConfig(
         **hf_config.model_dump(),
@@ -22,12 +18,10 @@ def test_model_updates_after_training(dataset):
         passage_prompt="Document:",
         similarity_fn_name="cosine",
         use_cache=False,
-        freeze=False
+        freeze=False,
     )
 
-    train_config = EmbedderFineTuningConfig(
-        epoch_num = 1
-    )
+    train_config = EmbedderFineTuningConfig(epoch_num=1)
     embedder = Embedder(embedder_config)
     embedder._load_model()
 
@@ -37,9 +31,7 @@ def test_model_updates_after_training(dataset):
         if param.requires_grad
     ]
     embedder.train(
-        utterances=data_handler.train_utterances(0)[:10],
-        labels=data_handler.train_labels(0)[:10],
-        config=train_config
+        utterances=data_handler.train_utterances(0)[:10], labels=data_handler.train_labels(0)[:10], config=train_config
     )
 
     trained_weights = [

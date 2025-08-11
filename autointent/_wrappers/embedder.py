@@ -126,25 +126,20 @@ class Embedder:
                 similarity_fn_name=self.config.similarity_fn_name,
                 trust_remote_code=self.config.trust_remote_code,
             )
+
     def train(self, utterances: list[str], labels: list[int], config: EmbedderFineTuningConfig) -> None:
         """Train the embedding model."""
         self._load_model()
 
-        tr_ds = Dataset.from_dict({
-        "text": utterances,
-        "label": labels
-        })
+        tr_ds = Dataset.from_dict({"text": utterances, "label": labels})
 
-        loss = BatchAllTripletLoss(
-            model=self.embedding_model,
-            margin=config.margin
-        )
+        loss = BatchAllTripletLoss(model=self.embedding_model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
             args = SentenceTransformerTrainingArguments(
                 save_strategy="no",
                 output_dir=tmp_dir,
                 num_train_epochs=config.epoch_num,
-                per_device_train_batch_size=self.config.batch_size,
+                per_device_train_batch_size=config.batch_size,
                 learning_rate=config.learning_rate,
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
