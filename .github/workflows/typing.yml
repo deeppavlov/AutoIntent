@@ -13,7 +13,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install .[typing]
+          uv lock
+          uv sync --group typing
 
       - name: Run mypy
         run: mypy autointent
