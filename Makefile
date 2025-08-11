@@ -17,7 +17,7 @@ test-html:
 
 .PHONY: typing
 typing:
-	$(sh) mypy autointent
+	$(sh) mypy src/autointent
 
 .PHONY: lint
 lint:
