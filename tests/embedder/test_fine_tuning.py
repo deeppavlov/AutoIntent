@@ -21,7 +21,7 @@ def test_model_updates_after_training(dataset):
         freeze=False,
     )
 
-    train_config = EmbedderFineTuningConfig(epoch_num=1)
+    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=8)
     embedder = Embedder(embedder_config)
     embedder._load_model()
 

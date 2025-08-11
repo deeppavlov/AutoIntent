@@ -9,7 +9,7 @@ import numpy.typing as npt
 import torch
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
-from transformers import (  # type: ignore[attr-defined]
+from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
     DataCollatorWithPadding,
