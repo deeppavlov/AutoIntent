@@ -21,17 +21,20 @@ def test_model_updates_after_training(dataset):
         freeze=False,
     )
 
-    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=8)
+    train_config = EmbedderFineTuningConfig(epoch_num=3, batch_size=8)
     embedder = Embedder(embedder_config)
     embedder._load_model()
 
+    for param in embedder.embedding_model.parameters():
+        assert param.requires_grad, "All trainable parameters should have requires_grad=True"
+    
     original_weights = [
         param.data.detach().cpu().numpy().copy()
         for param in embedder.embedding_model.parameters()
         if param.requires_grad
     ]
     embedder.train(
-        utterances=data_handler.train_utterances(0)[:10], labels=data_handler.train_labels(0)[:10], config=train_config
+        utterances=data_handler.train_utterances(0)[:1000], labels=data_handler.train_labels(0)[:1000], config=train_config
     )
 
     trained_weights = [
