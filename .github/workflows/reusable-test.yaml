@@ -49,4 +49,4 @@ jobs:
 
     - name: Run tests
       run: |
-        ${{ inputs.test_command }}
+        uv run ${{ inputs.test_command }}
