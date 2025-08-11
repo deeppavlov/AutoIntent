@@ -13,7 +13,7 @@ from datasets import concatenate_datasets
 from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
-from transformers import set_seed  # type: ignore[attr-defined]
+from transformers import set_seed
 
 from autointent import Dataset
 from autointent.custom_types import LabelType

@@ -12,7 +12,7 @@ from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
-from transformers import (  # type: ignore[attr-defined]
+from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
     PreTrainedModel,
