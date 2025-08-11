@@ -27,14 +27,16 @@ def test_model_updates_after_training(dataset):
 
     for param in embedder.embedding_model.parameters():
         assert param.requires_grad, "All trainable parameters should have requires_grad=True"
-    
+
     original_weights = [
         param.data.detach().cpu().numpy().copy()
         for param in embedder.embedding_model.parameters()
         if param.requires_grad
     ]
     embedder.train(
-        utterances=data_handler.train_utterances(0)[:1000], labels=data_handler.train_labels(0)[:1000], config=train_config
+        utterances=data_handler.train_utterances(0)[:1000],
+        labels=data_handler.train_labels(0)[:1000],
+        config=train_config,
     )
 
     trained_weights = [
