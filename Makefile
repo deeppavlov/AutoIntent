@@ -9,20 +9,20 @@ install:
 
 .PHONY: test
 test:
-	$(uv) pytest tests --cov
+	$(sh) pytest tests --cov
 
 .PHONY: test-html
 test-html:
-	$(uv) pytest --cov --cov-report html
+	$(sh) pytest --cov --cov-report html
 
 .PHONY: typing
 typing:
-	$(uv) mypy autointent
+	$(sh) mypy autointent
 
 .PHONY: lint
 lint:
-	$(uv) ruff format
-	$(uv) ruff check --fix
+	$(sh) ruff format
+	$(sh) ruff check --fix
 
 .PHONY: docs
 docs:

@@ -22,4 +22,4 @@ jobs:
           uv sync --group typing
 
       - name: Run mypy
-        run: uv run mypy autointent
+        run: uv run mypy src/autointent
