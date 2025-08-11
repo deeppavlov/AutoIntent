@@ -1,0 +1,28 @@
+search_space:
+  - node_type: scoring
+    target_metric: scoring_f1
+    search_space:
+      - module_name: bert
+        classification_model_config:
+          - model_name: microsoft/deberta-v3-large
+        num_train_epochs: [30]
+        batch_size: [32, 64]
+        learning_rate:
+          low: 1.0e-5
+          high: 1.0e-4
+          log: True
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+      - module_name: argmax
+      - module_name: jinoos
+      - module_name: tunable
+      - module_name: adaptive
+hpo_config:
+  sampler: tpe
+  n_trials: 40
+  n_startup_trials: 20

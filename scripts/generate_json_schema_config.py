@@ -2,12 +2,18 @@ import json
 from pathlib import Path
 
 from autointent import OptimizationConfig
+from autointent.schemas.node_validation import OptimizationSearchSpaceConfig
 
 
 def generate_json_schema_optimizer_config() -> None:
     """Generate the JSON schema for the optimizer config."""
     schema = OptimizationConfig.model_json_schema()
     path = Path(__file__).parent.parent / "docs" / "optimizer_config.schema.json"
+    with path.open("w") as f:
+        json.dump(schema, f, indent=4)
+
+    schema = OptimizationSearchSpaceConfig.model_json_schema()
+    path = Path(__file__).parent.parent / "docs" / "optimizer_search_space_config.schema.json"
     with path.open("w") as f:
         json.dump(schema, f, indent=4)
 

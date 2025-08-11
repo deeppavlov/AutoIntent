@@ -25,7 +25,7 @@ from autointent.custom_types import (
     SearchSpacePreset,
     SearchSpaceValidationMode,
 )
-from autointent.metrics import DECISION_METRICS
+from autointent.metrics import DECISION_METRICS, DICISION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_preset, load_search_space
 
@@ -247,12 +247,16 @@ class Pipeline:
 
         if test_utterances is not None:
             predictions = self.predict(test_utterances)
-            for metric_name, metric in DECISION_METRICS.items():
+            metrics = DICISION_METRICS_MULTILABEL if context.data_handler.multilabel else DECISION_METRICS
+            for metric_name, metric in metrics.items():
                 context.optimization_info.pipeline_metrics[metric_name] = metric(
                     context.data_handler.test_labels(),
                     predictions,
                 )
-            context.callback_handler.log_final_metrics(context.optimization_info.dump_evaluation_results())
+            all_final_metrics = context.callback_handler.update_final_metrics(
+                context.optimization_info.dump_evaluation_results(),
+            )
+            context.callback_handler.log_final_metrics(all_final_metrics)
 
         return context
 
@@ -376,9 +380,11 @@ class Pipeline:
 
         context.data_handler.prepare_for_refit()
 
+        scoring_module.clear_cache()
         scoring_module.fit(*scoring_module.get_train_data(context))
         scores = scoring_module.predict(context.data_handler.train_utterances(1))
 
+        decision_module.clear_cache()
         decision_module.fit(scores, context.data_handler.train_labels(1), context.data_handler.tags)
 
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:

@@ -17,7 +17,6 @@ from optuna.trial import Trial
 from autointent import Dataset
 from autointent.context import Context
 from autointent.custom_types import NodeType, SearchSpaceValidationMode
-from autointent.nodes.emissions_tracker import EmissionsTracker
 from autointent.nodes.info import NODES_INFO
 from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
 
@@ -50,7 +49,6 @@ class NodeOptimizer:
         self.node_type = node_type
         self.node_info = NODES_INFO[node_type]
         self.target_metric = target_metric
-        self.emissions_tracker = EmissionsTracker(project_name=f"{self.node_info.node_type}")
 
         self.metrics = metrics if metrics is not None else []
         if self.target_metric not in self.metrics:
@@ -67,10 +65,6 @@ class NodeOptimizer:
 
         Args:
             context: The optimization context containing relevant data.
-            sampler: The sampling strategy used for optimization.
-            n_trials: Number of optuna trials.
-            timeout: Number of secords for optimizing the whole node.
-            n_jobs: The number of parallel jobs to run during optimization.
 
         Raises:
             AssertionError: If an invalid sampler type is provided.
@@ -131,6 +125,11 @@ class NodeOptimizer:
         """
         module_name, module_hyperparams = self._suggest_module_and_hyperparams(trial, search_space)
 
+        if prev_metric := _check_duplicate(trial):
+            msg = f"Duplicated trial with {module_name=}, {prev_metric=}, {module_hyperparams=}"
+            logger.debug(msg)
+            return prev_metric
+
         self._logger.debug("Initializing %s module with config: %s", module_name, json.dumps(module_hyperparams))
         module = self.node_info.modules_available[module_name].from_context(context, **module_hyperparams)
         module_hyperparams.update(module.get_implicit_initialization_params())
@@ -143,13 +142,10 @@ class NodeOptimizer:
 
         self._logger.debug("Scoring %s module...", module_name)
 
-        self.emissions_tracker.start_task("module_scoring")
         quality_metrics = module.score(context, metrics=self.metrics)
-        emissions_metrics = self.emissions_tracker.stop_task()
-        all_metrics = {**quality_metrics, **emissions_metrics}
 
         target_metric = quality_metrics[self.target_metric]
-
+        all_metrics = context.callback_handler.update_metrics(quality_metrics)
         context.callback_handler.log_metrics(all_metrics)
         context.callback_handler.end_module()
 
@@ -242,18 +238,34 @@ class NodeOptimizer:
         filtered_search_space = []
         if is_multilabel and self.target_metric not in self.node_info.multilabel_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multilabel datasets.", True
+                mode,
+                f"Target metric '{self.target_metric}' is not available for multilabel datasets. "
+                f"Available metrics: {list(self.node_info.multilabel_available_metrics.keys())}",
+                True,
             )
         elif not is_multilabel and self.target_metric not in self.node_info.multiclass_available_metrics:
             handle_message_on_mode(
-                mode, f"Target metric '{self.target_metric}' is not available for multiclass datasets.", True
+                mode,
+                f"Target metric '{self.target_metric}' is not available for multiclass datasets. "
+                f"Available metrics: {list(self.node_info.multiclass_available_metrics.keys())}",
+                True,
             )
 
         for metric in self.metrics:
             if is_multilabel and metric not in self.node_info.multilabel_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multilabel datasets.", True)
+                handle_message_on_mode(
+                    mode,
+                    f"Metric '{metric}' is not available for multilabel datasets. "
+                    f"Available metrics: {list(self.node_info.multilabel_available_metrics.keys())}",
+                    True,
+                )
             elif not is_multilabel and metric not in self.node_info.multiclass_available_metrics:
-                handle_message_on_mode(mode, f"Metric '{metric}' is not available for multiclass datasets.", True)
+                handle_message_on_mode(
+                    mode,
+                    f"Metric '{metric}' is not available for multiclass datasets. "
+                    f"Available metrics: {list(self.node_info.multiclass_available_metrics.keys())}",
+                    True,
+                )
 
         for search_space in deepcopy(self.modules_search_spaces):
             module_name = search_space["module_name"]
@@ -414,3 +426,14 @@ def handle_message_on_mode(
         logger.warning(message)
     if strict:
         raise ValueError(message)
+
+
+# TODO research on possibility to use custom pruner
+def _check_duplicate(trial: Trial) -> float | None:
+    completed_trials = trial.study.get_trials(states=[optuna.trial.TrialState.COMPLETE], deepcopy=False)
+
+    previous_trial = next(
+        (completed_trial for completed_trial in completed_trials if completed_trial.params == trial.params), None
+    )
+
+    return previous_trial.value if previous_trial is not None else None

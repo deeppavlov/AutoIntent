@@ -23,8 +23,7 @@ class Hasher:
         """
         self._state = xxhash.xxh64()
 
-    @classmethod
-    def hash(cls, value: Any) -> int:  # noqa: ANN401
+    def hash(self, value: Any) -> int:  # noqa: ANN401
         """Generate a hash for the given value using xxhash.
 
         Args:
@@ -33,8 +32,6 @@ class Hasher:
         Returns:
             The resulting hash digest as a hexadecimal string.
         """
-        if hasattr(value, "__hash__") and value.__hash__ not in {None, object.__hash__}:
-            return hash(value)
         return xxhash.xxh64(pickle.dumps(value)).intdigest()
 
     def update(self, value: Any) -> None:  # noqa: ANN401

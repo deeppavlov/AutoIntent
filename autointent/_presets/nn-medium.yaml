@@ -1,0 +1,44 @@
+search_space:
+  - node_type: scoring
+    target_metric: scoring_f1
+    search_space:
+      - module_name: cnn
+        dropout:
+          low: 0.1
+          high: 0.3
+        batch_size: [32, 64, 128]
+        learning_rate:
+          low: 5.0e-4
+          high: 1.0e-2
+          log: True
+        num_train_epochs: [60]
+        embed_dim: [64]
+        kernel_sizes: [[3, 4, 5]]
+        num_filters: [64]
+      - module_name: rnn
+        dropout:
+          low: 0.1
+          high: 0.3
+        batch_size: [32, 64, 128]
+        learning_rate:
+          low: 5.0e-4
+          high: 1.0e-2
+          log: True
+        num_train_epochs: [60]
+        embed_dim: [64]
+        hidden_dim: [128]
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+      - module_name: argmax
+      - module_name: jinoos
+      - module_name: tunable
+      - module_name: adaptive
+hpo_config:
+  sampler: tpe
+  n_trials: 55
+  n_startup_trials: 20

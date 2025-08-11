@@ -30,7 +30,7 @@ class BaseModule(ABC):
     supports_multiclass: bool
     """Whether the module supports multiclass classification"""
     name: str
-    """Name of the module."""
+    """Name of the module to reference in search space configuration."""
 
     @property
     def trial_name(self) -> str:

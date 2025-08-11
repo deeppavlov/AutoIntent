@@ -1,0 +1,40 @@
+search_space:
+  - node_type: scoring
+    target_metric: scoring_f1
+    search_space:
+      - module_name: knn
+        k:
+          low: 1
+          high: 20
+        weights: [uniform, distance, closest]
+      - module_name: linear
+      - module_name: mlknn
+        k:
+          low: 1
+          high: 20
+      - module_name: catboost
+        depth: [3, 6, 10]
+        features_type: ["text", "embedding", "both"]
+      - module_name: sklearn
+        clf_name: [RandomForestClassifier]
+        n_estimators: [200, 300, 500]
+        max_depth: [50, 100, 150]
+        max_features: [sqrt, log2]
+        n_jobs: [8]
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: threshold
+        thresh:
+          low: 0.1
+          high: 0.9
+      - module_name: argmax
+      - module_name: jinoos
+      - module_name: tunable
+      - module_name: adaptive
+hpo_config:
+  sampler: tpe
+  n_trials: 55
+  n_startup_trials: 20
+embedder_config:
+  model_name: intfloat/multilingual-e5-large-instruct

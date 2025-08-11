@@ -1,7 +1,7 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from peft import LoraConfig, get_peft_model
 
@@ -51,12 +51,7 @@ class BERTLoRAScorer(BertScorer):
         # Make predictions
         test_utterances = ["Good product", "Not worth it"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)
 
-    .. testoutput::
-
-        [[0.89 0.11]
-        [0.23 0.77]]
     """
 
     name = "lora"
@@ -68,7 +63,8 @@ class BERTLoRAScorer(BertScorer):
         batch_size: int = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
+        report_to: REPORTERS_NAMES | Literal["none"] = "none",  # type: ignore  # noqa: PGH003
+        print_progress: bool = False,
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
@@ -82,6 +78,7 @@ class BERTLoRAScorer(BertScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
+            print_progress=print_progress,
         )
         self._lora_config = LoraConfig(**lora_kwargs)
 

@@ -18,7 +18,7 @@
     - module_name: rerank
       k: [ 5, 10 ]
       weights: [ uniform, distance, closest ]
-      use_crosencoder_scores: [true, false]
+      use_cross_encoder_scores: [true, false]
       m: [ 2, 3 ]
       cross_encoder_config:
         - model_name: cross-encoder/ms-marco-MiniLM-L6-v2

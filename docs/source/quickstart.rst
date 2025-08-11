@@ -1,10 +1,46 @@
 Quickstart
-===========
+==========
+
+Welcome to AutoIntent! This guide will get you up and running with intent classification in just a few minutes.
+
+What is AutoIntent?
+-------------------
+
+AutoIntent is a powerful AutoML library for intent classification that automatically finds the best model architecture and hyperparameters for your text classification tasks. Whether you're building chatbots or text analysis pipelines, AutoIntent simplifies the process of creating high-performance intent classifiers.
+
+Key Features
+------------
+
+* ✨ **AutoML Pipeline**: Automated model selection and hyperparameter optimization
+* 🔧 **Modular Design**: Use individual components or the full pipeline
+* 📊 **Multiple Algorithms**: Support for classical neural networks, transformers, and traditional ML methods
+* 📈 **Experiment Tracking**: Built-in support for Weights & Biases, TensorBoard and CodeCarbon
 
 Installation
 ------------
 
-AutoIntent can be installed using the package manager ``pip``:
+Basic Installation
+..................
+
+AutoIntent is compatible with Python 3.10+. For core functionality:
+
+.. code-block:: bash
+
+    pip install autointent
+
+With Experiment Tracking
+........................
+
+To include experiment tracking capabilities:
+
+.. code-block:: bash
+
+    pip install autointent[wandb,codecarbon]
+
+Development Installation
+........................
+
+To install the latest development version:
 
 .. code-block:: bash
 
@@ -12,100 +48,205 @@ AutoIntent can be installed using the package manager ``pip``:
     cd AutoIntent
     pip install .
 
-The library is compatible with Python 3.10+.
+Quick Example
+-------------
+
+Here's a complete example that demonstrates AutoIntent's capabilities:
+
+.. testcode:: python
+
+    from autointent import Dataset, Pipeline
+
+    # Prepare your data
+    data = {
+        "train": [
+            {"utterance": "I want to check my account balance", "label": 0},
+            {"utterance": "How do I transfer money?", "label": 1},
+            {"utterance": "What's my current balance?", "label": 0},
+            {"utterance": "I need to send money to my friend", "label": 1},
+            {"utterance": "Can you help me make a payment?", "label": 1},
+            {"utterance": "Show me my transaction history", "label": 0},
+            {"utterance": "Can you show me my account details?", "label": 0},
+            {"utterance": "I want to send funds to someone", "label": 1},
+            {"utterance": "What is my available balance?", "label": 0},
+            {"utterance": "How can I make a transfer?", "label": 1},
+            {"utterance": "Please help me with a payment", "label": 1},
+            {"utterance": "I need to view my recent transactions", "label": 0}
+        ],
+        "validation": [
+            {"utterance": "Display my account info", "label": 0},
+            {"utterance": "I want to transfer funds", "label": 1}
+        ]
+    }
+
+    # Load data into AutoIntent
+    dataset = Dataset.from_dict(data)
+
+    # Initialize and train the AutoML pipeline
+    pipeline = Pipeline.from_preset("classic-light")
+    pipeline.fit(dataset)
+
+    # Make predictions on new data
+    predictions = pipeline.predict([
+        "What is my available balance?",
+        "Transfer money to John"
+    ])
+
+That's it! AutoIntent will automatically find the best model for your data.
 
 Data Format
 -----------
 
-To work with AutoIntent, you need to format your training data in a specific way. You need to provide a training split containing samples with utterances and labels, as shown below:
+AutoIntent expects your data in a simple dictionary format with train/validation/test splits:
 
-.. code-block:: json
+Single-Label Classification
+...........................
 
-    {
+.. code-block:: python
+
+    data = {
         "train": [
-            {
-                "utterance": "Hello!",
-                "label": 0
-            }
+            {"utterance": "Hello, how are you?", "label": 0},
+            {"utterance": "Book a flight to Paris", "label": 1},
+            {"utterance": "What's the weather like?", "label": 2}
+        ],
+        "validation": [  # Optional
+            {"utterance": "Hi there!", "label": 0}
+        ],
+        "test": [  # Optional but highly recommended
+            {"utterance": "Good morning", "label": 0}
         ]
     }
 
-For a multilabel dataset, the ``label`` field should be a list of integers representing the corresponding class labels.
+Multi-Label Classification
+..........................
 
-To use it with our Python API, you can use our :class:`autointent.Dataset` object.
+For multi-label tasks, use lists of 0s and 1s:
+
+.. code-block:: python
+
+    data = {
+        "train": [
+            {"utterance": "Book urgent flight to Paris", "label": [1, 0, 1]},  # booking=1, weather=0, urgent=1
+            {"utterance": "What's the weather?", "label": [0, 1, 0]}
+        ]
+    }
+
+Loading Data
+............
 
 .. code-block:: python
 
     from autointent import Dataset
 
-    dataset = Dataset.from_dict({"train": [...]})
+    # From dictionary
+    dataset = Dataset.from_dict(data)
+    
+    # From JSON file
+    dataset = Dataset.from_json("/path/to/your/data.json")
+    
+    # From Hugging Face Hub
+    dataset = Dataset.from_hub("your-username/your-dataset")
 
-To load a dataset from the file system into Python, the :meth:`autointent.Dataset.from_json` method exists:
+AutoML Training
+---------------
 
-.. code-block:: python
-
-    dataset = Dataset.from_json("/path/to/json")
-
-AutoML goes brrr...
--------------------
-
-Once the data is ready, you can start building the optimal classifier from the command line:
-
-.. code-block:: bash
-
-    autointent data.train_path="path/to/your/data.json"
-
-This command will start the hyperparameter search in the default :ref:`search space <key-search-space>`.
-
-As a result, a ``runs`` folder will be created in the current working directory, which will save the selected classifier ready for inference.
-
-Similar actions but in a limited mode can be started using the Python API:
-
-.. code-block:: python
-
-    from autointent import PipelineOptimizer
-
-    pipeline_optimizer = PipelineOptimizer.default(multilabel=False)
-    pipeline_optimizer.fit(dataset)
-
-Inference
----------
-
-To apply the built classifier to new data, you can use our Python API:
+AutoIntent provides several preset configurations optimized for different scenarios:
 
 .. code-block:: python
 
     from autointent import Pipeline
 
-    pipeline = Pipeline.load("path/to/run/directory")
-    utterances = ["123", "hello world"]
-    prediction = pipeline.predict(utterances)
+    # Our quick and accurate SoTA
+    pipeline = Pipeline.from_preset("classic-light")
 
-Modular Approach
-----------------
+    # If you have more training time
+    pipeline = Pipeline.from_preset("classic-heavy")
 
-If there is no need to iterate over pipelines and hyperparameters, you can import classification methods directly.
+    # Experimental preset with fine-tuning methods
+    pipeline = Pipeline.from_preset("transformers-light")
+
+    # Train the pipeline
+    pipeline.fit(dataset)
+
+Available Presets
+.................
+
+- ``classic-light``: Fast training with traditional ML methods
+- ``classic-heavy``: Comprehensive search with traditional methods
+- ``nn-medium``: Classic neural network-based approaches (RNN, CNN)
+- ``nn-heavy``: Comprehensive neural network optimization
+- ``transformers-light``: Transformer models with limited search
+- ``transformers-no-hpo``: Transformer models without hyperparameter optimization
+- ``zero-shot-llm``: Zero-shot classification using OpenAI models
+- ``zero-shot-encoders``: Zero-shot classification using transformer models
+
+Making Predictions
+-------------------
+
+Once trained, use your pipeline for inference:
 
 .. code-block:: python
 
+    # Batch predictions
+    results = pipeline.predict([
+        "What's my account balance?",
+        "Transfer $100 to John",
+        "Show me recent transactions"
+    ])
+
+
+Direct Module Usage
+-------------------
+
+For more control, use individual components without AutoML:
+
+.. testcode:: python
+
     from autointent.modules import KNNScorer
 
-    scorer = KNNScorer(embedder_name="sergeyzh/rubert-tiny-turbo", k=1)
+    # Initialize a specific scorer
+    scorer = KNNScorer(
+        embedder_config="sentence-transformers/all-MiniLM-L6-v2",
+        k=3
+    )
+
+    # Train on your data
     train_utterances = [
-        "why is there a hold on my american saving bank account",
-        "i am not sure why my account is blocked",
-        "why is there a hold on my capital one checking account",
+        "Check my account balance",
+        "Transfer money to account",
+        "Show transaction history"
     ]
-    train_labels = [0, 2, 1]
+    train_labels = [0, 1, 0]
+    
     scorer.fit(train_utterances, train_labels)
-    test_utterances = [
-        "i think my account is blocked but i do not know the reason",
-        "can you tell me why is my bank account frozen",
-    ]
-    scorer.predict(test_utterances)
 
-Further Reading
----------------
+    # Make predictions
+    predictions = scorer.predict([
+        "What's my current balance?",
+        "Send money to my friend"
+    ])
 
-- Get familiar with :doc:`concepts`.
-- Check out the guide on basic Python API Usage: :doc:`user_guides/index_basic_usage`
+Available Modules
+.................
+
+- **Scoring**: :class:`autointent.modules.KNNScorer`, :class:`autointent.modules.BertScorer`, :class:`autointent.modules.SklearnScorer`, :class:`autointent.modules.CatBoostScorer`
+- **Decision**: :class:`autointent.modules.ArgmaxDecision`,  :class:`autointent.modules.TunableDecision`, :class:`autointent.modules.AdaptiveDecision`
+
+See more at API reference  :doc:`Modules <autoapi/autointent/modules/index>`.
+
+Next Steps
+----------
+
+🚀 **Ready to dive deeper?**
+
+- **Concepts**: Learn about :doc:`concepts` and AutoIntent's architecture
+- **Tutorials**: Follow our step-by-step guides in :doc:`user_guides`
+- **Background**: Learn the AutoML and intent classification from the theoretical perspective at :doc:`learn/index` page.
+
+🛠️ **Need Help?**
+
+- Report issues on our `GitHub Issues <https://github.com/DeepPavlov/AutoIntent/issues>`_
+- Check out the full :doc:`API reference <autoapi/autointent/index>`
+
+Happy intent classification! 🎯

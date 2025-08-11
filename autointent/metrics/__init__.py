@@ -73,7 +73,14 @@ SCORING_METRICS_MULTICLASS: dict[str, ScoringMetricFn] = _funcs_to_dict(
     scoring_roc_auc,
 )
 
-SCORING_METRICS_MULTILABEL: dict[str, ScoringMetricFn] = SCORING_METRICS_MULTICLASS | _funcs_to_dict(
+SCORING_METRICS_MULTILABEL: dict[str, ScoringMetricFn] = _funcs_to_dict(
+    # multiclass except for scoring_roc_auc
+    scoring_accuracy,
+    scoring_f1,
+    scoring_log_likelihood,
+    scoring_precision,
+    scoring_recall,
+    # multilabel
     scoring_hit_rate,
     scoring_map,
     scoring_neg_coverage,
@@ -86,6 +93,13 @@ DECISION_METRICS: dict[str, DecisionMetricFn] = _funcs_to_dict(
     decision_precision,
     decision_recall,
     decision_roc_auc,
+)
+
+DICISION_METRICS_MULTILABEL: dict[str, DecisionMetricFn] = _funcs_to_dict(
+    decision_accuracy,
+    decision_f1,
+    decision_precision,
+    decision_recall,
 )
 
 REGEX_METRICS = _funcs_to_dict(regex_partial_accuracy, regex_partial_precision)

@@ -5,6 +5,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from sklearn.base import BaseEstimator
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
@@ -15,7 +16,7 @@ from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)
-AVAILABLE_CLASSIFIERS = {
+AVAILABLE_CLASSIFIERS: dict[str, type[BaseEstimator]] = {
     name: class_
     for name, class_ in all_estimators(
         type_filter=[
@@ -61,7 +62,7 @@ class SklearnScorer(BaseScorer):
         self,
         clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        **clf_args: Any,  # noqa: ANN401
+        **clf_args: dict[str, float | str | bool],
     ) -> None:
         """Initialize the SklearnScorer.
 
@@ -89,7 +90,7 @@ class SklearnScorer(BaseScorer):
         context: Context,
         clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | None = None,
-        **clf_args: float | str | bool,
+        **clf_args: dict[str, float | str | bool],
     ) -> Self:
         """Create a SklearnScorer instance using a Context object.
 
@@ -127,15 +128,7 @@ class SklearnScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        embedder = Embedder(
-            EmbedderConfig(
-                model_name=self.embedder_config.model_name,
-                device=self.embedder_config.device,
-                batch_size=self.embedder_config.batch_size,
-                tokenizer_config=self.embedder_config.tokenizer_config,
-                use_cache=self.embedder_config.use_cache,
-            )
-        )
+        embedder = Embedder(embedder_config=self.embedder_config)
         features = embedder.embed(utterances, TaskTypeEnum.classification)
 
         clf = MultiOutputClassifier(self._base_clf) if self._multilabel else self._base_clf
@@ -163,5 +156,6 @@ class SklearnScorer(BaseScorer):
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the embedder."""
         if hasattr(self, "_clf"):
-            self._embedder.delete()
             delattr(self, "_clf")
+        if hasattr(self, "_embedder"):
+            self._embedder.delete()

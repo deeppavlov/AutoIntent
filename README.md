@@ -30,7 +30,15 @@ Example of building an intent classifier in a couple of lines of code:
 from autointent import Pipeline, Dataset
 
 dataset = Dataset.from_json(path_to_json)
-pipeline = Pipeline.from_preset("light")
+pipeline = Pipeline.from_preset("classic-light")
 pipeline.fit(dataset)
 pipeline.predict(["show me my latest transactions"])
 ```
+
+## Disclaimer
+
+This project is in development phase. Bugs and breaking changes are expected. Contributions and feedback are welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## Credits
+
+Logo designed by [nkognit0](https://github.com/nkognit0).

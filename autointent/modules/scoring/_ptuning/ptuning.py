@@ -34,7 +34,6 @@ class PTuningScorer(BertScorer):
             classification_model_config="prajjwal1/bert-tiny",
             num_train_epochs=3,
             batch_size=8,
-            task_type="SEQ_CLS",
             num_virtual_tokens=10,
             seed=42
         )
@@ -43,12 +42,6 @@ class PTuningScorer(BertScorer):
         scorer.fit(utterances, labels)
         test_utterances = ["hi", "bye"]
         probabilities = scorer.predict(test_utterances)
-        print(probabilities)
-
-    .. testoutput::
-
-        [[0.49925193 0.50074804]
-        [0.4944601  0.5055399 ]]
 
     """
 
@@ -61,13 +54,14 @@ class PTuningScorer(BertScorer):
         batch_size: PositiveInt = 8,
         learning_rate: float = 5e-5,
         seed: int = 0,
-        report_to: REPORTERS_NAMES | None = None,  # type: ignore[valid-type]
+        report_to: REPORTERS_NAMES | Literal["none"] = "none",  # type: ignore  # noqa: PGH003
         encoder_reparameterization_type: Literal["MLP", "LSTM"] = "LSTM",
         num_virtual_tokens: PositiveInt = 10,
         encoder_dropout: float = 0.1,
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
         early_stopping_config: EarlyStoppingConfig | None = None,
+        print_progress: bool = False,
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         super().__init__(
@@ -78,6 +72,7 @@ class PTuningScorer(BertScorer):
             seed=seed,
             report_to=report_to,
             early_stopping_config=early_stopping_config,
+            print_progress=print_progress,
         )
         self._ptuning_config = PromptEncoderConfig(
             task_type=TaskType.SEQ_CLS,
