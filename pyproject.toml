@@ -29,7 +29,7 @@ classifiers=[
     'Framework :: Sphinx',
     'Typing :: Typed',
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "sentence-transformers (>=3,<4)",
     "scikit-learn (>=1.5,<2.0)",
@@ -51,11 +51,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "tach (>=0.11.3,<1.0.0)",
+dspy = [
+    "dspy (>=2.6.5,<3.0.0)",
+]
+wandb = [
+    "wandb (>=0.19.10,<1.0.0)",
+]
+codecarbon = [
+    "codecarbon (>=3.0.2, <3.1.0)",
+    "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
+]
+
+[dependency-groups]
+nb = [
     "ipykernel (>=6.29.5,<7.0.0)",
     "ipywidgets (>=8.1.5,<9.0.0)",
+]
+lint = [
     "ruff (==0.8.4)",
+]
+sentencepiece = [
     "sentencepiece (>=0.2.0,<0.3.0)",
 ]
 test = [
@@ -89,16 +104,6 @@ docs = [
     "sphinx-toolbox  (>=4.0.0,<5.0.0)",
     "sphinx-llms-txt (>=0.3.0,<0.4.0)"
 ]
-dspy = [
-    "dspy (>=2.6.5,<3.0.0)",
-]
-wandb = [
-    "wandb (>=0.19.10,<1.0.0)",
-]
-codecarbon = [
-    "codecarbon (>=3.0.2, <3.1.0)",
-    "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
-]
 
 [project.urls]
 Homepage = "https://deeppavlov.github.io/AutoIntent/"
@@ -108,6 +113,10 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.8.7,<0.9.0"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
@@ -144,11 +153,6 @@ max-args = 10
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-
-[build-system]
-requires = ["poetry-core>=2.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
