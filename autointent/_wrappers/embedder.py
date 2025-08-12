@@ -23,7 +23,7 @@ from sentence_transformers.losses import BatchAllTripletLoss
 from sentence_transformers.similarity_functions import SimilarityFunction
 from sentence_transformers.training_args import BatchSamplers
 from sklearn.model_selection import train_test_split
-from transformers import EarlyStoppingCallback
+from transformers import EarlyStoppingCallback, TrainerCallback
 
 from autointent._hash import Hasher
 from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
@@ -156,10 +156,10 @@ class Embedder:
                 batch_sampler=BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,
-                evaluation_strategy="epoch",
+                eval_strategy="epoch",
                 greater_is_better=False,
             )
-            callback = []
+            callback: list[TrainerCallback] = []
             if config.early_stopping:
                 callback.append(
                     EarlyStoppingCallback(
