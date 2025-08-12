@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from autointent import Pipeline
-from autointent.custom_types import ListOfLabels
+from autointent.custom_types import ListOfLabelsWithOOS
 
 
 class Settings(BaseSettings):
@@ -30,7 +30,7 @@ class PredictRequest(BaseModel):
 class PredictResponse(BaseModel):
     """Response model for the predict endpoint."""
 
-    predictions: ListOfLabels = Field(..., description="List of predicted class labels")
+    predictions: ListOfLabelsWithOOS = Field(..., description="List of predicted class labels")
 
 
 settings = Settings()
@@ -59,18 +59,19 @@ def load_pipeline() -> Pipeline:
         return pipeline
 
 
-app = FastAPI(
-    title="AutoIntent Pipeline API",
-    description="API for serving AutoIntent predictions",
-    version="0.0.1",
-)
-
-
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
     """Load pipe."""
     load_pipeline()
     yield
+
+
+app = FastAPI(
+    title="AutoIntent Pipeline API",
+    description="API for serving AutoIntent predictions",
+    version="0.0.1",
+    lifespan=lifespan,
+)
 
 
 @app.get("/health")
