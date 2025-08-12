@@ -156,19 +156,24 @@ class Embedder:
                 batch_sampler=BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,
-                evaluation_strategy = "epoch",
+                evaluation_strategy="epoch",
                 greater_is_better=False,
             )
+            callback = []
+            if config.early_stopping:
+                callback.append(
+                    EarlyStoppingCallback(
+                        early_stopping_patience=config.early_stopping,
+                        early_stopping_threshold=config.early_stopping_threshold,
+                    )
+                )
             trainer = SentenceTransformerTrainer(
                 model=self.embedding_model,
                 args=args,
                 train_dataset=tr_ds,
                 eval_dataset=val_ds,
                 loss=loss,
-                callbacks=EarlyStoppingCallback(
-                    early_stopping_patience=config.early_stopping,
-                    early_stopping_threshold=config.early_stopping_threshold,
-                ),
+                callbacks=callback,
             )
 
             trainer.train()
