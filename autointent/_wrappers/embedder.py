@@ -102,7 +102,7 @@ class Embedder:
             The hash value of the Embedder.
         """
         hasher = Hasher()
-        if self.config.freeze:
+        if self.config.freeze and not Path(self.config.model_name).exists():
             commit_hash = _get_latest_commit_hash(self.config.model_name)
             hasher.update(commit_hash)
         else:
