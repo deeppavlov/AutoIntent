@@ -147,17 +147,18 @@ class Embedder:
                 output_dir=tmp_dir,
                 num_train_epochs=config.epoch_num,
                 per_device_train_batch_size=config.batch_size,
+                per_device_eval_batch_size=8,
+                eval_steps=1,
                 learning_rate=config.learning_rate,
                 warmup_ratio=config.warmup_ratio,
-                metric_for_best_model="eval_loss",
-                greater_is_better=False,
                 fp16=config.fp16,
                 bf16=config.bf16,
                 batch_sampler=BatchSamplers.NO_DUPLICATES,
+                metric_for_best_model="eval_loss",
+                load_best_model_at_end=True,
+                evaluation_strategy = "epoch",
+                greater_is_better=False,
             )
-            if config.early_stopping:
-                args.set_training(load_best_model_at_end=True)
-                args.set_evaluate(strategy="epoch", steps=1)
             trainer = SentenceTransformerTrainer(
                 model=self.embedding_model,
                 args=args,
