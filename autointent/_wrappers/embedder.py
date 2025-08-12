@@ -22,6 +22,8 @@ from sentence_transformers import SentenceTransformer, SentenceTransformerTraine
 from sentence_transformers.losses import BatchAllTripletLoss
 from sentence_transformers.similarity_functions import SimilarityFunction
 from sentence_transformers.training_args import BatchSamplers
+from sklearn.model_selection import train_test_split
+from transformers import EarlyStoppingCallback
 
 from autointent._hash import Hasher
 from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
@@ -130,8 +132,13 @@ class Embedder:
     def train(self, utterances: list[str], labels: list[int], config: EmbedderFineTuningConfig) -> None:
         """Train the embedding model."""
         self._load_model()
-
-        tr_ds = Dataset.from_dict({"text": utterances, "label": labels})
+        if config.early_stopping:
+            x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=0.1, random_state=42)
+            tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
+            val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
+        else:
+            tr_ds = Dataset.from_dict({"text": utterances, "label": labels})
+            val_ds = None
 
         loss = BatchAllTripletLoss(model=self.embedding_model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -142,16 +149,25 @@ class Embedder:
                 per_device_train_batch_size=config.batch_size,
                 learning_rate=config.learning_rate,
                 warmup_ratio=config.warmup_ratio,
+                metric_for_best_model="eval_loss",
+                greater_is_better=False,
                 fp16=config.fp16,
                 bf16=config.bf16,
                 batch_sampler=BatchSamplers.NO_DUPLICATES,
             )
-
+            if config.early_stopping:
+                args.set_training(load_best_model_at_end=True)
+                args.set_evaluate(strategy="epoch", steps=1)
             trainer = SentenceTransformerTrainer(
                 model=self.embedding_model,
                 args=args,
                 train_dataset=tr_ds,
+                eval_dataset=val_ds,
                 loss=loss,
+                callbacks=EarlyStoppingCallback(
+                    early_stopping_patience=config.early_stopping,
+                    early_stopping_threshold=config.early_stopping_threshold,
+                ),
             )
 
             trainer.train()
