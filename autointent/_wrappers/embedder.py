@@ -143,7 +143,7 @@ class Embedder:
         loss = BatchAllTripletLoss(model=self.embedding_model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
             args = SentenceTransformerTrainingArguments(
-                save_strategy="no",
+                save_strategy="epoch",
                 output_dir=tmp_dir,
                 num_train_epochs=config.epoch_num,
                 per_device_train_batch_size=config.batch_size,
