@@ -4,34 +4,27 @@ This module provides the `VectorIndex` class to handle indexing, querying, and
 management of embeddings for nearest neighbor search.
 """
 
+import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypedDict, assert_never
+from typing import TYPE_CHECKING, Any, assert_never
 
 import numpy as np
 import numpy.typing as npt
 
 from autointent._wrappers import Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum, TokenizerConfig, VectorIndexConfig
-from autointent.custom_types import ListOfLabels, VectorIndexBackend
+from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
+from autointent.custom_types import ListOfLabels
 
 from .base_backend import BaseBackend, Document
 from .faiss import FaissBackend
 from .opensearch import OpenSearchBackend
 
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
-class VectorIndexMetadata(TypedDict):
-    embedder_model_name: str
-    embedder_device: str | None
-    embedder_batch_size: int
-    embedder_max_length: int | None
-    embedder_use_cache: bool
-
-
-class VectorIndexData(TypedDict):
-    texts: list[str]
-    labels: ListOfLabels
+logger = logging.getLogger(__name__)
 
 
 class VectorIndex:
@@ -41,12 +34,13 @@ class VectorIndex:
     labels for efficient nearest neighbor search.
     """
 
-    _data_file = "data.json"
-    _meta_data_file = "metadata.json"
+    _index_path = "data"
+    _embedder_path = "embedder"
+    _config_path = "config"
+    embedder: Embedder
+    index: BaseBackend
 
-    def __init__(
-        self, embedder_config: EmbedderConfig, config: VectorIndexConfig, backend: VectorIndexBackend = "faiss"
-    ) -> None:
+    def __init__(self, embedder_config: EmbedderConfig, config: VectorIndexConfig) -> None:
         """Initialize the VectorIndex with an embedding model.
 
         Args:
@@ -55,18 +49,15 @@ class VectorIndex:
             backend: vector index backend to use.
         """
         self.embedder = Embedder(embedder_config)
-        self.backend = backend
         self.config = config
 
-        self._logger = logging.getLogger(__name__)
-
-    def _init_backend(self) -> BaseBackend:
-        if self.backend == "faiss":
+    def _init_index(self) -> BaseBackend:
+        if isinstance(self.config, FaissConfig):
             res = FaissBackend(config=self.config)
-        elif self.backend == "opensearch":
+        elif isinstance(self.config, OpenSearchConfig):
             res = OpenSearchBackend(config=self.config)
         else:
-            assert_never(self.backend)
+            assert_never(self.config)
         return res
 
     def add(self, texts: list[str], labels: ListOfLabels) -> None:
@@ -76,11 +67,11 @@ class VectorIndex:
             texts: List of input texts.
             labels: List of labels corresponding to the texts.
         """
-        self._logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
+        logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
-            self.index = self._init_backend()
+            self.index = self._init_index()
 
         self.index.add(
             embeddings=embeddings, documents=[Document(text=t, label=i) for t, i in zip(texts, labels, strict=True)]
@@ -88,11 +79,9 @@ class VectorIndex:
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        self._logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
+        logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
         self.embedder.clear_ram()
         self.index.clear_ram()
-        self.labels = []
-        self.texts = []
 
     def _search_by_text(self, texts: list[str], k: int) -> tuple[npt.NDArray[Any], list[list[Document]]]:
         """Search the index using text queries.
@@ -156,52 +145,50 @@ class VectorIndex:
         dir_path.mkdir(parents=True, exist_ok=True)
         self.dump_dir = dir_path
 
-        data = VectorIndexData(texts=self.texts, labels=self.labels)
-        with (self.dump_dir / self._data_file).open("w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4, ensure_ascii=False)
+        self.index.dump(self.dump_dir / self._index_path)
+        self.embedder.dump(self.dump_dir / self._embedder_path)
 
-        metadata = VectorIndexMetadata(
-            embedder_max_length=self.embedder.config.tokenizer_config.max_length,
-            embedder_model_name=str(self.embedder.config.model_name),
-            embedder_device=self.embedder.config.device,
-            embedder_batch_size=self.embedder.config.batch_size,
-            embedder_use_cache=self.embedder.config.use_cache,
-        )
-
-        with (self.dump_dir / self._meta_data_file).open("w", encoding="utf-8") as file:
-            json.dump(metadata, file, indent=4, ensure_ascii=False)
+        class_info = {"name": self.config.__class__.__name__, "module": self.config.__class__.__module__}
+        with (dir_path / self._config_path / "class_info.json").open("w", encoding="utf-8") as file:
+            json.dump(class_info, file, ensure_ascii=False, indent=4)
+        with (dir_path / self._config_path / "model_dump.json").open("w", encoding="utf-8") as file:
+            json.dump(self.config.model_dump(), file, ensure_ascii=False, indent=4)
 
     @classmethod
     def load(
         cls,
         dir_path: Path,
-        embedder_device: str | None = None,
-        embedder_batch_size: int | None = None,
-        embedder_use_cache: bool | None = None,
+        embedder_override_config: EmbedderConfig | None = None,
     ) -> "VectorIndex":
         """Load the index and associated data from disk.
 
         Args:
             dir_path: Directory path where the data is stored.
-            embedder_device: Device for the embedding model.
-            embedder_batch_size: Batch size for the embedding model.
-            embedder_use_cache: Whether to use caching for the embedding model.
+            embedder_override_config: override some settings like device and inference batch size
         """
-        with (dir_path / cls._meta_data_file).open(encoding="utf-8") as file:
-            metadata: VectorIndexMetadata = json.load(file)
+        embedder = Embedder.load(dir_path / cls._embedder_path, override_config=embedder_override_config)
+
+        with (dir_path / cls._config_path / "model_dump.json").open("r", encoding="utf-8") as file:
+            content = json.load(file)
+
+        with (dir_path / cls._config_path / "class_info.json").open("r", encoding="utf-8") as file:
+            class_info = json.load(file)
+
+        model_type = importlib.import_module(class_info["module"])
+        model_type: BaseModel = getattr(model_type, class_info["name"])
+        config = model_type.model_validate(content)
 
         instance = cls(
-            EmbedderConfig(
-                model_name=metadata["embedder_model_name"],
-                device=embedder_device or metadata["embedder_device"],
-                batch_size=embedder_batch_size or metadata["embedder_batch_size"],
-                tokenizer_config=TokenizerConfig(max_length=metadata["embedder_max_length"]),
-                use_cache=embedder_use_cache or metadata["embedder_use_cache"],
-            )
+            embedder_config=EmbedderConfig(),  # dummy embedder config
+            config=config,
         )
+        instance.embedder = embedder
 
-        with (dir_path / cls._data_file).open(encoding="utf-8") as file:
-            data: VectorIndexData = json.load(file)
+        if isinstance(config, FaissConfig):
+            instance.index = FaissBackend.load(dir_path / cls._index_path)
+        elif isinstance(config, OpenSearchConfig):
+            instance.index = OpenSearchBackend.load(dir_path / cls._index_path)
+        else:
+            assert_never(config)
 
-        instance.add(**data)
         return instance
