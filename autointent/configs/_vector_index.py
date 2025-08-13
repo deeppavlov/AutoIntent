@@ -17,4 +17,5 @@ class OpenSearchHost(TypedDict):
 
 class OpenSearchConfig(VectorIndexConfig):
     hosts: list[OpenSearchHost]
+    index_name: str
     kwargs: dict[str, Any]  # TODO define set of options
