@@ -11,17 +11,19 @@ from ._transformers import (
     TaskTypeEnum,
     TokenizerConfig,
 )
-from ._vector_index import VectorIndexConfig
+from ._vector_index import FaissConfig, OpenSearchConfig, VectorIndexConfig
 
 __all__ = [
     "CrossEncoderConfig",
     "DataConfig",
     "EarlyStoppingConfig",
     "EmbedderConfig",
+    "FaissConfig",
     "HFModelConfig",
     "HPOConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
+    "OpenSearchConfig",
     "TaskTypeEnum",
     "TokenizerConfig",
     "TorchTrainingConfig",

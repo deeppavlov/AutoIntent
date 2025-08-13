@@ -3,7 +3,11 @@ from typing import Any, TypedDict
 from pydantic import BaseModel
 
 
-class FaissConfig(BaseModel): ...
+class VectorIndexConfig(BaseModel):
+    vector_size: int
+
+
+class FaissConfig(VectorIndexConfig): ...
 
 
 class OpenSearchHost(TypedDict):
@@ -11,12 +15,6 @@ class OpenSearchHost(TypedDict):
     port: int
 
 
-class OpenSearchConfig(BaseModel):
+class OpenSearchConfig(VectorIndexConfig):
     hosts: list[OpenSearchHost]
     kwargs: dict[str, Any]  # TODO define set of options
-
-
-class VectorIndexConfig(BaseModel):
-    vector_size: int
-    faiss: FaissConfig
-    opensearch: OpenSearchConfig

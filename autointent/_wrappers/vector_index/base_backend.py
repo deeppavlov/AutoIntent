@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Any
 
 import numpy.typing as npt
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from autointent.configs import VectorIndexConfig
 from autointent.custom_types import LabelType
@@ -53,3 +55,10 @@ class BaseBackend(ABC):
 
     @abstractmethod
     def get_all_embeddings(self) -> npt.NDArray[Any]: ...
+
+    @abstractmethod
+    def dump(self, path: Path) -> None: ...
+
+    @abstractmethod
+    @classmethod
+    def load(cls, path: Path) -> Self: ...
