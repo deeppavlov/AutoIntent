@@ -1,6 +1,6 @@
 from typing import Any, TypedDict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class VectorIndexConfig(BaseModel): ...
@@ -16,5 +16,5 @@ class OpenSearchHost(TypedDict):
 
 class OpenSearchConfig(VectorIndexConfig):
     hosts: list[OpenSearchHost]
-    index_name: str
-    kwargs: dict[str, Any]  # TODO define set of options
+    index_name: str | None = None
+    kwargs: dict[str, Any] = Field(default_factory=dict)  # TODO define set of options

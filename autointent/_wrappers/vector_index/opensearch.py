@@ -17,8 +17,9 @@ class OpenSearchBackend(BaseBackend):
     _documents_filename = "documents.json"
     _config_filename = "config.json"
     _embeddings_filename = "embeddings.json"
+    _vector_size_filename = "vector_size.txt"
 
-    def __init__(self, config: OpenSearchConfig) -> None:
+    def __init__(self, config: OpenSearchConfig, vector_size: int) -> None:
         try:
             import opensearchpy
 
@@ -27,12 +28,20 @@ class OpenSearchBackend(BaseBackend):
             msg = "Unable to create OpenSearch vector index. Install opensearch-py python package first."
             raise RuntimeError(msg) from e
 
-        self.config = config
+        self.vector_size = vector_size
+        self.config = config.model_copy()
         self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.kwargs)
-        self._init_index()
+        self._index_name = self.config.index_name
+
+    @property
+    def index_name(self) -> str:
+        if self._index_name is None:
+            msg = "Index is not set. Either use existing collection or add some documents."
+            raise RuntimeError(msg)
+        return self._index_name
 
     def _init_index(self) -> None:
-        if not self._client.indices.exists(index=self.config.index_name):
+        if not self._client.indices.exists(index=self.index_name):
             # Create index for exact vector search using script scoring
             index_body = {
                 "settings": {
@@ -46,7 +55,7 @@ class OpenSearchBackend(BaseBackend):
                     "properties": {
                         "values": {
                             "type": "knn_vector",
-                            "dimension": self.config.vector_size,
+                            "dimension": self.vector_size,
                             # No method specified - this enables exact search with script scoring
                         },
                         "text": {
@@ -59,13 +68,13 @@ class OpenSearchBackend(BaseBackend):
                     }
                 },
             }
-            self._client.indices.create(index=self.config.index_name, body=index_body)
+            self._client.indices.create(index=self.index_name, body=index_body)
 
     def clear_ram(self) -> None:
         """Clear the index by deleting all documents."""
-        if self._client.indices.exists(index=self.config.index_name):
+        if self._client.indices.exists(index=self.index_name):
             self._client.delete_by_query(
-                index=self.config.index_name,
+                index=self.index_name,
                 body={"query": {"match_all": {}}},
                 refresh=True,
             )
@@ -76,6 +85,10 @@ class OpenSearchBackend(BaseBackend):
             msg = f"Number of embeddings ({len(embeddings)}) must match number of documents ({len(documents)})"
             raise ValueError(msg)
 
+        if self._index_name is None:
+            self._index_name = hashlib.sha256(documents[0].text.encode("utf-8")).hexdigest()[:16]
+            self.config.index_name = self._index_name
+
         # Prepare bulk data
         bulk_data = []
         for i, (embedding, doc) in enumerate(zip(embeddings, documents, strict=True)):
@@ -84,7 +97,7 @@ class OpenSearchBackend(BaseBackend):
             doc_id = f"{text_hash}_{i}"
             bulk_data.append(
                 {
-                    "_index": self.config.index_name,
+                    "_index": self.index_name,
                     "_id": doc_id,
                     "_source": {
                         "values": embedding.tolist(),
@@ -93,6 +106,9 @@ class OpenSearchBackend(BaseBackend):
                     },
                 }
             )
+
+
+        self._init_index()
 
         # Use bulk API for efficient indexing
         try:
@@ -110,7 +126,7 @@ class OpenSearchBackend(BaseBackend):
 
         # Refresh index to make documents searchable immediately
         # Note: For large datasets, consider batching refreshes or using refresh=wait_for in bulk operations
-        self._client.indices.refresh(index=self.config.index_name)
+        self._client.indices.refresh(index=self.index_name)
 
     def query(self, embedding: NDArray[Any], k: int) -> tuple[NDArray[Any], list[list[Document]]]:
         """Query the index using exact vector similarity search with script scoring."""
@@ -137,7 +153,7 @@ class OpenSearchBackend(BaseBackend):
                 },
                 "_source": ["text", "label"],
             }
-            search_queries.append({"index": self.config.index_name})
+            search_queries.append({"index": self.index_name})
             search_queries.append(query_body)
 
         # Execute multi-search
@@ -175,7 +191,7 @@ class OpenSearchBackend(BaseBackend):
 
         embeddings = []
         response = self._client.search(
-            index=self.config.index_name,
+            index=self.index_name,
             body=search_body,
             scroll="1m",
         )
@@ -201,7 +217,7 @@ class OpenSearchBackend(BaseBackend):
             # Clean up scroll context
             self._client.clear_scroll(scroll_id=scroll_id)
 
-        return np.array(embeddings) if embeddings else np.array([]).reshape(0, self.config.vector_size)
+        return np.array(embeddings)
 
     def dump(self, path: Path) -> None:
         """Save index data to files."""
@@ -210,11 +226,17 @@ class OpenSearchBackend(BaseBackend):
         with (path / self._config_filename).open("w", encoding="utf-8") as file:
             json.dump(self.config.model_dump(), file, indent=4, ensure_ascii=False)
 
+        with (path / self._vector_size_filename).open("w", encoding="utf-8") as file:
+            file.write(str(self.vector_size))
+
     @classmethod
     def load(cls, path: Path) -> Self:
         """Load index from saved files."""
         with (path / cls._config_filename).open("r", encoding="utf-8") as file:
             config_data = json.load(file)
 
+        with (path / cls._vector_size_filename).open("r", encoding="utf-8") as file:
+            vector_size = int(file.read())
+
         config = OpenSearchConfig.model_validate(config_data)
-        return cls(config)
+        return cls(config=config, vector_size=vector_size)
