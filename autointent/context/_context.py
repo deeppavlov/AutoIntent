@@ -8,7 +8,15 @@ from typing_extensions import assert_never
 
 from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
-from autointent.configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, HPOConfig, LoggingConfig
+from autointent.configs import (
+    CrossEncoderConfig,
+    DataConfig,
+    EmbedderConfig,
+    HFModelConfig,
+    HPOConfig,
+    LoggingConfig,
+    VectorIndexConfig,
+)
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -71,6 +79,12 @@ class Context:
     def configure_hpo(self, config: HPOConfig) -> None:
         if isinstance(config, HPOConfig):
             self.hpo_config = config
+        else:
+            assert_never(config)
+
+    def configure_vector_index(self, config: VectorIndexConfig) -> None:
+        if isinstance(config, VectorIndexConfig):
+            self.vector_index_config = config
         else:
             assert_never(config)
 

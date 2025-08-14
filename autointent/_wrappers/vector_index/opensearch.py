@@ -107,7 +107,6 @@ class OpenSearchBackend(BaseBackend):
                 }
             )
 
-
         self._init_index()
 
         # Use bulk API for efficient indexing

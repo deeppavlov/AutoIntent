@@ -9,7 +9,7 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -64,10 +64,12 @@ class DNNCScorer(BaseScorer):
         k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `DNNCScorer` must be a positive int"
@@ -99,6 +101,7 @@ class DNNCScorer(BaseScorer):
             k=k,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
+            vector_index_config=context.vector_index_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -119,7 +122,7 @@ class DNNCScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(self.embedder_config)
+        self._vector_index = VectorIndex(self.embedder_config, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
         self._cross_encoder = Ranker(self.cross_encoder_config, output_range="sigmoid")

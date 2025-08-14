@@ -11,7 +11,7 @@ from ._transformers import (
     TaskTypeEnum,
     TokenizerConfig,
 )
-from ._vector_index import FaissConfig, OpenSearchConfig, VectorIndexConfig
+from ._vector_index import FaissConfig, OpenSearchConfig, VectorIndexConfig, get_default_vector_index_config
 
 __all__ = [
     "CrossEncoderConfig",
@@ -29,4 +29,5 @@ __all__ = [
     "TorchTrainingConfig",
     "VectorIndexConfig",
     "VocabConfig",
+    "get_default_vector_index_config",
 ]

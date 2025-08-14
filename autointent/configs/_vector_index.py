@@ -18,3 +18,7 @@ class OpenSearchConfig(VectorIndexConfig):
     hosts: list[OpenSearchHost]
     index_name: str | None = None
     kwargs: dict[str, Any] = Field(default_factory=dict)  # TODO define set of options
+
+
+def get_default_vector_index_config() -> VectorIndexConfig:
+    return FaissConfig()

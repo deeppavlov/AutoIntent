@@ -7,7 +7,7 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
 from autointent.custom_types import ListOfLabels, WeightType
 
 from .knn import KNNScorer
@@ -42,6 +42,7 @@ class RerankScorer(KNNScorer):
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         super().__init__(
             embedder_config=embedder_config,
@@ -50,6 +51,7 @@ class RerankScorer(KNNScorer):
         )
 
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         self.m = k if m is None else m
         self.use_cross_encoder_scores = use_cross_encoder_scores
@@ -94,6 +96,7 @@ class RerankScorer(KNNScorer):
             use_cross_encoder_scores=use_cross_encoder_scores,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
+            vector_index_config=context.vector_index_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
