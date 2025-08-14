@@ -3,8 +3,7 @@ from typing import Any, TypedDict
 from pydantic import BaseModel
 
 
-class VectorIndexConfig(BaseModel):
-    vector_size: int
+class VectorIndexConfig(BaseModel): ...
 
 
 class FaissConfig(VectorIndexConfig): ...

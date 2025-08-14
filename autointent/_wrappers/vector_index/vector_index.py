@@ -51,11 +51,11 @@ class VectorIndex:
         self.embedder = Embedder(embedder_config)
         self.config = config
 
-    def _init_index(self) -> BaseBackend:
+    def _init_index(self, vector_size: int) -> BaseBackend:
         if isinstance(self.config, FaissConfig):
-            res = FaissBackend(config=self.config)
+            res = FaissBackend(config=self.config, vector_size=vector_size)
         elif isinstance(self.config, OpenSearchConfig):
-            res = OpenSearchBackend(config=self.config)
+            res = OpenSearchBackend(config=self.config, vector_size=vector_size)
         else:
             assert_never(self.config)
         return res
@@ -71,7 +71,7 @@ class VectorIndex:
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
-            self.index = self._init_index()
+            self.index = self._init_index(vector_size=embeddings.shape[1])
 
         self.index.add(
             embeddings=embeddings, documents=[Document(text=t, label=i) for t, i in zip(texts, labels, strict=True)]
@@ -148,6 +148,7 @@ class VectorIndex:
         self.index.dump(self.dump_dir / self._index_path)
         self.embedder.dump(self.dump_dir / self._embedder_path)
 
+        (dir_path / self._config_path).mkdir(parents=True)
         class_info = {"name": self.config.__class__.__name__, "module": self.config.__class__.__module__}
         with (dir_path / self._config_path / "class_info.json").open("w", encoding="utf-8") as file:
             json.dump(class_info, file, ensure_ascii=False, indent=4)

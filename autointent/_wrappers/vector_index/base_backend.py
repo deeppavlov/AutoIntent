@@ -17,7 +17,7 @@ class Document(BaseModel):
 
 class BaseBackend(ABC):
     @abstractmethod
-    def __init__(self, config: VectorIndexConfig) -> None: ...
+    def __init__(self, config: VectorIndexConfig, vector_size: int) -> None: ...
 
     @abstractmethod
     def add(self, embeddings: npt.NDArray[Any], documents: list[Document]) -> None: ...
@@ -59,6 +59,6 @@ class BaseBackend(ABC):
     @abstractmethod
     def dump(self, path: Path) -> None: ...
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def load(cls, path: Path) -> Self: ...
