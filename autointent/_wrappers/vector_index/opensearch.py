@@ -30,7 +30,7 @@ class OpenSearchBackend(BaseBackend):
 
         self.vector_size = vector_size
         self.config = config.model_copy()
-        self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.kwargs)
+        self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
         self._index_name = self.config.index_name
 
     @property
