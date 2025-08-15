@@ -134,14 +134,16 @@ class RerankScorer(KNNScorer):
                 - Array of predicted scores
                 - List of neighbor utterances
         """
-        knn_labels, knn_distances, knn_neighbors = self._get_neighbours(utterances)
+        knn_distances, knn_neighbors = self._get_neighbours(utterances)
+        knn_labels = [[n.label for n in neigs] for neigs in knn_neighbors]
+        knn_utterances = [[n.text for n in neigs] for neigs in knn_neighbors]
 
         labels: list[ListOfLabels] = []
         distances: list[list[float]] = []
         neighbours: list[list[str]] = []
 
         for query, query_labels, query_distances, query_docs in zip(
-            utterances, knn_labels, knn_distances, knn_neighbors, strict=True
+            utterances, knn_labels, knn_distances, knn_utterances, strict=True
         ):
             cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
