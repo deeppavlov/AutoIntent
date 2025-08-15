@@ -23,12 +23,6 @@ class Settings(BaseSettings):
     path: str = Field(..., description="Path to the optimized pipeline assets")
 
 
-class PredictInput(BaseModel):
-    """Input model for the predict tool."""
-
-    utterances: list[str] = Field(..., description="List of text utterances to classify")
-
-
 class PredictOutput(BaseModel):
     """Output model for the predict tool."""
 
@@ -49,24 +43,11 @@ class PaginationInfo(BaseModel):
     total_pages: int = Field(..., description="Total number of pages")
 
 
-class ClassesInput(BaseModel):
-    """Input model for the classes tool."""
-
-    pagination_params: PaginationParams
-
-
 class ClassesOutput(BaseModel):
     """Output model for the classes tool."""
 
     classes: list[Intent] = Field(..., description="List of class information")
     pagination_info: PaginationInfo
-
-
-class TrainDataInput(BaseModel):
-    """Input model for the train_data tool."""
-
-    class_filter: list[int] | None = Field(default=None, description="Filter by specific class IDs")
-    pagination_params: PaginationParams
 
 
 class DataSample(BaseModel):
