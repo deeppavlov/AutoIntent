@@ -19,6 +19,8 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="AUTOINTENT_")
     path: str = Field(..., description="Path to the optimized pipeline assets")
+    host: str = "127.0.0.1"
+    port: int = 8013
 
 
 class PredictRequest(BaseModel):
@@ -98,3 +100,15 @@ async def predict(request: PredictRequest) -> PredictResponse:
     predictions = current_pipeline.predict(request.utterances)
 
     return PredictResponse(predictions=predictions)
+
+
+def main() -> None:
+    """Main entry point for the HTTP server."""
+    import uvicorn
+
+    uvicorn.run(
+        "autointent.server.http:app",
+        host=settings.host,
+        port=settings.port,
+        reload=False,
+    )

@@ -117,6 +117,7 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
 "autointent-mcp" = "autointent.server.mcp:main"
+"autointent-http" = "autointent.server.http:main"
 
 [tool.ruff]
 line-length = 120
