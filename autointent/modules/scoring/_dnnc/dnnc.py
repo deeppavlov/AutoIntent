@@ -222,10 +222,11 @@ class DNNCScorer(BaseScorer):
                 - List of neighbor utterances
                 - List of neighbor scores
         """
-        labels, neighbors = self._vector_index.query(
+        _, neighbors = self._vector_index.query(
             utterances,
             self.k,
         )
+        labels = [[n.label for n in neigs] for neigs in neighbors]
 
         cross_encoder_scores = self._get_cross_encoder_scores(utterances, neighbors)
 
