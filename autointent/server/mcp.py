@@ -21,7 +21,6 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="AUTOINTENT_")
     path: str = Field(..., description="Path to the optimized pipeline assets")
-    dataset_path: str = Field(..., description="Path to the training dataset JSON file")
 
 
 class PredictInput(BaseModel):
@@ -112,10 +111,12 @@ def load_pipeline() -> Pipeline:
 
 @lru_cache(maxsize=1)
 def load_dataset() -> Dataset:
-    """Load the training dataset from disk."""
-    dataset_path = Path(settings.dataset_path)
+    """Load the training dataset from the pipeline directory."""
+    pipeline_path = Path(settings.path)
+    dataset_path = pipeline_path / "dataset.json"
+
     if not dataset_path.exists():
-        msg = f"Dataset path does not exist: {dataset_path}"
+        msg = f"Dataset file does not exist: {dataset_path}"
         logger.error(msg)
         raise FileNotFoundError(msg)
 
@@ -155,6 +156,9 @@ mcp = FastMCP(
     name="AutoIntent MCP Server",
     instructions="""
     AutoIntent MCP Server provides text classification capabilities through a trained AutoIntent pipeline.
+
+    The server loads both the trained pipeline and the original dataset from the pipeline directory.
+    Set AUTOINTENT_PATH environment variable to the path containing the trained pipeline assets.
 
     Available tools:
     - predict: Classify text utterances using the trained model

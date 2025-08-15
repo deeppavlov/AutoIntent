@@ -17,7 +17,7 @@ Client = pytest.importorskip("fastmcp").Client
 
 @pytest.fixture
 def trained_pipeline_path(dataset):
-    """Train a pipeline and save it to a temporary directory."""
+    """Train a pipeline and save it to a temporary directory along with the dataset."""
     # Create temporary directory for this test
     with tempfile.TemporaryDirectory() as temp_dir:
         project_dir = Path(temp_dir) / "test_mcp"
@@ -30,30 +30,23 @@ def trained_pipeline_path(dataset):
         logging_config = LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True)
         pipeline_optimizer.set_config(logging_config)
 
-        # Train and save pipeline
+        # Train and save pipeline (this automatically saves dataset.json in the same directory)
         context = pipeline_optimizer.fit(dataset)
         context.dump()
 
         yield logging_config.dirpath
 
 
-@pytest.fixture
-def dataset_path(dataset, tmp_path):
-    """Save the dataset to a temporary JSON file."""
-    dataset_file = tmp_path / "test_dataset.json"
-    dataset.to_json(dataset_file)
-    return str(dataset_file)
+
 
 
 @pytest.fixture
-def mcp_server(trained_pipeline_path, dataset_path):
-    """Create an MCP server with the trained pipeline and dataset."""
+def mcp_server(trained_pipeline_path):
+    """Create an MCP server with the trained pipeline."""
     # Set environment variables for the MCP server
     original_path = os.environ.get("AUTOINTENT_PATH")
-    original_dataset_path = os.environ.get("AUTOINTENT_DATASET_PATH")
 
     os.environ["AUTOINTENT_PATH"] = str(trained_pipeline_path)
-    os.environ["AUTOINTENT_DATASET_PATH"] = str(dataset_path)
 
     try:
         # Import after setting environment variables to ensure they're picked up
@@ -66,11 +59,6 @@ def mcp_server(trained_pipeline_path, dataset_path):
             os.environ["AUTOINTENT_PATH"] = original_path
         else:
             os.environ.pop("AUTOINTENT_PATH", None)
-
-        if original_dataset_path is not None:
-            os.environ["AUTOINTENT_DATASET_PATH"] = original_dataset_path
-        else:
-            os.environ.pop("AUTOINTENT_DATASET_PATH", None)
 
 
 @pytest.mark.asyncio
