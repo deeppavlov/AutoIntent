@@ -168,22 +168,22 @@ mcp = FastMCP(
 
 
 @mcp.tool()
-def predict(input_data: PredictInput) -> PredictOutput:
+def predict(utterances: list[str]) -> PredictOutput:
     """Classify text utterances using the trained AutoIntent pipeline.
 
     Args:
-        input_data: Contains list of utterances to classify
+        utterances: List of text utterances to classify
 
     Returns:
         Predictions for each utterance
     """
     pipeline = load_pipeline()
 
-    if not input_data.utterances:
+    if not utterances:
         return PredictOutput(predictions=[])
 
     try:
-        predictions = pipeline.predict(input_data.utterances)
+        predictions = pipeline.predict(utterances)
         return PredictOutput(predictions=predictions)
     except Exception:
         logger.exception("Failed to make predictions")
@@ -191,21 +191,24 @@ def predict(input_data: PredictInput) -> PredictOutput:
 
 
 @mcp.tool()
-def classes(input_data: ClassesInput) -> ClassesOutput:
+def classes(page: int = 1, page_size: int = 20) -> ClassesOutput:
     """Get paginated list of all available classes/intents with their metadata.
 
     Args:
-        input_data: Contains pagination parameters
+        page: Page number (1-indexed)
+        page_size: Number of classes per page
 
     Returns:
         Paginated list of classes with metadata
     """
     dataset = load_dataset()
 
+    # Create pagination params object
+    pagination_params = PaginationParams(page=page, page_size=page_size)
+
     total_classes = dataset.n_classes
     start_idx, end_idx = _calculate_page_bounds(
-        page=input_data.pagination_params.page,
-        page_size=input_data.pagination_params.page_size,
+        params=pagination_params,
         total_items=total_classes,
     )
 
@@ -213,24 +216,28 @@ def classes(input_data: ClassesInput) -> ClassesOutput:
     paginated_intents = dataset.intents[start_idx:end_idx]
 
     pagination_info = PaginationInfo(
-        total_items=total_classes, total_pages=math.ceil(total_classes / input_data.pagination_params.page_size)
+        total_items=total_classes, total_pages=math.ceil(total_classes / pagination_params.page_size)
     )
 
     return ClassesOutput(classes=paginated_intents, pagination_info=pagination_info)
 
 
 @mcp.tool()
-def train_data(input_data: TrainDataInput) -> TrainDataOutput:
+def train_data(page: int = 1, page_size: int = 20, class_filter: list[int] | None = None) -> TrainDataOutput:
     """Access training samples with pagination and filtering options.
 
     Args:
-        input_data: Contains pagination and filtering parameters
+        page: Page number (1-indexed)
+        page_size: Number of samples per page
+        class_filter: Filter by specific class IDs
 
     Returns:
         Paginated and filtered training samples
     """
     dataset = load_dataset()
-    split_data = dataset[Split.TRAIN]
+    # Handle both 'train' and 'train_0' splits similar to how dataset.multilabel property works
+    train_split = Split.TRAIN if Split.TRAIN in dataset else f"{Split.TRAIN}_0"
+    split_data = dataset[train_split]
 
     # Convert to DataSample list
     samples_list: list[DataSample] = []
@@ -241,13 +248,15 @@ def train_data(input_data: TrainDataInput) -> TrainDataOutput:
         samples_list.append(sample)
 
     # Apply class filtering if specified
-    if input_data.class_filter is not None:
-        samples_list = _filter_samples_by_class(samples_list, input_data.class_filter, dataset.multilabel)
+    if class_filter is not None:
+        samples_list = _filter_samples_by_class(samples_list, class_filter, dataset.multilabel)
 
     total_samples = len(samples_list)
+
+    # Create pagination params object
+    pagination_params = PaginationParams(page=page, page_size=page_size)
     start_idx, end_idx = _calculate_page_bounds(
-        page=input_data.pagination_params.page,
-        page_size=input_data.pagination_params.page_size,
+        params=pagination_params,
         total_items=total_samples,
     )
 
@@ -256,7 +265,7 @@ def train_data(input_data: TrainDataInput) -> TrainDataOutput:
 
     pagination_info = PaginationInfo(
         total_items=total_samples,
-        total_pages=math.ceil(total_samples / input_data.pagination_params.page_size) if total_samples > 0 else 1,
+        total_pages=math.ceil(total_samples / pagination_params.page_size) if total_samples > 0 else 1,
     )
 
     return TrainDataOutput(samples=paginated_samples, pagination_info=pagination_info)
