@@ -37,9 +37,6 @@ def trained_pipeline_path(dataset):
         yield logging_config.dirpath
 
 
-
-
-
 @pytest.fixture
 def mcp_server(trained_pipeline_path):
     """Create an MCP server with the trained pipeline."""
@@ -200,9 +197,7 @@ async def test_train_data_tool_with_class_filter(mcp_server):
         if classes_data.classes:
             class_id = classes_data.classes[0].id
 
-            result = await client.call_tool(
-                "train_data", {"class_filter": [class_id], "page": 1, "page_size": 10}
-            )
+            result = await client.call_tool("train_data", {"class_filter": [class_id], "page": 1, "page_size": 10})
 
             # Extract the actual data from the CallToolResult
             data = result.data
@@ -226,9 +221,7 @@ async def test_train_data_tool_with_class_filter(mcp_server):
 async def test_train_data_tool_empty_class_filter(mcp_server):
     """Test the train_data tool with an empty class filter."""
     async with Client(mcp_server) as client:
-        result = await client.call_tool(
-            "train_data", {"class_filter": [], "page": 1, "page_size": 10}
-        )
+        result = await client.call_tool("train_data", {"class_filter": [], "page": 1, "page_size": 10})
 
         # Extract the actual data from the CallToolResult
         data = result.data
