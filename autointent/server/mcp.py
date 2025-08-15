@@ -6,6 +6,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
@@ -21,6 +22,9 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="AUTOINTENT_")
     path: str = Field(..., description="Path to the optimized pipeline assets")
+    transport: Literal["stdio", "http"] = "stdio"
+    host: str = "127.0.0.1"
+    port: int = 8012
 
 
 class PredictOutput(BaseModel):
@@ -65,13 +69,18 @@ class TrainDataOutput(BaseModel):
     pagination_info: PaginationInfo
 
 
-settings = Settings()
 logger = logging.getLogger(__name__)
+
+
+def get_settings() -> Settings:
+    """Get or create settings instance."""
+    return Settings()
 
 
 @lru_cache(maxsize=1)
 def load_pipeline() -> Pipeline:
     """Load the optimized pipeline from disk."""
+    settings = get_settings()
     pipeline_path = Path(settings.path)
     if not pipeline_path.exists():
         msg = f"Pipeline path does not exist: {pipeline_path}"
@@ -93,6 +102,7 @@ def load_pipeline() -> Pipeline:
 @lru_cache(maxsize=1)
 def load_dataset() -> Dataset:
     """Load the training dataset from the pipeline directory."""
+    settings = get_settings()
     pipeline_path = Path(settings.path)
     dataset_path = pipeline_path / "dataset.json"
 
@@ -300,6 +310,11 @@ def _filter_samples_by_class(
     return [s for s in samples if s.label in class_filter]
 
 
-# Make the server runnable
-if __name__ == "__main__":
-    mcp.run()
+def main() -> None:
+    """Main entry point for the MCP server."""
+    settings = get_settings()
+    if settings.transport == "stdio":
+        mcp.run()
+    else:
+        mcp.run(transport=settings.transport, host=settings.host, port=settings.port)
+
