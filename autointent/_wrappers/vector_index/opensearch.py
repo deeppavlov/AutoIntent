@@ -7,8 +7,8 @@ import numpy as np
 from numpy._typing import NDArray
 from typing_extensions import Self
 
-from autointent._wrappers.vector_index.base_backend import Document
 from autointent.configs import OpenSearchConfig
+from autointent.custom_types import Document
 
 from .base_backend import BaseBackend
 

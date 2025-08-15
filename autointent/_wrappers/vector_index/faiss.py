@@ -6,8 +6,9 @@ from numpy._typing import NDArray
 from typing_extensions import Self
 
 from autointent.configs import FaissConfig
+from autointent.custom_types import Document
 
-from .base_backend import BaseBackend, Document
+from .base_backend import BaseBackend
 
 
 class FaissBackend(BaseBackend):

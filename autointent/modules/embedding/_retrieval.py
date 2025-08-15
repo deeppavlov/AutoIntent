@@ -150,5 +150,5 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         Returns:
             List of labels for each retrieved utterance
         """
-        predictions, _, _ = self._vector_index.query(utterances, self.k)
+        predictions, _ = self._vector_index.query(utterances, self.k)
         return predictions

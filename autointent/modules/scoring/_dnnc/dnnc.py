@@ -10,7 +10,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
 from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
-from autointent.custom_types import ListOfLabels
+from autointent.custom_types import Document, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)
@@ -157,7 +157,7 @@ class DNNCScorer(BaseScorer):
         ]
         return scores, metadata
 
-    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[Document]]) -> list[list[float]]:
         """Compute cross-encoder scores for utterances against their candidate neighbors.
 
         Args:
@@ -175,7 +175,9 @@ class DNNCScorer(BaseScorer):
             logger.error(msg)
             raise ValueError(msg)
 
-        text_pairs = [[(query, cand) for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
+        text_pairs = [
+            [(query, cand.text) for cand in docs] for query, docs in zip(utterances, candidates, strict=False)
+        ]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 
@@ -220,7 +222,7 @@ class DNNCScorer(BaseScorer):
                 - List of neighbor utterances
                 - List of neighbor scores
         """
-        labels, _, neighbors = self._vector_index.query(
+        labels, neighbors = self._vector_index.query(
             utterances,
             self.k,
         )

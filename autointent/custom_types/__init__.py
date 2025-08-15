@@ -1,6 +1,7 @@
 """Types used throughout AutoIntent library."""
 
 from ._types import (
+    Document,
     FloatFromZeroToOne,
     LabelType,
     LabelWithOOS,
@@ -22,6 +23,7 @@ from ._types import (
 )
 
 __all__ = [
+    "Document",
     "FloatFromZeroToOne",
     "LabelType",
     "LabelWithOOS",

@@ -8,7 +8,7 @@ from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
 from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
-from autointent.custom_types import ListOfLabels, WeightType
+from autointent.custom_types import Document, ListOfLabels, WeightType
 from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights
@@ -147,7 +147,7 @@ class KNNScorer(BaseScorer):
         if hasattr(self, "_vector_index"):
             self._vector_index.clear_ram()
 
-    def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+    def _get_neighbours(self, utterances: list[str]) -> tuple[list[list[float]], list[list[Document]]]:
         """Get nearest neighbors for given utterances.
 
         Args:
@@ -184,6 +184,7 @@ class KNNScorer(BaseScorer):
                 - Array of class probabilities
                 - List of neighbor utterances
         """
-        labels, distances, neighbors = self._get_neighbours(utterances)
+        distances, neighbors = self._get_neighbours(utterances)
+        labels = [[lab.label for lab in n] for n in neighbors]
         scores = self._count_scores(np.array(labels), np.array(distances))
         return scores, neighbors

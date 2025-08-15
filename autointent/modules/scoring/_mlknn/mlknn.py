@@ -191,13 +191,15 @@ class MLKnnScorer(BaseScorer):
                 - Array of neighbor labels
                 - List of neighbor utterances
         """
-        labels, _, neighbors = self._vector_index.query(
+        _, neighbors = self._vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
         )
+        labels = [[lab.label for lab in n] for n in neighbors]
+        utterances = [[lab.text for lab in n] for n in neighbors]
         return (
             np.array([candidates[self.ignore_first_neighbours :] for candidates in labels]),
-            neighbors,
+            utterances,
         )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:

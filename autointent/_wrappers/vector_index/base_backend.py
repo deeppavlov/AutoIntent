@@ -3,16 +3,10 @@ from pathlib import Path
 from typing import Any
 
 import numpy.typing as npt
-from pydantic import BaseModel
 from typing_extensions import Self
 
 from autointent.configs import VectorIndexConfig
-from autointent.custom_types import LabelType
-
-
-class Document(BaseModel):
-    text: str
-    label: LabelType
+from autointent.custom_types import Document
 
 
 class BaseBackend(ABC):

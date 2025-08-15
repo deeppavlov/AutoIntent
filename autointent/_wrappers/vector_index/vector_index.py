@@ -16,9 +16,9 @@ from typing_extensions import assert_never
 
 from autointent._wrappers import Embedder
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
-from autointent.custom_types import ListOfLabels
+from autointent.custom_types import Document, ListOfLabels
 
-from .base_backend import BaseBackend, Document
+from .base_backend import BaseBackend
 from .faiss import FaissBackend
 from .opensearch import OpenSearchBackend
 
@@ -115,7 +115,7 @@ class VectorIndex:
         self,
         queries: list[str] | npt.NDArray[Any],
         k: int,
-    ) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+    ) -> tuple[list[list[float]], list[list[Document]]]:
         """Query the index to retrieve nearest neighbors.
 
         Args:
