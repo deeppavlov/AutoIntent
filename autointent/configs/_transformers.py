@@ -23,7 +23,7 @@ class EmbedderFineTuningConfig(BaseModel):
     warmup_ratio: float = Field(default=0.1)
     early_stopping: bool = Field(default=True)
     early_stopping_threshold: float = Field(default=0.0)
-    fp16: bool = Field(default=True)
+    fp16: bool = Field(default=False)
     bf16: bool = Field(default=False)
 
 
