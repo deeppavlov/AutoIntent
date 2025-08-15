@@ -8,10 +8,11 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
+from typing_extensions import assert_never
 
 from autointent._wrappers import Embedder
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
