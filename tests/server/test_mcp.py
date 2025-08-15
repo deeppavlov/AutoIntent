@@ -57,7 +57,7 @@ def mcp_server(trained_pipeline_path, dataset_path):
 
     try:
         # Import after setting environment variables to ensure they're picked up
-        from autointent.api.mcp import mcp
+        from autointent.server.mcp import mcp
 
         yield mcp
     finally:

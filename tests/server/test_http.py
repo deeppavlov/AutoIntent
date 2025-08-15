@@ -46,7 +46,7 @@ def api_client(trained_pipeline_path):
 
     try:
         # Import after setting environment variable to ensure it's picked up
-        from autointent.api.http import app
+        from autointent.server.http import app
 
         with TestClient(app) as client:
             yield client
