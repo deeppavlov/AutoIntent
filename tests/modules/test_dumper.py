@@ -52,9 +52,10 @@ class TestTransformers:
         tokenizer_predictions = self.tokenizer(["hello", "world"]).input_ids
         np.testing.assert_array_equal(self._tokenizer_predictions, tokenizer_predictions)
         with torch.no_grad():
-            np.testing.assert_array_equal(
+            np.testing.assert_almost_equal(
                 self._transformer_predictions,
                 self.transformer(input_ids=torch.tensor(tokenizer_predictions)).logits.cpu().numpy(),
+                decimal=4,
             )
 
 

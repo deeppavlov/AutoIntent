@@ -1,7 +1,7 @@
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import EmbedderConfig
+from autointent.configs import EmbedderConfig, FaissConfig
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def data_handler():
 
 
 def test_create_collection(data_handler):
-    vector_index = VectorIndex(embedder_config=EmbedderConfig(model_name="bert-base-uncased"))
+    vector_index = VectorIndex(embedder_config=EmbedderConfig(model_name="bert-base-uncased"), config=FaissConfig())
     vector_index.add(
         data_handler.utterances_train,
         data_handler.labels_train,
