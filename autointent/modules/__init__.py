@@ -1,5 +1,3 @@
-"""Heart of the library with different intent classification methods implemented."""
-
 from typing import TypeVar
 
 from .base import BaseDecision, BaseEmbedding, BaseModule, BaseRegex, BaseScorer
@@ -20,6 +18,7 @@ from .scoring import (
     CNNScorer,
     CrossEncoderDescriptionScorer,
     DNNCScorer,
+    GCNScorer,
     KNNScorer,
     LinearScorer,
     LLMDescriptionScorer,
@@ -47,6 +46,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
         CatBoostScorer,
         DNNCScorer,
+        GCNScorer,
         KNNScorer,
         LinearScorer,
         BiEncoderDescriptionScorer,

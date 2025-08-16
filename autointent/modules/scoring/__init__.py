@@ -2,6 +2,7 @@ from ._bert import BertScorer
 from ._catboost import CatBoostScorer
 from ._description import BiEncoderDescriptionScorer, CrossEncoderDescriptionScorer, LLMDescriptionScorer
 from ._dnnc import DNNCScorer
+from ._gcn import GCNScorer
 from ._knn import KNNScorer, RerankScorer
 from ._linear import LinearScorer
 from ._lora import BERTLoRAScorer
@@ -18,6 +19,7 @@ __all__ = [
     "CatBoostScorer",
     "CrossEncoderDescriptionScorer",
     "DNNCScorer",
+    "GCNScorer",
     "KNNScorer",
     "LLMDescriptionScorer",
     "LinearScorer",
