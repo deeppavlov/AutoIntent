@@ -92,7 +92,8 @@ class GCNScorer(BaseScorer):
         self._label_embedder = Embedder(self.label_embedder_config)
 
         x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
-        y_tensor = torch.tensor(labels, dtype=torch.float)
+        y_tensor_dtype = torch.float if self._multilabel else torch.long
+        y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
         intent_texts = [f"intent {i}" for i in range(self._n_classes)]
         self._label_embeddings = torch.tensor(
@@ -107,14 +108,16 @@ class GCNScorer(BaseScorer):
             p_reweight=self.p_reweight,
             tau_threshold=self.tau_threshold,
         )
-        self._model.set_correlation_matrix(y_tensor)
-        self._train_model(x_tensor, y_tensor)
 
-    def _train_model(self, train_x: torch.Tensor, train_y: torch.Tensor) -> None:
+        y_corr_tensor = y_tensor if self._multilabel else torch.nn.functional.one_hot(y_tensor, self._n_classes)
+        self._model.set_correlation_matrix(y_corr_tensor.float())
+
+        criterion = nn.BCEWithLogitsLoss() if self._multilabel else nn.CrossEntropyLoss()
+        self._train_model(x_tensor, y_tensor, criterion)
+
+    def _train_model(self, train_x: torch.Tensor, train_y: torch.Tensor, criterion: nn.Module) -> None:
         train_dataset = TensorDataset(train_x, train_y)
         train_dataloader = DataLoader(train_dataset, batch_size=self.torch_config.batch_size, shuffle=True)
-
-        criterion = nn.BCEWithLogitsLoss()
         optimizer = torch.optim.Adam(self._model.parameters(), lr=self.torch_config.learning_rate)
 
         self._model.to(self.torch_config.device)
@@ -142,7 +145,10 @@ class GCNScorer(BaseScorer):
             for i in range(0, len(x_tensor), self.torch_config.batch_size):
                 batch_x = x_tensor[i : i + self.torch_config.batch_size].to(self.torch_config.device)
                 outputs = self._model(batch_x, self._label_embeddings)
-                probs = torch.sigmoid(outputs).cpu().numpy()
+                if self._multilabel:
+                    probs = torch.sigmoid(outputs).cpu().numpy()
+                else:
+                    probs = torch.softmax(outputs, dim=1).cpu().numpy()
                 all_probs.append(probs)
 
         return np.concatenate(all_probs, axis=0)

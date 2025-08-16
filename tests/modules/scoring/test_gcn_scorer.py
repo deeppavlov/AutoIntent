@@ -23,18 +23,30 @@ def multilabel_dataset():
     return Dataset.from_dict(data)
 
 
-def test_gcn_scorer_fit_predict(multilabel_dataset):
-    scorer = GCNScorer(
-        embedder_config="prajjwal1/bert-tiny",
-        num_train_epochs=1,
-        batch_size=2,
-    )
+@pytest.fixture
+def multiclass_dataset():
+    data = {
+        "train": [
+            {"utterance": "utterance 1", "label": 0},
+            {"utterance": "utterance 2", "label": 1},
+            {"utterance": "utterance 3", "label": 2},
+            {"utterance": "utterance 4", "label": 0},
+        ],
+        "intents": [
+            {"id": 0, "name": "intent_0"},
+            {"id": 1, "name": "intent_1"},
+            {"id": 2, "name": "intent_2"},
+        ],
+    }
+    return Dataset.from_dict(data)
+
+
+def test_gcn_scorer_multilabel(multilabel_dataset):
+    scorer = GCNScorer(embedder_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=2)
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
-
     scorer.fit(train_utterances, train_labels)
-
-    test_utterances = ["test utterance 1", "test utterance 2"]
+    test_utterances = ["test 1", "test 2"]
     predictions = scorer.predict(test_utterances)
 
     assert isinstance(predictions, np.ndarray)
@@ -42,17 +54,26 @@ def test_gcn_scorer_fit_predict(multilabel_dataset):
     assert np.all((predictions >= 0) & (predictions <= 1))
 
 
+def test_gcn_scorer_multiclass(multiclass_dataset):
+    scorer = GCNScorer(embedder_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=2)
+    train_utterances = multiclass_dataset["train"]["utterance"]
+    train_labels = multiclass_dataset["train"]["label"]
+    scorer.fit(train_utterances, train_labels)
+    test_utterances = ["test 1", "test 2"]
+    predictions = scorer.predict(test_utterances)
+
+    assert isinstance(predictions, np.ndarray)
+    assert predictions.shape == (2, 3)
+    assert np.all((predictions >= 0) & (predictions <= 1))
+    np.testing.assert_allclose(predictions.sum(axis=1), 1.0, atol=1e-6)
+
+
 def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
-    scorer = GCNScorer(
-        embedder_config="prajjwal1/bert-tiny",
-        num_train_epochs=1,
-        batch_size=2,
-    )
+    scorer = GCNScorer(embedder_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=2)
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
     scorer.fit(train_utterances, train_labels)
-
-    test_utterances = ["test utterance 1", "test utterance 2"]
+    test_utterances = ["test utterance 1"]
     original_predictions = scorer.predict(test_utterances)
 
     scorer.dump(str(tmp_path))
