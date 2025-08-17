@@ -6,9 +6,10 @@ import torch
 from pydantic import PositiveInt
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
+from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum, TorchTrainingConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum, TorchTrainingConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
@@ -162,3 +163,15 @@ class GCNScorer(BaseScorer):
         if hasattr(self, "_label_embedder"):
             self._label_embedder.clear_ram()
             del self._label_embedder
+
+    @classmethod
+    def load(
+        cls,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> Self:
+        instance = super().load(path, embedder_config, cross_encoder_config)
+        if hasattr(instance, "_label_embeddings"):
+            instance._label_embeddings = torch.tensor(instance._label_embeddings).to(instance.torch_config.device)
+        return instance

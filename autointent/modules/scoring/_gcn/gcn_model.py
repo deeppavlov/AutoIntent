@@ -4,8 +4,10 @@ from pathlib import Path
 import torch
 import torch.nn as nn
 from pydantic import BaseModel
+from typing_extensions import Self
 
 from autointent._utils import detect_device
+from autointent._wrappers import BaseTorchModuleWithVocab
 
 
 class GCNModelDumpMetadata(BaseModel):
@@ -28,7 +30,7 @@ class GCNLayer(nn.Module):
         return output
 
 
-class TextMLGCN(nn.Module):
+class TextMLGCN(BaseTorchModuleWithVocab):
     _metadata_dict_name = "metadata.json"
     _state_dict_name = "state_dict.pt"
 
@@ -41,7 +43,7 @@ class TextMLGCN(nn.Module):
         p_reweight: float,
         tau_threshold: float,
     ):
-        super().__init__()
+        super().__init__(embed_dim=bert_feature_dim)
         self.num_classes = num_classes
         self.p_reweight = p_reweight
         self.tau_threshold = tau_threshold
@@ -93,7 +95,7 @@ class TextMLGCN(nn.Module):
         )
         self.correlation_matrix.data.copy_(corr_matrix)
 
-    def forward(self, bert_features, label_embeddings):
+    def forward(self, bert_features, label_embeddings):  # type: ignore
         classifiers = label_embeddings
         for i in range(len(self.gcn_layers)):
             classifiers = self.gcn_layers[i](self.correlation_matrix, classifiers)
@@ -101,10 +103,6 @@ class TextMLGCN(nn.Module):
 
         logits = torch.matmul(bert_features, classifiers.T)
         return logits
-
-    @property
-    def device(self) -> torch.device:
-        return next(self.parameters()).device
 
     def dump(self, path: Path) -> None:
         metadata = GCNModelDumpMetadata(
@@ -124,7 +122,7 @@ class TextMLGCN(nn.Module):
         self.to(device)
 
     @classmethod
-    def load(cls, path: Path, device: str | None = None) -> "TextMLGCN":
+    def load(cls, path: Path, device: str | None = None) -> Self:
         with (path / cls._metadata_dict_name).open() as file:
             metadata = GCNModelDumpMetadata(**json.load(file))
         device = device or detect_device()
