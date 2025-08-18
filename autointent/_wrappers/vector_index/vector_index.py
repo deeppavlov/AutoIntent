@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class VectorIndex:
-    """A class for managing a vector index using FAISS and embedding models.
+    """A class for managing a vector index and embedding models.
 
     This class allows adding, querying, and managing embeddings and their associated
     labels for efficient nearest neighbor search.
