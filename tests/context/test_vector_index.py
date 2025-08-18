@@ -23,9 +23,11 @@ def is_opensearch_running() -> bool:
 
     try:
         client = opensearchpy.OpenSearch(hosts=[{"host": "localhost", "port": 9200}], timeout=1, max_retries=0)
-        client.cluster.health(timeout="1s")
-    except Exception:  # noqa: BLE001
-        return False
+        client.cluster.health(timeout=1)
+    except opensearchpy.ConnectionError as e:
+        if "Connection refused" in str(e):
+            return False
+        raise
     else:
         return True
 
@@ -59,6 +61,13 @@ class TestVectorIndex:
     @pytest.fixture
     def vector_index(self, embedder_config: EmbedderConfig, vector_config) -> VectorIndex:
         """Create a VectorIndex instance for testing."""
+        # For OpenSearch, ensure unique index names to avoid test interference
+        if isinstance(vector_config, OpenSearchConfig):
+            import uuid
+
+            unique_id = str(uuid.uuid4())[:8]
+            vector_config.index_name = f"test_index_{unique_id}"
+
         return VectorIndex(embedder_config=embedder_config, config=vector_config)
 
     @pytest.fixture
