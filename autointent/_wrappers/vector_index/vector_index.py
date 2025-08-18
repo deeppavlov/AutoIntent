@@ -69,6 +69,10 @@ class VectorIndex:
             texts: List of input texts.
             labels: List of labels corresponding to the texts.
         """
+        if len(texts) != len(labels):
+            msg = f"Texts and labels lengths mismatch: {len(texts)=} !] {len(labels)=}"
+            raise ValueError(msg)
+
         logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
