@@ -15,7 +15,7 @@ ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[
 ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes
     | TagsList
-    | np.ndarray
+    | np.ndarray  # type: ignore[type-arg]
     | Embedder
     | VectorIndex
     | BaseEstimator
