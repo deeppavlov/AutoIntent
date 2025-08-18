@@ -151,4 +151,4 @@ class RetrievalAimedEmbedding(BaseEmbedding):
             List of labels for each retrieved utterance
         """
         _, documents = self._vector_index.query(utterances, self.k)
-        return [[n.label for n in neigs] for neigs in documents]
+        return [[n.label for n in neigs] for neigs in documents]  # type: ignore[misc]

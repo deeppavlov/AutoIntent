@@ -136,3 +136,8 @@ class Document(BaseModel):
 
     text: str
     label: LabelType
+
+
+class RerankedItem(BaseModel):
+    corpus_id: int
+    score: float

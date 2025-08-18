@@ -186,7 +186,7 @@ class DNNCScorer(BaseScorer):
             logger.error(msg)
             raise ValueError(msg)
 
-        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self._cross_encoder.predict(flattened_text_pairs)
+        flattened_cross_encoder_scores: npt.NDArray[np.float32] = self._cross_encoder.predict(flattened_text_pairs)
         return [
             flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
@@ -226,11 +226,12 @@ class DNNCScorer(BaseScorer):
             utterances,
             self.k,
         )
-        labels = [[n.label for n in neigs] for neigs in neighbors]
+        labels: list[ListOfLabels] = [[n.label for n in neigs] for neigs in neighbors]  # type: ignore[misc]
+        texts = [[n.text for n in neigs] for neigs in neighbors]
 
         cross_encoder_scores = self._get_cross_encoder_scores(utterances, neighbors)
 
-        return self._build_result(cross_encoder_scores, labels), neighbors, cross_encoder_scores
+        return self._build_result(cross_encoder_scores, labels), texts, cross_encoder_scores
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

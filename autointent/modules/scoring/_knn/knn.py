@@ -186,5 +186,6 @@ class KNNScorer(BaseScorer):
         """
         distances, neighbors = self._get_neighbours(utterances)
         labels = [[lab.label for lab in n] for n in neighbors]
+        texts = [[lab.text for lab in n] for n in neighbors]
         scores = self._count_scores(np.array(labels), np.array(distances))
-        return scores, neighbors
+        return scores, texts

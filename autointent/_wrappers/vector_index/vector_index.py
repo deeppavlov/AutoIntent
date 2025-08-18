@@ -8,7 +8,7 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -21,9 +21,6 @@ from autointent.custom_types import Document, ListOfLabels
 from .base_backend import BaseBackend
 from .faiss import FaissBackend
 from .opensearch import OpenSearchBackend
-
-if TYPE_CHECKING:
-    from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +50,14 @@ class VectorIndex:
         self.config = config
 
     def _init_index(self, vector_size: int) -> BaseBackend:
+        res: BaseBackend
         if isinstance(self.config, FaissConfig):
             res = FaissBackend(config=self.config, vector_size=vector_size)
         elif isinstance(self.config, OpenSearchConfig):
             res = OpenSearchBackend(config=self.config, vector_size=vector_size)
+        elif isinstance(self.config, VectorIndexConfig):
+            msg = f"Passed abstract vector index config {self.config.__repr__()}"
+            raise TypeError(msg)
         else:
             assert_never(self.config)
         return res
@@ -176,8 +177,8 @@ class VectorIndex:
         with (dir_path / cls._config_path / "class_info.json").open("r", encoding="utf-8") as file:
             class_info = json.load(file)
 
-        model_type = importlib.import_module(class_info["module"])
-        model_type: BaseModel = getattr(model_type, class_info["name"])
+        model_type_module = importlib.import_module(class_info["module"])
+        model_type: type[VectorIndexConfig] = getattr(model_type_module, class_info["name"])
         config = model_type.model_validate(content)
 
         instance = cls(
@@ -190,6 +191,9 @@ class VectorIndex:
             instance.index = FaissBackend.load(dir_path / cls._index_path)
         elif isinstance(config, OpenSearchConfig):
             instance.index = OpenSearchBackend.load(dir_path / cls._index_path)
+        elif isinstance(config, VectorIndexConfig):
+            msg = f"Passed abstract config to vector index: {config.__repr__()}"
+            raise TypeError(msg)
         else:
             assert_never(config)
 

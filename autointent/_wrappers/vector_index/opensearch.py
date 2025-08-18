@@ -132,7 +132,7 @@ class OpenSearchBackend(BaseBackend):
         self._validate_embeddings(embedding)
 
         # Prepare multi-search queries using script_score for exact search
-        search_queries = []
+        search_queries: list[dict[str, Any]] = []
         for query_vector in embedding:
             query_body = {
                 "size": k,

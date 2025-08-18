@@ -147,13 +147,13 @@ class RerankScorer(KNNScorer):
         ):
             cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
-            for dst, src in zip([labels, neighbours], [query_labels, query_docs], strict=True):
-                dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
+            labels.append([query_labels[rank.corpus_id] for rank in cur_ranks])  # type: ignore[arg-type]
+            neighbours.append([query_docs[rank.corpus_id] for rank in cur_ranks])
 
             if self.use_cross_encoder_scores:
-                distances.append([rank["score"] for rank in cur_ranks])
+                distances.append([rank.score for rank in cur_ranks])
             else:
-                distances.append([query_distances[rank["corpus_id"]] for rank in cur_ranks])
+                distances.append([query_distances[rank.corpus_id] for rank in cur_ranks])
 
         scores = self._count_scores(np.array(labels), np.array(distances))
 

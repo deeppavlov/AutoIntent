@@ -146,7 +146,7 @@ class Embedder:
         if override_config is not None:
             kwargs = {**config.model_dump(), **override_config.model_dump(exclude_unset=True)}
         else:
-            kwargs = config.model_dump()  # type: ignore[assignment]
+            kwargs = config.model_dump()
 
         max_length = kwargs.pop("max_length", None)
         if max_length is not None:
