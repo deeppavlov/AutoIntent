@@ -1,4 +1,7 @@
 import json
+import platform
+from collections.abc import Generator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +12,25 @@ from autointent.configs import FaissConfig
 from autointent.custom_types import Document
 
 from .base_backend import BaseBackend
+
+
+@contextmanager
+def _limit_openmp_threads_on_darwin() -> Generator[None, None, None]:
+    """Context manager that limits OpenMP threads to 1 on Darwin (macOS) platform.
+
+    This helps avoid potential threading issues with FAISS on macOS by ensuring
+    single-threaded execution during query operations.
+    """
+    if platform.system() != "Darwin":
+        # Not on macOS, no need to limit threads
+        yield
+        return
+
+    from threadpoolctl import threadpool_limits
+
+    # Limit OpenMP threads to 1 on macOS
+    with threadpool_limits(limits=1, user_api="openmp"):
+        yield
 
 
 class FaissBackend(BaseBackend):
@@ -43,9 +65,10 @@ class FaissBackend(BaseBackend):
         self._documents.extend(documents)
 
     def query(self, embedding: NDArray[Any], k: int) -> tuple[NDArray[Any], list[list[Document]]]:
-        cosine_similarities, indices = self._index.search(embedding, k)
-        documents = [[self._documents[i] for i in neighbors_ids] for neighbors_ids in indices]
-        return cosine_similarities, documents
+        with _limit_openmp_threads_on_darwin():
+            cosine_similarities, indices = self._index.search(embedding, k)
+            documents = [[self._documents[i] for i in neighbors_ids] for neighbors_ids in indices]
+            return cosine_similarities, documents
 
     def dump(self, path: Path) -> None:
         data = [d.model_dump(mode="json") for d in self._documents]
