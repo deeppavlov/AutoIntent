@@ -21,7 +21,7 @@ from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
 from autointent.configs import CrossEncoderConfig
-from autointent.custom_types import ListOfLabels
+from autointent.custom_types import ListOfLabels, RerankedItem
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +194,7 @@ class Ranker:
         pairs, labels_ = construct_samples(utterances, labels, balancing_factor=1)
         self._fit(pairs, labels_)  # type: ignore[arg-type]
 
-    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[Any]:
+    def predict(self, pairs: list[tuple[str, str]]) -> npt.NDArray[np.float32]:
         """Predict probabilities of two utterances having the same intent label.
 
         Args:
@@ -224,7 +224,7 @@ class Ranker:
         query: str,
         query_docs: list[str],
         top_k: int | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[RerankedItem]:
         """Rank documents according to meaning closeness to the query.
 
         Args:
@@ -241,8 +241,8 @@ class Ranker:
         if top_k is None:
             top_k = len(query_docs)
 
-        results = [{"corpus_id": i, "score": scores[i]} for i in range(len(query_docs))]
-        results.sort(key=lambda x: x["score"], reverse=True)
+        results = [RerankedItem(corpus_id=i, score=scores[i]) for i in range(len(query_docs))]
+        results.sort(key=lambda x: x.score, reverse=True)
         return results[:top_k]
 
     def save(self, path: str) -> None:

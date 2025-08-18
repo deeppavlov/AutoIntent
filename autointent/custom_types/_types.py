@@ -8,6 +8,7 @@ from enum import Enum
 from typing import Annotated, Literal, TypeAlias
 
 from annotated_types import Interval
+from pydantic import BaseModel
 
 
 class LogLevel(Enum):
@@ -128,3 +129,15 @@ SearchSpacePreset = Literal[
     "zero-shot-encoders",
 ]
 """Some presets that our library supports."""
+
+
+class Document(BaseModel):
+    """Data model for objects returned from :py:class:`autointent.VectorIndex`."""
+
+    text: str
+    label: LabelType
+
+
+class RerankedItem(BaseModel):
+    corpus_id: int
+    score: float

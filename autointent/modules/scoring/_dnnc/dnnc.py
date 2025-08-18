@@ -9,8 +9,8 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.custom_types import ListOfLabels
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent.custom_types import Document, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 logger = logging.getLogger(__name__)
@@ -64,10 +64,12 @@ class DNNCScorer(BaseScorer):
         k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `DNNCScorer` must be a positive int"
@@ -99,6 +101,7 @@ class DNNCScorer(BaseScorer):
             k=k,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
+            vector_index_config=context.vector_index_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -119,7 +122,7 @@ class DNNCScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(self.embedder_config)
+        self._vector_index = VectorIndex(self.embedder_config, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
         self._cross_encoder = Ranker(self.cross_encoder_config, output_range="sigmoid")
@@ -154,7 +157,7 @@ class DNNCScorer(BaseScorer):
         ]
         return scores, metadata
 
-    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[str]]) -> list[list[float]]:
+    def _get_cross_encoder_scores(self, utterances: list[str], candidates: list[list[Document]]) -> list[list[float]]:
         """Compute cross-encoder scores for utterances against their candidate neighbors.
 
         Args:
@@ -172,7 +175,9 @@ class DNNCScorer(BaseScorer):
             logger.error(msg)
             raise ValueError(msg)
 
-        text_pairs = [[(query, cand) for cand in docs] for query, docs in zip(utterances, candidates, strict=False)]
+        text_pairs = [
+            [(query, cand.text) for cand in docs] for query, docs in zip(utterances, candidates, strict=False)
+        ]
 
         flattened_text_pairs = list(it.chain.from_iterable(text_pairs))
 
@@ -181,7 +186,7 @@ class DNNCScorer(BaseScorer):
             logger.error(msg)
             raise ValueError(msg)
 
-        flattened_cross_encoder_scores: npt.NDArray[np.float64] = self._cross_encoder.predict(flattened_text_pairs)
+        flattened_cross_encoder_scores: npt.NDArray[np.float32] = self._cross_encoder.predict(flattened_text_pairs)
         return [
             flattened_cross_encoder_scores[i : i + self.k].tolist()
             for i in range(0, len(flattened_cross_encoder_scores), self.k)
@@ -217,14 +222,16 @@ class DNNCScorer(BaseScorer):
                 - List of neighbor utterances
                 - List of neighbor scores
         """
-        labels, _, neighbors = self._vector_index.query(
+        _, neighbors = self._vector_index.query(
             utterances,
             self.k,
         )
+        labels: list[ListOfLabels] = [[n.label for n in neigs] for neigs in neighbors]  # type: ignore[misc]
+        texts = [[n.text for n in neigs] for neigs in neighbors]
 
         cross_encoder_scores = self._get_cross_encoder_scores(utterances, neighbors)
 
-        return self._build_result(cross_encoder_scores, labels), neighbors, cross_encoder_scores
+        return self._build_result(cross_encoder_scores, labels), texts, cross_encoder_scores
 
 
 def build_result(scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int) -> npt.NDArray[Any]:

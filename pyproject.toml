@@ -48,6 +48,7 @@ dependencies = [
     "catboost (>=1.2.8,<2.0.0)",
     "aiometer (>=1.0.0,<2.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
+    "threadpoolctl (>=3.0.0,<4.0.0)",
 ]
 
 [project.optional-dependencies]
@@ -95,9 +96,21 @@ dspy = [
 wandb = [
     "wandb (>=0.19.10,<1.0.0)",
 ]
-codecarbon = [
-    "codecarbon (>=3.0.2, <3.1.0)",
-    "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
+# codecarbon = [
+#     "codecarbon (>=3.0.2, <3.1.0)",
+#     "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
+# ]
+fastapi = [
+    "fastapi (>=0.115, <1.0)",
+    "uvicorn (>=0.24, <1.0)",
+    "pydantic-settings (>=2.0, <3.0)"
+]
+fastmcp = [
+    "pydantic-settings (>=2.0, <3.0)",
+    "fastmcp (>=2.11.3, <3.0)"
+]
+opensearch = [
+    "opensearch-py (>=3.0.0, <4.0.0)",
 ]
 
 [project.urls]
@@ -108,6 +121,8 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
+"autointent-mcp" = "autointent.server.mcp:main"
+"autointent-http" = "autointent.server.http:main"
 
 [tool.ruff]
 line-length = 120
@@ -246,4 +261,11 @@ module = [
     "autointent.modules.abc.*",
 ]
 warn_unreachable = false
+
+[[tool.mypy.overrides]]
+module = [
+    "autointent.server.http",
+    "autointent.server.mcp",
+]
+ignore_errors = true
 

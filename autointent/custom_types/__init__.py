@@ -1,6 +1,7 @@
 """Types used throughout AutoIntent library."""
 
 from ._types import (
+    Document,
     FloatFromZeroToOne,
     LabelType,
     LabelWithOOS,
@@ -11,6 +12,7 @@ from ._types import (
     MultiLabel,
     MultiLabelWithOOS,
     NodeType,
+    RerankedItem,
     SamplerType,
     SearchSpacePreset,
     SearchSpaceValidationMode,
@@ -22,6 +24,7 @@ from ._types import (
 )
 
 __all__ = [
+    "Document",
     "FloatFromZeroToOne",
     "LabelType",
     "LabelWithOOS",
@@ -32,6 +35,7 @@ __all__ = [
     "MultiLabel",
     "MultiLabelWithOOS",
     "NodeType",
+    "RerankedItem",
     "SamplerType",
     "SearchSpacePreset",
     "SearchSpaceValidationMode",

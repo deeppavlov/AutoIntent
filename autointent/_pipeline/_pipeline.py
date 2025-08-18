@@ -18,13 +18,10 @@ from autointent.configs import (
     HPOConfig,
     InferenceNodeConfig,
     LoggingConfig,
+    VectorIndexConfig,
+    get_default_vector_index_config,
 )
-from autointent.custom_types import (
-    ListOfGenericLabels,
-    NodeType,
-    SearchSpacePreset,
-    SearchSpaceValidationMode,
-)
+from autointent.custom_types import ListOfGenericLabels, NodeType, SearchSpacePreset, SearchSpaceValidationMode
 from autointent.metrics import DECISION_METRICS, DICISION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_preset, load_search_space
@@ -64,11 +61,19 @@ class Pipeline:
             self.data_config = DataConfig()
             self.transformer_config = HFModelConfig()
             self.hpo_config = HPOConfig()
+            self.vector_index_config = get_default_vector_index_config()
         elif not isinstance(nodes[0], InferenceNode):
             assert_never(nodes)
 
     def set_config(
-        self, config: LoggingConfig | EmbedderConfig | CrossEncoderConfig | DataConfig | HFModelConfig | HPOConfig
+        self,
+        config: LoggingConfig
+        | EmbedderConfig
+        | CrossEncoderConfig
+        | DataConfig
+        | HFModelConfig
+        | HPOConfig
+        | VectorIndexConfig,
     ) -> None:
         """Set the configuration for the pipeline.
 
@@ -87,6 +92,8 @@ class Pipeline:
             self.transformer_config = config
         elif isinstance(config, HPOConfig):
             self.hpo_config = config
+        elif isinstance(config, VectorIndexConfig):
+            self.vector_index_config = config
         else:
             assert_never(config)
 
@@ -203,6 +210,7 @@ class Pipeline:
         context.configure_transformer(self.cross_encoder_config)
         context.configure_transformer(self.transformer_config)
         context.configure_hpo(self.hpo_config)
+        context.configure_vector_index(self.vector_index_config)
 
         self.validate_modules(dataset, mode=incompatible_search_space)
 

@@ -7,8 +7,8 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig
-from autointent.custom_types import ListOfLabels, WeightType
+from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent.custom_types import Document, ListOfLabels, WeightType
 from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights
@@ -59,10 +59,12 @@ class KNNScorer(BaseScorer):
         k: PositiveInt = 5,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         weights: WeightType = "distance",
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.k = k
         self.weights = weights
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `KNNScorer` must be a positive int"
@@ -92,9 +94,7 @@ class KNNScorer(BaseScorer):
             embedder_config = context.resolve_embedder()
 
         return cls(
-            embedder_config=embedder_config,
-            k=k,
-            weights=weights,
+            embedder_config=embedder_config, k=k, weights=weights, vector_index_config=context.vector_index_config
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -113,7 +113,7 @@ class KNNScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(self.embedder_config)
+        self._vector_index = VectorIndex(self.embedder_config, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
@@ -147,7 +147,7 @@ class KNNScorer(BaseScorer):
         if hasattr(self, "_vector_index"):
             self._vector_index.clear_ram()
 
-    def _get_neighbours(self, utterances: list[str]) -> tuple[list[ListOfLabels], list[list[float]], list[list[str]]]:
+    def _get_neighbours(self, utterances: list[str]) -> tuple[list[list[float]], list[list[Document]]]:
         """Get nearest neighbors for given utterances.
 
         Args:
@@ -184,6 +184,8 @@ class KNNScorer(BaseScorer):
                 - Array of class probabilities
                 - List of neighbor utterances
         """
-        labels, distances, neighbors = self._get_neighbours(utterances)
+        distances, neighbors = self._get_neighbours(utterances)
+        labels = [[lab.label for lab in n] for n in neighbors]
+        texts = [[lab.text for lab in n] for n in neighbors]
         scores = self._count_scores(np.array(labels), np.array(distances))
-        return scores, neighbors
+        return scores, texts
