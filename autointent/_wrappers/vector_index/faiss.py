@@ -11,7 +11,7 @@ from typing_extensions import Self
 from autointent.configs import FaissConfig
 from autointent.custom_types import Document
 
-from .base_backend import BaseBackend
+from .base_backend import BaseIndexBackend
 
 
 @contextmanager
@@ -33,7 +33,7 @@ def _limit_openmp_threads_on_darwin() -> Generator[None, None, None]:
         yield
 
 
-class FaissBackend(BaseBackend):
+class FaissBackend(BaseIndexBackend):
     _documents_filaname = "documents.json"
     _config_filename = "config.json"
     _index_filename = "index.bin"

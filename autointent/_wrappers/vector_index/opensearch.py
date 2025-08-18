@@ -10,10 +10,10 @@ from typing_extensions import Self
 from autointent.configs import OpenSearchConfig
 from autointent.custom_types import Document
 
-from .base_backend import BaseBackend
+from .base_backend import BaseIndexBackend
 
 
-class OpenSearchBackend(BaseBackend):
+class OpenSearchBackend(BaseIndexBackend):
     _documents_filename = "documents.json"
     _config_filename = "config.json"
     _embeddings_filename = "embeddings.json"

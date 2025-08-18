@@ -18,7 +18,7 @@ from autointent._wrappers import Embedder
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
 from autointent.custom_types import Document, ListOfLabels
 
-from .base_backend import BaseBackend
+from .base_backend import BaseIndexBackend
 from .faiss import FaissBackend
 from .opensearch import OpenSearchBackend
 
@@ -36,7 +36,7 @@ class VectorIndex:
     _embedder_path = "embedder"
     _config_path = "config"
     embedder: Embedder
-    index: BaseBackend
+    index: BaseIndexBackend
 
     def __init__(self, embedder_config: EmbedderConfig, config: VectorIndexConfig) -> None:
         """Initialize the VectorIndex with an embedding model.
@@ -49,8 +49,8 @@ class VectorIndex:
         self.embedder = Embedder(embedder_config)
         self.config = config
 
-    def _init_index(self, vector_size: int) -> BaseBackend:
-        res: BaseBackend
+    def _init_index(self, vector_size: int) -> BaseIndexBackend:
+        res: BaseIndexBackend
         if isinstance(self.config, FaissConfig):
             res = FaissBackend(config=self.config, vector_size=vector_size)
         elif isinstance(self.config, OpenSearchConfig):

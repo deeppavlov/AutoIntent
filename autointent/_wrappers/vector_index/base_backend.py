@@ -9,7 +9,7 @@ from autointent.configs import VectorIndexConfig
 from autointent.custom_types import Document
 
 
-class BaseBackend(ABC):
+class BaseIndexBackend(ABC):
     @abstractmethod
     def __init__(self, config: VectorIndexConfig, vector_size: int) -> None: ...
 
