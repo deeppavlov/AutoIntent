@@ -27,17 +27,22 @@ class HumanUtteranceGenerator:
     to bypass a critic that identifies machine-generated text.
     """
 
-    def __init__(self, generator: Generator, critic: CriticHumanLike, async_mode: bool = False) -> None:
+    def __init__(self, generator: Generator, critic: CriticHumanLike, async_mode: bool = False, max_at_once: int = 5,
+        max_per_second: int = 10) -> None:
         """Initialize the HumanUtteranceGeneratoror.
 
         Args:
             generator: Wrapper for the LLM API used to generate utterances.
             critic: Critic to determine whether the generated utterance sounds human-like.
             async_mode: Whether to use asynchronous mode for generation.
+            max_at_once: Maximum number of concurrent async tasks.
+            max_per_second: Maximum number of tasks per second.
         """
         self.generator = generator
         self.critic = critic
         self.async_mode = async_mode
+        self.max_at_once = max_at_once
+        self.max_per_second = max_per_second
 
     def augment(
         self, dataset: Dataset, split_name: str = Split.TRAIN, update_split: bool = True, n_final_per_class: int = 5
@@ -113,9 +118,6 @@ class HumanUtteranceGenerator:
             class_to_samples[sample["label"]].append(sample["utterance"])
 
         async def generate_one(intent_id: str, intent_name: str) -> list[dict[str, str]]:
-            if intent_name is None:
-                logger.warning("Intent with id %s has no name! Skipping it...", intent_id)
-                return []
             generated: list[dict[str, str]] = []
             attempts = 0
             seed_utterances = class_to_samples[intent_id]
@@ -139,7 +141,7 @@ class HumanUtteranceGenerator:
             if class_to_samples.get(intent_id) and intent_name is not None
         ]
 
-        results = await aiometer.run_all(tasks, max_at_once=5, max_per_second=10)
+        results = await aiometer.run_all(tasks, self.max_at_once, self.max_per_second)
 
         for result in results:
             new_samples.extend(result)
