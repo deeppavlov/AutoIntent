@@ -26,7 +26,7 @@ def _limit_openmp_threads_on_darwin() -> Generator[None, None, None]:
         yield
         return
 
-    from threadpoolctl import threadpool_limits
+    from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
     # Limit OpenMP threads to 1 on macOS
     with threadpool_limits(limits=1, user_api="openmp"):
