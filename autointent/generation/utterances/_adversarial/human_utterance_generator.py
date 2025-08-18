@@ -27,8 +27,14 @@ class HumanUtteranceGenerator:
     to bypass a critic that identifies machine-generated text.
     """
 
-    def __init__(self, generator: Generator, critic: CriticHumanLike, async_mode: bool = False, max_at_once: int = 5,
-        max_per_second: int = 10) -> None:
+    def __init__(
+        self,
+        generator: Generator,
+        critic: CriticHumanLike,
+        async_mode: bool = False,
+        max_at_once: int = 5,
+        max_per_second: int = 10,
+    ) -> None:
         """Initialize the HumanUtteranceGeneratoror.
 
         Args:
@@ -141,7 +147,11 @@ class HumanUtteranceGenerator:
             if class_to_samples.get(intent_id) and intent_name is not None
         ]
 
-        results = await aiometer.run_all(tasks, self.max_at_once, self.max_per_second)
+        results = await aiometer.run_all(
+            tasks,
+            max_at_once=self.max_at_once,
+            max_per_second=self.max_per_second,
+        )
 
         for result in results:
             new_samples.extend(result)
