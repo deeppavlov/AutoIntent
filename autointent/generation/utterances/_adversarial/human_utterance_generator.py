@@ -17,6 +17,8 @@ from autointent.schemas import Sample
 from .critic_human_like import CriticHumanLike
 
 logger = logging.getLogger(__name__)
+
+
 class HumanUtteranceGenerator:
     """Generator of human-like utterances.
 
@@ -110,17 +112,17 @@ class HumanUtteranceGenerator:
         for sample in original_split:
             class_to_samples[sample["label"]].append(sample["utterance"])
 
-
-        async def generate_one(intent_id: str, intent_name: str) -> list[dict]:
+        async def generate_one(intent_id: str, intent_name: str) -> list[dict[str, str]]:
             if intent_name is None:
                 logger.warning("Intent with id %s has no name! Skipping it...", intent_id)
-            generated = []
+                return []
+            generated: list[dict[str, str]] = []
             attempts = 0
             seed_utterances = class_to_samples[intent_id]
             while len(generated) < n_final_per_class and attempts < n_final_per_class * 3:
                 attempts += 1
                 seed_examples = random.sample(seed_utterances, k=min(3, len(seed_utterances)))
-                rejected = []
+                rejected: list[str] = []
 
                 for _ in range(3):
                     prompt = self._build_adversarial_prompt(intent_name, seed_examples, rejected)
@@ -130,15 +132,14 @@ class HumanUtteranceGenerator:
                         break
                     rejected.append(utterance)
             return generated
+
         tasks = [
-        partial(generate_one, intent_id, intent_name)
-        for intent_id, intent_name in id_to_name.items()
-          if class_to_samples.get(intent_id) and intent_name is not None
+            partial(generate_one, str(intent_id), intent_name)
+            for intent_id, intent_name in id_to_name.items()
+            if class_to_samples.get(intent_id) and intent_name is not None
         ]
 
-        results = await aiometer.run_all(
-            tasks, max_at_once=5, max_per_second=10
-        )
+        results = await aiometer.run_all(tasks, max_at_once=5, max_per_second=10)
 
         for result in results:
             new_samples.extend(result)
