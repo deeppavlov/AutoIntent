@@ -2,11 +2,11 @@
 
 ## Minimum Configuration
 
-We use `poetry` as our dependency manager and packager.
+We use `uv` as our dependency manager and packager.
 
-1. Install `poetry`. We recommend referring to the official documentation section [Installation with the official installer](https://python-poetry.org/docs/#installing-with-the-official-installer). In short, you just need to run:
+1. Install `uv`. We recommend referring to the documentations on [installing uv](https://docs.astral.sh/uv/#installation). In short, you just need to run:
 ```bash
-curl -sSL https://install.python-poetry.org | python3 -
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 2. Clone the project and navigate to the root directory
@@ -45,7 +45,7 @@ make test
 ```
 Or run a specific test (using `test_bert.py` as an example):
 ```bash
-poetry run pytest tests/modules/scoring/test_bert.py
+uv run pytest tests/modules/scoring/test_bert.py
 ```
 - Check code style (it also applies formatter)
 ```bash
@@ -57,7 +57,7 @@ make typing
 ```
 Note: If mypy shows different errors locally compared to github actions, you should update your local dependencies:
 ```bash
-make update
+make install
 ```
 But it still doesn't guarantee that the local type checker will give the same errors as CI. This is because CI is configured to check on Python 3.10 and your local python version is probably the latest one.
 

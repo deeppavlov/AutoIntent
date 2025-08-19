@@ -31,11 +31,6 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
       - name: Cache Hugging Face
         id: cache-hf
         uses: actions/cache@v4
@@ -47,25 +42,30 @@ jobs:
         run: |
           sudo apt install pandoc
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.8"
+
       - name: Install dependencies
         run: |
-          pip install .[docs]
+          uv sync --group docs
 
       - name: Run tests
         if: github.event_name != 'workflow_dispatch'
         run: |
           echo "Testing documentation build..."
-          python -m sphinx build -b doctest docs/source docs/build/html
+          make test-docs
 
       - name: Build documentation
         if: ${{ github.ref == 'refs/heads/dev' }} && github.event_name != 'workflow_dispatch'
         run: |
-          python -m sphinx build -b html docs/source docs/build/html
+          make docs
 
       - name: build multiversion documentation
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
-          sphinx-multiversion docs/source docs/build/html
+          make multi-version-docs
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

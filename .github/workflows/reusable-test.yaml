@@ -31,16 +31,16 @@ jobs:
         path: ~/.cache/huggingface
         key: ${{ runner.os }}-hf
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
       with:
-        python-version: ${{ matrix.python-version }}
-        cache: "pip"
+        version: "0.8.8"
 
-    - name: Install dependencies
+    - name: Install dependencies for Python ${{ matrix.python-version }}
       run: |
-        pip install .[test]
+        uv python pin ${{ matrix.python-version }}
+        uv sync --group test
 
     - name: Run tests
       run: |
-        ${{ inputs.test_command }}
+        uv run ${{ inputs.test_command }}
