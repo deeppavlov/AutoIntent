@@ -4,8 +4,13 @@ from typing import Any
 
 from pydantic import PositiveInt
 
-from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent import Context, Embedder, VectorIndex
+from autointent.configs import (
+    EmbedderConfig,
+    EmbedderFineTuningConfig,
+    VectorIndexConfig,
+    get_default_vector_index_config,
+)
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
@@ -21,6 +26,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     Args:
         k: Number of nearest neighbors to retrieve
         embedder_config: Config of the embedder used for creating embeddings
+        ft_config: settings for fine-tuning embeddings
 
     Examples:
     --------
@@ -49,11 +55,12 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         vector_index_config: VectorIndexConfig | None = None,
         k: PositiveInt = 10,
+        ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> None:
         self.k = k
-        embedder_config = EmbedderConfig.from_search_config(embedder_config)
-        self.embedder_config = embedder_config
+        self._embedder = Embedder(EmbedderConfig.from_search_config(embedder_config))
         self.vector_index_config = vector_index_config or get_default_vector_index_config()
+        self.ft_config = EmbedderFineTuningConfig.from_search_config(ft_config)
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `RetrievalAimedEmbedding` must be a positive int"
@@ -65,6 +72,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         context: Context,
         embedder_config: EmbedderConfig | str | None = None,
         k: PositiveInt = 10,
+        ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> "RetrievalAimedEmbedding":
         """Create an instance using a Context object.
 
@@ -72,11 +80,13 @@ class RetrievalAimedEmbedding(BaseEmbedding):
             context: The context containing configurations and utilities
             k: Number of nearest neighbors to retrieve
             embedder_config: Config of the embedder to use
+            ft_config: settings for fine-tuning embeddings
         """
         return cls(
             k=k,
             embedder_config=embedder_config,
             vector_index_config=context.vector_index_config,
+            ft_config=ft_config,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -88,7 +98,10 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(self.embedder_config, config=self.vector_index_config)
+        if self.ft_config is not None:
+            self._embedder.train(utterances=utterances, labels=labels, config=self.ft_config)
+
+        self._vector_index = VectorIndex(self._embedder, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
@@ -134,7 +147,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         Returns:
             A EmbeddingArtifact object containing embedder information
         """
-        return EmbeddingArtifact(config=self.embedder_config)
+        return EmbeddingArtifact(config=self._embedder.config)
 
     def clear_cache(self) -> None:
         """Clear cached data in memory used by the vector index."""

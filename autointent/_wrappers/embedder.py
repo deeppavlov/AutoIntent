@@ -10,6 +10,7 @@ import shutil
 import tempfile
 from functools import lru_cache
 from pathlib import Path
+from uuid import uuid4
 
 import huggingface_hub
 import numpy as np
@@ -26,6 +27,7 @@ from transformers import EarlyStoppingCallback, TrainerCallback
 
 from autointent._hash import Hasher
 from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
+from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +74,9 @@ class Embedder:
     """
 
     _metadata_dict_name: str = "metadata.json"
+    _weights_dir_name: str = "sentence_transformer"
     _dump_dir: Path | None = None
+    _trained: bool = False
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
         """Initialize the Embedder.
@@ -89,7 +93,7 @@ class Embedder:
             The hash value of the Embedder.
         """
         hasher = Hasher()
-        if self.config.freeze:
+        if not Path(self.config.model_name).exists():
             commit_hash = _get_latest_commit_hash(self.config.model_name)
             hasher.update(commit_hash)
         else:
@@ -113,8 +117,22 @@ class Embedder:
             res = self.embedding_model
         return res
 
-    def train(self, utterances: list[str], labels: list[int], config: EmbedderFineTuningConfig) -> None:
+    def train(self, utterances: list[str], labels: ListOfLabels, config: EmbedderFineTuningConfig) -> None:
         """Train the embedding model."""
+        if len(utterances) != len(labels):
+            msg = f"Utterances and labels lists lengths mismatch: {len(utterances)=} != {len(labels)=}"
+            raise ValueError(msg)
+
+        if len(labels) == 0:
+            msg = "Empty data"
+            raise ValueError(msg)
+
+        # TODO support multi-label data
+        if isinstance(labels[0], list):
+            msg = "Multi-label data is not supported for embeddings fine-tuning for now"
+            logger.warning(msg)
+            return
+
         self._load_model()
         if config.early_stopping:
             x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=0.1, random_state=42)
@@ -131,8 +149,7 @@ class Embedder:
                 output_dir=tmp_dir,
                 num_train_epochs=config.epoch_num,
                 per_device_train_batch_size=config.batch_size,
-                per_device_eval_batch_size=8,
-                eval_steps=1,
+                per_device_eval_batch_size=config.batch_size,
                 learning_rate=config.learning_rate,
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
@@ -143,9 +160,9 @@ class Embedder:
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
-            callback: list[TrainerCallback] = []
+            callbacks: list[TrainerCallback] = []
             if config.early_stopping:
-                callback.append(
+                callbacks.append(
                     EarlyStoppingCallback(
                         early_stopping_patience=config.early_stopping,
                         early_stopping_threshold=config.early_stopping_threshold,
@@ -157,10 +174,17 @@ class Embedder:
                 train_dataset=tr_ds,
                 eval_dataset=val_ds,
                 loss=loss,
-                callbacks=callback,
+                callbacks=callbacks,
             )
 
             trainer.train()
+
+        # use temporary path for re-usage
+        model_path = str(Path(tempfile.mkdtemp("autointent_embedders")) / str(uuid4()))
+        self.embedding_model.save(model_path)
+        self.config.model_name = model_path
+
+        self._trained = True
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
@@ -182,6 +206,11 @@ class Embedder:
         Args:
             path: Path to the directory where the model will be saved.
         """
+        if self._trained:
+            model_path = str((path / self._weights_dir_name).resolve())
+            self.embedding_model.save(model_path, create_model_card=False)
+            self.config.model_name = model_path
+
         self._dump_dir = path
         path.mkdir(parents=True, exist_ok=True)
         with (path / self._metadata_dict_name).open("w") as file:

@@ -38,7 +38,7 @@ class VectorIndex:
     embedder: Embedder
     index: BaseIndexBackend
 
-    def __init__(self, embedder_config: EmbedderConfig, config: VectorIndexConfig) -> None:
+    def __init__(self, embedder_config: EmbedderConfig | Embedder, config: VectorIndexConfig) -> None:
         """Initialize the VectorIndex with an embedding model.
 
         Args:
@@ -46,7 +46,7 @@ class VectorIndex:
             config: settings for vector index.
             backend: vector index backend to use.
         """
-        self.embedder = Embedder(embedder_config)
+        self.embedder = embedder_config if isinstance(embedder_config, Embedder) else Embedder(embedder_config)
         self.config = config
 
     def _init_index(self, vector_size: int) -> BaseIndexBackend:

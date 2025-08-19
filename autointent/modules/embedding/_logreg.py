@@ -10,7 +10,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
@@ -26,6 +26,7 @@ class LogregAimedEmbedding(BaseEmbedding):
     Args:
         embedder_config: Config of the embedder used for creating embeddings
         cv: Number of folds used in LogisticRegressionCV
+        ft_config: settings for fine-tuning embeddings
 
     Examples:
     --------
@@ -52,9 +53,11 @@ class LogregAimedEmbedding(BaseEmbedding):
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
+        ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> None:
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self._embedder = Embedder(EmbedderConfig.from_search_config(embedder_config))
         self.cv = cv
+        self.ft_config = EmbedderFineTuningConfig.from_search_config(ft_config)
 
         if self.cv < 0 or not isinstance(self.cv, int):
             msg = "`cv` argument of `LogregAimedEmbedding` must be a positive int"
@@ -65,6 +68,7 @@ class LogregAimedEmbedding(BaseEmbedding):
         cls,
         context: Context,
         embedder_config: EmbedderConfig | str | None = None,
+        ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":
         """Create a LogregAimedEmbedding instance using a Context object.
@@ -73,10 +77,12 @@ class LogregAimedEmbedding(BaseEmbedding):
             context: Context containing configurations and utilities
             cv: Number of folds used in LogisticRegressionCV
             embedder_config: Config of the embedder to use
+            ft_config: settings for fine-tuning embeddings
         """
         return cls(
             cv=cv,
             embedder_config=embedder_config,
+            ft_config=ft_config,
         )
 
     def clear_cache(self) -> None:
@@ -93,9 +99,9 @@ class LogregAimedEmbedding(BaseEmbedding):
         """
         self._validate_task(labels)
 
-        self._embedder = Embedder(
-            self.embedder_config,
-        )
+        if self.ft_config is not None:
+            self._embedder.train(utterances=utterances, labels=labels, config=self.ft_config)
+
         embeddings = self._embedder.embed(utterances, TaskTypeEnum.classification)
 
         if self._multilabel:
@@ -153,7 +159,7 @@ class LogregAimedEmbedding(BaseEmbedding):
         Returns:
             EmbeddingArtifact object containing embedder information
         """
-        return EmbeddingArtifact(config=self.embedder_config)
+        return EmbeddingArtifact(config=self._embedder.config)
 
     def predict(self, utterances: list[str]) -> NDArray[np.float64]:
         """Predict probabilities for input utterances.

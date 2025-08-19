@@ -156,7 +156,6 @@ class NodeOptimizer:
             metric_value=target_metric,
             metric_name=self.target_metric,
             metrics=quality_metrics,
-            artifact=module.get_assets(),  # retriever name / scores / predictions
             module_dump_dir=self.get_module_dump_dir(context, module_name, self._counter),
             module=module,
         )
