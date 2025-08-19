@@ -188,6 +188,3 @@ def test_dumper(test_class):
         loaded_obj = test_class()
         Dumper.load(loaded_obj, Path(temp_dir), raise_errors=True)
         loaded_obj.check_attributes()
-        loaded_obj.check_attributes()
-        loaded_obj.check_attributes()
-        loaded_obj.check_attributes()
