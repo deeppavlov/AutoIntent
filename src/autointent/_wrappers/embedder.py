@@ -77,6 +77,7 @@ class Embedder:
     _weights_dir_name: str = "sentence_transformer"
     _dump_dir: Path | None = None
     _trained: bool = False
+    _model: SentenceTransformer
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
         """Initialize the Embedder.
@@ -97,15 +98,15 @@ class Embedder:
             commit_hash = _get_latest_commit_hash(self.config.model_name)
             hasher.update(commit_hash)
         else:
-            self.embedding_model = self._load_model()
-            for parameter in self.embedding_model.parameters():
+            self._model = self._load_model()
+            for parameter in self._model.parameters():
                 hasher.update(parameter.detach().cpu().numpy())
         hasher.update(self.config.tokenizer_config.max_length)
         return hasher.intdigest()
 
     def _load_model(self) -> SentenceTransformer:
         """Load sentence transformers model to device."""
-        if not hasattr(self, "embedding_model"):
+        if not hasattr(self, "_model"):
             res = SentenceTransformer(
                 self.config.model_name,
                 device=self.config.device,
@@ -114,7 +115,7 @@ class Embedder:
                 trust_remote_code=self.config.trust_remote_code,
             )
         else:
-            res = self.embedding_model
+            res = self._model
         return res
 
     def train(self, utterances: list[str], labels: ListOfLabels, config: EmbedderFineTuningConfig) -> None:
@@ -133,7 +134,8 @@ class Embedder:
             logger.warning(msg)
             return
 
-        self._load_model()
+        self._model = self._load_model()
+
         if config.early_stopping:
             x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=0.1, random_state=42)
             tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
@@ -142,7 +144,7 @@ class Embedder:
             tr_ds = Dataset.from_dict({"text": utterances, "label": labels})
             val_ds = None
 
-        loss = BatchAllTripletLoss(model=self.embedding_model, margin=config.margin)
+        loss = BatchAllTripletLoss(model=self._model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
             args = SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
@@ -169,7 +171,7 @@ class Embedder:
                     )
                 )
             trainer = SentenceTransformerTrainer(
-                model=self.embedding_model,
+                model=self._model,
                 args=args,
                 train_dataset=tr_ds,
                 eval_dataset=val_ds,
@@ -181,7 +183,7 @@ class Embedder:
 
         # use temporary path for re-usage
         model_path = str(Path(tempfile.mkdtemp("autointent_embedders")) / str(uuid4()))
-        self.embedding_model.save(model_path)
+        self._model.save(model_path)
         self.config.model_name = model_path
 
         self._trained = True
@@ -190,8 +192,8 @@ class Embedder:
         """Move the embedding model to CPU and delete it from memory."""
         if hasattr(self, "embedding_model"):
             logger.debug("Clearing embedder %s from memory", self.config.model_name)
-            self.embedding_model.cpu()
-            del self.embedding_model
+            self._model.cpu()
+            del self._model
             torch.cuda.empty_cache()
 
     def delete(self) -> None:
@@ -208,7 +210,7 @@ class Embedder:
         """
         if self._trained:
             model_path = str((path / self._weights_dir_name).resolve())
-            self.embedding_model.save(model_path, create_model_card=False)
+            self._model.save(model_path, create_model_card=False)
             self.config.model_name = model_path
 
         self._dump_dir = path
@@ -248,6 +250,11 @@ class Embedder:
         Returns:
             A numpy array of embeddings.
         """
+        if len(utterances) == 0:
+            msg = "Empty input"
+            logger.error(msg)
+            raise ValueError(msg)
+
         prompt = self.config.get_prompt(task_type)
 
         if self.config.use_cache:
@@ -263,7 +270,7 @@ class Embedder:
                 logger.debug("loading embeddings from %s", str(embeddings_path))
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
-        self.embedding_model = self._load_model()
+        self._model = self._load_model()
 
         logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s, prompt=%s",
@@ -275,9 +282,9 @@ class Embedder:
         )
 
         if self.config.tokenizer_config.max_length is not None:
-            self.embedding_model.max_seq_length = self.config.tokenizer_config.max_length
+            self._model.max_seq_length = self.config.tokenizer_config.max_length
 
-        embeddings = self.embedding_model.encode(
+        embeddings = self._model.encode(
             utterances,
             convert_to_numpy=True,
             batch_size=self.config.batch_size,
