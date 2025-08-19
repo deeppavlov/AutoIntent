@@ -148,7 +148,6 @@ def test_pipeline_callbacks(dataset):
                         "passage_prompt": None,
                         "similarity_fn_name": "cosine",
                         "use_cache": True,
-                        "freeze": True,
                         "fp16": False,
                         "bf16": False,
                     }
@@ -180,7 +179,6 @@ def test_pipeline_callbacks(dataset):
                         "passage_prompt": None,
                         "similarity_fn_name": "cosine",
                         "use_cache": True,
-                        "freeze": True,
                         "fp16": False,
                         "bf16": False,
                     },
@@ -208,7 +206,6 @@ def test_pipeline_callbacks(dataset):
                         "passage_prompt": None,
                         "similarity_fn_name": "cosine",
                         "use_cache": True,
-                        "freeze": True,
                         "fp16": False,
                         "bf16": False,
                     },

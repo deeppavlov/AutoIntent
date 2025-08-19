@@ -18,7 +18,6 @@ def test_model_updates_after_training(dataset):
         passage_prompt="Document:",
         similarity_fn_name="cosine",
         use_cache=False,
-        freeze=False,
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=3, batch_size=8)
