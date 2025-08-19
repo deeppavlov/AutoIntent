@@ -1,11 +1,14 @@
-sh = uv run
-groups = --group test --group typing --group lint --group nb --group docs
+.PHONY: all
+all: lint
+
+.DEFAULT_GOAL := all
+
+sh = uv run --no-sync --frozen
 
 .PHONY: install
 install:
 	rm -rf uv.lock 
-	uv lock
-	uv sync $(groups)
+	uv sync --all-groups
 
 .PHONY: test
 test:
