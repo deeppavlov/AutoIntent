@@ -59,7 +59,7 @@ wandb = [
     "wandb (>=0.19.10,<1.0.0)",
 ]
 codecarbon = [
-    "codecarbon (>=3.0.2, <3.1.0)",
+    "codecarbon (==3.0.0)",
     "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
 ]
 fastapi = [
@@ -73,6 +73,14 @@ fastmcp = [
 ]
 opensearch = [
     "opensearch-py (>=3.0.0, <4.0.0)",
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "codecarbon" },
+        { extra = "fastmcp" },
+    ]
 ]
 
 [dependency-groups]
@@ -270,4 +278,3 @@ module = [
     "autointent.server.mcp",
 ]
 ignore_errors = true
-
