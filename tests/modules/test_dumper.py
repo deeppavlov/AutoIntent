@@ -9,7 +9,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, FaissConfig, TokenizerConfig
 from autointent.schemas import Tag, TagsList
 
 
@@ -63,12 +63,12 @@ class TestVectorIndex:
     def init_attributes(self):
         self.vector_index = VectorIndex(
             embedder_config=EmbedderConfig.from_search_config("bert-base-uncased"),
+            config=FaissConfig(),
         )
         self.vector_index.add(texts=["hello", "world"], labels=[0, 1])
 
     def check_attributes(self):
-        assert self.vector_index.texts == ["hello", "world"]
-        assert self.vector_index.labels == [0, 1]
+        assert self.vector_index.config == FaissConfig()
 
 
 class TestEmbedder:

@@ -8,7 +8,7 @@ from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
 from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig
+from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -67,11 +67,13 @@ class MLKnnScorer(BaseScorer):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         s: float = 1.0,
         ignore_first_neighbours: int = 0,
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.k = k
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `MLKnnScorer` must be a positive int"
@@ -109,6 +111,7 @@ class MLKnnScorer(BaseScorer):
             embedder_config=embedder_config,
             s=s,
             ignore_first_neighbours=ignore_first_neighbours,
+            vector_index_config=context.vector_index_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -127,15 +130,7 @@ class MLKnnScorer(BaseScorer):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(
-            EmbedderConfig(
-                model_name=self.embedder_config.model_name,
-                device=self.embedder_config.device,
-                batch_size=self.embedder_config.batch_size,
-                tokenizer_config=self.embedder_config.tokenizer_config,
-                use_cache=self.embedder_config.use_cache,
-            ),
-        )
+        self._vector_index = VectorIndex(embedder_config=self.embedder_config, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
         self._features = self._vector_index.get_all_embeddings()
@@ -196,13 +191,15 @@ class MLKnnScorer(BaseScorer):
                 - Array of neighbor labels
                 - List of neighbor utterances
         """
-        labels, _, neighbors = self._vector_index.query(
+        _, neighbors = self._vector_index.query(
             queries,
             self.k + self.ignore_first_neighbours,
         )
+        labels = [[lab.label for lab in n] for n in neighbors]
+        utterances = [[lab.text for lab in n] for n in neighbors]
         return (
             np.array([candidates[self.ignore_first_neighbours :] for candidates in labels]),
-            neighbors,
+            utterances,
         )
 
     def predict_labels(self, utterances: list[str], thresh: float = 0.5) -> NDArray[np.int64]:

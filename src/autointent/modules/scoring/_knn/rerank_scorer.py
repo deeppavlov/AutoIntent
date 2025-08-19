@@ -7,7 +7,7 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
 from autointent.custom_types import ListOfLabels, WeightType
 
 from .knn import KNNScorer
@@ -42,6 +42,7 @@ class RerankScorer(KNNScorer):
         m: PositiveInt | None = None,
         cross_encoder_config: CrossEncoderConfig | str | dict[str, Any] | None = None,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         super().__init__(
             embedder_config=embedder_config,
@@ -50,6 +51,7 @@ class RerankScorer(KNNScorer):
         )
 
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         self.m = k if m is None else m
         self.use_cross_encoder_scores = use_cross_encoder_scores
@@ -94,6 +96,7 @@ class RerankScorer(KNNScorer):
             use_cross_encoder_scores=use_cross_encoder_scores,
             embedder_config=embedder_config,
             cross_encoder_config=cross_encoder_config,
+            vector_index_config=context.vector_index_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -131,24 +134,26 @@ class RerankScorer(KNNScorer):
                 - Array of predicted scores
                 - List of neighbor utterances
         """
-        knn_labels, knn_distances, knn_neighbors = self._get_neighbours(utterances)
+        knn_distances, knn_neighbors = self._get_neighbours(utterances)
+        knn_labels = [[n.label for n in neigs] for neigs in knn_neighbors]
+        knn_utterances = [[n.text for n in neigs] for neigs in knn_neighbors]
 
         labels: list[ListOfLabels] = []
         distances: list[list[float]] = []
         neighbours: list[list[str]] = []
 
         for query, query_labels, query_distances, query_docs in zip(
-            utterances, knn_labels, knn_distances, knn_neighbors, strict=True
+            utterances, knn_labels, knn_distances, knn_utterances, strict=True
         ):
             cur_ranks = self._scorer.rank(query, query_docs, top_k=self.m)
 
-            for dst, src in zip([labels, neighbours], [query_labels, query_docs], strict=True):
-                dst.append([src[rank["corpus_id"]] for rank in cur_ranks])  # type: ignore[attr-defined]
+            labels.append([query_labels[rank.corpus_id] for rank in cur_ranks])  # type: ignore[arg-type]
+            neighbours.append([query_docs[rank.corpus_id] for rank in cur_ranks])
 
             if self.use_cross_encoder_scores:
-                distances.append([rank["score"] for rank in cur_ranks])
+                distances.append([rank.score for rank in cur_ranks])
             else:
-                distances.append([query_distances[rank["corpus_id"]] for rank in cur_ranks])
+                distances.append([query_distances[rank.corpus_id] for rank in cur_ranks])
 
         scores = self._count_scores(np.array(labels), np.array(distances))
 

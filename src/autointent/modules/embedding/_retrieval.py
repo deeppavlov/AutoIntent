@@ -5,7 +5,7 @@ from typing import Any
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig
+from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
@@ -47,11 +47,13 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     def __init__(
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
+        vector_index_config: VectorIndexConfig | None = None,
         k: PositiveInt = 10,
     ) -> None:
         self.k = k
         embedder_config = EmbedderConfig.from_search_config(embedder_config)
         self.embedder_config = embedder_config
+        self.vector_index_config = vector_index_config or get_default_vector_index_config()
 
         if self.k < 0 or not isinstance(self.k, int):
             msg = "`k` argument of `RetrievalAimedEmbedding` must be a positive int"
@@ -74,6 +76,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         return cls(
             k=k,
             embedder_config=embedder_config,
+            vector_index_config=context.vector_index_config,
         )
 
     def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
@@ -85,9 +88,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         """
         self._validate_task(labels)
 
-        self._vector_index = VectorIndex(
-            self.embedder_config,
-        )
+        self._vector_index = VectorIndex(self.embedder_config, config=self.vector_index_config)
         self._vector_index.add(utterances, labels)
 
     def score_ho(self, context: Context, metrics: list[str]) -> dict[str, float]:
@@ -149,5 +150,5 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         Returns:
             List of labels for each retrieved utterance
         """
-        predictions, _, _ = self._vector_index.query(utterances, self.k)
-        return predictions
+        _, documents = self._vector_index.query(utterances, self.k)
+        return [[n.label for n in neigs] for neigs in documents]  # type: ignore[misc]

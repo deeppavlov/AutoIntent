@@ -9,7 +9,6 @@ import logging
 import shutil
 from functools import lru_cache
 from pathlib import Path
-from typing import TypedDict
 
 import huggingface_hub
 import numpy as np
@@ -59,23 +58,6 @@ def _get_latest_commit_hash(model_name: str) -> str:
     return commit_hash
 
 
-class EmbedderDumpMetadata(TypedDict):
-    """Metadata for saving and loading an Embedder instance."""
-
-    model_name: str
-    """Name of the hugging face model or a local path to sentence transformers dump."""
-    device: str | None
-    """Torch notation for CPU or CUDA."""
-    batch_size: int
-    """Batch size used for embedding calculations."""
-    max_length: int | None
-    """Maximum sequence length for the embedding model."""
-    use_cache: bool
-    """Whether to use embeddings caching."""
-    similarity_fn_name: str | None
-    """Name of the similarity function to use."""
-
-
 class Embedder:
     """A wrapper for managing embedding models using :py:class:`sentence_transformers.SentenceTransformer`.
 
@@ -85,7 +67,6 @@ class Embedder:
 
     _metadata_dict_name: str = "metadata.json"
     _dump_dir: Path | None = None
-    embedding_model: SentenceTransformer
 
     def __init__(self, embedder_config: EmbedderConfig) -> None:
         """Initialize the Embedder.
@@ -106,22 +87,25 @@ class Embedder:
             commit_hash = _get_latest_commit_hash(self.config.model_name)
             hasher.update(commit_hash)
         else:
-            self._load_model()
+            self.embedding_model = self._load_model()
             for parameter in self.embedding_model.parameters():
                 hasher.update(parameter.detach().cpu().numpy())
         hasher.update(self.config.tokenizer_config.max_length)
         return hasher.intdigest()
 
-    def _load_model(self) -> None:
+    def _load_model(self) -> SentenceTransformer:
         """Load sentence transformers model to device."""
         if not hasattr(self, "embedding_model"):
-            self.embedding_model = SentenceTransformer(
+            res = SentenceTransformer(
                 self.config.model_name,
                 device=self.config.device,
                 prompts=self.config.get_prompt_config(),
                 similarity_fn_name=self.config.similarity_fn_name,
                 trust_remote_code=self.config.trust_remote_code,
             )
+        else:
+            res = self.embedding_model
+        return res
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
@@ -144,17 +128,9 @@ class Embedder:
             path: Path to the directory where the model will be saved.
         """
         self._dump_dir = path
-        metadata = EmbedderDumpMetadata(
-            model_name=str(self.config.model_name),
-            device=self.config.device,
-            batch_size=self.config.batch_size,
-            max_length=self.config.tokenizer_config.max_length,
-            use_cache=self.config.use_cache,
-            similarity_fn_name=self.config.similarity_fn_name,
-        )
         path.mkdir(parents=True, exist_ok=True)
         with (path / self._metadata_dict_name).open("w") as file:
-            json.dump(metadata, file, indent=4)
+            json.dump(self.config.model_dump(mode="json"), file, indent=4)
 
     @classmethod
     def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
@@ -165,12 +141,12 @@ class Embedder:
             override_config: one can override presaved settings
         """
         with (Path(path) / cls._metadata_dict_name).open(encoding="utf-8") as file:
-            metadata: EmbedderDumpMetadata = json.load(file)
+            config = EmbedderConfig.model_validate_json(file.read())
 
         if override_config is not None:
-            kwargs = {**metadata, **override_config.model_dump(exclude_unset=True)}
+            kwargs = {**config.model_dump(), **override_config.model_dump(exclude_unset=True)}
         else:
-            kwargs = metadata  # type: ignore[assignment]
+            kwargs = config.model_dump()
 
         max_length = kwargs.pop("max_length", None)
         if max_length is not None:
@@ -203,7 +179,7 @@ class Embedder:
                 logger.debug("loading embeddings from %s", str(embeddings_path))
                 return np.load(embeddings_path)  # type: ignore[no-any-return]
 
-        self._load_model()
+        self.embedding_model = self._load_model()
 
         logger.debug(
             "Calculating embeddings with model %s, batch_size=%d, max_seq_length=%s, embedder_device=%s, prompt=%s",
