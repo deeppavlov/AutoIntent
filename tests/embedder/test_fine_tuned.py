@@ -22,15 +22,13 @@ def test_model_updates_after_training(dataset):
 
     train_config = EmbedderFineTuningConfig(epoch_num=3, batch_size=8)
     embedder = Embedder(embedder_config)
-    embedder._load_model()
+    embedder._model = embedder._load_model()
 
-    for param in embedder.embedding_model.parameters():
+    for param in embedder._model.parameters():
         assert param.requires_grad, "All trainable parameters should have requires_grad=True"
 
     original_weights = [
-        param.data.detach().cpu().numpy().copy()
-        for param in embedder.embedding_model.parameters()
-        if param.requires_grad
+        param.data.detach().cpu().numpy().copy() for param in embedder._model.parameters() if param.requires_grad
     ]
     embedder.train(
         utterances=data_handler.train_utterances(0)[:1000],
@@ -39,9 +37,7 @@ def test_model_updates_after_training(dataset):
     )
 
     trained_weights = [
-        param.data.detach().cpu().numpy().copy()
-        for param in embedder.embedding_model.parameters()
-        if param.requires_grad
+        param.data.detach().cpu().numpy().copy() for param in embedder._model.parameters() if param.requires_grad
     ]
 
     weights_changed = any(
