@@ -72,7 +72,7 @@ intersphinx_mapping = {
 }
 
 autoapi_keep_files = True
-autoapi_dirs = [Path.cwd().parent.parent / "autointent"]
+autoapi_dirs = [Path.cwd().parent.parent / "src/autointent"]
 autoapi_options = [
     "members",
     "undoc-members",
