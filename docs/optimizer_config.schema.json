@@ -266,12 +266,6 @@
                     "description": "Whether to use embeddings caching.",
                     "title": "Use Cache",
                     "type": "boolean"
-                },
-                "freeze": {
-                    "default": true,
-                    "description": "Whether to freeze the model parameters.",
-                    "title": "Freeze",
-                    "type": "boolean"
                 }
             },
             "title": "EmbedderConfig",
@@ -578,8 +572,7 @@
                 "query_prompt": null,
                 "passage_prompt": null,
                 "similarity_fn_name": "cosine",
-                "use_cache": true,
-                "freeze": true
+                "use_cache": true
             }
         },
         "cross_encoder_config": {
