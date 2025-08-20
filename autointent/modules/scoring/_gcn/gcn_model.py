@@ -52,7 +52,7 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         self.gcn_hidden_dims = gcn_hidden_dims
 
         gcn_layers = []
-        activation_layers = []
+        activation_layers: list[nn.LeakyReLU] = []
 
         in_dim = label_embedding_dim
         for hidden_dim in gcn_hidden_dims:
