@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import cast
 
 import torch
 from pydantic import BaseModel
@@ -98,12 +97,12 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         self.correlation_matrix.data.copy_(corr_matrix)
 
     def forward(self, bert_features: torch.Tensor, label_embeddings: torch.Tensor) -> torch.Tensor:
-        classifiers = label_embeddings
+        classifiers: torch.Tensor = label_embeddings
         for i in range(len(self.gcn_layers)):
             classifiers = self.gcn_layers[i](self.correlation_matrix, classifiers)
-            classifiers = self.activations[i](classifiers)  # type: ignore[operator]
+            classifiers = self.activations[i](classifiers)
 
-        return torch.matmul(bert_features, cast(torch.Tensor, classifiers).T)
+        return torch.matmul(bert_features, classifiers.T)
 
     def dump(self, path: Path) -> None:
         metadata = GCNModelDumpMetadata(
