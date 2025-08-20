@@ -165,6 +165,6 @@ class GCNScorer(BaseTorchTrainerScorer):
         cross_encoder_config: CrossEncoderConfig | None = None,
     ) -> Self:
         instance = super().load(path, embedder_config, cross_encoder_config)
-        if hasattr(instance, "_label_embeddings"):
+        if hasattr(instance, "label_embeddings"):
             instance.label_embeddings = torch.tensor(instance.label_embeddings).to(instance.torch_config.device)
         return instance
