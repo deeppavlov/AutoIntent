@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 import numpy.typing as npt
 import torch
@@ -97,10 +97,10 @@ class GCNScorer(BaseTorchTrainerScorer):
         }
 
     def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
-        descriptions = [intent.description or intent.name for intent in context.data_handler.dataset.intents]
+        descriptions = [intent.description or intent.name or "" for intent in context.data_handler.dataset.intents]
         return (
             context.data_handler.train_utterances(0),
-            context.data_handler.train_labels(0),
+            cast(ListOfLabels, context.data_handler.train_labels(0)),
             descriptions,
         )
 
