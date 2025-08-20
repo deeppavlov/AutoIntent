@@ -24,7 +24,7 @@ class GCNScorer(BaseTorchTrainerScorer):
     supports_multiclass = True
     supports_multilabel = True
 
-    def __init__(
+    def __init__( # noqa: PLR0913
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         label_embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
@@ -37,7 +37,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         seed: int = 42,
         device: str | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ):
+    ) -> None:
         if gcn_hidden_dims is None:
             gcn_hidden_dims = [1024]
         self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
@@ -56,7 +56,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
 
     @classmethod
-    def from_context(
+    def from_context(  # noqa: PLR0913
         cls,
         context: Context,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
@@ -112,14 +112,14 @@ class GCNScorer(BaseTorchTrainerScorer):
         y_tensor_dtype = torch.float if self._multilabel else torch.long
         y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
-        self._label_embeddings = torch.tensor(
+        self.label_embeddings = torch.tensor(
             self._label_embedder.embed(descriptions, TaskTypeEnum.classification)
         ).to(self.torch_config.device)
 
         self._model = TextMLGCN(
             num_classes=self._n_classes,
             bert_feature_dim=x_tensor.shape[1],
-            label_embedding_dim=self._label_embeddings.shape[1],
+            label_embedding_dim=self.label_embeddings.shape[1],
             gcn_hidden_dims=self.gcn_hidden_dims,
             p_reweight=self.p_reweight,
             tau_threshold=self.tau_threshold,
@@ -138,14 +138,14 @@ class GCNScorer(BaseTorchTrainerScorer):
         else:
             train_x, val_x, train_y, val_y = x_tensor, None, y_tensor, None
 
-        self._train_model(train_x, train_y, val_x, val_y, self._label_embeddings)
+        self._train_model(train_x, train_y, val_x, val_y, self.label_embeddings)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
         x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
-        return self._predict_tensors(x_tensor, self._label_embeddings)
+        return self._predict_tensors(x_tensor, self.label_embeddings)
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
@@ -166,5 +166,5 @@ class GCNScorer(BaseTorchTrainerScorer):
     ) -> Self:
         instance = super().load(path, embedder_config, cross_encoder_config)
         if hasattr(instance, "_label_embeddings"):
-            instance._label_embeddings = torch.tensor(instance._label_embeddings).to(instance.torch_config.device)
+            instance.label_embeddings = torch.tensor(instance.label_embeddings).to(instance.torch_config.device)
         return instance
