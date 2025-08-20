@@ -95,7 +95,7 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         corr_matrix = self.create_correlation_matrix(
             train_labels, self.num_classes, self.p_reweight, self.tau_threshold
         )
-        self.correlation_matrix.data.copy_(corr_matrix)
+        self.correlation_matrix.copy_(corr_matrix)
 
     def forward(self, bert_features: torch.Tensor, label_embeddings: torch.Tensor) -> torch.Tensor:
         classifiers = label_embeddings
