@@ -13,7 +13,49 @@ from typing_extensions import Self
 from autointent.configs import VocabConfig
 
 
-class BaseTorchModuleWithVocab(nn.Module, ABC):
+class BaseTorchModule(nn.Module, ABC):
+    @abstractmethod
+    def forward(self, text: torch.Tensor) -> torch.Tensor:
+        """Compute sentence embeddings for given text.
+
+        Args:
+            text: torch tensor of shape (B, T), token ids
+
+        Returns:
+            embeddings of shape (B, H)
+        """
+
+    @abstractmethod
+    def dump(self, path: Path) -> None:
+        """Dump torch module to disk.
+
+        This method encapsulates all the logic of dumping module's weights and
+        hyperparameters required for initialization from disk and nice inference.
+
+        Args:
+            path: path in file system
+        """
+
+    @classmethod
+    @abstractmethod
+    def load(cls, path: Path, device: str | None = None) -> Self:
+        """Load torch module from disk.
+
+        This method loads all weights and hyperparameters required for
+        initialization from disk and inference.
+
+        Args:
+            path: path in file system
+            device: torch notation for CPU, CUDA, MPS, etc. By default, it is inferred automatically.
+        """
+
+    @property
+    def device(self) -> torch.device:
+        """Torch device object where this module resides."""
+        return next(self.parameters()).device
+
+
+class BaseTorchModuleWithVocab(BaseTorchModule, ABC):
     def __init__(
         self,
         embed_dim: int,
@@ -80,43 +122,3 @@ class BaseTorchModuleWithVocab(nn.Module, ABC):
             seq = seq + [self.vocab_config.padding_idx] * (self.vocab_config.max_seq_length - len(seq))
             sequences.append(seq)
         return sequences
-
-    @abstractmethod
-    def forward(self, text: torch.Tensor) -> torch.Tensor:
-        """Compute sentence embeddings for given text.
-
-        Args:
-            text: torch tensor of shape (B, T), token ids
-
-        Returns:
-            embeddings of shape (B, H)
-        """
-
-    @abstractmethod
-    def dump(self, path: Path) -> None:
-        """Dump torch module to disk.
-
-        This method encapsulates all the logic of dumping module's weights and
-        hyperparameters required for initialization from disk and nice inference.
-
-        Args:
-            path: path in file system
-        """
-
-    @classmethod
-    @abstractmethod
-    def load(cls, path: Path, device: str | None = None) -> Self:
-        """Load torch module from disk.
-
-        This method loads all weights and hyperparameters required for
-        initialization from disk and inference.
-
-        Args:
-            path: path in file system
-            device: torch notation for CPU, CUDA, MPS, etc. By default, it is inferred automatically.
-        """
-
-    @property
-    def device(self) -> torch.device:
-        """Torch device object where this module resides."""
-        return next(self.parameters()).device

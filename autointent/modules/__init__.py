@@ -1,3 +1,5 @@
+"""Heart of the library with different intent classification methods implemented."""
+
 from typing import TypeVar
 
 from .base import BaseDecision, BaseEmbedding, BaseModule, BaseRegex, BaseScorer

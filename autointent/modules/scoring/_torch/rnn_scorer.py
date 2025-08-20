@@ -3,11 +3,11 @@ from typing import Any
 from autointent import Context
 from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
-from .base_scorer import BaseTorchScorer
+from .base_scorer import BaseVocabTorchScorer
 from .rnn_model import TextRNN
 
 
-class RNNScorer(BaseTorchScorer):
+class RNNScorer(BaseVocabTorchScorer):
     """Recurrent Neural Network (RNN) scorer for intent classification.
 
     This module uses an RNN architecture to perform intent classification on text data.

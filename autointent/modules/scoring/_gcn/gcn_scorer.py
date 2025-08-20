@@ -5,7 +5,6 @@ import numpy.typing as npt
 import torch
 from pydantic import PositiveInt
 from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
 from typing_extensions import Self
 
 from autointent import Context, Embedder
@@ -13,9 +12,10 @@ from autointent.configs import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum,
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
+from autointent.modules.scoring._torch.base_scorer import BaseTorchTrainerScorer
 
 
-class GCNScorer(BaseScorer):
+class GCNScorer(BaseTorchTrainerScorer):
     name = "gcn"
     supports_multiclass = True
     supports_multilabel = True
@@ -87,7 +87,15 @@ class GCNScorer(BaseScorer):
             "label_embedder_config": self.label_embedder_config.model_dump(),
         }
 
-    def fit(self, utterances: list[str], labels: ListOfLabels) -> None:
+    def get_train_data(self, context: Context) -> tuple[list[str], ListOfLabels, list[str]]:
+        descriptions = [intent.description or intent.name for intent in context.data_handler.dataset.intents]
+        return (
+            context.data_handler.train_utterances(0),
+            context.data_handler.train_labels(0),  # type: ignore
+            descriptions,
+        )
+
+    def fit(self, utterances: list[str], labels: ListOfLabels, descriptions: list[str]) -> None:
         self._validate_task(labels)
         self._embedder = Embedder(self.embedder_config)
         self._label_embedder = Embedder(self.label_embedder_config)
@@ -96,9 +104,8 @@ class GCNScorer(BaseScorer):
         y_tensor_dtype = torch.float if self._multilabel else torch.long
         y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
-        intent_texts = [f"intent {i}" for i in range(self._n_classes)]
         self._label_embeddings = torch.tensor(
-            self._label_embedder.embed(intent_texts, TaskTypeEnum.classification)
+            self._label_embedder.embed(descriptions, TaskTypeEnum.classification)
         ).to(self.torch_config.device)
 
         self._model = TextMLGCN(
@@ -112,47 +119,13 @@ class GCNScorer(BaseScorer):
 
         y_corr_tensor = y_tensor if self._multilabel else torch.nn.functional.one_hot(y_tensor, self._n_classes)
         self._model.set_correlation_matrix(y_corr_tensor.float())
-
-        criterion = nn.BCEWithLogitsLoss() if self._multilabel else nn.CrossEntropyLoss()
-        self._train_model(x_tensor, y_tensor, criterion)
-
-    def _train_model(self, train_x: torch.Tensor, train_y: torch.Tensor, criterion: nn.Module) -> None:
-        train_dataset = TensorDataset(train_x, train_y)
-        train_dataloader = DataLoader(train_dataset, batch_size=self.torch_config.batch_size, shuffle=True)
-        optimizer = torch.optim.Adam(self._model.parameters(), lr=self.torch_config.learning_rate)
-
-        self._model.to(self.torch_config.device)
-        self._model.train()
-
-        for _ in range(self.torch_config.num_train_epochs):
-            for batch_x, batch_y in train_dataloader:
-                optimizer.zero_grad()
-                outputs = self._model(batch_x.to(self.torch_config.device), self._label_embeddings)
-                loss = criterion(outputs, batch_y.to(self.torch_config.device))
-                loss.backward()
-                optimizer.step()
-
-        self._model.eval()
+        self._train_model(x_tensor, y_tensor, self._label_embeddings)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model"):
             raise RuntimeError("Model is not trained. Call fit() first.")
-
         x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
-        all_probs = []
-
-        self._model.eval()
-        with torch.no_grad():
-            for i in range(0, len(x_tensor), self.torch_config.batch_size):
-                batch_x = x_tensor[i : i + self.torch_config.batch_size].to(self.torch_config.device)
-                outputs = self._model(batch_x, self._label_embeddings)
-                if self._multilabel:
-                    probs = torch.sigmoid(outputs).cpu().numpy()
-                else:
-                    probs = torch.softmax(outputs, dim=1).cpu().numpy()
-                all_probs.append(probs)
-
-        return np.concatenate(all_probs, axis=0)
+        return self._predict_tensors(x_tensor, self._label_embeddings)
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
