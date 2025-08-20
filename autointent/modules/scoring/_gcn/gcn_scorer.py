@@ -4,11 +4,12 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from pydantic import PositiveInt
+from sklearn.model_selection import train_test_split
 from torch import nn
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, TaskTypeEnum, TorchTrainingConfig
+from autointent.configs import CrossEncoderConfig, EarlyStoppingConfig, EmbedderConfig, TaskTypeEnum, TorchTrainingConfig
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
@@ -32,6 +33,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         learning_rate: float = 1e-3,
         seed: int = 42,
         device: str | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ):
         if gcn_hidden_dims is None:
             gcn_hidden_dims = [1024]
@@ -48,6 +50,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         )
         if device is not None:
             self.torch_config.device = device
+        self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
 
     @classmethod
     def from_context(
@@ -62,6 +65,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         batch_size: PositiveInt = 16,
         learning_rate: float = 1e-3,
         seed: int = 42,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> "GCNScorer":
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
@@ -79,6 +83,7 @@ class GCNScorer(BaseTorchTrainerScorer):
             learning_rate=learning_rate,
             seed=seed,
             device=context.transformer_config.device,
+            early_stopping_config=early_stopping_config,
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
@@ -119,7 +124,18 @@ class GCNScorer(BaseTorchTrainerScorer):
 
         y_corr_tensor = y_tensor if self._multilabel else torch.nn.functional.one_hot(y_tensor, self._n_classes)
         self._model.set_correlation_matrix(y_corr_tensor.float())
-        self._train_model(x_tensor, y_tensor, self._label_embeddings)
+
+        if self.early_stopping_config.metric is not None:
+            train_x, val_x, train_y, val_y = train_test_split(
+                x_tensor,
+                y_tensor,
+                test_size=self.early_stopping_config.val_fraction,
+                random_state=self.torch_config.seed,
+            )
+        else:
+            train_x, val_x, train_y, val_y = x_tensor, None, y_tensor, None
+
+        self._train_model(train_x, train_y, val_x, val_y, self._label_embeddings)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model"):

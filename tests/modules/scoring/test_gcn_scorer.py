@@ -53,7 +53,7 @@ def test_gcn_scorer_multilabel(multilabel_dataset):
     test_utterances = ["test 1", "test 2"]
     predictions = scorer.predict(test_utterances)
 
-    expected_predictions = np.array([[0.518882, 0.495033, 0.489146], [0.518882, 0.495033, 0.489146]])
+    expected_predictions = np.array([[0.481326, 0.480452, 0.487172], [0.481336, 0.480337, 0.487094]])
     np.testing.assert_allclose(predictions, expected_predictions, atol=1e-5)
 
 
@@ -68,7 +68,7 @@ def test_gcn_scorer_multiclass(multiclass_dataset):
     test_utterances = ["test 1", "test 2"]
     predictions = scorer.predict(test_utterances)
 
-    expected_predictions = np.array([[0.33928, 0.32943, 0.33129], [0.33928, 0.32943, 0.33129]])
+    expected_predictions = np.array([[0.345223, 0.322953, 0.331824], [0.345442, 0.322777, 0.331781]])
     np.testing.assert_allclose(predictions, expected_predictions, atol=1e-5)
     np.testing.assert_allclose(predictions.sum(axis=1), 1.0, atol=1e-6)
 
