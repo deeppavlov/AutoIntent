@@ -98,10 +98,10 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         self.correlation_matrix.data.copy_(corr_matrix)
 
     def forward(self, bert_features: torch.Tensor, label_embeddings: torch.Tensor) -> torch.Tensor:
-        classifiers: torch.Tensor = label_embeddings
-        for i in range(len(self.gcn_layers)):
-            classifiers = self.gcn_layers[i](self.correlation_matrix, classifiers)
-            classifiers = self.activations[i](classifiers)
+        classifiers = label_embeddings
+        for gcn_layer, activation in zip(self.gcn_layers, self.activations, strict=True):
+            classifiers = gcn_layer(self.correlation_matrix, classifiers)
+            classifiers = activation(classifiers)
 
         return torch.matmul(bert_features, classifiers.T)
 
