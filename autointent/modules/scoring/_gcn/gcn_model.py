@@ -33,6 +33,7 @@ class GCNLayer(nn.Module):
 class TextMLGCN(BaseTorchModuleWithVocab):
     _metadata_dict_name = "metadata.json"
     _state_dict_name = "state_dict.pt"
+    correlation_matrix: torch.Tensor
 
     def __init__(
         self,
