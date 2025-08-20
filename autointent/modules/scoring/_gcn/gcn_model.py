@@ -80,7 +80,7 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         adj_matrix = (conditional_prob > tau).float()
 
         adj_matrix_no_self_loop = adj_matrix - torch.eye(num_classes, device=adj_matrix.device)
-        sum_neighbors = adj_matrix_no_self_loop.sum(axis=1)
+        sum_neighbors = adj_matrix_no_self_loop.sum(dim=1)
 
         weights_p = p / sum_neighbors
         weights_p.nan_to_num_(0)

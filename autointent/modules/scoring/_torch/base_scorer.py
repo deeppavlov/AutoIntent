@@ -27,6 +27,14 @@ class BaseTorchTrainerScorer(BaseScorer):
     _best_model_weights = "best_model.pt"
     _model: BaseTorchModule
 
+    def __init__(
+        self,
+        torch_config: TorchTrainingConfig | dict[str, Any] | None = None,
+        early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
+    ) -> None:
+        self.torch_config = TorchTrainingConfig.from_search_config(torch_config)
+        self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
+
     def _train_model(
         self,
         train_x: torch.Tensor,
@@ -170,9 +178,8 @@ class BaseVocabTorchScorer(BaseTorchTrainerScorer):
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
     ) -> None:
-        self.torch_config = TorchTrainingConfig.from_search_config(torch_config)
+        super().__init__(torch_config=torch_config, early_stopping_config=early_stopping_config)
         self.vocab_config = VocabConfig.from_search_config(vocab_config)
-        self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
 
     @abstractmethod
     def _init_model(self) -> BaseTorchModuleWithVocab: ...

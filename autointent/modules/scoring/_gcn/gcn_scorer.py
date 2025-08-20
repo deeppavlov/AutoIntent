@@ -45,15 +45,16 @@ class GCNScorer(BaseTorchTrainerScorer):
         self.gcn_hidden_dims = gcn_hidden_dims
         self.p_reweight = p_reweight
         self.tau_threshold = tau_threshold
-        self.torch_config = TorchTrainingConfig(
+        torch_config = TorchTrainingConfig(
             num_train_epochs=num_train_epochs,
             batch_size=batch_size,
             learning_rate=learning_rate,
             seed=seed,
         )
         if device is not None:
-            self.torch_config.device = device
-        self.early_stopping_config = EarlyStoppingConfig.from_search_config(early_stopping_config)
+            torch_config.device = device
+
+        super().__init__(torch_config=torch_config, early_stopping_config=early_stopping_config)
 
     @classmethod
     def from_context(  # noqa: PLR0913

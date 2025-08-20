@@ -76,6 +76,9 @@ class BaseTorchModuleWithVocab(BaseTorchModule, ABC):
 
     def set_vocab(self, vocab: dict[str, Any]) -> None:
         """Save vocabulary into module's attributes and initialize embeddings matrix."""
+        if self.embed_dim is None:
+            msg = "embed_dim must be set to initialize embeddings"
+            raise ValueError(msg)
         self.vocab_config.vocab = vocab
         self.embedding = nn.Embedding(
             num_embeddings=len(self.vocab_config.vocab),
