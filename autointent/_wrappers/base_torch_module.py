@@ -58,7 +58,7 @@ class BaseTorchModule(nn.Module, ABC):
 class BaseTorchModuleWithVocab(BaseTorchModule, ABC):
     def __init__(
         self,
-        embed_dim: int,
+        embed_dim: int | None = None,
         vocab_config: VocabConfig | None = None,
     ) -> None:
         super().__init__()
@@ -85,6 +85,10 @@ class BaseTorchModuleWithVocab(BaseTorchModule, ABC):
 
     def build_vocab(self, utterances: list[str]) -> None:
         """Build vocabulary from training utterances."""
+        if self.embed_dim is None:
+            msg = "embed_dim must be set to initialize embeddings"
+            raise ValueError(msg)
+
         if self.vocab_config.vocab is not None:
             msg = "Vocab is already built."
             raise RuntimeError(msg)

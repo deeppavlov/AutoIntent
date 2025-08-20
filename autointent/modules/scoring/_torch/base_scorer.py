@@ -33,7 +33,7 @@ class BaseTorchTrainerScorer(BaseScorer):
         train_y: torch.Tensor,
         val_x: torch.Tensor | None = None,
         val_y: torch.Tensor | None = None,
-        *forward_args: Any,
+        *forward_args: torch.Tensor,
     ) -> None:
         if not hasattr(self, "_model"):
             msg = "Scorer is not initialized"
@@ -130,7 +130,7 @@ class BaseTorchTrainerScorer(BaseScorer):
         return should_stop, best_metric, patience_counter, best_model_path
 
     def _validate_epoch(
-        self, val_x: torch.Tensor, val_y: torch.Tensor, metric_fn: ScoringMetricFn, *forward_args: Any
+        self, val_x: torch.Tensor, val_y: torch.Tensor, metric_fn: ScoringMetricFn, *forward_args: torch.Tensor
     ) -> float:
         self._model.eval()
         logger.debug("Validating epoch on %d samples.", len(val_x))
@@ -142,7 +142,7 @@ class BaseTorchTrainerScorer(BaseScorer):
         logger.debug("Validation metric value: %.4f", metric_value)
         return metric_value
 
-    def _predict_tensors(self, x_tensor: torch.Tensor, *forward_args: Any) -> npt.NDArray[Any]:
+    def _predict_tensors(self, x_tensor: torch.Tensor, *forward_args: torch.Tensor) -> npt.NDArray[Any]:
         self._model.eval()
         logger.debug("Predicting tensors for batch size: %d", self.torch_config.batch_size)
         all_probs: list[npt.NDArray[Any]] = []

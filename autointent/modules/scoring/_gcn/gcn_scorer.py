@@ -1,17 +1,20 @@
 from typing import Any
 
-import numpy as np
 import numpy.typing as npt
 import torch
 from pydantic import PositiveInt
 from sklearn.model_selection import train_test_split
-from torch import nn
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.configs import CrossEncoderConfig, EarlyStoppingConfig, EmbedderConfig, TaskTypeEnum, TorchTrainingConfig
+from autointent.configs import (
+    CrossEncoderConfig,
+    EarlyStoppingConfig,
+    EmbedderConfig,
+    TaskTypeEnum,
+    TorchTrainingConfig,
+)
 from autointent.custom_types import ListOfLabels
-from autointent.modules.base import BaseScorer
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
 from autointent.modules.scoring._torch.base_scorer import BaseTorchTrainerScorer
 
@@ -96,7 +99,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         descriptions = [intent.description or intent.name for intent in context.data_handler.dataset.intents]
         return (
             context.data_handler.train_utterances(0),
-            context.data_handler.train_labels(0),  # type: ignore
+            context.data_handler.train_labels(0),
             descriptions,
         )
 
@@ -139,7 +142,8 @@ class GCNScorer(BaseTorchTrainerScorer):
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model"):
-            raise RuntimeError("Model is not trained. Call fit() first.")
+            msg = "Model is not trained. Call fit() first."
+            raise RuntimeError(msg)
         x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
         return self._predict_tensors(x_tensor, self._label_embeddings)
 

@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 import torch
-import torch.nn as nn
 from pydantic import BaseModel
+from torch import nn
 from typing_extensions import Self
 
 from autointent._utils import detect_device
@@ -20,14 +20,13 @@ class GCNModelDumpMetadata(BaseModel):
 
 
 class GCNLayer(nn.Module):
-    def __init__(self, in_features, out_features):
+    def __init__(self, in_features: int, out_features: int) -> None:
         super().__init__()
         self.linear = nn.Linear(in_features, out_features, bias=False)
 
-    def forward(self, adj_matrix, features):
+    def forward(self, adj_matrix: torch.Tensor, features: torch.Tensor) -> torch.Tensor:
         support = self.linear(features)
-        output = torch.matmul(adj_matrix, support)
-        return output
+        return torch.matmul(adj_matrix, support)
 
 
 class TextMLGCN(BaseTorchModuleWithVocab):
@@ -42,8 +41,8 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         gcn_hidden_dims: list[int],
         p_reweight: float,
         tau_threshold: float,
-    ):
-        super().__init__(embed_dim=bert_feature_dim)
+    ) -> None:
+        super().__init__()
         self.num_classes = num_classes
         self.p_reweight = p_reweight
         self.tau_threshold = tau_threshold
@@ -69,7 +68,9 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         self.register_buffer("correlation_matrix", torch.zeros(num_classes, num_classes))
 
     @staticmethod
-    def create_correlation_matrix(train_labels, num_classes, p, tau):
+    def create_correlation_matrix(
+        train_labels: torch.Tensor, num_classes: int, p: float, tau: float
+    ) -> torch.Tensor:
         co_occurrence = train_labels.T @ train_labels
         num_labels_per_class = torch.diagonal(co_occurrence)
 
@@ -89,20 +90,19 @@ class TextMLGCN(BaseTorchModuleWithVocab):
 
         return reweighted_adj
 
-    def set_correlation_matrix(self, train_labels):
+    def set_correlation_matrix(self, train_labels: torch.Tensor) -> None:
         corr_matrix = self.create_correlation_matrix(
             train_labels, self.num_classes, self.p_reweight, self.tau_threshold
         )
         self.correlation_matrix.data.copy_(corr_matrix)
 
-    def forward(self, bert_features, label_embeddings):  # type: ignore
+    def forward(self, bert_features: torch.Tensor, label_embeddings: torch.Tensor) -> torch.Tensor:
         classifiers = label_embeddings
         for i in range(len(self.gcn_layers)):
             classifiers = self.gcn_layers[i](self.correlation_matrix, classifiers)
             classifiers = self.activations[i](classifiers)
 
-        logits = torch.matmul(bert_features, classifiers.T)
-        return logits
+        return torch.matmul(bert_features, classifiers.T)
 
     def dump(self, path: Path) -> None:
         metadata = GCNModelDumpMetadata(
