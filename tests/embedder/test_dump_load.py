@@ -8,10 +8,10 @@ from autointent._wrappers.embedder import Embedder
 from autointent.configs._transformers import EmbedderConfig
 
 
-def test_load_from_disk():
+def test_load_from_disk(on_windows):
     model = SentenceTransformer("sergeyzh/rubert-tiny-turbo")
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as tmp_dir:
         model.save(str(Path(tmp_dir) / "weights"))
         embedder = Embedder(EmbedderConfig(model_name=str(Path(tmp_dir) / "weights")))
         predictions = embedder.embed(["hi!"])
@@ -22,7 +22,7 @@ def test_load_from_disk():
     np.testing.assert_almost_equal(predictions_after, predictions, decimal=4)
 
 
-def test_dump_load_cycle():
+def test_dump_load_cycle(on_windows):
     """Test complete dump/load cycle preserves functionality."""
     original_config = EmbedderConfig(
         model_name="sergeyzh/rubert-tiny-turbo",
@@ -32,7 +32,7 @@ def test_dump_load_cycle():
         use_cache=False,
     )
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Create and test original embedder
@@ -56,7 +56,7 @@ def test_dump_load_cycle():
         assert embedder_loaded.config.similarity_fn_name == original_config.similarity_fn_name
 
 
-def test_load_with_config_override():
+def test_load_with_config_override(on_windows):
     """Test loading with configuration override."""
     original_config = EmbedderConfig(
         model_name="sergeyzh/rubert-tiny-turbo",
@@ -64,7 +64,7 @@ def test_load_with_config_override():
         use_cache=False,
     )
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Create and dump original

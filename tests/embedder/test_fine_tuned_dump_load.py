@@ -9,7 +9,7 @@ from autointent.configs._transformers import EmbedderConfig, EmbedderFineTuningC
 from autointent.context.data_handler import DataHandler
 
 
-def test_finetune_dump_load(dataset):
+def test_finetune_dump_load(dataset, on_windows):
     """Test scenario: fine-tune -> dump -> load."""
     data_handler = DataHandler(dataset)
 
@@ -24,7 +24,7 @@ def test_finetune_dump_load(dataset):
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Step 1: Fine-tune the embedder
@@ -64,7 +64,7 @@ def test_finetune_dump_load(dataset):
         )
 
 
-def test_dump_load_finetune(dataset):
+def test_dump_load_finetune(dataset, on_windows):
     """Test scenario: dump -> load -> fine-tune."""
     data_handler = DataHandler(dataset)
 
@@ -79,7 +79,7 @@ def test_dump_load_finetune(dataset):
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Step 1: Create and dump original embedder (not fine-tuned)
@@ -116,11 +116,11 @@ def test_dump_load_finetune(dataset):
         ), "Embeddings should change after fine-tuning the loaded model"
 
 
-def test_load_from_disk_finetune_dump_load(dataset):
+def test_load_from_disk_finetune_dump_load(dataset, on_windows):
     """Test scenario: load sentence transformer from disk -> fine-tune -> dump -> load."""
     data_handler = DataHandler(dataset)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Step 1: Save a sentence transformer model to disk
@@ -173,7 +173,7 @@ def test_load_from_disk_finetune_dump_load(dataset):
         )
 
 
-def test_embeddings_consistency_across_workflows(dataset):
+def test_embeddings_consistency_across_workflows(dataset, on_windows):
     """Test that different workflows produce consistent results when starting from same model."""
     data_handler = DataHandler(dataset)
 
@@ -193,7 +193,7 @@ def test_embeddings_consistency_across_workflows(dataset):
         "labels": data_handler.train_labels(0)[:50],
     }
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Workflow 1: Direct fine-tune
@@ -217,7 +217,7 @@ def test_embeddings_consistency_across_workflows(dataset):
         )
 
 
-def test_multiple_dump_load_cycles_after_finetuning(dataset):
+def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
     """Test that multiple dump/load cycles preserve fine-tuned model state."""
     data_handler = DataHandler(dataset)
 
@@ -231,7 +231,7 @@ def test_multiple_dump_load_cycles_after_finetuning(dataset):
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Fine-tune original embedder
