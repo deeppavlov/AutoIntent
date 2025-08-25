@@ -37,11 +37,11 @@ def check_predictions(predicted, labels):
 
 def check_ranking(ranked, labels):
     for r in ranked:
-        assert "corpus_id" in r
-        assert "score" in r
+        assert hasattr(r, "corpus_id")
+        assert hasattr(r, "score")
 
     # We expect the same label text to go first, then the rest
-    ranked_labels = [labels[r["corpus_id"] + 1] == labels[0] for r in ranked]
+    ranked_labels = [labels[r.corpus_id + 1] == labels[0] for r in ranked]
     expected_labels = [labels[0] == lbl for lbl in labels[1:]]
     expected_labels.sort(reverse=True)
     assert ranked_labels == expected_labels

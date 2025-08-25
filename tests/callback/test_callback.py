@@ -5,7 +5,7 @@ import numpy as np
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
-from autointent.configs import DataConfig, HPOConfig, LoggingConfig
+from autointent.configs import DataConfig, FaissConfig, HPOConfig, LoggingConfig
 from tests.conftest import setup_environment
 
 
@@ -96,6 +96,7 @@ def test_pipeline_callbacks(dataset):
     context.callback_handler = CallbackHandler([DummyCallback])
     context.set_dataset(dataset, DataConfig(scheme="ho"))
     context.configure_hpo(HPOConfig(n_trials=10))
+    context.configure_vector_index(FaissConfig())
 
     pipeline_optimizer._fit(context)
 
