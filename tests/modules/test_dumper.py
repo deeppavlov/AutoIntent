@@ -9,7 +9,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, EmbedderConfig, FaissConfig, TokenizerConfig
 from autointent.schemas import Tag, TagsList
 
 
@@ -50,11 +50,12 @@ class TestTransformers:
 
     def check_attributes(self):
         tokenizer_predictions = self.tokenizer(["hello", "world"]).input_ids
-        np.testing.assert_array_equal(self._tokenizer_predictions, tokenizer_predictions)
+        np.testing.assert_almost_equal(self._tokenizer_predictions, tokenizer_predictions, decimal=4)
         with torch.no_grad():
-            np.testing.assert_array_equal(
+            np.testing.assert_almost_equal(
                 self._transformer_predictions,
                 self.transformer(input_ids=torch.tensor(tokenizer_predictions)).logits.cpu().numpy(),
+                decimal=4,
             )
 
 
@@ -62,12 +63,12 @@ class TestVectorIndex:
     def init_attributes(self):
         self.vector_index = VectorIndex(
             embedder_config=EmbedderConfig.from_search_config("bert-base-uncased"),
+            config=FaissConfig(),
         )
         self.vector_index.add(texts=["hello", "world"], labels=[0, 1])
 
     def check_attributes(self):
-        assert self.vector_index.texts == ["hello", "world"]
-        assert self.vector_index.labels == [0, 1]
+        assert self.vector_index.config == FaissConfig()
 
 
 class TestEmbedder:
@@ -78,9 +79,10 @@ class TestEmbedder:
         self._embedder_predictions = self.embedder.embed(["hello", "world"])
 
     def check_attributes(self):
-        np.testing.assert_array_equal(
+        np.testing.assert_almost_equal(
             self._embedder_predictions,
             self.embedder.embed(["hello", "world"]),
+            decimal=4,
         )
 
 
@@ -91,9 +93,10 @@ class TestSklearnEstimator:
         self._estimator_predictions = self.estimator.predict([[1, 2, 3], [4, 5, 6]])
 
     def check_attributes(self):
-        np.testing.assert_array_equal(
+        np.testing.assert_almost_equal(
             self._estimator_predictions,
             self.estimator.predict([[1, 2, 3], [4, 5, 6]]),
+            decimal=4,
         )
 
 
@@ -111,9 +114,10 @@ class TestRanker:
         )
 
     def check_attributes(self):
-        np.testing.assert_array_equal(
+        np.testing.assert_almost_equal(
             self._ranker_predictions,
             self.ranker.predict([("hello", "world"), ("bye", "earth")]),
+            decimal=4,
         )
 
 

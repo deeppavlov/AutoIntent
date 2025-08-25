@@ -172,7 +172,7 @@ data/RuBanking77
 data/RuClinc150
 data/RuSnips
 eurlex.json
-poetry.lock
+uv.lock
 
 indexes_dirnames.json
 tests_logs
@@ -182,3 +182,5 @@ vector_db*
 *.db
 *.sqlite
 /wandb
+model_output/
+my.py

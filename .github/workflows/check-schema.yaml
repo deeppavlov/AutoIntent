@@ -16,18 +16,18 @@ jobs:
       with:
         ref: ${{ github.head_ref }}
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
       with:
-        python-version: '3.10'
+        version: "0.8.8"
 
     - name: Install dependencies
       run: |
-        pip install .
+        uv sync
 
     - name: Generate JSON Schema
       run: |
-        python -m scripts.generate_json_schema_config
+        uv run python -m scripts.generate_json_schema_config
 
     - name: Check for changes in JSON Schema
       id: check_changes

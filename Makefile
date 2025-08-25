@@ -1,47 +1,47 @@
+.PHONY: all
+all: lint
+
 .DEFAULT_GOAL := all
-poetry = poetry run
+
+sh = uv run --no-sync --frozen
 
 .PHONY: install
 install:
-	poetry install --extras "dev test typing docs"
+	rm -rf uv.lock 
+	uv sync --all-groups
 
 .PHONY: test
 test:
-	$(poetry) pytest tests --cov
+	$(sh) pytest tests --cov
 
 .PHONY: test-html
 test-html:
-	$(poetry) pytest --cov --cov-report html
+	$(sh) pytest --cov --cov-report html
 
 .PHONY: typing
 typing:
-	$(poetry) mypy autointent
+	$(sh) mypy src/autointent
 
 .PHONY: lint
 lint:
-	$(poetry) ruff format
-	$(poetry) ruff check --fix
-
-.PHONY: update
-update:
-	rm -f poetry.lock
-	poetry install --extras "dev test typing docs"
+	$(sh) ruff format
+	$(sh) ruff check --fix
 
 .PHONY: docs
 docs:
-	$(poetry) python -m sphinx build -b html docs/source docs/build/html
+	$(sh) python -m sphinx build -b html docs/source docs/build/html
 
 .PHONY: test-docs
 test-docs:
-	$(poetry) python -m sphinx build -b doctest docs/source docs/build/html
+	$(sh) python -m sphinx build -b doctest docs/source docs/build/html
 
 .PHONY: serve-docs
 serve-docs:
-	$(poetry) python -m http.server -d docs/build/html 8333
+	$(sh) python -m http.server -d docs/build/html 8333
 
 .PHONY: multi-version-docs
 multi-version-docs:
-	$(poetry) sphinx-multiversion docs/source docs/build/html
+	$(sh) sphinx-multiversion docs/source docs/build/html
 
 .PHONY: clean-docs
 clean-docs:
@@ -51,7 +51,5 @@ clean-docs:
 
 .PHONY: schema
 schema:
-	$(poetry) python -m scripts.generate_json_schema_config
+	$(sh) python -m scripts.generate_json_schema_config
 
-.PHONY: all
-all: lint

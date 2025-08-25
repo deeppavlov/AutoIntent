@@ -29,7 +29,7 @@ classifiers=[
     'Framework :: Sphinx',
     'Typing :: Typed',
 ]
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "sentence-transformers (>=3,<4)",
     "scikit-learn (>=1.5,<2.0)",
@@ -48,14 +48,50 @@ dependencies = [
     "catboost (>=1.2.8,<2.0.0)",
     "aiometer (>=1.0.0,<2.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
+    "threadpoolctl (>=3.0.0,<4.0.0)",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "tach (>=0.11.3,<1.0.0)",
+dspy = [
+    "dspy (>=2.6.5,<3.0.0)",
+]
+wandb = [
+    "wandb (>=0.19.10,<1.0.0)",
+]
+codecarbon = [
+    "codecarbon (==3.0.0)",
+    "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
+]
+fastapi = [
+    "fastapi (>=0.115, <1.0)",
+    "uvicorn (>=0.24, <1.0)",
+    "pydantic-settings (>=2.0, <3.0)"
+]
+fastmcp = [
+    "pydantic-settings (>=2.0, <3.0)",
+    "fastmcp (>=2.11.3, <3.0)"
+]
+opensearch = [
+    "opensearch-py (>=3.0.0, <4.0.0)",
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { extra = "codecarbon" },
+        { extra = "fastmcp" },
+    ]
+]
+
+[dependency-groups]
+nb = [
     "ipykernel (>=6.29.5,<7.0.0)",
     "ipywidgets (>=8.1.5,<9.0.0)",
+]
+lint = [
     "ruff (==0.8.4)",
+]
+sentencepiece = [
     "sentencepiece (>=0.2.0,<0.3.0)",
 ]
 test = [
@@ -89,16 +125,6 @@ docs = [
     "sphinx-toolbox  (>=4.0.0,<5.0.0)",
     "sphinx-llms-txt (>=0.3.0,<0.4.0)"
 ]
-dspy = [
-    "dspy (>=2.6.5,<3.0.0)",
-]
-wandb = [
-    "wandb (>=0.19.10,<1.0.0)",
-]
-codecarbon = [
-    "codecarbon (>=3.0.2, <3.1.0)",
-    "pynvml (>=8.0.4, <12.0.0)", # to avoid "attribute nvmlDeviceGetTotalEnergyConsumption not found" error
-]
 
 [project.urls]
 Homepage = "https://deeppavlov.github.io/AutoIntent/"
@@ -108,6 +134,10 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "basic-aug" = "autointent.generation.utterances.basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.8.7,<0.9.0"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
@@ -130,11 +160,11 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "D104"]
-"autointent/__init__.py" = ["I001"]
-"autointent/_wrappers/__init__.py" = ["I001"]
+"src/autointent/__init__.py" = ["I001"]
+"src/autointent/_wrappers/__init__.py" = ["I001"]
 "tests/*.py" = ["S", "PLR2004", "ERA", "D", "ANN", "SLF"]
 "tests/context/datahandler/test_data_handler.py" = ["PT011"]
-"autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
+"src/autointent/modules/*" = ["ARG002", "ARG003"]  # unused argument
 "docs/*" = ["INP001", "A001", "D"]
 "*/utils.py" = ["D104", "D100"]
 "*user_guides/*" = ["B018", "E501", "INP001", "T", "D", "E402", "I001", "W292", "ANN202", "ANN001", "ANN201", "PLR2004"]
@@ -145,17 +175,12 @@ max-args = 10
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-
-[build-system]
-requires = ["poetry-core>=2.0"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = [
     "tests",
 ]
-pythonpath = "autointent"
+pythonpath = "src/autointent"
 # `--cov` option breaks pycharm's test debugger
 addopts = """
     -m "not transformers"
@@ -195,7 +220,7 @@ omit = [
 
 [tool.coverage.paths]
 source = [
-    "autointent/",
+    "src/autointent/",
 ]
 
 [tool.coverage.report]
@@ -212,7 +237,7 @@ local_partial_types = true
 plugins = [
     "pydantic.mypy",
 ]
-mypy_path = "autointent"
+mypy_path = "src/autointent"
 disable_error_code = ["override"]
 
 [[tool.mypy.overrides]]
@@ -247,3 +272,9 @@ module = [
 ]
 warn_unreachable = false
 
+[[tool.mypy.overrides]]
+module = [
+    "autointent.server.http",
+    "autointent.server.mcp",
+]
+ignore_errors = true

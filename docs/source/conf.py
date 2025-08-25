@@ -72,7 +72,7 @@ intersphinx_mapping = {
 }
 
 autoapi_keep_files = True
-autoapi_dirs = [Path.cwd().parent.parent / "autointent"]
+autoapi_dirs = [Path.cwd().parent.parent / "src/autointent"]
 autoapi_options = [
     "members",
     "undoc-members",
@@ -187,6 +187,7 @@ smv_remote_whitelist = r"^(origin|upstream)$"  # Use branches from origin and up
 repo_root = Path(__file__).resolve().parents[2]  # if conf.py is in docs/
 
 llms_txt_exclude = ["autoapi*"]
+
 
 def setup(app: Sphinx) -> None:
     generate_versions_json(repo_root, BASE_URL)

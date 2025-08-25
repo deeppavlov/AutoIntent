@@ -9,11 +9,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-          cache: "pip"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.8"
 
       - name: Install dependencies
         run: |
-          pip install .[typing]
+          uv lock
+          uv sync --group typing
 
       - name: Run mypy
-        run: mypy autointent
+        run: uv run mypy src/autointent
