@@ -21,8 +21,9 @@ class EmbedderFineTuningConfig(BaseModel):
     margin: float = Field(default=0.5)
     learning_rate: float = Field(default=2e-5)
     warmup_ratio: float = Field(default=0.1)
-    early_stopping: bool = Field(default=True)
+    early_stopping_patience: int = Field(default=1)
     early_stopping_threshold: float = Field(default=0.0)
+    val_fraction: float = Field(default=0.2)
     fp16: bool = Field(default=False)
     bf16: bool = Field(default=False)
 

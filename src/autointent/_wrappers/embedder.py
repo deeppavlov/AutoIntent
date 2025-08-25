@@ -136,18 +136,15 @@ class Embedder:
 
         self._model = self._load_model()
 
-        if config.early_stopping:
-            x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=0.1, random_state=42)
-            tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
-            val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
-        else:
-            tr_ds = Dataset.from_dict({"text": utterances, "label": labels})
-            val_ds = None
+        x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
+        tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
+        val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
 
         loss = BatchAllTripletLoss(model=self._model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
             args = SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
+                save_total_limit=1,
                 output_dir=tmp_dir,
                 num_train_epochs=config.epoch_num,
                 per_device_train_batch_size=config.batch_size,
@@ -162,14 +159,12 @@ class Embedder:
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
-            callbacks: list[TrainerCallback] = []
-            if config.early_stopping:
-                callbacks.append(
-                    EarlyStoppingCallback(
-                        early_stopping_patience=config.early_stopping,
-                        early_stopping_threshold=config.early_stopping_threshold,
-                    )
+            callbacks: list[TrainerCallback] = [
+                EarlyStoppingCallback(
+                    early_stopping_patience=config.early_stopping_patience,
+                    early_stopping_threshold=config.early_stopping_threshold,
                 )
+            ]
             trainer = SentenceTransformerTrainer(
                 model=self._model,
                 args=args,
