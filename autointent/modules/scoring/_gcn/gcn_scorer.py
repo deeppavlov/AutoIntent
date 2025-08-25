@@ -4,11 +4,9 @@ import numpy.typing as npt
 import torch
 from pydantic import PositiveInt
 from sklearn.model_selection import train_test_split
-from typing_extensions import Self
 
 from autointent import Context, Embedder
 from autointent.configs import (
-    CrossEncoderConfig,
     EarlyStoppingConfig,
     EmbedderConfig,
     TaskTypeEnum,
@@ -20,6 +18,30 @@ from autointent.modules.scoring._torch.base_scorer import BaseTorchTrainerScorer
 
 
 class GCNScorer(BaseTorchTrainerScorer):
+    """Graph Convolutional Network (GCN) scorer for intent classification.
+
+    This module uses a GCN to model label correlations for multi-label text
+    classification. It leverages embeddings for both utterances and labels
+    (descriptions/names) to learn a classifier for each label.
+
+    Args:
+        embedder_config: Config for utterance embedder.
+        label_embedder_config: Config for label description embedder.
+        gcn_hidden_dims: List of hidden dimensions for GCN layers.
+        p_reweight: Reweighting parameter for the correlation matrix.
+        tau_threshold: Threshold for creating the adjacency matrix.
+        num_train_epochs: Number of training epochs.
+        batch_size: Batch size for training.
+        learning_rate: Learning rate for the optimizer.
+        seed: Random seed for reproducibility.
+        device: Device to train on ('cpu', 'cuda', etc.).
+        early_stopping_config: Configuration for early stopping.
+
+    Reference:
+        Yao, L., Mao, C., & Luo, Y. (2019).
+        Graph Convolutional Networks for Text Classification.
+        In Proceedings of the AAAI Conference on Artificial Intelligence.
+    """
     name = "gcn"
     supports_multiclass = True
     supports_multilabel = True
@@ -113,14 +135,14 @@ class GCNScorer(BaseTorchTrainerScorer):
         y_tensor_dtype = torch.float if self._multilabel else torch.long
         y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
-        self.label_embeddings = torch.tensor(
+        label_embeddings = torch.tensor(
             self._label_embedder.embed(descriptions, TaskTypeEnum.classification)
         ).to(self.torch_config.device)
 
         self._model = TextMLGCN(
             num_classes=self._n_classes,
             bert_feature_dim=x_tensor.shape[1],
-            label_embedding_dim=self.label_embeddings.shape[1],
+            label_embedding_dim=label_embeddings.shape[1],
             gcn_hidden_dims=self.gcn_hidden_dims,
             p_reweight=self.p_reweight,
             tau_threshold=self.tau_threshold,
@@ -128,6 +150,7 @@ class GCNScorer(BaseTorchTrainerScorer):
 
         y_corr_tensor = y_tensor if self._multilabel else torch.nn.functional.one_hot(y_tensor, self._n_classes)
         self._model.set_correlation_matrix(y_corr_tensor.float())
+        self._model.set_label_embeddings(label_embeddings)
 
         if self.early_stopping_config.metric is not None:
             train_x, val_x, train_y, val_y = train_test_split(
@@ -139,14 +162,14 @@ class GCNScorer(BaseTorchTrainerScorer):
         else:
             train_x, val_x, train_y, val_y = x_tensor, None, y_tensor, None
 
-        self._train_model(train_x, train_y, val_x, val_y, self.label_embeddings)
+        self._train_model(train_x, train_y, val_x, val_y)
 
     def predict(self, utterances: list[str]) -> npt.NDArray[Any]:
         if not hasattr(self, "_model"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
         x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
-        return self._predict_tensors(x_tensor, self.label_embeddings)
+        return self._predict_tensors(x_tensor)
 
     def clear_cache(self) -> None:
         if hasattr(self, "_model"):
@@ -157,15 +180,3 @@ class GCNScorer(BaseTorchTrainerScorer):
         if hasattr(self, "_label_embedder"):
             self._label_embedder.clear_ram()
             del self._label_embedder
-
-    @classmethod
-    def load(
-        cls,
-        path: str,
-        embedder_config: EmbedderConfig | None = None,
-        cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> Self:
-        instance = super().load(path, embedder_config, cross_encoder_config)
-        if hasattr(instance, "label_embeddings"):
-            instance.label_embeddings = torch.tensor(instance.label_embeddings).to(instance.torch_config.device)
-        return instance

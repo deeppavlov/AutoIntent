@@ -8,7 +8,7 @@ from torch import nn
 from typing_extensions import Self
 
 from autointent._utils import detect_device
-from autointent._wrappers import BaseTorchModuleWithVocab
+from autointent._wrappers import BaseTorchModule
 
 
 class GCNModelDumpMetadata(BaseModel):
@@ -30,10 +30,9 @@ class GCNLayer(nn.Module):
         return torch.matmul(adj_matrix, support)
 
 
-class TextMLGCN(BaseTorchModuleWithVocab):
+class TextMLGCN(BaseTorchModule):
     _metadata_dict_name = "metadata.json"
     _state_dict_name = "state_dict.pt"
-    correlation_matrix: torch.Tensor
 
     def __init__(
         self,
@@ -68,6 +67,7 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         self.activations = nn.ModuleList(activation_layers)
 
         self.register_buffer("correlation_matrix", torch.zeros(num_classes, num_classes))
+        self.register_buffer("label_embeddings", torch.zeros(num_classes, label_embedding_dim))
 
     @staticmethod
     def create_correlation_matrix(
@@ -96,10 +96,13 @@ class TextMLGCN(BaseTorchModuleWithVocab):
         corr_matrix = self.create_correlation_matrix(
             train_labels, self.num_classes, self.p_reweight, self.tau_threshold
         )
-        self.correlation_matrix.copy_(corr_matrix)
+        self.correlation_matrix.data.copy_(corr_matrix)
 
-    def forward(self, bert_features: torch.Tensor, label_embeddings: torch.Tensor) -> torch.Tensor:
-        classifiers = label_embeddings
+    def set_label_embeddings(self, label_embeddings: torch.Tensor) -> None:
+        self.label_embeddings.data.copy_(label_embeddings)
+
+    def forward(self, bert_features: torch.Tensor) -> torch.Tensor:
+        classifiers = self.label_embeddings
         for gcn_layer, activation in zip(self.gcn_layers, self.activations, strict=True):
             classifiers = gcn_layer(self.correlation_matrix, classifiers)
             classifiers = activation(classifiers)
