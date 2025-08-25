@@ -72,9 +72,7 @@ class TextMLGCN(BaseTorchModule):
         self.register_buffer("label_embeddings", torch.zeros(num_classes, label_embedding_dim))
 
     @staticmethod
-    def create_correlation_matrix(
-        train_labels: torch.Tensor, num_classes: int, p: float, tau: float
-    ) -> torch.Tensor:
+    def create_correlation_matrix(train_labels: torch.Tensor, num_classes: int, p: float, tau: float) -> torch.Tensor:
         co_occurrence = train_labels.T @ train_labels
         num_labels_per_class = torch.diagonal(co_occurrence)
 
