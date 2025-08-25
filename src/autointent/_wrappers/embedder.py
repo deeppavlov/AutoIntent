@@ -185,7 +185,7 @@ class Embedder:
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
-        if hasattr(self, "embedding_model"):
+        if hasattr(self, "_model"):
             logger.debug("Clearing embedder %s from memory", self.config.model_name)
             self._model.cpu()
             del self._model
