@@ -33,6 +33,8 @@ class GCNLayer(nn.Module):
 class TextMLGCN(BaseTorchModule):
     _metadata_dict_name = "metadata.json"
     _state_dict_name = "state_dict.pt"
+    correlation_matrix: torch.Tensor
+    label_embeddings: torch.Tensor
 
     def __init__(
         self,
@@ -96,13 +98,13 @@ class TextMLGCN(BaseTorchModule):
         corr_matrix = self.create_correlation_matrix(
             train_labels, self.num_classes, self.p_reweight, self.tau_threshold
         )
-        self.correlation_matrix.data.copy_(corr_matrix)
+        self.correlation_matrix.copy_(corr_matrix)
 
     def set_label_embeddings(self, label_embeddings: torch.Tensor) -> None:
-        self.label_embeddings.data.copy_(label_embeddings)
+        self.label_embeddings.copy_(label_embeddings)
 
     def forward(self, bert_features: torch.Tensor) -> torch.Tensor:
-        classifiers = self.label_embeddings
+        classifiers: torch.Tensor = self.label_embeddings
         for gcn_layer, activation in zip(self.gcn_layers, self.activations, strict=True):
             classifiers = gcn_layer(self.correlation_matrix, classifiers)
             classifiers = activation(classifiers)
