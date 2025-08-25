@@ -58,9 +58,13 @@ class BaseTorchTrainerScorer(BaseScorer):
         self._model.to(self.torch_config.device)
         logger.debug("Model moved to device: %s", self.torch_config.device)
 
+        # Early stopping variables
+
         best_metric = float("-inf")
         patience_counter = 0
         best_model_path: Path | None = None
+
+        # Get metric function if early stopping is enabled
 
         metric_fn = None
         if self.early_stopping_config.metric is not None:
@@ -95,6 +99,8 @@ class BaseTorchTrainerScorer(BaseScorer):
                     if should_stop:
                         logger.debug("Early stopping triggered at epoch %d.", epoch + 1)
                         break
+
+            # this is triggered only if early stoppping is enabled
 
             if best_model_path is not None:
                 logger.debug("Loading best model weights from: %s", best_model_path)

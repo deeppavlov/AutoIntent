@@ -38,15 +38,16 @@ class GCNScorer(BaseTorchTrainerScorer):
         early_stopping_config: Configuration for early stopping.
 
     Reference:
-        Yao, L., Mao, C., & Luo, Y. (2019).
-        Graph Convolutional Networks for Text Classification.
-        In Proceedings of the AAAI Conference on Artificial Intelligence.
+        Chen, Z. M., Wei, X. S., Wang, P., & Guo, Y. (2019).
+        Multi-Label Image Recognition with Graph Convolutional Networks.
+        arXiv preprint arXiv:1904.03582.
     """
+
     name = "gcn"
     supports_multiclass = True
     supports_multilabel = True
 
-    def __init__( # noqa: PLR0913
+    def __init__(  # noqa: PLR0913
         self,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         label_embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
@@ -135,9 +136,9 @@ class GCNScorer(BaseTorchTrainerScorer):
         y_tensor_dtype = torch.float if self._multilabel else torch.long
         y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
-        label_embeddings = torch.tensor(
-            self._label_embedder.embed(descriptions, TaskTypeEnum.classification)
-        ).to(self.torch_config.device)
+        label_embeddings = torch.tensor(self._label_embedder.embed(descriptions, TaskTypeEnum.classification)).to(
+            self.torch_config.device
+        )
 
         self._model = TextMLGCN(
             num_classes=self._n_classes,
