@@ -317,4 +317,3 @@ def main() -> None:
         mcp.run()
     else:
         mcp.run(transport=settings.transport, host=settings.host, port=settings.port)
-
