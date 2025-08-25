@@ -1,11 +1,11 @@
-from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import EmbedderConfig
+from autointent import Embedder
+from autointent.configs import EmbedderConfig, TokenizerConfig
 
 
 def test_hash_consistency():
     """Test that hash generation is consistent for same configuration."""
-    config1 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", batch_size=4)
-    config2 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", batch_size=4)
+    config1 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo")
+    config2 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo")
 
     embedder1 = Embedder(config1)
     embedder2 = Embedder(config2)
@@ -16,8 +16,8 @@ def test_hash_consistency():
 
 def test_hash_different_for_different_configs():
     """Test that different configurations produce different hashes."""
-    config1 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", batch_size=4)
-    config2 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", batch_size=8)
+    config1 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", tokenizer_config=TokenizerConfig(max_length=12))
+    config2 = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", tokenizer_config=TokenizerConfig(max_length=13))
 
     embedder1 = Embedder(config1)
     embedder2 = Embedder(config2)

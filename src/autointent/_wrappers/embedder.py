@@ -85,7 +85,7 @@ class Embedder:
         Args:
             embedder_config: Config of embedder.
         """
-        self.config = embedder_config
+        self.config = embedder_config.model_copy(deep=True)
 
     def _get_hash(self) -> int:
         """Compute a hash value for the Embedder.
