@@ -10,6 +10,7 @@ import shutil
 import tempfile
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal, cast, overload
 from uuid import uuid4
 
 import huggingface_hub
@@ -235,6 +236,21 @@ class Embedder:
 
         return cls(EmbedderConfig(**kwargs))
 
+    @overload
+    def embed(
+        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
+    ) -> torch.Tensor: ...
+
+    @overload
+    def embed(
+        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
+    ) -> npt.NDArray[np.float32]: ...
+
+    @overload
+    def embed(
+        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: bool = False
+    ) -> npt.NDArray[np.float32] | torch.Tensor: ...
+
     def embed(
         self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
     ) -> npt.NDArray[np.float32] | torch.Tensor:
@@ -266,10 +282,10 @@ class Embedder:
             embeddings_path = _get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = np.load(embeddings_path)
+                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
                 if return_tensors:
                     return torch.from_numpy(embeddings_np).to(self.config.device)
-                return embeddings_np  # type: ignore[no-any-return]
+                return embeddings_np
 
         self._model = self._load_model()
 
@@ -285,21 +301,33 @@ class Embedder:
         if self.config.tokenizer_config.max_length is not None:
             self._model.max_seq_length = self.config.tokenizer_config.max_length
 
-        embeddings = self._model.encode(
-            utterances,
-            convert_to_numpy=not return_tensors,
-            convert_to_tensor=return_tensors,
-            batch_size=self.config.batch_size,
-            normalize_embeddings=True,
-            prompt=prompt,
-        )
+        embeddings: npt.NDArray[np.float32] | torch.Tensor
+        if return_tensors:
+            embeddings = self._model.encode(
+                utterances,
+                convert_to_tensor=True,
+                batch_size=self.config.batch_size,
+                normalize_embeddings=True,
+                prompt=prompt,
+            )
+        else:
+            embeddings = cast(
+                npt.NDArray[np.float32],
+                self._model.encode(
+                    utterances,
+                    convert_to_numpy=True,
+                    batch_size=self.config.batch_size,
+                    normalize_embeddings=True,
+                    prompt=prompt,
+                ),
+            )
 
         if self.config.use_cache:
-            embeddings_to_save = embeddings
-            if return_tensors:
-                embeddings_to_save = embeddings.cpu().numpy()
             embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(embeddings_path, embeddings_to_save)
+            if isinstance(embeddings, torch.Tensor):
+                np.save(embeddings_path, embeddings.cpu().numpy())
+            else:
+                np.save(embeddings_path, embeddings)
 
         return embeddings
 
