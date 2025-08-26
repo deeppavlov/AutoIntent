@@ -132,13 +132,13 @@ class GCNScorer(BaseTorchTrainerScorer):
         self._embedder = Embedder(self.embedder_config)
         self._label_embedder = Embedder(self.label_embedder_config)
 
-        x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
+        x_tensor = self._embedder.embed(utterances, TaskTypeEnum.classification, return_tensors=True)
         y_tensor_dtype = torch.float if self._multilabel else torch.long
         y_tensor = torch.tensor(labels, dtype=y_tensor_dtype)
 
-        label_embeddings = torch.tensor(self._label_embedder.embed(descriptions, TaskTypeEnum.classification)).to(
-            self.torch_config.device
-        )
+        label_embeddings = self._label_embedder.embed(
+            descriptions, TaskTypeEnum.classification, return_tensors=True
+        ).to(self.torch_config.device)
 
         self._model = TextMLGCN(
             num_classes=self._n_classes,
@@ -169,7 +169,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         if not hasattr(self, "_model"):
             msg = "Model is not trained. Call fit() first."
             raise RuntimeError(msg)
-        x_tensor = torch.tensor(self._embedder.embed(utterances, TaskTypeEnum.classification))
+        x_tensor = self._embedder.embed(utterances, TaskTypeEnum.classification, return_tensors=True)
         return self._predict_tensors(x_tensor)
 
     def clear_cache(self) -> None:
