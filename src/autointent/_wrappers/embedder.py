@@ -246,11 +246,6 @@ class Embedder:
         self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
     ) -> npt.NDArray[np.float32]: ...
 
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: bool = False
-    ) -> npt.NDArray[np.float32] | torch.Tensor: ...
-
     def embed(
         self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
     ) -> npt.NDArray[np.float32] | torch.Tensor:
