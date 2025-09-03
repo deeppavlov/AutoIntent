@@ -15,7 +15,8 @@ from typing_extensions import assert_never
 
 from autointent import Context
 from autointent._dump_tools import Dumper
-from autointent.configs._transformers import CrossEncoderConfig, EmbedderConfig
+from autointent.configs._embedder import EmbedderConfig
+from autointent.configs._transformers import CrossEncoderConfig
 from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Message, Role
 

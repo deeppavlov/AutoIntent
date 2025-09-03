@@ -25,15 +25,13 @@ class BaseEmbeddingBackend(ABC):
     @abstractmethod
     def embed(
         self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
-    ) -> torch.Tensor:
-        ...
+    ) -> torch.Tensor: ...
 
     @overload
     @abstractmethod
     def embed(
         self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
-    ) -> npt.NDArray[np.float32]:
-        ...
+    ) -> npt.NDArray[np.float32]: ...
 
     @abstractmethod
     def embed(
