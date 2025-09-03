@@ -8,7 +8,12 @@ from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
 from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent.configs import (
+    EmbedderConfig,
+    VectorIndexConfig,
+    get_default_vector_index_config,
+    initialize_embedder_config,
+)
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -70,7 +75,7 @@ class MLKnnScorer(BaseScorer):
         vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.k = k
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self.s = s
         self.ignore_first_neighbours = ignore_first_neighbours
         self.vector_index_config = vector_index_config or get_default_vector_index_config()

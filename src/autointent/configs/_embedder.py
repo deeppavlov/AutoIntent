@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -98,5 +99,15 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     )
 
 
-def get_default_embedder_config() -> EmbedderConfig:
-    return SentenceTransformerEmbeddingConfig()
+def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401
+    return SentenceTransformerEmbeddingConfig(**kwargs)
+
+
+def initialize_embedder_config(values: dict[str, Any] | str | EmbedderConfig | None) -> EmbedderConfig:
+    if values is None:
+        return get_default_embedder_config()
+    if isinstance(values, EmbedderConfig):
+        return values.model_copy(deep=True)
+    if isinstance(values, str):
+        return get_default_embedder_config(model_name=values)
+    return get_default_embedder_config(**values)

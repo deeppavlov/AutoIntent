@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -62,7 +62,7 @@ class LinearScorer(BaseScorer):
     ) -> None:
         self.cv = cv
         self.seed = seed
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
 
         if self.cv < 0 or not isinstance(self.cv, int):
             msg = "`cv` argument of `LinearScorer` must be a positive int"

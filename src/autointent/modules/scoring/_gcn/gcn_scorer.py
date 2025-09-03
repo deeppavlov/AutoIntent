@@ -11,6 +11,7 @@ from autointent.configs import (
     EmbedderConfig,
     TaskTypeEnum,
     TorchTrainingConfig,
+    initialize_embedder_config,
 )
 from autointent.custom_types import ListOfLabels
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
@@ -63,8 +64,8 @@ class GCNScorer(BaseTorchTrainerScorer):
     ) -> None:
         if gcn_hidden_dims is None:
             gcn_hidden_dims = [1024]
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
-        self.label_embedder_config = EmbedderConfig.from_search_config(label_embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
+        self.label_embedder_config = initialize_embedder_config(label_embedder_config)
         self.gcn_hidden_dims = gcn_hidden_dims
         self.p_reweight = p_reweight
         self.tau_threshold = tau_threshold

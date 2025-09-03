@@ -6,6 +6,7 @@ from ._embedder import (
     SentenceTransformerEmbeddingConfig,
     TaskTypeEnum,
     get_default_embedder_config,
+    initialize_embedder_config,
 )
 from ._inference_node import InferenceNodeConfig
 from ._optimization import DataConfig, HPOConfig, LoggingConfig
@@ -40,4 +41,5 @@ __all__ = [
     "VocabConfig",
     "get_default_embedder_config",
     "get_default_vector_index_config",
+    "initialize_embedder_config",
 ]

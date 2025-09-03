@@ -73,7 +73,7 @@ class VectorIndex:
             msg = f"Texts and labels lengths mismatch: {len(texts)=} !] {len(labels)=}"
             raise ValueError(msg)
 
-        logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
+        logger.debug("Adding embeddings to vector index")
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
@@ -85,7 +85,7 @@ class VectorIndex:
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
+        logger.debug("Clearing vector index from RAM")
         self.embedder.clear_ram()
         self.index.clear_ram()
 

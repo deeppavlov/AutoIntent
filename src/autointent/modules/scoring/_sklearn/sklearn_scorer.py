@@ -11,7 +11,7 @@ from sklearn.utils import all_estimators
 from typing_extensions import Self
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -69,7 +69,7 @@ class SklearnScorer(BaseScorer):
         Raises:
             ValueError: If the specified classifier doesn't exist or lacks predict_proba
         """
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self.clf_name = clf_name
 
         clf_type = AVAILABLE_CLASSIFIERS.get(self.clf_name, None)

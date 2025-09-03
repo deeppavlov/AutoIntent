@@ -38,7 +38,10 @@ class BaseEmbeddingBackend(ABC):
 
     @abstractmethod
     def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
+        self,
+        utterances: list[str],
+        task_type: TaskTypeEnum | None = None,
+        return_tensors: bool = False,
     ) -> npt.NDArray[np.float32] | torch.Tensor:
         """Calculate embeddings for a list of utterances.
 

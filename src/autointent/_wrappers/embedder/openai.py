@@ -2,13 +2,14 @@ import asyncio
 import logging
 from functools import partial
 from pathlib import Path
-from typing import Literal, overload
+from typing import Literal, TypedDict, cast, overload
 
 import aiometer
 import numpy as np
 import numpy.typing as npt
 import openai
 import torch
+from typing_extensions import NotRequired
 
 from autointent._hash import Hasher
 from autointent.configs import TaskTypeEnum
@@ -18,6 +19,12 @@ from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
 
 logger = logging.getLogger(__name__)
+
+
+class EmbeddingsCreateKwargs(TypedDict):
+    input: list[str]
+    model: str
+    dimensions: NotRequired[int]
 
 
 class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
@@ -30,9 +37,10 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             config: Configuration for OpenAI embeddings.
         """
         self.config = config
-        self._client = None
-        self._async_client = None
-        self._event_loop = None
+        self._client: openai.OpenAI | None = None
+        self._async_client: openai.AsyncOpenAI | None = None
+        self._event_loop: asyncio.AbstractEventLoop | None = None
+
         if config.max_concurrent is not None:
             self._init_event_loop()
 
@@ -124,7 +132,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = np.load(embeddings_path).astype(np.float32)
+                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
                 if return_tensors:
                     return torch.from_numpy(embeddings_np)
                 return embeddings_np
@@ -162,7 +170,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             batch = utterances[i : i + self.config.batch_size]
 
             # Prepare API call parameters
-            kwargs = {
+            kwargs: EmbeddingsCreateKwargs = {
                 "input": batch,
                 "model": self.config.model_name,
             }
@@ -198,6 +206,9 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             max_at_once=self.config.max_concurrent,
             max_per_second=self.config.max_per_second,
         )
+        if self._event_loop is None:
+            msg = "Event loop is not initialized"
+            raise RuntimeError(msg)
         batch_results = self._event_loop.run_until_complete(task)
 
         # Flatten results
@@ -210,7 +221,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         client = self._get_async_client()
 
         # Prepare API call parameters
-        kwargs = {
+        kwargs: EmbeddingsCreateKwargs = {
             "input": batch,
             "model": self.config.model_name,
         }
@@ -246,7 +257,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Calculate cosine similarity
         similarity_matrix = np.dot(normalized1, normalized2.T)
-        return similarity_matrix.astype(np.float32)
+        return cast(npt.NDArray[np.float32], similarity_matrix)
 
     def dump(self, path: Path) -> None:
         """Save the backend state to disk.

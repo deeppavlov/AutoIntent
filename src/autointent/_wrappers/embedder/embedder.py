@@ -13,7 +13,6 @@ from typing import Literal, overload
 import numpy as np
 import numpy.typing as npt
 import torch
-from typing_extensions import assert_never
 
 from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import EmbedderConfig, OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
@@ -54,10 +53,9 @@ class Embedder:
         if isinstance(self.config, OpenaiEmbeddingConfig):
             return OpenaiEmbeddingBackend(self.config)
         # Check if it's exactly the abstract base config (not a subclass)
-        if type(self.config) is EmbedderConfig:
-            msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
-            raise TypeError(msg)
-        assert_never(self.config)
+
+        msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
+        raise TypeError(msg)
 
     def _get_hash(self) -> int:
         """Compute a hash value for the Embedder.
@@ -149,13 +147,9 @@ class Embedder:
             instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)  # noqa: SLF001
         elif isinstance(config, OpenaiEmbeddingConfig):
             instance._backend = OpenaiEmbeddingBackend.load(backend_path)  # noqa: SLF001
-        # Check if it's exactly the abstract base config (not a subclass)
-        elif type(config) is EmbedderConfig:
-            # Handle abstract base config case
+        else:
             msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
             raise TypeError(msg)
-        else:
-            assert_never(config)
 
         return instance
 
@@ -170,7 +164,10 @@ class Embedder:
     ) -> npt.NDArray[np.float32]: ...
 
     def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
+        self,
+        utterances: list[str],
+        task_type: TaskTypeEnum | None = None,
+        return_tensors: bool = False,
     ) -> npt.NDArray[np.float32] | torch.Tensor:
         """Calculate embeddings for a list of utterances.
 
@@ -182,7 +179,7 @@ class Embedder:
         Returns:
             A numpy array or PyTorch tensor of embeddings.
         """
-        return self._backend.embed(utterances, task_type, return_tensors=return_tensors)
+        return self._backend.embed(utterances=utterances, task_type=task_type, return_tensors=return_tensors)
 
     def similarity(
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
