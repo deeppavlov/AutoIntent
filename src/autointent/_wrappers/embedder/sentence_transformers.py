@@ -9,7 +9,6 @@ import huggingface_hub
 import numpy as np
 import numpy.typing as npt
 import torch
-from appdirs import user_cache_dir
 from datasets import Dataset
 from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
 from sentence_transformers.losses import BatchAllTripletLoss
@@ -24,25 +23,9 @@ from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
 from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
+from .utils import get_embeddings_path
 
 logger = logging.getLogger(__name__)
-
-
-def _get_embeddings_path(filename: str) -> Path:
-    """Get the path to the embeddings file.
-
-    This function constructs the full path to an embeddings file stored
-    in a specific directory under the user's home directory. The embeddings
-    file is named based on the provided filename, with the `.npy` extension
-    added.
-
-    Args:
-        filename: The name of the embeddings file (without extension).
-
-    Returns:
-        The full path to the embeddings file.
-    """
-    return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
 
 
 @lru_cache(maxsize=128)
@@ -64,6 +47,8 @@ def _get_latest_commit_hash(model_name: str) -> str:
 
 class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
     """SentenceTransformer-based embedding backend implementation."""
+
+    supports_training: bool = True
 
     def __init__(self, config: SentenceTransformerEmbeddingConfig) -> None:
         """Initialize the SentenceTransformer backend.
@@ -152,7 +137,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             if prompt:
                 hasher.update(prompt)
 
-            embeddings_path = _get_embeddings_path(hasher.hexdigest())
+            embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
                 embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
@@ -290,3 +275,68 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         self.config.model_name = model_path
 
         self._trained = True
+
+    def dump(self, path: Path) -> None:
+        """Save the backend state to disk.
+
+        Args:
+            path: Path to the directory where the backend will be saved.
+        """
+        import json
+
+        path.mkdir(parents=True, exist_ok=True)
+
+        # Save the configuration
+        config_path = path / "config.json"
+        with config_path.open("w", encoding="utf-8") as file:
+            json.dump(self.config.model_dump(mode="json"), file, indent=4, ensure_ascii=False)
+
+        # Save trained model if exists
+        if self._trained and hasattr(self, "_model") and self._model is not None:
+            model_path = path / "sentence_transformer"
+            self._model.save(str(model_path), create_model_card=False)
+
+            # Save training state
+            training_state_path = path / "training_state.json"
+            with training_state_path.open("w", encoding="utf-8") as file:
+                json.dump({"trained": True}, file, indent=4)
+
+    @classmethod
+    def load(cls, path: Path) -> "SentenceTransformerEmbeddingBackend":
+        """Load the backend state from disk.
+
+        Args:
+            path: Path to the directory where the backend is stored.
+
+        Returns:
+            Loaded backend instance.
+        """
+        import json
+
+        from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
+
+        # Load configuration
+        config_path = path / "config.json"
+        with config_path.open("r", encoding="utf-8") as file:
+            config_data = json.load(file)
+
+        config = SentenceTransformerEmbeddingConfig.model_validate(config_data)
+
+        # Check if a trained model exists
+        model_path = path / "sentence_transformer"
+        training_state_path = path / "training_state.json"
+
+        if model_path.exists() and training_state_path.exists():
+            # Update config to point to the saved model
+            config.model_name = str(model_path)
+
+        # Create instance
+        instance = cls(config)
+
+        # Set training state if applicable
+        if training_state_path.exists():
+            with training_state_path.open("r", encoding="utf-8") as file:
+                training_state = json.load(file)
+            instance._trained = training_state.get("trained", False)  # noqa: SLF001
+
+        return instance

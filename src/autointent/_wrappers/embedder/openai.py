@@ -1,38 +1,23 @@
+import asyncio
 import logging
-import time
+from functools import partial
 from pathlib import Path
 from typing import Literal, overload
 
+import aiometer
 import numpy as np
 import numpy.typing as npt
 import openai
 import torch
-from appdirs import user_cache_dir
 
 from autointent._hash import Hasher
 from autointent.configs import TaskTypeEnum
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
+from .utils import get_embeddings_path
 
 logger = logging.getLogger(__name__)
-
-
-def _get_embeddings_path(filename: str) -> Path:
-    """Get the path to the embeddings file.
-
-    This function constructs the full path to an embeddings file stored
-    in a specific directory under the user's home directory. The embeddings
-    file is named based on the provided filename, with the `.npy` extension
-    added.
-
-    Args:
-        filename: The name of the embeddings file (without extension).
-
-    Returns:
-        The full path to the embeddings file.
-    """
-    return Path(user_cache_dir("autointent")) / "embeddings" / f"{filename}.npy"
 
 
 class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
@@ -46,6 +31,10 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         """
         self.config = config
         self._client = None
+        self._async_client = None
+        self._event_loop = None
+        if config.max_concurrent is not None:
+            self._init_event_loop()
 
     def _get_client(self) -> openai.OpenAI:
         """Get or create OpenAI client instance."""
@@ -56,6 +45,29 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 max_retries=self.config.max_retries,
             )
         return self._client
+
+    def _get_async_client(self) -> openai.AsyncOpenAI:
+        """Get or create async OpenAI client instance."""
+        if self._async_client is None:
+            self._async_client = openai.AsyncOpenAI(
+                api_key=self.config.api_key,
+                timeout=self.config.timeout,
+                max_retries=self.config.max_retries,
+            )
+        return self._async_client
+
+    def _init_event_loop(self) -> None:
+        """Initialize the asyncio event loop for async processing."""
+        if self.config.max_concurrent is not None:
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_closed():
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+            self._event_loop = loop
 
     def clear_ram(self) -> None:
         """Clear the backend from RAM. For OpenAI, this is a no-op."""
@@ -85,7 +97,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         Args:
             utterances: List of input texts to calculate embeddings for.
-            task_type: Type of task for which embeddings are calculated (unused for OpenAI).
+            task_type: Type of task for which embeddings are calculated.
             return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
 
         Returns:
@@ -96,13 +108,20 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             logger.error(msg)
             raise ValueError(msg)
 
+        # Apply task-specific prompt
+        prompt = self.config.get_prompt(task_type)
+        if prompt:
+            utterances = [f"{prompt} {utterance}" for utterance in utterances]
+
         if self.config.use_cache:
             logger.debug("Using cached embeddings for %s", self.config.model_name)
             hasher = Hasher()
             hasher.update(self.get_hash())
             hasher.update(utterances)
+            if prompt:
+                hasher.update(prompt)
 
-            embeddings_path = _get_embeddings_path(hasher.hexdigest())
+            embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
                 embeddings_np = np.load(embeddings_path).astype(np.float32)
@@ -110,15 +129,32 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                     return torch.from_numpy(embeddings_np)
                 return embeddings_np
 
-        client = self._get_client()
-
         logger.debug(
-            "Calculating embeddings with OpenAI model %s, batch_size=%d, dimensions=%s",
+            "Calculating embeddings with OpenAI model %s, batch_size=%d, dimensions=%s, prompt=%s, max_concurrent=%s",
             self.config.model_name,
             self.config.batch_size,
             str(self.config.dimensions),
+            prompt,
+            self.config.max_concurrent,
         )
 
+        # Use async processing if max_concurrent is specified
+        if self.config.max_concurrent is not None:
+            embeddings_np = self._process_embeddings_async(utterances)
+        else:
+            embeddings_np = self._process_embeddings_sync(utterances)
+
+        if self.config.use_cache:
+            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
+            np.save(embeddings_path, embeddings_np)
+
+        if return_tensors:
+            return torch.from_numpy(embeddings_np)
+        return embeddings_np
+
+    def _process_embeddings_sync(self, utterances: list[str]) -> np.ndarray:
+        """Process embeddings synchronously."""
+        client = self._get_client()
         all_embeddings = []
 
         # Process in batches
@@ -138,24 +174,56 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 batch_embeddings = [data.embedding for data in response.data]
                 all_embeddings.extend(batch_embeddings)
 
-                # Add small delay to avoid rate limiting
-                if i + self.config.batch_size < len(utterances):
-                    time.sleep(0.1)
-
             except Exception as e:
                 msg = "Error calling OpenAI API"
                 logger.exception(msg)
                 raise RuntimeError(msg) from e
 
-        embeddings_np = np.array(all_embeddings, dtype=np.float32)
+        return np.array(all_embeddings, dtype=np.float32)
 
-        if self.config.use_cache:
-            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(embeddings_path, embeddings_np)
+    def _process_embeddings_async(self, utterances: list[str]) -> np.ndarray:
+        """Process embeddings asynchronously using aiometer."""
+        # Create batches
+        batches = []
+        for i in range(0, len(utterances), self.config.batch_size):
+            batch = utterances[i : i + self.config.batch_size]
+            batches.append(batch)
 
-        if return_tensors:
-            return torch.from_numpy(embeddings_np)
-        return embeddings_np
+        # Create async tasks
+        tasks = [partial(self._process_batch_async, batch) for batch in batches]
+
+        # Run tasks with aiometer
+        task = aiometer.run_all(
+            tasks,
+            max_at_once=self.config.max_concurrent,
+            max_per_second=self.config.max_per_second,
+        )
+        batch_results = self._event_loop.run_until_complete(task)
+
+        # Flatten results
+        all_embeddings = [e for batch_embeddings in batch_results for e in batch_embeddings]
+
+        return np.array(all_embeddings, dtype=np.float32)
+
+    async def _process_batch_async(self, batch: list[str]) -> list[list[float]]:
+        """Process a single batch asynchronously."""
+        client = self._get_async_client()
+
+        # Prepare API call parameters
+        kwargs = {
+            "input": batch,
+            "model": self.config.model_name,
+        }
+        if self.config.dimensions is not None:
+            kwargs["dimensions"] = self.config.dimensions
+
+        try:
+            response = await client.embeddings.create(**kwargs)
+            return [data.embedding for data in response.data]
+        except Exception as e:
+            msg = f"Error calling OpenAI API for batch: {e}"
+            logger.exception(msg)
+            raise RuntimeError(msg) from e
 
     def similarity(
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
@@ -179,3 +247,42 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         # Calculate cosine similarity
         similarity_matrix = np.dot(normalized1, normalized2.T)
         return similarity_matrix.astype(np.float32)
+
+    def dump(self, path: Path) -> None:
+        """Save the backend state to disk.
+
+        Args:
+            path: Path to the directory where the backend will be saved.
+        """
+        import json
+
+        path.mkdir(parents=True, exist_ok=True)
+
+        # Save the configuration
+        config_path = path / "config.json"
+        with config_path.open("w", encoding="utf-8") as file:
+            json.dump(self.config.model_dump(mode="json"), file, indent=4, ensure_ascii=False)
+
+    @classmethod
+    def load(cls, path: Path) -> "OpenaiEmbeddingBackend":
+        """Load the backend state from disk.
+
+        Args:
+            path: Path to the directory where the backend is stored.
+
+        Returns:
+            Loaded backend instance.
+        """
+        import json
+
+        from autointent.configs._embedder import OpenaiEmbeddingConfig
+
+        # Load configuration
+        config_path = path / "config.json"
+        with config_path.open("r", encoding="utf-8") as file:
+            config_data = json.load(file)
+
+        config = OpenaiEmbeddingConfig.model_validate(config_data)
+
+        # Create instance
+        return cls(config)

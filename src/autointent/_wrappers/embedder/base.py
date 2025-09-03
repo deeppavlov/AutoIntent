@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Literal, overload
 
 import numpy as np
@@ -10,6 +11,8 @@ from autointent.configs import EmbedderConfig, TaskTypeEnum
 
 class BaseEmbeddingBackend(ABC):
     """Abstract base class for embedding backends."""
+
+    supports_training: bool = False
 
     @abstractmethod
     def __init__(self, config: EmbedderConfig) -> None:
@@ -70,5 +73,27 @@ class BaseEmbeddingBackend(ABC):
 
         Returns:
             The hash value of the backend.
+        """
+        ...
+
+    @abstractmethod
+    def dump(self, path: Path) -> None:
+        """Save the backend state to disk.
+
+        Args:
+            path: Path to the directory where the backend will be saved.
+        """
+        ...
+
+    @classmethod
+    @abstractmethod
+    def load(cls, path: Path) -> "BaseEmbeddingBackend":
+        """Load the backend state from disk.
+
+        Args:
+            path: Path to the directory where the backend is stored.
+
+        Returns:
+            Loaded backend instance.
         """
         ...

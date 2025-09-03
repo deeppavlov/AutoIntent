@@ -68,18 +68,23 @@ class Embedder:
         return self._backend.get_hash()
 
     def train(self, utterances: list[str], labels: ListOfLabels, config: EmbedderFineTuningConfig) -> None:
-        """Train the embedding model (only supported for SentenceTransformer backend).
+        """Train the embedding model (only supported for backends with training support).
 
         Args:
             utterances: List of training utterances.
             labels: List of labels corresponding to utterances.
             config: Fine-tuning configuration.
         """
-        if not isinstance(self._backend, SentenceTransformerEmbeddingBackend):
-            msg = "Training is only supported for SentenceTransformer backend"
+        if not self._backend.supports_training:
+            msg = f"Training is not supported for {self._backend.__class__.__name__} backend"
             raise NotImplementedError(msg)
 
-        self._backend.train(utterances, labels, config)
+        # Only SentenceTransformer backend currently implements training
+        if isinstance(self._backend, SentenceTransformerEmbeddingBackend):
+            self._backend.train(utterances, labels, config)
+        else:
+            msg = f"Training method not implemented for {self._backend.__class__.__name__}"
+            raise NotImplementedError(msg)
 
     def clear_ram(self) -> None:
         """Move the embedding model to CPU and delete it from memory."""
@@ -97,21 +102,11 @@ class Embedder:
         Args:
             path: Path to the directory where the model will be saved.
         """
-        # Handle SentenceTransformer specific dumping
-        if (
-            isinstance(self._backend, SentenceTransformerEmbeddingBackend)
-            and hasattr(self._backend, "_trained")
-            and self._backend._trained
-        ):
-            model_path = str((path / self._weights_dir_name).resolve())
-            if hasattr(self._backend, "_model") and self._backend._model is not None:
-                self._backend._model.save(model_path, create_model_card=False)
-                self.config.model_name = model_path
-
         self._dump_dir = path
         path.mkdir(parents=True, exist_ok=True)
-        with (path / self._metadata_dict_name).open("w") as file:
-            json.dump(self.config.model_dump(mode="json"), file, indent=4)
+
+        # Delegate to backend
+        self._backend.dump(path)
 
     @classmethod
     def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
@@ -121,28 +116,59 @@ class Embedder:
             path: Path to the directory where the model is stored.
             override_config: one can override presaved settings
         """
-        with (Path(path) / cls._metadata_dict_name).open(encoding="utf-8") as file:
-            config_data = json.load(file)
+        path = Path(path)
 
-        # Determine the config type based on the saved data
-        if "api_key" in config_data or "openai" in config_data.get("model_name", "").lower():
-            config = OpenaiEmbeddingConfig.model_validate(config_data)
-        else:
-            config = SentenceTransformerEmbeddingConfig.model_validate(config_data)
+        # Try to load from backend first (new format)
+        config_path = path / "config.json"
+        if config_path.exists():
+            with config_path.open(encoding="utf-8") as file:
+                config_data = json.load(file)
 
-        if override_config is not None:
-            kwargs = {**config.model_dump(), **override_config.model_dump(exclude_unset=True)}
-            if isinstance(config, SentenceTransformerEmbeddingConfig):
-                config = SentenceTransformerEmbeddingConfig(**kwargs)
+            # Determine backend type from config data
+            if "api_key" in config_data or "max_concurrent" in config_data:
+                backend = OpenaiEmbeddingBackend.load(path)
             else:
-                config = OpenaiEmbeddingConfig(**kwargs)
+                backend = SentenceTransformerEmbeddingBackend.load(path)
 
-        # Handle legacy max_length field
-        max_length = config_data.get("max_length")
-        if max_length is not None and isinstance(config, SentenceTransformerEmbeddingConfig):
-            config.tokenizer_config.max_length = max_length
+            # Apply override config if provided
+            if override_config is not None:
+                config_dict = {**backend.config.model_dump(), **override_config.model_dump(exclude_unset=True)}
+                if isinstance(backend, OpenaiEmbeddingBackend):
+                    backend.config = OpenaiEmbeddingConfig(**config_dict)
+                else:
+                    backend.config = SentenceTransformerEmbeddingConfig(**config_dict)
 
-        return cls(config)
+            # Create Embedder instance and set backend directly
+            instance = cls.__new__(cls)
+            instance.config = backend.config
+            instance._backend = backend
+            instance._dump_dir = path
+            return instance
+
+        # Fallback to legacy format (deprecated)
+        else:
+            with (path / cls._metadata_dict_name).open(encoding="utf-8") as file:
+                config_data = json.load(file)
+
+            # Determine the config type based on the saved data
+            if "api_key" in config_data or "openai" in config_data.get("model_name", "").lower():
+                config = OpenaiEmbeddingConfig.model_validate(config_data)
+            else:
+                config = SentenceTransformerEmbeddingConfig.model_validate(config_data)
+
+            if override_config is not None:
+                kwargs = {**config.model_dump(), **override_config.model_dump(exclude_unset=True)}
+                if isinstance(config, SentenceTransformerEmbeddingConfig):
+                    config = SentenceTransformerEmbeddingConfig(**kwargs)
+                else:
+                    config = OpenaiEmbeddingConfig(**kwargs)
+
+            # Handle legacy max_length field
+            max_length = config_data.get("max_length")
+            if max_length is not None and isinstance(config, SentenceTransformerEmbeddingConfig):
+                config.tokenizer_config.max_length = max_length
+
+            return cls(config)
 
     @overload
     def embed(
