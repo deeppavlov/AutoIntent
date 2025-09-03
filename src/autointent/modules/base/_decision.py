@@ -105,7 +105,7 @@ class BaseDecision(BaseModule, ABC):
                 metrics_values[name].append(fn(val_labels, val_decisions))
             all_val_decisions.append(val_decisions)
 
-        flattened_decisions = [pred for pred_list in all_val_decisions for pred in pred_list]  # type: ignore[misc]
+        flattened_decisions = [pred for pred_list in all_val_decisions for pred in pred_list]
         self._artifact = DecisionArtifact(labels=cast(ListOfLabelsWithOOS, flattened_decisions))
         return {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
 

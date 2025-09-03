@@ -112,7 +112,7 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def from_preset(cls, name: SearchSpacePreset, seed: int | None = 42) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePreset, seed: int = 42) -> "Pipeline":
         """Instantiate pipeline optimizer from a preset."""
         optimization_config = load_preset(name)
         config = OptimizationConfig(seed=seed, **optimization_config)
@@ -396,6 +396,19 @@ class Pipeline:
         decision_module.clear_cache()
         decision_module.fit(scores, context.data_handler.train_labels(1), context.data_handler.tags)
 
+    def _convert_score_to_float_list(self, score: Any) -> list[float]:  # noqa: ANN401
+        """Convert score to list of floats for InferencePipelineUtteranceOutput."""
+        if hasattr(score, "tolist"):
+            result = score.tolist()
+            return result if isinstance(result, list) else [float(result)]
+        if score is None:
+            return []
+        if isinstance(score, int | float):
+            return [float(score)]
+        if hasattr(score, "__iter__") and not isinstance(score, str):
+            return [float(x) for x in score]
+        return [float(score)]
+
     def predict_with_metadata(self, utterances: list[str]) -> InferencePipelineOutput:
         """Predict the labels for the utterances with metadata.
 
@@ -423,13 +436,13 @@ class Pipeline:
                 regex_prediction_metadata=regex_predictions_metadata[idx]
                 if regex_predictions_metadata is not None
                 else None,
-                score=scores[idx],
+                score=self._convert_score_to_float_list(scores[idx]),
                 score_metadata=scores_metadata[idx] if scores_metadata is not None else None,
             )
             outputs.append(output)
 
         return InferencePipelineOutput(
-            predictions=predictions,
+            predictions=predictions,  # type: ignore[arg-type]
             regex_predictions=regex_predictions,
             utterances=outputs,
         )

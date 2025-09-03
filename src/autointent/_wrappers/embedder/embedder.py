@@ -179,7 +179,9 @@ class Embedder:
         Returns:
             A numpy array or PyTorch tensor of embeddings.
         """
-        return self._backend.embed(utterances, task_type, return_tensors=return_tensors)
+        if return_tensors:
+            return self._backend.embed(utterances, task_type, return_tensors=True)
+        return self._backend.embed(utterances, task_type, return_tensors=False)
 
     def similarity(
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
