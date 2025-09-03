@@ -96,3 +96,7 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     max_per_second: float | None = Field(
         None, description="Maximum number of API requests per second. Only used with async processing."
     )
+
+
+def get_default_embedder_config() -> EmbedderConfig:
+    return SentenceTransformerEmbeddingConfig()

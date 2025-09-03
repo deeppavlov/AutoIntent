@@ -19,6 +19,7 @@ from autointent.configs import (
     InferenceNodeConfig,
     LoggingConfig,
     VectorIndexConfig,
+    get_default_embedder_config,
     get_default_vector_index_config,
 )
 from autointent.custom_types import ListOfGenericLabels, NodeType, SearchSpacePreset, SearchSpaceValidationMode
@@ -56,7 +57,7 @@ class Pipeline:
 
         if isinstance(nodes[0], NodeOptimizer):
             self.logging_config = LoggingConfig()
-            self.embedder_config = EmbedderConfig()
+            self.embedder_config = get_default_embedder_config()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
             self.transformer_config = HFModelConfig()

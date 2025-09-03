@@ -55,7 +55,6 @@ class Embedder:
             return OpenaiEmbeddingBackend(self.config)
         # Check if it's exactly the abstract base config (not a subclass)
         if type(self.config) is EmbedderConfig:
-            # Handle abstract base config case
             msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
             raise TypeError(msg)
         assert_never(self.config)
