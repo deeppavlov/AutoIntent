@@ -4,9 +4,9 @@ This module provides the `Embedder` class for managing, persisting, and loading
 embedding models and calculating embeddings for input texts using different backends.
 """
 
+import importlib
 import json
 import logging
-import shutil
 from pathlib import Path
 from typing import Literal, overload
 
@@ -33,8 +33,8 @@ class Embedder:
     embedding models, as well as calculating embeddings for input texts.
     """
 
-    _metadata_dict_name: str = "metadata.json"
-    _weights_dir_name: str = "sentence_transformer"
+    _backend_path = "backend"
+    _config_path = "config"
     _dump_dir: Path | None = None
     _backend: BaseEmbeddingBackend
 
@@ -53,7 +53,8 @@ class Embedder:
             return SentenceTransformerEmbeddingBackend(self.config)
         if isinstance(self.config, OpenaiEmbeddingConfig):
             return OpenaiEmbeddingBackend(self.config)
-        if isinstance(self.config, EmbedderConfig):
+        # Check if it's exactly the abstract base config (not a subclass)
+        if type(self.config) is EmbedderConfig:
             # Handle abstract base config case
             msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
             raise TypeError(msg)
@@ -90,23 +91,24 @@ class Embedder:
         """Move the embedding model to CPU and delete it from memory."""
         self._backend.clear_ram()
 
-    def delete(self) -> None:
-        """Delete the embedding model and its associated directory."""
-        self.clear_ram()
-        if self._dump_dir is not None:
-            shutil.rmtree(self._dump_dir)
-
     def dump(self, path: Path) -> None:
         """Save the embedding model and metadata to disk.
 
         Args:
             path: Path to the directory where the model will be saved.
         """
-        self._dump_dir = path
         path.mkdir(parents=True, exist_ok=True)
 
-        # Delegate to backend
-        self._backend.dump(path)
+        # Save the backend
+        self._backend.dump(path / self._backend_path)
+
+        # Save the config with class info
+        (path / self._config_path).mkdir(parents=True, exist_ok=True)
+        class_info = {"name": self.config.__class__.__name__, "module": self.config.__class__.__module__}
+        with (path / self._config_path / "class_info.json").open("w", encoding="utf-8") as file:
+            json.dump(class_info, file, ensure_ascii=False, indent=4)
+        with (path / self._config_path / "model_dump.json").open("w", encoding="utf-8") as file:
+            json.dump(self.config.model_dump(), file, ensure_ascii=False, indent=4)
 
     @classmethod
     def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
@@ -118,57 +120,45 @@ class Embedder:
         """
         path = Path(path)
 
-        # Try to load from backend first (new format)
-        config_path = path / "config.json"
-        if config_path.exists():
-            with config_path.open(encoding="utf-8") as file:
-                config_data = json.load(file)
+        # Load config class information
+        with (path / cls._config_path / "class_info.json").open("r", encoding="utf-8") as file:
+            class_info = json.load(file)
 
-            # Determine backend type from config data
-            if "api_key" in config_data or "max_concurrent" in config_data:
-                backend = OpenaiEmbeddingBackend.load(path)
-            else:
-                backend = SentenceTransformerEmbeddingBackend.load(path)
+        with (path / cls._config_path / "model_dump.json").open("r", encoding="utf-8") as file:
+            content = json.load(file)
 
-            # Apply override config if provided
-            if override_config is not None:
-                config_dict = {**backend.config.model_dump(), **override_config.model_dump(exclude_unset=True)}
-                if isinstance(backend, OpenaiEmbeddingBackend):
-                    backend.config = OpenaiEmbeddingConfig(**config_dict)
-                else:
-                    backend.config = SentenceTransformerEmbeddingConfig(**config_dict)
+        # Dynamically load the config class
+        model_type_module = importlib.import_module(class_info["module"])
+        model_type: type[EmbedderConfig] = getattr(model_type_module, class_info["name"])
+        config = model_type.model_validate(content)
 
-            # Create Embedder instance and set backend directly
-            instance = cls.__new__(cls)
-            instance.config = backend.config
-            instance._backend = backend
-            instance._dump_dir = path
-            return instance
+        # Apply override config if provided
+        if override_config is not None:
+            # Merge override config with loaded config
+            # Only override specific fields, preserving the original config type
+            override_dict = override_config.model_dump(exclude_unset=True)
+            config_dict = config.model_dump()
+            config_dict.update(override_dict)
+            config = model_type.model_validate(config_dict)
 
-        # Fallback to legacy format (deprecated)
+        # Create instance with the loaded/overridden config
+        instance = cls(config)
+
+        # Load the appropriate backend
+        backend_path = path / cls._backend_path
+        if isinstance(config, SentenceTransformerEmbeddingConfig):
+            instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)  # noqa: SLF001
+        elif isinstance(config, OpenaiEmbeddingConfig):
+            instance._backend = OpenaiEmbeddingBackend.load(backend_path)  # noqa: SLF001
+        # Check if it's exactly the abstract base config (not a subclass)
+        elif type(config) is EmbedderConfig:
+            # Handle abstract base config case
+            msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
+            raise TypeError(msg)
         else:
-            with (path / cls._metadata_dict_name).open(encoding="utf-8") as file:
-                config_data = json.load(file)
+            assert_never(config)
 
-            # Determine the config type based on the saved data
-            if "api_key" in config_data or "openai" in config_data.get("model_name", "").lower():
-                config = OpenaiEmbeddingConfig.model_validate(config_data)
-            else:
-                config = SentenceTransformerEmbeddingConfig.model_validate(config_data)
-
-            if override_config is not None:
-                kwargs = {**config.model_dump(), **override_config.model_dump(exclude_unset=True)}
-                if isinstance(config, SentenceTransformerEmbeddingConfig):
-                    config = SentenceTransformerEmbeddingConfig(**kwargs)
-                else:
-                    config = OpenaiEmbeddingConfig(**kwargs)
-
-            # Handle legacy max_length field
-            max_length = config_data.get("max_length")
-            if max_length is not None and isinstance(config, SentenceTransformerEmbeddingConfig):
-                config.tokenizer_config.max_length = max_length
-
-            return cls(config)
+        return instance
 
     @overload
     def embed(
