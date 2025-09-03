@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+import numpy as np
 import numpy.typing as npt
 
 from autointent import Context
@@ -79,7 +80,15 @@ class BaseScorer(BaseModule, ABC):
             chosen_metrics, context.data_handler.validation_iterator()
         )
 
-        self._artifact = ScorerArtifact(folded_scores=all_val_scores)
+        folded_scores_np = []
+        if all_val_scores:
+            for scores in all_val_scores:
+                if isinstance(scores, np.ndarray):
+                    folded_scores_np.append(scores.astype(np.float64))
+                else:
+                    folded_scores_np.append(np.array(scores, dtype=np.float64))
+
+        self._artifact = ScorerArtifact(folded_scores=folded_scores_np if folded_scores_np else None)
 
         return metrics_calculated
 

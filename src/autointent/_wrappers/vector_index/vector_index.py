@@ -8,7 +8,7 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -16,7 +16,7 @@ from typing_extensions import assert_never
 
 from autointent._wrappers import Embedder
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
-from autointent.custom_types import Document, ListOfLabels
+from autointent.custom_types import Document, LabelType, ListOfLabels
 
 from .base_backend import BaseIndexBackend
 from .faiss import FaissBackend
@@ -80,7 +80,8 @@ class VectorIndex:
             self.index = self._init_index(vector_size=embeddings.shape[1])
 
         self.index.add(
-            embeddings=embeddings, documents=[Document(text=t, label=i) for t, i in zip(texts, labels, strict=True)]
+            embeddings=embeddings,
+            documents=[Document(text=t, label=cast(LabelType, i)) for t, i in zip(texts, labels, strict=True)],
         )
 
     def clear_ram(self) -> None:

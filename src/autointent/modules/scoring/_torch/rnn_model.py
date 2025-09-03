@@ -50,6 +50,10 @@ class TextRNN(BaseTorchModuleWithVocab):
         return self.fc(outputs[:, -1])  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:
+        if self.embed_dim is None:
+            msg = "embed_dim cannot be None when dumping the model"
+            raise ValueError(msg)
+
         metadata = TextRNNDumpMetadata(
             embed_dim=self.embed_dim,
             n_classes=self.n_classes,

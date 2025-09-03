@@ -158,4 +158,4 @@ class SklearnScorer(BaseScorer):
         if hasattr(self, "_clf"):
             delattr(self, "_clf")
         if hasattr(self, "_embedder"):
-            self._embedder.delete()
+            self._embedder.clear_ram()

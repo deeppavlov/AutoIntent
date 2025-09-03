@@ -160,7 +160,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             return torch.from_numpy(embeddings_np)
         return embeddings_np
 
-    def _process_embeddings_sync(self, utterances: list[str]) -> np.ndarray:
+    def _process_embeddings_sync(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         """Process embeddings synchronously."""
         client = self._get_client()
         all_embeddings = []
@@ -189,7 +189,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         return np.array(all_embeddings, dtype=np.float32)
 
-    def _process_embeddings_async(self, utterances: list[str]) -> np.ndarray:
+    def _process_embeddings_async(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         """Process embeddings asynchronously using aiometer."""
         # Create batches
         batches = []
