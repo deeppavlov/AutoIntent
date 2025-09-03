@@ -19,11 +19,6 @@ class TaskTypeEnum(Enum):
 class EmbedderConfig(BaseModel):
     """Base class for embedder configurations."""
 
-
-class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
-    """Configuration for Sentence Transformer based embeddings."""
-
-    model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
     default_prompt: str | None = Field(
         None, description="Default prompt for the model. This is used when no task specific prompt is not provided."
     )
@@ -32,7 +27,6 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
     sts_prompt: str | None = Field(None, description="Prompt for finding most similar sentences.")
     query_prompt: str | None = Field(None, description="Prompt for query.")
     passage_prompt: str | None = Field(None, description="Prompt for passage.")
-    similarity_fn_name: str = Field("cosine", description="Name of the similarity function to use.")
     use_cache: bool = Field(True, description="Whether to use embeddings caching.")
 
     def get_prompt_config(self) -> dict[str, str] | None:
@@ -67,7 +61,7 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
         """
         if prompt_type == TaskTypeEnum.classification and self.classification_prompt is not None:
             return self.classification_prompt
-        if prompt_type == TaskTypeEnum.cluster and self.classification_prompt is not None:
+        if prompt_type == TaskTypeEnum.cluster and self.cluster_prompt is not None:
             return self.cluster_prompt
         if prompt_type == TaskTypeEnum.query and self.query_prompt is not None:
             return self.query_prompt
@@ -76,6 +70,13 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
         if prompt_type == TaskTypeEnum.sts and self.sts_prompt is not None:
             return self.sts_prompt
         return self.default_prompt
+
+
+class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
+    """Configuration for Sentence Transformer based embeddings."""
+
+    model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
+    similarity_fn_name: str = Field("cosine", description="Name of the similarity function to use.")
 
 
 class OpenaiEmbeddingConfig(EmbedderConfig):
@@ -89,4 +90,9 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     dimensions: int | None = Field(
         None, description="Number of dimensions for the embedding. Only supported for certain models."
     )
-    use_cache: bool = Field(True, description="Whether to use embeddings caching.")
+    max_concurrent: int | None = Field(
+        None, description="Maximum number of concurrent API requests. If None, uses synchronous processing."
+    )
+    max_per_second: float | None = Field(
+        None, description="Maximum number of API requests per second. Only used with async processing."
+    )
