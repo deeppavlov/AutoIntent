@@ -494,16 +494,7 @@
             }
         },
         "embedder_config": {
-            "$ref": "#/$defs/EmbedderConfig",
-            "default": {
-                "default_prompt": null,
-                "classification_prompt": null,
-                "cluster_prompt": null,
-                "sts_prompt": null,
-                "query_prompt": null,
-                "passage_prompt": null,
-                "use_cache": true
-            }
+            "$ref": "#/$defs/EmbedderConfig"
         },
         "cross_encoder_config": {
             "$ref": "#/$defs/CrossEncoderConfig",
