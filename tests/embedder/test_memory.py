@@ -2,7 +2,7 @@ import tempfile
 from pathlib import Path
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import EmbedderConfig
+from autointent.configs import EmbedderConfig
 
 
 def test_clear_ram():

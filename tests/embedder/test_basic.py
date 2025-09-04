@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import EmbedderConfig
+from autointent.configs import EmbedderConfig
 
 
 @pytest.fixture

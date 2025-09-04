@@ -5,7 +5,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import EmbedderConfig
+from autointent.configs import EmbedderConfig
 
 
 def test_load_from_disk(on_windows):
