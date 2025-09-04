@@ -1,3 +1,4 @@
+from abc import ABC
 from enum import Enum
 from typing import Any
 
@@ -17,7 +18,7 @@ class TaskTypeEnum(Enum):
     sts = "sts"
 
 
-class EmbedderConfig(BaseModel):
+class EmbedderConfig(ABC, BaseModel, extra="forbid"):
     """Base class for embedder configurations."""
 
     default_prompt: str | None = Field(
