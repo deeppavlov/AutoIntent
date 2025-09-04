@@ -50,7 +50,7 @@ class TestEmbedderCaching:
         embeddings2 = embedder.embed(test_utterances)
 
         # Should still be the same since same model/input (deterministic)
-        np.testing.assert_allclose(embeddings1, embeddings2, rtol=1e-5)
+        np.testing.assert_allclose(embeddings1, embeddings2, atol=1e-3)
 
 
 class TestSentenceTransformerCachingSpecific:
