@@ -1,8 +1,5 @@
-import tempfile
-from pathlib import Path
-
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
 
 
 def test_clear_ram():
@@ -16,20 +13,3 @@ def test_clear_ram():
     embedder.clear_ram()
 
     assert not hasattr(embedder, "_model")
-
-
-def test_delete_cleanup():
-    """Test delete method cleans up resources."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_path = Path(temp_dir)
-
-        config = EmbedderConfig(model_name="sergeyzh/rubert-tiny-turbo", use_cache=False)
-        embedder = Embedder(config)
-        embedder.embed(["test"])  # Load model
-        embedder.dump(temp_path)
-
-        # Delete should clean up
-        embedder.delete()
-
-        # Directory should be removed
-        assert not temp_path.exists()

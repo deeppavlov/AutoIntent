@@ -5,7 +5,8 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, HFModelConfig
+from autointent.configs import EmbedderFineTuningConfig, HFModelConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
 from autointent.context.data_handler import DataHandler
 
 

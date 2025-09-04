@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent.configs import TaskTypeEnum
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
 
 
 def test_caching_enabled():

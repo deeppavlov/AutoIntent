@@ -1,5 +1,6 @@
 from autointent import Embedder
-from autointent.configs import EmbedderConfig, TokenizerConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent.configs import TokenizerConfig
 
 
 def test_hash_consistency():
