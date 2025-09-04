@@ -122,6 +122,7 @@
             "type": "object"
         },
         "EmbedderConfig": {
+            "additionalProperties": false,
             "description": "Base class for embedder configurations.",
             "properties": {
                 "default_prompt": {
