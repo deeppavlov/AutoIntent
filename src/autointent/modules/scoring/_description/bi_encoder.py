@@ -73,7 +73,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
         cls,
         context: Context,
         temperature: PositiveFloat = 1.0,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> "BiEncoderDescriptionScorer":
         """Create a BiEncoderDescriptionScorer instance using a Context object.
 

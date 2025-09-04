@@ -71,7 +71,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         k: PositiveInt = 10,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> "RetrievalAimedEmbedding":

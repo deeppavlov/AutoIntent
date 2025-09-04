@@ -73,7 +73,7 @@ class LinearScorer(BaseScorer):
         cls,
         context: Context,
         cv: PositiveInt = 3,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> "LinearScorer":
         """Create a LinearScorer instance using a Context object.
 

@@ -67,7 +67,7 @@ class LogregAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":

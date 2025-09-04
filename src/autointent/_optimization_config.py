@@ -1,8 +1,16 @@
 from typing import Any
 
-from pydantic import BaseModel, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt, field_validator
 
-from .configs import CrossEncoderConfig, DataConfig, EmbedderConfig, HFModelConfig, HPOConfig, LoggingConfig
+from .configs import (
+    CrossEncoderConfig,
+    DataConfig,
+    EmbedderConfig,
+    HFModelConfig,
+    HPOConfig,
+    LoggingConfig,
+    initialize_embedder_config,
+)
 
 
 class OptimizationConfig(BaseModel):
@@ -20,7 +28,13 @@ class OptimizationConfig(BaseModel):
     logging_config: LoggingConfig = LoggingConfig()
     """See tutorial on logging configuration."""
 
-    embedder_config: EmbedderConfig = EmbedderConfig()
+    embedder_config: EmbedderConfig = Field(default_factory=lambda: initialize_embedder_config(None))
+
+    @field_validator("embedder_config", mode="before")
+    @classmethod
+    def validate_embedder_config(cls, v: Any) -> EmbedderConfig:  # noqa: ANN401
+        """Validate and convert embedder config to proper type."""
+        return initialize_embedder_config(v)
 
     cross_encoder_config: CrossEncoderConfig = CrossEncoderConfig()
 
