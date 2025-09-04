@@ -2,18 +2,22 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 from sentence_transformers import SentenceTransformer
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent.configs import EmbedderConfig, SentenceTransformerEmbeddingConfig
+
+from .conftest import backend_configs
 
 
 def test_load_from_disk(on_windows):
+    """Test loading embedder from disk with custom saved model."""
     model = SentenceTransformer("sergeyzh/rubert-tiny-turbo")
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as tmp_dir:
         model.save(str(Path(tmp_dir) / "weights"))
-        embedder = Embedder(EmbedderConfig(model_name=str(Path(tmp_dir) / "weights")))
+        embedder = Embedder(SentenceTransformerEmbeddingConfig(model_name=str(Path(tmp_dir) / "weights")))
         predictions = embedder.embed(["hi!"])
         embedder.dump(Path(tmp_dir) / "embedder")
         embedder_loaded = Embedder.load(Path(tmp_dir) / "embedder")
@@ -22,60 +26,104 @@ def test_load_from_disk(on_windows):
     np.testing.assert_almost_equal(predictions_after, predictions, decimal=4)
 
 
-def test_dump_load_cycle(on_windows):
-    """Test complete dump/load cycle preserves functionality."""
-    original_config = EmbedderConfig(
-        model_name="sergeyzh/rubert-tiny-turbo",
-        default_prompt="Test prompt:",
-        similarity_fn_name="cosine",
-        batch_size=4,
-        use_cache=False,
-    )
+@pytest.mark.parametrize("embedder_config", backend_configs)
+class TestEmbedderDumpLoad:
+    """Unified test class for Embedder dump/load with different backends."""
 
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
-        temp_path = Path(temp_dir)
+    @pytest.fixture
+    def embedder(self, embedder_config: EmbedderConfig) -> Embedder:
+        """Create an Embedder instance for testing."""
+        return Embedder(embedder_config)
 
-        # Create and test original embedder
-        embedder_original = Embedder(original_config)
-        test_utterances = ["Test sentence for persistence"]
-        original_embeddings = embedder_original.embed(test_utterances)
+    def test_dump_load_cycle(self, embedder: Embedder, on_windows):
+        """Test complete dump/load cycle preserves functionality."""
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
+            temp_path = Path(temp_dir)
 
-        # Dump embedder
-        embedder_original.dump(temp_path)
+            # Create and test original embedder
+            test_utterances = ["Test sentence for persistence", "Another test sentence"]
+            original_embeddings = embedder.embed(test_utterances)
 
-        # Load embedder
-        embedder_loaded = Embedder.load(temp_path)
+            # Dump embedder
+            embedder.dump(temp_path)
 
-        # Test that loaded embedder works the same
-        loaded_embeddings = embedder_loaded.embed(test_utterances)
-        np.testing.assert_allclose(original_embeddings, loaded_embeddings, rtol=1e-5)
+            # Load embedder
+            embedder_loaded = Embedder.load(temp_path)
 
-        # Test configuration preservation
-        assert embedder_loaded.config.model_name == original_config.model_name
-        assert embedder_loaded.config.default_prompt == original_config.default_prompt
-        assert embedder_loaded.config.similarity_fn_name == original_config.similarity_fn_name
+            # Test that loaded embedder works the same
+            loaded_embeddings = embedder_loaded.embed(test_utterances)
+            np.testing.assert_allclose(original_embeddings, loaded_embeddings, rtol=1e-5)
 
+            # Test configuration preservation
+            assert embedder_loaded.config.model_name == embedder.config.model_name
+            assert embedder_loaded.config.default_prompt == embedder.config.default_prompt
+            assert embedder_loaded.config.batch_size == embedder.config.batch_size
 
-def test_load_with_config_override(on_windows):
-    """Test loading with configuration override."""
-    original_config = EmbedderConfig(
-        model_name="sergeyzh/rubert-tiny-turbo",
-        batch_size=8,
-        use_cache=False,
-    )
+    def test_load_with_config_override(self, embedder: Embedder, on_windows):
+        """Test loading with configuration override."""
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
+            temp_path = Path(temp_dir)
 
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
-        temp_path = Path(temp_dir)
+            # Create and dump original
+            embedder.dump(temp_path)
 
-        # Create and dump original
-        embedder_original = Embedder(original_config)
-        embedder_original.dump(temp_path)
+            # Create appropriate override config based on backend type
+            if isinstance(embedder.config, SentenceTransformerEmbeddingConfig):
+                override_config = SentenceTransformerEmbeddingConfig(batch_size=16)
+            else:
+                # For OpenAI, we can override batch_size too
+                from autointent.configs import OpenaiEmbeddingConfig
 
-        # Load with override
-        override_config = EmbedderConfig(batch_size=16)
-        embedder_loaded = Embedder.load(temp_path, override_config)
+                override_config = OpenaiEmbeddingConfig(batch_size=16)
 
-        # Verify override took effect
-        assert embedder_loaded.config.batch_size == 16
-        # Verify original config preserved where not overridden
-        assert embedder_loaded.config.model_name == original_config.model_name
+            # Load with override
+            embedder_loaded = Embedder.load(temp_path, override_config)
+
+            # Verify override took effect
+            assert embedder_loaded.config.batch_size == 16
+            # Verify original config preserved where not overridden
+            assert embedder_loaded.config.model_name == embedder.config.model_name
+
+    def test_similarity_preserved_after_load(self, embedder: Embedder, on_windows):
+        """Test that similarity function works correctly after dump/load."""
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
+            temp_path = Path(temp_dir)
+
+            # Test similarity with original embedder
+            utterances = ["Hello world", "Test sentence"]
+            embeddings = embedder.embed(utterances)
+            original_similarity = embedder.similarity(embeddings[:1], embeddings[1:])
+
+            # Dump and load
+            embedder.dump(temp_path)
+            embedder_loaded = Embedder.load(temp_path)
+
+            # Test similarity with loaded embedder
+            loaded_embeddings = embedder_loaded.embed(utterances)
+            loaded_similarity = embedder_loaded.similarity(loaded_embeddings[:1], loaded_embeddings[1:])
+
+            # Similarities should be the same
+            np.testing.assert_allclose(original_similarity, loaded_similarity, rtol=1e-5)
+
+    def test_multiple_dump_load_cycles(self, embedder: Embedder, on_windows):
+        """Test multiple dump/load cycles maintain consistency."""
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
+            temp_path = Path(temp_dir)
+            test_utterances = ["Consistency test"]
+
+            # Original embeddings
+            original_embeddings = embedder.embed(test_utterances)
+
+            # First dump/load cycle
+            embedder.dump(temp_path / "cycle1")
+            embedder_1 = Embedder.load(temp_path / "cycle1")
+            embeddings_1 = embedder_1.embed(test_utterances)
+
+            # Second dump/load cycle
+            embedder_1.dump(temp_path / "cycle2")
+            embedder_2 = Embedder.load(temp_path / "cycle2")
+            embeddings_2 = embedder_2.embed(test_utterances)
+
+            # All embeddings should be consistent
+            np.testing.assert_allclose(original_embeddings, embeddings_1, rtol=1e-5)
+            np.testing.assert_allclose(embeddings_1, embeddings_2, rtol=1e-5)

@@ -120,6 +120,7 @@ class TestRanker:
             decimal=4,
         )
 
+
 class TestCrossEncoderConfig:
     def init_attributes(self):
         self.pydantic_model = CrossEncoderConfig(

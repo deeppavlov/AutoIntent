@@ -44,9 +44,9 @@ class Embedder:
             embedder_config: Config of embedder.
         """
         self.config = embedder_config.model_copy(deep=True)
-        self._backend = self._load_model()
+        self._backend = self._init_backend()
 
-    def _load_model(self) -> BaseEmbeddingBackend:
+    def _init_backend(self) -> BaseEmbeddingBackend:
         """Load and instantiate proper backend based on config type."""
         if isinstance(self.config, SentenceTransformerEmbeddingConfig):
             return SentenceTransformerEmbeddingBackend(self.config)

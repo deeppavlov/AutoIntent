@@ -1,4 +1,5 @@
 """DescriptionScorer classes for scoring utterances based on intent descriptions."""
+
 from abc import ABC, abstractmethod
 
 import numpy as np

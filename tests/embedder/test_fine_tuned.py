@@ -1,8 +1,7 @@
 import numpy as np
 
-from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderFineTuningConfig, HFModelConfig
-from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
+from autointent.configs import EmbedderFineTuningConfig, HFModelConfig, SentenceTransformerEmbeddingConfig
 from autointent.context.data_handler import DataHandler
 
 
@@ -12,7 +11,7 @@ def test_model_updates_after_training(dataset):
 
     hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=8, trust_remote_code=True)
 
-    embedder_config = EmbedderConfig(
+    embedder_config = SentenceTransformerEmbeddingConfig(
         **hf_config.model_dump(),
         default_prompt="Represent this text for retrieval:",
         query_prompt="Search query:",
@@ -22,23 +21,26 @@ def test_model_updates_after_training(dataset):
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=3, batch_size=8)
-    embedder = Embedder(embedder_config)
-    embedder._model = embedder._load_model()
 
-    for param in embedder._model.parameters():
+    # Test with backend directly for fine-tuning specific functionality
+    backend = SentenceTransformerEmbeddingBackend(embedder_config)
+    backend._model = backend._load_model()
+
+    for param in backend._model.parameters():
         assert param.requires_grad, "All trainable parameters should have requires_grad=True"
 
     original_weights = [
-        param.data.detach().cpu().numpy().copy() for param in embedder._model.parameters() if param.requires_grad
+        param.data.detach().cpu().numpy().copy() for param in backend._model.parameters() if param.requires_grad
     ]
-    embedder.train(
+
+    backend.train(
         utterances=data_handler.train_utterances(0)[:1000],
         labels=data_handler.train_labels(0)[:1000],
         config=train_config,
     )
 
     trained_weights = [
-        param.data.detach().cpu().numpy().copy() for param in embedder._model.parameters() if param.requires_grad
+        param.data.detach().cpu().numpy().copy() for param in backend._model.parameters() if param.requires_grad
     ]
 
     weights_changed = any(
