@@ -101,7 +101,7 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
 
 
 def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401
-    return SentenceTransformerEmbeddingConfig(**kwargs)
+    return SentenceTransformerEmbeddingConfig.model_validate(kwargs)
 
 
 def initialize_embedder_config(values: dict[str, Any] | str | EmbedderConfig | None) -> EmbedderConfig:
