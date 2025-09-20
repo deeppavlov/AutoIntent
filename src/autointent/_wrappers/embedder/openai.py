@@ -286,8 +286,6 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         """
         import json
 
-        from autointent.configs._embedder import OpenaiEmbeddingConfig
-
         # Load configuration
         config_path = path / "config.json"
         with config_path.open("r", encoding="utf-8") as file:
