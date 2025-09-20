@@ -78,7 +78,9 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
     """Configuration for Sentence Transformer based embeddings."""
 
     model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
-    similarity_fn_name: str = Field("cosine", description="Name of the similarity function to use.")
+    similarity_fn_name: str | None = Field(
+        None, description="Name of the similarity function to use. Set to `None` to use model-native."
+    )
 
 
 class OpenaiEmbeddingConfig(EmbedderConfig):

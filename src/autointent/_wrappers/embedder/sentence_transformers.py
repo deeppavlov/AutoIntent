@@ -12,7 +12,6 @@ import torch
 from datasets import Dataset
 from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
 from sentence_transformers.losses import BatchAllTripletLoss
-from sentence_transformers.similarity_functions import SimilarityFunction
 from sentence_transformers.training_args import BatchSamplers
 from sklearn.model_selection import train_test_split
 from transformers import EarlyStoppingCallback, TrainerCallback
@@ -202,8 +201,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             A numpy array of similarities (size n x m).
         """
-        similarity_fn = SimilarityFunction.to_similarity_fn(self.config.similarity_fn_name)
-        return similarity_fn(embeddings1, embeddings2).detach().cpu().numpy().astype(np.float32)
+        model = self._load_model()
+        return model.similarity(embeddings1, embeddings2).detach().cpu().numpy().astype(np.float32)
 
     def train(self, utterances: list[str], labels: ListOfLabels, config: EmbedderFineTuningConfig) -> None:
         """Train the embedding model.
