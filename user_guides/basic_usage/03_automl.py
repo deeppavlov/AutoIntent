@@ -115,8 +115,7 @@ You can specify which transformer models to use for text embeddings and cross-en
 """
 
 # %%
-from autointent.configs import (CrossEncoderConfig, TokenizerConfig,
-                                get_default_embedder_config)
+from autointent.configs import CrossEncoderConfig, TokenizerConfig, get_default_embedder_config
 
 # Configure embedding model (used for vector representations)
 custom_pipeline.set_config(get_default_embedder_config(model_name="prajjwal1/bert-tiny"))
