@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from functools import partial
 from pathlib import Path
 from typing import Literal, TypedDict, cast, overload
@@ -48,10 +49,9 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         """Get or create OpenAI client instance."""
         if self._client is None:
             self._client = openai.OpenAI(
-                api_key=self.config.api_key,
                 timeout=self.config.timeout,
                 max_retries=self.config.max_retries,
-                base_url=self.config.base_url,
+                base_url=os.getenv("OPENAI_BASE_URL", None),
             )
         return self._client
 
@@ -59,10 +59,9 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         """Get or create async OpenAI client instance."""
         if self._async_client is None:
             self._async_client = openai.AsyncOpenAI(
-                api_key=self.config.api_key,
                 timeout=self.config.timeout,
                 max_retries=self.config.max_retries,
-                base_url=self.config.base_url,
+                base_url=os.getenv("OPENAI_BASE_URL", None),
             )
         return self._async_client
 

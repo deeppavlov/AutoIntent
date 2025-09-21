@@ -28,7 +28,6 @@ backend_configs = [
     pytest.param(
         OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
-            api_key=os.getenv("OPENAI_API_KEY", "fake-key-for-testing"),
             batch_size=2,
             use_cache=False,
             max_retries=1,
@@ -73,7 +72,6 @@ def create_openai_config(**kwargs) -> OpenaiEmbeddingConfig:
     """Helper function to create OpenAI config with defaults."""
     defaults = {
         "model_name": "text-embedding-3-small",
-        "api_key": os.getenv("OPENAI_API_KEY", "fake-key-for-testing"),
         "batch_size": 2,
         "use_cache": False,
         "max_retries": 1,

@@ -20,7 +20,6 @@ def openai_backend_config():
     """Create an OpenAI backend config for testing."""
     return OpenaiEmbeddingConfig(
         model_name="text-embedding-3-small",
-        api_key=os.getenv("OPENAI_API_KEY"),
         batch_size=2,
         use_cache=False,
         max_retries=1,
@@ -83,11 +82,9 @@ class TestOpenaiBackend:
         """Test that different models produce different hashes."""
         config1 = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
-            api_key=os.getenv("OPENAI_API_KEY"),
         )
         config2 = OpenaiEmbeddingConfig(
             model_name="text-embedding-ada-002",
-            api_key=os.getenv("OPENAI_API_KEY"),
         )
 
         backend1 = OpenaiEmbeddingBackend(config1)
@@ -100,7 +97,6 @@ class TestOpenaiBackend:
         # Test with different dimensions (if supported by model)
         config_with_dims = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
-            api_key=os.getenv("OPENAI_API_KEY"),
             dimensions=512,  # Reduced dimensions
             use_cache=False,
         )
@@ -126,7 +122,6 @@ class TestOpenaiBackend:
         """Test async processing initialization."""
         config = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
-            api_key=os.getenv("OPENAI_API_KEY"),
             max_concurrent=2,  # Enable async processing
             max_per_second=1.0,
             use_cache=False,
@@ -142,7 +137,6 @@ class TestOpenaiBackend:
         """Test that prompts are applied correctly."""
         config = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
-            api_key=os.getenv("OPENAI_API_KEY"),
             query_prompt="Query:",
             passage_prompt="Passage:",
             use_cache=False,
@@ -159,20 +153,6 @@ class TestOpenaiBackend:
 
         # Embeddings should be different when prompts are applied
         assert not np.allclose(embeddings_no_prompt, embeddings_with_prompt, rtol=1e-3)
-
-    def test_error_handling_invalid_api_key(self):
-        """Test error handling with invalid API key."""
-        config = OpenaiEmbeddingConfig(
-            model_name="text-embedding-3-small",
-            api_key="invalid-key",
-            max_retries=0,  # Don't retry
-            timeout=5.0,
-        )
-
-        backend = OpenaiEmbeddingBackend(config)
-
-        with pytest.raises(RuntimeError, match="Error calling OpenAI API"):
-            backend.embed(["Test sentence"])
 
     def test_return_tensors_functionality(self, openai_backend: OpenaiEmbeddingBackend):
         """Test return_tensors parameter."""

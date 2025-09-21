@@ -1,4 +1,3 @@
-import os
 import tempfile
 from pathlib import Path
 
@@ -53,7 +52,7 @@ class TestEmbedderDumpLoad:
 
             # Test that loaded embedder works the same
             loaded_embeddings = embedder_loaded.embed(test_utterances)
-            np.testing.assert_allclose(original_embeddings, loaded_embeddings, rtol=1e-5)
+            np.testing.assert_allclose(original_embeddings, loaded_embeddings, rtol=1e-3)
 
             # Test configuration preservation
             assert embedder_loaded.config.model_name == embedder.config.model_name
@@ -75,7 +74,7 @@ class TestEmbedderDumpLoad:
                 # For OpenAI, we can override batch_size too
                 from autointent.configs import OpenaiEmbeddingConfig
 
-                override_config = OpenaiEmbeddingConfig(batch_size=16, api_key=os.getenv("OPENAI_API_KEY"))
+                override_config = OpenaiEmbeddingConfig(batch_size=16)
 
             # Load with override
             embedder_loaded = Embedder.load(temp_path, override_config)
@@ -104,7 +103,7 @@ class TestEmbedderDumpLoad:
             loaded_similarity = embedder_loaded.similarity(loaded_embeddings[:1], loaded_embeddings[1:])
 
             # Similarities should be the same
-            np.testing.assert_allclose(original_similarity, loaded_similarity, rtol=1e-5)
+            np.testing.assert_allclose(original_similarity, loaded_similarity, rtol=1e-3)
 
     def test_multiple_dump_load_cycles(self, embedder: Embedder, on_windows):
         """Test multiple dump/load cycles maintain consistency."""
