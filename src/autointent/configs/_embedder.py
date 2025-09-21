@@ -88,6 +88,7 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
 
     model_name: str = Field("text-embedding-3-small", description="Name of the OpenAI embedding model.")
     api_key: str = Field(description="OpenAI API key. If None, will look for OPENAI_API_KEY environment variable.")
+    base_url: str | None = Field(default=None, description="Base URL for OpenAI API calls")
     batch_size: int = Field(100, description="Batch size for API requests.")
     max_retries: int = Field(3, description="Maximum number of retries for failed API requests.")
     timeout: float = Field(30.0, description="Timeout for API requests in seconds.")

@@ -51,6 +51,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 api_key=self.config.api_key,
                 timeout=self.config.timeout,
                 max_retries=self.config.max_retries,
+                base_url=self.config.base_url,
             )
         return self._client
 
@@ -61,6 +62,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 api_key=self.config.api_key,
                 timeout=self.config.timeout,
                 max_retries=self.config.max_retries,
+                base_url=self.config.base_url,
             )
         return self._async_client
 
