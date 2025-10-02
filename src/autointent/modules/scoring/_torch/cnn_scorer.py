@@ -5,11 +5,11 @@ from typing import Any
 from autointent import Context
 from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
-from .base_scorer import BaseTorchScorer
+from .base_scorer import BaseVocabTorchScorer
 from .cnn_model import TextCNN
 
 
-class CNNScorer(BaseTorchScorer):
+class CNNScorer(BaseVocabTorchScorer):
     """Convolutional Neural Network (CNN) scorer for intent classification.
 
     This module uses a CNN architecture to perform intent classification on text data.

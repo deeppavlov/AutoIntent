@@ -182,3 +182,5 @@ vector_db*
 *.db
 *.sqlite
 /wandb
+model_output/
+my.py

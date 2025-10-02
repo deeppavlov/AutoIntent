@@ -4,6 +4,7 @@ from typing import Any, ClassVar, TypeVar
 
 import numpy as np
 import numpy.typing as npt
+import torch
 
 from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
@@ -108,6 +109,8 @@ class Dumper:
                 simple_attrs[key] = val
             elif isinstance(val, np.ndarray):
                 arrays[key] = val
+            elif isinstance(val, torch.Tensor):
+                arrays[key] = val.cpu().numpy()
             else:
                 # Use the appropriate dumper for complex objects
                 Dumper._dump_single_object(key, val, path, exists_ok, raise_errors)

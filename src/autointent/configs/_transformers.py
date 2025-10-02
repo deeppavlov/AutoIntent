@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
-from typing_extensions import Self
+from typing_extensions import Self, assert_never
 
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
@@ -13,6 +13,29 @@ class TokenizerConfig(BaseModel):
     padding: bool | Literal["longest", "max_length", "do_not_pad"] = True
     truncation: bool = True
     max_length: PositiveInt | None = Field(None, description="Maximum length of input sequences.")
+
+
+class EmbedderFineTuningConfig(BaseModel):
+    epoch_num: int
+    batch_size: int
+    margin: float = Field(default=0.5)
+    learning_rate: float = Field(default=2e-5)
+    warmup_ratio: float = Field(default=0.1)
+    early_stopping_patience: int = Field(default=1)
+    early_stopping_threshold: float = Field(default=0.0)
+    val_fraction: float = Field(default=0.2)
+    fp16: bool = Field(default=False)
+    bf16: bool = Field(default=False)
+
+    @classmethod
+    def from_search_config(cls, values: dict[str, Any] | BaseModel | None) -> Self | None:
+        if isinstance(values, BaseModel):
+            return cls(**values.model_dump())
+        if isinstance(values, dict):
+            return cls(**values)
+        if values is None:
+            return None
+        assert_never(values)
 
 
 class HFModelConfig(BaseModel):
@@ -42,7 +65,7 @@ class HFModelConfig(BaseModel):
         if values is None:
             return cls()
         if isinstance(values, BaseModel):
-            return values  # type: ignore[return-value]
+            return cls(**values.model_dump())
         if isinstance(values, str):
             return cls(model_name=values)
         return cls(**values)
@@ -73,7 +96,6 @@ class EmbedderConfig(HFModelConfig):
         "cosine", description="Name of the similarity function to use."
     )
     use_cache: bool = Field(True, description="Whether to use embeddings caching.")
-    freeze: bool = Field(True, description="Whether to freeze the model parameters.")
 
     def get_prompt_config(self) -> dict[str, str] | None:
         """Get the prompt config for the given prompt type.
@@ -162,5 +184,7 @@ class EarlyStoppingConfig(BaseModel):
         if values is None:
             return cls()
         if isinstance(values, BaseModel):
-            return values  # type: ignore[return-value]
-        return cls(**values)
+            return cls(**values.model_dump())
+        if isinstance(values, dict):
+            return cls(**values)
+        assert_never(values)

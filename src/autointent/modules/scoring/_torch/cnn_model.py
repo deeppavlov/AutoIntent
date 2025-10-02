@@ -46,6 +46,7 @@ class TextCNN(BaseTorchModuleWithVocab):
         self.kernel_sizes = kernel_sizes
         self.num_filters = num_filters
         self.dropout_rate = dropout
+        assert self.embed_dim is not None  # noqa: S101
 
         # Initialize other layers
         self.convs = nn.ModuleList(
@@ -70,6 +71,7 @@ class TextCNN(BaseTorchModuleWithVocab):
         return self.fc(dropped)  # type: ignore[no-any-return]
 
     def dump(self, path: Path) -> None:
+        assert self.embed_dim is not None  # noqa: S101
         metadata = TextCNNDumpMetadata(
             embed_dim=self.embed_dim,
             n_classes=self.n_classes,

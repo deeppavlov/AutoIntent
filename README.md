@@ -7,7 +7,7 @@ Auto ML for intent classification.
 
 Documentation: [deeppavlov.github.io/AutoIntent](https://deeppavlov.github.io/AutoIntent/).
 
-> The project is under active development.
+The project is under active development.
 
 ## Installation
 
@@ -33,6 +33,21 @@ dataset = Dataset.from_json(path_to_json)
 pipeline = Pipeline.from_preset("classic-light")
 pipeline.fit(dataset)
 pipeline.predict(["show me my latest transactions"])
+```
+
+## Cite
+
+If you find our work useful, please cite our EMNLP 2025 [paper](https://arxiv.org/abs/2509.21138):
+```
+@misc{alekseev2025autointentautomltextclassification,
+      title={AutoIntent: AutoML for Text Classification}, 
+      author={Ilya Alekseev and Roman Solomatin and Darina Rustamova and Denis Kuznetsov},
+      year={2025},
+      eprint={2509.21138},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2509.21138}, 
+}
 ```
 
 ## Disclaimer

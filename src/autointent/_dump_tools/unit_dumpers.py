@@ -21,7 +21,7 @@ from transformers import (
 )
 
 from autointent import Embedder, Ranker, VectorIndex
-from autointent._wrappers import BaseTorchModuleWithVocab
+from autointent._wrappers import BaseTorchModule
 from autointent.schemas import TagsList
 
 from .base import BaseObjectDumper, ModuleSimpleAttributes
@@ -276,11 +276,11 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
         return isinstance(obj, PreTrainedTokenizer | PreTrainedTokenizerFast)
 
 
-class TorchModelDumper(BaseObjectDumper[BaseTorchModuleWithVocab]):
+class TorchModelDumper(BaseObjectDumper[BaseTorchModule]):
     dir_or_file_name = "torch_models"
 
     @staticmethod
-    def dump(obj: BaseTorchModuleWithVocab, path: Path, exists_ok: bool) -> None:
+    def dump(obj: BaseTorchModule, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         class_info = {
             "module": obj.__class__.__module__,
@@ -291,16 +291,16 @@ class TorchModelDumper(BaseObjectDumper[BaseTorchModuleWithVocab]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseTorchModuleWithVocab:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseTorchModule:  # noqa: ANN401, ARG004
         with (path / "class_info.json").open("r") as f:
             class_info = json.load(f)
         module = importlib.import_module(class_info["module"])
-        model_class: BaseTorchModuleWithVocab = getattr(module, class_info["name"])
+        model_class: BaseTorchModule = getattr(module, class_info["name"])
         return model_class.load(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, BaseTorchModuleWithVocab)
+        return isinstance(obj, BaseTorchModule)
 
 
 class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):

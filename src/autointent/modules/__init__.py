@@ -20,6 +20,7 @@ from .scoring import (
     CNNScorer,
     CrossEncoderDescriptionScorer,
     DNNCScorer,
+    GCNScorer,
     KNNScorer,
     LinearScorer,
     LLMDescriptionScorer,
@@ -47,6 +48,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
     [
         CatBoostScorer,
         DNNCScorer,
+        GCNScorer,
         KNNScorer,
         LinearScorer,
         BiEncoderDescriptionScorer,

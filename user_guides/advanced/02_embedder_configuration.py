@@ -68,7 +68,6 @@ embedder_config = EmbedderConfig(
     classification_prompt="Classify the following text: ",  # Task-specific prompt
     similarity_fn_name="cosine",
     use_cache=True,
-    freeze=True,  # Freeze model parameters for consistent embeddings
 )
 
 scorer = KNNScorer(embedder_config=embedder_config, k=10)
@@ -107,7 +106,6 @@ Prompts can significantly improve embedding quality for specific tasks:
 
 ### Performance Settings
 - **`use_cache`**: Cache embeddings to disk for repeated use (highly recommended)
-- **`freeze`**: Freeze model parameters for consistent embeddings across runs
 - **`similarity_fn_name`**: Similarity function (default: `"cosine"`; other options like `"dot"`, `"euclidean"`, `"manhattan"` are available, but we recommend keeping the default unless you have a specific reason)
 
 ## Practical Examples
@@ -141,7 +139,6 @@ quality_config = EmbedderConfig(
     tokenizer_config=TokenizerConfig(max_length=512),  # Longer sequences for context
     classification_prompt="Classify the intent of this message: ",
     use_cache=True,
-    freeze=True,
     similarity_fn_name="cosine",
 )
 
@@ -159,7 +156,6 @@ multilingual_config = EmbedderConfig(
     batch_size=32,
     tokenizer_config=TokenizerConfig(max_length=256),
     use_cache=True,
-    freeze=True,
 )
 
 scorer = KNNScorer(embedder_config=multilingual_config, k=7)
@@ -212,7 +208,6 @@ scorer = KNNScorer(embedder_config=multilingual_config, k=7)
    - Ensure GPU/MPS utilization
 
 3. **Inconsistent Results**
-   - Set `freeze=True` for reproducible embeddings
    - Use `use_cache=True` to avoid recomputation
    - Check if seed is set for your program
 """
