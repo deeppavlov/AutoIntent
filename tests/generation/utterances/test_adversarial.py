@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, Mock
 
-from autointent import Sample
 from autointent.generation.utterances import CriticHumanLike, HumanUtteranceGenerator
+from autointent.schemas import Sample
 
 
 def test_human_utterance_generator_sync(dataset):
