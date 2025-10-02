@@ -2,10 +2,13 @@
 
 from ._basic import DatasetBalancer, UtteranceGenerator
 from ._evolution import IncrementalUtteranceEvolver, UtteranceEvolver
+from ._adversarial import HumanUtteranceGenerator, CriticHumanLike
 
 __all__ = [
     "DatasetBalancer",
     "IncrementalUtteranceEvolver",
     "UtteranceEvolver",
     "UtteranceGenerator",
+    "HumanUtteranceGenerator",
+    "CriticHumanLike"
 ]

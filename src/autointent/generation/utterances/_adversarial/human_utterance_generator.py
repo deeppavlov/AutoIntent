@@ -155,7 +155,8 @@ class HumanUtteranceGenerator:
 
         for result in results:
             new_samples.extend(result)
-
+        for s in new_samples:
+            s['label'] = int(s['label'])
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
