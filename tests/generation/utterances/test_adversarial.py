@@ -1,20 +1,18 @@
-from unittest.mock import Mock, AsyncMock
-import pytest
-from autointent.generation import Generator
+from unittest.mock import AsyncMock, Mock
 
-from autointent.generation.utterances import HumanUtteranceGenerator, CriticHumanLike
-from autointent import Dataset, Sample
+from autointent import Sample
+from autointent.generation.utterances import CriticHumanLike, HumanUtteranceGenerator
 
 
 def test_human_utterance_generator_sync(dataset):
     mock_llm = Mock()
     mock_llm.get_chat_completion.return_value = "Human-like utterance"
-    
+
     mock_critic = Mock(spec=CriticHumanLike)
     mock_critic.is_human.return_value = True
 
     generator = HumanUtteranceGenerator(mock_llm, mock_critic, async_mode=False)
-    
+
     n_before = len(dataset["train_0"])
     new_samples = generator.augment(dataset, split_name="train_0", update_split=False, n_final_per_class=2)
     n_after = len(dataset["train_0"])
@@ -29,7 +27,7 @@ def test_human_utterance_generator_sync(dataset):
 def test_human_utterance_generator_async(dataset):
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "Human-like utterance"
-    
+
     mock_critic = AsyncMock(spec=CriticHumanLike)
     mock_critic.is_human_async.return_value = True
     generator = HumanUtteranceGenerator(mock_llm, mock_critic, async_mode=True)

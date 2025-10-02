@@ -3,6 +3,7 @@ import logging
 import random
 from collections import defaultdict
 from functools import partial
+from typing import Any
 
 import aiometer
 from datasets import Dataset as HFDataset
@@ -123,8 +124,8 @@ class HumanUtteranceGenerator:
         for sample in original_split:
             class_to_samples[sample["label"]].append(sample["utterance"])
 
-        async def generate_one(intent_id: str, intent_name: str) -> list[dict[str, str]]:
-            generated: list[dict[str, str]] = []
+        async def generate_one(intent_id: str, intent_name: str) -> list[dict[str, Any]]:
+            generated: list[dict[str, Any]] = []
             attempts = 0
             seed_utterances = class_to_samples[intent_id]
             while len(generated) < n_final_per_class and attempts < n_final_per_class * 3:
@@ -136,7 +137,7 @@ class HumanUtteranceGenerator:
                     prompt = self._build_adversarial_prompt(intent_name, seed_examples, rejected)
                     utterance = (await self.generator.get_chat_completion_async([prompt])).strip()
                     if await self.critic.is_human_async(utterance, intent_name):
-                        generated.append({Dataset.label_feature: intent_id, Dataset.utterance_feature: utterance})
+                        generated.append({Dataset.label_feature: int(intent_id), Dataset.utterance_feature: utterance})
                         break
                     rejected.append(utterance)
             return generated
@@ -155,8 +156,6 @@ class HumanUtteranceGenerator:
 
         for result in results:
             new_samples.extend(result)
-        for s in new_samples:
-            s['label'] = int(s['label'])
         if update_split:
             generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
