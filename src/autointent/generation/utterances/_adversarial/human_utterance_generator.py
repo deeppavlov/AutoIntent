@@ -26,6 +26,9 @@ class HumanUtteranceGenerator:
     This class rewrites given user utterances to make them sound more natural and human-like,
     while preserving their original intent. The generation process is iterative and attempts
     to bypass a critic that identifies machine-generated text.
+
+    .. warning:: This method is experimental and can yield inferior data quality.
+
     """
 
     def __init__(
