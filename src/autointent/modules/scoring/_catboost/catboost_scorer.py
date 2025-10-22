@@ -11,7 +11,7 @@ from catboost import CatBoostClassifier
 from pydantic import PositiveInt
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -113,7 +113,7 @@ class CatBoostScorer(BaseScorer):
             msg = "Only catbooost text features will be used, `use_embedding_features` is ignored."
             logger.warning(msg)
 
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self.loss_function = loss_function
         self.verbose = verbose
         self.catboost_kwargs = catboost_kwargs or {}

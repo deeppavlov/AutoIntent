@@ -184,3 +184,4 @@ vector_db*
 /wandb
 model_output/
 my.py
+.DS_store

@@ -10,6 +10,7 @@ from autointent.configs import (
     EmbedderFineTuningConfig,
     VectorIndexConfig,
     get_default_vector_index_config,
+    initialize_embedder_config,
 )
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
@@ -58,7 +59,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> None:
         self.k = k
-        self._embedder = Embedder(EmbedderConfig.from_search_config(embedder_config))
+        self._embedder = Embedder(initialize_embedder_config(embedder_config))
         self.vector_index_config = vector_index_config or get_default_vector_index_config()
         self.ft_config = EmbedderFineTuningConfig.from_search_config(ft_config)
 
@@ -70,7 +71,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         k: PositiveInt = 10,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> "RetrievalAimedEmbedding":

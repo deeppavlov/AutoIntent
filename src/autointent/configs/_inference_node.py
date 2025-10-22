@@ -4,7 +4,8 @@ from typing import Any
 
 from autointent.custom_types import NodeType
 
-from ._transformers import CrossEncoderConfig, EmbedderConfig
+from ._embedder import EmbedderConfig
+from ._transformers import CrossEncoderConfig
 
 
 class InferenceNodeConfig:

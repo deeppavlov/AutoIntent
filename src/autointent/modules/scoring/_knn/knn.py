@@ -7,7 +7,12 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
-from autointent.configs import EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent.configs import (
+    EmbedderConfig,
+    VectorIndexConfig,
+    get_default_vector_index_config,
+    initialize_embedder_config,
+)
 from autointent.custom_types import Document, ListOfLabels, WeightType
 from autointent.modules.base import BaseScorer
 
@@ -61,7 +66,7 @@ class KNNScorer(BaseScorer):
         weights: WeightType = "distance",
         vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self.k = k
         self.weights = weights
         self.vector_index_config = vector_index_config or get_default_vector_index_config()

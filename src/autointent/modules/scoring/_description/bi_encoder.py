@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from pydantic import PositiveFloat
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 
 from .base import BaseDescriptionScorer
 
@@ -64,7 +64,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
         multilabel: bool = False,
     ) -> None:
         super().__init__(temperature=temperature, multilabel=multilabel)
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self._embedder: Embedder | None = None
         self._description_vectors: NDArray[Any] | None = None
 
@@ -73,7 +73,7 @@ class BiEncoderDescriptionScorer(BaseDescriptionScorer):
         cls,
         context: Context,
         temperature: PositiveFloat = 1.0,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
     ) -> "BiEncoderDescriptionScorer":
         """Create a BiEncoderDescriptionScorer instance using a Context object.
 

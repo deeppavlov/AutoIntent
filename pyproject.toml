@@ -240,6 +240,10 @@ plugins = [
 mypy_path = "src/autointent"
 disable_error_code = ["override"]
 
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+
 [[tool.mypy.overrides]]
 module = [
     "scipy",

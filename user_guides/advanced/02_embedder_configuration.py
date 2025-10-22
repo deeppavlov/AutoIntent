@@ -29,7 +29,7 @@ For more control, pass a dictionary with configuration parameters:
 """
 
 # %%
-from autointent.configs import EmbedderConfig
+from autointent.configs import get_default_embedder_config
 
 # Using a dictionary for detailed configuration
 advanced_embedder_config = {
@@ -59,7 +59,7 @@ import torch
 
 from autointent.configs import TokenizerConfig
 
-embedder_config = EmbedderConfig(
+embedder_config = get_default_embedder_config(
     model_name="sentence-transformers/all-mpnet-base-v2",
     batch_size=32,
     # Device is auto-detected, but you can override if needed
@@ -115,7 +115,7 @@ Prompts can significantly improve embedding quality for specific tasks:
 
 # %%
 # Example: Performance-optimized configuration
-perf_config = EmbedderConfig(
+perf_config = get_default_embedder_config(
     model_name="sentence-transformers/all-MiniLM-L6-v2",  # Fast, lightweight model
     batch_size=128,  # Large batch for speed
     # Device auto-detected by sentence-transformers
@@ -133,7 +133,7 @@ scorer = KNNScorer(embedder_config=perf_config, k=5)
 
 # %%
 # Example: Quality-optimized configuration
-quality_config = EmbedderConfig(
+quality_config = get_default_embedder_config(
     model_name="sentence-transformers/all-mpnet-base-v2",  # High-quality model
     batch_size=16,  # Smaller batch to handle longer sequences
     tokenizer_config=TokenizerConfig(max_length=512),  # Longer sequences for context
@@ -151,7 +151,7 @@ scorer = LinearScorer(embedder_config=quality_config)
 
 # %%
 # Example: Multilingual setup
-multilingual_config = EmbedderConfig(
+multilingual_config = get_default_embedder_config(
     model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     batch_size=32,
     tokenizer_config=TokenizerConfig(max_length=256),

@@ -20,7 +20,7 @@ from autointent.schemas import Intent
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    model_config = SettingsConfigDict(env_file=".env", env_prefix="AUTOINTENT_")
+    model_config = SettingsConfigDict(env_file=".env", env_prefix="AUTOINTENT_", extra="ignore")
     path: str = Field(..., description="Path to the optimized pipeline assets")
     transport: Literal["stdio", "http"] = "stdio"
     host: str = "127.0.0.1"

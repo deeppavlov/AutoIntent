@@ -10,7 +10,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
 
 from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum
+from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
@@ -55,7 +55,7 @@ class LogregAimedEmbedding(BaseEmbedding):
         cv: PositiveInt = 3,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
     ) -> None:
-        self._embedder = Embedder(EmbedderConfig.from_search_config(embedder_config))
+        self._embedder = Embedder(initialize_embedder_config(embedder_config))
         self.cv = cv
         self.ft_config = EmbedderFineTuningConfig.from_search_config(ft_config)
 
@@ -67,7 +67,7 @@ class LogregAimedEmbedding(BaseEmbedding):
     def from_context(
         cls,
         context: Context,
-        embedder_config: EmbedderConfig | str | None = None,
+        embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
     ) -> "LogregAimedEmbedding":

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
+from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, get_default_embedder_config
 from autointent.custom_types import Document
 
 # Check if opensearch-py is available
@@ -56,7 +56,7 @@ class TestVectorIndex:
     @pytest.fixture
     def embedder_config(self) -> EmbedderConfig:
         """Create a lightweight embedder config for testing."""
-        return EmbedderConfig.from_search_config("sentence-transformers/all-MiniLM-L6-v2")
+        return get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
     @pytest.fixture
     def vector_index(self, embedder_config: EmbedderConfig, vector_config) -> VectorIndex:
@@ -242,7 +242,7 @@ class TestVectorIndex:
             vector_index.dump(dump_path)
 
             # Create override config
-            override_config = EmbedderConfig.from_search_config("sentence-transformers/all-MiniLM-L6-v2")
+            override_config = get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
             override_config.device = "cpu"
             override_config.batch_size = 1
 
@@ -287,7 +287,7 @@ class TestVectorIndexEdgeCases:
         """Test that using abstract VectorIndexConfig raises an error."""
         from autointent.configs import VectorIndexConfig
 
-        embedder_config = EmbedderConfig.from_search_config("sentence-transformers/all-MiniLM-L6-v2")
+        embedder_config = get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
         vector_index = VectorIndex(embedder_config=embedder_config, config=VectorIndexConfig())
         with pytest.raises(TypeError, match="Passed abstract vector index config"):

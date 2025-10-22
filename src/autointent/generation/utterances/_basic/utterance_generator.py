@@ -101,7 +101,7 @@ class UtteranceGenerator:
             generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
-        return [Sample(**sample) for sample in new_samples]
+        return [Sample.model_validate(sample) for sample in new_samples]
 
     async def _augment_async(
         self,
@@ -143,7 +143,7 @@ class UtteranceGenerator:
             generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
-        return [Sample(**sample) for sample in new_samples]
+        return [Sample.model_validate(sample) for sample in new_samples]
 
 
 def _extract_utterances(response_text: str) -> list[str]:

@@ -123,54 +123,8 @@
         },
         "EmbedderConfig": {
             "additionalProperties": false,
+            "description": "Base class for embedder configurations.",
             "properties": {
-                "model_name": {
-                    "default": "sentence-transformers/all-MiniLM-L6-v2",
-                    "description": "Name of the hugging face model.",
-                    "title": "Model Name",
-                    "type": "string"
-                },
-                "batch_size": {
-                    "default": 32,
-                    "description": "Batch size for model inference.",
-                    "exclusiveMinimum": 0,
-                    "title": "Batch Size",
-                    "type": "integer"
-                },
-                "device": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Torch notation for CPU or CUDA.",
-                    "title": "Device"
-                },
-                "bf16": {
-                    "default": false,
-                    "description": "Whether to use mixed precision training (not all devices support this).",
-                    "title": "Bf16",
-                    "type": "boolean"
-                },
-                "fp16": {
-                    "default": false,
-                    "description": "Whether to use mixed precision training (not all devices support this).",
-                    "title": "Fp16",
-                    "type": "boolean"
-                },
-                "tokenizer_config": {
-                    "$ref": "#/$defs/TokenizerConfig"
-                },
-                "trust_remote_code": {
-                    "default": false,
-                    "description": "Whether to trust the remote code when loading the model.",
-                    "title": "Trust Remote Code",
-                    "type": "boolean"
-                },
                 "default_prompt": {
                     "anyOf": [
                         {
@@ -248,18 +202,6 @@
                     "default": null,
                     "description": "Prompt for passage.",
                     "title": "Passage Prompt"
-                },
-                "similarity_fn_name": {
-                    "default": "cosine",
-                    "description": "Name of the similarity function to use.",
-                    "enum": [
-                        "cosine",
-                        "dot",
-                        "euclidean",
-                        "manhattan"
-                    ],
-                    "title": "Similarity Fn Name",
-                    "type": "string"
                 },
                 "use_cache": {
                     "default": true,
@@ -552,28 +494,7 @@
             }
         },
         "embedder_config": {
-            "$ref": "#/$defs/EmbedderConfig",
-            "default": {
-                "model_name": "sentence-transformers/all-MiniLM-L6-v2",
-                "batch_size": 32,
-                "device": null,
-                "bf16": false,
-                "fp16": false,
-                "tokenizer_config": {
-                    "max_length": null,
-                    "padding": true,
-                    "truncation": true
-                },
-                "trust_remote_code": false,
-                "default_prompt": null,
-                "classification_prompt": null,
-                "cluster_prompt": null,
-                "sts_prompt": null,
-                "query_prompt": null,
-                "passage_prompt": null,
-                "similarity_fn_name": "cosine",
-                "use_cache": true
-            }
+            "$ref": "#/$defs/EmbedderConfig"
         },
         "cross_encoder_config": {
             "$ref": "#/$defs/CrossEncoderConfig",

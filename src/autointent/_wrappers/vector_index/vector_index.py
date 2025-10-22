@@ -8,15 +8,22 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import assert_never
 
 from autointent._wrappers import Embedder
-from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
-from autointent.custom_types import Document, ListOfLabels
+from autointent.configs import (
+    EmbedderConfig,
+    FaissConfig,
+    OpenSearchConfig,
+    TaskTypeEnum,
+    VectorIndexConfig,
+    get_default_embedder_config,
+)
+from autointent.custom_types import Document, LabelType, ListOfLabels
 
 from .base_backend import BaseIndexBackend
 from .faiss import FaissBackend
@@ -73,19 +80,20 @@ class VectorIndex:
             msg = f"Texts and labels lengths mismatch: {len(texts)=} !] {len(labels)=}"
             raise ValueError(msg)
 
-        logger.debug("Adding embeddings to vector index %s", self.embedder.config.model_name)
+        logger.debug("Adding embeddings to vector index")
         embeddings = self.embedder.embed(texts, TaskTypeEnum.passage)
 
         if not hasattr(self, "index"):
             self.index = self._init_index(vector_size=embeddings.shape[1])
 
         self.index.add(
-            embeddings=embeddings, documents=[Document(text=t, label=i) for t, i in zip(texts, labels, strict=True)]
+            embeddings=embeddings,
+            documents=[Document(text=t, label=cast(LabelType, i)) for t, i in zip(texts, labels, strict=True)],
         )
 
     def clear_ram(self) -> None:
         """Clear the vector index from RAM."""
-        logger.debug("Clearing vector index %s from RAM", self.embedder.config.model_name)
+        logger.debug("Clearing vector index from RAM")
         self.embedder.clear_ram()
         self.index.clear_ram()
 
@@ -186,7 +194,7 @@ class VectorIndex:
         config = model_type.model_validate(content)
 
         instance = cls(
-            embedder_config=EmbedderConfig(),  # dummy embedder config
+            embedder_config=get_default_embedder_config(),  # dummy embedder config
             config=config,
         )
         instance.embedder = embedder

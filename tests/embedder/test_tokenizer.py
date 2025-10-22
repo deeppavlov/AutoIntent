@@ -1,5 +1,5 @@
 from autointent._wrappers.embedder import Embedder
-from autointent.configs._transformers import EmbedderConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
 
 
 def test_max_length_configuration():

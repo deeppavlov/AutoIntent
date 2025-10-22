@@ -9,7 +9,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, FaissConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, FaissConfig, TokenizerConfig, initialize_embedder_config
 from autointent.schemas import Tag, TagsList
 
 
@@ -62,7 +62,7 @@ class TestTransformers:
 class TestVectorIndex:
     def init_attributes(self):
         self.vector_index = VectorIndex(
-            embedder_config=EmbedderConfig.from_search_config("bert-base-uncased"),
+            embedder_config=initialize_embedder_config("bert-base-uncased"),
             config=FaissConfig(),
         )
         self.vector_index.add(texts=["hello", "world"], labels=[0, 1])
@@ -74,7 +74,7 @@ class TestVectorIndex:
 class TestEmbedder:
     def init_attributes(self):
         self.embedder = Embedder(
-            embedder_config=EmbedderConfig.from_search_config("bert-base-uncased"),
+            embedder_config=initialize_embedder_config("bert-base-uncased"),
         )
         self._embedder_predictions = self.embedder.embed(["hello", "world"])
 
@@ -121,26 +121,6 @@ class TestRanker:
         )
 
 
-class TestEmbedderConfig:
-    def init_attributes(self):
-        self.pydantic_model = EmbedderConfig(
-            model_name="bert-base-uncased",
-            batch_size=16,
-            device="cpu",
-            trust_remote_code=True,
-            tokenizer_config=TokenizerConfig(max_length=512, padding="longest", truncation=False),
-        )
-
-    def check_attributes(self):
-        assert self.pydantic_model.model_name == "bert-base-uncased"
-        assert self.pydantic_model.batch_size == 16
-        assert self.pydantic_model.device == "cpu"
-        assert self.pydantic_model.trust_remote_code
-        assert self.pydantic_model.tokenizer_config.max_length == 512
-        assert self.pydantic_model.tokenizer_config.padding == "longest"
-        assert not self.pydantic_model.tokenizer_config.truncation
-
-
 class TestCrossEncoderConfig:
     def init_attributes(self):
         self.pydantic_model = CrossEncoderConfig(
@@ -173,7 +153,6 @@ class TestCrossEncoderConfig:
         TestEmbedder,
         TestSklearnEstimator,
         TestRanker,
-        TestEmbedderConfig,
         TestCrossEncoderConfig,
     ],
 )

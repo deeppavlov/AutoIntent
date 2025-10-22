@@ -3,7 +3,7 @@ import os
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import EmbedderConfig, LoggingConfig, TokenizerConfig
+from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embedder_config
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space, setup_environment
 
@@ -129,7 +129,8 @@ def test_load_with_overrided_params(dataset):
 
     # case 1: simple inference from file system
     inference_pipeline = Pipeline.load(
-        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
+        logging_config.dirpath,
+        embedder_config=get_default_embedder_config(tokenizer_config=TokenizerConfig(max_length=8)),
     )
     utterances = ["123", "hello world"]
     prediction = inference_pipeline.predict(utterances)
@@ -146,7 +147,8 @@ def test_load_with_overrided_params(dataset):
     del pipeline_optimizer
 
     loaded_pipe = Pipeline.load(
-        logging_config.dirpath, embedder_config=EmbedderConfig(tokenizer_config=TokenizerConfig(max_length=8))
+        logging_config.dirpath,
+        embedder_config=get_default_embedder_config(tokenizer_config=TokenizerConfig(max_length=8)),
     )
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2

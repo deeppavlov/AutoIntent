@@ -9,7 +9,13 @@ import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, Ranker, VectorIndex
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
+from autointent.configs import (
+    CrossEncoderConfig,
+    EmbedderConfig,
+    VectorIndexConfig,
+    get_default_vector_index_config,
+    initialize_embedder_config,
+)
 from autointent.custom_types import Document, ListOfLabels
 from autointent.modules.base import BaseScorer
 
@@ -67,7 +73,7 @@ class DNNCScorer(BaseScorer):
         vector_index_config: VectorIndexConfig | None = None,
     ) -> None:
         self.cross_encoder_config = CrossEncoderConfig.from_search_config(cross_encoder_config)
-        self.embedder_config = EmbedderConfig.from_search_config(embedder_config)
+        self.embedder_config = initialize_embedder_config(embedder_config)
         self.k = k
         self.vector_index_config = vector_index_config or get_default_vector_index_config()
 

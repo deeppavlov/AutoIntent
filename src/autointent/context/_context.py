@@ -192,9 +192,6 @@ class Context:
         - default configuration preset by user with :py:meth:`Context.configure_transformer`
         - default configuration preset by AutoIntent in :py:class:`autointent.configs.HFModelConfig`
         """
-        try:
-            return self.optimization_info.get_best_embedder()
-        except ValueError:
-            if hasattr(self, "transformer_config"):
-                return self.transformer_config
-            return HFModelConfig()
+        if hasattr(self, "transformer_config"):
+            return self.transformer_config
+        return HFModelConfig()
