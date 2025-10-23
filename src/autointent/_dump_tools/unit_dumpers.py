@@ -2,13 +2,12 @@ import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
-from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
@@ -21,10 +20,14 @@ from transformers import (
 )
 
 from autointent import Embedder, Ranker, VectorIndex
+from autointent._utils import require
 from autointent._wrappers import BaseTorchModule
 from autointent.schemas import TagsList
 
 from .base import BaseObjectDumper, ModuleSimpleAttributes
+
+if TYPE_CHECKING:
+    from catboost import CatBoostClassifier
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -303,20 +306,25 @@ class TorchModelDumper(BaseObjectDumper[BaseTorchModule]):
         return isinstance(obj, BaseTorchModule)
 
 
-class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
+class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
     dir_or_file_name = "catboost_models"
 
     @staticmethod
-    def dump(obj: CatBoostClassifier, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+    def dump(obj: "CatBoostClassifier", path: Path, exists_ok: bool) -> None:  # noqa: ARG004
         path.parent.mkdir(parents=True, exist_ok=True)
         obj.save_model(str(path), format="cbm")
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401, ARG004
-        model = CatBoostClassifier()
+    def load(path: Path, **kwargs: Any) -> "CatBoostClassifier":  # noqa: ANN401, ARG004
+        catboost = require("catboost", extra="catboost")
+        model = catboost.CatBoostClassifier()
         model.load_model(str(path))
         return model
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, CatBoostClassifier)
+        try:
+            catboost = require("catboost", extra="catboost")
+            return isinstance(obj, catboost.CatBoostClassifier)
+        except ImportError:
+            return False

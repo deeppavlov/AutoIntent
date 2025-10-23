@@ -8,6 +8,7 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CatBoostScorer
 
+pytest.importorskip("catboost")
 
 def test_catboost_scorer_dump_load(dataset):
     """Test that CatBoostScorer can be saved and loaded while preserving predictions."""
