@@ -201,7 +201,7 @@ class BertScorer(BaseScorer):
             trainer.train()
 
     def _get_trainer_callbacks(self) -> list["TrainerCallback"]:
-        res: list["TrainerCallback"] = []
+        res: list[TrainerCallback] = []
         if self.early_stopping_config.metric is not None:
             res.append(
                 self._EarlyStoppingCallback(

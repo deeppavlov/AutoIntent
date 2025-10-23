@@ -156,7 +156,7 @@ class StratifiedSplitter:
             A sequence containing indices for train and test splits.
         """
         if self.random_seed is not None:
-            # Set all seeds for reproducibility (workaround for buggy nature of IterativeStratification from skmultilearn)
+            # Set all seeds for reproducibility (workaround for bugs in IterativeStratification from skmultilearn)
             random.seed(self.random_seed)
         splitter = IterativeStratification(
             n_splits=2,

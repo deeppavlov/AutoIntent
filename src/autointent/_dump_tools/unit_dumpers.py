@@ -217,7 +217,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             # strategy to save lora models: merge adapters and save as usual hugging face model
             lora_path = path / "lora"
             lora_path.mkdir(parents=True, exist_ok=exists_ok)
-            merged_model: "PreTrainedModel" = obj.merge_and_unload()
+            merged_model: PreTrainedModel = obj.merge_and_unload()
             merged_model.save_pretrained(lora_path)
 
     @staticmethod

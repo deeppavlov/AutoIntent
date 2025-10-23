@@ -257,7 +257,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
-            callbacks: list["TrainerCallback"] = [
+            callbacks: list[TrainerCallback] = [
                 transformers.EarlyStoppingCallback(
                     early_stopping_patience=config.early_stopping_patience,
                     early_stopping_threshold=config.early_stopping_threshold,
