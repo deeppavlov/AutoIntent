@@ -10,13 +10,6 @@ import numpy as np
 import numpy.typing as npt
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    PreTrainedModel,
-    PreTrainedTokenizer,
-    PreTrainedTokenizerFast,
-)
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._utils import require
@@ -28,6 +21,7 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 if TYPE_CHECKING:
     from catboost import CatBoostClassifier
     from peft import PeftModel
+    from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -223,21 +217,22 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             # strategy to save lora models: merge adapters and save as usual hugging face model
             lora_path = path / "lora"
             lora_path.mkdir(parents=True, exist_ok=exists_ok)
-            merged_model: PreTrainedModel = obj.merge_and_unload()
+            merged_model: "PreTrainedModel" = obj.merge_and_unload()
             merged_model.save_pretrained(lora_path)
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> "PeftModel":  # noqa: ANN401, ARG004
         peft = require("peft", extra="peft")
+        transformers = require("transformers", extra="transformers")
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
-            model = AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
+            model = transformers.AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
             return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-any-return]
+            return transformers.AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-any-return]
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
@@ -250,38 +245,48 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             return False
 
 
-class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
+class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
     dir_or_file_name = "hf_models"
 
     @staticmethod
-    def dump(obj: PreTrainedModel, path: Path, exists_ok: bool) -> None:
+    def dump(obj: "PreTrainedModel", path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401, ARG004
-        return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
+    def load(path: Path, **kwargs: Any) -> "PreTrainedModel":  # noqa: ANN401, ARG004
+        transformers = require("transformers", extra="transformers")
+        return transformers.AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, PreTrainedModel)
+        try:
+            transformers = require("transformers", extra="transformers")
+            return isinstance(obj, transformers.PreTrainedModel)
+        except ImportError:
+            return False
 
 
-class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokenizerFast]):
+class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokenizerFast"]):
     dir_or_file_name = "hf_tokenizers"
 
     @staticmethod
-    def dump(obj: PreTrainedTokenizer | PreTrainedTokenizerFast, path: Path, exists_ok: bool) -> None:
+    def dump(obj: "PreTrainedTokenizer | PreTrainedTokenizerFast", path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
-        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
+    def load(path: Path, **kwargs: Any) -> "PreTrainedTokenizer | PreTrainedTokenizerFast":  # noqa: ANN401, ARG004
+        transformers = require("transformers", extra="transformers")
+        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, PreTrainedTokenizer | PreTrainedTokenizerFast)
+        try:
+            transformers = require("transformers", extra="transformers")
+            return isinstance(obj, transformers.PreTrainedTokenizer | transformers.PreTrainedTokenizerFast)
+        except ImportError:
+            return False
 
 
 class TorchModelDumper(BaseObjectDumper[BaseTorchModule]):

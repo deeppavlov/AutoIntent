@@ -2,7 +2,7 @@ import logging
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, cast, overload
+from typing import TYPE_CHECKING, Literal, cast, overload
 from uuid import uuid4
 
 import huggingface_hub
@@ -14,15 +14,18 @@ from sentence_transformers import SentenceTransformer, SentenceTransformerTraine
 from sentence_transformers.losses import BatchAllTripletLoss
 from sentence_transformers.training_args import BatchSamplers
 from sklearn.model_selection import train_test_split
-from transformers import EarlyStoppingCallback, TrainerCallback
 
 from autointent._hash import Hasher
+from autointent._utils import require
 from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
 from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
+
+if TYPE_CHECKING:
+    from transformers import TrainerCallback
 
 logger = logging.getLogger(__name__)
 
@@ -234,6 +237,9 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
 
         loss = BatchAllTripletLoss(model=model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
+            # Lazy import transformers (only needed for fine-tuning)
+            transformers = require("transformers", extra="transformers")
+
             args = SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
                 save_total_limit=1,
@@ -251,8 +257,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
-            callbacks: list[TrainerCallback] = [
-                EarlyStoppingCallback(
+            callbacks: list["TrainerCallback"] = [
+                transformers.EarlyStoppingCallback(
                     early_stopping_patience=config.early_stopping_patience,
                     early_stopping_threshold=config.early_stopping_threshold,
                 )
