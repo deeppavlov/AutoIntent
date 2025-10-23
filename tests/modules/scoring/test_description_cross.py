@@ -6,6 +6,8 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CrossEncoderDescriptionScorer
 
+pytest.importorskip("sentence-transformers")
+
 
 @pytest.mark.parametrize(
     ("expected_prediction", "multilabel"),

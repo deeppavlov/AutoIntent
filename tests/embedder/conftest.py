@@ -8,6 +8,8 @@ from autointent.configs import OpenaiEmbeddingConfig, SentenceTransformerEmbeddi
 # Check if OpenAI API key is available for testing
 openai_available = os.getenv("OPENAI_API_KEY") is not None
 
+pytest.importorskip("sentence-transformers")
+
 
 @pytest.fixture
 def on_windows() -> bool:

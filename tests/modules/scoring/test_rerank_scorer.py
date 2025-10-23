@@ -1,9 +1,12 @@
 import tempfile
 
 import numpy as np
+import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import RerankScorer
+
+pytest.importorskip("sentence-transformers")
 
 
 def test_base_rerank_scorer(dataset):

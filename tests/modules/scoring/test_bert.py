@@ -8,6 +8,8 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BertScorer
 
+pytest.importorskip("transformers")
+
 
 def test_bert_scorer_dump_load(dataset):
     """Test that BertScorer can be saved and loaded while preserving predictions."""

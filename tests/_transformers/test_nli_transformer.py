@@ -5,6 +5,8 @@ import pytest
 from autointent import Dataset, Ranker
 from autointent.context.data_handler import DataHandler
 
+pytest.importorskip("sentence-transformers")
+
 
 @pytest.fixture
 def data_handler():

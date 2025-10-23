@@ -6,6 +6,8 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DNNCScorer
 
+pytest.importorskip("sentence-transformers")
+
 
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1)])
 def test_base_dnnc(dataset, train_head, pred_score):

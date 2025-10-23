@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 import torch
 from sklearn.linear_model import LogisticRegression
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
@@ -39,6 +38,8 @@ class TestTags:
 
 class TestTransformers:
     def init_attributes(self):
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
         self._tokenizer_predictions = np.array(self.tokenizer(["hello", "world"]).input_ids)
         self.transformer = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
@@ -143,16 +144,55 @@ class TestCrossEncoderConfig:
         assert not self.pydantic_model.tokenizer_config.truncation
 
 
+def _st_is_installed() -> bool:
+    try:
+        import sentence_transformers  # noqa: F401
+    except ImportError:
+        return False
+    else:
+        return True
+
+
+def _transformers_is_installed() -> bool:
+    try:
+        import transformers  # noqa: F401
+    except ImportError:
+        return False
+    else:
+        return True
+
+
 @pytest.mark.parametrize(
     "test_class",
     [
         TestSimpleAttributes,
         TestTags,
-        TestTransformers,
+        pytest.param(
+            TestTransformers,
+            marks=pytest.mark.skipif(
+                not _transformers_is_installed(),
+                reason="need transformers dependency",
+            ),
+            id="transformer",
+        ),
         TestVectorIndex,
-        TestEmbedder,
+        pytest.param(
+            TestEmbedder,
+            marks=pytest.mark.skipif(
+                not _st_is_installed(),
+                reason="need sentence-transformers dependency",
+            ),
+            id="embedder",
+        ),
         TestSklearnEstimator,
-        TestRanker,
+        pytest.param(
+            TestRanker,
+            marks=pytest.mark.skipif(
+                not _st_is_installed(),
+                reason="need sentence-transformers dependency",
+            ),
+            id="ranker",
+        ),
         TestCrossEncoderConfig,
     ],
 )
