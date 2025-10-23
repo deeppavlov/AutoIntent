@@ -8,6 +8,8 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import PTuningScorer
 
+pytest.importorskip("peft")
+
 
 def test_ptuning_scorer_dump_load(dataset):
     """Test that PTuningScorer can be saved and loaded while preserving predictions."""

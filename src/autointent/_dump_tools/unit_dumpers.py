@@ -8,7 +8,6 @@ import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
-from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 from transformers import (
@@ -28,6 +27,7 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
     from catboost import CatBoostClassifier
+    from peft import PeftModel
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -207,11 +207,11 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
         return isinstance(obj, BaseModel)
 
 
-class PeftModelDumper(BaseObjectDumper[PeftModel]):
+class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     dir_or_file_name = "peft_models"
 
     @staticmethod
-    def dump(obj: PeftModel, path: Path, exists_ok: bool) -> None:
+    def dump(obj: "PeftModel", path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         if obj._is_prompt_learning:  # noqa: SLF001
             # strategy to save prompt learning models: save prompt encoder and bert classifier separately
@@ -227,12 +227,13 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
             merged_model.save_pretrained(lora_path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> "PeftModel":  # noqa: ANN401, ARG004
+        peft = require("peft", extra="peft")
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
             model = AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
-            return PeftModel.from_pretrained(model, ptuning_path / "peft")
+            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
@@ -242,7 +243,11 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
-        return isinstance(obj, PeftModel)
+        try:
+            peft = require("peft", extra="peft")
+            return isinstance(obj, peft.PeftModel)
+        except ImportError:
+            return False
 
 
 class HFModelDumper(BaseObjectDumper[PreTrainedModel]):

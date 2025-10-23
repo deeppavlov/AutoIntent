@@ -8,6 +8,8 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BERTLoRAScorer
 
+pytest.importorskip("peft")
+
 
 def test_lora_scorer_dump_load(dataset):
     """Test that BERTLoRAScorer can be saved and loaded while preserving predictions."""

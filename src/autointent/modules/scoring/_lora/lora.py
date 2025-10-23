@@ -1,15 +1,17 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
 from pathlib import Path
-from typing import Any, Literal
-
-from peft import LoraConfig, get_peft_model
+from typing import TYPE_CHECKING, Any, Literal
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
+from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
+
+if TYPE_CHECKING:
+    from peft import LoraConfig
 
 
 class BERTLoRAScorer(BertScorer):
@@ -56,6 +58,8 @@ class BERTLoRAScorer(BertScorer):
 
     name = "lora"
 
+    _lora_config: "LoraConfig"
+
     def __init__(
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -67,6 +71,11 @@ class BERTLoRAScorer(BertScorer):
         print_progress: bool = False,
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
+        # Lazy import peft
+        peft = require("peft", extra="peft")
+        self._LoraConfig = peft.LoraConfig
+        self._get_peft_model = peft.get_peft_model
+
         # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
         early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
 
@@ -80,7 +89,7 @@ class BERTLoRAScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             print_progress=print_progress,
         )
-        self._lora_config = LoraConfig(**lora_kwargs)
+        self._lora_config = self._LoraConfig(**lora_kwargs)
 
     @classmethod
     def from_context(
@@ -107,7 +116,7 @@ class BERTLoRAScorer(BertScorer):
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
         model = super()._initialize_model()
-        return get_peft_model(model, self._lora_config)
+        return self._get_peft_model(model, self._lora_config)
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[LoraConfig])
+        Dumper.dump(self, Path(path), exclude=[self._LoraConfig])

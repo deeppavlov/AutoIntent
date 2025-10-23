@@ -1,16 +1,19 @@
 """PTuningScorer class for ptuning-based classification."""
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
-from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType, get_peft_model
 from pydantic import PositiveInt
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
+from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
+
+if TYPE_CHECKING:
+    from peft import PromptEncoderConfig
 
 
 class PTuningScorer(BertScorer):
@@ -47,6 +50,8 @@ class PTuningScorer(BertScorer):
 
     name = "ptuning"
 
+    _ptuning_config: "PromptEncoderConfig"
+
     def __init__(  # noqa: PLR0913
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -64,6 +69,13 @@ class PTuningScorer(BertScorer):
         print_progress: bool = False,
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
+        # Lazy import peft
+        peft = require("peft", extra="peft")
+        self._PromptEncoderConfig = peft.PromptEncoderConfig
+        self._PromptEncoderReparameterizationType = peft.PromptEncoderReparameterizationType
+        self._TaskType = peft.TaskType
+        self._get_peft_model = peft.get_peft_model
+
         super().__init__(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
@@ -74,9 +86,9 @@ class PTuningScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             print_progress=print_progress,
         )
-        self._ptuning_config = PromptEncoderConfig(
-            task_type=TaskType.SEQ_CLS,
-            encoder_reparameterization_type=PromptEncoderReparameterizationType(encoder_reparameterization_type),
+        self._ptuning_config = self._PromptEncoderConfig(
+            task_type=self._TaskType.SEQ_CLS,
+            encoder_reparameterization_type=self._PromptEncoderReparameterizationType(encoder_reparameterization_type),
             num_virtual_tokens=num_virtual_tokens,
             encoder_dropout=encoder_dropout,
             encoder_hidden_size=encoder_hidden_size,
@@ -139,7 +151,7 @@ class PTuningScorer(BertScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         """Initialize the model with P-tuning configuration."""
         model = super()._initialize_model()
-        return get_peft_model(model, self._ptuning_config)
+        return self._get_peft_model(model, self._ptuning_config)
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[PromptEncoderConfig])
+        Dumper.dump(self, Path(path), exclude=[self._PromptEncoderConfig])
