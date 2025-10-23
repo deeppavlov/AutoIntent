@@ -89,13 +89,13 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.multilabel is True
     assert handler.dataset.n_classes == 2
     assert handler.train_utterances(0) == [
-        "hey, how's it going?",
+        "farewell and see you later",
+        "good morning",
         "so long and take care",
-        "hello, nice to meet you",
-        "later, see you soon",
+        "greetings and salutations",
     ]
     assert handler.test_utterances() == ["greetings", "farewell"]
-    assert handler.train_labels(0) == [[1, 0], [0, 1], [0, 1], [1, 0]]
+    assert handler.train_labels(0) == [[0, 1], [1, 0], [0, 1], [1, 0]]
     assert handler.test_labels() == [[0, 1], [1, 0]]
 
 
@@ -239,6 +239,6 @@ def test_few_shot_split(dataset):
     }
 
     for data_split in dh.dataset:
-        assert (
-            Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split]
-        ), f"Failed for {data_split}"
+        assert Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split], (
+            f"Failed for {data_split}"
+        )

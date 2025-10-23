@@ -5,15 +5,14 @@ It includes support for both single-label and multi-label stratified splitting.
 """
 
 import logging
-import random
 from collections.abc import Sequence
 
 import numpy as np
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
+from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
 from numpy import typing as npt
 from sklearn.model_selection import train_test_split
-from skmultilearn.model_selection import IterativeStratification
 
 from autointent import Dataset
 from autointent.custom_types import LabelType
@@ -155,13 +154,10 @@ class StratifiedSplitter:
         Returns:
             A sequence containing indices for train and test splits.
         """
-        if self.random_seed is not None:
-            # Set all seeds for reproducibility (workaround for bugs in IterativeStratification from skmultilearn)
-            random.seed(self.random_seed)
-        splitter = IterativeStratification(
-            n_splits=2,
-            order=2,
-            sample_distribution_per_fold=[test_size, 1.0 - test_size],
+        splitter = MultilabelStratifiedShuffleSplit(
+            n_splits=1,
+            test_size=test_size,
+            random_state=self.random_seed,
         )
         return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
 

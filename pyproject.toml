@@ -33,7 +33,7 @@ requires-python = ">=3.10,<3.13"
 dependencies = [
     "sentence-transformers (>=3,<4)",
     "scikit-learn (>=1.5,<2.0)",
-    "scikit-multilearn (==0.2.0)",
+    "iterative-stratification (>=0.1.9)",
     "appdirs (>=1.4,<2.0)",
     "optuna (>=4.0.0,<5.0.0)",
     "pathlib (>=1.0.1,<2.0.0)",
@@ -253,7 +253,7 @@ module = [
     "xeger",
     "appdirs",
     "sre_yield",
-    "skmultilearn.model_selection",
+    "iterstrat.ml_stratifiers",
     "hydra",
     "hydra.*",
     "transformers",
