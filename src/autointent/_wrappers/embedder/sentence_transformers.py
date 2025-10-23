@@ -10,9 +10,6 @@ import numpy as np
 import numpy.typing as npt
 import torch
 from datasets import Dataset
-from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
-from sentence_transformers.losses import BatchAllTripletLoss
-from sentence_transformers.training_args import BatchSamplers
 from sklearn.model_selection import train_test_split
 
 from autointent._hash import Hasher
@@ -25,6 +22,7 @@ from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
     from transformers import TrainerCallback
 
 logger = logging.getLogger(__name__)
@@ -51,6 +49,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
     """SentenceTransformer-based embedding backend implementation."""
 
     supports_training: bool = True
+    _model: "SentenceTransformer | None"
 
     def __init__(self, config: SentenceTransformerEmbeddingConfig) -> None:
         """Initialize the SentenceTransformer backend.
@@ -59,7 +58,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             config: Configuration for SentenceTransformer embeddings.
         """
         self.config = config
-        self._model: SentenceTransformer | None = None
+        self._model = None
         self._trained: bool = False
 
     def clear_ram(self) -> None:
@@ -71,10 +70,12 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             self._model = None
             torch.cuda.empty_cache()
 
-    def _load_model(self) -> SentenceTransformer:
+    def _load_model(self) -> "SentenceTransformer":
         """Load sentence transformers model to device."""
         if self._model is None:
-            res = SentenceTransformer(
+            # Lazy import sentence-transformers
+            st = require("sentence_transformers", extra="sentence-transformers")
+            res = st.SentenceTransformer(
                 self.config.model_name,
                 device=self.config.device,
                 prompts=self.config.get_prompt_config(),
@@ -231,16 +232,17 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
 
         model = self._load_model()
 
+        # Lazy import sentence-transformers training components (only needed for fine-tuning)
+        st = require("sentence_transformers", extra="sentence-transformers")
+        transformers = require("transformers", extra="transformers")
+
         x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
         tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
         val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
 
-        loss = BatchAllTripletLoss(model=model, margin=config.margin)
+        loss = st.losses.BatchAllTripletLoss(model=model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            # Lazy import transformers (only needed for fine-tuning)
-            transformers = require("transformers", extra="transformers")
-
-            args = SentenceTransformerTrainingArguments(
+            args = st.SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
                 save_total_limit=1,
                 output_dir=tmp_dir,
@@ -251,7 +253,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
                 bf16=config.bf16,
-                batch_sampler=BatchSamplers.NO_DUPLICATES,
+                batch_sampler=st.training_args.BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,
                 eval_strategy="epoch",
@@ -263,7 +265,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                     early_stopping_threshold=config.early_stopping_threshold,
                 )
             ]
-            trainer = SentenceTransformerTrainer(
+            trainer = st.SentenceTransformerTrainer(
                 model=model,
                 args=args,
                 train_dataset=tr_ds,

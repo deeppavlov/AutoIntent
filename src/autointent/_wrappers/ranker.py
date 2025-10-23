@@ -10,18 +10,21 @@ import json
 import logging
 from pathlib import Path
 from random import shuffle
-from typing import Any, Literal, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import joblib
 import numpy as np
 import numpy.typing as npt
-import sentence_transformers as st
 import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
+from autointent._utils import require
 from autointent.configs import CrossEncoderConfig
 from autointent.custom_types import ListOfLabels, RerankedItem
+
+if TYPE_CHECKING:
+    import sentence_transformers as st
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +98,7 @@ class Ranker:
     _metadata_file_name = "metadata.json"
     _classifier_file_name = "classifier.joblib"
     config: CrossEncoderConfig
-    cross_encoder: st.CrossEncoder
+    cross_encoder: "st.CrossEncoder"
 
     def __init__(
         self,
@@ -110,12 +113,15 @@ class Ranker:
             classifier_head: Optional pre-trained classifier head
             output_range: Range of the output probabilities ([0, 1] for sigmoid, [-1, 1] for tanh)
         """
+        # Lazy import sentence-transformers
+        st = require("sentence_transformers", extra="sentence-transformers")
+
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
         self.cross_encoder = st.CrossEncoder(
             self.config.model_name,
             trust_remote_code=self.config.trust_remote_code,
             device=self.config.device,
-            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
+            max_length=self.config.tokenizer_config.max_length,
         )
         self._train_head = False
         self._clf = classifier_head
