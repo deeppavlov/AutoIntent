@@ -90,7 +90,7 @@ class TextMLGCN(BaseTorchModule):
         reweighted_adj = adj_matrix_no_self_loop * weights_p.unsqueeze(1)
         reweighted_adj.fill_diagonal_(1 - p)
 
-        return cast(torch.Tensor, reweighted_adj)
+        return reweighted_adj
 
     def set_correlation_matrix(self, train_labels: torch.Tensor) -> None:
         corr_matrix = self.create_correlation_matrix(

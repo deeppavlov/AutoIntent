@@ -228,7 +228,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             # prompt learning model
             ptuning_path = path / "ptuning"
             model = transformers.AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
-            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")
+            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")  # type: ignore[no-any-return]
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
@@ -278,7 +278,7 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
     @staticmethod
     def load(path: Path, **kwargs: Any) -> "PreTrainedTokenizer | PreTrainedTokenizerFast":  # noqa: ANN401, ARG004
         transformers = require("transformers", extra="transformers")
-        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
+        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
