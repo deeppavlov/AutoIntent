@@ -7,11 +7,11 @@ on:
         required: true
         type: string
         description: 'Command to run tests'
-      install_all_extras:
+      extras:
         required: false
-        type: boolean
-        default: false
-        description: 'Install all extra dependency groups'
+        type: string
+        default: ''
+        description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
 
 jobs:
   test:
@@ -44,7 +44,7 @@ jobs:
     - name: Install dependencies for Python ${{ matrix.python-version }}
       run: |
         uv python pin ${{ matrix.python-version }}
-        uv sync --group test ${{ inputs.install_all_extras && '--all-extras' || '' }}
+        uv sync --group test ${{ inputs.extras }}
 
     - name: Run tests
       run: |

@@ -11,4 +11,4 @@ jobs:
     uses: ./.github/workflows/reusable-test.yaml
     with:
       test_command: pytest -n auto tests/pipeline/test_inference.py
-      install_all_extras: true
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
