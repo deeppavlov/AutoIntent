@@ -35,7 +35,7 @@ class TestEmbedderDumpLoad:
         """Create an Embedder instance for testing."""
         return Embedder(embedder_config)
 
-    def test_dump_load_cycle(self, embedder: Embedder, on_windows):
+    def test_dump_load_cycle(self, embedder: Embedder, on_windows, embedder_config: EmbedderConfig):  # noqa: ARG002
         """Test complete dump/load cycle preserves functionality."""
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
             temp_path = Path(temp_dir)
@@ -54,13 +54,22 @@ class TestEmbedderDumpLoad:
             loaded_embeddings = embedder_loaded.embed(test_utterances)
             np.testing.assert_allclose(original_embeddings, loaded_embeddings, rtol=1e-3)
 
-            # Test configuration preservation
-            assert embedder_loaded.config.model_name == embedder.config.model_name
-            assert embedder_loaded.config.default_prompt == embedder.config.default_prompt
-            assert embedder_loaded.config.batch_size == embedder.config.batch_size
+            # Test configuration preservation (only for configs that have these attributes)
+            if hasattr(embedder.config, "model_name"):
+                assert embedder_loaded.config.model_name == embedder.config.model_name
+            if hasattr(embedder.config, "default_prompt"):
+                assert embedder_loaded.config.default_prompt == embedder.config.default_prompt
+            if hasattr(embedder.config, "batch_size"):
+                assert embedder_loaded.config.batch_size == embedder.config.batch_size
 
-    def test_load_with_config_override(self, embedder: Embedder, on_windows):
+    def test_load_with_config_override(self, embedder: Embedder, on_windows, embedder_config: EmbedderConfig):  # noqa: ARG002
         """Test loading with configuration override."""
+        from autointent.configs import HashingVectorizerEmbeddingConfig, OpenaiEmbeddingConfig
+
+        # Skip for HashingVectorizer as it doesn't support batch_size override
+        if isinstance(embedder.config, HashingVectorizerEmbeddingConfig):
+            pytest.skip("HashingVectorizer doesn't support batch_size configuration")
+
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
             temp_path = Path(temp_dir)
 
@@ -72,8 +81,6 @@ class TestEmbedderDumpLoad:
                 override_config = SentenceTransformerEmbeddingConfig(batch_size=16)
             else:
                 # For OpenAI, we can override batch_size too
-                from autointent.configs import OpenaiEmbeddingConfig
-
                 override_config = OpenaiEmbeddingConfig(batch_size=16)
 
             # Load with override
