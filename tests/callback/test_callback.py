@@ -6,7 +6,7 @@ import numpy as np
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import DataConfig, FaissConfig, HPOConfig, LoggingConfig
-from tests.conftest import setup_environment
+from tests.conftest import get_test_embedder_config, setup_environment
 
 
 class DummyCallback(OptimizerCallback):
@@ -62,7 +62,6 @@ def test_pipeline_callbacks(dataset):
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
                 }
             ],
         },
@@ -97,6 +96,7 @@ def test_pipeline_callbacks(dataset):
     context.set_dataset(dataset, DataConfig(scheme="ho"))
     context.configure_hpo(HPOConfig(n_trials=10))
     context.configure_vector_index(FaissConfig())
+    context.configure_transformer(get_test_embedder_config())
 
     pipeline_optimizer._fit(context)
 
@@ -111,7 +111,7 @@ def test_pipeline_callbacks(dataset):
             {
                 "module_name": "retrieval",
                 "num": 0,
-                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+                "module_kwargs": {"k": 10},
             },
         ),
         ("update_metrics", {"retrieval_hit_rate": 1.0}),
@@ -122,7 +122,7 @@ def test_pipeline_callbacks(dataset):
             {
                 "module_name": "retrieval",
                 "num": 1,
-                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
+                "module_kwargs": {"k": 5},
             },
         ),
         ("update_metrics", {"retrieval_hit_rate": 1.0}),
@@ -135,7 +135,7 @@ def test_pipeline_callbacks(dataset):
                 "num": 0,
                 "module_kwargs": {
                     "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
                         "batch_size": 32,
                         "device": None,
                         "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
@@ -154,8 +154,8 @@ def test_pipeline_callbacks(dataset):
                 },
             },
         ),
-        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
-        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
         ("end_module", {}),
         (
             "start_module",
@@ -166,7 +166,7 @@ def test_pipeline_callbacks(dataset):
                     "k": 1,
                     "weights": "uniform",
                     "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
                         "batch_size": 32,
                         "device": None,
                         "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
@@ -193,7 +193,7 @@ def test_pipeline_callbacks(dataset):
             {
                 "module_kwargs": {
                     "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
+                        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
                         "batch_size": 32,
                         "device": None,
                         "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
