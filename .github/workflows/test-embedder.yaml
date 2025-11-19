@@ -10,6 +10,6 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-test.yaml
     with:
-      test_command: pytest -n auto tests/embedder/
+      test_command: pytest -n auto tests/embedder/ tests/callback/
       extras: --extra sentence-transformers --extra transformers
 
