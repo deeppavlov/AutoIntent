@@ -158,7 +158,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         logger.debug("Loaded HashingVectorizer backend from %s", path)
         return instance
 
-    def train(self, utterances: list[str], labels: list[int], config) -> None:  # noqa: ANN001  # type: ignore[no-untyped-def]
+    def train(self, utterances: list[str], labels: list[int], config) -> None:  # type: ignore[no-untyped-def]  # noqa: ANN001
         """Train the backend.
 
         HashingVectorizer is stateless and doesn't support training.
