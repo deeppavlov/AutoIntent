@@ -61,6 +61,7 @@ def test_rerank_in_pipeline(dataset):
     search_space = [
         {
             "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
             "search_space": [
                 {
                     "module_name": "rerank",
@@ -70,7 +71,7 @@ def test_rerank_in_pipeline(dataset):
                 }
             ],
         },
-        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
     ]
 
     pipeline = Pipeline.from_search_space(search_space)

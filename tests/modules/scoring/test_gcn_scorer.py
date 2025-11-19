@@ -98,6 +98,7 @@ def test_gcn_in_pipeline(dataset):
     search_space = [
         {
             "node_type": "scoring",
+            "target_metric": "scoring_hit_rate",
             "search_space": [
                 {
                     "module_name": "gcn",
@@ -106,10 +107,15 @@ def test_gcn_in_pipeline(dataset):
                 }
             ],
         },
-        {"node_type": "decision", "search_space": [{"module_name": "threshold", "thresh": [0.5]}]},
+        {
+            "node_type": "decision",
+            "target_metric": "decision_accuracy",
+            "search_space": [{"module_name": "threshold", "thresh": [0.5]}],
+        },
     ]
 
     pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
     pipeline.fit(dataset.to_multilabel())
     predictions = pipeline.predict(["test utterance"])
     assert len(predictions) == 1

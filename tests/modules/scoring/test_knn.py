@@ -53,6 +53,7 @@ def test_knn_in_pipeline(dataset):
     search_space = [
         {
             "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
             "search_space": [
                 {
                     "module_name": "knn",
@@ -61,10 +62,11 @@ def test_knn_in_pipeline(dataset):
                 }
             ],
         },
-        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
     ]
 
     pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
     pipeline.fit(dataset)
     predictions = pipeline.predict(["test utterance"])
     assert len(predictions) == 1
