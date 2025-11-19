@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import RNNScorer
 
@@ -125,3 +126,26 @@ def test_rnn_scorer_dump_load(dataset):
     finally:
         # Clean up
         shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
+
+
+def test_rnn_in_pipeline(dataset):
+    """Test RNNScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "rnn",
+                    "embed_dim": [8],
+                    "hidden_dim": [8],
+                    "num_train_epochs": [1],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

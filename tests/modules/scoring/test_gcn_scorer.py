@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from autointent import Dataset
+from autointent import Dataset, Pipeline
 from autointent.modules.scoring import GCNScorer
 from tests.conftest import get_test_embedder_config
 
@@ -91,3 +91,25 @@ def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
     loaded_predictions = loaded_scorer.predict(test_utterances)
 
     np.testing.assert_allclose(original_predictions, loaded_predictions, atol=1e-6)
+
+
+def test_gcn_in_pipeline(dataset):
+    """Test GCNScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "gcn",
+                    "num_train_epochs": [1],
+                    "batch_size": [8],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "threshold", "thresh": [0.5]}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset.to_multilabel())
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

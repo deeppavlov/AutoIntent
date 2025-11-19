@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BiEncoderDescriptionScorer
 
@@ -56,3 +57,25 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
         new_scorer = BiEncoderDescriptionScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_utterances)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+def test_description_bi_in_pipeline(dataset):
+    """Test BiEncoderDescriptionScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "description_bi",
+                    "embedder_config": [{"model_name": "sergeyzh/rubert-tiny-turbo"}],
+                    "temperature": [0.3],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

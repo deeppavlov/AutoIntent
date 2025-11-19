@@ -2,6 +2,7 @@ import tempfile
 
 import numpy as np
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
 from tests.conftest import get_test_embedder_config
@@ -45,3 +46,25 @@ def test_base_knn(dataset):
         new_scorer = KNNScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)
+
+
+def test_knn_in_pipeline(dataset):
+    """Test KNNScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "knn",
+                    "k": [3],
+                    "weights": ["distance"],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

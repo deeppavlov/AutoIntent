@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import PTuningScorer
 
@@ -113,3 +114,27 @@ def test_ptuning_cache_clearing(dataset):
 
     with pytest.raises(RuntimeError):
         scorer.predict(test_data)
+
+
+def test_ptuning_in_pipeline(dataset):
+    """Test PTuningScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "ptuning",
+                    "classification_model_config": [{"model_name": "prajjwal1/bert-tiny"}],
+                    "num_train_epochs": [1],
+                    "batch_size": [8],
+                    "num_virtual_tokens": [10],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

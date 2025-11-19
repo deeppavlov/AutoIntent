@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import RerankScorer
 
@@ -53,3 +54,26 @@ def test_base_rerank_scorer(dataset):
         new_scorer = RerankScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)
+
+
+def test_rerank_in_pipeline(dataset):
+    """Test RerankScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "rerank",
+                    "k": [3],
+                    "weights": ["distance"],
+                    "cross_encoder_config": [{"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2"}],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

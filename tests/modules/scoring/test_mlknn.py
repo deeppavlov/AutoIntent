@@ -2,6 +2,7 @@ import tempfile
 
 import numpy as np
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import MLKnnScorer
 from tests.conftest import get_test_embedder_config
@@ -50,3 +51,24 @@ def test_base_mlknn(dataset):
         new_scorer = MLKnnScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)
+
+
+def test_mlknn_in_pipeline(dataset):
+    """Test MLKnnScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "mlknn",
+                    "k": [3],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "threshold", "thresh": [0.5]}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset.to_multilabel())
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

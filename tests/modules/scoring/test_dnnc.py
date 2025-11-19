@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DNNCScorer
 
@@ -41,3 +42,25 @@ def test_base_dnnc(dataset, train_head, pred_score):
         new_scorer = DNNCScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+def test_dnnc_in_pipeline(dataset):
+    """Test DNNCScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "search_space": [
+                {
+                    "module_name": "dnnc",
+                    "cross_encoder_config": [{"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2"}],
+                    "k": [3],
+                }
+            ],
+        },
+        {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1
