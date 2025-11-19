@@ -67,7 +67,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         hasher.update(self.config.norm if self.config.norm is not None else "None")
         hasher.update(self.config.binary)
         hasher.update(self.config.dtype)
-        return hasher.hexdigest()
+        return int(hasher.hexdigest(), 16)
 
     @overload
     def embed(
@@ -97,7 +97,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         """
         # Transform texts to sparse matrix, then convert to dense
         embeddings_sparse = self._vectorizer.transform(utterances)
-        embeddings = embeddings_sparse.toarray().astype(np.float32)
+        embeddings: npt.NDArray[np.float32] = embeddings_sparse.toarray().astype(np.float32)
 
         if return_tensors:
             return torch.from_numpy(embeddings)
@@ -115,7 +115,8 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             Similarity matrix with shape (n_samples, m_samples).
         """
-        return cosine_similarity(embeddings1, embeddings2).astype(np.float32)
+        similarity_matrix: npt.NDArray[np.float32] = cosine_similarity(embeddings1, embeddings2).astype(np.float32)
+        return similarity_matrix
 
     def dump(self, path: Path) -> None:
         """Save the backend state to disk.
@@ -157,7 +158,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         logger.debug("Loaded HashingVectorizer backend from %s", path)
         return instance
 
-    def train(self, utterances: list[str], labels: list[int], config) -> None:  # noqa: ANN001
+    def train(self, utterances: list[str], labels: list[int], config) -> None:  # noqa: ANN001  # type: ignore[no-untyped-def]
         """Train the backend.
 
         HashingVectorizer is stateless and doesn't support training.
