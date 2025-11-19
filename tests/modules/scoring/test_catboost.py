@@ -170,6 +170,7 @@ def test_catboost_in_pipeline(dataset):
     ]
 
     pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
     pipeline.fit(dataset)
     predictions = pipeline.predict(["test utterance"])
     assert len(predictions) == 1
