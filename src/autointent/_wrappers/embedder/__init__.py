@@ -2,12 +2,14 @@
 
 from .base import BaseEmbeddingBackend
 from .embedder import Embedder
+from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
 
 __all__ = [
     "BaseEmbeddingBackend",
     "Embedder",
+    "HashingVectorizerEmbeddingBackend",
     "OpenaiEmbeddingBackend",
     "SentenceTransformerEmbeddingBackend",
 ]

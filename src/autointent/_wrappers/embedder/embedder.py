@@ -15,10 +15,16 @@ import numpy.typing as npt
 import torch
 
 from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
-from autointent.configs._embedder import EmbedderConfig, OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs._embedder import (
+    EmbedderConfig,
+    HashingVectorizerEmbeddingConfig,
+    OpenaiEmbeddingConfig,
+    SentenceTransformerEmbeddingConfig,
+)
 from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
+from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
 
@@ -52,6 +58,8 @@ class Embedder:
             return SentenceTransformerEmbeddingBackend(self.config)
         if isinstance(self.config, OpenaiEmbeddingConfig):
             return OpenaiEmbeddingBackend(self.config)
+        if isinstance(self.config, HashingVectorizerEmbeddingConfig):
+            return HashingVectorizerEmbeddingBackend(self.config)
         # Check if it's exactly the abstract base config (not a subclass)
 
         msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
@@ -147,6 +155,8 @@ class Embedder:
             instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)  # noqa: SLF001
         elif isinstance(config, OpenaiEmbeddingConfig):
             instance._backend = OpenaiEmbeddingBackend.load(backend_path)  # noqa: SLF001
+        elif isinstance(config, HashingVectorizerEmbeddingConfig):
+            instance._backend = HashingVectorizerEmbeddingBackend.load(backend_path)  # noqa: SLF001
         else:
             msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
             raise TypeError(msg)
