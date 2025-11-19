@@ -40,6 +40,7 @@ def test_on_dataset_incremental(dataset):
     assert len(new_samples) == n_before
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
 
+
 @pytest.mark.skip(reason="issues with sentence-transformers dependency")
 def test_on_dataset_increment_evolver_async(dataset):
     mock_llm = AsyncMock()
@@ -70,6 +71,7 @@ def test_on_dataset_increment_evolver_async(dataset):
         new_samples = augmenter.augment(
             dataset, split_name=split_name, n_evolutions=1, update_split=True, sequential=True
         )
+
 
 @pytest.mark.skip(reason="issues with sentence-transformers dependency")
 def test_on_dataset_increment_evolver_async_with_batch_size(dataset):
