@@ -43,3 +43,29 @@ def get_search_space_path(task_type: TaskType):
 def get_search_space(task_type: TaskType):
     path = get_search_space_path(task_type)
     return load_search_space(path)
+
+
+def get_test_embedder_config(**kwargs):
+    """Get lightweight embedder config for tests (HashingVectorizer-based).
+
+    This function returns a HashingVectorizer-based embedder config that is:
+    - Fast (no model downloads or loading)
+    - Lightweight (minimal memory usage)
+    - Stateless (no training required)
+
+    Perfect for testing non-embedder specific functionality.
+
+    Args:
+        **kwargs: Additional keyword arguments to override defaults.
+
+    Returns:
+        HashingVectorizerEmbeddingConfig: Configured embedder for testing.
+    """
+    from autointent.configs import HashingVectorizerEmbeddingConfig
+
+    defaults = {
+        "n_features": 512,
+        "use_cache": False,
+    }
+    defaults.update(kwargs)
+    return HashingVectorizerEmbeddingConfig(**defaults)
