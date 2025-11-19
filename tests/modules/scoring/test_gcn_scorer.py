@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch
 
-from autointent import Dataset
+from autointent import Dataset, Pipeline
 from autointent.modules.scoring import GCNScorer
 from tests.conftest import get_test_embedder_config
 
@@ -45,7 +45,13 @@ def multiclass_dataset():
 
 def test_gcn_scorer_multilabel(multilabel_dataset):
     torch.manual_seed(42)
-    scorer = GCNScorer(embedder_config=get_test_embedder_config(), num_train_epochs=1, batch_size=2, seed=42)
+    scorer = GCNScorer(
+        embedder_config=get_test_embedder_config(),
+        label_embedder_config=get_test_embedder_config(),
+        num_train_epochs=1,
+        batch_size=2,
+        seed=42,
+    )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
     descriptions = [intent.name for intent in multilabel_dataset.intents]
@@ -60,7 +66,13 @@ def test_gcn_scorer_multilabel(multilabel_dataset):
 
 def test_gcn_scorer_multiclass(multiclass_dataset):
     torch.manual_seed(42)
-    scorer = GCNScorer(embedder_config=get_test_embedder_config(), num_train_epochs=1, batch_size=2, seed=42)
+    scorer = GCNScorer(
+        embedder_config=get_test_embedder_config(),
+        label_embedder_config=get_test_embedder_config(),
+        num_train_epochs=1,
+        batch_size=2,
+        seed=42,
+    )
     train_utterances = multiclass_dataset["train"]["utterance"]
     train_labels = multiclass_dataset["train"]["label"]
     descriptions = [intent.name for intent in multiclass_dataset.intents]
@@ -76,7 +88,13 @@ def test_gcn_scorer_multiclass(multiclass_dataset):
 
 def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
     torch.manual_seed(42)
-    scorer = GCNScorer(embedder_config=get_test_embedder_config(), num_train_epochs=1, batch_size=2, seed=42)
+    scorer = GCNScorer(
+        embedder_config=get_test_embedder_config(),
+        label_embedder_config=get_test_embedder_config(),
+        num_train_epochs=1,
+        batch_size=2,
+        seed=42,
+    )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
     descriptions = [intent.name for intent in multilabel_dataset.intents]
@@ -91,3 +109,31 @@ def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
     loaded_predictions = loaded_scorer.predict(test_utterances)
 
     np.testing.assert_allclose(original_predictions, loaded_predictions, atol=1e-6)
+
+
+def test_gcn_in_pipeline(dataset):
+    """Test GCNScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_hit_rate",
+            "search_space": [
+                {
+                    "module_name": "gcn",
+                    "num_train_epochs": [1],
+                    "batch_size": [8],
+                }
+            ],
+        },
+        {
+            "node_type": "decision",
+            "target_metric": "decision_accuracy",
+            "search_space": [{"module_name": "threshold", "thresh": [0.5]}],
+        },
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset.to_multilabel())
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

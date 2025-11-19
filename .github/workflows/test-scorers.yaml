@@ -1,17 +1,10 @@
-name: Reusable Test Workflow
+name: test scorers
 
 on:
-  workflow_call:
-    inputs:
-      test_command:
-        required: true
-        type: string
-        description: 'Command to run tests'
-      extras:
-        required: false
-        type: string
-        default: ''
-        description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
+  push:
+    branches:
+      - dev
+  pull_request:
 
 jobs:
   test:
@@ -21,9 +14,11 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         python-version: [ "3.10", "3.11", "3.12" ]
+        dependency-group: [ "base", "transformers", "peft", "catboost" ]
         include:
           - os: windows-latest
             python-version: "3.10"
+            dependency-group: "base"
 
     steps:
     - name: Checkout code
@@ -44,8 +39,9 @@ jobs:
     - name: Install dependencies for Python ${{ matrix.python-version }}
       run: |
         uv python pin ${{ matrix.python-version }}
-        uv sync --group test ${{ inputs.extras }}
+        uv sync --group test ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}
 
-    - name: Run tests
+    - name: Run scorer tests
       run: |
-        uv run ${{ inputs.test_command }}
+        uv run pytest -n auto tests/modules/scoring/
+

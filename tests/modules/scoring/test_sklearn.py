@@ -2,6 +2,7 @@ import tempfile
 
 import numpy as np
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import SklearnScorer
 from tests.conftest import get_test_embedder_config
@@ -52,3 +53,26 @@ def test_base_sklearn(dataset):
         new_scorer = SklearnScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+def test_sklearn_in_pipeline(dataset):
+    """Test SklearnScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "sklearn",
+                    "clf_name": ["LogisticRegression"],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BERTLoRAScorer
 
@@ -117,3 +118,27 @@ def test_lora_cache_clearing(dataset):
     # Should raise exception after clearing cache
     with pytest.raises(RuntimeError):
         scorer.predict(test_data)
+
+
+def test_lora_in_pipeline(dataset):
+    """Test BERTLoRAScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "lora",
+                    "classification_model_config": [{"model_name": "prajjwal1/bert-tiny"}],
+                    "num_train_epochs": [1],
+                    "batch_size": [8],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1
