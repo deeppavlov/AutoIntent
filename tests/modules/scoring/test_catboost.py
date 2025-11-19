@@ -7,6 +7,7 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CatBoostScorer
+from tests.conftest import get_test_embedder_config
 
 pytest.importorskip("catboost")
 
@@ -55,7 +56,7 @@ def test_catboost_prediction_multilabel(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = CatBoostScorer(
-        embedder_config="prajjwal1/bert-tiny",
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -99,7 +100,7 @@ def test_catboost_features_types(dataset, features_type, use_embedding_features)
     data_handler = DataHandler(dataset)
 
     scorer = CatBoostScorer(
-        embedder_config="prajjwal1/bert-tiny",
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,

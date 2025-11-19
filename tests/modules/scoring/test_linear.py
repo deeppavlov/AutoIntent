@@ -4,12 +4,13 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_linear(dataset):
     data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer(embedder_config="sergeyzh/rubert-tiny-turbo")
+    scorer = LinearScorer(embedder_config=get_test_embedder_config())
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     test_data = [

@@ -8,8 +8,9 @@ from sklearn.linear_model import LogisticRegression
 
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
-from autointent.configs import CrossEncoderConfig, FaissConfig, TokenizerConfig, initialize_embedder_config
+from autointent.configs import CrossEncoderConfig, FaissConfig, TokenizerConfig
 from autointent.schemas import Tag, TagsList
+from tests.conftest import get_test_embedder_config
 
 
 class TestSimpleAttributes:
@@ -63,7 +64,7 @@ class TestTransformers:
 class TestVectorIndex:
     def init_attributes(self):
         self.vector_index = VectorIndex(
-            embedder_config=initialize_embedder_config("bert-base-uncased"),
+            embedder_config=get_test_embedder_config(),
             config=FaissConfig(),
         )
         self.vector_index.add(texts=["hello", "world"], labels=[0, 1])
@@ -75,7 +76,7 @@ class TestVectorIndex:
 class TestEmbedder:
     def init_attributes(self):
         self.embedder = Embedder(
-            embedder_config=initialize_embedder_config("bert-base-uncased"),
+            embedder_config=get_test_embedder_config(),
         )
         self._embedder_predictions = self.embedder.embed(["hello", "world"])
 
@@ -176,14 +177,7 @@ def _transformers_is_installed() -> bool:
             id="transformer",
         ),
         TestVectorIndex,
-        pytest.param(
-            TestEmbedder,
-            marks=pytest.mark.skipif(
-                not _st_is_installed(),
-                reason="need sentence-transformers dependency",
-            ),
-            id="embedder",
-        ),
+        TestEmbedder,
         TestSklearnEstimator,
         pytest.param(
             TestRanker,

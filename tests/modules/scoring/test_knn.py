@@ -4,12 +4,13 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_knn(dataset):
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", embedder_config="sergeyzh/rubert-tiny-turbo")
+    scorer = KNNScorer(k=3, weights="distance", embedder_config=get_test_embedder_config())
 
     test_data = [
         "why is there a hold on my american saving bank account",

@@ -4,12 +4,13 @@ import numpy as np
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import MLKnnScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_mlknn(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
-    scorer = MLKnnScorer(embedder_config="sergeyzh/rubert-tiny-turbo", k=3)
+    scorer = MLKnnScorer(embedder_config=get_test_embedder_config(), k=3)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
