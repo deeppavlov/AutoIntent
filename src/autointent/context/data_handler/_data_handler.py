@@ -97,7 +97,7 @@ class DataHandler:
             idx: Optional index for a specific training split.
         """
         split = self._choose_split(Split.TRAIN, idx)
-        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
+        return cast("list[str]", self.dataset[split][self.dataset.utterance_feature])
 
     def train_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """Retrieve training labels from the dataset.
@@ -110,7 +110,7 @@ class DataHandler:
             idx: Optional index for a specific training split.
         """
         split = self._choose_split(Split.TRAIN, idx)
-        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
+        return cast("ListOfGenericLabels", self.dataset[split][self.dataset.label_feature])
 
     def train_labels_folded(self) -> list[ListOfGenericLabels]:
         """Retrieve train labels fold by fold."""
@@ -127,7 +127,7 @@ class DataHandler:
             idx: Optional index for a specific validation split.
         """
         split = self._choose_split(Split.VALIDATION, idx)
-        return cast(list[str], self.dataset[split][self.dataset.utterance_feature])
+        return cast("list[str]", self.dataset[split][self.dataset.utterance_feature])
 
     def validation_labels(self, idx: int | None = None) -> ListOfGenericLabels:
         """Retrieve validation labels from the dataset.
@@ -140,17 +140,17 @@ class DataHandler:
             idx: Optional index for a specific validation split.
         """
         split = self._choose_split(Split.VALIDATION, idx)
-        return cast(ListOfGenericLabels, self.dataset[split][self.dataset.label_feature])
+        return cast("ListOfGenericLabels", self.dataset[split][self.dataset.label_feature])
 
     def test_utterances(self) -> list[str] | None:
         """Retrieve test utterances from the dataset."""
         if Split.TEST not in self.dataset:
             return None
-        return cast(list[str], self.dataset[Split.TEST][self.dataset.utterance_feature])
+        return cast("list[str]", self.dataset[Split.TEST][self.dataset.utterance_feature])
 
     def test_labels(self) -> ListOfGenericLabels:
         """Retrieve test labels from the dataset."""
-        return cast(ListOfGenericLabels, self.dataset[Split.TEST][self.dataset.label_feature])
+        return cast("ListOfGenericLabels", self.dataset[Split.TEST][self.dataset.label_feature])
 
     def validation_iterator(self) -> Generator[tuple[list[str], ListOfLabels, list[str], ListOfLabels]]:
         """Yield folds for cross-validation."""

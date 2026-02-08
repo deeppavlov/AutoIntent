@@ -67,7 +67,7 @@ class BaseDecision(BaseModule, ABC):
         decisions = self.predict(val_scores)
         chosen_metrics = {name: fn for name, fn in DECISION_METRICS.items() if name in metrics}
 
-        self._artifact = DecisionArtifact(labels=cast(ListOfLabelsWithOOS, decisions))
+        self._artifact = DecisionArtifact(labels=cast("ListOfLabelsWithOOS", decisions))
         return self.score_metrics_ho((val_labels, decisions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
@@ -106,7 +106,7 @@ class BaseDecision(BaseModule, ABC):
             all_val_decisions.append(val_decisions)
 
         flattened_decisions = [pred for pred_list in all_val_decisions for pred in pred_list]
-        self._artifact = DecisionArtifact(labels=cast(ListOfLabelsWithOOS, flattened_decisions))
+        self._artifact = DecisionArtifact(labels=cast("ListOfLabelsWithOOS", flattened_decisions))
         return {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
 
     def get_assets(self) -> DecisionArtifact:

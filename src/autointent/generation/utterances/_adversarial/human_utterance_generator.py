@@ -114,7 +114,7 @@ class HumanUtteranceGenerator:
             generated_split = HFDataset.from_list(new_samples)
             dataset[split_name] = concatenate_datasets([original_split, generated_split])
 
-        return [Sample(**sample) for sample in new_samples]
+        return [Sample.model_validate(sample) for sample in new_samples]
 
     async def augment_async(
         self, dataset: Dataset, split_name: str = Split.TRAIN, update_split: bool = True, n_final_per_class: int = 5

@@ -239,6 +239,6 @@ def test_few_shot_split(dataset):
     }
 
     for data_split in dh.dataset:
-        assert (
-            Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split]
-        ), f"Failed for {data_split}"
+        assert Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split], (
+            f"Failed for {data_split}"
+        )

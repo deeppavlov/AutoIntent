@@ -98,7 +98,7 @@ def test_cv(dataset, task_type):
     context = pipeline_optimizer.fit(dataset, refit_after=True)
     context.dump()
 
-    assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
+    assert len(pipeline_optimizer.logging_config.dump_dir.iterdir()) > 0
 
 
 @pytest.mark.parametrize(
@@ -161,7 +161,7 @@ def test_dump_modules(dataset, task_type):
     context = pipeline_optimizer.fit(dataset)
     context.dump()
 
-    assert os.listdir(pipeline_optimizer.logging_config.dump_dir)
+    assert pipeline_optimizer.logging_config.dump_dir.iterdir() > 0
 
 
 @pytest.mark.parametrize(
@@ -176,5 +176,5 @@ def test_optimization_validation_metric_names(dataset, task_type):
     if task_type == "multiclass":
         dataset = dataset.to_multilabel()
 
-    with pytest.raises(ValueError, match="Target metric .*"):
+    with pytest.raises(ValueError, match=r"Target metric .*"):
         pipeline_optimizer.fit(dataset, incompatible_search_space="raise")

@@ -94,8 +94,8 @@ class FaissBackend(BaseIndexBackend):
         with (path / cls._documents_filaname).open("r", encoding="utf-8") as file:
             docs_data = json.load(file)
 
-        instance._documents = [Document.model_validate(d) for d in docs_data]  # noqa: SLF001
+        instance._documents = [Document.model_validate(d) for d in docs_data]
 
-        instance._index = instance._faiss.read_index(str(path / cls._index_filename))  # noqa: SLF001
+        instance._index = instance._faiss.read_index(str(path / cls._index_filename))
 
         return instance

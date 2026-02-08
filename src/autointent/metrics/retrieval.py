@@ -487,7 +487,7 @@ def _dcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
     """
     relevance_scores = relevance_scores[:k]
     discounts = np.log2(np.arange(2, relevance_scores.shape[0] + 2))
-    return np.sum(relevance_scores / discounts)  # type: ignore[no-any-return]
+    return np.sum(relevance_scores / discounts)
 
 
 def _idcg(relevance_scores: npt.NDArray[Any], k: int | None = None) -> float:
