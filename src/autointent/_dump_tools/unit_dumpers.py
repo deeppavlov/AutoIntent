@@ -269,7 +269,7 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
-        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
+        return AutoTokenizer.from_pretrained(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401

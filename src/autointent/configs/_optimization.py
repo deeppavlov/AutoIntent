@@ -90,10 +90,10 @@ class LoggingConfig(BaseModel):
 
     @field_validator("report_to")
     @classmethod
-    def validate_report_to(cls, value: list[REPORTERS_NAMES] | None) -> list[REPORTERS_NAMES]:
+    def validate_report_to(cls, value: list[REPORTERS_NAMES] | None) -> list[REPORTERS_NAMES]:  # type: ignore[valid-type]
         """Validate the `report_to` field to ensure it is either 'none' or a list of valid reporter names."""
         if value is None:
-            return ["none"]  # since transformers v5 doesn't allow None for report_to
+            return ["none"]  # transformers v5 doesn't allow None for report_to
         return value
 
 
