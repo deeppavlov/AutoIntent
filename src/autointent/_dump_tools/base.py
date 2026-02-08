@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
 import numpy as np
+import numpy.typing as npt
 from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
@@ -15,7 +16,7 @@ ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[
 ModuleAttributes: TypeAlias = (
     ModuleSimpleAttributes
     | TagsList
-    | np.ndarray
+    | npt.NDArray[np.floating]
     | Embedder
     | VectorIndex
     | BaseEstimator
