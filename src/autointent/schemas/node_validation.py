@@ -1,9 +1,20 @@
 """Schemes."""
+from __future__ import annotations
 
 import inspect
 from abc import ABC, abstractmethod
-from collections.abc import Iterator
-from typing import Annotated, Any, Literal, TypeAlias, TypeVar, Union, get_args, get_origin, get_type_hints
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    Literal,
+    TypeAlias,
+    TypeVar,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 from pydantic import (
     BaseModel,
@@ -12,14 +23,21 @@ from pydantic import (
     PositiveInt,
     RootModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
     model_validator,
 )
 
 from autointent.custom_types import NodeType
-from autointent.modules.base import BaseModule
 from autointent.nodes.info import DecisionNodeInfo, EmbeddingNodeInfo, RegexNodeInfo, ScoringNodeInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from pydantic import (
+        ValidationInfo,
+    )
+
+    from autointent.modules.base import BaseModule
 
 
 class ParamSpace(BaseModel, ABC):

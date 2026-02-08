@@ -1,13 +1,17 @@
 """Retrieval metrics."""
+from __future__ import annotations
 
 from functools import wraps
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
-import numpy.typing as npt
 
 from ._converter import transform
-from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
 
 
 class RetrievalMetricFn(Protocol):

@@ -1,14 +1,19 @@
 """Scoring node info."""
+from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from autointent.custom_types import NodeType
-from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL, ScoringMetricFn
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules import SCORING_MODULES
-from autointent.modules.base import BaseScorer
 
 from ._base import NodeInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from autointent.metrics import ScoringMetricFn
+    from autointent.modules.base import BaseScorer
 
 
 class ScoringNodeInfo(NodeInfo):

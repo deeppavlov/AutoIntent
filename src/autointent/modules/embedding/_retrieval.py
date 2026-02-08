@@ -1,21 +1,27 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from pydantic import PositiveInt
-
-from autointent import Context, Embedder, VectorIndex
+from autointent import Embedder, VectorIndex
 from autointent.configs import (
-    EmbedderConfig,
     EmbedderFineTuningConfig,
-    VectorIndexConfig,
     get_default_vector_index_config,
     initialize_embedder_config,
 )
 from autointent.context.optimization_info import EmbeddingArtifact
-from autointent.custom_types import ListOfLabels
 from autointent.metrics import RETRIEVAL_METRICS_MULTICLASS, RETRIEVAL_METRICS_MULTILABEL
 from autointent.modules.base import BaseEmbedding
+
+if TYPE_CHECKING:
+    from pydantic import PositiveInt
+
+    from autointent import Context
+    from autointent.configs import (
+        EmbedderConfig,
+        VectorIndexConfig,
+    )
+    from autointent.custom_types import ListOfLabels
 
 
 class RetrievalAimedEmbedding(BaseEmbedding):
@@ -74,7 +80,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         k: PositiveInt = 10,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
-    ) -> "RetrievalAimedEmbedding":
+    ) -> RetrievalAimedEmbedding:
         """Create an instance using a Context object.
 
         Args:

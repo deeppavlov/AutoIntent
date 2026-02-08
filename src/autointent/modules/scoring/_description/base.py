@@ -1,17 +1,22 @@
 """DescriptionScorer classes for scoring utterances based on intent descriptions."""
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy
-from numpy.typing import NDArray
-from pydantic import PositiveFloat
 
-from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
-from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+    from pydantic import PositiveFloat
+
+    from autointent import Context
+    from autointent.custom_types import ListOfLabels
 
 
 class BaseDescriptionScorer(BaseScorer, ABC):

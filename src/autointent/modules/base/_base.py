@@ -1,21 +1,27 @@
 """Base module for all modules."""
+from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
-from typing_extensions import Self, assert_never
+from typing_extensions import assert_never
 
 from autointent._dump_tools import Dumper
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
-from autointent.context import Context
-from autointent.context.optimization_info import Artifact
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 from autointent.exceptions import WrongClassificationError
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    import numpy.typing as npt
+    from typing_extensions import Self
+
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
+    from autointent.context import Context
+    from autointent.context.optimization_info import Artifact
+    from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +141,7 @@ class BaseModule(ABC):
 
     @classmethod
     @abstractmethod
-    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> "BaseModule":
+    def from_context(cls, context: Context, **kwargs: dict[str, Any]) -> BaseModule:
         """Initialize self from context.
 
         Args:

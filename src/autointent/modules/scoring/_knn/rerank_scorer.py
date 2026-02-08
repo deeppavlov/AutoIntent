@@ -1,16 +1,22 @@
 """RerankScorer class for re-ranking based on cross-encoder scoring."""
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
-from pydantic import PositiveInt
 
-from autointent import Context, Ranker
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, VectorIndexConfig, get_default_vector_index_config
-from autointent.custom_types import ListOfLabels, WeightType
+from autointent import Ranker
+from autointent.configs import CrossEncoderConfig, get_default_vector_index_config
 
 from .knn import KNNScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from pydantic import PositiveInt
+
+    from autointent import Context
+    from autointent.configs import EmbedderConfig, VectorIndexConfig
+    from autointent.custom_types import ListOfLabels, WeightType
 
 
 class RerankScorer(KNNScorer):
@@ -70,7 +76,7 @@ class RerankScorer(KNNScorer):
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
         use_cross_encoder_scores: bool = False,
-    ) -> "RerankScorer":
+    ) -> RerankScorer:
         """Create a RerankScorer instance from a given context.
 
         Args:

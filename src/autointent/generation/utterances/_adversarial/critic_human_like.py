@@ -1,11 +1,14 @@
 """CriticHumanLike class for distinguishing human vs generated utterances."""
+from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel
 
-from autointent.generation import Generator
 from autointent.generation.chat_templates import Message, Role
+
+if TYPE_CHECKING:
+    from autointent.generation import Generator
 
 
 class CriticResponse(BaseModel):

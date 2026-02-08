@@ -1,16 +1,20 @@
 """Torch model for text classification."""
+from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
 from collections import Counter
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import torch
 from torch import nn
-from typing_extensions import Self
 
 from autointent.configs import VocabConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import torch
+    from typing_extensions import Self
 
 
 class BaseTorchModule(nn.Module, ABC):

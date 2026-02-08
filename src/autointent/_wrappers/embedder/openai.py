@@ -1,24 +1,30 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
 import os
 from functools import partial
-from pathlib import Path
-from typing import Literal, TypedDict, cast, overload
+from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
 
 import aiometer
 import numpy as np
-import numpy.typing as npt
 import openai
 import torch
-from typing_extensions import NotRequired
 
 from autointent._hash import Hasher
-from autointent.configs import TaskTypeEnum
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
+    from typing_extensions import NotRequired
+
+    from autointent.configs import TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -275,7 +281,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             json.dump(self.config.model_dump(mode="json"), file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "OpenaiEmbeddingBackend":
+    def load(cls, path: Path) -> OpenaiEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:

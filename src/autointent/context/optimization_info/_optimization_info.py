@@ -3,27 +3,33 @@
 This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
+from __future__ import annotations
 
 import json
 import logging
 import shutil
 import tempfile
-from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 
 from autointent._dump_tools import Dumper
-from autointent.configs import EmbedderConfig, InferenceNodeConfig
+from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 
-from ._data_models import Artifacts, EmbeddingArtifact, ScorerArtifact, Trial, Trials
+from ._data_models import Artifacts, Trial, Trials
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from numpy.typing import NDArray
+
+    from autointent.configs import EmbedderConfig
     from autointent.modules.base import BaseModule
+
+    from ._data_models import EmbeddingArtifact, ScorerArtifact
 
 
 logger = logging.getLogger(__name__)
@@ -40,12 +46,12 @@ class ModulesList:
         decision: Best module for the decision node.
     """
 
-    regex: "BaseModule | None" = None
-    embedding: "BaseModule | None" = None
-    scoring: "BaseModule | None" = None
-    decision: "BaseModule | None" = None
+    regex: BaseModule | None = None
+    embedding: BaseModule | None = None
+    scoring: BaseModule | None = None
+    decision: BaseModule | None = None
 
-    def get(self, node_type: str) -> "BaseModule | None":
+    def get(self, node_type: str) -> BaseModule | None:
         """Retrieve the module for a specific node type.
 
         Args:
@@ -56,7 +62,7 @@ class ModulesList:
         """
         return getattr(self, node_type)  # type: ignore[no-any-return]
 
-    def add_module(self, node_type: str, module: "BaseModule") -> None:
+    def add_module(self, node_type: str, module: BaseModule) -> None:
         """Set the module for a specific node type.
 
         Args:
@@ -96,7 +102,7 @@ class OptimizationInfo:
         metric_name: str,
         metrics: dict[str, float],
         module_dump_dir: str | None,
-        module: "BaseModule",
+        module: BaseModule,
     ) -> None:
         """Log optimization results for a module.
 
@@ -287,7 +293,7 @@ class OptimizationInfo:
             best_trial = self.trials.get_trials(node_type)[best_trial_idx]
             yield node_type, best_trial, best_trial_idx
 
-    def get_best_modules(self) -> dict[NodeType, "BaseModule"]:
+    def get_best_modules(self) -> dict[NodeType, BaseModule]:
         """Retrieve the best modules for all node types.
 
         Returns:

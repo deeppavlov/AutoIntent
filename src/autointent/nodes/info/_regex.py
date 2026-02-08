@@ -1,15 +1,19 @@
 """Regex node info."""
+from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from autointent.custom_types import NodeType
 from autointent.metrics import REGEX_METRICS
-from autointent.metrics.regex import RegexMetricFn
 from autointent.modules import REGEX_MODULES
-from autointent.modules.base import BaseRegex
 
 from ._base import NodeInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from autointent.metrics.regex import RegexMetricFn
+    from autointent.modules.base import BaseRegex
 
 
 class RegexNodeInfo(NodeInfo):

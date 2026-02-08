@@ -1,10 +1,11 @@
 """Helpers for caching structured outputs from LLM."""
+from __future__ import annotations
 
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from appdirs import user_cache_dir
 from dotenv import load_dotenv
@@ -12,7 +13,9 @@ from pydantic import BaseModel, ValidationError
 
 from autointent._dump_tools.unit_dumpers import PydanticModelDumper
 from autointent._hash import Hasher
-from autointent.generation.chat_templates import Message
+
+if TYPE_CHECKING:
+    from autointent.generation.chat_templates import Message
 
 logger = logging.getLogger(__name__)
 

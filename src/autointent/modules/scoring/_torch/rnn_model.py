@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import torch
 from pydantic import BaseModel
@@ -7,7 +9,11 @@ from torch import nn
 
 from autointent._utils import detect_device
 from autointent._wrappers import BaseTorchModuleWithVocab
-from autointent.configs import VocabConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent.configs import VocabConfig
 
 
 class TextRNNDumpMetadata(BaseModel):
@@ -72,7 +78,7 @@ class TextRNN(BaseTorchModuleWithVocab):
         self.to(device)  # Move back to original device
 
     @classmethod
-    def load(cls, path: Path, device: str | None = None) -> "TextRNN":
+    def load(cls, path: Path, device: str | None = None) -> TextRNN:
         with (path / cls._metadata_dict_name).open() as file:
             metadata = TextRNNDumpMetadata(**json.load(file))
         device = device or detect_device()

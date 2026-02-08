@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Literal, overload
+from typing import TYPE_CHECKING, Literal, overload
 
-import numpy as np
-import numpy.typing as npt
-import torch
+if TYPE_CHECKING:
+    from pathlib import Path
 
-from autointent.configs import EmbedderConfig, TaskTypeEnum
+    import numpy as np
+    import numpy.typing as npt
+    import torch
+
+    from autointent.configs import EmbedderConfig, TaskTypeEnum
 
 
 class BaseEmbeddingBackend(ABC):
@@ -90,7 +94,7 @@ class BaseEmbeddingBackend(ABC):
 
     @classmethod
     @abstractmethod
-    def load(cls, path: Path) -> "BaseEmbeddingBackend":
+    def load(cls, path: Path) -> BaseEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:

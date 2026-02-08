@@ -1,11 +1,14 @@
 """Utility functions for handling multilabel predictions."""
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 
-from autointent.schemas import Tag
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.schemas import Tag
 
 
 def apply_tags(labels: npt.NDArray[Any], scores: npt.NDArray[Any], tags: list[Tag]) -> npt.NDArray[Any]:

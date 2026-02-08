@@ -1,8 +1,14 @@
-from datasets import Dataset as HFDataset
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.context.data_handler._stratification import StratifiedSplitter
+
+if TYPE_CHECKING:
+    from datasets import Dataset as HFDataset
 
 
 def count_oos(split: HFDataset):

@@ -1,7 +1,7 @@
 """Retrieval node info."""
+from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import ClassVar, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from autointent.custom_types import NodeType
 from autointent.metrics import (
@@ -9,13 +9,19 @@ from autointent.metrics import (
     RETRIEVAL_METRICS_MULTILABEL,
     SCORING_METRICS_MULTICLASS,
     SCORING_METRICS_MULTILABEL,
-    RetrievalMetricFn,
-    ScoringMetricFn,
 )
 from autointent.modules import EMBEDDING_MODULES
-from autointent.modules.base import BaseEmbedding
 
 from ._base import NodeInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from autointent.metrics import (
+        RetrievalMetricFn,
+        ScoringMetricFn,
+    )
+    from autointent.modules.base import BaseEmbedding
 
 
 class EmbeddingNodeInfo(NodeInfo):

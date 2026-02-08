@@ -1,10 +1,15 @@
-from typing import Any
+from __future__ import annotations
 
-from autointent import Context
-from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
+from typing import TYPE_CHECKING, Any
+
+from autointent.configs import TorchTrainingConfig
 
 from .base_scorer import BaseVocabTorchScorer
 from .rnn_model import TextRNN
+
+if TYPE_CHECKING:
+    from autointent import Context
+    from autointent.configs import EarlyStoppingConfig, VocabConfig
 
 
 class RNNScorer(BaseVocabTorchScorer):
@@ -107,7 +112,7 @@ class RNNScorer(BaseVocabTorchScorer):
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "RNNScorer":
+    ) -> RNNScorer:
         """Create a RNNScorer from context."""
         return cls(
             embed_dim=embed_dim,

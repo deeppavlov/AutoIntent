@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
 
 from autointent import Embedder
-from autointent.configs import EmbedderConfig, SentenceTransformerEmbeddingConfig, TokenizerConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig, TokenizerConfig
 
 from .conftest import backend_configs
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 
 @pytest.mark.parametrize("embedder_config", backend_configs)

@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import abc
 import re
-from typing import ClassVar, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
-import nbformat
 from jupytext import jupytext
 from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    import nbformat
 
 
 class ReplacePattern(BaseModel, abc.ABC):

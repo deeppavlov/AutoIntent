@@ -1,20 +1,25 @@
 """Wrapper class for accessing OpenAI API."""
+from __future__ import annotations
 
 import json
 import logging
 import os
-from pathlib import Path
 from textwrap import dedent
-from typing import Any, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
 import openai
 from dotenv import load_dotenv
 from openai import LengthFinishReasonError
 from pydantic import BaseModel, ValidationError
 
-from autointent.generation.chat_templates import Message, Role
+from autointent.generation.chat_templates import Role
 
 from ._cache import StructuredOutputCache
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent.generation.chat_templates import Message
 
 logger = logging.getLogger(__name__)
 
@@ -382,7 +387,7 @@ class Generator:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "Generator":
+    def load(cls, path: Path) -> Generator:
         with (path / cls._dump_data_filename).open(encoding="utf-8") as file:
             data: GeneratorDumpData = json.load(file)
 

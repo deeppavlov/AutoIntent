@@ -1,8 +1,14 @@
 """File containing definitions of DatasetReader and DatasetValidator for handling dataset operations."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from autointent.schemas import Intent, Sample
+from autointent.schemas import Intent
+
+if TYPE_CHECKING:
+    from autointent.schemas import Sample
 
 
 class DatasetReader(BaseModel):
@@ -31,7 +37,7 @@ class DatasetReader(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     @model_validator(mode="after")
-    def validate_dataset(self) -> "DatasetReader":
+    def validate_dataset(self) -> DatasetReader:
         """Validates dataset integrity by ensuring consistent data splits and intent mappings.
 
         Raises:
@@ -119,7 +125,7 @@ class DatasetReader(BaseModel):
             raise ValueError(message)
         return n_classes[0]
 
-    def _validate_intents(self, n_classes: int) -> "DatasetReader":
+    def _validate_intents(self, n_classes: int) -> DatasetReader:
         """Ensures intent IDs are sequential and match the number of classes.
 
         Args:
@@ -143,7 +149,7 @@ class DatasetReader(BaseModel):
             raise ValueError(message)
         return self
 
-    def _validate_split(self, split: list[Sample]) -> "DatasetReader":
+    def _validate_split(self, split: list[Sample]) -> DatasetReader:
         """Validate a dataset split to ensure all sample labels reference valid intent IDs.
 
         Args:

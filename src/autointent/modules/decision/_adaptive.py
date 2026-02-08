@@ -1,19 +1,23 @@
 """AdaptiveDecision module for multi-label classification with adaptive thresholds."""
+from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 
-from autointent import Context
-from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
 from autointent.modules.base import BaseDecision
-from autointent.schemas import Tag
 
 from ._utils import apply_tags
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent import Context
+    from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
+    from autointent.schemas import Tag
 
 default_search_space = np.linspace(0, 1, num=10)
 logger = logging.getLogger(__name__)
@@ -64,7 +68,7 @@ class AdaptiveDecision(BaseDecision):
             raise ValueError(msg)
 
     @classmethod
-    def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> "AdaptiveDecision":
+    def from_context(cls, context: Context, search_space: list[FloatFromZeroToOne] | None = None) -> AdaptiveDecision:
         """Create an AdaptiveDecision instance using a Context object.
 
         Args:

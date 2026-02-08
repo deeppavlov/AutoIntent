@@ -1,11 +1,14 @@
 """Metrics for regex modules."""
+from __future__ import annotations
 
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
 from ._converter import transform
-from .custom_types import LABELS_VALUE_TYPE
+
+if TYPE_CHECKING:
+    from .custom_types import LABELS_VALUE_TYPE
 
 
 class RegexMetricFn(Protocol):

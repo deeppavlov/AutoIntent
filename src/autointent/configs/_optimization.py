@@ -1,13 +1,18 @@
 """Configuration for the optimization process."""
+from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator
-
-from autointent._callbacks import REPORTERS_NAMES
-from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ._name import get_run_name
+
+if TYPE_CHECKING:
+    from pydantic import PositiveInt
+
+    from autointent._callbacks import REPORTERS_NAMES
+    from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
 
 
 class DataConfig(BaseModel):

@@ -1,11 +1,14 @@
 """Base node info class."""
+from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from autointent.custom_types import NodeType
-from autointent.metrics import METRIC_FN
-from autointent.modules.base import BaseModule
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from autointent.custom_types import NodeType
+    from autointent.metrics import METRIC_FN
+    from autointent.modules.base import BaseModule
 
 
 class NodeInfo:

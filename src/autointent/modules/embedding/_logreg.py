@@ -1,20 +1,26 @@
 """LogregAimedEmbedding class for a proxy optimization of embedding."""
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
-from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import LabelEncoder
 
-from autointent import Context, Embedder
-from autointent.configs import EmbedderConfig, EmbedderFineTuningConfig, TaskTypeEnum, initialize_embedder_config
+from autointent import Embedder
+from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.context.optimization_info import EmbeddingArtifact
-from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseEmbedding
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+    from pydantic import PositiveInt
+
+    from autointent import Context
+    from autointent.configs import EmbedderConfig
+    from autointent.custom_types import ListOfLabels
 
 
 class LogregAimedEmbedding(BaseEmbedding):
@@ -70,7 +76,7 @@ class LogregAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
-    ) -> "LogregAimedEmbedding":
+    ) -> LogregAimedEmbedding:
         """Create a LogregAimedEmbedding instance using a Context object.
 
         Args:

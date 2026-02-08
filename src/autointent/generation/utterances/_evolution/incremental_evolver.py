@@ -2,20 +2,26 @@
 
 Deeply inspired by DeepEval evolutions.
 """
+from __future__ import annotations
 
 import copy
-from collections.abc import Sequence
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
-from autointent import Dataset, Pipeline
+from autointent import Pipeline
 from autointent.custom_types import Split
-from autointent.generation import Generator
-from autointent.generation.chat_templates import EvolutionChatTemplate
 from autointent.generation.utterances._evolution.evolver import UtteranceEvolver
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from datasets import Dataset as HFDataset
+
+    from autointent import Dataset
+    from autointent.generation import Generator
+    from autointent.generation.chat_templates import EvolutionChatTemplate
 
 SEARCH_SPACE = [
     {

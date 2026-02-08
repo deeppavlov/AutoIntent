@@ -1,7 +1,8 @@
 """TextCNN model for text classification."""
+from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as F  # noqa: N812
@@ -10,7 +11,11 @@ from torch import nn
 
 from autointent._utils import detect_device
 from autointent._wrappers import BaseTorchModuleWithVocab
-from autointent.configs import VocabConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent.configs import VocabConfig
 
 
 class TextCNNDumpMetadata(BaseModel):
@@ -90,7 +95,7 @@ class TextCNN(BaseTorchModuleWithVocab):
         self.to(device)  # Move back to original device
 
     @classmethod
-    def load(cls, path: Path, device: str | None = None) -> "TextCNN":
+    def load(cls, path: Path, device: str | None = None) -> TextCNN:
         with (path / cls._metadata_dict_name).open() as file:
             metadata = TextCNNDumpMetadata(**json.load(file))
         device = device or detect_device()

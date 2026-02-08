@@ -1,23 +1,30 @@
 """DNNCScorer class for scoring utterances using deep neural network classifiers (DNNC)."""
+from __future__ import annotations
 
 import itertools as it
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
-from pydantic import PositiveInt
 
-from autointent import Context, Ranker, VectorIndex
+from autointent import Ranker, VectorIndex
 from autointent.configs import (
     CrossEncoderConfig,
-    EmbedderConfig,
-    VectorIndexConfig,
     get_default_vector_index_config,
     initialize_embedder_config,
 )
-from autointent.custom_types import Document, ListOfLabels
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from pydantic import PositiveInt
+
+    from autointent import Context
+    from autointent.configs import (
+        EmbedderConfig,
+        VectorIndexConfig,
+    )
+    from autointent.custom_types import Document, ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +95,7 @@ class DNNCScorer(BaseScorer):
         k: PositiveInt = 5,
         cross_encoder_config: CrossEncoderConfig | str | None = None,
         embedder_config: EmbedderConfig | str | None = None,
-    ) -> "DNNCScorer":
+    ) -> DNNCScorer:
         """Create a DNNCScorer instance using a Context object.
 
         Args:

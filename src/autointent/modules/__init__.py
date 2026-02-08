@@ -1,8 +1,9 @@
 """Heart of the library with different intent classification methods implemented."""
+from __future__ import annotations
 
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-from .base import BaseDecision, BaseEmbedding, BaseModule, BaseRegex, BaseScorer
+from .base import BaseModule
 from .decision import (
     AdaptiveDecision,
     ArgmaxDecision,
@@ -30,6 +31,9 @@ from .scoring import (
     RNNScorer,
     SklearnScorer,
 )
+
+if TYPE_CHECKING:
+    from .base import BaseDecision, BaseEmbedding, BaseRegex, BaseScorer
 
 T = TypeVar("T", bound=BaseModule)
 

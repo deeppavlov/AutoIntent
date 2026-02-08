@@ -1,12 +1,16 @@
 """CNNScorer class for scoring."""
+from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from autointent import Context
-from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
+from autointent.configs import TorchTrainingConfig
 
 from .base_scorer import BaseVocabTorchScorer
 from .cnn_model import TextCNN
+
+if TYPE_CHECKING:
+    from autointent import Context
+    from autointent.configs import EarlyStoppingConfig, VocabConfig
 
 
 class CNNScorer(BaseVocabTorchScorer):
@@ -107,7 +111,7 @@ class CNNScorer(BaseVocabTorchScorer):
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "CNNScorer":
+    ) -> CNNScorer:
         return cls(
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,

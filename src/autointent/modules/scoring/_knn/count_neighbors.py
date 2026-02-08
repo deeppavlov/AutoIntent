@@ -1,7 +1,12 @@
 """Util functions for counting neighbors in kNN-based models."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 def get_counts(labels: NDArray[np.int_], n_classes: int, weights: NDArray[np.float64]) -> NDArray[np.int64]:

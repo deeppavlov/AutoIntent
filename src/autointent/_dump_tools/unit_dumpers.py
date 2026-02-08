@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import importlib
 import json
 import logging
-from pathlib import Path
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import aiofiles
 import joblib
@@ -26,6 +27,9 @@ from autointent.schemas import TagsList
 
 from .base import BaseObjectDumper, ModuleSimpleAttributes
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
@@ -38,7 +42,7 @@ class TagsListDumper(BaseObjectDumper[TagsList]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> TagsList:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> TagsList:  # noqa: ANN401
         return TagsList.load(path)
 
     @classmethod
@@ -56,7 +60,7 @@ class SimpleAttributesDumper(BaseObjectDumper[dict[str, ModuleSimpleAttributes]]
             json.dump(obj, file, ensure_ascii=False, indent=4)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> dict[str, ModuleSimpleAttributes]:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> dict[str, ModuleSimpleAttributes]:  # noqa: ANN401
         with path.open(encoding="utf-8") as file:
             return json.load(file)  # type: ignore[no-any-return]
 
@@ -75,7 +79,7 @@ class ArraysDumper(BaseObjectDumper[dict[str, npt.NDArray[Any]]]):
         np.savez(path, allow_pickle=False, **obj)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> dict[str, npt.NDArray[Any]]:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> dict[str, npt.NDArray[Any]]:  # noqa: ANN401
         return dict(np.load(path))
 
     @classmethod
@@ -110,7 +114,7 @@ class VectorIndexDumper(BaseObjectDumper[VectorIndex]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> VectorIndex:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> VectorIndex:  # noqa: ANN401
         return VectorIndex.load(path)
 
     @classmethod
@@ -127,7 +131,7 @@ class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
         joblib.dump(obj, path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseEstimator:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseEstimator:  # noqa: ANN401
         return joblib.load(path)
 
     @classmethod
@@ -174,7 +178,7 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
             await file.write(json.dumps(obj.model_dump(), ensure_ascii=False, indent=4))
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401
         with (path / "model_dump.json").open("r", encoding="utf-8") as file:
             content = json.load(file)
 
@@ -186,7 +190,7 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
         return model_type.model_validate(content)  # type: ignore[no-any-return]
 
     @staticmethod
-    async def load_async(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
+    async def load_async(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401
         async with aiofiles.open(path / "model_dump.json", encoding="utf-8") as file:
             content_str = await file.read()
             content = json.loads(content_str)
@@ -224,7 +228,7 @@ class PeftModelDumper(BaseObjectDumper[PeftModel]):
             merged_model.save_pretrained(lora_path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
@@ -251,7 +255,7 @@ class HFModelDumper(BaseObjectDumper[PreTrainedModel]):
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401
         return AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
@@ -268,7 +272,7 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401
         return AutoTokenizer.from_pretrained(path)
 
     @classmethod
@@ -291,7 +295,7 @@ class TorchModelDumper(BaseObjectDumper[BaseTorchModule]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseTorchModule:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseTorchModule:  # noqa: ANN401
         with (path / "class_info.json").open("r") as f:
             class_info = json.load(f)
         module = importlib.import_module(class_info["module"])
@@ -312,7 +316,7 @@ class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
         obj.save_model(str(path), format="cbm")
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401
         model = CatBoostClassifier()
         model.load_model(str(path))
         return model
