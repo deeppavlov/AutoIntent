@@ -3,20 +3,17 @@
 This module defines data models for managing artifacts and trials in the pipeline,
 including their configurations, outputs, and optimization details.
 """
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field
 
-from autointent.custom_types import NodeType
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
-
-    from autointent.configs import EmbedderConfig
-    from autointent.custom_types import ListOfLabelsWithOOS
+from autointent.configs import EmbedderConfig
+from autointent.custom_types import ListOfLabelsWithOOS, NodeType
 
 
 class Artifact(BaseModel):

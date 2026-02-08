@@ -1,4 +1,5 @@
 """Base class for chat templates for evolution augmentation."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar

@@ -1,4 +1,5 @@
 """Argmax decision module."""
+
 from __future__ import annotations
 
 import logging
@@ -6,14 +7,14 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from autointent import Context
+from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.base import BaseDecision
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-    from autointent import Context
-    from autointent.custom_types import ListOfGenericLabels
     from autointent.schemas import Tag
 
 logger = logging.getLogger(__name__)

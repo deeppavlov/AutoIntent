@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from autointent.custom_types import LabelWithOOS, ListOfLabels, ListOfLabelsWithOOS
+from autointent.custom_types import LabelWithOOS, ListOfLabels, ListOfLabelsWithOOS
 
 
 class InferencePipelineUtteranceOutput(BaseModel):

@@ -1,4 +1,5 @@
 """BertScorer class for transformer-based classification."""
+
 from __future__ import annotations
 
 import tempfile
@@ -19,6 +20,7 @@ from transformers import (
     TrainingArguments,
 )
 
+from autointent import Context
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
@@ -32,7 +34,6 @@ if TYPE_CHECKING:
     )
     from transformers.trainer_callback import TrainerCallback
 
-    from autointent import Context
     from autointent._callbacks import REPORTERS_NAMES
     from autointent.custom_types import ListOfLabels
 

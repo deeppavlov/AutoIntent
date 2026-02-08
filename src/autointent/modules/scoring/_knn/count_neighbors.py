@@ -1,4 +1,5 @@
 """Util functions for counting neighbors in kNN-based models."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

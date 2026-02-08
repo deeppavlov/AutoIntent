@@ -1,4 +1,5 @@
 """AdaptiveDecision module for multi-label classification with adaptive thresholds."""
+
 from __future__ import annotations
 
 import logging
@@ -6,6 +7,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from autointent import Context
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import decision_f1
 from autointent.modules.base import BaseDecision
@@ -15,8 +18,6 @@ from ._utils import apply_tags
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-    from autointent import Context
-    from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabelsWithOOS, MultiLabel
     from autointent.schemas import Tag
 
 default_search_space = np.linspace(0, 1, num=10)

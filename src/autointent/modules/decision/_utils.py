@@ -1,4 +1,5 @@
 """Utility functions for handling multilabel predictions."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any

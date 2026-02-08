@@ -1,11 +1,15 @@
 """Tunable predictor module."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, get_args
 
 import numpy as np
 import optuna
+from pydantic import PositiveInt
 
+from autointent import Context
+from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseDecision
@@ -15,10 +19,7 @@ from ._threshold import multiclass_predict, multilabel_predict
 if TYPE_CHECKING:
     import numpy.typing as npt
     from optuna.trial import Trial
-    from pydantic import PositiveInt
 
-    from autointent.context import Context
-    from autointent.custom_types import ListOfGenericLabels
     from autointent.metrics import DecisionMetricFn
     from autointent.schemas import Tag
 

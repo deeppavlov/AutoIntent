@@ -1,12 +1,16 @@
 """KNNScorer class for k-nearest neighbors scoring."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
+from pydantic import PositiveInt
 
-from autointent import VectorIndex
+from autointent import Context, VectorIndex
 from autointent.configs import (
+    EmbedderConfig,
+    VectorIndexConfig,
     get_default_vector_index_config,
     initialize_embedder_config,
 )
@@ -17,13 +21,7 @@ from .weighting import apply_weights
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    from pydantic import PositiveInt
 
-    from autointent import Context
-    from autointent.configs import (
-        EmbedderConfig,
-        VectorIndexConfig,
-    )
     from autointent.custom_types import Document, ListOfLabels
 
 

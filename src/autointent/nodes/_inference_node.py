@@ -1,4 +1,5 @@
 """InferenceNode class for inference nodes."""
+
 from __future__ import annotations
 
 import gc

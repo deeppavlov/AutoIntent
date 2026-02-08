@@ -1,4 +1,5 @@
 """Module for balancing datasets through augmentation of underrepresented classes."""
+
 from __future__ import annotations
 
 import logging

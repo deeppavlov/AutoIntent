@@ -3,6 +3,7 @@
 This module provides functionality for ranking retrieved sentences by meaning closeness
 to provided utterances using cross-encoder models.
 """
+
 from __future__ import annotations
 
 import gc

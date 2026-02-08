@@ -1,4 +1,5 @@
 """FastAPI application for AutoIntent pipeline inference."""
+
 from __future__ import annotations
 
 import logging
@@ -12,11 +13,10 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from autointent import Pipeline
+from autointent.custom_types import ListOfLabelsWithOOS
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
-
-    from autointent.custom_types import ListOfLabelsWithOOS
 
 
 class Settings(BaseSettings):

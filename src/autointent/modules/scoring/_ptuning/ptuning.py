@@ -1,20 +1,20 @@
 """PTuningScorer class for ptuning-based classification."""
+
 from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType, get_peft_model
+from pydantic import PositiveInt
 
+from autointent import Context
 from autointent._dump_tools import Dumper
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
-    from pydantic import PositiveInt
-
-    from autointent import Context
     from autointent._callbacks import REPORTERS_NAMES
-    from autointent.configs import EarlyStoppingConfig, HFModelConfig
 
 
 class PTuningScorer(BertScorer):

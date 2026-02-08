@@ -1,4 +1,5 @@
 """Emissions tracking functionality for monitoring energy consumption and carbon emissions."""
+
 from __future__ import annotations
 
 import json

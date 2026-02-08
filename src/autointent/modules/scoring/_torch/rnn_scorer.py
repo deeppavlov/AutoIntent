@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from autointent.configs import TorchTrainingConfig
+from autointent import Context
+from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
 
 from .base_scorer import BaseVocabTorchScorer
 from .rnn_model import TextRNN
-
-if TYPE_CHECKING:
-    from autointent import Context
-    from autointent.configs import EarlyStoppingConfig, VocabConfig
 
 
 class RNNScorer(BaseVocabTorchScorer):

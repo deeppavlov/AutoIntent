@@ -2,16 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from typing_extensions import assert_never
 
+from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
 if TYPE_CHECKING:
-    from pydantic import PositiveInt
     from typing_extensions import Self
-
-    from autointent.custom_types import FloatFromZeroToOne
 
 
 class TokenizerConfig(BaseModel):

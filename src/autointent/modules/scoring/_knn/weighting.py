@@ -1,4 +1,5 @@
 """Utility functions for calculating probabilities and weighting nearest neighbors."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any

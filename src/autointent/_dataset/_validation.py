@@ -1,14 +1,10 @@
 """File containing definitions of DatasetReader and DatasetValidator for handling dataset operations."""
-from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from autointent.schemas import Intent
-
-if TYPE_CHECKING:
-    from autointent.schemas import Sample
+from autointent.schemas import Intent, Sample
 
 
 class DatasetReader(BaseModel):

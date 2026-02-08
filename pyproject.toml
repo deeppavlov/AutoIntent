@@ -179,6 +179,16 @@ convention = "google"
 
 [tool.ruff.lint.flake8-type-checking]
 strict = true
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+exempt-modules = [
+    "typing",
+    "typing_extensions",
+    # reqired for config validation
+    "autointent.Context",
+    "autointent.custom_types",
+    "autointent.configs",
+    "pydantic",
+]
 
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true

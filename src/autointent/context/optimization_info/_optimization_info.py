@@ -3,6 +3,7 @@
 This module handles the tracking and logging of optimization artifacts,
 trials, and modules during the pipeline's execution.
 """
+
 from __future__ import annotations
 
 import json

@@ -3,6 +3,7 @@
 This module provides utilities for splitting datasets into training and testing sets.
 It includes support for both single-label and multi-label stratified splitting.
 """
+
 from __future__ import annotations
 
 import logging

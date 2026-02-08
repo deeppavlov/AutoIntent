@@ -9,11 +9,10 @@ from torch import nn
 
 from autointent._utils import detect_device
 from autointent._wrappers import BaseTorchModuleWithVocab
+from autointent.configs import VocabConfig
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from autointent.configs import VocabConfig
 
 
 class TextRNNDumpMetadata(BaseModel):

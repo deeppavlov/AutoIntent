@@ -1,22 +1,21 @@
 """LinearScorer class for linear classification."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
-from autointent import Embedder
-from autointent.configs import TaskTypeEnum, initialize_embedder_config
+from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    from pydantic import PositiveInt
 
-    from autointent import Context
-    from autointent.configs import EmbedderConfig
     from autointent.custom_types import ListOfLabels
 
 

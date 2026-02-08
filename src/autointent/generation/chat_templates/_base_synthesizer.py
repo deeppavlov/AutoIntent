@@ -1,4 +1,5 @@
 """Base class for chat template for class-wise augmentation."""
+
 from __future__ import annotations
 
 import random

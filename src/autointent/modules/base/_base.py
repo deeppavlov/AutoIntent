@@ -1,4 +1,5 @@
 """Base module for all modules."""
+
 from __future__ import annotations
 
 import logging
@@ -9,7 +10,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from typing_extensions import assert_never
 
+from autointent import Context
 from autointent._dump_tools import Dumper
+from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 from autointent.exceptions import WrongClassificationError
 
 if TYPE_CHECKING:
@@ -19,9 +22,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from autointent.configs import CrossEncoderConfig, EmbedderConfig
-    from autointent.context import Context
     from autointent.context.optimization_info import Artifact
-    from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 
 logger = logging.getLogger(__name__)
 

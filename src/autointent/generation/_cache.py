@@ -1,4 +1,5 @@
 """Helpers for caching structured outputs from LLM."""
+
 from __future__ import annotations
 
 import json

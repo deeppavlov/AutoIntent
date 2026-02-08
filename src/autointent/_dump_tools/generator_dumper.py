@@ -1,4 +1,5 @@
 """Separate file to fix circular import error."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any

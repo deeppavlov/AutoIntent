@@ -3,6 +3,7 @@
 This module provides the `VectorIndex` class to handle indexing, querying, and
 management of embeddings for nearest neighbor search.
 """
+
 from __future__ import annotations
 
 import importlib

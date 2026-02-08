@@ -1,4 +1,5 @@
 """BertScorer class for transformer-based classification with LoRA."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,14 +7,13 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from peft import LoraConfig, get_peft_model
 
+from autointent import Context
 from autointent._dump_tools import Dumper
-from autointent.configs import EarlyStoppingConfig
+from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
-    from autointent import Context
     from autointent._callbacks import REPORTERS_NAMES
-    from autointent.configs import HFModelConfig
 
 
 class BERTLoRAScorer(BertScorer):

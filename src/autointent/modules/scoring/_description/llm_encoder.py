@@ -1,4 +1,5 @@
 """LLMDescriptionScorer class for scoring utterances based on intent descriptions using LLM."""
+
 from __future__ import annotations
 
 import asyncio
@@ -10,9 +11,10 @@ from typing import TYPE_CHECKING, Any
 
 import aiometer
 import numpy as np
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
+from autointent import Context
 from autointent._dump_tools import Dumper
 from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Message, Role
@@ -21,11 +23,8 @@ from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-    from pydantic import PositiveFloat, PositiveInt
 
-    from autointent import Context
-    from autointent.configs._embedder import EmbedderConfig
-    from autointent.configs._transformers import CrossEncoderConfig
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 

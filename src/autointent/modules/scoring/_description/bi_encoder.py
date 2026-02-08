@@ -1,21 +1,19 @@
 """DescriptionScorer classes for scoring utterances based on intent descriptions."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from pydantic import PositiveFloat
 
-from autointent import Embedder
-from autointent.configs import TaskTypeEnum, initialize_embedder_config
+from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 
 from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-    from pydantic import PositiveFloat
-
-    from autointent import Context
-    from autointent.configs import EmbedderConfig
 
 
 class BiEncoderDescriptionScorer(BaseDescriptionScorer):

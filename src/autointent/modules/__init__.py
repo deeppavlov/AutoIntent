@@ -1,4 +1,5 @@
 """Heart of the library with different intent classification methods implemented."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeVar

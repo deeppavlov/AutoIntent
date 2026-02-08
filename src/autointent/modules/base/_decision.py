@@ -1,4 +1,5 @@
 """Predictor module."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -7,15 +8,15 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 import numpy as np
 from typing_extensions import assert_never
 
+from autointent import Context
 from autointent.context.optimization_info import DecisionArtifact
+from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
 from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseModule
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-    from autointent import Context
-    from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
     from autointent.schemas import Tag
 
 

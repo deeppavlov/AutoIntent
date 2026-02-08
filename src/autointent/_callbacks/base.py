@@ -1,4 +1,5 @@
 """Base class for reporters (W&B, TensorBoard, etc)."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

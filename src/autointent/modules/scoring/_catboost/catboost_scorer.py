@@ -1,4 +1,5 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
+
 from __future__ import annotations
 
 import logging
@@ -8,18 +9,16 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
+from pydantic import PositiveInt
 
-from autointent import Embedder
-from autointent.configs import TaskTypeEnum, initialize_embedder_config
+from autointent import Context, Embedder
+from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
+from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    from pydantic import PositiveInt
 
-    from autointent import Context
-    from autointent.configs import EmbedderConfig
-    from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 
 logger = logging.getLogger(__name__)
 

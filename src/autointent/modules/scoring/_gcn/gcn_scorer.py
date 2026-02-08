@@ -3,27 +3,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, cast
 
 import torch
+from pydantic import PositiveInt
 from sklearn.model_selection import train_test_split
 
-from autointent import Embedder
+from autointent import Context, Embedder
 from autointent.configs import (
+    EarlyStoppingConfig,
+    EmbedderConfig,
     TaskTypeEnum,
     TorchTrainingConfig,
     initialize_embedder_config,
 )
+from autointent.custom_types import ListOfLabels
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
 from autointent.modules.scoring._torch.base_scorer import BaseTorchTrainerScorer
 
 if TYPE_CHECKING:
     import numpy.typing as npt
-    from pydantic import PositiveInt
-
-    from autointent import Context
-    from autointent.configs import (
-        EarlyStoppingConfig,
-        EmbedderConfig,
-    )
-    from autointent.custom_types import ListOfLabels
 
 
 class GCNScorer(BaseTorchTrainerScorer):

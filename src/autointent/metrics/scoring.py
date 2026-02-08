@@ -1,4 +1,5 @@
 """Scoring metrics for multiclass and multilabel classification tasks."""
+
 from __future__ import annotations
 
 import logging

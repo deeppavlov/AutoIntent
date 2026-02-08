@@ -1,20 +1,19 @@
 """DescriptionScorer class for scoring utterances based on intent descriptions."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from pydantic import PositiveFloat
 
-from autointent import Ranker
+from autointent import Context, Ranker
 from autointent.configs import CrossEncoderConfig
 
 from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-    from pydantic import PositiveFloat
-
-    from autointent import Context
 
 
 class CrossEncoderDescriptionScorer(BaseDescriptionScorer):

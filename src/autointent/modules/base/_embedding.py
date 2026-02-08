@@ -1,13 +1,14 @@
 """Base class for embedding modules."""
+
 from __future__ import annotations
 
 from abc import ABC
 from typing import TYPE_CHECKING, Any
 
+from autointent import Context
 from autointent.modules.base import BaseModule
 
 if TYPE_CHECKING:
-    from autointent import Context
     from autointent.custom_types import ListOfLabels
 
 

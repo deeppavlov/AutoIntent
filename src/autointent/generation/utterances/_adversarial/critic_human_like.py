@@ -1,4 +1,5 @@
 """CriticHumanLike class for distinguishing human vs generated utterances."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal

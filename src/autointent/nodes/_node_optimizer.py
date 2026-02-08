@@ -1,4 +1,5 @@
 """Node optimizer for optimizing module configurations."""
+
 from __future__ import annotations
 
 import gc
@@ -21,8 +22,7 @@ if TYPE_CHECKING:
 
     from optuna.trial import Trial
 
-    from autointent import Dataset
-    from autointent.context import Context
+    from autointent import Context, Dataset
     from autointent.custom_types import NodeType, SearchSpaceValidationMode
     from autointent.schemas.node_validation import ParamSpaceT
 

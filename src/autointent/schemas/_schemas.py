@@ -2,6 +2,7 @@
 
 This module provides data models for utterances, intents, and tags.
 """
+
 from __future__ import annotations
 
 import json
@@ -12,10 +13,10 @@ from pydantic import (
     model_validator,
 )
 
+from autointent.custom_types import LabelWithOOS
+
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from autointent.custom_types import LabelWithOOS
 
 
 class Tag(BaseModel):

@@ -3,6 +3,7 @@
 This module provides the `Embedder` class for managing, persisting, and loading
 embedding models and calculating embeddings for input texts using different backends.
 """
+
 from __future__ import annotations
 
 import importlib

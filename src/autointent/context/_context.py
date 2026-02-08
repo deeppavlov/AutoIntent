@@ -1,4 +1,5 @@
 """Context manager for configuring and managing data handling, vector indexing, and optimization."""
+
 from __future__ import annotations
 
 import logging

@@ -1,24 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PositiveInt, field_validator
 
 from .configs import (
     CrossEncoderConfig,
     DataConfig,
+    EmbedderConfig,
     HFModelConfig,
     HPOConfig,
     LoggingConfig,
     initialize_embedder_config,
 )
-
-if TYPE_CHECKING:
-    from pydantic import PositiveInt
-
-    from .configs import (
-        EmbedderConfig,
-    )
 
 
 class OptimizationConfig(BaseModel):

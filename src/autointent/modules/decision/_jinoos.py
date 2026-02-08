@@ -1,18 +1,19 @@
 """Jinoos predictor module."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from autointent import Context
+from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.base import BaseDecision
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
-    from autointent import Context
-    from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels
     from autointent.schemas import Tag
 
 default_search_space = np.linspace(0, 1, num=100)

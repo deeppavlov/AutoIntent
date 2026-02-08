@@ -1,4 +1,5 @@
 """Module for regular expressions based intent detection."""
+
 from __future__ import annotations
 
 import json
@@ -8,7 +9,9 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 import numpy as np
 
+from autointent import Context
 from autointent.context.optimization_info import Artifact
+from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
 from autointent.metrics import REGEX_METRICS
 from autointent.modules.base import BaseRegex
 
@@ -17,9 +20,7 @@ if TYPE_CHECKING:
 
     import numpy.typing as npt
 
-    from autointent import Context
     from autointent.configs import CrossEncoderConfig, EmbedderConfig
-    from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
     from autointent.schemas import Intent
 
 
