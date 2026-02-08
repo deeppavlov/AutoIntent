@@ -8,7 +8,7 @@ from autointent._callbacks.wandb import WandbCallback
 
 REPORTERS = {cb.name: cb for cb in [WandbCallback, TensorBoardCallback, EmissionsTrackerCallback]}
 
-REPORTERS_NAMES = Literal[tuple(REPORTERS.keys())]  # type: ignore[valid-type]
+REPORTERS_NAMES = Literal[tuple(REPORTERS.keys()) + ("none",)]  # type: ignore[valid-type]
 
 
 def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
@@ -25,6 +25,8 @@ def get_callbacks(reporters: list[str] | None) -> CallbackHandler:
 
     reporters_cb = []
     for reporter in reporters:
+        if reporter == "none":
+            continue
         if reporter not in REPORTERS:
             msg = f"Reporter {reporter} not supported. Supported reporters {','.join(REPORTERS)}"
             raise ValueError(msg)

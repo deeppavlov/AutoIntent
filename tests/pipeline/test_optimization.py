@@ -98,7 +98,7 @@ def test_cv(dataset, task_type):
     context = pipeline_optimizer.fit(dataset, refit_after=True)
     context.dump()
 
-    assert len(pipeline_optimizer.logging_config.dump_dir.iterdir()) > 0
+    assert len(list(pipeline_optimizer.logging_config.dump_dir.iterdir())) > 0
 
 
 @pytest.mark.parametrize(
@@ -161,7 +161,7 @@ def test_dump_modules(dataset, task_type):
     context = pipeline_optimizer.fit(dataset)
     context.dump()
 
-    assert pipeline_optimizer.logging_config.dump_dir.iterdir() > 0
+    assert len(list(pipeline_optimizer.logging_config.dump_dir.iterdir())) > 0
 
 
 @pytest.mark.parametrize(

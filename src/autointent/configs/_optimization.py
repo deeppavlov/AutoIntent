@@ -1,8 +1,9 @@
 """Configuration for the optimization process."""
 
 from pathlib import Path
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator
 
 from autointent._callbacks import REPORTERS_NAMES
 from autointent.custom_types import FloatFromZeroToOne, SamplerType, ValidationScheme
@@ -57,7 +58,7 @@ class LoggingConfig(BaseModel):
     clear_ram: bool = Field(False, description="Whether to clear the RAM after dumping the modules")
     """Whether to clear the RAM after dumping the modules"""
     report_to: list[REPORTERS_NAMES] | None = Field(  # type: ignore[valid-type]
-        None, description="List of callbacks to report to. If None, no callbacks will be used"
+        ['none'], description="List of callbacks to report to. If None, no callbacks will be used"
     )
     log_interval_time: float = Field(
         0.1, description="Sampling interval for the system monitor in seconds for Wandb logger."
@@ -87,6 +88,13 @@ class LoggingConfig(BaseModel):
         if self.run_name is None:
             self.run_name = get_run_name()
         return self.run_name
+
+    @field_validator("report_to")
+    def validate_report_to(cls, value: list[REPORTERS_NAMES] | None) -> list[REPORTERS_NAMES]:
+        """Validate the `report_to` field to ensure it is either 'none' or a list of valid reporter names."""
+        if value is None:
+            return ['none']  # since transformers v5 doesn't allow None for report_to
+        return value
 
 
 class HPOConfig(BaseModel):
