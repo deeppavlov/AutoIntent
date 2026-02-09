@@ -29,7 +29,7 @@ classifiers=[
     'Framework :: Sphinx',
     'Typing :: Typed',
 ]
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.10,<=3.13"
 dependencies = [
     "sentence-transformers (>=3,<6)",
     "scikit-learn (>=1.5,<2.0)",
