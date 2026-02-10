@@ -29,7 +29,7 @@ classifiers=[
     'Framework :: Sphinx',
     'Typing :: Typed',
 ]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "sentence-transformers (>=3,<6)",
     "scikit-learn (>=1.5,<2.0)",
@@ -45,13 +45,15 @@ dependencies = [
     "python-dotenv (>=1.0.1,<2.0.0)",
     "transformers[torch] (>=4.49.0,<6.0.0)",
     "peft (>= 0.10.0, !=0.15.0, !=0.15.1, <1.0.0)",
-    "catboost (>=1.2.8,<2.0.0)",
     "aiometer (>=1.0.0,<2.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
     "threadpoolctl (>=3.0.0,<4.0.0)",
 ]
 
 [project.optional-dependencies]
+catboost = [
+    "catboost (>=1.2.8,<2.0.0)",
+]
 dspy = [
     "dspy (>=2.6.5,<3.0.0)",
 ]

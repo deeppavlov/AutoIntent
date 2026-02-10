@@ -1,6 +1,6 @@
 """Utils."""
-
-from typing import TypeVar
+import importlib
+from typing import Any, TypeVar
 
 import torch
 
@@ -25,3 +25,33 @@ def detect_device() -> str:
     if torch.mps.is_available():
         return "mps"
     return "cpu"
+
+
+def _is_package_available(pkg_name: str) -> bool:
+    package_exists = importlib.util.find_spec(pkg_name) is not None
+    return package_exists
+
+
+def _requires_package(
+    obj: Any, package_name: str, group_name: str,
+) -> None:
+    """Check if a package is available and raise an error with installation instructions if it's not.
+
+    Args:
+        obj: The object (class or function) that requires the package.
+        package_name: The name of the package to check.
+        group_name: The instruction to install the package. If None, defaults to "pip install {package_name}".
+    """
+    if _is_package_available(package_name):
+        return
+    install_instruction = (
+        f"pip install {package_name}"
+    )
+    group_install_instruction = (
+        f"pip install autointent[{group_name}]"
+    )
+    name = obj.__name__ if hasattr(obj, "__name__") else obj.__class__.__name__
+    raise ImportError(
+        f"{name} requires the `{package_name}` library but it was not found in your environment. "
+        + f"If you want to load {model_name} models, please run `{group_install_instruction}` or `{install_instruction}` to install the package."
+    )
