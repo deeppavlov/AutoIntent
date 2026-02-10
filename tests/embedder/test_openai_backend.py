@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from autointent._wrappers.embedder.openai import OpenaiEmbeddingBackend
-from autointent.configs import OpenaiEmbeddingConfig
+from autointent.configs import OpenaiEmbeddingConfig, TaskTypeEnum
 
 # Skip all tests if OpenAI API key is not available
 pytestmark = pytest.mark.skipif(
@@ -145,8 +145,6 @@ class TestOpenaiBackend:
         backend = OpenaiEmbeddingBackend(config)
 
         # Test with query task type
-        from autointent.configs import TaskTypeEnum
-
         # Get embeddings with and without prompts
         embeddings_no_prompt = backend.embed(["test"], None)
         embeddings_with_prompt = backend.embed(["test"], TaskTypeEnum.query)

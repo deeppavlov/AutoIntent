@@ -1,4 +1,6 @@
+import sys
 import tempfile
+import uuid
 from pathlib import Path
 
 import numpy as np
@@ -63,8 +65,6 @@ class TestVectorIndex:
         """Create a VectorIndex instance for testing."""
         # For OpenSearch, ensure unique index names to avoid test interference
         if isinstance(vector_config, OpenSearchConfig):
-            import uuid
-
             unique_id = str(uuid.uuid4())[:8]
             vector_config.index_name = f"test_index_{unique_id}"
 
@@ -296,7 +296,6 @@ class TestVectorIndexEdgeCases:
     def test_opensearch_dependency_error(self, monkeypatch):
         """Test OpenSearch dependency error handling."""
         # Mock opensearchpy import to fail
-        import sys
 
         original_modules = sys.modules.copy()
 

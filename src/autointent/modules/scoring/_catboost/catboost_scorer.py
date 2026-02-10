@@ -218,7 +218,9 @@ class CatBoostScorer(BaseScorer):
             **self.get_extra_params(),
         )
         self._model.fit(
-            dataset, labels, early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None
+            dataset,
+            list(labels),  # datasets >4 would pass `Column` instead of list, which causes error in CatBoostClassifier
+            early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[np.float64]:

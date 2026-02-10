@@ -260,7 +260,7 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
     Returns:
         Negative coverage score.
     """
-    labels_, scores_ = transform(labels, scores)
+    _, scores_ = transform(labels, scores)
 
     n_classes = scores_.shape[1]
     return float(1 - (coverage_error(labels, scores) - 1) / (n_classes - 1))

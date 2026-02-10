@@ -156,7 +156,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             List of messages for the LLM
         """
         descriptions_text = "\n".join(
-            f"<description_{i+1}>\n{desc}\n</description_{i+1}>" for i, desc in enumerate(descriptions)
+            f"<description_{i + 1}>\n{desc}\n</description_{i + 1}>" for i, desc in enumerate(descriptions)
         )
 
         content = dedent(

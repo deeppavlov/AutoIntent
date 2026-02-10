@@ -115,7 +115,7 @@ class Ranker:
             self.config.model_name,
             trust_remote_code=self.config.trust_remote_code,
             device=self.config.device,
-            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
+            max_length=self.config.tokenizer_config.max_length,
         )
         self._train_head = False
         self._clf = classifier_head
@@ -124,7 +124,7 @@ class Ranker:
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
+            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)  # type: ignore[union-attr]
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         """Hook to capture classifier activations.
@@ -148,7 +148,7 @@ class Ranker:
         """
         if not self._train_head:
             return np.array(
-                self.cross_encoder.predict(
+                self.cross_encoder.predict(  # type: ignore[call-overload]
                     pairs,
                     batch_size=self.config.batch_size,
                     activation_fct=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),

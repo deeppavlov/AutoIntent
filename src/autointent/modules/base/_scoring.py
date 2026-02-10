@@ -88,7 +88,7 @@ class BaseScorer(BaseModule, ABC):
                 else:
                     folded_scores_np.append(np.array(scores, dtype=np.float64))
 
-        self._artifact = ScorerArtifact(folded_scores=folded_scores_np if folded_scores_np else None)
+        self._artifact = ScorerArtifact(folded_scores=folded_scores_np or None)
 
         return metrics_calculated
 

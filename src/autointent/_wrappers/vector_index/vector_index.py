@@ -88,7 +88,7 @@ class VectorIndex:
 
         self.index.add(
             embeddings=embeddings,
-            documents=[Document(text=t, label=cast(LabelType, i)) for t, i in zip(texts, labels, strict=True)],
+            documents=[Document(text=t, label=cast("LabelType", i)) for t, i in zip(texts, labels, strict=True)],
         )
 
     def clear_ram(self) -> None:

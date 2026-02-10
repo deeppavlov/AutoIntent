@@ -167,7 +167,7 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
     @staticmethod
     async def dump_async(obj: BaseModel, path: Path, exists_ok: bool) -> None:
         class_info = {"name": obj.__class__.__name__, "module": obj.__class__.__module__}
-        path.mkdir(parents=True, exist_ok=exists_ok)
+        path.mkdir(parents=True, exist_ok=exists_ok)  # noqa: ASYNC240
         async with aiofiles.open(path / "class_info.json", mode="w", encoding="utf-8") as file:
             await file.write(json.dumps(class_info, ensure_ascii=False, indent=4))
         async with aiofiles.open(path / "model_dump.json", mode="w", encoding="utf-8") as file:
@@ -269,7 +269,7 @@ class HFTokenizerDumper(BaseObjectDumper[PreTrainedTokenizer | PreTrainedTokeniz
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401, ARG004
-        return AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
+        return AutoTokenizer.from_pretrained(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401

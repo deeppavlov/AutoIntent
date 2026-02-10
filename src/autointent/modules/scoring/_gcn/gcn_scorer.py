@@ -124,7 +124,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         descriptions = [intent.description or intent.name or "" for intent in context.data_handler.dataset.intents]
         return (
             context.data_handler.train_utterances(0),
-            cast(ListOfLabels, context.data_handler.train_labels(0)),
+            cast("ListOfLabels", context.data_handler.train_labels(0)),
             descriptions,
         )
 

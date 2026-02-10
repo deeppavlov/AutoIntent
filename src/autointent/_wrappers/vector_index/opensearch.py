@@ -111,7 +111,7 @@ class OpenSearchBackend(BaseIndexBackend):
 
         # Use bulk API for efficient indexing
         try:
-            success_count, failed_items = self._opensearchpy.helpers.bulk(
+            _, failed_items = self._opensearchpy.helpers.bulk(
                 self._client, bulk_data, stats_only=False, raise_on_error=False
             )
 
