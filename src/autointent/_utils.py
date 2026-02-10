@@ -1,4 +1,5 @@
 """Utils."""
+
 import importlib
 from typing import Any, TypeVar
 
@@ -28,12 +29,13 @@ def detect_device() -> str:
 
 
 def _is_package_available(pkg_name: str) -> bool:
-    package_exists = importlib.util.find_spec(pkg_name) is not None
-    return package_exists
+    return importlib.util.find_spec(pkg_name) is not None
 
 
 def _requires_package(
-    obj: Any, package_name: str, group_name: str,
+    obj: Any,  # noqa: ANN401
+    package_name: str,
+    group_name: str,
 ) -> None:
     """Check if a package is available and raise an error with installation instructions if it's not.
 
@@ -44,14 +46,11 @@ def _requires_package(
     """
     if _is_package_available(package_name):
         return
-    install_instruction = (
-        f"pip install {package_name}"
-    )
-    group_install_instruction = (
-        f"pip install autointent[{group_name}]"
-    )
+    install_instruction = f"pip install {package_name}"
+    group_install_instruction = f"pip install autointent[{group_name}]"
     name = obj.__name__ if hasattr(obj, "__name__") else obj.__class__.__name__
-    raise ImportError(
+    msg = (
         f"{name} requires the `{package_name}` library but it was not found in your environment. "
-        + f"If you want to load {model_name} models, please run `{group_install_instruction}` or `{install_instruction}` to install the package."
+        f"Please run `{group_install_instruction}` or `{install_instruction}` to install the package."
     )
+    raise ImportError(msg)
