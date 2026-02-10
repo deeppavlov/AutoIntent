@@ -1,17 +1,23 @@
 """Defines the Dataset class and related utilities for handling datasets."""
 
+from __future__ import annotations
+
 import json
 import logging
 from collections import defaultdict
 from functools import cached_property
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from datasets import Dataset as HFDataset
 from datasets import Sequence, get_dataset_config_names, load_dataset
 
-from autointent.custom_types import LabelWithOOS, Split
-from autointent.schemas import Intent, Tag
+from autointent.custom_types import Split
+from autointent.schemas import Tag
+
+if TYPE_CHECKING:
+    from autointent.custom_types import LabelWithOOS
+    from autointent.schemas import Intent
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +78,7 @@ class Dataset(dict[str, HFDataset]):
         return len(self.intents)
 
     @classmethod
-    def from_dict(cls, mapping: dict[str, Any]) -> "Dataset":
+    def from_dict(cls, mapping: dict[str, Any]) -> Dataset:
         """Creates a dataset from a dictionary mapping.
 
         Args:
@@ -83,7 +89,7 @@ class Dataset(dict[str, HFDataset]):
         return DictReader().read(mapping)
 
     @classmethod
-    def from_json(cls, filepath: str | Path) -> "Dataset":
+    def from_json(cls, filepath: str | Path) -> Dataset:
         """Loads a dataset from a JSON file.
 
         Args:
@@ -94,9 +100,7 @@ class Dataset(dict[str, HFDataset]):
         return JsonReader().read(filepath)
 
     @classmethod
-    def from_hub(
-        cls, repo_name: str, data_split: str = "default", intent_subset_name: str = Split.INTENTS
-    ) -> "Dataset":
+    def from_hub(cls, repo_name: str, data_split: str = "default", intent_subset_name: str = Split.INTENTS) -> Dataset:
         """Loads a dataset from the Hugging Face Hub.
 
         Args:
@@ -113,7 +117,7 @@ class Dataset(dict[str, HFDataset]):
 
         return DictReader().read(mapping)
 
-    def to_multilabel(self) -> "Dataset":
+    def to_multilabel(self) -> Dataset:
         """Converts dataset labels to multilabel format."""
         for split_name, split in self.items():
             self[split_name] = split.map(self._to_multilabel)

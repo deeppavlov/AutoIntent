@@ -1,6 +1,11 @@
-from pathlib import Path
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from autointent.modules.embedding import RetrievalAimedEmbedding
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_get_assets_returns_correct_artifact():

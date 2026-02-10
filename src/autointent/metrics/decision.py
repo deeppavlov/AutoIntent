@@ -1,16 +1,20 @@
 """Prediction metrics for multiclass and multilabel classification tasks."""
 
+from __future__ import annotations
+
 import logging
 from functools import partial
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
-import numpy.typing as npt
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
-from autointent.custom_types import ListOfGenericLabels, ListOfLabels
-
 from ._converter import transform
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.custom_types import ListOfGenericLabels, ListOfLabels
 
 logger = logging.getLogger(__name__)
 

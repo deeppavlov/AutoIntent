@@ -4,19 +4,25 @@ This module provides utilities for splitting datasets into training and testing 
 It includes support for both single-label and multi-label stratified splitting.
 """
 
+from __future__ import annotations
+
 import logging
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
-from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
-from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 from skmultilearn.model_selection import IterativeStratification
 from transformers import set_seed
 
-from autointent import Dataset
-from autointent.custom_types import LabelType
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from datasets import Dataset as HFDataset
+    from numpy import typing as npt
+
+    from autointent import Dataset
+    from autointent.custom_types import LabelType
 
 logger = logging.getLogger(__name__)
 

@@ -1,16 +1,21 @@
+from __future__ import annotations
+
 import hashlib
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy._typing import NDArray
-from typing_extensions import Self
 
 from autointent.configs import OpenSearchConfig
 from autointent.custom_types import Document
 
 from .base_backend import BaseIndexBackend
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy._typing import NDArray
+    from typing_extensions import Self
 
 
 class OpenSearchBackend(BaseIndexBackend):

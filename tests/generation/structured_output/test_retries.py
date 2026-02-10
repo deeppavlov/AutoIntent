@@ -1,5 +1,7 @@
 """Tests for structured output functionality."""
 
+from __future__ import annotations
+
 import os
 from typing import Literal
 
@@ -21,7 +23,7 @@ class Person(BaseModel):
     hobbies: list[str] = Field(description="List of the person's hobbies and interests")
 
     @model_validator(mode="after")
-    def val_hobbies(self) -> "Person":
+    def val_hobbies(self) -> Person:
         if len(self.hobbies) < 5:
             raise ValueError("it should has at least 5 hobbies")  # noqa: EM101, TRY003
         if self.status != "pending":

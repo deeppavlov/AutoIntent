@@ -158,6 +158,7 @@ ignore = [
     "RUF001",  # ambiguous unicode character
     "PLC0415",  # import outside top-level
 ]
+future-annotations = true  # For TC rules
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "D104"]
@@ -175,6 +176,22 @@ max-args = 10
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+strict = true
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+exempt-modules = [
+    "typing",
+    "typing_extensions",
+    # reqired for config validation
+    "autointent.Context",
+    "autointent.custom_types",
+    "autointent.configs",
+    "pydantic",
+]
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"

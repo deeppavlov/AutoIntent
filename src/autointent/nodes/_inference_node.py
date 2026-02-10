@@ -1,13 +1,18 @@
 """InferenceNode class for inference nodes."""
 
+from __future__ import annotations
+
 import gc
+from typing import TYPE_CHECKING
 
 import torch
 
-from autointent.configs import InferenceNodeConfig
-from autointent.custom_types import NodeType
-from autointent.modules.base import BaseModule
 from autointent.nodes.info import NODES_INFO
+
+if TYPE_CHECKING:
+    from autointent.configs import InferenceNodeConfig
+    from autointent.custom_types import NodeType
+    from autointent.modules.base import BaseModule
 
 
 class InferenceNode:
@@ -24,7 +29,7 @@ class InferenceNode:
         self.node_type = node_type
 
     @classmethod
-    def from_config(cls, config: InferenceNodeConfig) -> "InferenceNode":
+    def from_config(cls, config: InferenceNodeConfig) -> InferenceNode:
         """Initialize from config.
 
         Args:

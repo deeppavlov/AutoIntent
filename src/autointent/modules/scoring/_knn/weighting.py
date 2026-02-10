@@ -1,13 +1,17 @@
 """Utility functions for calculating probabilities and weighting nearest neighbors."""
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
-
-from autointent.custom_types import WeightType
 
 from .count_neighbors import get_counts, get_counts_multilabel
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    from autointent.custom_types import WeightType
 
 
 def apply_weights(

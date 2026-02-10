@@ -1,9 +1,10 @@
 """LogregAimedEmbedding class for a proxy optimization of embedding."""
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
@@ -15,6 +16,9 @@ from autointent.context.optimization_info import EmbeddingArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseEmbedding
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 class LogregAimedEmbedding(BaseEmbedding):
@@ -70,7 +74,7 @@ class LogregAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
         cv: PositiveInt = 3,
-    ) -> "LogregAimedEmbedding":
+    ) -> LogregAimedEmbedding:
         """Create a LogregAimedEmbedding instance using a Context object.
 
         Args:

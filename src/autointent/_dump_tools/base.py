@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any, Generic, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeAlias, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -10,6 +11,9 @@ from sklearn.base import BaseEstimator
 from autointent import Embedder, Ranker, VectorIndex
 from autointent._wrappers import BaseTorchModuleWithVocab
 from autointent.schemas import TagsList
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 ModuleSimpleAttributes = None | str | int | float | bool | list  # type: ignore[type-arg]
 

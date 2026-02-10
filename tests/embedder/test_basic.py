@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig
 
 from .conftest import backend_configs
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 
 @pytest.mark.parametrize("embedder_config", backend_configs)

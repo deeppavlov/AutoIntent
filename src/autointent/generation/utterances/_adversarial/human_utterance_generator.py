@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import asyncio
 import logging
 import random
 from collections import defaultdict
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import aiometer
 from datasets import Dataset as HFDataset
@@ -11,11 +13,13 @@ from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation import Generator
 from autointent.generation.chat_templates._evolution_templates_schemas import Message, Role
 from autointent.schemas import Sample
 
-from .critic_human_like import CriticHumanLike
+if TYPE_CHECKING:
+    from autointent.generation import Generator
+
+    from .critic_human_like import CriticHumanLike
 
 logger = logging.getLogger(__name__)
 

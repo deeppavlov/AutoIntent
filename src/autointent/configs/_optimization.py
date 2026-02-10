@@ -1,5 +1,7 @@
 """Configuration for the optimization process."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, field_validator

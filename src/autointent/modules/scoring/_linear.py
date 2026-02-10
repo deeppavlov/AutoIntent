@@ -1,17 +1,22 @@
 """LinearScorer class for linear classification."""
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 from pydantic import PositiveInt
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.multioutput import MultiOutputClassifier
 
 from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
-from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.custom_types import ListOfLabels
 
 
 class LinearScorer(BaseScorer):
@@ -74,7 +79,7 @@ class LinearScorer(BaseScorer):
         context: Context,
         cv: PositiveInt = 3,
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-    ) -> "LinearScorer":
+    ) -> LinearScorer:
         """Create a LinearScorer instance using a Context object.
 
         Args:

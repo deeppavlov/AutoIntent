@@ -1,6 +1,7 @@
-from typing import Any, cast
+from __future__ import annotations
 
-import numpy.typing as npt
+from typing import TYPE_CHECKING, Any, cast
+
 import torch
 from pydantic import PositiveInt
 from sklearn.model_selection import train_test_split
@@ -16,6 +17,9 @@ from autointent.configs import (
 from autointent.custom_types import ListOfLabels
 from autointent.modules.scoring._gcn.gcn_model import TextMLGCN
 from autointent.modules.scoring._torch.base_scorer import BaseTorchTrainerScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 
 class GCNScorer(BaseTorchTrainerScorer):
@@ -94,7 +98,7 @@ class GCNScorer(BaseTorchTrainerScorer):
         learning_rate: float = 1e-3,
         seed: int = 42,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "GCNScorer":
+    ) -> GCNScorer:
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
         if label_embedder_config is None:

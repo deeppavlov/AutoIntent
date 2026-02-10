@@ -1,29 +1,35 @@
+from __future__ import annotations
+
 import json
 import logging
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal, cast, overload
+from typing import TYPE_CHECKING, Literal, cast, overload
 from uuid import uuid4
 
 import huggingface_hub
 import numpy as np
-import numpy.typing as npt
 import torch
 from datasets import Dataset
 from sentence_transformers import SentenceTransformer, SentenceTransformerTrainer, SentenceTransformerTrainingArguments
 from sentence_transformers.losses import BatchAllTripletLoss
 from sentence_transformers.training_args import BatchSamplers
 from sklearn.model_selection import train_test_split
-from transformers import EarlyStoppingCallback, TrainerCallback
+from transformers import EarlyStoppingCallback
 
 from autointent._hash import Hasher
-from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
-from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from transformers import TrainerCallback
+
+    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -300,7 +306,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 json.dump({"trained": True}, file, indent=4)
 
     @classmethod
-    def load(cls, path: Path) -> "SentenceTransformerEmbeddingBackend":
+    def load(cls, path: Path) -> SentenceTransformerEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:

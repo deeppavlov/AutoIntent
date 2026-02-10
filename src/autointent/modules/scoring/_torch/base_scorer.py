@@ -1,21 +1,27 @@
+from __future__ import annotations
+
 import logging
 import tempfile
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 import torch
 from sklearn.model_selection import train_test_split
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from autointent._wrappers import BaseTorchModule, BaseTorchModuleWithVocab
 from autointent.configs import EarlyStoppingConfig, TorchTrainingConfig, VocabConfig
-from autointent.custom_types import ListOfLabels
-from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL, ScoringMetricFn
+from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent._wrappers import BaseTorchModule, BaseTorchModuleWithVocab
+    from autointent.custom_types import ListOfLabels
+    from autointent.metrics import ScoringMetricFn
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,7 @@
 """RetrievalAimedEmbedding class for a proxy optimization of embedding."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from pydantic import PositiveInt
@@ -74,7 +76,7 @@ class RetrievalAimedEmbedding(BaseEmbedding):
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
         k: PositiveInt = 10,
         ft_config: EmbedderFineTuningConfig | dict[str, Any] | None = None,
-    ) -> "RetrievalAimedEmbedding":
+    ) -> RetrievalAimedEmbedding:
         """Create an instance using a Context object.
 
         Args:

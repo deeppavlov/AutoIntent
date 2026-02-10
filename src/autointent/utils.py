@@ -1,12 +1,15 @@
 """AutoIntent utilities."""
 
+from __future__ import annotations
+
 import importlib.resources as ires
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from autointent.custom_types import SearchSpacePreset
+if TYPE_CHECKING:
+    from autointent.custom_types import SearchSpacePreset
 
 
 def load_search_space(path_or_str: Path | str) -> list[dict[str, Any]]:
