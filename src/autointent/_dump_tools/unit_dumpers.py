@@ -28,7 +28,10 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
     from pathlib import Path
+
     from catboost import CatBoostClassifier
+else:
+    CatBoostClassifier = Any
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
