@@ -9,7 +9,6 @@ import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
-from catboost import CatBoostClassifier
 from peft import PeftModel
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
@@ -29,6 +28,7 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from catboost import CatBoostClassifier
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -317,10 +317,14 @@ class CatBoostDumper(BaseObjectDumper[CatBoostClassifier]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401
+        from catboost import CatBoostClassifier
+
         model = CatBoostClassifier()
         model.load_model(str(path))
         return model
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
+        from catboost import CatBoostClassifier
+
         return isinstance(obj, CatBoostClassifier)
