@@ -82,6 +82,7 @@ class BertScorer(BaseScorer):
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
         print_progress: bool = False,
     ) -> None:
+        require("transformers", "transformers")
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
@@ -121,10 +122,12 @@ class BertScorer(BaseScorer):
         }
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
+        from transformers import AutoModelForSequenceClassification
+
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
-        return self._AutoModelForSequenceClassification.from_pretrained(
+        return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
             num_labels=self._n_classes,
@@ -138,6 +141,8 @@ class BertScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
+        from transformers import AutoTokenizer
+
         self._validate_task(labels)
 
         self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
@@ -153,8 +158,10 @@ class BertScorer(BaseScorer):
         Args:
             tokenized_dataset: output from :py:meth:`BertScorer._get_tokenized_dataset`
         """
+        from transformers import DataCollatorWithPadding, PrinterCallback, ProgressCallback, Trainer, TrainingArguments
+
         with tempfile.TemporaryDirectory() as tmp_dir:
-            training_args = self._TrainingArguments(
+            training_args = TrainingArguments(
                 output_dir=tmp_dir,
                 num_train_epochs=self.num_train_epochs,
                 per_device_train_batch_size=self.batch_size,
@@ -173,13 +180,13 @@ class BertScorer(BaseScorer):
                 load_best_model_at_end=self.early_stopping_config.metric is not None,
             )
 
-            trainer = self._Trainer(
+            trainer = Trainer(
                 model=self._model,
                 args=training_args,
                 train_dataset=tokenized_dataset["train"],
                 eval_dataset=tokenized_dataset["validation"],
                 processing_class=self._tokenizer,
-                data_collator=self._DataCollatorWithPadding(tokenizer=self._tokenizer),
+                data_collator=DataCollatorWithPadding(tokenizer=self._tokenizer),
                 compute_metrics=self._get_compute_metrics(),
                 callbacks=self._get_trainer_callbacks(),
             )
@@ -190,10 +197,12 @@ class BertScorer(BaseScorer):
             trainer.train()
 
     def _get_trainer_callbacks(self) -> list["TrainerCallback"]:
+        from transformers import EarlyStoppingCallback
+
         res: list[TrainerCallback] = []
         if self.early_stopping_config.metric is not None:
             res.append(
-                self._EarlyStoppingCallback(
+                EarlyStoppingCallback(
                     early_stopping_patience=self.early_stopping_config.patience,
                     early_stopping_threshold=self.early_stopping_config.threshold,
                 )

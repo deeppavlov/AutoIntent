@@ -22,6 +22,9 @@ if TYPE_CHECKING:
     from catboost import CatBoostClassifier
     from peft import PeftModel
     from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
+else:
+    PreTrainedTokenizer = Any
+    PreTrainedTokenizerFast = Any
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -271,7 +274,7 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
     dir_or_file_name = "hf_tokenizers"
 
     @staticmethod
-    def dump(obj: "PreTrainedTokenizer | PreTrainedTokenizerFast", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PreTrainedTokenizer | PreTrainedTokenizerFast, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
