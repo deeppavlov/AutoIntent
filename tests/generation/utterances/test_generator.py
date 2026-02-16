@@ -7,6 +7,7 @@ from autointent.generation.chat_templates import Message
 
 pytest.importorskip("openai", reason="OpenAI library is required")
 
+
 @pytest.fixture(autouse=True)
 def set_env_vars(monkeypatch):
     monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")

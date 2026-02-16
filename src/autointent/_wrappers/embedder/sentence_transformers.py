@@ -22,16 +22,13 @@ from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
     from sentence_transformers import SentenceTransformer
     from transformers import TrainerCallback
 
     from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
     from autointent.custom_types import ListOfLabels
-    import numpy.typing as npt
-    from transformers import TrainerCallback
 
-    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
-    from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 

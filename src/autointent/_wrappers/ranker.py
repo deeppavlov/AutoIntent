@@ -26,9 +26,9 @@ from autointent.custom_types import RerankedItem
 
 if TYPE_CHECKING:
     import numpy.typing as npt
+    import sentence_transformers as st
 
     from autointent.custom_types import ListOfLabels
-    import sentence_transformers as st
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ class Ranker:
     _metadata_file_name = "metadata.json"
     _classifier_file_name = "classifier.joblib"
     config: CrossEncoderConfig
-    cross_encoder: "st.CrossEncoder"
+    cross_encoder: st.CrossEncoder
 
     def __init__(
         self,

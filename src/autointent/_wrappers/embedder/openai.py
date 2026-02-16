@@ -22,15 +22,12 @@ from .utils import get_embeddings_path
 if TYPE_CHECKING:
     from pathlib import Path
 
-    import openai
-
-    from autointent.configs import TaskTypeEnum
-    from pathlib import Path
-
     import numpy.typing as npt
+    import openai
     from typing_extensions import NotRequired
 
     from autointent.configs import TaskTypeEnum
+
 
 logger = logging.getLogger(__name__)
 

@@ -20,10 +20,11 @@ from autointent.schemas import TagsList
 from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from catboost import CatBoostClassifier
     from peft import PeftModel
     from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
-    from pathlib import Path
 else:
     PreTrainedTokenizer = Any
     PreTrainedTokenizerFast = Any
@@ -210,7 +211,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     dir_or_file_name = "peft_models"
 
     @staticmethod
-    def dump(obj: "PeftModel", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PeftModel, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         if obj._is_prompt_learning:  # noqa: SLF001
             # strategy to save prompt learning models: save prompt encoder and bert classifier separately
@@ -254,7 +255,7 @@ class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
     dir_or_file_name = "hf_models"
 
     @staticmethod
-    def dump(obj: "PreTrainedModel", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PreTrainedModel, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
@@ -325,7 +326,7 @@ class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
     dir_or_file_name = "catboost_models"
 
     @staticmethod
-    def dump(obj: "CatBoostClassifier", path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+    def dump(obj: CatBoostClassifier, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
         path.parent.mkdir(parents=True, exist_ok=True)
         obj.save_model(str(path), format="cbm")
 

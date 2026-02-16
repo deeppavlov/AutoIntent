@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from typing import TYPE_CHECKING, Any, Literal
-
 from autointent import Context
 from autointent._dump_tools import Dumper
 from autointent._utils import require
@@ -14,8 +12,9 @@ from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
-    from autointent._callbacks import REPORTERS_NAMES
     from peft import LoraConfig
+
+    from autointent._callbacks import REPORTERS_NAMES
 
 
 class BERTLoRAScorer(BertScorer):
@@ -62,7 +61,7 @@ class BERTLoRAScorer(BertScorer):
 
     name = "lora"
 
-    _lora_config: "LoraConfig"
+    _lora_config: LoraConfig
 
     def __init__(
         self,

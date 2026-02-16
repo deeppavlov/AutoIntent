@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import tempfile
-from typing import TYPE_CHECKING, Any, Literal
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -11,6 +10,7 @@ import numpy as np
 import torch
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
+
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._utils import require
@@ -19,14 +19,10 @@ from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTI
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
-    from transformers import EvalPrediction, TrainerCallback
     from collections.abc import Callable
 
     import numpy.typing as npt
-    from transformers import (
-        EvalPrediction,
-    )
-    from transformers.trainer_callback import TrainerCallback
+    from transformers import EvalPrediction, TrainerCallback
 
     from autointent._callbacks import REPORTERS_NAMES
     from autointent.custom_types import ListOfLabels
@@ -206,7 +202,7 @@ class BertScorer(BaseScorer):
 
             trainer.train()
 
-    def _get_trainer_callbacks(self) -> list["TrainerCallback"]:
+    def _get_trainer_callbacks(self) -> list[TrainerCallback]:
         from transformers import EarlyStoppingCallback
 
         res: list[TrainerCallback] = []
@@ -246,7 +242,7 @@ class BertScorer(BaseScorer):
 
         return dataset.map(tokenize_function, batched=True, batch_size=self.batch_size)
 
-    def _get_compute_metrics(self) -> Callable[["EvalPrediction"], dict[str, float]] | None:
+    def _get_compute_metrics(self) -> Callable[[EvalPrediction], dict[str, float]] | None:
         """Construct callable for computing metrics during transformer training.
 
         The result of this function is supposed to pass to :py:class:`transformers.Trainer`.
@@ -257,7 +253,7 @@ class BertScorer(BaseScorer):
         metric_name = self.early_stopping_config.metric
         metric_fn = (SCORING_METRICS_MULTILABEL | SCORING_METRICS_MULTICLASS)[metric_name]
 
-        def compute_metrics(output: "EvalPrediction") -> dict[str, float]:
+        def compute_metrics(output: EvalPrediction) -> dict[str, float]:
             return {
                 metric_name: metric_fn(output.label_ids.tolist(), output.predictions.tolist())  # type: ignore[union-attr]
             }

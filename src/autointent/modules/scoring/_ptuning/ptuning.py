@@ -53,7 +53,7 @@ class PTuningScorer(BertScorer):
 
     name = "ptuning"
 
-    _ptuning_config: "PromptEncoderConfig"
+    _ptuning_config: PromptEncoderConfig
 
     def __init__(  # noqa: PLR0913
         self,

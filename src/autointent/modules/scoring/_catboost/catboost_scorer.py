@@ -17,8 +17,8 @@ from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
-    from catboost import CatBoostClassifier
     import numpy.typing as npt
+    from catboost import CatBoostClassifier
 
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ class CatBoostScorer(BaseScorer):
     supports_multiclass = True
     supports_multilabel = True
 
-    _model: "CatBoostClassifier"
+    _model: CatBoostClassifier
 
     encoder_features_types = (FeaturesType.EMBEDDING, FeaturesType.BOTH)
 
