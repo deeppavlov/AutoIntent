@@ -7,6 +7,8 @@ from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embed
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space, setup_environment
 
+pytest.importorskip("peft")
+
 
 @pytest.fixture
 def project_dir(task_type):
