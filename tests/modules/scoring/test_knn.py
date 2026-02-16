@@ -1,12 +1,15 @@
 import tempfile
 
 import numpy as np
+import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
 
 
 def test_base_knn(dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     data_handler = DataHandler(dataset)
 
     scorer = KNNScorer(k=3, weights="distance", embedder_config="sergeyzh/rubert-tiny-turbo")

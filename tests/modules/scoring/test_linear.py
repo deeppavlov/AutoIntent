@@ -1,12 +1,15 @@
 import tempfile
 
 import numpy as np
+import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
 
 
 def test_base_linear(dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     data_handler = DataHandler(dataset)
 
     scorer = LinearScorer(embedder_config="sergeyzh/rubert-tiny-turbo")

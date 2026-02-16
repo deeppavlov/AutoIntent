@@ -23,6 +23,7 @@ try:
 except ImportError:
     opensearch_available = False
 
+pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
 
 def is_opensearch_running() -> bool:
     """Check if OpenSearch is running on localhost:9200."""

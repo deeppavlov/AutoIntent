@@ -117,7 +117,6 @@ class KNNScorer(BaseScorer):
         Args:
             utterances: List of training utterances
             labels: List of labels corresponding to the utterances
-            clear_cache: Whether to clear the vector index cache before fitting
 
         Raises:
             ValueError: If the vector index mismatches the provided utterances

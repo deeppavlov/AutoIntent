@@ -19,6 +19,8 @@ from autointent.modules import ThresholdDecision
     ],
 )
 def test_predict(fit_fixture, threshold, expected, request, scores):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     fit_data = request.getfixturevalue(fit_fixture)
 
     predictor = ThresholdDecision(threshold)
@@ -28,6 +30,8 @@ def test_predict(fit_fixture, threshold, expected, request, scores):
 
 
 def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
+    pytest.importorskip("sentence_transformers", reason="SentenceTransformers library is required")
+
     predictor = ThresholdDecision(thresh=0.5)
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
@@ -43,6 +47,8 @@ def test_fails_on_wrong_n_classes_fit(multiclass_fit_data):
 
 @pytest.mark.parametrize("fit_fixture", ["multiclass_fit_data", "multilabel_fit_data"])
 def test_dump_load(fit_fixture, request, tmp_path):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     fit_data = request.getfixturevalue(fit_fixture)
     predictor = ThresholdDecision(thresh=0.3)
     predictor.fit(*fit_data)
