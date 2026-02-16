@@ -84,6 +84,7 @@ def test_bayes(dataset, sampler):
     ],
 )
 def test_cv(dataset, task_type):
+    pytest.importorskip("peft")
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -117,6 +118,8 @@ def test_cv(dataset, task_type):
     ],
 )
 def test_no_context_optimization(dataset, task_type):
+    pytest.importorskip("peft")
+
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -148,6 +151,8 @@ def test_no_context_optimization(dataset, task_type):
     ],
 )
 def test_dump_modules(dataset, task_type):
+    pytest.importorskip("peft")
+
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
