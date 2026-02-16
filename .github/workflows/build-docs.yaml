@@ -49,7 +49,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group docs
+          uv sync --group docs --all-groups
 
       - name: Run tests
         if: github.event_name != 'workflow_dispatch'

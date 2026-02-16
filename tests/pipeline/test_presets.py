@@ -23,6 +23,7 @@ from tests.conftest import setup_environment
     ],
 )
 def test_presets(dataset, preset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for transformer-based presets")
     project_dir = setup_environment()
 
     pipeline_optimizer = Pipeline.from_preset(preset)
