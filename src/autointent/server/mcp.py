@@ -1,12 +1,13 @@
 """MCP Server for AutoIntent."""
 
+from __future__ import annotations
+
 import logging
 import math
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from fastmcp import FastMCP
 from pydantic import BaseModel, Field
@@ -15,6 +16,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from autointent import Dataset, Pipeline
 from autointent.custom_types import LabelWithOOS, ListOfLabelsWithOOS, Split
 from autointent.schemas import Intent
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 class Settings(BaseSettings):

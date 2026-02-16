@@ -1,16 +1,16 @@
 """Context manager for configuring and managing data handling, vector indexing, and optimization."""
 
+from __future__ import annotations
+
 import logging
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 from typing_extensions import assert_never
 
-from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
     CrossEncoderConfig,
-    DataConfig,
     EmbedderConfig,
     HFModelConfig,
     HPOConfig,
@@ -20,6 +20,14 @@ from autointent.configs import (
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent import Dataset
+    from autointent.configs import (
+        DataConfig,
+    )
 
 
 class Context:

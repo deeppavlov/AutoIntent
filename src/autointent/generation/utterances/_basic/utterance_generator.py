@@ -1,15 +1,21 @@
 """Basic generation of new utterances from existing ones."""
 
+from __future__ import annotations
+
 import asyncio
+from typing import TYPE_CHECKING
 
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation import Generator
-from autointent.generation.chat_templates import BaseSynthesizerTemplate
-from autointent.schemas import Intent, Sample
+from autointent.schemas import Sample
+
+if TYPE_CHECKING:
+    from autointent.generation import Generator
+    from autointent.generation.chat_templates import BaseSynthesizerTemplate
+    from autointent.schemas import Intent
 
 
 class UtteranceGenerator:

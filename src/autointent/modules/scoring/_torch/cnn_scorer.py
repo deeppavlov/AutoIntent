@@ -1,5 +1,7 @@
 """CNNScorer class for scoring."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from autointent import Context
@@ -107,7 +109,7 @@ class CNNScorer(BaseVocabTorchScorer):
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "CNNScorer":
+    ) -> CNNScorer:
         return cls(
             embed_dim=embed_dim,
             kernel_sizes=kernel_sizes,

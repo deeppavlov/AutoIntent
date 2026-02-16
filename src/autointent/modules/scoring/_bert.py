@@ -1,25 +1,35 @@
 """BertScorer class for transformer-based classification."""
 
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING, Any, Literal
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-import numpy.typing as npt
 import torch
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
-
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
 from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
-from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
     from transformers import EvalPrediction, TrainerCallback
+    from collections.abc import Callable
+
+    import numpy.typing as npt
+    from transformers import (
+        EvalPrediction,
+    )
+    from transformers.trainer_callback import TrainerCallback
+
+    from autointent._callbacks import REPORTERS_NAMES
+    from autointent.custom_types import ListOfLabels
 
 
 class BertScorer(BaseScorer):
@@ -102,7 +112,7 @@ class BertScorer(BaseScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "BertScorer":
+    ) -> BertScorer:
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
 

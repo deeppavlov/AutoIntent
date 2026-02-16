@@ -1,11 +1,12 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
 
+from __future__ import annotations
+
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 from pydantic import PositiveInt
 
@@ -17,6 +18,8 @@ from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
     from catboost import CatBoostClassifier
+    import numpy.typing as npt
+
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +142,7 @@ class CatBoostScorer(BaseScorer):
         iterations: PositiveInt = 1000,
         depth: PositiveInt = 6,
         **catboost_kwargs: dict[str, Any],
-    ) -> "CatBoostScorer":
+    ) -> CatBoostScorer:
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
         return cls(

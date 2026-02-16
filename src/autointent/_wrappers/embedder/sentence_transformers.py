@@ -10,7 +10,6 @@ from uuid import uuid4
 
 import huggingface_hub
 import numpy as np
-import numpy.typing as npt
 import torch
 from datasets import Dataset
 from sklearn.model_selection import train_test_split
@@ -24,6 +23,11 @@ from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
     from sentence_transformers import SentenceTransformer
+    from transformers import TrainerCallback
+
+    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.custom_types import ListOfLabels
+    import numpy.typing as npt
     from transformers import TrainerCallback
 
     from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum

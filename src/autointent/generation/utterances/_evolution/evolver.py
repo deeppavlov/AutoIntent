@@ -3,18 +3,24 @@
 Deeply inspired by DeepEval evolutions.
 """
 
+from __future__ import annotations
+
 import asyncio
 import random
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation import Generator
-from autointent.generation.chat_templates import EvolutionChatTemplate
-from autointent.schemas import Intent
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from autointent.generation import Generator
+    from autointent.generation.chat_templates import EvolutionChatTemplate
+    from autointent.schemas import Intent
 
 
 class UtteranceEvolver:

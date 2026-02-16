@@ -1,10 +1,11 @@
 """Predictor module."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
-import numpy.typing as npt
 from typing_extensions import assert_never
 
 from autointent import Context
@@ -12,7 +13,11 @@ from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
 from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseModule
-from autointent.schemas import Tag
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.schemas import Tag
 
 
 class BaseDecision(BaseModule, ABC):

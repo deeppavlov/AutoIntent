@@ -1,11 +1,11 @@
 """Module for classification scoring using sklearn classifiers with predict_proba() method."""
 
+from __future__ import annotations
+
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
-from sklearn.base import BaseEstimator
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.utils import all_estimators
 from typing_extensions import Self
@@ -14,6 +14,11 @@ from autointent import Context, Embedder
 from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from sklearn.base import BaseEstimator
+
 
 logger = logging.getLogger(__name__)
 AVAILABLE_CLASSIFIERS: dict[str, type[BaseEstimator]] = {

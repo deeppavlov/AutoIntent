@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import numpy.typing as npt
-from typing_extensions import Self
+if TYPE_CHECKING:
+    from pathlib import Path
 
-from autointent.configs import VectorIndexConfig
-from autointent.custom_types import Document
+    import numpy.typing as npt
+    from typing_extensions import Self
+
+    from autointent.configs import VectorIndexConfig
+    from autointent.custom_types import Document
 
 
 class BaseIndexBackend(ABC):

@@ -1,16 +1,15 @@
+from __future__ import annotations
+
 import logging
-from pathlib import Path
-from typing import Any, ClassVar, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 import numpy as np
-import numpy.typing as npt
 import torch
 
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
 from autointent.schemas import TagsList
 
-from .base import BaseObjectDumper, ModuleAttributes, ModuleSimpleAttributes
+from .base import ModuleSimpleAttributes
 from .generator_dumper import GeneratorDumper
 from .unit_dumpers import (
     ArraysDumper,
@@ -27,6 +26,15 @@ from .unit_dumpers import (
     TorchModelDumper,
     VectorIndexDumper,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
+
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
+
+    from .base import BaseObjectDumper, ModuleAttributes
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)

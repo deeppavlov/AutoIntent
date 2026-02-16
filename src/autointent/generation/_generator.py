@@ -19,6 +19,8 @@ from ._cache import StructuredOutputCache
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from autointent.generation.chat_templates import Message
+
 logger = logging.getLogger(__name__)
 
 load_dotenv()

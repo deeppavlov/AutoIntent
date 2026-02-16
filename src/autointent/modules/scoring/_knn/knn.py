@@ -1,9 +1,10 @@
 """KNNScorer class for k-nearest neighbors scoring."""
 
-from typing import Any, get_args
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, get_args
 
 import numpy as np
-import numpy.typing as npt
 from pydantic import PositiveInt
 
 from autointent import Context, VectorIndex
@@ -13,10 +14,15 @@ from autointent.configs import (
     get_default_vector_index_config,
     initialize_embedder_config,
 )
-from autointent.custom_types import Document, ListOfLabels, WeightType
+from autointent.custom_types import WeightType
 from autointent.modules.base import BaseScorer
 
 from .weighting import apply_weights
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.custom_types import Document, ListOfLabels
 
 
 class KNNScorer(BaseScorer):
@@ -86,7 +92,7 @@ class KNNScorer(BaseScorer):
         k: PositiveInt = 5,
         weights: WeightType = "distance",
         embedder_config: EmbedderConfig | str | None = None,
-    ) -> "KNNScorer":
+    ) -> KNNScorer:
         """Create a KNNScorer instance using a Context object.
 
         Args:

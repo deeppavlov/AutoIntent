@@ -1,13 +1,20 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import torch
 from pydantic import BaseModel
 from torch import nn
-from typing_extensions import Self
 
 from autointent._utils import detect_device
 from autointent._wrappers import BaseTorchModule
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from typing_extensions import Self
 
 
 class GCNModelDumpMetadata(BaseModel):

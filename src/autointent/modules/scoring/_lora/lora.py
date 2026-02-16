@@ -1,16 +1,20 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
+from typing import TYPE_CHECKING, Any, Literal
+
 from autointent import Context
-from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
 from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
+    from autointent._callbacks import REPORTERS_NAMES
     from peft import LoraConfig
 
 
@@ -101,7 +105,7 @@ class BERTLoRAScorer(BertScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         **lora_kwargs: Any,  # noqa: ANN401
-    ) -> "BERTLoRAScorer":
+    ) -> BERTLoRAScorer:
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
         return cls(

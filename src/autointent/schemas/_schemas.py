@@ -3,9 +3,10 @@
 This module provides data models for utterances, intents, and tags.
 """
 
+from __future__ import annotations
+
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import (
     BaseModel,
@@ -13,6 +14,9 @@ from pydantic import (
 )
 
 from autointent.custom_types import LabelWithOOS
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class Tag(BaseModel):
@@ -37,7 +41,7 @@ class TagsList(list[Tag]):
             json.dump(serialized, file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "TagsList":
+    def load(cls, path: Path) -> TagsList:
         """Load pydantic model from file system."""
         with path.open(encoding="utf-8") as file:
             serialized: list[dict[str, Any]] = json.load(file)
@@ -57,7 +61,7 @@ class Sample(BaseModel):
     label: LabelWithOOS = None
 
     @model_validator(mode="after")
-    def validate_sample(self) -> "Sample":
+    def validate_sample(self) -> Sample:
         """Validate the sample after model instantiation.
 
         This method ensures that the `label` field adheres to the expected constraints:
@@ -70,7 +74,7 @@ class Sample(BaseModel):
         """
         return self._validate_label()
 
-    def _validate_label(self) -> "Sample":
+    def _validate_label(self) -> Sample:
         """Validate the `label` field of the sample.
 
         - Ensures that the `label` is not empty for multilabel samples.

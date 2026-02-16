@@ -11,7 +11,6 @@ import aiometer
 import numpy as np
 import numpy.typing as npt
 import torch
-from typing_extensions import NotRequired
 
 from autointent._hash import Hasher
 from autointent._utils import require
@@ -24,6 +23,12 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     import openai
+
+    from autointent.configs import TaskTypeEnum
+    from pathlib import Path
+
+    import numpy.typing as npt
+    from typing_extensions import NotRequired
 
     from autointent.configs import TaskTypeEnum
 

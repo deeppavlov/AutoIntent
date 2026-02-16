@@ -4,6 +4,8 @@ This module provides functionality for ranking retrieved sentences by meaning cl
 to provided utterances using cross-encoder models.
 """
 
+from __future__ import annotations
+
 import gc
 import itertools as it
 import json
@@ -14,16 +16,18 @@ from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import joblib
 import numpy as np
-import numpy.typing as npt
 import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
 from autointent._utils import require
 from autointent.configs import CrossEncoderConfig
-from autointent.custom_types import ListOfLabels, RerankedItem
+from autointent.custom_types import RerankedItem
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.custom_types import ListOfLabels
     import sentence_transformers as st
 
 logger = logging.getLogger(__name__)
@@ -274,7 +278,7 @@ class Ranker:
         joblib.dump(self._clf, dump_dir / self._classifier_file_name)
 
     @classmethod
-    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> "Ranker":
+    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> Ranker:
         """Load the model and classifier from disk.
 
         Args:

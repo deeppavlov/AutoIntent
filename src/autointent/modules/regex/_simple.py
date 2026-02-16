@@ -1,21 +1,27 @@
 """Module for regular expressions based intent detection."""
 
+from __future__ import annotations
+
 import json
 import re
-from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import numpy as np
-import numpy.typing as npt
 
 from autointent import Context
-from autointent.configs import CrossEncoderConfig, EmbedderConfig
 from autointent.context.optimization_info import Artifact
 from autointent.custom_types import LabelType, ListOfGenericLabels, ListOfLabels
 from autointent.metrics import REGEX_METRICS
 from autointent.modules.base import BaseRegex
-from autointent.schemas import Intent
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    import numpy.typing as npt
+
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
+    from autointent.schemas import Intent
 
 
 class RegexPatternsCompiled(TypedDict):
@@ -45,7 +51,7 @@ class SimpleRegex(BaseRegex):
     supports_oos = False
 
     @classmethod
-    def from_context(cls, context: Context) -> "SimpleRegex":
+    def from_context(cls, context: Context) -> SimpleRegex:
         """Initialize from context.
 
         Args:
@@ -259,7 +265,7 @@ class SimpleRegex(BaseRegex):
         path: str,
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> "SimpleRegex":
+    ) -> SimpleRegex:
         instance = cls()
 
         with (Path(path) / "regex_patterns.json").open(encoding="utf-8") as file:

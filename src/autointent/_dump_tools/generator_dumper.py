@@ -1,11 +1,15 @@
 """Separate file to fix circular import error."""
 
-from pathlib import Path
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from autointent.generation import Generator
 
 from .base import BaseObjectDumper
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class GeneratorDumper(BaseObjectDumper[Generator]):
@@ -16,7 +20,7 @@ class GeneratorDumper(BaseObjectDumper[Generator]):
         obj.dump(path, exist_ok=exists_ok)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> Generator:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> Generator:  # noqa: ANN401
         return Generator.load(path)
 
     @classmethod

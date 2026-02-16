@@ -1,16 +1,21 @@
 """Module for balancing datasets through augmentation of underrepresented classes."""
 
+from __future__ import annotations
+
 import logging
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
 from datasets import Dataset as HFDataset
 
 from autointent import Dataset
 from autointent.custom_types import Split
-from autointent.generation import Generator
-from autointent.generation.chat_templates import BaseSynthesizerTemplate
 
 from .utterance_generator import UtteranceGenerator
+
+if TYPE_CHECKING:
+    from autointent.generation import Generator
+    from autointent.generation.chat_templates import BaseSynthesizerTemplate
 
 logger = logging.getLogger(__name__)
 

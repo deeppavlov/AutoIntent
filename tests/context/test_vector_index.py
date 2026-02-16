@@ -1,14 +1,20 @@
+from __future__ import annotations
+
 import sys
 import tempfile
 import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, get_default_embedder_config
+from autointent.configs import FaissConfig, OpenSearchConfig, get_default_embedder_config
 from autointent.custom_types import Document
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 # Check if opensearch-py is available
 opensearch_available = True
@@ -305,7 +311,7 @@ class TestVectorIndexEdgeCases:
                 del sys.modules["opensearchpy"]
 
             # Mock import to raise ImportError
-            def mock_import(name, *args, **kwargs):  # noqa: ARG001
+            def mock_import(name, *args, **kwargs):
                 if name == "opensearchpy":
                     msg = "No module named opensearchpy"
                     raise ImportError(msg)

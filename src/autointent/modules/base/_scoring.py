@@ -1,16 +1,20 @@
 """Base class for scoring modules."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 
 from autointent import Context
 from autointent.context.optimization_info import ScorerArtifact
 from autointent.custom_types import ListOfLabels
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseModule
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 
 class BaseScorer(BaseModule, ABC):

@@ -1,17 +1,23 @@
 """Data Handler file."""
 
+from __future__ import annotations
+
 import logging
-from collections.abc import Generator
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from datasets import concatenate_datasets
 
-from autointent import Dataset
 from autointent.configs import DataConfig
-from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels, Split
-from autointent.schemas import Tag
+from autointent.custom_types import Split
 
 from ._stratification import create_few_shot_split, split_dataset
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from autointent import Dataset
+    from autointent.custom_types import FloatFromZeroToOne, ListOfGenericLabels, ListOfLabels
+    from autointent.schemas import Tag
 
 logger = logging.getLogger(__name__)
 

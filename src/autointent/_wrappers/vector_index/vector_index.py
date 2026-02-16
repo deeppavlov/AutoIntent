@@ -4,30 +4,40 @@ This module provides the `VectorIndex` class to handle indexing, querying, and
 management of embeddings for nearest neighbor search.
 """
 
+from __future__ import annotations
+
 import importlib
 import json
 import logging
-from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-import numpy as np
-import numpy.typing as npt
 from typing_extensions import assert_never
 
 from autointent._wrappers import Embedder
 from autointent.configs import (
-    EmbedderConfig,
     FaissConfig,
     OpenSearchConfig,
     TaskTypeEnum,
     VectorIndexConfig,
     get_default_embedder_config,
 )
-from autointent.custom_types import Document, LabelType, ListOfLabels
+from autointent.custom_types import Document
 
-from .base_backend import BaseIndexBackend
 from .faiss import FaissBackend
 from .opensearch import OpenSearchBackend
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy as np
+    import numpy.typing as npt
+
+    from autointent.configs import (
+        EmbedderConfig,
+    )
+    from autointent.custom_types import LabelType, ListOfLabels
+
+    from .base_backend import BaseIndexBackend
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +184,7 @@ class VectorIndex:
         cls,
         dir_path: Path,
         embedder_override_config: EmbedderConfig | None = None,
-    ) -> "VectorIndex":
+    ) -> VectorIndex:
         """Load the index and associated data from disk.
 
         Args:

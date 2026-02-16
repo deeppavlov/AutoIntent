@@ -1,10 +1,13 @@
 """Base class for chat templates for evolution augmentation."""
 
-from typing import ClassVar
+from __future__ import annotations
 
-from autointent.schemas import Intent
+from typing import TYPE_CHECKING, ClassVar
 
 from ._evolution_templates_schemas import Message, Role
+
+if TYPE_CHECKING:
+    from autointent.schemas import Intent
 
 
 class EvolutionChatTemplate:

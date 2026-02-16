@@ -1,12 +1,13 @@
 """PTuningScorer class for ptuning-based classification."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import PositiveInt
 
 from autointent import Context
-from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
 from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
@@ -14,6 +15,8 @@ from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
     from peft import PromptEncoderConfig
+
+    from autointent._callbacks import REPORTERS_NAMES
 
 
 class PTuningScorer(BertScorer):
@@ -111,7 +114,7 @@ class PTuningScorer(BertScorer):
         encoder_hidden_size: PositiveInt = 128,
         encoder_num_layers: PositiveInt = 2,
         **ptuning_kwargs: Any,  # noqa: ANN401
-    ) -> "PTuningScorer":
+    ) -> PTuningScorer:
         """Create a PTuningScorer instance using a Context object.
 
         Args:

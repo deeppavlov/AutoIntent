@@ -1,7 +1,10 @@
-from typing import Any
+from __future__ import annotations
 
-from sphinx.application import Sphinx
-from sphinx.ext.autodoc import Options
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+    from sphinx.ext.autodoc import Options
 
 
 def skip_member(app: Sphinx, what: str, name: str, obj: Any, skip: bool, options: Options) -> bool | None:  # noqa: ANN401, ARG001
