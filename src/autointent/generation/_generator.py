@@ -1,20 +1,23 @@
 """Wrapper class for accessing OpenAI API."""
 
+from __future__ import annotations
+
 import json
 import logging
 import os
-from pathlib import Path
 from textwrap import dedent
-from typing import Any, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
-import openai
 from dotenv import load_dotenv
-from openai import LengthFinishReasonError
 from pydantic import BaseModel, ValidationError
 
+from autointent._utils import require
 from autointent.generation.chat_templates import Message, Role
 
 from ._cache import StructuredOutputCache
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +137,8 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
+        openai = require("openai", "openai")
+
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
 
@@ -213,6 +218,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -298,6 +305,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -382,7 +391,7 @@ class Generator:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "Generator":
+    def load(cls, path: Path) -> Generator:
         with (path / cls._dump_data_filename).open(encoding="utf-8") as file:
             data: GeneratorDumpData = json.load(file)
 

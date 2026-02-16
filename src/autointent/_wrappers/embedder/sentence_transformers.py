@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import tempfile
@@ -15,9 +17,7 @@ from sklearn.model_selection import train_test_split
 
 from autointent._hash import Hasher
 from autointent._utils import require
-from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
-from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
@@ -25,6 +25,9 @@ from .utils import get_embeddings_path
 if TYPE_CHECKING:
     from sentence_transformers import SentenceTransformer
     from transformers import TrainerCallback
+
+    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +53,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
     """SentenceTransformer-based embedding backend implementation."""
 
     supports_training: bool = True
-    _model: "SentenceTransformer | None"
+    _model: SentenceTransformer | None
 
     def __init__(self, config: SentenceTransformerEmbeddingConfig) -> None:
         """Initialize the SentenceTransformer backend.
@@ -71,7 +74,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             self._model = None
             torch.cuda.empty_cache()
 
-    def _load_model(self) -> "SentenceTransformer":
+    def _load_model(self) -> SentenceTransformer:
         """Load sentence transformers model to device."""
         if self._model is None:
             # Lazy import sentence-transformers
@@ -308,7 +311,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 json.dump({"trained": True}, file, indent=4)
 
     @classmethod
-    def load(cls, path: Path) -> "SentenceTransformerEmbeddingBackend":
+    def load(cls, path: Path) -> SentenceTransformerEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:

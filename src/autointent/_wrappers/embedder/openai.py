@@ -1,24 +1,31 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import logging
 import os
 from functools import partial
-from pathlib import Path
-from typing import Literal, TypedDict, cast, overload
+from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
 
 import aiometer
 import numpy as np
 import numpy.typing as npt
-import openai
 import torch
 from typing_extensions import NotRequired
 
 from autointent._hash import Hasher
-from autointent.configs import TaskTypeEnum
+from autointent._utils import require
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import openai
+
+    from autointent.configs import TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +39,17 @@ class EmbeddingsCreateKwargs(TypedDict):
 class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
     """OpenAI-based embedding backend implementation."""
 
+    _client: openai.OpenAI | None = None
+    _async_client: openai.AsyncOpenAI | None = None
+
     def __init__(self, config: OpenaiEmbeddingConfig) -> None:
         """Initialize the OpenAI backend.
 
         Args:
             config: Configuration for OpenAI embeddings.
         """
+        require("openai", "openai")
         self.config = config
-        self._client: openai.OpenAI | None = None
-        self._async_client: openai.AsyncOpenAI | None = None
         self._event_loop: asyncio.AbstractEventLoop | None = None
 
         if config.max_concurrent is not None:
@@ -48,6 +57,8 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_client(self) -> openai.OpenAI:
         """Get or create OpenAI client instance."""
+        import openai
+
         if self._client is None:
             self._client = openai.OpenAI(
                 timeout=self.config.timeout,
@@ -58,6 +69,8 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_async_client(self) -> openai.AsyncOpenAI:
         """Get or create async OpenAI client instance."""
+        import openai
+
         if self._async_client is None:
             self._async_client = openai.AsyncOpenAI(
                 timeout=self.config.timeout,
@@ -275,7 +288,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             json.dump(self.config.model_dump(mode="json"), file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "OpenaiEmbeddingBackend":
+    def load(cls, path: Path) -> OpenaiEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:

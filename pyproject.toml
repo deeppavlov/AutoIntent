@@ -39,7 +39,6 @@ dependencies = [
     "pathlib (>=1.0.1,<2.0.0)",
     "pydantic (>=2.10.5,<3.0.0)",
     "faiss-cpu (>=1.9.0,<2.0.0)",
-    "openai (>=1.59.6,<2.0.0)",
     "datasets (>=3.2.0,<5.0.0)",
     "xxhash (>=3.5.0,<4.0.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
@@ -74,6 +73,9 @@ fastmcp = [
 ]
 opensearch = [
     "opensearch-py (>=3.0.0, <4.0.0)",
+]
+openai = [
+    "openai (>=1.59.6,<2.0.0)",
 ]
 
 [tool.uv]
