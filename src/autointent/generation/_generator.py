@@ -164,7 +164,7 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = self.client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,
             model=self.model_name,
             **self.generation_params,
         )
@@ -177,7 +177,7 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = await self.async_client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,
             model=self.model_name,
             **self.generation_params,
         )
@@ -229,9 +229,9 @@ class Generator:
         try:
             response = await self.async_client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -316,9 +316,9 @@ class Generator:
         try:
             response = self.client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed

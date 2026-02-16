@@ -151,7 +151,7 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)  # type: ignore[no-untyped-call]
         self._model = self._initialize_model()
         tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
         self._train(tokenized_dataset)
@@ -197,8 +197,8 @@ class BertScorer(BaseScorer):
                 callbacks=self._get_trainer_callbacks(),
             )
             if not self.print_progress:
-                trainer.remove_callback(PrinterCallback)  # type: ignore[no-untyped-call]
-                trainer.remove_callback(ProgressCallback)  # type: ignore[no-untyped-call]
+                trainer.remove_callback(PrinterCallback)
+                trainer.remove_callback(ProgressCallback)
 
             trainer.train()
 

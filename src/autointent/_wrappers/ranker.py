@@ -134,7 +134,7 @@ class Ranker:
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)  # type: ignore[union-attr]
+            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         """Hook to capture classifier activations.
@@ -158,7 +158,7 @@ class Ranker:
         """
         if not self._train_head:
             return np.array(
-                self.cross_encoder.predict(  # type: ignore[call-overload]
+                self.cross_encoder.predict(
                     pairs,
                     batch_size=self.config.batch_size,
                     activation_fct=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),
@@ -168,7 +168,7 @@ class Ranker:
         self.cross_encoder.predict(pairs, batch_size=self.config.batch_size)
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
-        return res  # type: ignore[no-any-return]
+        return res
 
     def _fit(self, pairs: list[tuple[str, str]], labels: ListOfLabels) -> None:
         """Train the logistic regression model on cross-encoder features.
