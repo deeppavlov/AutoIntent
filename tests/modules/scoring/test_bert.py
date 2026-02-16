@@ -8,7 +8,7 @@ import pytest
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BertScorer
 
-pytest.importorskip("transformers")
+pytest.importorskip("transformers", reason="Transformers library is required for BertScorer tests")
 
 
 def test_bert_scorer_dump_load(dataset):
