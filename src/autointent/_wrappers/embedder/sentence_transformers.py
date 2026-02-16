@@ -240,6 +240,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         # Lazy import sentence-transformers training components (only needed for fine-tuning)
         st = require("sentence_transformers", extra="sentence-transformers")
         transformers = require("transformers", extra="transformers")
+        require("accelerate", extra="transformers")
 
         x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
         tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})

@@ -14,6 +14,8 @@ pytest.importorskip("sentence_transformers", reason="Sentence Transformers libra
 
 def test_finetune_dump_load(dataset, on_windows):
     """Test scenario: fine-tune -> dump -> load."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Setup config for fine-tuning
@@ -69,6 +71,8 @@ def test_finetune_dump_load(dataset, on_windows):
 
 def test_dump_load_finetune(dataset, on_windows):
     """Test scenario: dump -> load -> fine-tune."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Setup config
@@ -121,6 +125,8 @@ def test_dump_load_finetune(dataset, on_windows):
 
 def test_load_from_disk_finetune_dump_load(dataset, on_windows):
     """Test scenario: load sentence transformer from disk -> fine-tune -> dump -> load."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     from sentence_transformers import SentenceTransformer
 
     data_handler = DataHandler(dataset)
@@ -180,6 +186,8 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
 
 def test_embeddings_consistency_across_workflows(dataset, on_windows):
     """Test that different workflows produce consistent results when starting from same model."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Common config
@@ -224,6 +232,7 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
 
 def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
     """Test that multiple dump/load cycles preserve fine-tuned model state."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
     data_handler = DataHandler(dataset)
 
     hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)

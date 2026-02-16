@@ -13,6 +13,8 @@ pytest.importorskip("transformers", reason="Transformers library is required for
 
 def test_bert_scorer_dump_load(dataset):
     """Test that BertScorer can be saved and loaded while preserving predictions."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
@@ -57,6 +59,8 @@ def test_bert_scorer_dump_load(dataset):
 
 def test_bert_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
@@ -94,6 +98,8 @@ def test_bert_prediction(dataset):
 
 def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     scorer = BertScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)

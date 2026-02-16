@@ -72,6 +72,8 @@ class TestSentenceTransformerBackend:
 
     def test_training_functionality(self, st_backend: SentenceTransformerEmbeddingBackend):
         """Test basic training functionality."""
+        pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
         # Simple training data
         utterances = [
             "Hello world",

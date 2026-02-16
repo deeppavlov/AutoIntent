@@ -7,8 +7,6 @@ from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embed
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space, setup_environment
 
-pytest.importorskip("peft")
-
 
 @pytest.fixture
 def project_dir(task_type):
@@ -32,6 +30,8 @@ def project_dir(task_type):
     ],
 )
 def test_inference_from_config(dataset, task_type, project_dir):
+    pytest.importorskip("peft")
+
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -85,6 +85,8 @@ def test_inference_from_config(dataset, task_type, project_dir):
     ],
 )
 def test_inference_on_the_fly(dataset, task_type, project_dir):
+    pytest.importorskip("peft")
+
     search_space = get_search_space(task_type)
 
     pipeline = Pipeline.from_search_space(search_space)
@@ -118,6 +120,8 @@ def test_inference_on_the_fly(dataset, task_type, project_dir):
 
 
 def test_load_with_overrided_params(dataset):
+    pytest.importorskip("peft")
+
     project_dir = setup_environment() / "test_inference" / "override"
     search_space = get_search_space("light")
 
@@ -158,6 +162,8 @@ def test_load_with_overrided_params(dataset):
 
 
 def test_no_saving(dataset):
+    pytest.importorskip("peft")
+
     project_dir = setup_environment() / "test_inference" / "no_saving"
     search_space = get_search_space("light")
 
