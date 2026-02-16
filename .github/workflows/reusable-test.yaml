@@ -39,7 +39,7 @@ jobs:
     - name: Install dependencies for Python ${{ matrix.python-version }}
       run: |
         uv python pin ${{ matrix.python-version }}
-        uv sync --group test
+        uv sync --group test --extra sentence-transformers --extra openai
 
     - name: Run tests
       run: |
