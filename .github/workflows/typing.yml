@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv lock
-          uv sync --group typing
+          uv sync --group typing --all-extras
 
       - name: Run mypy
         run: uv run mypy src/autointent
