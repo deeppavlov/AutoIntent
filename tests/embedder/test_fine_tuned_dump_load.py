@@ -46,9 +46,9 @@ def test_finetune_dump_load(dataset, on_windows):
         trained_embeddings = embedder_original.embed(test_utterances)
 
         # Verify that training changed the embeddings
-        assert not np.allclose(
-            original_embeddings, trained_embeddings, atol=1e-6
-        ), "Embeddings should change after fine-tuning"
+        assert not np.allclose(original_embeddings, trained_embeddings, atol=1e-6), (
+            "Embeddings should change after fine-tuning"
+        )
 
         # Step 2: Dump the fine-tuned embedder
         dump_path = temp_path / "fine_tuned_embedder"
@@ -112,9 +112,9 @@ def test_dump_load_finetune(dataset, on_windows):
 
         # Verify that training changed the embeddings
         loaded_after_training = embedder_loaded.embed(test_utterances)
-        assert not np.allclose(
-            loaded_before_training, loaded_after_training, atol=1e-6
-        ), "Embeddings should change after fine-tuning the loaded model"
+        assert not np.allclose(loaded_before_training, loaded_after_training, atol=1e-6), (
+            "Embeddings should change after fine-tuning the loaded model"
+        )
 
 
 def test_load_from_disk_finetune_dump_load(dataset, on_windows):
@@ -155,9 +155,9 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
         embeddings_after_training = embedder_from_disk.embed(test_utterances)
 
         # Verify that training changed the embeddings
-        assert not np.allclose(
-            embeddings_before_training, embeddings_after_training, atol=1e-6
-        ), "Embeddings should change after fine-tuning"
+        assert not np.allclose(embeddings_before_training, embeddings_after_training, atol=1e-6), (
+            "Embeddings should change after fine-tuning"
+        )
 
         # Step 4: Dump the fine-tuned embedder
         dump_path = temp_path / "fine_tuned_from_disk"

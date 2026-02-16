@@ -29,8 +29,9 @@ classifiers=[
     'Framework :: Sphinx',
     'Typing :: Typed',
 ]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.14"
 dependencies = [
+    "sentence-transformers (>=3,<6)",
     "torch (>=2.0.0,<3.0.0)",
     "scikit-learn (>=1.5,<2.0)",
     "iterative-stratification (>=0.1.9)",
@@ -40,9 +41,12 @@ dependencies = [
     "pydantic (>=2.10.5,<3.0.0)",
     "faiss-cpu (>=1.9.0,<2.0.0)",
     "openai (>=1.59.6,<2.0.0)",
-    "datasets (>=3.2.0,<4.0.0)",
+    "datasets (>=3.2.0,<5.0.0)",
     "xxhash (>=3.5.0,<4.0.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
+    "transformers[torch] (>=4.49.0,<6.0.0)",
+    "peft (>= 0.10.0, !=0.15.0, !=0.15.1, <1.0.0)",
+    "catboost (>=1.2.8,<2.0.0)",
     "aiometer (>=1.0.0,<2.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
     "threadpoolctl (>=3.0.0,<4.0.0)",
@@ -90,7 +94,7 @@ nb = [
     "ipywidgets (>=8.1.5,<9.0.0)",
 ]
 lint = [
-    "ruff (==0.8.4)",
+    "ruff (==0.15.0)",
 ]
 sentencepiece = [
     "sentencepiece (>=0.2.0,<0.3.0)",
@@ -157,6 +161,7 @@ ignore = [
     "ERA001",  # commented code
     "FBT",     # boolean trap
     "RUF001",  # ambiguous unicode character
+    "PLC0415",  # import outside top-level
 ]
 
 [tool.ruff.lint.per-file-ignores]

@@ -1,3 +1,4 @@
+import json
 import logging
 import tempfile
 from functools import lru_cache
@@ -143,7 +144,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
+                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
                 if return_tensors:
                     device = self.config.device or "cpu"
                     return torch.from_numpy(embeddings_np).to(device)
@@ -174,7 +175,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             )
         else:
             embeddings = cast(
-                npt.NDArray[np.float32],
+                "npt.NDArray[np.float32]",
                 model.encode(
                     utterances,
                     convert_to_numpy=True,
@@ -289,8 +290,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         Args:
             path: Path to the directory where the backend will be saved.
         """
-        import json
-
         path.mkdir(parents=True, exist_ok=True)
 
         # Save the configuration
@@ -318,8 +317,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             Loaded backend instance.
         """
-        import json
-
         # Load configuration
         config_path = path / "config.json"
         with config_path.open("r", encoding="utf-8") as file:
@@ -342,6 +339,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         if training_state_path.exists():
             with training_state_path.open("r", encoding="utf-8") as file:
                 training_state = json.load(file)
-            instance._trained = training_state.get("trained", False)  # noqa: SLF001
+            instance._trained = training_state.get("trained", False)
 
         return instance

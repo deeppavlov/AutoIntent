@@ -33,9 +33,9 @@ class EmbeddingNodeInfo(NodeInfo):
     node_type = NodeType.embedding
 
     multiclass_available_metrics: ClassVar[Mapping[str, RetrievalMetricFn | ScoringMetricFn]] = cast(
-        Mapping[str, RetrievalMetricFn | ScoringMetricFn], RETRIEVAL_METRICS_MULTICLASS | SCORING_METRICS_MULTICLASS
+        "Mapping[str, RetrievalMetricFn | ScoringMetricFn]", RETRIEVAL_METRICS_MULTICLASS | SCORING_METRICS_MULTICLASS
     )
 
     multilabel_available_metrics: ClassVar[Mapping[str, RetrievalMetricFn | ScoringMetricFn]] = cast(
-        Mapping[str, RetrievalMetricFn | ScoringMetricFn], RETRIEVAL_METRICS_MULTILABEL | SCORING_METRICS_MULTILABEL
+        "Mapping[str, RetrievalMetricFn | ScoringMetricFn]", RETRIEVAL_METRICS_MULTILABEL | SCORING_METRICS_MULTILABEL
     )

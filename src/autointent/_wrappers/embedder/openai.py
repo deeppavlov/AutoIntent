@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 from functools import partial
@@ -133,7 +134,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
+                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
                 if return_tensors:
                     return torch.from_numpy(embeddings_np)
                 return embeddings_np
@@ -258,7 +259,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Calculate cosine similarity
         similarity_matrix = np.dot(normalized1, normalized2.T)
-        return cast(npt.NDArray[np.float32], similarity_matrix)
+        return cast("npt.NDArray[np.float32]", similarity_matrix)
 
     def dump(self, path: Path) -> None:
         """Save the backend state to disk.
@@ -266,8 +267,6 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         Args:
             path: Path to the directory where the backend will be saved.
         """
-        import json
-
         path.mkdir(parents=True, exist_ok=True)
 
         # Save the configuration
@@ -285,8 +284,6 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             Loaded backend instance.
         """
-        import json
-
         # Load configuration
         config_path = path / "config.json"
         with config_path.open("r", encoding="utf-8") as file:

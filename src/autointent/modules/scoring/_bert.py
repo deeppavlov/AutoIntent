@@ -82,17 +82,6 @@ class BertScorer(BaseScorer):
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
         print_progress: bool = False,
     ) -> None:
-        # Lazy import transformers
-        transformers = require("transformers", extra="transformers")
-        self._AutoModelForSequenceClassification = transformers.AutoModelForSequenceClassification
-        self._AutoTokenizer = transformers.AutoTokenizer
-        self._DataCollatorWithPadding = transformers.DataCollatorWithPadding
-        self._EarlyStoppingCallback = transformers.EarlyStoppingCallback
-        self._PrinterCallback = transformers.PrinterCallback
-        self._ProgressCallback = transformers.ProgressCallback
-        self._Trainer = transformers.Trainer
-        self._TrainingArguments = transformers.TrainingArguments
-
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
@@ -151,7 +140,7 @@ class BertScorer(BaseScorer):
     ) -> None:
         self._validate_task(labels)
 
-        self._tokenizer = self._AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
+        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)
         self._model = self._initialize_model()
         tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
         self._train(tokenized_dataset)
@@ -195,8 +184,8 @@ class BertScorer(BaseScorer):
                 callbacks=self._get_trainer_callbacks(),
             )
             if not self.print_progress:
-                trainer.remove_callback(self._PrinterCallback)
-                trainer.remove_callback(self._ProgressCallback)
+                trainer.remove_callback(PrinterCallback)  # type: ignore[no-untyped-call]
+                trainer.remove_callback(ProgressCallback)  # type: ignore[no-untyped-call]
 
             trainer.train()
 

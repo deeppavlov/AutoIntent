@@ -207,10 +207,10 @@ def generate_models_and_union_type_for_classes(
 
             if search_type is None:
                 # Regular parameter: use a list of the parameter's type
-                fields[param_name] = (list[param_type], field)
+                fields[param_name] = (list[param_type], field)  # type: ignore[assignment]
             else:
                 # Parameter eligible for optimization: allow either list of values or search space
-                fields[param_name] = (list[param_type] | search_type, field)
+                fields[param_name] = (list[param_type] | search_type, field)  # type: ignore[assignment]
 
         # Generate a name for the model class
         model_name = f"{cls.__name__}InitModel"

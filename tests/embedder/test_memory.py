@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
@@ -63,6 +64,5 @@ class TestEmbedderMemory:
         embeddings2 = embedder.embed(["test"])
 
         # Results should be identical (deterministic)
-        import numpy as np
 
         np.testing.assert_allclose(embeddings1, embeddings2, rtol=1e-5)

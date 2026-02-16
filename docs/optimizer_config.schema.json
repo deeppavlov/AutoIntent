@@ -393,7 +393,8 @@
                                 "enum": [
                                     "wandb",
                                     "tensorboard",
-                                    "codecarbon"
+                                    "codecarbon",
+                                    "none"
                                 ],
                                 "type": "string"
                             },
@@ -403,7 +404,9 @@
                             "type": "null"
                         }
                     ],
-                    "default": null,
+                    "default": [
+                        "none"
+                    ],
                     "description": "List of callbacks to report to. If None, no callbacks will be used",
                     "title": "Report To"
                 },
@@ -489,7 +492,9 @@
                 "run_name": null,
                 "dump_modules": false,
                 "clear_ram": false,
-                "report_to": null,
+                "report_to": [
+                    "none"
+                ],
                 "log_interval_time": 0.1
             }
         },

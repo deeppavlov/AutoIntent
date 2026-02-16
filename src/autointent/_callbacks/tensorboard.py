@@ -53,11 +53,11 @@ class TensorBoardCallback(OptimizerCallback):
         """
         module_run_name = f"{self.run_name}_{module_name}_{num}"
         log_dir = Path(self.dirpath) / module_run_name
-        self.module_writer = self.writer(log_dir=log_dir)  # type: ignore[no-untyped-call]
+        self.module_writer = self.writer(log_dir=log_dir)
 
-        self.module_writer.add_text("module_info", f"Starting module {module_name}_{num}")  # type: ignore[no-untyped-call]
+        self.module_writer.add_text("module_info", f"Starting module {module_name}_{num}")
         for key, value in module_kwargs.items():
-            self.module_writer.add_text(f"module_params/{key}", str(value))  # type: ignore[no-untyped-call]
+            self.module_writer.add_text(f"module_params/{key}", str(value))
 
     def log_value(self, **kwargs: dict[str, int | float | Any]) -> None:
         """Logs scalar or text values.
@@ -69,7 +69,7 @@ class TensorBoardCallback(OptimizerCallback):
             if isinstance(value, int | float):
                 self.module_writer.add_scalar(key, value)
             else:
-                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+                self.module_writer.add_text(key, str(value))
 
     def log_metrics(self, metrics: dict[str, Any]) -> None:
         """Logs training metrics.
@@ -79,9 +79,9 @@ class TensorBoardCallback(OptimizerCallback):
         """
         for key, value in metrics.items():
             if isinstance(value, int | float):
-                self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]
+                self.module_writer.add_scalar(key, value)
             else:
-                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+                self.module_writer.add_text(key, str(value))
 
     def log_final_metrics(self, metrics: dict[str, Any]) -> None:
         """Logs final metrics at the end of training.
@@ -97,13 +97,13 @@ class TensorBoardCallback(OptimizerCallback):
             raise RuntimeError(msg)
 
         log_dir = Path(self.dirpath) / "final_metrics"
-        self.module_writer = self.writer(log_dir=log_dir)  # type: ignore[no-untyped-call]
+        self.module_writer = self.writer(log_dir=log_dir)
 
         for key, value in metrics.items():
             if isinstance(value, int | float):
-                self.module_writer.add_scalar(key, value)  # type: ignore[no-untyped-call]
+                self.module_writer.add_scalar(key, value)
             else:
-                self.module_writer.add_text(key, str(value))  # type: ignore[no-untyped-call]
+                self.module_writer.add_text(key, str(value))
 
     def end_module(self) -> None:
         """Ends the current module and closes the TensorBoard writer.
@@ -115,8 +115,8 @@ class TensorBoardCallback(OptimizerCallback):
             msg = "start_run must be called before end_module."
             raise RuntimeError(msg)
 
-        self.module_writer.add_text("module_info", "Ending module")  # type: ignore[no-untyped-call]
-        self.module_writer.close()  # type: ignore[no-untyped-call]
+        self.module_writer.add_text("module_info", "Ending module")
+        self.module_writer.close()
 
     def end_run(self) -> None:
         """Ends the current run. This method is currently a placeholder."""

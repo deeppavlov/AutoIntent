@@ -144,9 +144,9 @@ class Embedder:
         # Load the appropriate backend
         backend_path = path / cls._backend_path
         if isinstance(config, SentenceTransformerEmbeddingConfig):
-            instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)  # noqa: SLF001
+            instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)
         elif isinstance(config, OpenaiEmbeddingConfig):
-            instance._backend = OpenaiEmbeddingBackend.load(backend_path)  # noqa: SLF001
+            instance._backend = OpenaiEmbeddingBackend.load(backend_path)
         else:
             msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
             raise TypeError(msg)

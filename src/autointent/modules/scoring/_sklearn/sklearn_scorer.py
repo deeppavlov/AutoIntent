@@ -72,7 +72,7 @@ class SklearnScorer(BaseScorer):
         self.embedder_config = initialize_embedder_config(embedder_config)
         self.clf_name = clf_name
 
-        clf_type = AVAILABLE_CLASSIFIERS.get(self.clf_name, None)
+        clf_type = AVAILABLE_CLASSIFIERS.get(self.clf_name)
         if clf_type:
             self._base_clf = clf_type(**clf_args)
         else:
