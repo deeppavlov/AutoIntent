@@ -62,8 +62,6 @@ class TestTransformers:
 
 class TestVectorIndex:
     def init_attributes(self):
-        pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
         self.vector_index = VectorIndex(
             embedder_config=initialize_embedder_config("bert-base-uncased"),
             config=FaissConfig(),
@@ -178,6 +176,14 @@ def _transformers_is_installed() -> bool:
             id="transformer",
         ),
         TestVectorIndex,
+        pytest.param(
+            TestVectorIndex,
+            marks=pytest.mark.skipif(
+                not _st_is_installed(),
+                reason="need sentence-transformers dependency",
+            ),
+            id="vector_index",
+        ),
         pytest.param(
             TestEmbedder,
             marks=pytest.mark.skipif(
