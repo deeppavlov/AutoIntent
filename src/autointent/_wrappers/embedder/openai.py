@@ -59,7 +59,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_client(self) -> openai.OpenAI:
         """Get or create OpenAI client instance."""
-        import openai
+        openai = require("openai", "openai")
 
         if self._client is None:
             self._client = openai.OpenAI(
@@ -71,7 +71,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_async_client(self) -> openai.AsyncOpenAI:
         """Get or create async OpenAI client instance."""
-        import openai
+        openai = require("openai", "openai")
 
         if self._async_client is None:
             self._async_client = openai.AsyncOpenAI(
@@ -308,3 +308,4 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Create instance
         return cls(config)
+

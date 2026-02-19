@@ -220,7 +220,7 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
-        from openai import LengthFinishReasonError
+        openai = require("openai", "openai")
 
         res: T | None = None
         msg: str | None = None
@@ -235,7 +235,7 @@ class Generator:
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
-        except (ValidationError, ValueError, LengthFinishReasonError) as e:
+        except (ValidationError, ValueError, openai.LengthFinishReasonError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
         else:
@@ -307,7 +307,7 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
-        from openai import LengthFinishReasonError
+        openai = require("openai", "openai")
 
         res: T | None = None
         msg: str | None = None
@@ -322,7 +322,7 @@ class Generator:
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
-        except (ValidationError, ValueError, LengthFinishReasonError) as e:
+        except (ValidationError, ValueError, openai.LengthFinishReasonError) as e:
             msg = f"Failed to obtain structured output for model {self.model_name} and messages {messages}: {e!s}"
             logger.warning(msg)
         else:
