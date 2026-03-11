@@ -423,15 +423,7 @@ def check_split_readiness(
         label_feature=dataset.label_feature,
         random_seed=None,
     )
-    if splitter.has_oos_samples(hf_split) and allow_oos_in_train is None:
-        return SplitReadinessResult(
-            ready=False,
-            underpopulated_classes=[],
-            min_samples_per_class_required=min_samples_per_class,
-            reason="OOS samples present; set allow_oos_in_train to check readiness.",
-        )
-    allow = allow_oos_in_train if allow_oos_in_train is not None else False
-    inputs = splitter.get_stratify_inputs(hf_split, dataset.multilabel, allow)
+    inputs = splitter.get_stratify_inputs(hf_split, dataset.multilabel, allow_oos_in_train)
     if inputs.multilabel:
         # Multilabel stratification uses IterativeStratification; we do not validate it here.
         return SplitReadinessResult(
