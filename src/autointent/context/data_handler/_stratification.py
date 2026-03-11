@@ -110,17 +110,6 @@ class StratifiedSplitter:
         Raises:
             ValueError: If OOS samples are present but allow_oos_in_train is not specified.
         """
-        if not self.has_oos_samples(dataset):
-            train, test = self._split_without_oos(dataset, multilabel, self.test_size)
-            if self.is_few_shot:
-                train, test = create_few_shot_split(
-                    train,
-                    test,
-                    multilabel=multilabel,
-                    label_column=self.label_feature,
-                    examples_per_label=self.examples_per_label,
-                )
-            return train, test
         inputs = self.get_stratify_inputs(dataset, multilabel, allow_oos_in_train)
         train, test = self._split_without_oos(inputs.dataset, inputs.multilabel, inputs.test_size)
         train, test = inputs.post_split_fn(train, test)
@@ -189,24 +178,14 @@ class StratifiedSplitter:
         OOS is mapped to a class so it is stratified; post_split_fn unmaps it.
         """
         if multilabel:
-            in_domain_sample = next(
-                sample for sample in dataset if sample[self.label_feature] is not None
-            )
+            in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
             n_classes = len(in_domain_sample[self.label_feature])
-            mapped_dataset = dataset.map(
-                self._add_oos_label, fn_kwargs={"n_classes": n_classes}
-            )
+            mapped_dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
 
-            def unmap_oos_multilabel(
-                train_ds: HFDataset, test_ds: HFDataset
-            ) -> tuple[HFDataset, HFDataset]:
+            def unmap_oos_multilabel(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
                 return (
-                    train_ds.map(
-                        self._remove_oos_label, fn_kwargs={"n_classes": n_classes}
-                    ),
-                    test_ds.map(
-                        self._remove_oos_label, fn_kwargs={"n_classes": n_classes}
-                    ),
+                    train_ds.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes}),
+                    test_ds.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes}),
                 )
 
             return StratifyInputs(
@@ -216,13 +195,9 @@ class StratifiedSplitter:
                 post_split_fn=unmap_oos_multilabel,
             )
         oos_class_id = len(dataset.unique(self.label_feature)) - 1
-        mapped_dataset = dataset.map(
-            self._map_label, fn_kwargs={"old": None, "new": oos_class_id}
-        )
+        mapped_dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
 
-        def unmap_oos_multiclass(
-            train_ds: HFDataset, test_ds: HFDataset
-        ) -> tuple[HFDataset, HFDataset]:
+        def unmap_oos_multiclass(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
             return (
                 train_ds.map(
                     self._map_label,
@@ -247,13 +222,9 @@ class StratifiedSplitter:
         Only in-domain data is stratified; post_split_fn appends OOS to the test set.
         """
         in_domain_dataset, out_of_domain_dataset = self._separate_oos(dataset)
-        adjusted_test_size = self._get_adjusted_test_size(
-            len(dataset), len(out_of_domain_dataset)
-        )
+        adjusted_test_size = self._get_adjusted_test_size(len(dataset), len(out_of_domain_dataset))
 
-        def concat_oos_to_test(
-            train_ds: HFDataset, test_ds: HFDataset
-        ) -> tuple[HFDataset, HFDataset]:
+        def concat_oos_to_test(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
             return (train_ds, concatenate_datasets([test_ds, out_of_domain_dataset]))
 
         return StratifyInputs(
