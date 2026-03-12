@@ -16,6 +16,7 @@ from autointent.configs import (
     HPOConfig,
     LoggingConfig,
     VectorIndexConfig,
+    get_default_hfmodel_config,
 )
 
 from .data_handler import DataHandler
@@ -25,9 +26,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from autointent import Dataset
-    from autointent.configs import (
-        DataConfig,
-    )
+    from autointent.configs import DataConfig
 
 
 class Context:
@@ -202,4 +201,4 @@ class Context:
         """
         if hasattr(self, "transformer_config"):
             return self.transformer_config
-        return HFModelConfig()
+        return get_default_hfmodel_config()

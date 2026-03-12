@@ -17,6 +17,7 @@ from ._transformers import (
     EmbedderFineTuningConfig,
     HFModelConfig,
     TokenizerConfig,
+    get_default_hfmodel_config,
 )
 from ._vector_index import FaissConfig, OpenSearchConfig, VectorIndexConfig, get_default_vector_index_config
 
@@ -40,6 +41,7 @@ __all__ = [
     "VectorIndexConfig",
     "VocabConfig",
     "get_default_embedder_config",
+    "get_default_hfmodel_config",
     "get_default_vector_index_config",
     "initialize_embedder_config",
 ]
