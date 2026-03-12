@@ -559,7 +559,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": null
+                "revision": "refs/pr/16"
             }
         },
         "hpo_config": {
