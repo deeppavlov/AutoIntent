@@ -11,6 +11,7 @@ from .configs import (
     HFModelConfig,
     HPOConfig,
     LoggingConfig,
+    get_default_hfmodel_config,
     initialize_embedder_config,
 )
 
@@ -40,7 +41,7 @@ class OptimizationConfig(BaseModel):
 
     cross_encoder_config: CrossEncoderConfig = CrossEncoderConfig()
 
-    transformer_config: HFModelConfig = HFModelConfig()
+    transformer_config: HFModelConfig = get_default_hfmodel_config()
 
     hpo_config: HPOConfig = HPOConfig()
 
