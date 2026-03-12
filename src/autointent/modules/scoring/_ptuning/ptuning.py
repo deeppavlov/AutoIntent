@@ -35,7 +35,7 @@ class PTuningScorer(BertScorer):
 
         from autointent.modules import PTuningScorer
         scorer = PTuningScorer(
-            classification_model_config="prajjwal1/bert-tiny",
+            classification_model_config="cointegrated/rubert-tiny2",
             num_train_epochs=3,
             batch_size=8,
             num_virtual_tokens=10,
