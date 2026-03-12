@@ -130,14 +130,13 @@ def test_check_split_readiness_missing_split(dataset_enough_samples):
 
 def test_check_split_readiness_oos_allow_none(dataset_unsplitted):
     """When dataset has OOS and allow_oos_in_train is None, result is not ready."""
-    result = check_split_readiness(
-        dataset_unsplitted,
-        split=Split.TRAIN,
-        test_size=0.5,
-        allow_oos_in_train=None,
-    )
-    assert result.ready is False
-    assert "OOS" in result.reason or "allow_oos_in_train" in result.reason
+    with pytest.raises(ValueError, match="allow_oos_in_train"):
+        check_split_readiness(
+            dataset_unsplitted,
+            split=Split.TRAIN,
+            test_size=0.5,
+            allow_oos_in_train=None,
+        )
 
 
 def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitted):
