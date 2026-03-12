@@ -43,7 +43,7 @@ dependencies = [
     "datasets (>=3.2.0,<5.0.0)",
     "xxhash (>=3.5.0,<4.0.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
-    "transformers[torch,tiktoken] (>=4.49.0,<6.0.0)",
+    "transformers[torch,tiktoken,sentencepiece] (>=4.49.0,<6.0.0)",
     "peft (>= 0.10.0, !=0.15.0, !=0.15.1, <1.0.0)",
     "catboost (>=1.2.8,<2.0.0)",
     "aiometer (>=1.0.0,<2.0.0)",
