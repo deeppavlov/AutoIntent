@@ -5,8 +5,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import PTuningScorer
+
+_config = HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
 
 def test_ptuning_scorer_dump_load(dataset):
@@ -14,7 +17,7 @@ def test_ptuning_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     scorer_original = PTuningScorer(
-        classification_model_config="prajjwal1/bert-tiny",
+        classification_model_config=_config,
         num_train_epochs=1,
         batch_size=8,
         num_virtual_tokens=10,
@@ -54,7 +57,7 @@ def test_ptuning_prediction(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = PTuningScorer(
-        classification_model_config="prajjwal1/bert-tiny",
+        classification_model_config=_config,
         num_train_epochs=1,
         batch_size=8,
         num_virtual_tokens=10,
@@ -93,7 +96,7 @@ def test_ptuning_cache_clearing(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = PTuningScorer(
-        classification_model_config="prajjwal1/bert-tiny",
+        classification_model_config=_config,
         num_train_epochs=1,
         batch_size=8,
         num_virtual_tokens=20,

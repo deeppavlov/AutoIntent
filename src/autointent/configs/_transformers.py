@@ -77,7 +77,7 @@ class HFModelConfig(BaseModel):
 
 
 def get_default_hfmodel_config() -> HFModelConfig:
-    return HFModelConfig(model_name="cointegrated/rubert-tiny2")
+    return HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
 
 class CrossEncoderConfig(HFModelConfig):
