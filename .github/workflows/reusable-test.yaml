@@ -35,6 +35,7 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         version: "0.10.0"
+        enable-cache: "true"
 
     - name: Install dependencies for Python ${{ matrix.python-version }}
       run: |

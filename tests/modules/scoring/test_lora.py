@@ -5,8 +5,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BERTLoRAScorer
+
+_config = HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
 
 def test_lora_scorer_dump_load(dataset):
@@ -14,9 +17,7 @@ def test_lora_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
-    scorer_original = BERTLoRAScorer(
-        classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8
-    )
+    scorer_original = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
     scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     # Test data
@@ -59,7 +60,7 @@ def test_lora_prediction(dataset):
     """Test that the lora model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
-    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
@@ -96,7 +97,7 @@ def test_lora_cache_clearing(dataset):
     """Test that the lora model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
-    scorer = BERTLoRAScorer(classification_model_config="prajjwal1/bert-tiny", num_train_epochs=1, batch_size=8)
+    scorer = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 

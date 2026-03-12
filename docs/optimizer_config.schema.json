@@ -50,6 +50,19 @@
                     "title": "Trust Remote Code",
                     "type": "boolean"
                 },
+                "revision": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Revision from HF repo",
+                    "title": "Revision"
+                },
                 "train_head": {
                     "default": false,
                     "description": "Whether to train the head of the model. If False, LogReg will be trained.",
@@ -262,6 +275,19 @@
                     "description": "Whether to trust the remote code when loading the model.",
                     "title": "Trust Remote Code",
                     "type": "boolean"
+                },
+                "revision": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Revision from HF repo",
+                    "title": "Revision"
                 }
             },
             "title": "HFModelConfig",
@@ -515,6 +541,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
+                "revision": null,
                 "train_head": false
             }
         },
@@ -531,7 +558,8 @@
                     "padding": true,
                     "truncation": true
                 },
-                "trust_remote_code": false
+                "trust_remote_code": false,
+                "revision": "refs/pr/16"
             }
         },
         "hpo_config": {

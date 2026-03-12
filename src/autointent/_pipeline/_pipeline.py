@@ -22,6 +22,7 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
     get_default_embedder_config,
+    get_default_hfmodel_config,
     get_default_vector_index_config,
 )
 from autointent.custom_types import NodeType
@@ -64,7 +65,7 @@ class Pipeline:
             self.embedder_config = get_default_embedder_config()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
-            self.transformer_config = HFModelConfig()
+            self.transformer_config = get_default_hfmodel_config()
             self.hpo_config = HPOConfig()
             self.vector_index_config = get_default_vector_index_config()
         elif not isinstance(nodes[0], InferenceNode):
