@@ -548,7 +548,7 @@
         "transformer_config": {
             "$ref": "#/$defs/HFModelConfig",
             "default": {
-                "model_name": "prajjwal1/bert-tiny",
+                "model_name": "cointegrated/rubert-tiny2",
                 "batch_size": 32,
                 "device": null,
                 "bf16": false,
@@ -559,7 +559,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": "refs/pr/16"
+                "revision": null
             }
         },
         "hpo_config": {
