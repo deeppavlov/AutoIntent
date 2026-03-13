@@ -5,8 +5,11 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent.configs import SentenceTransformerEmbeddingConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CatBoostScorer
+
+_embedder_config = SentenceTransformerEmbeddingConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
 pytest.importorskip("catboost")
 
@@ -55,7 +58,7 @@ def test_catboost_prediction_multilabel(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = CatBoostScorer(
-        embedder_config="prajjwal1/bert-tiny",
+        embedder_config=_embedder_config,
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -99,7 +102,7 @@ def test_catboost_features_types(dataset, features_type, use_embedding_features)
     data_handler = DataHandler(dataset)
 
     scorer = CatBoostScorer(
-        embedder_config="prajjwal1/bert-tiny",
+        embedder_config=_embedder_config,
         iterations=50,
         learning_rate=0.05,
         depth=6,

@@ -136,6 +136,7 @@ class BertScorer(BaseScorer):
         return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
+            revision=self.classification_model_config.revision,
             num_labels=self._n_classes,
             label2id=label2id,
             id2label=id2label,
@@ -151,7 +152,9 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(self.classification_model_config.model_name)  # type: ignore[no-untyped-call]
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            self.classification_model_config.model_name, revision=self.classification_model_config.revision
+        )
         self._model = self._initialize_model()
         tokenized_dataset = self._get_tokenized_dataset(utterances, labels)
         self._train(tokenized_dataset)

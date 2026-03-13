@@ -86,6 +86,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 prompts=self.config.get_prompt_config(),
                 similarity_fn_name=self.config.similarity_fn_name,
                 trust_remote_code=self.config.trust_remote_code,
+                revision=self.config.revision,
             )
             self._model = res
         return self._model
