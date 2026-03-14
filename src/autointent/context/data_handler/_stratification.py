@@ -55,7 +55,7 @@ class SplitReadinessResult:
     """
 
     ready: bool
-    underpopulated_classes: list[tuple[int | str | None, int]]
+    underpopulated_classes: list[tuple[int, int]]
     min_samples_per_class_required: int
     reason: str | None
 
@@ -378,9 +378,9 @@ class StratifiedSplitter:
 
 def _check_multiclass_counts(
     dataset: HFDataset, label_feature: str, min_samples_per_class: int
-) -> list[tuple[int | str | None, int]]:
+) -> list[tuple[int, int]]:
     """Return (label, count) for each class with fewer than min_samples_per_class samples."""
-    labels = dataset[label_feature]
+    labels: list[int] = dataset[label_feature]
     counts = Counter(labels)
     return [(label, count) for label, count in counts.items() if count < min_samples_per_class]
 
