@@ -118,7 +118,10 @@ def _iterative_stratify_remaining(
     splitter = IterativeStratification(
         n_splits=2,
         order=2,
-        sample_distribution_per_fold=[1.0 - test_size, test_size],
+        # NOTE: IterativeStratification expects fold distribution in (test, train) order,
+        # but returns indices as (train, test). This matches the library's behavior and
+        # keeps backward-compatible train/test sizes with prior implementation.
+        sample_distribution_per_fold=[test_size, 1.0 - test_size],
     )
     train_r, test_r = next(splitter.split(np.arange(len(remaining)), y[remaining]))
     train_idx |= set(remaining[train_r].tolist())
