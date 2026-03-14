@@ -36,7 +36,6 @@ class SplitReadinessResult:
 def check_split_readiness(
     dataset: Dataset,
     split: str,
-    test_size: float,
     config: DataConfig,
     allow_oos_in_train: bool | None = None,
 ) -> SplitReadinessResult:
@@ -67,7 +66,7 @@ def check_split_readiness(
         )
     hf_split = dataset[split]
     splitter = StratifiedSplitter(
-        test_size=test_size,
+        test_size=config.validation_size,
         label_feature=dataset.label_feature,
         random_seed=None,
     )
