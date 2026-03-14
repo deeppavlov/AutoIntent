@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 from skmultilearn.model_selection import IterativeStratification
 from transformers import set_seed
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 _MULTILABEL_NDIMS = 2
 _RARE_LABEL_COUNT_SINGLETON = 1
@@ -11,8 +16,8 @@ _COIN_FLIP_P = 0.5
 
 
 def safe_multilabel_split_indices(
-    y: np.ndarray, test_size: float, random_seed: int | None
-) -> tuple[np.ndarray, np.ndarray]:
+    y: npt.NDArray[Any], test_size: float, random_seed: int | None
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     """Split multilabel data with coverage guarantees for rare labels."""
     _validate_multilabel_matrix(y)
     n_samples = int(y.shape[0])
@@ -38,7 +43,7 @@ def safe_multilabel_split_indices(
     return _finalize_partition(n_samples=n_samples, train_idx=train_idx, test_idx=test_idx)
 
 
-def _validate_multilabel_matrix(y: np.ndarray) -> None:
+def _validate_multilabel_matrix(y: npt.NDArray[Any]) -> None:
     if y.ndim != _MULTILABEL_NDIMS:
         msg = (
             "Expected multilabel data to be a 2D matrix-like structure "
@@ -55,7 +60,7 @@ def _assigned_split(sample_idx: int, train_idx: set[int], test_idx: set[int]) ->
     return None
 
 
-def _force_singleton_labels(y: np.ndarray, label_counts: np.ndarray, train_idx: set[int]) -> None:
+def _force_singleton_labels(y: npt.NDArray[Any], label_counts: npt.NDArray[Any], train_idx: set[int]) -> None:
     for label, count in enumerate(label_counts):
         if int(count) != _RARE_LABEL_COUNT_SINGLETON:
             continue
@@ -83,7 +88,11 @@ def _force_pair_samples(a: int, b: int, train_idx: set[int], test_idx: set[int],
 
 
 def _force_pair_labels(
-    y: np.ndarray, label_counts: np.ndarray, train_idx: set[int], test_idx: set[int], rng: np.random.Generator
+    y: npt.NDArray[Any],
+    label_counts: npt.NDArray[Any],
+    train_idx: set[int],
+    test_idx: set[int],
+    rng: np.random.Generator,
 ) -> None:
     for label, count in enumerate(label_counts):
         if int(count) != _RARE_LABEL_COUNT_PAIR:
@@ -94,8 +103,8 @@ def _force_pair_labels(
 
 
 def _iterative_stratify_remaining(
-    y: np.ndarray,
-    remaining: np.ndarray,
+    y: npt.NDArray[Any],
+    remaining: npt.NDArray[Any],
     test_size: float,
     random_seed: int | None,
     train_idx: set[int],
@@ -116,7 +125,9 @@ def _iterative_stratify_remaining(
     test_idx |= set(remaining[test_r].tolist())
 
 
-def _finalize_partition(n_samples: int, train_idx: set[int], test_idx: set[int]) -> tuple[np.ndarray, np.ndarray]:
+def _finalize_partition(
+    n_samples: int, train_idx: set[int], test_idx: set[int]
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any]]:
     train_arr = np.array(sorted(train_idx), dtype=int)
     test_arr = np.array(sorted(test_idx), dtype=int)
 
