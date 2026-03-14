@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from datasets import Dataset as HFDataset
 
     from autointent import Dataset
+    from autointent.configs import DataConfig
 
 from ._safe_multilabel_stratification import _validate_multilabel_matrix
 from ._stratification import StratifiedSplitter
@@ -36,7 +37,7 @@ def check_split_readiness(
     dataset: Dataset,
     split: str,
     test_size: float,
-    min_samples_per_class: int = 2,
+    config: DataConfig,
     allow_oos_in_train: bool | None = None,
 ) -> SplitReadinessResult:
     """Check whether the dataset has enough samples per class for stratified splitting.
@@ -49,14 +50,14 @@ def check_split_readiness(
         dataset: The dataset to check (e.g. the same passed to :func:`split_dataset`).
         split: The split name to check (e.g. ``Split.TRAIN``).
         test_size: Proportion used for the test split (must match the value used when splitting).
-        min_samples_per_class: Minimum number of samples per class required for stratification.
-            Default 2 matches sklearn's requirement for a 2-way stratified split.
+        config: data config
         allow_oos_in_train: Same as in :func:`split_dataset`. If the dataset has OOS samples
             and this is not set, the function returns ``ready=False`` with a reason.
 
     Returns:
         SplitReadinessResult with ``ready``, ``underpopulated_classes``, and optional ``reason``.
     """
+    min_samples_per_class = _min_samples_per_class_for_config(config=config)
     if split not in dataset:
         return SplitReadinessResult(
             ready=False,
@@ -100,6 +101,18 @@ def check_split_readiness(
         min_samples_per_class_required=min_samples_per_class,
         reason=reason,
     )
+
+
+def _min_samples_per_class_for_config(config: DataConfig) -> int:
+    """Return a recommended minimum samples-per-class for a given data config."""
+    # Base requirement for a single stratified split.
+    # For CV, the canonical lower bound is one example per fold.
+    base = 2 if config.scheme == "ho" else int(config.n_folds)
+
+    # separation_ratio triggers an extra stratified split of the effective train
+    # pool (e.g. decision vs scoring), so we double the requirement.
+    factor = 1 if config.separation_ratio is None else 2
+    return base * factor
 
 
 def _check_multiclass_counts(
