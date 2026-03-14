@@ -259,14 +259,9 @@ class StratifiedSplitter:
         Returns:
             A sequence containing indices for train and test splits.
         """
-        if self.random_seed is not None:
-            set_seed(self.random_seed)  # workaround for buggy nature of IterativeStratification from skmultilearn
-        splitter = IterativeStratification(
-            n_splits=2,
-            order=2,
-            sample_distribution_per_fold=[test_size, 1.0 - test_size],
-        )
-        return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
+        y = np.asarray(dataset[self.label_feature])
+        train_arr, test_arr = safe_multilabel_split_indices(y=y, test_size=test_size, random_seed=self.random_seed)
+        return (train_arr, test_arr)
 
     def _map_label(
         self, sample: dict[str, str | LabelType], old: LabelType, new: LabelType

@@ -175,17 +175,45 @@ def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_b
     assert result_strict.min_samples_per_class_required == 3
 
 
-def test_check_split_readiness_multilabel_returns_ready(dataset_unsplitted):
-    """Multilabel datasets return ready=True (multilabel stratification is not validated)."""
-    dataset = dataset_unsplitted.to_multilabel()
+def test_check_split_readiness_multilabel_returns_ready():
+    """Multilabel datasets are checked by per-label positive counts."""
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "x1", "label": [1, 0, 1]},
+                {"utterance": "x2", "label": [1, 0, 0]},
+                {"utterance": "x3", "label": [0, 1, 0]},
+                {"utterance": "x4", "label": [0, 0, 1]},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 2, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+
+    # label 1 appears only once -> not ready for min_samples_per_class=2
     result = check_split_readiness(
         dataset,
         split=Split.TRAIN,
         test_size=0.5,
         allow_oos_in_train=False,
     )
-    assert result.ready is True
-    assert result.underpopulated_classes == []
+    assert result.ready is False
+    assert result.underpopulated_classes == [(1, 1)]
+    assert result.reason is not None
+
+    # With min_samples_per_class=1 it becomes ready.
+    result_relaxed = check_split_readiness(
+        dataset,
+        split=Split.TRAIN,
+        test_size=0.5,
+        min_samples_per_class=1,
+        allow_oos_in_train=False,
+    )
+    assert result_relaxed.ready is True
+    assert result_relaxed.underpopulated_classes == []
 
 
 def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samples):
