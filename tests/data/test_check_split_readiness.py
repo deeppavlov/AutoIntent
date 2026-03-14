@@ -3,6 +3,7 @@
 import pytest
 
 from autointent import Dataset
+from autointent.configs import DataConfig
 from autointent.context.data_handler import (
     SplitReadinessResult,
     check_split_readiness,
@@ -87,7 +88,7 @@ def test_check_split_readiness_ready_when_enough_samples(dataset_enough_samples)
     result = check_split_readiness(
         dataset_enough_samples,
         split=Split.TRAIN,
-        test_size=0.3,
+        config=DataConfig(validation_size=0.3, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert isinstance(result, SplitReadinessResult)
@@ -102,7 +103,7 @@ def test_check_split_readiness_not_ready_underpopulated(dataset_underpopulated):
     result = check_split_readiness(
         dataset_underpopulated,
         split=Split.TRAIN,
-        test_size=0.3,
+        config=DataConfig(validation_size=0.3, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result.ready is False
@@ -121,7 +122,7 @@ def test_check_split_readiness_missing_split(dataset_enough_samples):
     result = check_split_readiness(
         dataset_enough_samples,
         split="nonexistent_split",
-        test_size=0.3,
+        config=DataConfig(validation_size=0.3, separation_ratio=None),
     )
     assert result.ready is False
     assert result.underpopulated_classes == []
@@ -134,7 +135,7 @@ def test_check_split_readiness_oos_allow_none(dataset_unsplitted):
         check_split_readiness(
             dataset_unsplitted,
             split=Split.TRAIN,
-            test_size=0.5,
+            config=DataConfig(validation_size=0.5, separation_ratio=None),
             allow_oos_in_train=None,
         )
 
@@ -144,7 +145,7 @@ def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitt
     result = check_split_readiness(
         dataset_unsplitted,
         split=Split.TRAIN,
-        test_size=0.5,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result.ready is True
@@ -157,8 +158,7 @@ def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_b
     result = check_split_readiness(
         dataset_two_classes_barely_enough,
         split=Split.TRAIN,
-        test_size=0.3,
-        min_samples_per_class=2,
+        config=DataConfig(validation_size=0.3, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result.ready is True
@@ -166,8 +166,7 @@ def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_b
     result_strict = check_split_readiness(
         dataset_two_classes_barely_enough,
         split=Split.TRAIN,
-        test_size=0.3,
-        min_samples_per_class=3,
+        config=DataConfig(scheme="cv", n_folds=3, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result_strict.ready is False
@@ -197,23 +196,12 @@ def test_check_split_readiness_multilabel_returns_ready():
     result = check_split_readiness(
         dataset,
         split=Split.TRAIN,
-        test_size=0.5,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result.ready is False
     assert result.underpopulated_classes == [(1, 1)]
     assert result.reason is not None
-
-    # With min_samples_per_class=1 it becomes ready.
-    result_relaxed = check_split_readiness(
-        dataset,
-        split=Split.TRAIN,
-        test_size=0.5,
-        min_samples_per_class=1,
-        allow_oos_in_train=False,
-    )
-    assert result_relaxed.ready is True
-    assert result_relaxed.underpopulated_classes == []
 
 
 def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samples):
@@ -221,7 +209,7 @@ def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samp
     result = check_split_readiness(
         dataset_enough_samples,
         split=Split.TRAIN,
-        test_size=0.5,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
         allow_oos_in_train=False,
     )
     assert result.ready is True
@@ -243,7 +231,7 @@ def test_check_split_readiness_underpopulated_implies_split_raises(dataset_under
     result = check_split_readiness(
         dataset_underpopulated,
         split=Split.TRAIN,
-        test_size=0.3,
+        config=DataConfig(validation_size=0.3),
         allow_oos_in_train=False,
     )
     assert result.ready is False
