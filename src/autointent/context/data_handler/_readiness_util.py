@@ -20,7 +20,7 @@ class ClassCount(NamedTuple):
     id: int
     """Class (intent) index."""
 
-    count: int
+    n_samples: int
     """Number of samples from the class (intent)."""
 
 
@@ -30,7 +30,7 @@ class SplitReadinessResult:
 
     Attributes:
         ready: True if stratification can be performed (enough samples per class).
-        underpopulated_classes: List of (label, count) for classes below the minimum.
+        underpopulated_classes: List of (label, n_samples) for classes below the minimum.
         min_samples_per_class_required: Minimum samples per class used for the check.
         reason: Human-readable reason when not ready (e.g. OOS not configured).
     """
@@ -119,7 +119,11 @@ def _find_underpopulated_multiclass(
     """Return (label, count) for each class with fewer than min_samples_per_class samples."""
     labels: list[int] = dataset[label_feature]
     counts = Counter(labels)
-    return [ClassCount(id=label, count=count) for label, count in counts.items() if count < min_samples_per_class]
+    return [
+        ClassCount(id=label, n_samples=n_samples)
+        for label, n_samples in counts.items()
+        if n_samples < min_samples_per_class
+    ]
 
 
 def _find_underpopulated_multilabel(
@@ -130,7 +134,9 @@ def _find_underpopulated_multilabel(
     _validate_multilabel_matrix(y)
     counts = y.sum(axis=0).astype(int)
     return [
-        ClassCount(id=int(idx), count=int(count)) for idx, count in enumerate(counts) if count < min_samples_per_class
+        ClassCount(id=int(idx), n_samples=int(n_samples))
+        for idx, n_samples in enumerate(counts)
+        if n_samples < min_samples_per_class
     ]
 
 
