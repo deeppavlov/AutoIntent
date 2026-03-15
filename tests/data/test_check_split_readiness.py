@@ -257,6 +257,36 @@ def test_check_split_readiness_multilabel_returns_ready():
     assert result.reason is not None
 
 
+def test_check_split_readiness_marks_declared_but_unseen_intent_as_underpopulated():
+    """Intents with 0 samples should be flagged so callers can filter them out."""
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "a1", "label": 0},
+                {"utterance": "a2", "label": 0},
+                {"utterance": "b1", "label": 1},
+                {"utterance": "b2", "label": 1},
+            ],
+            # Declare 3 intents, but only provide samples for ids 0 and 1.
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 2, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+
+    result = check_split_readiness(
+        dataset,
+        split=Split.TRAIN,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
+        allow_oos_in_train=False,
+    )
+    assert result.ready is False
+    assert (2, 0) in result.underpopulated_classes
+    assert result.reason is not None
+
+
 def test_check_split_readiness_multilabel_oos_allow_true_checks_oos_label():
     """Multilabel + OOS + allow_oos_in_train=True should not crash and should include OOS label."""
     dataset = Dataset.from_dict(

@@ -71,10 +71,17 @@ def check_split_readiness(
         random_seed=None,
     )
     inputs = splitter.get_stratify_inputs(hf_split, dataset.multilabel, allow_oos_in_train)
+    expected_n_classes = _expected_n_classes(dataset, inputs.dataset, splitter.label_feature)
+
     if inputs.multilabel:
         underpopulated = _find_underpopulated_multilabel(inputs.dataset, splitter.label_feature, min_samples_per_class)
     else:
-        underpopulated = _find_underpopulated_multiclass(inputs.dataset, splitter.label_feature, min_samples_per_class)
+        underpopulated = _find_underpopulated_multiclass(
+            inputs.dataset,
+            splitter.label_feature,
+            min_samples_per_class,
+            expected_n_classes=expected_n_classes,
+        )
     ready = len(underpopulated) == 0
     reason: str | None = None
 
@@ -83,6 +90,7 @@ def check_split_readiness(
             dataset=inputs.dataset,
             label_feature=splitter.label_feature,
             test_size=inputs.test_size,
+            expected_n_classes=expected_n_classes,
         )
         if not split_ok:
             ready = False
@@ -114,16 +122,19 @@ def _min_samples_per_class_for_config(config: DataConfig) -> int:
 
 
 def _find_underpopulated_multiclass(
-    dataset: HFDataset, label_feature: str, min_samples_per_class: int
+    dataset: HFDataset, label_feature: str, min_samples_per_class: int, expected_n_classes: int
 ) -> list[ClassCount]:
     """Return (label, count) for each class with fewer than min_samples_per_class samples."""
     labels: list[int] = dataset[label_feature]
     counts = Counter(labels)
-    return [
-        ClassCount(id=label, n_samples=n_samples)
-        for label, n_samples in counts.items()
-        if n_samples < min_samples_per_class
-    ]
+
+    # Ensure "missing" classes are treated as 0-count (underpopulated)
+    result: list[ClassCount] = []
+    for label in range(int(expected_n_classes)):
+        n_samples = int(counts.get(label, 0))
+        if n_samples < min_samples_per_class:
+            result.append(ClassCount(id=int(label), n_samples=n_samples))
+    return result
 
 
 def _find_underpopulated_multilabel(
@@ -141,7 +152,7 @@ def _find_underpopulated_multilabel(
 
 
 def _check_multiclass_split_size_feasibility(
-    dataset: HFDataset, label_feature: str, test_size: float
+    dataset: HFDataset, label_feature: str, test_size: float, expected_n_classes: int
 ) -> tuple[bool, str | None]:
     """Return whether stratified train/test sizes are feasible for multiclass splits.
 
@@ -149,7 +160,7 @@ def _check_multiclass_split_size_feasibility(
     the requested train/test sizes are too small to include all classes.
     """
     labels = dataset[label_feature]
-    n_classes = len(set(labels))
+    n_classes = expected_n_classes
     n_samples = len(labels)
 
     # Mirror sklearn's float test_size -> n_test calculation (ceil).
@@ -174,3 +185,11 @@ def _check_multiclass_split_size_feasibility(
             f"for the number of classes (n_classes={n_classes}).",
         )
     return True, None
+
+
+def _expected_n_classes(dataset: Dataset, prepared: HFDataset, label_feature: str) -> int:
+    if dataset.multilabel:
+        return len(prepared[label_feature][0])
+    labels: list[int] = prepared[label_feature]
+    max_seen = max(labels) if labels else -1
+    return max(dataset.n_classes, int(max_seen) + 1)
