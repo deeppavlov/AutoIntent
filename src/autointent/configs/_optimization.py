@@ -29,7 +29,7 @@ class DataConfig(BaseModel):
     )
     """Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split)."""
     separation_ratio: FloatFromZeroToOne | None = Field(
-        0.5, description="Set to float to prevent data leak between scoring and decision nodes."
+        None, description="Set to float to prevent data leak between scoring and decision nodes."
     )
     """Set to float to prevent data leak between scoring and decision nodes."""
     is_few_shot_train: bool = Field(False, description="Whether to use few-shot training.")
