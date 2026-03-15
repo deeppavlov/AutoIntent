@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 import numpy as np
 
@@ -16,9 +16,17 @@ from ._safe_multilabel_stratification import _validate_multilabel_matrix
 from ._stratification import StratifiedSplitter
 
 
+class ClassCount(NamedTuple):
+    id: int
+    """Class (intent) index."""
+
+    count: int
+    """Number of samples from the class (intent)."""
+
+
 @dataclass(frozen=True)
 class SplitReadinessResult:
-    """Result of checking whether a dataset can be stratified split.
+    """Result of checking whether a dataset can be fed to autointent pipeline.
 
     Attributes:
         ready: True if stratification can be performed (enough samples per class).
@@ -28,7 +36,7 @@ class SplitReadinessResult:
     """
 
     ready: bool
-    underpopulated_classes: list[tuple[int, int]]
+    underpopulated_classes: list[ClassCount]
     min_samples_per_class_required: int
     reason: str | None
 
@@ -39,11 +47,7 @@ def check_split_readiness(
     config: DataConfig,
     allow_oos_in_train: bool | None = None,
 ) -> SplitReadinessResult:
-    """Check whether the dataset has enough samples per class for stratified splitting.
-
-    Uses the same OOS and stratification logic as :func:`split_dataset`, so downstream
-    code can call this before creating a :class:`DataHandler` or calling :func:`split_dataset`
-    and handle underpopulated classes (e.g. skip phase, log, or fail with a clear message).
+    """Check whether the dataset has enough samples per class for autointent pipeline.
 
     Args:
         dataset: The dataset to check (e.g. the same passed to :func:`split_dataset`).
@@ -52,9 +56,6 @@ def check_split_readiness(
         config: data config
         allow_oos_in_train: Same as in :func:`split_dataset`. If the dataset has OOS samples
             and this is not set, the function returns ``ready=False`` with a reason.
-
-    Returns:
-        SplitReadinessResult with ``ready``, ``underpopulated_classes``, and optional ``reason``.
     """
     min_samples_per_class = _min_samples_per_class_for_config(config=config)
     if split not in dataset:
@@ -72,21 +73,9 @@ def check_split_readiness(
     )
     inputs = splitter.get_stratify_inputs(hf_split, dataset.multilabel, allow_oos_in_train)
     if inputs.multilabel:
-        underpopulated = _check_multilabel_counts(inputs.dataset, splitter.label_feature, min_samples_per_class)
-        ready = len(underpopulated) == 0
-        reason = None
-        if not ready:
-            parts = [f"label {label!r}: {count} (need {min_samples_per_class})" for label, count in underpopulated]
-            reason = "Multilabel stratification requires at least {} positives per label. Underpopulated: {}.".format(
-                min_samples_per_class, "; ".join(parts)
-            )
-        return SplitReadinessResult(
-            ready=ready,
-            underpopulated_classes=underpopulated,
-            min_samples_per_class_required=min_samples_per_class,
-            reason=reason,
-        )
-    underpopulated = _check_multiclass_counts(inputs.dataset, splitter.label_feature, min_samples_per_class)
+        underpopulated = _find_underpopulated_multilabel(inputs.dataset, splitter.label_feature, min_samples_per_class)
+    else:
+        underpopulated = _find_underpopulated_multiclass(inputs.dataset, splitter.label_feature, min_samples_per_class)
     ready = len(underpopulated) == 0
     reason = None
     if not ready:
@@ -114,20 +103,22 @@ def _min_samples_per_class_for_config(config: DataConfig) -> int:
     return base * factor
 
 
-def _check_multiclass_counts(
+def _find_underpopulated_multiclass(
     dataset: HFDataset, label_feature: str, min_samples_per_class: int
-) -> list[tuple[int, int]]:
+) -> list[ClassCount]:
     """Return (label, count) for each class with fewer than min_samples_per_class samples."""
     labels: list[int] = dataset[label_feature]
     counts = Counter(labels)
-    return [(label, count) for label, count in counts.items() if count < min_samples_per_class]
+    return [ClassCount(id=label, count=count) for label, count in counts.items() if count < min_samples_per_class]
 
 
-def _check_multilabel_counts(
+def _find_underpopulated_multilabel(
     dataset: HFDataset, label_feature: str, min_samples_per_class: int
-) -> list[tuple[int, int]]:
+) -> list[ClassCount]:
     """Return (label_idx, positive_count) for each label with fewer than min_samples_per_class positives."""
     y = np.asarray(dataset[label_feature])
     _validate_multilabel_matrix(y)
     counts = y.sum(axis=0).astype(int)
-    return [(int(idx), int(count)) for idx, count in enumerate(counts) if count < min_samples_per_class]
+    return [
+        ClassCount(id=int(idx), count=int(count)) for idx, count in enumerate(counts) if count < min_samples_per_class
+    ]
