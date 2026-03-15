@@ -160,7 +160,14 @@ class StratifiedSplitter:
         OOS is mapped to a class so it is stratified; post_split_fn unmaps it.
         """
         if multilabel:
-            in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            try:
+                in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            except StopIteration as e:
+                msg = (
+                    "Cannot infer multilabel dimensionality: dataset contains only OOS samples "
+                    f"({self.label_feature}=None for all rows)."
+                )
+                raise ValueError(msg) from e
             n_classes = len(in_domain_sample[self.label_feature])
             mapped_dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
 
