@@ -172,7 +172,7 @@ class StratifiedSplitter:
 
             return StratifyInputs(
                 dataset=mapped_dataset,
-                multilabel=False,
+                multilabel=True,
                 test_size=self.test_size,
                 post_split_fn=unmap_oos_multilabel,
             )
@@ -292,7 +292,9 @@ class StratifiedSplitter:
         """
         if sample[self.label_feature] is None:
             sample[self.label_feature] = [0] * n_classes
-        sample[self.label_feature] += [1]  # type: ignore[operator]
+            sample[self.label_feature] += [1]  # type: ignore[operator]
+        else:
+            sample[self.label_feature] += [0]  # type: ignore[operator]
         return sample
 
     def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
