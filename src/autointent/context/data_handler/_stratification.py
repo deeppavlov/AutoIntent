@@ -7,15 +7,12 @@ It includes support for both single-label and multi-label stratified splitting.
 from __future__ import annotations
 
 import logging
-from collections import Counter
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import numpy as np
 from datasets import concatenate_datasets
 from sklearn.model_selection import train_test_split
-from skmultilearn.model_selection import IterativeStratification
-from transformers import set_seed
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -25,6 +22,8 @@ if TYPE_CHECKING:
 
     from autointent import Dataset
     from autointent.custom_types import LabelType
+
+from ._safe_multilabel_stratification import safe_multilabel_split_indices
 
 logger = logging.getLogger(__name__)
 
@@ -41,23 +40,6 @@ class StratifyInputs:
     multilabel: bool
     test_size: float
     post_split_fn: Callable[[HFDataset, HFDataset], tuple[HFDataset, HFDataset]]
-
-
-@dataclass(frozen=True)
-class SplitReadinessResult:
-    """Result of checking whether a dataset can be stratified split.
-
-    Attributes:
-        ready: True if stratification can be performed (enough samples per class).
-        underpopulated_classes: List of (label, count) for classes below the minimum.
-        min_samples_per_class_required: Minimum samples per class used for the check.
-        reason: Human-readable reason when not ready (e.g. OOS not configured).
-    """
-
-    ready: bool
-    underpopulated_classes: list[tuple[int, int]]
-    min_samples_per_class_required: int
-    reason: str | None
 
 
 class StratifiedSplitter:
@@ -178,7 +160,14 @@ class StratifiedSplitter:
         OOS is mapped to a class so it is stratified; post_split_fn unmaps it.
         """
         if multilabel:
-            in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            try:
+                in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            except StopIteration as e:
+                msg = (
+                    "Cannot infer multilabel dimensionality: dataset contains only OOS samples "
+                    f"({self.label_feature}=None for all rows)."
+                )
+                raise ValueError(msg) from e
             n_classes = len(in_domain_sample[self.label_feature])
             mapped_dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
 
@@ -190,7 +179,7 @@ class StratifiedSplitter:
 
             return StratifyInputs(
                 dataset=mapped_dataset,
-                multilabel=False,
+                multilabel=True,
                 test_size=self.test_size,
                 post_split_fn=unmap_oos_multilabel,
             )
@@ -277,14 +266,9 @@ class StratifiedSplitter:
         Returns:
             A sequence containing indices for train and test splits.
         """
-        if self.random_seed is not None:
-            set_seed(self.random_seed)  # workaround for buggy nature of IterativeStratification from skmultilearn
-        splitter = IterativeStratification(
-            n_splits=2,
-            order=2,
-            sample_distribution_per_fold=[test_size, 1.0 - test_size],
-        )
-        return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
+        y = np.asarray(dataset[self.label_feature])
+        train_arr, test_arr = safe_multilabel_split_indices(y=y, test_size=test_size, random_seed=self.random_seed)
+        return (train_arr, test_arr)
 
     def _map_label(
         self, sample: dict[str, str | LabelType], old: LabelType, new: LabelType
@@ -315,7 +299,9 @@ class StratifiedSplitter:
         """
         if sample[self.label_feature] is None:
             sample[self.label_feature] = [0] * n_classes
-        sample[self.label_feature] += [1]  # type: ignore[operator]
+            sample[self.label_feature] += [1]  # type: ignore[operator]
+        else:
+            sample[self.label_feature] += [0]  # type: ignore[operator]
         return sample
 
     def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
@@ -374,78 +360,6 @@ class StratifiedSplitter:
             )
             raise ValueError(msg)
         return res
-
-
-def _check_multiclass_counts(
-    dataset: HFDataset, label_feature: str, min_samples_per_class: int
-) -> list[tuple[int, int]]:
-    """Return (label, count) for each class with fewer than min_samples_per_class samples."""
-    labels: list[int] = dataset[label_feature]
-    counts = Counter(labels)
-    return [(label, count) for label, count in counts.items() if count < min_samples_per_class]
-
-
-def check_split_readiness(
-    dataset: Dataset,
-    split: str,
-    test_size: float,
-    min_samples_per_class: int = 2,
-    allow_oos_in_train: bool | None = None,
-) -> SplitReadinessResult:
-    """Check whether the dataset has enough samples per class for stratified splitting.
-
-    Uses the same OOS and stratification logic as :func:`split_dataset`, so downstream
-    code can call this before creating a :class:`DataHandler` or calling :func:`split_dataset`
-    and handle underpopulated classes (e.g. skip phase, log, or fail with a clear message).
-
-    Args:
-        dataset: The dataset to check (e.g. the same passed to :func:`split_dataset`).
-        split: The split name to check (e.g. ``Split.TRAIN``).
-        test_size: Proportion used for the test split (must match the value used when splitting).
-        min_samples_per_class: Minimum number of samples per class required for stratification.
-            Default 2 matches sklearn's requirement for a 2-way stratified split.
-        allow_oos_in_train: Same as in :func:`split_dataset`. If the dataset has OOS samples
-            and this is not set, the function returns ``ready=False`` with a reason.
-
-    Returns:
-        SplitReadinessResult with ``ready``, ``underpopulated_classes``, and optional ``reason``.
-    """
-    if split not in dataset:
-        return SplitReadinessResult(
-            ready=False,
-            underpopulated_classes=[],
-            min_samples_per_class_required=min_samples_per_class,
-            reason=f"Dataset has no split '{split}'.",
-        )
-    hf_split = dataset[split]
-    splitter = StratifiedSplitter(
-        test_size=test_size,
-        label_feature=dataset.label_feature,
-        random_seed=None,
-    )
-    inputs = splitter.get_stratify_inputs(hf_split, dataset.multilabel, allow_oos_in_train)
-    if inputs.multilabel:
-        # Multilabel stratification uses IterativeStratification; we do not validate it here.
-        return SplitReadinessResult(
-            ready=True,
-            underpopulated_classes=[],
-            min_samples_per_class_required=min_samples_per_class,
-            reason=None,
-        )
-    underpopulated = _check_multiclass_counts(inputs.dataset, splitter.label_feature, min_samples_per_class)
-    ready = len(underpopulated) == 0
-    reason = None
-    if not ready:
-        parts = [f"class {label!r}: {count} (need {min_samples_per_class})" for label, count in underpopulated]
-        reason = "Stratification requires at least {} samples per class. Underpopulated: {}.".format(
-            min_samples_per_class, "; ".join(parts)
-        )
-    return SplitReadinessResult(
-        ready=ready,
-        underpopulated_classes=underpopulated,
-        min_samples_per_class_required=min_samples_per_class,
-        reason=reason,
-    )
 
 
 def split_dataset(
