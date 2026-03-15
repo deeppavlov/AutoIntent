@@ -52,10 +52,9 @@ def check_split_readiness(
     Args:
         dataset: The dataset to check (e.g. the same passed to :func:`split_dataset`).
         split: The split name to check (e.g. ``Split.TRAIN``).
-        test_size: Proportion used for the test split (must match the value used when splitting).
         config: data config
-        allow_oos_in_train: Same as in :func:`split_dataset`. If the dataset has OOS samples
-            and this is not set, the function returns ``ready=False`` with a reason.
+        allow_oos_in_train: Same as in :func:`split_dataset`. If the split contains OOS samples
+            and this is ``None``, this function raises ``ValueError`` (mirrors splitting behavior).
     """
     min_samples_per_class = _min_samples_per_class_for_config(config=config)
     if split not in dataset:
@@ -77,8 +76,19 @@ def check_split_readiness(
     else:
         underpopulated = _find_underpopulated_multiclass(inputs.dataset, splitter.label_feature, min_samples_per_class)
     ready = len(underpopulated) == 0
-    reason = None
-    if not ready:
+    reason: str | None = None
+
+    if ready and (not inputs.multilabel):
+        split_ok, split_reason = _check_multiclass_split_size_feasibility(
+            dataset=inputs.dataset,
+            label_feature=splitter.label_feature,
+            test_size=inputs.test_size,
+        )
+        if not split_ok:
+            ready = False
+            reason = split_reason
+
+    if not ready and reason is None:
         parts = [f"class {label!r}: {count} (need {min_samples_per_class})" for label, count in underpopulated]
         reason = "Stratification requires at least {} samples per class. Underpopulated: {}.".format(
             min_samples_per_class, "; ".join(parts)
@@ -122,3 +132,39 @@ def _find_underpopulated_multilabel(
     return [
         ClassCount(id=int(idx), count=int(count)) for idx, count in enumerate(counts) if count < min_samples_per_class
     ]
+
+
+def _check_multiclass_split_size_feasibility(
+    dataset: HFDataset, label_feature: str, test_size: float
+) -> tuple[bool, str | None]:
+    """Return whether stratified train/test sizes are feasible for multiclass splits.
+
+    Even if each class has >=2 samples, sklearn stratified splitting can fail when
+    the requested train/test sizes are too small to include all classes.
+    """
+    labels = dataset[label_feature]
+    n_classes = len(set(labels))
+    n_samples = len(labels)
+
+    # Mirror sklearn's float test_size -> n_test calculation (ceil).
+    n_test = int(np.ceil(float(test_size) * n_samples))
+    n_train = n_samples - n_test
+
+    if n_test <= 0 or n_train <= 0:
+        return (
+            False,
+            f"Requested split sizes are invalid (n_samples={n_samples}, test_size={test_size}).",
+        )
+    if n_test < n_classes:
+        return (
+            False,
+            f"Stratified split would allocate too few test samples (n_test={n_test}) "
+            f"for the number of classes (n_classes={n_classes}).",
+        )
+    if n_train < n_classes:
+        return (
+            False,
+            f"Stratified split would allocate too few train samples (n_train={n_train}) "
+            f"for the number of classes (n_classes={n_classes}).",
+        )
+    return True, None
