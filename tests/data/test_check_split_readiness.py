@@ -19,15 +19,40 @@ def dataset_enough_samples():
             "train": [
                 {"utterance": "a1", "label": 0},
                 {"utterance": "a2", "label": 0},
+                {"utterance": "a3", "label": 0},
                 {"utterance": "b1", "label": 1},
                 {"utterance": "b2", "label": 1},
+                {"utterance": "b3", "label": 1},
                 {"utterance": "c1", "label": 2},
                 {"utterance": "c2", "label": 2},
+                {"utterance": "c3", "label": 2},
             ],
             "test": [
                 {"utterance": "t1", "label": 0},
                 {"utterance": "t2", "label": 1},
                 {"utterance": "t3", "label": 2},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 2, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def dataset_three_classes_two_each():
+    """3 classes, 2 samples each (no OOS). Useful for split-size feasibility tests."""
+    return Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "a1", "label": 0},
+                {"utterance": "a2", "label": 0},
+                {"utterance": "b1", "label": 1},
+                {"utterance": "b2", "label": 1},
+                {"utterance": "c1", "label": 2},
+                {"utterance": "c2", "label": 2},
             ],
             "intents": [
                 {"id": 0, "regex_full_match": [], "regex_partial_match": []},
@@ -153,6 +178,34 @@ def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitt
     assert result.reason is None
 
 
+def test_check_split_readiness_multiclass_too_small_test_split(dataset_three_classes_two_each):
+    """Even with >=2/class, stratification can fail if test split can't include all classes."""
+    result = check_split_readiness(
+        dataset_three_classes_two_each,
+        split=Split.TRAIN,
+        config=DataConfig(validation_size=0.1, separation_ratio=None),
+        allow_oos_in_train=False,
+    )
+    assert result.ready is False
+    assert result.underpopulated_classes == []
+    assert result.reason is not None
+    assert "too few test samples" in result.reason
+
+
+def test_check_split_readiness_multiclass_too_small_train_split(dataset_three_classes_two_each):
+    """Even with >=2/class, stratification can fail if train split can't include all classes."""
+    result = check_split_readiness(
+        dataset_three_classes_two_each,
+        split=Split.TRAIN,
+        config=DataConfig(validation_size=0.8, separation_ratio=None),
+        allow_oos_in_train=False,
+    )
+    assert result.ready is False
+    assert result.underpopulated_classes == []
+    assert result.reason is not None
+    assert "too few train samples" in result.reason
+
+
 def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_barely_enough):
     """Custom min_samples_per_class is respected."""
     result = check_split_readiness(
@@ -204,6 +257,97 @@ def test_check_split_readiness_multilabel_returns_ready():
     assert result.reason is not None
 
 
+def test_check_split_readiness_multilabel_oos_allow_true_checks_oos_label():
+    """Multilabel + OOS + allow_oos_in_train=True should not crash and should include OOS label."""
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "x1", "label": [1, 0]},
+                {"utterance": "x2", "label": [1, 0]},
+                {"utterance": "x3", "label": [0, 1]},
+                {"utterance": "x4", "label": [0, 1]},
+                {"utterance": "oos1", "label": None},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+
+    result = check_split_readiness(
+        dataset,
+        split=Split.TRAIN,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
+        allow_oos_in_train=True,
+    )
+    assert result.ready is False
+    # OOS indicator label is appended -> index == n_classes == 2
+    assert (2, 1) in result.underpopulated_classes
+    assert result.reason is not None
+
+
+def test_check_split_readiness_multilabel_oos_allow_true_ready_when_oos_sufficient():
+    """When OOS count meets minimum, multilabel readiness can be true."""
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "x1", "label": [1, 0]},
+                {"utterance": "x2", "label": [1, 0]},
+                {"utterance": "x3", "label": [0, 1]},
+                {"utterance": "x4", "label": [0, 1]},
+                {"utterance": "oos1", "label": None},
+                {"utterance": "oos2", "label": None},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+
+    result = check_split_readiness(
+        dataset,
+        split=Split.TRAIN,
+        config=DataConfig(validation_size=0.5, separation_ratio=None),
+        allow_oos_in_train=True,
+    )
+    assert result.ready is True
+    assert result.underpopulated_classes == []
+    assert result.reason is None
+
+
+def test_split_dataset_multilabel_oos_allow_true_does_not_raise():
+    """Sanity-check: split_dataset supports multilabel+OOS when allow_oos_in_train=True."""
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "x1", "label": [1, 0]},
+                {"utterance": "x2", "label": [1, 0]},
+                {"utterance": "x3", "label": [0, 1]},
+                {"utterance": "x4", "label": [0, 1]},
+                {"utterance": "oos1", "label": None},
+                {"utterance": "oos2", "label": None},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+    from autointent.context.data_handler import split_dataset
+
+    train, test = split_dataset(
+        dataset,
+        split=Split.TRAIN,
+        test_size=0.5,
+        random_seed=42,
+        allow_oos_in_train=True,
+    )
+    assert len(train) > 0
+    assert len(test) > 0
+
+
 def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samples):
     """When check_split_readiness says ready, split_dataset does not raise."""
     result = check_split_readiness(
@@ -245,3 +389,20 @@ def test_check_split_readiness_underpopulated_implies_split_raises(dataset_under
             random_seed=42,
             allow_oos_in_train=False,
         )
+
+
+def test_stratified_splitter_multilabel_allow_oos_all_oos_raises_value_error():
+    """Multilabel OOS mapping needs an in-domain row to infer label dimensionality."""
+    from datasets import Dataset as HFDataset
+
+    from autointent.context.data_handler._stratification import StratifiedSplitter
+
+    hf_ds = HFDataset.from_list(
+        [
+            {"utterance": "oos1", "label": None},
+            {"utterance": "oos2", "label": None},
+        ]
+    )
+    splitter = StratifiedSplitter(test_size=0.5, label_feature="label", random_seed=0)
+    with pytest.raises(ValueError, match=r"only OOS|infer multilabel dimensionality"):
+        splitter.get_stratify_inputs(hf_ds, multilabel=True, allow_oos_in_train=True)
