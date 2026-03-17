@@ -13,7 +13,7 @@ def test_validate_search_space_multiclass(dataset):
     ]
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
-    with pytest.raises(ValueError, match="Module 'adaptive' does not support multiclass datasets."):
+    with pytest.raises(ValueError, match=r"Module 'adaptive' does not support multiclass datasets."):
         pipeline_optimizer.validate_modules(dataset, mode="raise")
 
 
@@ -28,5 +28,5 @@ def test_validate_search_space_multilabel(dataset):
         },
     ]
     pipeline_optimizer = Pipeline.from_search_space(search_space)
-    with pytest.raises(ValueError, match="Module 'argmax' does not support multilabel datasets."):
+    with pytest.raises(ValueError, match=r"Module 'argmax' does not support multilabel datasets."):
         pipeline_optimizer.validate_modules(dataset, mode="raise")

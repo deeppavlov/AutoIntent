@@ -1,12 +1,16 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 import pytest
 
 from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules import JinoosDecision
 from tests.conftest import setup_environment
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 
 def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float):

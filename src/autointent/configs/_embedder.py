@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC
 from enum import Enum
 from typing import Any, Literal
@@ -52,7 +54,7 @@ class EmbedderConfig(ABC, BaseModel, extra="forbid"):
             prompts[TaskTypeEnum.sts.value] = self.sts_prompt
         return prompts if len(prompts) > 0 else None
 
-    def get_prompt(self, prompt_type: "TaskTypeEnum | None") -> str | None:
+    def get_prompt(self, prompt_type: TaskTypeEnum | None) -> str | None:
         """Get the prompt type for the given task type.
 
         Args:

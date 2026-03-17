@@ -1,10 +1,11 @@
 """Predictor module."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
-import numpy.typing as npt
 from typing_extensions import assert_never
 
 from autointent import Context
@@ -12,7 +13,11 @@ from autointent.context.optimization_info import DecisionArtifact
 from autointent.custom_types import ListOfGenericLabels, ListOfLabelsWithOOS
 from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseModule
-from autointent.schemas import Tag
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.schemas import Tag
 
 
 class BaseDecision(BaseModule, ABC):
@@ -67,7 +72,7 @@ class BaseDecision(BaseModule, ABC):
         decisions = self.predict(val_scores)
         chosen_metrics = {name: fn for name, fn in DECISION_METRICS.items() if name in metrics}
 
-        self._artifact = DecisionArtifact(labels=cast(ListOfLabelsWithOOS, decisions))
+        self._artifact = DecisionArtifact(labels=cast("ListOfLabelsWithOOS", decisions))
         return self.score_metrics_ho((val_labels, decisions), chosen_metrics)
 
     def score_cv(self, context: Context, metrics: list[str]) -> dict[str, float]:
@@ -106,7 +111,7 @@ class BaseDecision(BaseModule, ABC):
             all_val_decisions.append(val_decisions)
 
         flattened_decisions = [pred for pred_list in all_val_decisions for pred in pred_list]
-        self._artifact = DecisionArtifact(labels=cast(ListOfLabelsWithOOS, flattened_decisions))
+        self._artifact = DecisionArtifact(labels=cast("ListOfLabelsWithOOS", flattened_decisions))
         return {name: float(np.mean(values_list)) for name, values_list in metrics_values.items()}
 
     def get_assets(self) -> DecisionArtifact:

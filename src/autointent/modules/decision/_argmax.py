@@ -1,16 +1,21 @@
 """Argmax decision module."""
 
+from __future__ import annotations
+
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 
 from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
 from autointent.modules.base import BaseDecision
-from autointent.schemas import Tag
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent.schemas import Tag
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +55,7 @@ class ArgmaxDecision(BaseDecision):
     def __init__(self) -> None: ...
 
     @classmethod
-    def from_context(cls, context: Context) -> "ArgmaxDecision":
+    def from_context(cls, context: Context) -> ArgmaxDecision:
         """Initialize from context.
 
         Args:

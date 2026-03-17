@@ -1,14 +1,20 @@
+from __future__ import annotations
+
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 from sentence_transformers import SentenceTransformer
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig
 
 from .conftest import backend_configs
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 
 def test_load_from_disk(on_windows):

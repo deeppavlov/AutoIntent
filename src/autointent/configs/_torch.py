@@ -1,9 +1,13 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict, Field
-from typing_extensions import Self
 
 from autointent._utils import detect_device
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class FromDictMixin:

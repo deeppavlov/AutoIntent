@@ -1,25 +1,32 @@
 """Context manager for configuring and managing data handling, vector indexing, and optimization."""
 
+from __future__ import annotations
+
 import logging
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 from typing_extensions import assert_never
 
-from autointent import Dataset
 from autointent._callbacks import CallbackHandler, get_callbacks
 from autointent.configs import (
     CrossEncoderConfig,
-    DataConfig,
     EmbedderConfig,
     HFModelConfig,
     HPOConfig,
     LoggingConfig,
     VectorIndexConfig,
+    get_default_hfmodel_config,
 )
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent import Dataset
+    from autointent.configs import DataConfig
 
 
 class Context:
@@ -194,4 +201,4 @@ class Context:
         """
         if hasattr(self, "transformer_config"):
             return self.transformer_config
-        return HFModelConfig()
+        return get_default_hfmodel_config()

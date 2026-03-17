@@ -39,6 +39,7 @@
       features_type: ["embedding"]
       embedder_config:
         - model_name: prajjwal1/bert-tiny
+          revision: refs/pr/16
     - module_name: bert
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0
@@ -61,7 +62,9 @@
       seed: [0]
       lora_alpha: [16]
     - module_name: ptuning
-      classification_model_config: ["prajjwal1/bert-tiny"]
+      classification_model_config:
+        - model_name: "prajjwal1/bert-tiny"
+          revision: refs/pr/16
       num_train_epochs: [1]
       batch_size: [8, 16]
       num_virtual_tokens: [10, 20]

@@ -1,9 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs import SentenceTransformerEmbeddingConfig
 
 from .conftest import backend_configs
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 
 @pytest.mark.parametrize("embedder_config", backend_configs)
@@ -63,6 +71,5 @@ class TestEmbedderMemory:
         embeddings2 = embedder.embed(["test"])
 
         # Results should be identical (deterministic)
-        import numpy as np
 
         np.testing.assert_allclose(embeddings1, embeddings2, rtol=1e-5)

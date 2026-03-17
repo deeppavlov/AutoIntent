@@ -1,7 +1,10 @@
 """CLI for evolutionary augmenter."""
 
+from __future__ import annotations
+
 import logging
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser
+from typing import TYPE_CHECKING
 
 from autointent import load_dataset
 from autointent.generation import Generator
@@ -12,6 +15,9 @@ from autointent.generation.chat_templates import (
 
 from .evolver import UtteranceEvolver
 from .incremental_evolver import IncrementalUtteranceEvolver
+
+if TYPE_CHECKING:
+    from argparse import Namespace
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)

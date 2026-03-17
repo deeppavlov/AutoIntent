@@ -1,12 +1,16 @@
 """Converter module for metrics."""
 
+from __future__ import annotations
+
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 
-from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
 
 logger = logging.getLogger(__name__)
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from autointent import Context
@@ -107,7 +109,7 @@ class RNNScorer(BaseVocabTorchScorer):
         seed: int = 42,
         vocab_config: VocabConfig | dict[str, Any] | None = None,
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
-    ) -> "RNNScorer":
+    ) -> RNNScorer:
         """Create a RNNScorer from context."""
         return cls(
             embed_dim=embed_dim,

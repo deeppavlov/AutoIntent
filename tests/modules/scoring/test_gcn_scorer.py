@@ -2,9 +2,13 @@ import numpy as np
 import pytest
 import torch
 
+from autointent import Dataset
+from autointent.configs import SentenceTransformerEmbeddingConfig
 from autointent import Dataset, Pipeline
 from autointent.modules.scoring import GCNScorer
 from tests.conftest import get_test_embedder_config
+
+_embedder_config = SentenceTransformerEmbeddingConfig(model_name="prajjwal1/bert-tiny")
 
 
 @pytest.fixture
@@ -44,14 +48,10 @@ def multiclass_dataset():
 
 
 def test_gcn_scorer_multilabel(multilabel_dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     torch.manual_seed(42)
-    scorer = GCNScorer(
-        embedder_config=get_test_embedder_config(),
-        label_embedder_config=get_test_embedder_config(),
-        num_train_epochs=1,
-        batch_size=2,
-        seed=42,
-    )
+    scorer = GCNScorer(embedder_config=_embedder_config, num_train_epochs=1, batch_size=2, seed=42)
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
     descriptions = [intent.name for intent in multilabel_dataset.intents]
@@ -65,14 +65,10 @@ def test_gcn_scorer_multilabel(multilabel_dataset):
 
 
 def test_gcn_scorer_multiclass(multiclass_dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     torch.manual_seed(42)
-    scorer = GCNScorer(
-        embedder_config=get_test_embedder_config(),
-        label_embedder_config=get_test_embedder_config(),
-        num_train_epochs=1,
-        batch_size=2,
-        seed=42,
-    )
+    scorer = GCNScorer(embedder_config=_embedder_config, num_train_epochs=1, batch_size=2, seed=42)
     train_utterances = multiclass_dataset["train"]["utterance"]
     train_labels = multiclass_dataset["train"]["label"]
     descriptions = [intent.name for intent in multiclass_dataset.intents]
@@ -87,14 +83,10 @@ def test_gcn_scorer_multiclass(multiclass_dataset):
 
 
 def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     torch.manual_seed(42)
-    scorer = GCNScorer(
-        embedder_config=get_test_embedder_config(),
-        label_embedder_config=get_test_embedder_config(),
-        num_train_epochs=1,
-        batch_size=2,
-        seed=42,
-    )
+    scorer = GCNScorer(embedder_config=_embedder_config, num_train_epochs=1, batch_size=2, seed=42)
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
     descriptions = [intent.name for intent in multilabel_dataset.intents]

@@ -1,10 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderConfig
+from autointent.configs import TaskTypeEnum
 
 from .conftest import backend_configs, create_sentence_transformer_config
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 
 @pytest.mark.parametrize("embedder_config", backend_configs)
@@ -95,8 +102,6 @@ class TestSentenceTransformerCachingSpecific:
             passage_prompt="Document:",
         )
         embedder = Embedder(config)
-
-        from autointent.configs import TaskTypeEnum
 
         # Same text with different prompts should be cached separately
         query_emb = embedder.embed(["test"], TaskTypeEnum.query)

@@ -1,11 +1,14 @@
 """Configuration for the nodes."""
 
-from typing import Any
+from __future__ import annotations
 
-from autointent.custom_types import NodeType
+from typing import TYPE_CHECKING, Any
 
-from ._embedder import EmbedderConfig
-from ._transformers import CrossEncoderConfig
+if TYPE_CHECKING:
+    from autointent.custom_types import NodeType
+
+    from ._embedder import EmbedderConfig
+    from ._transformers import CrossEncoderConfig
 
 
 class InferenceNodeConfig:

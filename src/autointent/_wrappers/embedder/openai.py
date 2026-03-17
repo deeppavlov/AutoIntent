@@ -1,23 +1,33 @@
+from __future__ import annotations
+
 import asyncio
+import json
 import logging
 import os
 from functools import partial
-from pathlib import Path
-from typing import Literal, TypedDict, cast, overload
+from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
 
 import aiometer
 import numpy as np
 import numpy.typing as npt
-import openai
 import torch
-from typing_extensions import NotRequired
 
 from autointent._hash import Hasher
-from autointent.configs import TaskTypeEnum
+from autointent._utils import require
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
+    import openai
+    from typing_extensions import NotRequired
+
+    from autointent.configs import TaskTypeEnum
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +41,17 @@ class EmbeddingsCreateKwargs(TypedDict):
 class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
     """OpenAI-based embedding backend implementation."""
 
+    _client: openai.OpenAI | None = None
+    _async_client: openai.AsyncOpenAI | None = None
+
     def __init__(self, config: OpenaiEmbeddingConfig) -> None:
         """Initialize the OpenAI backend.
 
         Args:
             config: Configuration for OpenAI embeddings.
         """
+        require("openai", "openai")
         self.config = config
-        self._client: openai.OpenAI | None = None
-        self._async_client: openai.AsyncOpenAI | None = None
         self._event_loop: asyncio.AbstractEventLoop | None = None
 
         if config.max_concurrent is not None:
@@ -47,6 +59,8 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_client(self) -> openai.OpenAI:
         """Get or create OpenAI client instance."""
+        import openai
+
         if self._client is None:
             self._client = openai.OpenAI(
                 timeout=self.config.timeout,
@@ -57,6 +71,8 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _get_async_client(self) -> openai.AsyncOpenAI:
         """Get or create async OpenAI client instance."""
+        import openai
+
         if self._async_client is None:
             self._async_client = openai.AsyncOpenAI(
                 timeout=self.config.timeout,
@@ -133,7 +149,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
+                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
                 if return_tensors:
                     return torch.from_numpy(embeddings_np)
                 return embeddings_np
@@ -258,7 +274,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Calculate cosine similarity
         similarity_matrix = np.dot(normalized1, normalized2.T)
-        return cast(npt.NDArray[np.float32], similarity_matrix)
+        return cast("npt.NDArray[np.float32]", similarity_matrix)
 
     def dump(self, path: Path) -> None:
         """Save the backend state to disk.
@@ -266,8 +282,6 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         Args:
             path: Path to the directory where the backend will be saved.
         """
-        import json
-
         path.mkdir(parents=True, exist_ok=True)
 
         # Save the configuration
@@ -276,7 +290,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             json.dump(self.config.model_dump(mode="json"), file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "OpenaiEmbeddingBackend":
+    def load(cls, path: Path) -> OpenaiEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:
@@ -285,8 +299,6 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             Loaded backend instance.
         """
-        import json
-
         # Load configuration
         config_path = path / "config.json"
         with config_path.open("r", encoding="utf-8") as file:

@@ -4,6 +4,8 @@ This module defines data models for managing artifacts and trials in the pipelin
 including their configurations, outputs, and optimization details.
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 import numpy as np
@@ -66,7 +68,7 @@ class ScorerArtifact(Artifact):
         return data
 
     @classmethod
-    def model_validate(cls, obj: dict[str, Any]) -> "ScorerArtifact":
+    def model_validate(cls, obj: dict[str, Any]) -> ScorerArtifact:
         """Convert lists back to numpy arrays during validation."""
         if obj.get("train_scores") is not None:
             obj["train_scores"] = np.array(obj["train_scores"])
@@ -143,7 +145,7 @@ class Artifacts(BaseModel):
         return data
 
     @classmethod
-    def model_validate(cls, obj: dict[str, Any]) -> "Artifacts":
+    def model_validate(cls, obj: dict[str, Any]) -> Artifacts:
         """Convert the dictionary back to an Artifacts instance, ensuring nested artifacts are properly deserialized."""
         # First convert the lists back to numpy arrays in the scoring artifacts
         if "scoring" in obj and obj["scoring"] is not None:

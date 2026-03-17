@@ -4,6 +4,8 @@ This module provides functionality for ranking retrieved sentences by meaning cl
 to provided utterances using cross-encoder models.
 """
 
+from __future__ import annotations
+
 import gc
 import itertools as it
 import json
@@ -14,17 +16,19 @@ from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import joblib
 import numpy as np
-import numpy.typing as npt
 import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
 from autointent._utils import require
 from autointent.configs import CrossEncoderConfig
-from autointent.custom_types import ListOfLabels, RerankedItem
+from autointent.custom_types import RerankedItem
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
     import sentence_transformers as st
+
+    from autointent.custom_types import ListOfLabels
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +102,7 @@ class Ranker:
     _metadata_file_name = "metadata.json"
     _classifier_file_name = "classifier.joblib"
     config: CrossEncoderConfig
-    cross_encoder: "st.CrossEncoder"
+    cross_encoder: st.CrossEncoder
 
     def __init__(
         self,
@@ -114,14 +118,15 @@ class Ranker:
             output_range: Range of the output probabilities ([0, 1] for sigmoid, [-1, 1] for tanh)
         """
         # Lazy import sentence-transformers
-        st = require("sentence_transformers", extra="sentence-transformers")
+        require("sentence_transformers", extra="sentence-transformers")
+        from sentence_transformers import CrossEncoder
 
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
-        self.cross_encoder = st.CrossEncoder(
+        self.cross_encoder = CrossEncoder(
             self.config.model_name,
             trust_remote_code=self.config.trust_remote_code,
             device=self.config.device,
-            max_length=self.config.tokenizer_config.max_length,
+            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
         )
         self._train_head = False
         self._clf = classifier_head
@@ -164,7 +169,7 @@ class Ranker:
         self.cross_encoder.predict(pairs, batch_size=self.config.batch_size)
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
-        return res  # type: ignore[no-any-return]
+        return res
 
     def _fit(self, pairs: list[tuple[str, str]], labels: ListOfLabels) -> None:
         """Train the logistic regression model on cross-encoder features.
@@ -274,7 +279,7 @@ class Ranker:
         joblib.dump(self._clf, dump_dir / self._classifier_file_name)
 
     @classmethod
-    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> "Ranker":
+    def load(cls, path: Path, override_config: CrossEncoderConfig | None = None) -> Ranker:
         """Load the model and classifier from disk.
 
         Args:

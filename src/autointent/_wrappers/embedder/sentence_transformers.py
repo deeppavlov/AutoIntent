@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import json
 import logging
 import tempfile
 from functools import lru_cache
@@ -7,23 +10,25 @@ from uuid import uuid4
 
 import huggingface_hub
 import numpy as np
-import numpy.typing as npt
 import torch
 from datasets import Dataset
 from sklearn.model_selection import train_test_split
 
 from autointent._hash import Hasher
 from autointent._utils import require
-from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
-from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
 from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
     from sentence_transformers import SentenceTransformer
     from transformers import TrainerCallback
+
+    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.custom_types import ListOfLabels
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +54,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
     """SentenceTransformer-based embedding backend implementation."""
 
     supports_training: bool = True
-    _model: "SentenceTransformer | None"
+    _model: SentenceTransformer | None
 
     def __init__(self, config: SentenceTransformerEmbeddingConfig) -> None:
         """Initialize the SentenceTransformer backend.
@@ -70,17 +75,20 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             self._model = None
             torch.cuda.empty_cache()
 
-    def _load_model(self) -> "SentenceTransformer":
+    def _load_model(self) -> SentenceTransformer:
         """Load sentence transformers model to device."""
         if self._model is None:
             # Lazy import sentence-transformers
-            st = require("sentence_transformers", extra="sentence-transformers")
-            res = st.SentenceTransformer(
+            require("sentence_transformers", extra="sentence-transformers")
+            from sentence_transformers import SentenceTransformer
+
+            res = SentenceTransformer(
                 self.config.model_name,
                 device=self.config.device,
                 prompts=self.config.get_prompt_config(),
                 similarity_fn_name=self.config.similarity_fn_name,
                 trust_remote_code=self.config.trust_remote_code,
+                revision=self.config.revision,
             )
             self._model = res
         return self._model
@@ -143,7 +151,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             embeddings_path = get_embeddings_path(hasher.hexdigest())
             if embeddings_path.exists():
                 logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast(npt.NDArray[np.float32], np.load(embeddings_path))
+                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
                 if return_tensors:
                     device = self.config.device or "cpu"
                     return torch.from_numpy(embeddings_np).to(device)
@@ -174,7 +182,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             )
         else:
             embeddings = cast(
-                npt.NDArray[np.float32],
+                "npt.NDArray[np.float32]",
                 model.encode(
                     utterances,
                     convert_to_numpy=True,
@@ -233,16 +241,24 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         model = self._load_model()
 
         # Lazy import sentence-transformers training components (only needed for fine-tuning)
-        st = require("sentence_transformers", extra="sentence-transformers")
-        transformers = require("transformers", extra="transformers")
+        require("sentence_transformers", extra="sentence-transformers")
+        require("transformers", extra="transformers")
+        require("accelerate", extra="transformers")
+        from sentence_transformers import (
+            SentenceTransformerTrainer,
+            SentenceTransformerTrainingArguments,
+            losses,
+            training_args,
+        )
+        from transformers import EarlyStoppingCallback
 
         x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
         tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
         val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
 
-        loss = st.losses.BatchAllTripletLoss(model=model, margin=config.margin)
+        loss = losses.BatchAllTripletLoss(model=model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            args = st.SentenceTransformerTrainingArguments(
+            args = SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
                 save_total_limit=1,
                 output_dir=tmp_dir,
@@ -253,19 +269,19 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
                 bf16=config.bf16,
-                batch_sampler=st.training_args.BatchSamplers.NO_DUPLICATES,
+                batch_sampler=training_args.BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
             callbacks: list[TrainerCallback] = [
-                transformers.EarlyStoppingCallback(
+                EarlyStoppingCallback(
                     early_stopping_patience=config.early_stopping_patience,
                     early_stopping_threshold=config.early_stopping_threshold,
                 )
             ]
-            trainer = st.SentenceTransformerTrainer(
+            trainer = SentenceTransformerTrainer(
                 model=model,
                 args=args,
                 train_dataset=tr_ds,
@@ -289,8 +305,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         Args:
             path: Path to the directory where the backend will be saved.
         """
-        import json
-
         path.mkdir(parents=True, exist_ok=True)
 
         # Save the configuration
@@ -309,7 +323,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 json.dump({"trained": True}, file, indent=4)
 
     @classmethod
-    def load(cls, path: Path) -> "SentenceTransformerEmbeddingBackend":
+    def load(cls, path: Path) -> SentenceTransformerEmbeddingBackend:
         """Load the backend state from disk.
 
         Args:
@@ -318,8 +332,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         Returns:
             Loaded backend instance.
         """
-        import json
-
         # Load configuration
         config_path = path / "config.json"
         with config_path.open("r", encoding="utf-8") as file:
@@ -342,6 +354,6 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         if training_state_path.exists():
             with training_state_path.open("r", encoding="utf-8") as file:
                 training_state = json.load(file)
-            instance._trained = training_state.get("trained", False)  # noqa: SLF001
+            instance._trained = training_state.get("trained", False)
 
         return instance

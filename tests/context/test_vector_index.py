@@ -1,13 +1,22 @@
+from __future__ import annotations
+
+import sys
 import tempfile
+import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from autointent import VectorIndex
+from autointent.configs import FaissConfig, OpenSearchConfig, get_default_embedder_config
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
 from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
+
+if TYPE_CHECKING:
+    from autointent.configs import EmbedderConfig
 
 # Check if opensearch-py is available
 opensearch_available = True
@@ -15,6 +24,8 @@ try:
     import opensearchpy
 except ImportError:
     opensearch_available = False
+
+pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
 
 
 def is_opensearch_running() -> bool:
@@ -64,8 +75,6 @@ class TestVectorIndex:
         """Create a VectorIndex instance for testing."""
         # For OpenSearch, ensure unique index names to avoid test interference
         if isinstance(vector_config, OpenSearchConfig):
-            import uuid
-
             unique_id = str(uuid.uuid4())[:8]
             vector_config.index_name = f"test_index_{unique_id}"
 
@@ -294,7 +303,6 @@ class TestVectorIndexEdgeCases:
     def test_opensearch_dependency_error(self, monkeypatch):
         """Test OpenSearch dependency error handling."""
         # Mock opensearchpy import to fail
-        import sys
 
         original_modules = sys.modules.copy()
 
@@ -304,7 +312,7 @@ class TestVectorIndexEdgeCases:
                 del sys.modules["opensearchpy"]
 
             # Mock import to raise ImportError
-            def mock_import(name, *args, **kwargs):  # noqa: ARG001
+            def mock_import(name, *args, **kwargs):
                 if name == "opensearchpy":
                     msg = "No module named opensearchpy"
                     raise ImportError(msg)

@@ -1,7 +1,11 @@
-from pathlib import Path
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from autointent._callbacks.base import OptimizerCallback
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class CallbackHandler(OptimizerCallback):

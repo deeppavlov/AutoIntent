@@ -1,7 +1,7 @@
 """Utils."""
 
 import importlib
-from typing import Any, TypeVar
+from typing import TypeVar
 
 import torch
 
@@ -28,7 +28,7 @@ def detect_device() -> str:
     return "cpu"
 
 
-def require(dependency: str, extra: str | None = None) -> Any:  # noqa: ANN401
+def require(dependency: str, extra: str | None = None) -> None:
     """Try to import dependency, raise informative ImportError if missing.
 
     Args:
@@ -42,7 +42,7 @@ def require(dependency: str, extra: str | None = None) -> Any:  # noqa: ANN401
         ImportError: If the dependency is not installed
     """
     try:
-        return importlib.import_module(dependency)
+        importlib.import_module(dependency)
     except ImportError as e:
         extra_info = f" Install with `pip install autointent[{extra}]`." if extra else ""
         msg = f"Missing dependency '{dependency}' required for this feature.{extra_info}"

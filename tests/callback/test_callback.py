@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Any
 
 import numpy as np
+import pytest
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
@@ -52,6 +53,8 @@ class DummyCallback(OptimizerCallback):
 
 
 def test_pipeline_callbacks(dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     project_dir = setup_environment()
 
     search_space = [
@@ -145,6 +148,7 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "sts_prompt": None,
                         "query_prompt": None,
+                        "revision": None,
                         "passage_prompt": None,
                         "similarity_fn_name": None,
                         "use_cache": True,
@@ -176,6 +180,7 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "sts_prompt": None,
                         "query_prompt": None,
+                        "revision": None,
                         "passage_prompt": None,
                         "similarity_fn_name": None,
                         "use_cache": True,
@@ -203,6 +208,7 @@ def test_pipeline_callbacks(dataset):
                         "cluster_prompt": None,
                         "sts_prompt": None,
                         "query_prompt": None,
+                        "revision": None,
                         "passage_prompt": None,
                         "similarity_fn_name": None,
                         "use_cache": True,

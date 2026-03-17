@@ -63,6 +63,8 @@ class TestTransformers:
 
 class TestVectorIndex:
     def init_attributes(self):
+        pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
         self.vector_index = VectorIndex(
             embedder_config=get_test_embedder_config(),
             config=FaissConfig(),

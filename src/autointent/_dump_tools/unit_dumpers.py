@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 import importlib
 import json
 import logging
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
 import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
+import peft
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
@@ -19,6 +21,8 @@ from autointent.schemas import TagsList
 from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from catboost import CatBoostClassifier
     from peft import PeftModel
     from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
@@ -35,7 +39,7 @@ class TagsListDumper(BaseObjectDumper[TagsList]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> TagsList:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> TagsList:  # noqa: ANN401
         return TagsList.load(path)
 
     @classmethod
@@ -53,7 +57,7 @@ class SimpleAttributesDumper(BaseObjectDumper[dict[str, ModuleSimpleAttributes]]
             json.dump(obj, file, ensure_ascii=False, indent=4)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> dict[str, ModuleSimpleAttributes]:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> dict[str, ModuleSimpleAttributes]:  # noqa: ANN401
         with path.open(encoding="utf-8") as file:
             return json.load(file)  # type: ignore[no-any-return]
 
@@ -72,7 +76,7 @@ class ArraysDumper(BaseObjectDumper[dict[str, npt.NDArray[Any]]]):
         np.savez(path, allow_pickle=False, **obj)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> dict[str, npt.NDArray[Any]]:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> dict[str, npt.NDArray[Any]]:  # noqa: ANN401
         return dict(np.load(path))
 
     @classmethod
@@ -107,7 +111,7 @@ class VectorIndexDumper(BaseObjectDumper[VectorIndex]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> VectorIndex:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> VectorIndex:  # noqa: ANN401
         return VectorIndex.load(path)
 
     @classmethod
@@ -124,7 +128,7 @@ class EstimatorDumper(BaseObjectDumper[BaseEstimator]):
         joblib.dump(obj, path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseEstimator:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseEstimator:  # noqa: ANN401
         return joblib.load(path)
 
     @classmethod
@@ -164,14 +168,14 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
     @staticmethod
     async def dump_async(obj: BaseModel, path: Path, exists_ok: bool) -> None:
         class_info = {"name": obj.__class__.__name__, "module": obj.__class__.__module__}
-        path.mkdir(parents=True, exist_ok=exists_ok)
+        path.mkdir(parents=True, exist_ok=exists_ok)  # noqa: ASYNC240
         async with aiofiles.open(path / "class_info.json", mode="w", encoding="utf-8") as file:
             await file.write(json.dumps(class_info, ensure_ascii=False, indent=4))
         async with aiofiles.open(path / "model_dump.json", mode="w", encoding="utf-8") as file:
             await file.write(json.dumps(obj.model_dump(), ensure_ascii=False, indent=4))
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401
         with (path / "model_dump.json").open("r", encoding="utf-8") as file:
             content = json.load(file)
 
@@ -183,7 +187,7 @@ class PydanticModelDumper(BaseObjectDumper[BaseModel]):
         return model_type.model_validate(content)  # type: ignore[no-any-return]
 
     @staticmethod
-    async def load_async(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401, ARG004
+    async def load_async(path: Path, **kwargs: Any) -> BaseModel:  # noqa: ANN401
         async with aiofiles.open(path / "model_dump.json", encoding="utf-8") as file:
             content_str = await file.read()
             content = json.loads(content_str)
@@ -205,7 +209,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     dir_or_file_name = "peft_models"
 
     @staticmethod
-    def dump(obj: "PeftModel", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PeftModel, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         if obj._is_prompt_learning:  # noqa: SLF001
             # strategy to save prompt learning models: save prompt encoder and bert classifier separately
@@ -221,14 +225,16 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             merged_model.save_pretrained(lora_path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> "PeftModel":  # noqa: ANN401, ARG004
-        peft = require("peft", extra="peft")
-        transformers = require("transformers", extra="transformers")
+    def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401
+        require("peft", extra="peft")
+        require("transformers", extra="transformers")
+        import transformers
+
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
             model = transformers.AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
-            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")  # type: ignore[no-any-return]
+            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
@@ -239,7 +245,9 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            peft = require("peft", extra="peft")
+            require("peft", extra="peft")
+            import peft
+
             return isinstance(obj, peft.PeftModel)
         except ImportError:
             return False
@@ -249,19 +257,23 @@ class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
     dir_or_file_name = "hf_models"
 
     @staticmethod
-    def dump(obj: "PreTrainedModel", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PreTrainedModel, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> "PreTrainedModel":  # noqa: ANN401, ARG004
-        transformers = require("transformers", extra="transformers")
+    def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401
+        require("transformers", extra="transformers")
+        import transformers
+
         return transformers.AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            transformers = require("transformers", extra="transformers")
+            require("transformers", extra="transformers")
+            import transformers
+
             return isinstance(obj, transformers.PreTrainedModel)
         except ImportError:
             return False
@@ -271,19 +283,23 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
     dir_or_file_name = "hf_tokenizers"
 
     @staticmethod
-    def dump(obj: "PreTrainedTokenizer | PreTrainedTokenizerFast", path: Path, exists_ok: bool) -> None:
+    def dump(obj: PreTrainedTokenizer | PreTrainedTokenizerFast, path: Path, exists_ok: bool) -> None:
         path.mkdir(parents=True, exist_ok=exists_ok)
         obj.save_pretrained(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> "PreTrainedTokenizer | PreTrainedTokenizerFast":  # noqa: ANN401, ARG004
-        transformers = require("transformers", extra="transformers")
-        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return]
+    def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401
+        require("transformers", extra="transformers")
+        import transformers
+
+        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            transformers = require("transformers", extra="transformers")
+            require("transformers", extra="transformers")
+            import transformers
+
             return isinstance(obj, transformers.PreTrainedTokenizer | transformers.PreTrainedTokenizerFast)
         except ImportError:
             return False
@@ -304,7 +320,7 @@ class TorchModelDumper(BaseObjectDumper[BaseTorchModule]):
         obj.dump(path)
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> BaseTorchModule:  # noqa: ANN401, ARG004
+    def load(path: Path, **kwargs: Any) -> BaseTorchModule:  # noqa: ANN401
         with (path / "class_info.json").open("r") as f:
             class_info = json.load(f)
         module = importlib.import_module(class_info["module"])
@@ -320,21 +336,25 @@ class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
     dir_or_file_name = "catboost_models"
 
     @staticmethod
-    def dump(obj: "CatBoostClassifier", path: Path, exists_ok: bool) -> None:  # noqa: ARG004
+    def dump(obj: CatBoostClassifier, path: Path, exists_ok: bool) -> None:  # noqa: ARG004
         path.parent.mkdir(parents=True, exist_ok=True)
         obj.save_model(str(path), format="cbm")
 
     @staticmethod
-    def load(path: Path, **kwargs: Any) -> "CatBoostClassifier":  # noqa: ANN401, ARG004
-        catboost = require("catboost", extra="catboost")
-        model = catboost.CatBoostClassifier()
+    def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401
+        require("catboost", extra="catboost")
+        from catboost import CatBoostClassifier
+
+        model = CatBoostClassifier()
         model.load_model(str(path))
         return model
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            catboost = require("catboost", extra="catboost")
-            return isinstance(obj, catboost.CatBoostClassifier)
+            require("catboost", extra="catboost")
+            from catboost import CatBoostClassifier
+
+            return isinstance(obj, CatBoostClassifier)
         except ImportError:
             return False

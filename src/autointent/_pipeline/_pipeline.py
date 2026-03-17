@@ -1,5 +1,7 @@
 """Pipeline optimizer."""
 
+from __future__ import annotations
+
 import json
 import logging
 from pathlib import Path
@@ -9,7 +11,7 @@ import numpy as np
 import yaml
 from typing_extensions import assert_never
 
-from autointent import Context, Dataset, OptimizationConfig
+from autointent import Context, OptimizationConfig
 from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
@@ -20,9 +22,10 @@ from autointent.configs import (
     LoggingConfig,
     VectorIndexConfig,
     get_default_embedder_config,
+    get_default_hfmodel_config,
     get_default_vector_index_config,
 )
-from autointent.custom_types import ListOfGenericLabels, NodeType, SearchSpacePreset, SearchSpaceValidationMode
+from autointent.custom_types import NodeType
 from autointent.metrics import DECISION_METRICS, DICISION_METRICS_MULTILABEL
 from autointent.nodes import InferenceNode, NodeOptimizer
 from autointent.utils import load_preset, load_search_space
@@ -30,6 +33,8 @@ from autointent.utils import load_preset, load_search_space
 from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.custom_types import ListOfGenericLabels, SearchSpacePreset, SearchSpaceValidationMode
     from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
 
 
@@ -60,7 +65,7 @@ class Pipeline:
             self.embedder_config = get_default_embedder_config()
             self.cross_encoder_config = CrossEncoderConfig()
             self.data_config = DataConfig()
-            self.transformer_config = HFModelConfig()
+            self.transformer_config = get_default_hfmodel_config()
             self.hpo_config = HPOConfig()
             self.vector_index_config = get_default_vector_index_config()
         elif not isinstance(nodes[0], InferenceNode):
@@ -99,7 +104,7 @@ class Pipeline:
             assert_never(config)
 
     @classmethod
-    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int | None = 42) -> "Pipeline":
+    def from_search_space(cls, search_space: list[dict[str, Any]] | Path | str, seed: int | None = 42) -> Pipeline:
         """Instantiate pipeline optimizer from given search space.
 
         Args:
@@ -112,14 +117,14 @@ class Pipeline:
         return cls(nodes=nodes, seed=seed)
 
     @classmethod
-    def from_preset(cls, name: SearchSpacePreset, seed: int = 42) -> "Pipeline":
+    def from_preset(cls, name: SearchSpacePreset, seed: int = 42) -> Pipeline:
         """Instantiate pipeline optimizer from a preset."""
         optimization_config = load_preset(name)
         config = OptimizationConfig(seed=seed, **optimization_config)
         return cls.from_optimization_config(config=config)
 
     @classmethod
-    def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> "Pipeline":
+    def from_optimization_config(cls, config: dict[str, Any] | Path | str | OptimizationConfig) -> Pipeline:
         """Create pipeline optimizer from optimization config.
 
         Args:
@@ -320,7 +325,7 @@ class Pipeline:
                 node.validate_nodes_with_dataset(dataset, mode)
 
     @classmethod
-    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> "Pipeline":
+    def from_config(cls, nodes_configs: list[InferenceNodeConfig]) -> Pipeline:
         """Create inference pipeline from config.
 
         Args:
@@ -335,7 +340,7 @@ class Pipeline:
         path: str | Path,
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> "Pipeline":
+    ) -> Pipeline:
         """Load pipeline in inference mode.
 
         Args:

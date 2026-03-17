@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import importlib.resources as ires
-from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import pytest
 
 from autointent import Dataset
 from autointent.utils import load_search_space
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def setup_environment() -> Path:

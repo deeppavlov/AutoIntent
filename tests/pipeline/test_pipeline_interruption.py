@@ -114,7 +114,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
 
     # Additionally, verify that total trials increased
     for db_file in db_files_second_run:
-        if db_file.name in ["NodeType.scoring_knn.db"]:
+        if db_file.name == "NodeType.scoring_knn.db":
             trials_after_second_run = count_trials_in_database(db_file)
             assert trials_after_second_run > trials_after_first_run[db_file.name], (
                 f"Database {db_file.name} did not have more trials after second run "

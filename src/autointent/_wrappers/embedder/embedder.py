@@ -4,30 +4,36 @@ This module provides the `Embedder` class for managing, persisting, and loading
 embedding models and calculating embeddings for input texts using different backends.
 """
 
+from __future__ import annotations
+
 import importlib
 import json
 import logging
 from pathlib import Path
-from typing import Literal, overload
+from typing import TYPE_CHECKING, Literal, overload
 
-import numpy as np
-import numpy.typing as npt
-import torch
+from autointent.configs._embedder import OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
 
+from .openai import OpenaiEmbeddingBackend
+from .sentence_transformers import SentenceTransformerEmbeddingBackend
 from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
-from autointent.configs._embedder import (
-    EmbedderConfig,
-    HashingVectorizerEmbeddingConfig,
-    OpenaiEmbeddingConfig,
-    SentenceTransformerEmbeddingConfig,
-)
+from autointent.configs._embedder import EmbedderConfig, OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
 from autointent.custom_types import ListOfLabels
 
 from .base import BaseEmbeddingBackend
-from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
 
+if TYPE_CHECKING:
+    import numpy as np
+    import numpy.typing as npt
+    import torch
+
+
+    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.configs._embedder import EmbedderConfig
+    from autointent.custom_types import ListOfLabels
+    from .base import BaseEmbeddingBackend
 logger = logging.getLogger(__name__)
 
 
@@ -116,7 +122,7 @@ class Embedder:
             json.dump(self.config.model_dump(), file, ensure_ascii=False, indent=4)
 
     @classmethod
-    def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> "Embedder":
+    def load(cls, path: Path | str, override_config: EmbedderConfig | None = None) -> Embedder:
         """Load the embedding model and metadata from disk.
 
         Args:
@@ -152,7 +158,7 @@ class Embedder:
         # Load the appropriate backend
         backend_path = path / cls._backend_path
         if isinstance(config, SentenceTransformerEmbeddingConfig):
-            instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)  # noqa: SLF001
+            instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)
         elif isinstance(config, OpenaiEmbeddingConfig):
             instance._backend = OpenaiEmbeddingBackend.load(backend_path)  # noqa: SLF001
         elif isinstance(config, HashingVectorizerEmbeddingConfig):

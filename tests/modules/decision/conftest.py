@@ -8,6 +8,8 @@ from tests.conftest import get_test_embedder_config
 
 @pytest.fixture
 def multiclass_fit_data(dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     data_handler = DataHandler(dataset)
 
     knn_params = {
@@ -25,6 +27,8 @@ def multiclass_fit_data(dataset):
 
 @pytest.fixture
 def multilabel_fit_data(dataset):
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     data_handler = DataHandler(dataset.to_multilabel())
 
     knn_params = {

@@ -1,5 +1,7 @@
 """Node optimizer for optimizing module configurations."""
 
+from __future__ import annotations
+
 import gc
 import itertools as it
 import json
@@ -7,18 +9,22 @@ import logging
 import os
 from copy import deepcopy
 from functools import partial
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import optuna
 import torch
-from optuna.trial import Trial
 
-from autointent import Dataset
-from autointent.context import Context
-from autointent.custom_types import NodeType, SearchSpaceValidationMode
 from autointent.nodes.info import NODES_INFO
-from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, ParamSpaceT, SearchSpaceConfig
+from autointent.schemas.node_validation import ParamSpaceFloat, ParamSpaceInt, SearchSpaceConfig
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from optuna.trial import Trial
+
+    from autointent import Context, Dataset
+    from autointent.custom_types import NodeType, SearchSpaceValidationMode
+    from autointent.schemas.node_validation import ParamSpaceT
 
 logger = logging.getLogger(__name__)
 

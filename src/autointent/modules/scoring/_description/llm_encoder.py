@@ -1,26 +1,30 @@
 """LLMDescriptionScorer class for scoring utterances based on intent descriptions using LLM."""
 
+from __future__ import annotations
+
 import asyncio
 import logging
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import aiometer
 import numpy as np
-from numpy.typing import NDArray
 from pydantic import BaseModel, Field, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
 from autointent import Context
 from autointent._dump_tools import Dumper
-from autointent.configs._embedder import EmbedderConfig
-from autointent.configs._transformers import CrossEncoderConfig
 from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Message, Role
 
 from .base import BaseDescriptionScorer
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +125,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         max_concurrent: PositiveInt | None = 15,
         max_per_second: PositiveInt = 10,
         max_retries: PositiveInt = 3,
-    ) -> "LLMDescriptionScorer":
+    ) -> LLMDescriptionScorer:
         return cls(
             temperature=temperature,
             generator_config=generator_config,
@@ -156,7 +160,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
             List of messages for the LLM
         """
         descriptions_text = "\n".join(
-            f"<description_{i+1}>\n{desc}\n</description_{i+1}>" for i, desc in enumerate(descriptions)
+            f"<description_{i + 1}>\n{desc}\n</description_{i + 1}>" for i, desc in enumerate(descriptions)
         )
 
         content = dedent(
@@ -288,7 +292,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         path: str,
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
-    ) -> "LLMDescriptionScorer":
+    ) -> LLMDescriptionScorer:
         instance = super().load(path=path, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
         instance._init_event_loop()  # noqa: SLF001
         return instance

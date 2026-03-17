@@ -1,10 +1,11 @@
 """BertScorer class for transformer-based classification with LoRA."""
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 from autointent import Context
-from autointent._callbacks import REPORTERS_NAMES
 from autointent._dump_tools import Dumper
 from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
@@ -12,6 +13,8 @@ from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
     from peft import LoraConfig
+
+    from autointent._callbacks import REPORTERS_NAMES
 
 
 class BERTLoRAScorer(BertScorer):
@@ -58,7 +61,7 @@ class BERTLoRAScorer(BertScorer):
 
     name = "lora"
 
-    _lora_config: "LoraConfig"
+    _lora_config: LoraConfig
 
     def __init__(
         self,
@@ -72,11 +75,10 @@ class BERTLoRAScorer(BertScorer):
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import peft
-        peft = require("peft", extra="peft")
-        self._LoraConfig = peft.LoraConfig
-        self._get_peft_model = peft.get_peft_model
+        require("peft", extra="peft")
+        from peft import LoraConfig
 
-        # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
+        # early stopping doesn't work with lora for now https://github.com/huggingface/transformers/issues/38130
         early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
 
         super().__init__(
@@ -89,7 +91,7 @@ class BERTLoRAScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             print_progress=print_progress,
         )
-        self._lora_config = self._LoraConfig(**lora_kwargs)
+        self._lora_config = LoraConfig(**lora_kwargs)
 
     @classmethod
     def from_context(
@@ -101,7 +103,7 @@ class BERTLoRAScorer(BertScorer):
         learning_rate: float = 5e-5,
         seed: int = 0,
         **lora_kwargs: Any,  # noqa: ANN401
-    ) -> "BERTLoRAScorer":
+    ) -> BERTLoRAScorer:
         if classification_model_config is None:
             classification_model_config = context.resolve_transformer()
         return cls(
@@ -116,7 +118,11 @@ class BERTLoRAScorer(BertScorer):
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
         model = super()._initialize_model()
-        return self._get_peft_model(model, self._lora_config)
+        from peft import get_peft_model
+
+        return get_peft_model(model, self._lora_config)
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[self._LoraConfig])
+        from peft import LoraConfig
+
+        Dumper.dump(self, Path(path), exclude=[LoraConfig])

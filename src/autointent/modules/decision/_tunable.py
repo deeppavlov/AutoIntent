@@ -1,21 +1,27 @@
 """Tunable predictor module."""
 
-from typing import Any, Literal, get_args
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal, get_args
 
 import numpy as np
-import numpy.typing as npt
 import optuna
-from optuna.trial import Trial
 from pydantic import PositiveInt
 
-from autointent.context import Context
+from autointent import Context
 from autointent.custom_types import ListOfGenericLabels
 from autointent.exceptions import MismatchNumClassesError
-from autointent.metrics import DECISION_METRICS, DecisionMetricFn
+from autointent.metrics import DECISION_METRICS
 from autointent.modules.base import BaseDecision
-from autointent.schemas import Tag
 
 from ._threshold import multiclass_predict, multilabel_predict
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+    from optuna.trial import Trial
+
+    from autointent.metrics import DecisionMetricFn
+    from autointent.schemas import Tag
 
 MetricType = Literal["decision_accuracy", "decision_f1", "decision_roc_auc", "decision_precision", "decision_recall"]
 
@@ -101,7 +107,7 @@ class TunableDecision(BaseDecision):
     @classmethod
     def from_context(
         cls, context: Context, target_metric: MetricType = "decision_accuracy", n_optuna_trials: PositiveInt = 320
-    ) -> "TunableDecision":
+    ) -> TunableDecision:
         """Initialize from context.
 
         Args:

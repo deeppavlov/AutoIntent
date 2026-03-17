@@ -5,14 +5,20 @@ language models. It includes utilities for grouping utterances, creating descrip
 for individual intents, and enhancing datasets with generated descriptions.
 """
 
+from __future__ import annotations
+
 import asyncio
 import random
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
-from autointent import Dataset
-from autointent.generation import Generator
 from autointent.generation.chat_templates import PromptDescription
-from autointent.schemas import Intent, Sample
+from autointent.schemas import Sample
+
+if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.generation import Generator
+    from autointent.schemas import Intent
 
 
 def group_utterances_by_label(samples: list[Sample]) -> dict[int, list[str]]:

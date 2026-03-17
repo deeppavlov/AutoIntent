@@ -1,4 +1,6 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, Field, PositiveInt, field_validator
 
@@ -9,8 +11,13 @@ from .configs import (
     HFModelConfig,
     HPOConfig,
     LoggingConfig,
+    get_default_hfmodel_config,
     initialize_embedder_config,
 )
+from .utils import load_preset
+
+if TYPE_CHECKING:
+    from .custom_types import SearchSpacePreset
 
 
 class OptimizationConfig(BaseModel):
@@ -38,8 +45,12 @@ class OptimizationConfig(BaseModel):
 
     cross_encoder_config: CrossEncoderConfig = CrossEncoderConfig()
 
-    transformer_config: HFModelConfig = HFModelConfig()
+    transformer_config: HFModelConfig = get_default_hfmodel_config()
 
     hpo_config: HPOConfig = HPOConfig()
 
     seed: PositiveInt = 42
+
+    @classmethod
+    def from_preset(cls, preset: SearchSpacePreset) -> OptimizationConfig:
+        return cls.model_validate(load_preset(preset))

@@ -1,10 +1,15 @@
-from typing import Any, Literal
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
-from typing_extensions import Self, assert_never
+from typing_extensions import assert_never
 
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class TokenizerConfig(BaseModel):
@@ -48,6 +53,7 @@ class HFModelConfig(BaseModel):
     fp16: bool = Field(False, description="Whether to use mixed precision training (not all devices support this).")
     tokenizer_config: TokenizerConfig = Field(default_factory=TokenizerConfig)
     trust_remote_code: bool = Field(False, description="Whether to trust the remote code when loading the model.")
+    revision: str | None = Field(None, description="Revision from HF repo")
 
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
@@ -68,6 +74,10 @@ class HFModelConfig(BaseModel):
         if isinstance(values, str):
             return cls(model_name=values)
         return cls(**values)
+
+
+def get_default_hfmodel_config() -> HFModelConfig:
+    return HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
 
 class CrossEncoderConfig(HFModelConfig):

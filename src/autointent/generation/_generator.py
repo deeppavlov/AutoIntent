@@ -1,20 +1,25 @@
 """Wrapper class for accessing OpenAI API."""
 
+from __future__ import annotations
+
 import json
 import logging
 import os
-from pathlib import Path
 from textwrap import dedent
-from typing import Any, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
-import openai
 from dotenv import load_dotenv
-from openai import LengthFinishReasonError
 from pydantic import BaseModel, ValidationError
 
+from autointent._utils import require
 from autointent.generation.chat_templates import Message, Role
 
 from ._cache import StructuredOutputCache
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent.generation.chat_templates import Message
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +139,9 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
+        require("openai", "openai")
+        import openai
+
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
 
@@ -157,7 +165,7 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = self.client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,
             model=self.model_name,
             **self.generation_params,
         )
@@ -170,7 +178,7 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = await self.async_client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,
             model=self.model_name,
             **self.generation_params,
         )
@@ -213,6 +221,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -220,9 +230,9 @@ class Generator:
         try:
             response = await self.async_client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -298,6 +308,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -305,9 +317,9 @@ class Generator:
         try:
             response = self.client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -382,7 +394,7 @@ class Generator:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
     @classmethod
-    def load(cls, path: Path) -> "Generator":
+    def load(cls, path: Path) -> Generator:
         with (path / cls._dump_data_filename).open(encoding="utf-8") as file:
             data: GeneratorDumpData = json.load(file)
 

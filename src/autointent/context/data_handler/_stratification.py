@@ -4,20 +4,43 @@ This module provides utilities for splitting datasets into training and testing 
 It includes support for both single-label and multi-label stratified splitting.
 """
 
+from __future__ import annotations
+
 import logging
-from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
-from datasets import Dataset as HFDataset
 from datasets import concatenate_datasets
-from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
 from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 
-from autointent import Dataset
-from autointent.custom_types import LabelType
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+
+    from datasets import Dataset as HFDataset
+    from numpy import typing as npt
+
+    from autointent import Dataset
+    from autointent.custom_types import LabelType
+
+from ._safe_multilabel_stratification import safe_multilabel_split_indices
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class StratifyInputs:
+    """Inputs for stratified splitting: the effective dataset and post-split hook.
+
+    Used internally so that the same OOS/mapping logic feeds both splitting and
+    readiness checks.
+    """
+
+    dataset: HFDataset
+    multilabel: bool
+    test_size: float
+    post_split_fn: Callable[[HFDataset, HFDataset], tuple[HFDataset, HFDataset]]
 
 
 class StratifiedSplitter:
@@ -70,25 +93,9 @@ class StratifiedSplitter:
         Raises:
             ValueError: If OOS samples are present but allow_oos_in_train is not specified.
         """
-        if not self._has_oos_samples(dataset):
-            train, test = self._split_without_oos(dataset, multilabel, self.test_size)
-            if self.is_few_shot:
-                train, test = create_few_shot_split(
-                    train,
-                    test,
-                    multilabel=multilabel,
-                    label_column=self.label_feature,
-                    examples_per_label=self.examples_per_label,
-                )
-            return train, test
-        if allow_oos_in_train is None:
-            msg = (
-                "Error while splitting dataset. It contains OOS samples, "
-                "you need to set the parameter allow_oos_in_train."
-            )
-            raise ValueError(msg)
-        splitter = self._split_allow_oos_in_train if allow_oos_in_train else self._split_disallow_oos_in_train
-        train, test = splitter(dataset, multilabel)
+        inputs = self.get_stratify_inputs(dataset, multilabel, allow_oos_in_train)
+        train, test = self._split_without_oos(inputs.dataset, inputs.multilabel, inputs.test_size)
+        train, test = inputs.post_split_fn(train, test)
         if self.is_few_shot:
             train, test = create_few_shot_split(
                 train,
@@ -99,7 +106,7 @@ class StratifiedSplitter:
             )
         return train, test
 
-    def _has_oos_samples(self, dataset: HFDataset) -> bool:
+    def has_oos_samples(self, dataset: HFDataset) -> bool:
         """Check if the dataset contains out-of-scope samples.
 
         Args:
@@ -110,6 +117,112 @@ class StratifiedSplitter:
         """
         oos_samples = dataset.filter(lambda sample: sample[self.label_feature] is None)
         return len(oos_samples) > 0
+
+    def get_stratify_inputs(
+        self, dataset: HFDataset, multilabel: bool, allow_oos_in_train: bool | None
+    ) -> StratifyInputs:
+        """Return the effective dataset and post-split hook for stratification.
+
+        Single source of truth for OOS handling: both splitting and readiness
+        checks use this so logic is not duplicated.
+
+        Args:
+            dataset: The input dataset (may contain OOS).
+            multilabel: Whether the dataset is multi-label.
+            allow_oos_in_train: Whether OOS samples are allowed in the train split.
+                Must be set when the dataset contains OOS samples.
+
+        Returns:
+            StratifyInputs with the dataset to stratify on and a post_split_fn.
+
+        Raises:
+            ValueError: If the dataset contains OOS samples and allow_oos_in_train is None.
+        """
+        if self.has_oos_samples(dataset) and allow_oos_in_train is None:
+            msg = (
+                "Error while splitting dataset. It contains OOS samples, "
+                "you need to set the parameter allow_oos_in_train."
+            )
+            raise ValueError(msg)
+        if not self.has_oos_samples(dataset):
+            return StratifyInputs(
+                dataset=dataset,
+                multilabel=multilabel,
+                test_size=self.test_size,
+                post_split_fn=lambda train_ds, test_ds: (train_ds, test_ds),
+            )
+        if allow_oos_in_train:
+            return self._stratify_inputs_allow_oos(dataset, multilabel)
+        return self._stratify_inputs_disallow_oos(dataset, multilabel)
+
+    def _stratify_inputs_allow_oos(self, dataset: HFDataset, multilabel: bool) -> StratifyInputs:
+        """Return stratify inputs when OOS samples are allowed in the train split.
+
+        OOS is mapped to a class so it is stratified; post_split_fn unmaps it.
+        """
+        if multilabel:
+            try:
+                in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
+            except StopIteration as e:
+                msg = (
+                    "Cannot infer multilabel dimensionality: dataset contains only OOS samples "
+                    f"({self.label_feature}=None for all rows)."
+                )
+                raise ValueError(msg) from e
+            n_classes = len(in_domain_sample[self.label_feature])
+            mapped_dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
+
+            def unmap_oos_multilabel(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
+                return (
+                    train_ds.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes}),
+                    test_ds.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes}),
+                )
+
+            return StratifyInputs(
+                dataset=mapped_dataset,
+                multilabel=True,
+                test_size=self.test_size,
+                post_split_fn=unmap_oos_multilabel,
+            )
+        oos_class_id = len(dataset.unique(self.label_feature)) - 1
+        mapped_dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
+
+        def unmap_oos_multiclass(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
+            return (
+                train_ds.map(
+                    self._map_label,
+                    fn_kwargs={"old": oos_class_id, "new": None},
+                ),
+                test_ds.map(
+                    self._map_label,
+                    fn_kwargs={"old": oos_class_id, "new": None},
+                ),
+            )
+
+        return StratifyInputs(
+            dataset=mapped_dataset,
+            multilabel=False,
+            test_size=self.test_size,
+            post_split_fn=unmap_oos_multiclass,
+        )
+
+    def _stratify_inputs_disallow_oos(self, dataset: HFDataset, multilabel: bool) -> StratifyInputs:
+        """Return stratify inputs when OOS samples are not allowed in the train split.
+
+        Only in-domain data is stratified; post_split_fn appends OOS to the test set.
+        """
+        in_domain_dataset, out_of_domain_dataset = self._separate_oos(dataset)
+        adjusted_test_size = self._get_adjusted_test_size(len(dataset), len(out_of_domain_dataset))
+
+        def concat_oos_to_test(train_ds: HFDataset, test_ds: HFDataset) -> tuple[HFDataset, HFDataset]:
+            return (train_ds, concatenate_datasets([test_ds, out_of_domain_dataset]))
+
+        return StratifyInputs(
+            dataset=in_domain_dataset,
+            multilabel=multilabel,
+            test_size=adjusted_test_size,
+            post_split_fn=concat_oos_to_test,
+        )
 
     def _split_without_oos(self, dataset: HFDataset, multilabel: bool, test_size: float) -> tuple[HFDataset, HFDataset]:
         """Split dataset that doesn't contain OOS samples.
@@ -154,48 +267,9 @@ class StratifiedSplitter:
         Returns:
             A sequence containing indices for train and test splits.
         """
-        splitter = MultilabelStratifiedShuffleSplit(
-            n_splits=1,
-            test_size=test_size,
-            random_state=self.random_seed,
-        )
-        return next(splitter.split(np.arange(len(dataset)), np.array(dataset[self.label_feature])))
-
-    def _split_allow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
-        """Proportionally distribute OOS samples between two splits.
-
-        Internally creates a dataset copy with some integer assigned as OOS class id.
-        With OOS samples treated as a separate class we obtain proportional distribution
-        of them between two splits.
-
-        Args:
-            dataset: Dataset to split.
-            multilabel: Whether the dataset is multi-label.
-
-        Returns:
-            A tuple containing training and testing datasets.
-        """
-        # add oos as a class
-        if multilabel:
-            in_domain_sample = next(sample for sample in dataset if sample[self.label_feature] is not None)
-            n_classes = len(in_domain_sample[self.label_feature])
-            dataset = dataset.map(self._add_oos_label, fn_kwargs={"n_classes": n_classes})
-        else:
-            oos_class_id = len(dataset.unique(self.label_feature)) - 1
-            dataset = dataset.map(self._map_label, fn_kwargs={"old": None, "new": oos_class_id})
-
-        # perform stratified splitting
-        train, test = self._split_without_oos(dataset, multilabel=False, test_size=self.test_size)
-
-        # remove oos as a class
-        if multilabel:
-            train = train.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
-            test = test.map(self._remove_oos_label, fn_kwargs={"n_classes": n_classes})
-        else:
-            train = train.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
-            test = test.map(self._map_label, fn_kwargs={"old": oos_class_id, "new": None})
-
-        return train, test
+        y = np.asarray(dataset[self.label_feature])
+        train_arr, test_arr = safe_multilabel_split_indices(y=y, test_size=test_size, random_seed=self.random_seed)
+        return (train_arr, test_arr)
 
     def _map_label(
         self, sample: dict[str, str | LabelType], old: LabelType, new: LabelType
@@ -226,7 +300,9 @@ class StratifiedSplitter:
         """
         if sample[self.label_feature] is None:
             sample[self.label_feature] = [0] * n_classes
-        sample[self.label_feature] += [1]  # type: ignore[operator]
+            sample[self.label_feature] += [1]  # type: ignore[operator]
+        else:
+            sample[self.label_feature] += [0]  # type: ignore[operator]
         return sample
 
     def _remove_oos_label(self, sample: dict[str, str | LabelType], n_classes: int) -> dict[str, str | LabelType]:
@@ -243,25 +319,6 @@ class StratifiedSplitter:
         if sample[self.label_feature] == [0] * n_classes:
             sample[self.label_feature] = None  # type: ignore[assignment]
         return sample
-
-    def _split_disallow_oos_in_train(self, dataset: HFDataset, multilabel: bool) -> tuple[HFDataset, HFDataset]:
-        """Move all OOS samples to test split.
-
-        This method preserves the defined test_size proportion so you won't get unexpectedly
-        large test set even you have lots of OOS samples.
-
-        Args:
-            dataset: Dataset to split.
-            multilabel: Whether the dataset is multi-label.
-
-        Returns:
-            A tuple containing training and testing datasets.
-        """
-        in_domain_dataset, out_of_domain_dataset = self._separate_oos(dataset)
-        adjusted_test_size = self._get_adjusted_test_size(len(dataset), len(out_of_domain_dataset))
-        train, test = self._split_without_oos(in_domain_dataset, multilabel, adjusted_test_size)
-        test = concatenate_datasets([test, out_of_domain_dataset])
-        return train, test
 
     def _separate_oos(self, dataset: HFDataset) -> tuple[HFDataset, HFDataset]:
         """Separate OOS samples from in-domain samples.

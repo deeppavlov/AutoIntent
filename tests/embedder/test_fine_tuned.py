@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
 from autointent.configs import EmbedderFineTuningConfig, HFModelConfig, SentenceTransformerEmbeddingConfig
@@ -7,6 +8,8 @@ from autointent.context.data_handler import DataHandler
 
 def test_model_updates_after_training(dataset):
     """Test that model weights actually change after training"""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=8, trust_remote_code=True)

@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import json
 import logging
 import os
 import re
 import subprocess
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,7 +17,7 @@ logger = logging.getLogger(__name__)
 def get_sorted_versions(repo_root: Path, base_url: str) -> list[dict]:
     os.chdir(repo_root)
     # Fetch tags and branches
-    tags_output = subprocess.check_output(["git", "tag"], text=True).strip().split("\n")  # noqa: S603, S607
+    tags_output = subprocess.check_output(["git", "tag"], text=True).strip().split("\n")  # noqa: S607
     tag_regex = re.compile(r"^v\d+\.\d+\.\d+$")  # Matches tags like v0.0.1
     tags = [tag for tag in tags_output if tag_regex.match(tag)]
 
@@ -37,7 +42,7 @@ def get_sorted_versions(repo_root: Path, base_url: str) -> list[dict]:
         versions.append({"version": tag, "url": f"{base_url}/{tag}/"})  # noqa: PERF401
 
     # Get branches
-    branches_output = subprocess.check_output(["git", "branch", "-r"], text=True).strip().split("\n")  # noqa: S603, S607
+    branches_output = subprocess.check_output(["git", "branch", "-r"], text=True).strip().split("\n")  # noqa: S607
     dev_branches = [
         branch.strip().split("/")[-1] for branch in branches_output if "origin/dev" in branch and "HEAD" not in branch
     ]

@@ -73,7 +73,9 @@ def mock_split():
 
 
 def test_data_handler_initialization(sample_multiclass_data):
-    handler = DataHandler(dataset=Dataset.from_dict(sample_multiclass_data), random_seed=42)
+    handler = DataHandler(
+        dataset=Dataset.from_dict(sample_multiclass_data), config=DataConfig(separation_ratio=0.5), random_seed=42
+    )
 
     assert handler.multilabel is False
     assert handler.dataset.n_classes == 2
@@ -84,7 +86,9 @@ def test_data_handler_initialization(sample_multiclass_data):
 
 
 def test_data_handler_multilabel_mode(sample_multilabel_data):
-    handler = DataHandler(dataset=Dataset.from_dict(sample_multilabel_data), random_seed=42)
+    handler = DataHandler(
+        dataset=Dataset.from_dict(sample_multilabel_data), config=DataConfig(separation_ratio=0.5), random_seed=42
+    )
 
     assert handler.multilabel is True
     assert handler.dataset.n_classes == 2
@@ -239,6 +243,6 @@ def test_few_shot_split(dataset):
     }
 
     for data_split in dh.dataset:
-        assert (
-            Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split]
-        ), f"Failed for {data_split}"
+        assert Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split], (
+            f"Failed for {data_split}"
+        )

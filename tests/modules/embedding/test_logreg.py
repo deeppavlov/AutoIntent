@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from autointent.modules.embedding import LogregAimedEmbedding
 from tests.conftest import get_test_embedder_config, setup_environment
@@ -11,6 +12,9 @@ def test_get_assets_returns_correct_artifact_for_logreg():
 
 
 def test_fit_trains_model():
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
+    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
@@ -23,7 +27,9 @@ def test_fit_trains_model():
 
 
 def test_predict_evaluates_model():
-    module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
+    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -37,6 +43,8 @@ def test_predict_evaluates_model():
 
 
 def test_dump_load():
+    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]

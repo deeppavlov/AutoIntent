@@ -1,9 +1,10 @@
 """MLKnnScorer class for multi-label k-nearest neighbors classification."""
 
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy.typing import NDArray
 from pydantic import NonNegativeInt, PositiveFloat, PositiveInt
 from typing_extensions import assert_never
 
@@ -16,6 +17,9 @@ from autointent.configs import (
 )
 from autointent.custom_types import ListOfLabels
 from autointent.modules.base import BaseScorer
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 class MLKnnScorer(BaseScorer):
@@ -95,7 +99,7 @@ class MLKnnScorer(BaseScorer):
         s: PositiveFloat = 1.0,
         ignore_first_neighbours: NonNegativeInt = 0,
         embedder_config: EmbedderConfig | str | None = None,
-    ) -> "MLKnnScorer":
+    ) -> MLKnnScorer:
         """Create an MLKnnScorer instance using a Context object.
 
         Args:

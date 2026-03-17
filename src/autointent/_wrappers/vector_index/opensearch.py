@@ -1,16 +1,21 @@
+from __future__ import annotations
+
 import hashlib
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from numpy._typing import NDArray
-from typing_extensions import Self
 
 from autointent.configs import OpenSearchConfig
 from autointent.custom_types import Document
 
 from .base_backend import BaseIndexBackend
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from numpy._typing import NDArray
+    from typing_extensions import Self
 
 
 class OpenSearchBackend(BaseIndexBackend):
@@ -111,7 +116,7 @@ class OpenSearchBackend(BaseIndexBackend):
 
         # Use bulk API for efficient indexing
         try:
-            success_count, failed_items = self._opensearchpy.helpers.bulk(
+            _, failed_items = self._opensearchpy.helpers.bulk(
                 self._client, bulk_data, stats_only=False, raise_on_error=False
             )
 

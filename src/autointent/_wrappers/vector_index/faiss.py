@@ -1,17 +1,21 @@
+from __future__ import annotations
+
 import json
 import platform
-from collections.abc import Generator
 from contextlib import contextmanager
-from pathlib import Path
-from typing import Any
-
-from numpy._typing import NDArray
-from typing_extensions import Self
+from typing import TYPE_CHECKING, Any
 
 from autointent.configs import FaissConfig
 from autointent.custom_types import Document
 
 from .base_backend import BaseIndexBackend
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+    from pathlib import Path
+
+    from numpy._typing import NDArray
+    from typing_extensions import Self
 
 
 @contextmanager
@@ -94,8 +98,8 @@ class FaissBackend(BaseIndexBackend):
         with (path / cls._documents_filaname).open("r", encoding="utf-8") as file:
             docs_data = json.load(file)
 
-        instance._documents = [Document.model_validate(d) for d in docs_data]  # noqa: SLF001
+        instance._documents = [Document.model_validate(d) for d in docs_data]
 
-        instance._index = instance._faiss.read_index(str(path / cls._index_filename))  # noqa: SLF001
+        instance._index = instance._faiss.read_index(str(path / cls._index_filename))
 
         return instance

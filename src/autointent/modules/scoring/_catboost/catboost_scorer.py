@@ -1,11 +1,12 @@
 """CatBoostScorer class for CatBoost-based classification with switchable encoding."""
 
+from __future__ import annotations
+
 import logging
 from enum import Enum
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 from pydantic import PositiveInt
 
@@ -16,7 +17,9 @@ from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
     from catboost import CatBoostClassifier
+
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +92,7 @@ class CatBoostScorer(BaseScorer):
     supports_multiclass = True
     supports_multilabel = True
 
-    _model: "CatBoostClassifier"
+    _model: CatBoostClassifier
 
     encoder_features_types = (FeaturesType.EMBEDDING, FeaturesType.BOTH)
 
@@ -107,8 +110,7 @@ class CatBoostScorer(BaseScorer):
         **catboost_kwargs: dict[str, Any],
     ) -> None:
         # Lazy import catboost
-        catboost = require("catboost", extra="catboost")
-        self._CatBoostClassifier = catboost.CatBoostClassifier
+        require("catboost", extra="catboost")
 
         self.val_fraction = val_fraction
         self.early_stopping_rounds = early_stopping_rounds
@@ -139,7 +141,7 @@ class CatBoostScorer(BaseScorer):
         iterations: PositiveInt = 1000,
         depth: PositiveInt = 6,
         **catboost_kwargs: dict[str, Any],
-    ) -> "CatBoostScorer":
+    ) -> CatBoostScorer:
         if embedder_config is None:
             embedder_config = context.resolve_embedder()
         return cls(
@@ -198,6 +200,8 @@ class CatBoostScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
+        from catboost import CatBoostClassifier
+
         self._validate_task(labels)
 
         if self.features_type in self.encoder_features_types:
@@ -214,7 +218,7 @@ class CatBoostScorer(BaseScorer):
             msg = "Disabling early stopping in CatBoostClassifier as it is not supported with multi-label task."
             logger.warning(msg)
 
-        self._model = self._CatBoostClassifier(
+        self._model = CatBoostClassifier(
             iterations=self.iterations,
             depth=self.depth,
             loss_function=self.loss_function or default_loss,
@@ -225,7 +229,9 @@ class CatBoostScorer(BaseScorer):
             **self.get_extra_params(),
         )
         self._model.fit(
-            dataset, labels, early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None
+            dataset,
+            list(labels),  # datasets >4 would pass `Column` instead of list, which causes error in CatBoostClassifier
+            early_stopping_rounds=self.early_stopping_rounds if self.val_fraction is not None else None,
         )
 
     def predict(self, utterances: list[str]) -> npt.NDArray[np.float64]:

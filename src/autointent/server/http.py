@@ -1,10 +1,12 @@
 """FastAPI application for AutoIntent pipeline inference."""
 
+from __future__ import annotations
+
 import logging
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -12,6 +14,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from autointent import Pipeline
 from autointent.custom_types import ListOfLabelsWithOOS
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 class Settings(BaseSettings):

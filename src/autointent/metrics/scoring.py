@@ -1,15 +1,20 @@
 """Scoring metrics for multiclass and multilabel classification tasks."""
 
+from __future__ import annotations
+
 import logging
 from functools import wraps
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 from sklearn.metrics import coverage_error, label_ranking_average_precision_score, label_ranking_loss, roc_auc_score
 
 from ._converter import transform
-from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
-from .decision import DecisionMetricFn, decision_accuracy, decision_f1, decision_precision, decision_recall
+from .decision import decision_accuracy, decision_f1, decision_precision, decision_recall
+
+if TYPE_CHECKING:
+    from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
+    from .decision import DecisionMetricFn
 
 logger = logging.getLogger(__name__)
 
@@ -260,7 +265,7 @@ def scoring_neg_coverage(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -
     Returns:
         Negative coverage score.
     """
-    labels_, scores_ = transform(labels, scores)
+    _, scores_ = transform(labels, scores)
 
     n_classes = scores_.shape[1]
     return float(1 - (coverage_error(labels, scores) - 1) / (n_classes - 1))
