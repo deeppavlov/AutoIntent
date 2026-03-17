@@ -12,4 +12,3 @@ jobs:
     with:
       test_command: pytest -n auto tests/embedder/ tests/callback/
       extras: --extra sentence-transformers --extra transformers
-
