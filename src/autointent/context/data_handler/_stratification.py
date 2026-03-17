@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from datasets import concatenate_datasets
-from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
 from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 
