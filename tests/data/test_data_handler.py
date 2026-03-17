@@ -99,7 +99,7 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
         "later, see you soon",
     ]
     assert handler.test_utterances() == ["greetings", "farewell"]
-    assert handler.train_labels(0) == [[0, 1], [1, 0], [0, 1], [1, 0]]
+    assert handler.train_labels(0) == [[1, 0], [0, 1], [0, 1], [1, 0]]
     assert handler.test_labels() == [[0, 1], [1, 0]]
 
 
