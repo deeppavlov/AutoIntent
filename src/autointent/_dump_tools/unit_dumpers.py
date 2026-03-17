@@ -238,7 +238,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return transformers.AutoModelForSequenceClassification.from_pretrained(lora_path)
+            return transformers.AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-any-return]
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
