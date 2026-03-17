@@ -21,6 +21,7 @@ from autointent.configs import (
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
+from ..configs._embedder import BaseEmbedderConfig
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -178,7 +179,7 @@ class Context:
         except ValueError:
             if hasattr(self, "embedder_config"):
                 return self.embedder_config
-            return EmbedderConfig()
+            return BaseEmbedderConfig()
 
     def resolve_ranker(self) -> CrossEncoderConfig:
         """Resolve the cross-encoder configuration.

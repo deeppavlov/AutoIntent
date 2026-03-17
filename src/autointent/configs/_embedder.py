@@ -20,7 +20,7 @@ class TaskTypeEnum(Enum):
     sts = "sts"
 
 
-class BaseEmbedderConfig(ABC, BaseModel, extra="forbid"):
+class BaseEmbedderConfig(BaseModel, extra="forbid"):
     """Base class for embedder configurations."""
 
     default_prompt: str | None = Field(
@@ -124,15 +124,15 @@ class HashingVectorizerEmbeddingConfig(BaseEmbedderConfig):
 
 
 EmbedderConfig: TypeAlias = (
-    SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig
+    SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig | BaseEmbedderConfig
 )
 
 
-def get_default_embedder_config(**kwargs: Any) -> SentenceTransformerEmbeddingConfig:  # noqa: ANN401
+def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401
     return SentenceTransformerEmbeddingConfig.model_validate(kwargs)
 
 
-def initialize_embedder_config(values: dict[str, Any] | str | BaseEmbedderConfig | None) -> BaseEmbedderConfig:
+def initialize_embedder_config(values: dict[str, Any] | str | BaseEmbedderConfig | None) -> EmbedderConfig:
     if values is None:
         return get_default_embedder_config()
     if isinstance(values, BaseEmbedderConfig):
