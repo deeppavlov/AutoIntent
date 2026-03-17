@@ -14,7 +14,7 @@ on:
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
 
 concurrency:
-  group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.test_group }}
+  group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
   cancel-in-progress: true
 
 jobs:
