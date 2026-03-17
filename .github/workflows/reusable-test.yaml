@@ -13,6 +13,10 @@ on:
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
 
+concurrency:
+  group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.test_group }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -20,7 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", ]
         include:
           - os: windows-latest
             python-version: "3.10"
