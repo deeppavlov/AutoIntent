@@ -169,7 +169,7 @@ class Ranker:
         self.cross_encoder.predict(pairs, batch_size=self.config.batch_size)
         res = np.concatenate(self._activations_list, axis=0)
         self._activations_list.clear()
-        return res
+        return res  # type: ignore[no-any-return]
 
     def _fit(self, pairs: list[tuple[str, str]], labels: ListOfLabels) -> None:
         """Train the logistic regression model on cross-encoder features.
