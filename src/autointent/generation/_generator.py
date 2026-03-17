@@ -139,7 +139,8 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
-        openai = require("openai", "openai")
+        require("openai", "openai")
+        import openai
 
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")

@@ -73,11 +73,9 @@ class PTuningScorer(BertScorer):
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import peft
-        peft = require("peft", extra="peft")
-        self._PromptEncoderConfig = peft.PromptEncoderConfig
-        self._PromptEncoderReparameterizationType = peft.PromptEncoderReparameterizationType
-        self._TaskType = peft.TaskType
-        self._get_peft_model = peft.get_peft_model
+        require("peft", extra="peft")
+
+        from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType
 
         super().__init__(
             classification_model_config=classification_model_config,
@@ -89,9 +87,9 @@ class PTuningScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             print_progress=print_progress,
         )
-        self._ptuning_config = self._PromptEncoderConfig(
-            task_type=self._TaskType.SEQ_CLS,
-            encoder_reparameterization_type=self._PromptEncoderReparameterizationType(encoder_reparameterization_type),
+        self._ptuning_config = PromptEncoderConfig(
+            task_type=TaskType.SEQ_CLS,
+            encoder_reparameterization_type=PromptEncoderReparameterizationType(encoder_reparameterization_type),
             num_virtual_tokens=num_virtual_tokens,
             encoder_dropout=encoder_dropout,
             encoder_hidden_size=encoder_hidden_size,
@@ -154,7 +152,11 @@ class PTuningScorer(BertScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         """Initialize the model with P-tuning configuration."""
         model = super()._initialize_model()
-        return self._get_peft_model(model, self._ptuning_config)
+        from peft import get_peft_model
+
+        return get_peft_model(model, self._ptuning_config)
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[self._PromptEncoderConfig])
+        from peft import PromptEncoderConfig
+
+        Dumper.dump(self, Path(path), exclude=[PromptEncoderConfig])

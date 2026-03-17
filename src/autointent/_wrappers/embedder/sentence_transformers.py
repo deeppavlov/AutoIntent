@@ -79,8 +79,10 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         """Load sentence transformers model to device."""
         if self._model is None:
             # Lazy import sentence-transformers
-            st = require("sentence_transformers", extra="sentence-transformers")
-            res = st.SentenceTransformer(
+            require("sentence_transformers", extra="sentence-transformers")
+            from sentence_transformers import SentenceTransformer
+
+            res = SentenceTransformer(
                 self.config.model_name,
                 device=self.config.device,
                 prompts=self.config.get_prompt_config(),
@@ -239,17 +241,24 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         model = self._load_model()
 
         # Lazy import sentence-transformers training components (only needed for fine-tuning)
-        st = require("sentence_transformers", extra="sentence-transformers")
-        transformers = require("transformers", extra="transformers")
+        require("sentence_transformers", extra="sentence-transformers")
+        require("transformers", extra="transformers")
         require("accelerate", extra="transformers")
+        from sentence_transformers import (
+            SentenceTransformerTrainer,
+            SentenceTransformerTrainingArguments,
+            losses,
+            training_args,
+        )
+        from transformers import EarlyStoppingCallback
 
         x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
         tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
         val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
 
-        loss = st.losses.BatchAllTripletLoss(model=model, margin=config.margin)
+        loss = losses.BatchAllTripletLoss(model=model, margin=config.margin)
         with tempfile.TemporaryDirectory() as tmp_dir:
-            args = st.SentenceTransformerTrainingArguments(
+            args = SentenceTransformerTrainingArguments(
                 save_strategy="epoch",
                 save_total_limit=1,
                 output_dir=tmp_dir,
@@ -260,19 +269,19 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
                 bf16=config.bf16,
-                batch_sampler=st.training_args.BatchSamplers.NO_DUPLICATES,
+                batch_sampler=training_args.BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,
                 eval_strategy="epoch",
                 greater_is_better=False,
             )
             callbacks: list[TrainerCallback] = [
-                transformers.EarlyStoppingCallback(
+                EarlyStoppingCallback(
                     early_stopping_patience=config.early_stopping_patience,
                     early_stopping_threshold=config.early_stopping_threshold,
                 )
             ]
-            trainer = st.SentenceTransformerTrainer(
+            trainer = SentenceTransformerTrainer(
                 model=model,
                 args=args,
                 train_dataset=tr_ds,

@@ -9,6 +9,7 @@ import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
+import peft
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
@@ -25,9 +26,6 @@ if TYPE_CHECKING:
     from catboost import CatBoostClassifier
     from peft import PeftModel
     from transformers import PreTrainedModel, PreTrainedTokenizer, PreTrainedTokenizerFast
-else:
-    PreTrainedTokenizer = Any
-    PreTrainedTokenizerFast = Any
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -228,24 +226,28 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401
-        peft = require("peft", extra="peft")
-        transformers = require("transformers", extra="transformers")
+        require("peft", extra="peft")
+        require("transformers", extra="transformers")
+        import transformers
+
         if (path / "ptuning").exists():
             # prompt learning model
             ptuning_path = path / "ptuning"
             model = transformers.AutoModelForSequenceClassification.from_pretrained(ptuning_path / "base_model")
-            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")  # type: ignore[no-any-return]
+            return peft.PeftModel.from_pretrained(model, ptuning_path / "peft")
         if (path / "lora").exists():
             # merged lora model
             lora_path = path / "lora"
-            return transformers.AutoModelForSequenceClassification.from_pretrained(lora_path)  # type: ignore[no-any-return]
+            return transformers.AutoModelForSequenceClassification.from_pretrained(lora_path)
         msg = f"Invalid PeftModel directory structure at {path}. Expected 'ptuning' or 'lora' subdirectory."
         raise ValueError(msg)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            peft = require("peft", extra="peft")
+            require("peft", extra="peft")
+            import peft
+
             return isinstance(obj, peft.PeftModel)
         except ImportError:
             return False
@@ -261,13 +263,17 @@ class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401
-        transformers = require("transformers", extra="transformers")
+        require("transformers", extra="transformers")
+        import transformers
+
         return transformers.AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            transformers = require("transformers", extra="transformers")
+            require("transformers", extra="transformers")
+            import transformers
+
             return isinstance(obj, transformers.PreTrainedModel)
         except ImportError:
             return False
@@ -283,13 +289,17 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401
-        transformers = require("transformers", extra="transformers")
-        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return]
+        require("transformers", extra="transformers")
+        import transformers
+
+        return transformers.AutoTokenizer.from_pretrained(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            transformers = require("transformers", extra="transformers")
+            require("transformers", extra="transformers")
+            import transformers
+
             return isinstance(obj, transformers.PreTrainedTokenizer | transformers.PreTrainedTokenizerFast)
         except ImportError:
             return False
@@ -332,15 +342,19 @@ class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401
-        catboost = require("catboost", extra="catboost")
-        model = catboost.CatBoostClassifier()
+        require("catboost", extra="catboost")
+        from catboost import CatBoostClassifier
+
+        model = CatBoostClassifier()
         model.load_model(str(path))
         return model
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            catboost = require("catboost", extra="catboost")
-            return isinstance(obj, catboost.CatBoostClassifier)
+            require("catboost", extra="catboost")
+            from catboost import CatBoostClassifier
+
+            return isinstance(obj, CatBoostClassifier)
         except ImportError:
             return False

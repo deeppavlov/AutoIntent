@@ -110,8 +110,7 @@ class CatBoostScorer(BaseScorer):
         **catboost_kwargs: dict[str, Any],
     ) -> None:
         # Lazy import catboost
-        catboost = require("catboost", extra="catboost")
-        self._CatBoostClassifier = catboost.CatBoostClassifier
+        require("catboost", extra="catboost")
 
         self.val_fraction = val_fraction
         self.early_stopping_rounds = early_stopping_rounds
@@ -201,6 +200,8 @@ class CatBoostScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
+        from catboost import CatBoostClassifier
+
         self._validate_task(labels)
 
         if self.features_type in self.encoder_features_types:
@@ -217,7 +218,7 @@ class CatBoostScorer(BaseScorer):
             msg = "Disabling early stopping in CatBoostClassifier as it is not supported with multi-label task."
             logger.warning(msg)
 
-        self._model = self._CatBoostClassifier(
+        self._model = CatBoostClassifier(
             iterations=self.iterations,
             depth=self.depth,
             loss_function=self.loss_function or default_loss,

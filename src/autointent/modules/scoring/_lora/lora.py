@@ -75,11 +75,10 @@ class BERTLoRAScorer(BertScorer):
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import peft
-        peft = require("peft", extra="peft")
-        self._LoraConfig = peft.LoraConfig
-        self._get_peft_model = peft.get_peft_model
+        require("peft", extra="peft")
+        from peft import LoraConfig
 
-        # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
+        # early stopping doesn't work with lora for now https://github.com/huggingface/transformers/issues/38130
         early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
 
         super().__init__(
@@ -92,7 +91,7 @@ class BERTLoRAScorer(BertScorer):
             early_stopping_config=early_stopping_config,
             print_progress=print_progress,
         )
-        self._lora_config = self._LoraConfig(**lora_kwargs)
+        self._lora_config = LoraConfig(**lora_kwargs)
 
     @classmethod
     def from_context(
@@ -119,7 +118,10 @@ class BERTLoRAScorer(BertScorer):
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
         model = super()._initialize_model()
-        return self._get_peft_model(model, self._lora_config)
+        from peft import get_peft_model
+
+        return get_peft_model(model, self._lora_config)
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[self._LoraConfig])
+        from peft import LoraConfig
+        Dumper.dump(self, Path(path), exclude=[LoraConfig])
