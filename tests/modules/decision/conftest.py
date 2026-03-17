@@ -3,19 +3,18 @@ import pytest
 
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
-from tests.conftest import get_test_embedder_config
 
 
 @pytest.fixture
 def multiclass_fit_data(dataset):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     data_handler = DataHandler(dataset)
 
     knn_params = {
         "k": 3,
         "weights": "distance",
-        "embedder_config": get_test_embedder_config(),
+        "embedder_config": {
+            "n_features": 32,
+        },
     }
     scorer = KNNScorer(**knn_params)
 
@@ -27,14 +26,14 @@ def multiclass_fit_data(dataset):
 
 @pytest.fixture
 def multilabel_fit_data(dataset):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     data_handler = DataHandler(dataset.to_multilabel())
 
     knn_params = {
         "k": 3,
         "weights": "distance",
-        "embedder_config": get_test_embedder_config(),
+        "embedder_config": {
+            "n_features": 32,
+        },
     }
     scorer = KNNScorer(**knn_params)
 

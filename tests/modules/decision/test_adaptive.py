@@ -17,8 +17,6 @@ def test_multilabel(multilabel_fit_data):
 
 
 def test_fails_on_wrong_n_classes_predict(multilabel_fit_data):
-    pytest.importorskip("sentence-transformers", reason="SentenceTransformers library is required")
-
     predictor = AdaptiveDecision()
     predictor.fit(*multilabel_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])

@@ -12,8 +12,6 @@ from autointent.configs import (
 # Check if OpenAI API key is available for testing
 openai_available = os.getenv("OPENAI_API_KEY") is not None
 
-pytest.importorskip("sentence_transformers")
-
 
 @pytest.fixture
 def on_windows() -> bool:

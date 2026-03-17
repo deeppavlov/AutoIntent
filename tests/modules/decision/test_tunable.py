@@ -21,9 +21,6 @@ from autointent.modules import TunableDecision
     ],
 )
 def test_predict_scenarios(request, fixture_name, scores, desired):
-    # Dynamically obtain fixture data
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     fit_data = request.getfixturevalue(fixture_name)
 
     predictor = TunableDecision()
@@ -34,8 +31,6 @@ def test_predict_scenarios(request, fixture_name, scores, desired):
 
 
 def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
-    pytest.importorskip("sentence_transformers", reason="SentenceTransformers library is required")
-
     predictor = TunableDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
@@ -45,8 +40,6 @@ def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
 
 @pytest.mark.parametrize("fit_fixture", ["multiclass_fit_data", "multilabel_fit_data"])
 def test_dump_load(fit_fixture, request, tmp_path):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     fit_data = request.getfixturevalue(fit_fixture)
     predictor = TunableDecision()
     predictor.fit(*fit_data)

@@ -10,4 +10,4 @@ jobs:
   test:
     uses: ./.github/workflows/reusable-test.yaml
     with:
-      test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder --ignore=tests/callback
+      test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder

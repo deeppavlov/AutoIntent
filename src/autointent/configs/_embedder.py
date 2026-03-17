@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum
-from typing import Any, Literal
+from typing import Any, Literal, TypeAlias
 
 from pydantic import BaseModel, Field, PositiveInt
 
@@ -20,7 +20,7 @@ class TaskTypeEnum(Enum):
     sts = "sts"
 
 
-class EmbedderConfig(ABC, BaseModel, extra="forbid"):
+class BaseEmbedderConfig(ABC, BaseModel, extra="forbid"):
     """Base class for embedder configurations."""
 
     default_prompt: str | None = Field(
@@ -76,7 +76,7 @@ class EmbedderConfig(ABC, BaseModel, extra="forbid"):
         return self.default_prompt
 
 
-class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
+class SentenceTransformerEmbeddingConfig(BaseEmbedderConfig, HFModelConfig):
     """Configuration for Sentence Transformer based embeddings."""
 
     model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
@@ -85,7 +85,7 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
     )
 
 
-class OpenaiEmbeddingConfig(EmbedderConfig):
+class OpenaiEmbeddingConfig(BaseEmbedderConfig):
     """Configuration for OpenAI based embeddings."""
 
     model_name: str = Field("text-embedding-3-small", description="Name of the OpenAI embedding model.")
@@ -103,7 +103,7 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     )
 
 
-class HashingVectorizerEmbeddingConfig(EmbedderConfig):
+class HashingVectorizerEmbeddingConfig(BaseEmbedderConfig):
     """Configuration for HashingVectorizer based embeddings from sklearn.
 
     This is a lightweight, stateless vectorizer that uses hashing trick for text feature extraction.
@@ -123,15 +123,22 @@ class HashingVectorizerEmbeddingConfig(EmbedderConfig):
     dtype: str = Field("float32", description="Type of the matrix returned by fit_transform() or transform().")
 
 
-def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401
+EmbedderConfig: TypeAlias = (
+    SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig
+)
+
+
+def get_default_embedder_config(**kwargs: Any) -> SentenceTransformerEmbeddingConfig:  # noqa: ANN401
     return SentenceTransformerEmbeddingConfig.model_validate(kwargs)
 
 
-def initialize_embedder_config(values: dict[str, Any] | str | EmbedderConfig | None) -> EmbedderConfig:
+def initialize_embedder_config(values: dict[str, Any] | str | BaseEmbedderConfig | None) -> BaseEmbedderConfig:
     if values is None:
         return get_default_embedder_config()
-    if isinstance(values, EmbedderConfig):
+    if isinstance(values, BaseEmbedderConfig):
         return values.model_copy(deep=True)
     if isinstance(values, str):
         return get_default_embedder_config(model_name=values)
+    if isinstance(values, dict) and "n_features" in values:
+        return HashingVectorizerEmbeddingConfig(**values)
     return get_default_embedder_config(**values)

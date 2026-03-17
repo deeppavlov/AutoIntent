@@ -76,7 +76,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
 
     @overload
     def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
+        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True] = True
     ) -> torch.Tensor: ...
 
     @overload

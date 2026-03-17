@@ -1,7 +1,6 @@
 import tempfile
 
 import numpy as np
-import pytest
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
@@ -10,8 +9,6 @@ from tests.conftest import get_test_embedder_config
 
 
 def test_base_mlknn(dataset):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = MLKnnScorer(embedder_config=get_test_embedder_config(), k=3)

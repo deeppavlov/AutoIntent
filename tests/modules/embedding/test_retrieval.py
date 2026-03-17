@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
 from autointent.modules.embedding import RetrievalAimedEmbedding
 from tests.conftest import get_test_embedder_config
 
@@ -18,9 +16,7 @@ def test_get_assets_returns_correct_artifact():
 
 
 def test_dump_and_load_preserves_model_state(tmp_path: Path):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
-    module = RetrievalAimedEmbedding(k=5, embedder_config="sergeyzh/rubert-tiny-turbo")
+    module = RetrievalAimedEmbedding(k=5, embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]

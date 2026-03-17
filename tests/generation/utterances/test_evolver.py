@@ -5,8 +5,6 @@ import pytest
 from autointent.generation.chat_templates import AbstractEvolution
 from autointent.generation.utterances import IncrementalUtteranceEvolver, UtteranceEvolver
 
-pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
 
 @pytest.mark.skip(reason="issues with sentence-transformers dependency")
 def test_on_dataset_incremental(dataset):

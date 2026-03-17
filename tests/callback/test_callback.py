@@ -2,7 +2,6 @@ from copy import deepcopy
 from typing import Any
 
 import numpy as np
-import pytest
 
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
@@ -53,8 +52,6 @@ class DummyCallback(OptimizerCallback):
 
 
 def test_pipeline_callbacks(dataset):
-    pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
-
     project_dir = setup_environment()
 
     search_space = [
@@ -65,7 +62,11 @@ def test_pipeline_callbacks(dataset):
                 {
                     "module_name": "retrieval",
                     "k": [5, 10],
-                    "embedder_config": ["sergeyzh/rubert-tiny-turbo"],
+                    "embedder_config": [
+                        {
+                            "n_features": 32,
+                        }
+                    ],
                 }
             ],
         },
@@ -112,9 +113,12 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
+                "module_kwargs": {
+                    "embedder_config": {"n_features": 32},
+                    "k": 10,
+                },
                 "module_name": "retrieval",
                 "num": 0,
-                "module_kwargs": {"k": 10, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
             },
         ),
         ("update_metrics", {"retrieval_hit_rate": 1.0}),
@@ -122,11 +126,7 @@ def test_pipeline_callbacks(dataset):
         ("end_module", {}),
         (
             "start_module",
-            {
-                "module_name": "retrieval",
-                "num": 1,
-                "module_kwargs": {"k": 5, "embedder_config": "sergeyzh/rubert-tiny-turbo"},
-            },
+            {"module_kwargs": {"embedder_config": {"n_features": 32}, "k": 5}, "module_name": "retrieval", "num": 1},
         ),
         ("update_metrics", {"retrieval_hit_rate": 1.0}),
         ("log_metric", {"metrics": {"retrieval_hit_rate": 1.0}}),
@@ -134,86 +134,80 @@ def test_pipeline_callbacks(dataset):
         (
             "start_module",
             {
-                "module_name": "linear",
-                "num": 0,
                 "module_kwargs": {
                     "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "batch_size": 32,
-                        "device": None,
-                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
-                        "trust_remote_code": False,
-                        "default_prompt": None,
+                        "analyzer": "word",
+                        "binary": False,
                         "classification_prompt": None,
                         "cluster_prompt": None,
-                        "sts_prompt": None,
-                        "query_prompt": None,
-                        "revision": None,
+                        "default_prompt": None,
+                        "dtype": "float32",
+                        "lowercase": True,
+                        "n_features": 32,
+                        "ngram_range": (1, 2),
+                        "norm": "l2",
                         "passage_prompt": None,
-                        "similarity_fn_name": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
                         "use_cache": True,
-                        "fp16": False,
-                        "bf16": False,
                     }
                 },
+                "module_name": "linear",
+                "num": 0,
             },
         ),
-        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}),
-        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 1.0}}),
+        ("update_metrics", {"scoring_accuracy": 0.75, "scoring_roc_auc": 0.8333333333333334}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.75, "scoring_roc_auc": 0.8333333333333334}}),
         ("end_module", {}),
         (
             "start_module",
             {
-                "module_name": "knn",
-                "num": 1,
                 "module_kwargs": {
+                    "embedder_config": {
+                        "analyzer": "word",
+                        "binary": False,
+                        "classification_prompt": None,
+                        "cluster_prompt": None,
+                        "default_prompt": None,
+                        "dtype": "float32",
+                        "lowercase": True,
+                        "n_features": 32,
+                        "ngram_range": (1, 2),
+                        "norm": "l2",
+                        "passage_prompt": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
+                        "use_cache": True,
+                    },
                     "k": 1,
                     "weights": "uniform",
-                    "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "batch_size": 32,
-                        "device": None,
-                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
-                        "trust_remote_code": False,
-                        "default_prompt": None,
-                        "classification_prompt": None,
-                        "cluster_prompt": None,
-                        "sts_prompt": None,
-                        "query_prompt": None,
-                        "revision": None,
-                        "passage_prompt": None,
-                        "similarity_fn_name": None,
-                        "use_cache": True,
-                        "fp16": False,
-                        "bf16": False,
-                    },
                 },
+                "module_name": "knn",
+                "num": 1,
             },
         ),
-        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
-        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        ("update_metrics", {"scoring_accuracy": 0.5, "scoring_roc_auc": 0.6666666666666667}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.5, "scoring_roc_auc": 0.6666666666666667}}),
         ("end_module", {}),
         (
             "start_module",
             {
                 "module_kwargs": {
                     "embedder_config": {
-                        "model_name": "sergeyzh/rubert-tiny-turbo",
-                        "batch_size": 32,
-                        "device": None,
-                        "tokenizer_config": {"padding": True, "truncation": True, "max_length": None},
-                        "trust_remote_code": False,
-                        "default_prompt": None,
+                        "analyzer": "word",
+                        "binary": False,
                         "classification_prompt": None,
                         "cluster_prompt": None,
-                        "sts_prompt": None,
-                        "query_prompt": None,
-                        "revision": None,
+                        "default_prompt": None,
+                        "dtype": "float32",
+                        "lowercase": True,
+                        "n_features": 32,
+                        "ngram_range": (1, 2),
+                        "norm": "l2",
                         "passage_prompt": None,
-                        "similarity_fn_name": None,
+                        "query_prompt": None,
+                        "sts_prompt": None,
                         "use_cache": True,
-                        "fp16": False,
-                        "bf16": False,
                     },
                     "k": 1,
                     "weights": "distance",
@@ -222,18 +216,42 @@ def test_pipeline_callbacks(dataset):
                 "num": 2,
             },
         ),
-        ("update_metrics", {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}),
-        ("log_metric", {"metrics": {"scoring_accuracy": 1.0, "scoring_roc_auc": 1.0}}),
+        ("update_metrics", {"scoring_accuracy": 0.5, "scoring_roc_auc": 0.6666666666666667}),
+        ("log_metric", {"metrics": {"scoring_accuracy": 0.5, "scoring_roc_auc": 0.6666666666666667}}),
         ("end_module", {}),
-        ("start_module", {"module_name": "argmax", "num": 0, "module_kwargs": {}}),
+        ("start_module", {"module_kwargs": {}, "module_name": "argmax", "num": 0}),
+        (
+            "update_metrics",
+            {
+                "decision_accuracy": 0.375,
+                "decision_f1": 0.3333333333333333,
+                "decision_precision": 0.2333333333333333,
+                "decision_recall": 0.6,
+                "decision_roc_auc": 0.7285714285714285,
+            },
+        ),
+        (
+            "log_metric",
+            {
+                "metrics": {
+                    "decision_accuracy": 0.375,
+                    "decision_f1": 0.3333333333333333,
+                    "decision_precision": 0.2333333333333333,
+                    "decision_recall": 0.6,
+                    "decision_roc_auc": 0.7285714285714285,
+                }
+            },
+        ),
+        ("end_module", {}),
+        ("start_module", {"module_kwargs": {"thresh": 0.5}, "module_name": "threshold", "num": 1}),
         (
             "update_metrics",
             {
                 "decision_accuracy": 0.5,
-                "decision_f1": 0.6133333333333333,
-                "decision_precision": 0.55,
-                "decision_recall": 0.8,
-                "decision_roc_auc": 0.8428571428571429,
+                "decision_f1": 0.2533333333333333,
+                "decision_precision": 0.2,
+                "decision_recall": 0.35,
+                "decision_roc_auc": 0.5857142857142857,
             },
         ),
         (
@@ -241,34 +259,10 @@ def test_pipeline_callbacks(dataset):
             {
                 "metrics": {
                     "decision_accuracy": 0.5,
-                    "decision_f1": 0.6133333333333333,
-                    "decision_precision": 0.55,
-                    "decision_recall": 0.8,
-                    "decision_roc_auc": 0.8428571428571429,
-                }
-            },
-        ),
-        ("end_module", {}),
-        ("start_module", {"module_name": "threshold", "num": 1, "module_kwargs": {"thresh": 0.5}}),
-        (
-            "update_metrics",
-            {
-                "decision_accuracy": 1.0,
-                "decision_f1": 1.0,
-                "decision_precision": 1.0,
-                "decision_recall": 1.0,
-                "decision_roc_auc": 1.0,
-            },
-        ),
-        (
-            "log_metric",
-            {
-                "metrics": {
-                    "decision_accuracy": 1.0,
-                    "decision_f1": 1.0,
-                    "decision_precision": 1.0,
-                    "decision_recall": 1.0,
-                    "decision_roc_auc": 1.0,
+                    "decision_f1": 0.2533333333333333,
+                    "decision_precision": 0.2,
+                    "decision_recall": 0.35,
+                    "decision_roc_auc": 0.5857142857142857,
                 }
             },
         ),
