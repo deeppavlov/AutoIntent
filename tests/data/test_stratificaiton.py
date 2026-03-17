@@ -1,5 +1,6 @@
 import pytest
 
+from autointent import Dataset
 from autointent.context.data_handler._stratification import split_dataset
 from autointent.custom_types import Split
 
@@ -41,6 +42,34 @@ def test_multilabel_train_test_split(dataset_unsplitted):
     assert dataset[Split.TRAIN].num_rows == 19
     assert dataset[Split.TEST].num_rows == 17
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST)
+
+
+def test_multilabel_train_test_split_multi_hot_preserves_label_coverage():
+    dataset = Dataset.from_dict(
+        {
+            "train": [
+                {"utterance": "u0", "label": [1, 0, 0]},
+                {"utterance": "u1", "label": [1, 1, 0]},
+                {"utterance": "u2", "label": [0, 1, 0]},
+                {"utterance": "u3", "label": [0, 1, 1]},
+                {"utterance": "u4", "label": [0, 0, 1]},
+                {"utterance": "u5", "label": [1, 0, 1]},
+            ],
+            "intents": [
+                {"id": 0, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 1, "regex_full_match": [], "regex_partial_match": []},
+                {"id": 2, "regex_full_match": [], "regex_partial_match": []},
+            ],
+        }
+    )
+    dataset[Split.TRAIN], dataset[Split.TEST] = split_dataset(
+        dataset,
+        split=Split.TRAIN,
+        test_size=0.5,
+        random_seed=42,
+        allow_oos_in_train=False,
+    )
+    assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST) == dataset.n_classes
 
 
 def test_multilabel_train_test_split_few_shot(dataset_unsplitted):

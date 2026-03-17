@@ -75,7 +75,7 @@ opensearch = [
     "opensearch-py (>=3.0.0, <4.0.0)",
 ]
 openai = [
-    "openai (>=1.59.6,<2.0.0)",
+    "openai (>=2,<3)",
 ]
 
 [tool.uv]
