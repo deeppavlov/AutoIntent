@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -113,9 +114,8 @@ def _iterative_stratify_remaining(
         return
     if random_seed is not None:
         # Workaround for buggy nature of IterativeStratification from skmultilearn
-        from transformers import set_seed
-
-        set_seed(random_seed)
+        random.seed(random_seed)
+        np.random.seed(random_seed)
     splitter = IterativeStratification(
         n_splits=2,
         order=2,
