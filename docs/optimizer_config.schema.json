@@ -1,5 +1,97 @@
 {
     "$defs": {
+        "BaseEmbedderConfig": {
+            "additionalProperties": false,
+            "description": "Base class for embedder configurations.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                }
+            },
+            "title": "BaseEmbedderConfig",
+            "type": "object"
+        },
         "CrossEncoderConfig": {
             "additionalProperties": false,
             "properties": {
@@ -926,6 +1018,9 @@
                 },
                 {
                     "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                },
+                {
+                    "$ref": "#/$defs/BaseEmbedderConfig"
                 }
             ],
             "title": "Embedder Config"
