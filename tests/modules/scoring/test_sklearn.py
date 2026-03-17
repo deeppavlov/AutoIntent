@@ -3,8 +3,10 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import SklearnScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_sklearn(dataset):
@@ -13,7 +15,7 @@ def test_base_sklearn(dataset):
     data_handler = DataHandler(dataset)
 
     scorer = SklearnScorer(
-        embedder_config="sergeyzh/rubert-tiny-turbo",
+        embedder_config=get_test_embedder_config(),
         clf_name="LogisticRegression",
         penalty="elasticnet",
         solver="saga",
@@ -33,11 +35,11 @@ def test_base_sklearn(dataset):
     np.testing.assert_almost_equal(
         np.array(
             [
-                [0.222, 0.287, 0.219, 0.271],
-                [0.222, 0.287, 0.219, 0.271],
-                [0.222, 0.287, 0.219, 0.271],
-                [0.222, 0.287, 0.219, 0.271],
-                [0.222, 0.287, 0.219, 0.271],
+                [0.19808616, 0.33850935, 0.20807189, 0.25533256],
+                [0.21305655, 0.28760493, 0.22420657, 0.275132],
+                [0.21481034, 0.2826606, 0.22563915, 0.27688998],
+                [0.21779545, 0.27305433, 0.22861205, 0.2805381],
+                [0.18922822, 0.3680897, 0.19876744, 0.2439147],
             ]
         ),
         predictions,
@@ -54,3 +56,26 @@ def test_base_sklearn(dataset):
         new_scorer = SklearnScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+def test_sklearn_in_pipeline(dataset):
+    """Test SklearnScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "sklearn",
+                    "clf_name": ["LogisticRegression"],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

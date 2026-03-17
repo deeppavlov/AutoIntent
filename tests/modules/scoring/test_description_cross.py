@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CrossEncoderDescriptionScorer
 
@@ -64,3 +65,26 @@ def test_description_scorer_cross_encoder(dataset, expected_prediction, multilab
         np.testing.assert_almost_equal(predictions, loaded_predictions, decimal=5)
 
         new_scorer.clear_cache()
+
+
+def test_description_cross_in_pipeline(dataset):
+    """Test CrossEncoderDescriptionScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "description_cross",
+                    "cross_encoder_config": [{"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2"}],
+                    "temperature": [0.3],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

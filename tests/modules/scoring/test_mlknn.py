@@ -3,8 +3,10 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import MLKnnScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_mlknn(dataset):
@@ -12,7 +14,7 @@ def test_base_mlknn(dataset):
 
     data_handler = DataHandler(dataset.to_multilabel())
 
-    scorer = MLKnnScorer(embedder_config="sergeyzh/rubert-tiny-turbo", k=3)
+    scorer = MLKnnScorer(embedder_config=get_test_embedder_config(), k=3)
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
 
     test_data = [
@@ -52,3 +54,30 @@ def test_base_mlknn(dataset):
         new_scorer = MLKnnScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)
+
+
+def test_mlknn_in_pipeline(dataset):
+    """Test MLKnnScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_hit_rate",
+            "search_space": [
+                {
+                    "module_name": "mlknn",
+                    "k": [3],
+                }
+            ],
+        },
+        {
+            "node_type": "decision",
+            "target_metric": "decision_accuracy",
+            "search_space": [{"module_name": "threshold", "thresh": [0.5]}],
+        },
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset.to_multilabel())
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

@@ -124,4 +124,5 @@ class BERTLoRAScorer(BertScorer):
 
     def dump(self, path: str) -> None:
         from peft import LoraConfig
+
         Dumper.dump(self, Path(path), exclude=[LoraConfig])

@@ -12,7 +12,6 @@ search_space:
         k:
           low: 1
           high: 20
-      - module_name: catboost
       - module_name: sklearn
         clf_name: [RandomForestClassifier]
         n_estimators: [150]

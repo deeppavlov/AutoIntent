@@ -3,8 +3,10 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import KNNScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_knn(dataset):
@@ -12,7 +14,7 @@ def test_base_knn(dataset):
 
     data_handler = DataHandler(dataset)
 
-    scorer = KNNScorer(k=3, weights="distance", embedder_config="sergeyzh/rubert-tiny-turbo")
+    scorer = KNNScorer(k=3, weights="distance", embedder_config=get_test_embedder_config())
 
     test_data = [
         "why is there a hold on my american saving bank account",
@@ -47,3 +49,27 @@ def test_base_knn(dataset):
         new_scorer = KNNScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         assert np.allclose(predictions, new_predictions)
+
+
+def test_knn_in_pipeline(dataset):
+    """Test KNNScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "knn",
+                    "k": [3],
+                    "weights": ["distance"],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

@@ -12,8 +12,17 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, overload
 
-from autointent.configs._embedder import OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+from autointent.configs._embedder import (
+    EmbedderConfig,
+    HashingVectorizerEmbeddingConfig,
+    OpenaiEmbeddingConfig,
+    SentenceTransformerEmbeddingConfig,
+)
+from autointent.custom_types import ListOfLabels
 
+from . import HashingVectorizerEmbeddingBackend
+from .base import BaseEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
 
@@ -27,7 +36,6 @@ if TYPE_CHECKING:
     from autointent.custom_types import ListOfLabels
 
     from .base import BaseEmbeddingBackend
-
 logger = logging.getLogger(__name__)
 
 
@@ -58,6 +66,8 @@ class Embedder:
             return SentenceTransformerEmbeddingBackend(self.config)
         if isinstance(self.config, OpenaiEmbeddingConfig):
             return OpenaiEmbeddingBackend(self.config)
+        if isinstance(self.config, HashingVectorizerEmbeddingConfig):
+            return HashingVectorizerEmbeddingBackend(self.config)
         # Check if it's exactly the abstract base config (not a subclass)
 
         msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
@@ -153,6 +163,8 @@ class Embedder:
             instance._backend = SentenceTransformerEmbeddingBackend.load(backend_path)
         elif isinstance(config, OpenaiEmbeddingConfig):
             instance._backend = OpenaiEmbeddingBackend.load(backend_path)
+        elif isinstance(config, HashingVectorizerEmbeddingConfig):
+            instance._backend = HashingVectorizerEmbeddingBackend.load(backend_path)
         else:
             msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
             raise TypeError(msg)

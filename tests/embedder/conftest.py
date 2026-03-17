@@ -3,7 +3,11 @@ import platform
 
 import pytest
 
-from autointent.configs import OpenaiEmbeddingConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs import (
+    HashingVectorizerEmbeddingConfig,
+    OpenaiEmbeddingConfig,
+    SentenceTransformerEmbeddingConfig,
+)
 
 # Check if OpenAI API key is available for testing
 openai_available = os.getenv("OPENAI_API_KEY") is not None
@@ -18,6 +22,13 @@ def on_windows() -> bool:
 
 # Backend configurations for parametrization
 backend_configs = [
+    pytest.param(
+        HashingVectorizerEmbeddingConfig(
+            n_features=512,
+            use_cache=False,
+        ),
+        id="hashing_vectorizer",
+    ),
     pytest.param(
         SentenceTransformerEmbeddingConfig(
             model_name="sergeyzh/rubert-tiny-turbo",

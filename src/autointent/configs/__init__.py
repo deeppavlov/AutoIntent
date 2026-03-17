@@ -2,6 +2,7 @@
 
 from ._embedder import (
     EmbedderConfig,
+    HashingVectorizerEmbeddingConfig,
     OpenaiEmbeddingConfig,
     SentenceTransformerEmbeddingConfig,
     TaskTypeEnum,
@@ -30,6 +31,7 @@ __all__ = [
     "FaissConfig",
     "HFModelConfig",
     "HPOConfig",
+    "HashingVectorizerEmbeddingConfig",
     "InferenceNodeConfig",
     "LoggingConfig",
     "OpenSearchConfig",

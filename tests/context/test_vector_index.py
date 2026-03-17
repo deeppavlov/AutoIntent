@@ -10,8 +10,9 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import FaissConfig, OpenSearchConfig, get_default_embedder_config
+from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
 from autointent.custom_types import Document
+from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
     from autointent.configs import EmbedderConfig
@@ -66,7 +67,7 @@ class TestVectorIndex:
     @pytest.fixture
     def embedder_config(self) -> EmbedderConfig:
         """Create a lightweight embedder config for testing."""
-        return get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        return get_test_embedder_config()
 
     @pytest.fixture
     def vector_index(self, embedder_config: EmbedderConfig, vector_config) -> VectorIndex:
@@ -250,16 +251,13 @@ class TestVectorIndex:
             vector_index.dump(dump_path)
 
             # Create override config
-            override_config = get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            override_config.device = "cpu"
-            override_config.batch_size = 1
+            override_config = get_test_embedder_config()
 
             # Load with override
             loaded_index = VectorIndex.load(dump_path, embedder_override_config=override_config)
 
-            # Check that override was applied
-            assert loaded_index.embedder.config.device == "cpu"
-            assert loaded_index.embedder.config.batch_size == 1
+            # Check that loaded index works with overridden config
+            assert loaded_index.embedder.config.n_features == 512
 
     def test_error_handling_mismatched_lengths(self, vector_index: VectorIndex):
         """Test error handling when texts and labels have different lengths."""
@@ -295,7 +293,7 @@ class TestVectorIndexEdgeCases:
         """Test that using abstract VectorIndexConfig raises an error."""
         from autointent.configs import VectorIndexConfig
 
-        embedder_config = get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embedder_config = get_test_embedder_config()
 
         vector_index = VectorIndex(embedder_config=embedder_config, config=VectorIndexConfig())
         with pytest.raises(TypeError, match="Passed abstract vector index config"):

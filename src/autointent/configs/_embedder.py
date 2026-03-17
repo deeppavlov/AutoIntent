@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from abc import ABC
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt
 
 from ._transformers import HFModelConfig
 
@@ -101,6 +101,26 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     max_per_second: float | None = Field(
         None, description="Maximum number of API requests per second. Only used with async processing."
     )
+
+
+class HashingVectorizerEmbeddingConfig(EmbedderConfig):
+    """Configuration for HashingVectorizer based embeddings from sklearn.
+
+    This is a lightweight, stateless vectorizer that uses hashing trick for text feature extraction.
+    Ideal for testing as it has no model dependencies and is very fast.
+    """
+
+    n_features: PositiveInt = Field(
+        2**18, description="Number of features (hash space dimension). Use 512 for fast tests."
+    )
+    ngram_range: tuple[int, int] = Field((1, 2), description="The lower and upper boundary of ngram range.")
+    analyzer: Literal["word", "char", "char_wb"] = Field(
+        "word", description="Whether to use word or character n-grams."
+    )
+    lowercase: bool = Field(True, description="Convert all characters to lowercase before tokenizing.")
+    norm: Literal["l1", "l2"] | None = Field("l2", description="Norm used to normalize term vectors.")
+    binary: bool = Field(False, description="If True, all non-zero counts are set to 1.")
+    dtype: str = Field("float32", description="Type of the matrix returned by fit_transform() or transform().")
 
 
 def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401

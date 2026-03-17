@@ -4,6 +4,7 @@ import tempfile
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LLMDescriptionScorer
 
@@ -50,3 +51,29 @@ def test_description_scorer_llm(dataset, multilabel):
         new_scorer = LLMDescriptionScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_utterances)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+@pytest.mark.skipif(
+    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
+    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
+)
+def test_llm_description_in_pipeline(dataset):
+    """Test LLMDescriptionScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "description_llm",
+                    "temperature": [0.3],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1
