@@ -21,7 +21,6 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
     from pathlib import Path
-    import peft
 
     from catboost import CatBoostClassifier
     from peft import PeftModel
@@ -228,6 +227,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401
         require("peft", extra="peft")
         require("transformers", extra="transformers")
+        import peft
         import transformers
 
         if (path / "ptuning").exists():
