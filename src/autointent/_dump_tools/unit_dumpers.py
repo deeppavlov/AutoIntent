@@ -9,7 +9,6 @@ import aiofiles
 import joblib
 import numpy as np
 import numpy.typing as npt
-import peft
 from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
@@ -22,6 +21,7 @@ from .base import BaseObjectDumper, ModuleSimpleAttributes
 
 if TYPE_CHECKING:
     from pathlib import Path
+    import peft
 
     from catboost import CatBoostClassifier
     from peft import PeftModel
