@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig, get_default_embedder_config
+from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
 from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
 
@@ -249,9 +249,8 @@ class TestVectorIndex:
             vector_index.dump(dump_path)
 
             # Create override config
-            override_config = get_default_embedder_config(model_name="sentence-transformers/all-MiniLM-L6-v2")
-            override_config.device = "cpu"
-            override_config.batch_size = 1
+            override_config = get_test_embedder_config()
+            override_config.analyzer = "char"
 
             # Load with override
             loaded_index = VectorIndex.load(dump_path, embedder_override_config=override_config)

@@ -18,10 +18,10 @@ from autointent.configs import (
     VectorIndexConfig,
     get_default_hfmodel_config,
 )
+from autointent.configs._embedder import BaseEmbedderConfig
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
-from ..configs._embedder import BaseEmbedderConfig
 
 if TYPE_CHECKING:
     from pathlib import Path

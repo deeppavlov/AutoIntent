@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC
 from enum import Enum
 from typing import Any, Literal, TypeAlias
 

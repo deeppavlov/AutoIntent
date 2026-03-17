@@ -11,12 +11,12 @@ from autointent.modules import TunableDecision
         (
             "multiclass_fit_data",
             np.array([[0.1, 0.9, 0, 0.5], [0.8, 0, 0.2, 0.5], [0, 0.3, 0.7, 0.5]]),
-            [1, 0, 2],
+            [1, None, None],
         ),
         (
             "multilabel_fit_data",
             np.array([[0.1, 0.9, 0, 0.1], [0.8, 0, 0.1, 0.1], [0, 0.2, 0.7, 0.1]]),
-            [None, None, [0, 0, 1, 0]],
+            [[0, 1, 0, 0], [1, 0, 0, 0], None],
         ),
     ],
 )
