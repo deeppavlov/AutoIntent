@@ -5,8 +5,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import HFModelConfig
 from autointent import Pipeline
+from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import PTuningScorer
 

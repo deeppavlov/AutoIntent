@@ -1,12 +1,12 @@
 """HashingVectorizer-based embedding backend for lightweight testing."""
 
+from __future__ import annotations
+
 import json
 import logging
-from pathlib import Path
-from typing import Literal, overload
+from typing import TYPE_CHECKING, Literal, overload
 
 import numpy as np
-import numpy.typing as npt
 import torch
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -16,6 +16,11 @@ from autointent.configs import TaskTypeEnum
 from autointent.configs._embedder import HashingVectorizerEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +144,7 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         logger.debug("Saved HashingVectorizer backend to %s", path)
 
     @classmethod
-    def load(cls, path: Path) -> "HashingVectorizerEmbeddingBackend":
+    def load(cls, path: Path) -> HashingVectorizerEmbeddingBackend:
         """Load the backend from disk.
 
         Args:

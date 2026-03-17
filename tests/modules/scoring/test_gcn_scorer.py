@@ -2,9 +2,8 @@ import numpy as np
 import pytest
 import torch
 
-from autointent import Dataset
-from autointent.configs import SentenceTransformerEmbeddingConfig
 from autointent import Dataset, Pipeline
+from autointent.configs import SentenceTransformerEmbeddingConfig
 from autointent.modules.scoring import GCNScorer
 from tests.conftest import get_test_embedder_config
 

@@ -10,7 +10,6 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import FaissConfig, OpenSearchConfig, get_default_embedder_config
 from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
 from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
