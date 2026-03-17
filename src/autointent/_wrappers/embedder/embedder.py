@@ -12,17 +12,13 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, overload
 
-from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
 from autointent.configs._embedder import (
-    EmbedderConfig,
     HashingVectorizerEmbeddingConfig,
     OpenaiEmbeddingConfig,
     SentenceTransformerEmbeddingConfig,
 )
-from autointent.custom_types import ListOfLabels
 
-from . import HashingVectorizerEmbeddingBackend
-from .base import BaseEmbeddingBackend
+from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
 
