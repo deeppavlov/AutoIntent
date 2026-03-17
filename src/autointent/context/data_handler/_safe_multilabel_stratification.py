@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from skmultilearn.model_selection import IterativeStratification
-from transformers import set_seed
 
 if TYPE_CHECKING:
     import numpy.typing as npt
@@ -114,6 +113,7 @@ def _iterative_stratify_remaining(
         return
     if random_seed is not None:
         # Workaround for buggy nature of IterativeStratification from skmultilearn
+        from transformers import set_seed
         set_seed(random_seed)
     splitter = IterativeStratification(
         n_splits=2,

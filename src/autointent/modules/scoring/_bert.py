@@ -152,7 +152,7 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(
+        self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
             self.classification_model_config.model_name, revision=self.classification_model_config.revision
         )
         self._model = self._initialize_model()
