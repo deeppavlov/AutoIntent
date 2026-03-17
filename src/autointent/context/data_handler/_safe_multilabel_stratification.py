@@ -115,7 +115,7 @@ def _iterative_stratify_remaining(
     if random_seed is not None:
         # Workaround for buggy nature of IterativeStratification from skmultilearn
         random.seed(random_seed)
-        np.random.seed(random_seed)
+        np.random.seed(random_seed)  # noqa: NPY002
     splitter = IterativeStratification(
         n_splits=2,
         order=2,

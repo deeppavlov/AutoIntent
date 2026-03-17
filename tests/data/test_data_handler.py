@@ -93,10 +93,10 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
     assert handler.multilabel is True
     assert handler.dataset.n_classes == 2
     assert handler.train_utterances(0) == [
-        "farewell and see you later",
-        "good morning",
+        "hey, how's it going?",
         "so long and take care",
-        "greetings and salutations",
+        "hello, nice to meet you",
+        "later, see you soon",
     ]
     assert handler.test_utterances() == ["greetings", "farewell"]
     assert handler.train_labels(0) == [[0, 1], [1, 0], [0, 1], [1, 0]]
