@@ -22,9 +22,6 @@ from tests.conftest import get_search_space, setup_environment
     ],
 )
 def test_with_regex(dataset, data_config, refit_after):
-    pytest.importorskip(
-        "sentence_transformers", reason="Sentence Transformers library is required for regex-based pipelines"
-    )
     project_dir = setup_environment()
     search_space = get_search_space("regex")
 
@@ -37,10 +34,6 @@ def test_with_regex(dataset, data_config, refit_after):
 
 
 def test_no_node_separation(dataset_no_oos):
-    pytest.importorskip(
-        "sentence_transformers", reason="Sentence Transformers library is required for regex-based pipelines"
-    )
-
     project_dir = setup_environment()
     search_space = get_search_space("light")
 
@@ -53,10 +46,6 @@ def test_no_node_separation(dataset_no_oos):
 
 
 def test_full_config(dataset_no_oos):
-    pytest.importorskip(
-        "sentence_transformers", reason="Sentence Transformers library is required for regex-based pipelines"
-    )
-
     config_path = ires.files("tests.assets.configs").joinpath("full_training.yaml")
     pipeline_optimizer = Pipeline.from_optimization_config(config_path)
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
@@ -67,10 +56,6 @@ def test_full_config(dataset_no_oos):
     ["tpe", "random"],
 )
 def test_bayes(dataset, sampler):
-    pytest.importorskip(
-        "sentence_transformers", reason="Sentence Transformers library is required for regex-based pipelines"
-    )
-
     project_dir = setup_environment()
     search_space = get_search_space("optuna")
 
@@ -99,7 +84,6 @@ def test_bayes(dataset, sampler):
     ],
 )
 def test_cv(dataset, task_type):
-    pytest.importorskip("peft")
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -133,8 +117,6 @@ def test_cv(dataset, task_type):
     ],
 )
 def test_no_context_optimization(dataset, task_type):
-    pytest.importorskip("peft")
-
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -166,8 +148,6 @@ def test_no_context_optimization(dataset, task_type):
     ],
 )
 def test_dump_modules(dataset, task_type):
-    pytest.importorskip("peft")
-
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
