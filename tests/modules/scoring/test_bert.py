@@ -5,15 +5,20 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from autointent import Pipeline
 from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BertScorer
 
 _config = HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
 
+pytest.importorskip("transformers", reason="Transformers library is required for BertScorer tests")
+
 
 def test_bert_scorer_dump_load(dataset):
     """Test that BertScorer can be saved and loaded while preserving predictions."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Create and train scorer
@@ -58,6 +63,8 @@ def test_bert_scorer_dump_load(dataset):
 
 def test_bert_prediction(dataset):
     """Test that the transformer model can fit and make predictions."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     scorer = BertScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
@@ -95,6 +102,8 @@ def test_bert_prediction(dataset):
 
 def test_bert_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     scorer = BertScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
@@ -116,3 +125,27 @@ def test_bert_cache_clearing(dataset):
     # Should raise exception after clearing cache
     with pytest.raises(RuntimeError):
         scorer.predict(test_data)
+
+
+def test_bert_in_pipeline(dataset):
+    """Test BertScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "bert",
+                    "classification_model_config": [{"model_name": "prajjwal1/bert-tiny"}],
+                    "num_train_epochs": [1],
+                    "batch_size": [8],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

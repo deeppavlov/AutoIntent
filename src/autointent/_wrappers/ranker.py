@@ -16,16 +16,17 @@ from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import joblib
 import numpy as np
-import sentence_transformers as st
 import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
+from autointent._utils import require
 from autointent.configs import CrossEncoderConfig
 from autointent.custom_types import RerankedItem
 
 if TYPE_CHECKING:
     import numpy.typing as npt
+    import sentence_transformers as st
 
     from autointent.custom_types import ListOfLabels
 
@@ -116,12 +117,16 @@ class Ranker:
             classifier_head: Optional pre-trained classifier head
             output_range: Range of the output probabilities ([0, 1] for sigmoid, [-1, 1] for tanh)
         """
+        # Lazy import sentence-transformers
+        require("sentence_transformers", extra="sentence-transformers")
+        from sentence_transformers import CrossEncoder
+
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)
-        self.cross_encoder = st.CrossEncoder(
+        self.cross_encoder = CrossEncoder(
             self.config.model_name,
             trust_remote_code=self.config.trust_remote_code,
             device=self.config.device,
-            max_length=self.config.tokenizer_config.max_length,
+            max_length=self.config.tokenizer_config.max_length,  # type: ignore[arg-type]
         )
         self._train_head = False
         self._clf = classifier_head
@@ -130,7 +135,7 @@ class Ranker:
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)  # type: ignore[union-attr]
+            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         """Hook to capture classifier activations.
@@ -154,7 +159,7 @@ class Ranker:
         """
         if not self._train_head:
             return np.array(
-                self.cross_encoder.predict(  # type: ignore[call-overload]
+                self.cross_encoder.predict(
                     pairs,
                     batch_size=self.config.batch_size,
                     activation_fct=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),

@@ -5,15 +5,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType, get_peft_model
 from pydantic import PositiveInt
 
 from autointent import Context
 from autointent._dump_tools import Dumper
+from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
+    from peft import PromptEncoderConfig
+
     from autointent._callbacks import REPORTERS_NAMES
 
 
@@ -51,6 +53,8 @@ class PTuningScorer(BertScorer):
 
     name = "ptuning"
 
+    _ptuning_config: PromptEncoderConfig
+
     def __init__(  # noqa: PLR0913
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -68,6 +72,11 @@ class PTuningScorer(BertScorer):
         print_progress: bool = False,
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
+        # Lazy import peft
+        require("peft", extra="peft")
+
+        from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType
+
         super().__init__(
             classification_model_config=classification_model_config,
             num_train_epochs=num_train_epochs,
@@ -143,7 +152,11 @@ class PTuningScorer(BertScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         """Initialize the model with P-tuning configuration."""
         model = super()._initialize_model()
+        from peft import get_peft_model
+
         return get_peft_model(model, self._ptuning_config)
 
     def dump(self, path: str) -> None:
+        from peft import PromptEncoderConfig
+
         Dumper.dump(self, Path(path), exclude=[PromptEncoderConfig])

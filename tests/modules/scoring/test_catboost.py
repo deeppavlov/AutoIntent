@@ -5,11 +5,12 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from autointent.configs import SentenceTransformerEmbeddingConfig
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import CatBoostScorer
+from tests.conftest import get_test_embedder_config
 
-_embedder_config = SentenceTransformerEmbeddingConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
+pytest.importorskip("catboost")
 
 
 def test_catboost_scorer_dump_load(dataset):
@@ -17,6 +18,7 @@ def test_catboost_scorer_dump_load(dataset):
     data_handler = DataHandler(dataset)
 
     scorer_original = CatBoostScorer(
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -56,7 +58,7 @@ def test_catboost_prediction_multilabel(dataset):
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = CatBoostScorer(
-        embedder_config=_embedder_config,
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -82,11 +84,11 @@ def test_catboost_prediction_multilabel(dataset):
         predictions,
         np.array(
             [
-                [0.41777172, 0.5278134, 0.41807876, 0.4174544],
-                [0.40775846, 0.46434019, 0.42728555, 0.43836945],
-                [0.4207232, 0.49201536, 0.42798494, 0.41541217],
-                [0.46765036, 0.45065999, 0.49705517, 0.45052473],
-                [0.41694272, 0.54160408, 0.40944069, 0.41674984],
+                [0.37150982, 0.5935175, 0.36279131, 0.37357718],
+                [0.37309364, 0.53746911, 0.38326219, 0.39884488],
+                [0.37744044, 0.56529594, 0.37456834, 0.38646843],
+                [0.41484185, 0.48539558, 0.41669755, 0.42929345],
+                [0.38344306, 0.58516115, 0.37940454, 0.39640789],
             ]
         ),
         rtol=0.01,
@@ -100,7 +102,7 @@ def test_catboost_features_types(dataset, features_type, use_embedding_features)
     data_handler = DataHandler(dataset)
 
     scorer = CatBoostScorer(
-        embedder_config=_embedder_config,
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -132,6 +134,7 @@ def test_catboost_cache_clearing(dataset):
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
     scorer = CatBoostScorer(
+        embedder_config=get_test_embedder_config(),
         iterations=50,
         learning_rate=0.05,
         depth=6,
@@ -146,3 +149,28 @@ def test_catboost_cache_clearing(dataset):
     scorer.clear_cache()
     with pytest.raises(RuntimeError):
         scorer.predict(test_data)
+
+
+def test_catboost_in_pipeline(dataset):
+    """Test CatBoostScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "catboost",
+                    "iterations": [50],
+                    "learning_rate": [0.05],
+                    "features_type": ["embedding"],
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

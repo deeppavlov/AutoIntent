@@ -3,24 +3,17 @@
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import torch
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
-from transformers import (
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    DataCollatorWithPadding,
-    EarlyStoppingCallback,
-    PrinterCallback,
-    ProgressCallback,
-    Trainer,
-    TrainingArguments,
-)
 
 from autointent import Context
+from autointent._callbacks import REPORTERS_NAMES
+from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
@@ -29,10 +22,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     import numpy.typing as npt
-    from transformers import (
-        EvalPrediction,
-    )
-    from transformers.trainer_callback import TrainerCallback
+    from transformers import EvalPrediction, TrainerCallback
 
     from autointent._callbacks import REPORTERS_NAMES
     from autointent.custom_types import ListOfLabels
@@ -98,6 +88,7 @@ class BertScorer(BaseScorer):
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
         print_progress: bool = False,
     ) -> None:
+        require("transformers", "transformers")
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size
@@ -137,6 +128,8 @@ class BertScorer(BaseScorer):
         }
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
+        from transformers import AutoModelForSequenceClassification
+
         label2id = {i: i for i in range(self._n_classes)}
         id2label = {i: i for i in range(self._n_classes)}
 
@@ -155,9 +148,11 @@ class BertScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
+        from transformers import AutoTokenizer
+
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(
+        self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
             self.classification_model_config.model_name, revision=self.classification_model_config.revision
         )
         self._model = self._initialize_model()
@@ -172,6 +167,8 @@ class BertScorer(BaseScorer):
         Args:
             tokenized_dataset: output from :py:meth:`BertScorer._get_tokenized_dataset`
         """
+        from transformers import DataCollatorWithPadding, PrinterCallback, ProgressCallback, Trainer, TrainingArguments
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             training_args = TrainingArguments(
                 output_dir=tmp_dir,
@@ -209,6 +206,8 @@ class BertScorer(BaseScorer):
             trainer.train()
 
     def _get_trainer_callbacks(self) -> list[TrainerCallback]:
+        from transformers import EarlyStoppingCallback
+
         res: list[TrainerCallback] = []
         if self.early_stopping_config.metric is not None:
             res.append(

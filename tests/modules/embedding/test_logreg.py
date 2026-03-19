@@ -1,17 +1,17 @@
 import numpy as np
 
 from autointent.modules.embedding import LogregAimedEmbedding
-from tests.conftest import setup_environment
+from tests.conftest import get_test_embedder_config, setup_environment
 
 
 def test_get_assets_returns_correct_artifact_for_logreg():
-    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     artifact = module.get_assets()
-    assert artifact.config.model_name == "sergeyzh/rubert-tiny-turbo"
+    assert artifact.config.n_features == 512
 
 
 def test_fit_trains_model():
-    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -23,7 +23,7 @@ def test_fit_trains_model():
 
 
 def test_predict_evaluates_model():
-    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
@@ -37,7 +37,7 @@ def test_predict_evaluates_model():
 
 
 def test_dump_load():
-    module = LogregAimedEmbedding(embedder_config="sergeyzh/rubert-tiny-turbo")
+    module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)

@@ -8,7 +8,7 @@ sh = uv run --no-sync --frozen
 .PHONY: install
 install:
 	rm -rf uv.lock 
-	uv sync --all-groups
+	uv sync --all-groups --extra catboost --extra peft --extra sentence-transformers --extra transformers
 
 .PHONY: test
 test:

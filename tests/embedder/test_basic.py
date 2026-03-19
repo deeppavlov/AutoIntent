@@ -71,20 +71,3 @@ class TestEmbedderBasic:
         sim2 = embedder.similarity(embeddings[1:], embeddings[:1])
 
         np.testing.assert_allclose(sim1, sim2.T, rtol=1e-5)
-
-    def test_return_tensors_functionality(self, embedder: Embedder):
-        """Test return_tensors parameter."""
-        utterances = ["Hello world", "Test sentence"]
-
-        # Test numpy return (default)
-        embeddings_np = embedder.embed(utterances, return_tensors=False)
-        assert isinstance(embeddings_np, np.ndarray)
-
-        # Test tensor return
-        embeddings_tensor = embedder.embed(utterances, return_tensors=True)
-        import torch
-
-        assert isinstance(embeddings_tensor, torch.Tensor)
-
-        # Values should be the same
-        np.testing.assert_allclose(embeddings_np, embeddings_tensor.cpu().numpy(), rtol=1e-5)

@@ -12,7 +12,9 @@ def multiclass_fit_data(dataset):
     knn_params = {
         "k": 3,
         "weights": "distance",
-        "embedder_config": "sergeyzh/rubert-tiny-turbo",
+        "embedder_config": {
+            "n_features": 32,
+        },
     }
     scorer = KNNScorer(**knn_params)
 
@@ -29,7 +31,9 @@ def multilabel_fit_data(dataset):
     knn_params = {
         "k": 3,
         "weights": "distance",
-        "embedder_config": "sergeyzh/rubert-tiny-turbo",
+        "embedder_config": {
+            "n_features": 32,
+        },
     }
     scorer = KNNScorer(**knn_params)
 

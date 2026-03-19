@@ -2,14 +2,16 @@ import tempfile
 
 import numpy as np
 
+from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import LinearScorer
+from tests.conftest import get_test_embedder_config
 
 
 def test_base_linear(dataset):
     data_handler = DataHandler(dataset)
 
-    scorer = LinearScorer(embedder_config="sergeyzh/rubert-tiny-turbo")
+    scorer = LinearScorer(embedder_config=get_test_embedder_config())
 
     scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
     test_data = [
@@ -23,11 +25,11 @@ def test_base_linear(dataset):
     np.testing.assert_almost_equal(
         np.array(
             [
-                [0.05998958, 0.74930755, 0.07045561, 0.12024726],
-                [0.06299568, 0.60657246, 0.11424723, 0.21618463],
-                [0.1285409, 0.53515583, 0.14137456, 0.19492871],
-                [0.09999432, 0.3907234, 0.12208764, 0.38719464],
-                [0.04322527, 0.85661047, 0.03667959, 0.06348467],
+                [4.42261625e-03, 9.80002146e-01, 5.84225268e-03, 9.73298532e-03],
+                [3.48457612e-02, 8.67882177e-01, 5.26664920e-02, 4.46055700e-02],
+                [6.60129036e-02, 6.81724763e-01, 6.13724992e-02, 1.90889834e-01],
+                [3.19191741e-01, 3.05030337e-01, 1.57439488e-01, 2.18338434e-01],
+                [1.25137105e-04, 9.99343901e-01, 2.06237249e-04, 3.24724282e-04],
             ]
         ),
         predictions,
@@ -44,3 +46,25 @@ def test_base_linear(dataset):
         new_scorer = LinearScorer.load(temp_dir)
         new_predictions = new_scorer.predict(test_data)
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
+
+
+def test_linear_in_pipeline(dataset):
+    """Test LinearScorer as part of an AutoML pipeline."""
+    search_space = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_roc_auc",
+            "search_space": [
+                {
+                    "module_name": "linear",
+                }
+            ],
+        },
+        {"node_type": "decision", "target_metric": "decision_accuracy", "search_space": [{"module_name": "argmax"}]},
+    ]
+
+    pipeline = Pipeline.from_search_space(search_space)
+    pipeline.set_config(get_test_embedder_config())
+    pipeline.fit(dataset)
+    predictions = pipeline.predict(["test utterance"])
+    assert len(predictions) == 1

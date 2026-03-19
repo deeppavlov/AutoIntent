@@ -2,16 +2,20 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+import pytest
 
 from autointent._wrappers.embedder import Embedder
 from autointent.configs import EmbedderFineTuningConfig, HFModelConfig
 from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
 from autointent.context.data_handler import DataHandler
 
+pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
+
 
 def test_finetune_dump_load(dataset, on_windows):
     """Test scenario: fine-tune -> dump -> load."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Setup config for fine-tuning
@@ -23,7 +27,7 @@ def test_finetune_dump_load(dataset, on_windows):
         use_cache=False,
     )
 
-    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
+    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
@@ -67,6 +71,8 @@ def test_finetune_dump_load(dataset, on_windows):
 
 def test_dump_load_finetune(dataset, on_windows):
     """Test scenario: dump -> load -> fine-tune."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Setup config
@@ -78,7 +84,7 @@ def test_dump_load_finetune(dataset, on_windows):
         use_cache=False,
     )
 
-    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
+    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
@@ -119,6 +125,10 @@ def test_dump_load_finetune(dataset, on_windows):
 
 def test_load_from_disk_finetune_dump_load(dataset, on_windows):
     """Test scenario: load sentence transformer from disk -> fine-tune -> dump -> load."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
+    from sentence_transformers import SentenceTransformer
+
     data_handler = DataHandler(dataset)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
@@ -144,7 +154,7 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
         embeddings_before_training = embedder_from_disk.embed(test_utterances)
 
         # Step 3: Fine-tune the embedder loaded from disk
-        train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
+        train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
         embedder_from_disk.train(
             utterances=data_handler.train_utterances(0),
             labels=data_handler.train_labels(0),
@@ -176,6 +186,8 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
 
 def test_embeddings_consistency_across_workflows(dataset, on_windows):
     """Test that different workflows produce consistent results when starting from same model."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
+
     data_handler = DataHandler(dataset)
 
     # Common config
@@ -186,7 +198,7 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
         similarity_fn_name="cosine",
         use_cache=False,
     )
-    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
+    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
     test_utterances = ["Test sentence for embedding"]
     train_data = {
@@ -220,6 +232,7 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
 
 def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
     """Test that multiple dump/load cycles preserve fine-tuned model state."""
+    pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
     data_handler = DataHandler(dataset)
 
     hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)
@@ -230,7 +243,7 @@ def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
         use_cache=False,
     )
 
-    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4, early_stopping=False)
+    train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)

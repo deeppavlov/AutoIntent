@@ -1,0 +1,18 @@
+name: test scorers
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        dependency-group: [ "base", "transformers", "peft", "catboost" ]
+    uses: ./.github/workflows/reusable-test.yaml
+    with:
+      test_command: pytest -n auto tests/modules/scoring/
+      extras: ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}

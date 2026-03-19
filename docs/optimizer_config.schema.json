@@ -1,5 +1,97 @@
 {
     "$defs": {
+        "BaseEmbedderConfig": {
+            "additionalProperties": false,
+            "description": "Base class for embedder configurations.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                }
+            },
+            "title": "BaseEmbedderConfig",
+            "type": "object"
+        },
         "CrossEncoderConfig": {
             "additionalProperties": false,
             "properties": {
@@ -132,98 +224,6 @@
                 }
             },
             "title": "DataConfig",
-            "type": "object"
-        },
-        "EmbedderConfig": {
-            "additionalProperties": false,
-            "description": "Base class for embedder configurations.",
-            "properties": {
-                "default_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
-                    "title": "Default Prompt"
-                },
-                "classification_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Prompt for classifier.",
-                    "title": "Classification Prompt"
-                },
-                "cluster_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Prompt for clustering.",
-                    "title": "Cluster Prompt"
-                },
-                "sts_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Prompt for finding most similar sentences.",
-                    "title": "Sts Prompt"
-                },
-                "query_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Prompt for query.",
-                    "title": "Query Prompt"
-                },
-                "passage_prompt": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "description": "Prompt for passage.",
-                    "title": "Passage Prompt"
-                },
-                "use_cache": {
-                    "default": true,
-                    "description": "Whether to use embeddings caching.",
-                    "title": "Use Cache",
-                    "type": "boolean"
-                }
-            },
-            "title": "EmbedderConfig",
             "type": "object"
         },
         "HFModelConfig": {
@@ -366,6 +366,170 @@
             "title": "HPOConfig",
             "type": "object"
         },
+        "HashingVectorizerEmbeddingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for HashingVectorizer based embeddings from sklearn.\n\nThis is a lightweight, stateless vectorizer that uses hashing trick for text feature extraction.\nIdeal for testing as it has no model dependencies and is very fast.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "n_features": {
+                    "default": 262144,
+                    "description": "Number of features (hash space dimension). Use 512 for fast tests.",
+                    "exclusiveMinimum": 0,
+                    "title": "N Features",
+                    "type": "integer"
+                },
+                "ngram_range": {
+                    "default": [
+                        1,
+                        2
+                    ],
+                    "description": "The lower and upper boundary of ngram range.",
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "integer"
+                        }
+                    ],
+                    "title": "Ngram Range",
+                    "type": "array"
+                },
+                "analyzer": {
+                    "default": "word",
+                    "description": "Whether to use word or character n-grams.",
+                    "enum": [
+                        "word",
+                        "char",
+                        "char_wb"
+                    ],
+                    "title": "Analyzer",
+                    "type": "string"
+                },
+                "lowercase": {
+                    "default": true,
+                    "description": "Convert all characters to lowercase before tokenizing.",
+                    "title": "Lowercase",
+                    "type": "boolean"
+                },
+                "norm": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                "l1",
+                                "l2"
+                            ],
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "l2",
+                    "description": "Norm used to normalize term vectors.",
+                    "title": "Norm"
+                },
+                "binary": {
+                    "default": false,
+                    "description": "If True, all non-zero counts are set to 1.",
+                    "title": "Binary",
+                    "type": "boolean"
+                },
+                "dtype": {
+                    "default": "float32",
+                    "description": "Type of the matrix returned by fit_transform() or transform().",
+                    "title": "Dtype",
+                    "type": "string"
+                }
+            },
+            "title": "HashingVectorizerEmbeddingConfig",
+            "type": "object"
+        },
         "LoggingConfig": {
             "additionalProperties": false,
             "description": "Configuration for the logging.",
@@ -444,6 +608,326 @@
                 }
             },
             "title": "LoggingConfig",
+            "type": "object"
+        },
+        "OpenaiEmbeddingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for OpenAI based embeddings.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "model_name": {
+                    "default": "text-embedding-3-small",
+                    "description": "Name of the OpenAI embedding model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 100,
+                    "description": "Batch size for API requests.",
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_retries": {
+                    "default": 3,
+                    "description": "Maximum number of retries for failed API requests.",
+                    "title": "Max Retries",
+                    "type": "integer"
+                },
+                "timeout": {
+                    "default": 30.0,
+                    "description": "Timeout for API requests in seconds.",
+                    "title": "Timeout",
+                    "type": "number"
+                },
+                "dimensions": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Number of dimensions for the embedding. Only supported for certain models.",
+                    "title": "Dimensions"
+                },
+                "max_concurrent": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum number of concurrent API requests. If None, uses synchronous processing.",
+                    "title": "Max Concurrent"
+                },
+                "max_per_second": {
+                    "anyOf": [
+                        {
+                            "type": "number"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum number of API requests per second. Only used with async processing.",
+                    "title": "Max Per Second"
+                }
+            },
+            "title": "OpenaiEmbeddingConfig",
+            "type": "object"
+        },
+        "SentenceTransformerEmbeddingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for Sentence Transformer based embeddings.",
+            "properties": {
+                "model_name": {
+                    "default": "sentence-transformers/all-MiniLM-L6-v2",
+                    "description": "Name of the hugging face model.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 32,
+                    "description": "Batch size for model inference.",
+                    "exclusiveMinimum": 0,
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "device": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Torch notation for CPU or CUDA.",
+                    "title": "Device"
+                },
+                "bf16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Bf16",
+                    "type": "boolean"
+                },
+                "fp16": {
+                    "default": false,
+                    "description": "Whether to use mixed precision training (not all devices support this).",
+                    "title": "Fp16",
+                    "type": "boolean"
+                },
+                "tokenizer_config": {
+                    "$ref": "#/$defs/TokenizerConfig"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust the remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                },
+                "revision": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Revision from HF repo",
+                    "title": "Revision"
+                },
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "similarity_fn_name": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Name of the similarity function to use. Set to `None` to use model-native.",
+                    "title": "Similarity Fn Name"
+                }
+            },
+            "title": "SentenceTransformerEmbeddingConfig",
             "type": "object"
         },
         "TokenizerConfig": {
@@ -525,7 +1009,21 @@
             }
         },
         "embedder_config": {
-            "$ref": "#/$defs/EmbedderConfig"
+            "anyOf": [
+                {
+                    "$ref": "#/$defs/SentenceTransformerEmbeddingConfig"
+                },
+                {
+                    "$ref": "#/$defs/OpenaiEmbeddingConfig"
+                },
+                {
+                    "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                },
+                {
+                    "$ref": "#/$defs/BaseEmbedderConfig"
+                }
+            ],
+            "title": "Embedder Config"
         },
         "cross_encoder_config": {
             "$ref": "#/$defs/CrossEncoderConfig",

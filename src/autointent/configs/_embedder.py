@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from abc import ABC
 from enum import Enum
-from typing import Any
+from typing import Any, Literal, TypeAlias
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt
 
 from ._transformers import HFModelConfig
 
@@ -20,7 +19,7 @@ class TaskTypeEnum(Enum):
     sts = "sts"
 
 
-class EmbedderConfig(ABC, BaseModel, extra="forbid"):
+class BaseEmbedderConfig(BaseModel, extra="forbid"):
     """Base class for embedder configurations."""
 
     default_prompt: str | None = Field(
@@ -76,7 +75,7 @@ class EmbedderConfig(ABC, BaseModel, extra="forbid"):
         return self.default_prompt
 
 
-class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
+class SentenceTransformerEmbeddingConfig(BaseEmbedderConfig, HFModelConfig):
     """Configuration for Sentence Transformer based embeddings."""
 
     model_name: str = Field("sentence-transformers/all-MiniLM-L6-v2", description="Name of the hugging face model.")
@@ -85,7 +84,7 @@ class SentenceTransformerEmbeddingConfig(EmbedderConfig, HFModelConfig):
     )
 
 
-class OpenaiEmbeddingConfig(EmbedderConfig):
+class OpenaiEmbeddingConfig(BaseEmbedderConfig):
     """Configuration for OpenAI based embeddings."""
 
     model_name: str = Field("text-embedding-3-small", description="Name of the OpenAI embedding model.")
@@ -103,15 +102,42 @@ class OpenaiEmbeddingConfig(EmbedderConfig):
     )
 
 
+class HashingVectorizerEmbeddingConfig(BaseEmbedderConfig):
+    """Configuration for HashingVectorizer based embeddings from sklearn.
+
+    This is a lightweight, stateless vectorizer that uses hashing trick for text feature extraction.
+    Ideal for testing as it has no model dependencies and is very fast.
+    """
+
+    n_features: PositiveInt = Field(
+        2**18, description="Number of features (hash space dimension). Use 512 for fast tests."
+    )
+    ngram_range: tuple[int, int] = Field((1, 2), description="The lower and upper boundary of ngram range.")
+    analyzer: Literal["word", "char", "char_wb"] = Field(
+        "word", description="Whether to use word or character n-grams."
+    )
+    lowercase: bool = Field(True, description="Convert all characters to lowercase before tokenizing.")
+    norm: Literal["l1", "l2"] | None = Field("l2", description="Norm used to normalize term vectors.")
+    binary: bool = Field(False, description="If True, all non-zero counts are set to 1.")
+    dtype: str = Field("float32", description="Type of the matrix returned by fit_transform() or transform().")
+
+
+EmbedderConfig: TypeAlias = (
+    SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig | BaseEmbedderConfig
+)
+
+
 def get_default_embedder_config(**kwargs: Any) -> EmbedderConfig:  # noqa: ANN401
     return SentenceTransformerEmbeddingConfig.model_validate(kwargs)
 
 
-def initialize_embedder_config(values: dict[str, Any] | str | EmbedderConfig | None) -> EmbedderConfig:
+def initialize_embedder_config(values: dict[str, Any] | str | BaseEmbedderConfig | None) -> EmbedderConfig:
     if values is None:
         return get_default_embedder_config()
-    if isinstance(values, EmbedderConfig):
+    if isinstance(values, BaseEmbedderConfig):
         return values.model_copy(deep=True)
     if isinstance(values, str):
         return get_default_embedder_config(model_name=values)
+    if isinstance(values, dict) and "n_features" in values:
+        return HashingVectorizerEmbeddingConfig(**values)
     return get_default_embedder_config(**values)

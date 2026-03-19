@@ -21,6 +21,12 @@ class TestEmbedderPrompts:
     @pytest.fixture
     def prompt_embedder_config(self, embedder_config: EmbedderConfig) -> EmbedderConfig:
         """Create embedder config with different prompts based on backend type."""
+        from autointent.configs import HashingVectorizerEmbeddingConfig
+
+        # Skip for HashingVectorizer as it doesn't support prompts
+        if isinstance(embedder_config, HashingVectorizerEmbeddingConfig):
+            pytest.skip("HashingVectorizer doesn't support prompts")
+
         if hasattr(embedder_config, "similarity_fn_name"):
             # SentenceTransformers config
             return create_sentence_transformer_config(
@@ -56,6 +62,12 @@ class TestEmbedderPrompts:
 
     def test_fallback_to_default_prompt(self, embedder_config: EmbedderConfig):
         """Test fallback to default prompt when specific prompt not set."""
+        from autointent.configs import HashingVectorizerEmbeddingConfig
+
+        # Skip for HashingVectorizer as it doesn't support prompts
+        if isinstance(embedder_config, HashingVectorizerEmbeddingConfig):
+            pytest.skip("HashingVectorizer doesn't support prompts")
+
         if hasattr(embedder_config, "similarity_fn_name"):
             # SentenceTransformers config
             config = create_sentence_transformer_config(

@@ -8,12 +8,11 @@ import os
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 
-import openai
 from dotenv import load_dotenv
-from openai import LengthFinishReasonError
 from pydantic import BaseModel, ValidationError
 
-from autointent.generation.chat_templates import Role
+from autointent._utils import require
+from autointent.generation.chat_templates import Message, Role
 
 from ._cache import StructuredOutputCache
 
@@ -140,6 +139,9 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
+        require("openai", "openai")
+        import openai
+
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
         model_name = model_name or os.getenv("OPENAI_MODEL_NAME")
 
@@ -219,6 +221,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None
@@ -304,6 +308,8 @@ class Generator:
         Returns:
             Tuple of (parsed_result, error_message, raw_response).
         """
+        from openai import LengthFinishReasonError
+
         res: T | None = None
         msg: str | None = None
         raw: str | None = None

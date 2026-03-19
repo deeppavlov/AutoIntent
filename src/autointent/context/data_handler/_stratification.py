@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 from datasets import concatenate_datasets
+from numpy import typing as npt
 from sklearn.model_selection import train_test_split
 
 if TYPE_CHECKING:

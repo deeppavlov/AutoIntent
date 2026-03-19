@@ -5,14 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from peft import LoraConfig, get_peft_model
-
 from autointent import Context
 from autointent._dump_tools import Dumper
+from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
 if TYPE_CHECKING:
+    from peft import LoraConfig
+
     from autointent._callbacks import REPORTERS_NAMES
 
 
@@ -60,6 +61,8 @@ class BERTLoRAScorer(BertScorer):
 
     name = "lora"
 
+    _lora_config: LoraConfig
+
     def __init__(
         self,
         classification_model_config: HFModelConfig | str | dict[str, Any] | None = None,
@@ -71,7 +74,11 @@ class BERTLoRAScorer(BertScorer):
         print_progress: bool = False,
         **lora_kwargs: Any,  # noqa: ANN401
     ) -> None:
-        # early stopping doesnt work with lora for now https://github.com/huggingface/transformers/issues/38130
+        # Lazy import peft
+        require("peft", extra="peft")
+        from peft import LoraConfig
+
+        # early stopping doesn't work with lora for now https://github.com/huggingface/transformers/issues/38130
         early_stopping_config = EarlyStoppingConfig(metric=None)  # disable early stopping
 
         super().__init__(
@@ -111,7 +118,11 @@ class BERTLoRAScorer(BertScorer):
 
     def _initialize_model(self) -> Any:  # noqa: ANN401
         model = super()._initialize_model()
+        from peft import get_peft_model
+
         return get_peft_model(model, self._lora_config)
 
     def dump(self, path: str) -> None:
+        from peft import LoraConfig
+
         Dumper.dump(self, Path(path), exclude=[LoraConfig])

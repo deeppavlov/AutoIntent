@@ -18,6 +18,7 @@ from autointent.configs import (
     VectorIndexConfig,
     get_default_hfmodel_config,
 )
+from autointent.configs._embedder import BaseEmbedderConfig
 
 from .data_handler import DataHandler
 from .optimization_info import OptimizationInfo
@@ -178,7 +179,7 @@ class Context:
         except ValueError:
             if hasattr(self, "embedder_config"):
                 return self.embedder_config
-            return EmbedderConfig()
+            return BaseEmbedderConfig()
 
     def resolve_ranker(self) -> CrossEncoderConfig:
         """Resolve the cross-encoder configuration.

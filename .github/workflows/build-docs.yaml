@@ -49,7 +49,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group docs
+          uv sync --group docs --extra catboost --extra peft --extra transformers --extra sentence-transformers --extra openai
 
       - name: Run tests
         if: github.event_name != 'workflow_dispatch'

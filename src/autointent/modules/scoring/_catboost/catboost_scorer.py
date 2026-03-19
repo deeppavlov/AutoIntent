@@ -8,16 +8,17 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
-from catboost import CatBoostClassifier
 from pydantic import PositiveInt
 
 from autointent import Context, Embedder
+from autointent._utils import require
 from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
 
 if TYPE_CHECKING:
     import numpy.typing as npt
+    from catboost import CatBoostClassifier
 
 
 logger = logging.getLogger(__name__)
@@ -108,6 +109,9 @@ class CatBoostScorer(BaseScorer):
         depth: int = 6,
         **catboost_kwargs: dict[str, Any],
     ) -> None:
+        # Lazy import catboost
+        require("catboost", extra="catboost")
+
         self.val_fraction = val_fraction
         self.early_stopping_rounds = early_stopping_rounds
         self.iterations = iterations
@@ -196,6 +200,8 @@ class CatBoostScorer(BaseScorer):
         utterances: list[str],
         labels: ListOfLabels,
     ) -> None:
+        from catboost import CatBoostClassifier
+
         self._validate_task(labels)
 
         if self.features_type in self.encoder_features_types:
