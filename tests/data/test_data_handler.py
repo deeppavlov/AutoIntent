@@ -250,12 +250,10 @@ def test_few_shot_split(dataset):
 
 
 def _make_multiclass_mapping_with_oos(*, with_validation: bool) -> dict:
-    in_domain = []
     # Ensure enough samples per class so stratified splitting doesn't fail.
-    for i in range(50):
-        in_domain.append({"utterance": f"c0_{i}", "label": 0})
-    for i in range(50):
-        in_domain.append({"utterance": f"c1_{i}", "label": 1})
+    in_domain = [{"utterance": f"c0_{i}", "label": 0} for i in range(50)] + [
+        {"utterance": f"c1_{i}", "label": 1} for i in range(50)
+    ]
 
     oos = [{"utterance": f"oos_{i}"} for i in range(20)]
 
