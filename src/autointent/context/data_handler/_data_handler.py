@@ -176,6 +176,36 @@ class DataHandler:
             train_labels = [lab for lab in train_labels if lab is not None]
             yield train_utterances, train_labels, val_utterances, val_labels  # type: ignore[misc]
 
+    def _has_oos_samples(self, split_name: str) -> bool:
+        """Return True if the given split contains OOS (label is None) samples."""
+        if split_name not in self.dataset:
+            return False
+        hf_split = self.dataset[split_name]
+        label_feature = self.dataset.label_feature
+        oos_samples = hf_split.filter(lambda sample: sample[label_feature] is None)
+        return len(oos_samples) > 0
+
+    def _duplicate_split_for_scoring_and_decision(self, split_name: str) -> None:
+        """Duplicate split into _0/_1 where _0 is in-domain only.
+
+        Intended for hold-out mode when OOS is present but separation_ratio is not set:
+        - scoring uses `{split_name}_0` (no OOS)
+        - decision uses `{split_name}_1` (full, may include OOS)
+        """
+        if split_name not in self.dataset:
+            return
+        hf_split = self.dataset[split_name]
+        label_feature = self.dataset.label_feature
+
+        in_domain = hf_split.filter(lambda sample: sample[label_feature] is not None)
+        if len(in_domain) == 0:
+            msg = f"Split '{split_name}' contains only OOS samples; cannot prepare scoring split."
+            raise ValueError(msg)
+
+        self.dataset[f"{split_name}_0"] = in_domain
+        self.dataset[f"{split_name}_1"] = hf_split
+        self.dataset.pop(split_name)
+
     def _split_ho(
         self,
         separation_ratio: FloatFromZeroToOne | None,
@@ -185,8 +215,16 @@ class DataHandler:
     ) -> None:
         has_validation_split = any(split.startswith(Split.VALIDATION) for split in self.dataset)
 
-        if separation_ratio is not None and Split.TRAIN in self.dataset:
-            self._split_train(separation_ratio)
+        if Split.TRAIN in self.dataset:
+            if separation_ratio is not None:
+                self._split_train(separation_ratio)
+            elif self._has_oos_samples(Split.TRAIN):
+                # When OOS exists and separation_ratio is not set, keep the same in-domain pool
+                # for scoring and decision, but exclude OOS from scoring split.
+                self._duplicate_split_for_scoring_and_decision(Split.TRAIN)
+                # If user provided a single validation split containing OOS, make scoring validation OOS-free.
+                if Split.VALIDATION in self.dataset and self._has_oos_samples(Split.VALIDATION):
+                    self._duplicate_split_for_scoring_and_decision(Split.VALIDATION)
 
         if not has_validation_split:
             self._split_validation_from_train(validation_size, is_few_shot, examples_per_intent)
