@@ -182,7 +182,7 @@ class DataHandler:
             return False
         hf_split = self.dataset[split_name]
         label_feature = self.dataset.label_feature
-        oos_samples = hf_split.filter(lambda sample: sample[label_feature] is None)  # noqa: B023
+        oos_samples = hf_split.filter(lambda sample: sample[label_feature] is None)
         return len(oos_samples) > 0
 
     def _duplicate_split_for_scoring_and_decision(self, split_name: str) -> None:
@@ -197,7 +197,7 @@ class DataHandler:
         hf_split = self.dataset[split_name]
         label_feature = self.dataset.label_feature
 
-        in_domain = hf_split.filter(lambda sample: sample[label_feature] is not None)  # noqa: B023
+        in_domain = hf_split.filter(lambda sample: sample[label_feature] is not None)
         if len(in_domain) == 0:
             msg = f"Split '{split_name}' contains only OOS samples; cannot prepare scoring split."
             raise ValueError(msg)
