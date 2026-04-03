@@ -5,6 +5,7 @@ import pytest
 from autointent import Dataset
 from autointent.configs import DataConfig
 from autointent.context.data_handler import DataHandler
+from autointent.custom_types import Split
 from autointent.schemas import Sample
 
 
@@ -246,3 +247,68 @@ def test_few_shot_split(dataset):
         assert Counter(dh.dataset[data_split][dh.dataset.label_feature]) == desired_specs[data_split], (
             f"Failed for {data_split}"
         )
+
+
+def _make_multiclass_mapping_with_oos(*, with_validation: bool) -> dict:
+    in_domain = []
+    # Ensure enough samples per class so stratified splitting doesn't fail.
+    for i in range(50):
+        in_domain.append({"utterance": f"c0_{i}", "label": 0})
+    for i in range(50):
+        in_domain.append({"utterance": f"c1_{i}", "label": 1})
+
+    oos = [{"utterance": f"oos_{i}"} for i in range(20)]
+
+    mapping: dict = {
+        "train": [*in_domain, *oos],
+        "intents": [{"id": 0}, {"id": 1}],
+    }
+
+    if with_validation:
+        mapping["validation"] = [
+            {"utterance": "val_c0_0", "label": 0},
+            {"utterance": "val_c0_1", "label": 0},
+            {"utterance": "val_c1_0", "label": 1},
+            {"utterance": "val_c1_1", "label": 1},
+            {"utterance": "val_oos_0"},
+            {"utterance": "val_oos_1"},
+        ]
+
+    return mapping
+
+
+def _split_has_oos_labels(dh: DataHandler, split_name: str) -> bool:
+    return any(lab is None for lab in dh.dataset[split_name][dh.dataset.label_feature])
+
+
+def test_ho_oos_without_separation_ratio_duplicates_and_filters_scoring_splits():
+    """If OOS exists and separation_ratio is None, scoring splits must be OOS-free."""
+    dataset = Dataset.from_dict(_make_multiclass_mapping_with_oos(with_validation=False))
+    dh = DataHandler(dataset, config=DataConfig(scheme="ho", separation_ratio=None), random_seed=42)
+
+    assert "train_0" in dh.dataset
+    assert "train_1" in dh.dataset
+    assert "validation_0" in dh.dataset
+    assert "validation_1" in dh.dataset
+    assert Split.TRAIN not in dh.dataset
+    assert Split.VALIDATION not in dh.dataset
+
+    assert _split_has_oos_labels(dh, "train_0") is False
+    assert _split_has_oos_labels(dh, "validation_0") is False
+    assert _split_has_oos_labels(dh, "train_1") is True
+    assert _split_has_oos_labels(dh, "validation_1") is True
+
+
+def test_ho_oos_with_user_validation_duplicates_validation_when_needed():
+    """If user provides validation with OOS, it should be duplicated and filtered for scoring."""
+    dataset = Dataset.from_dict(_make_multiclass_mapping_with_oos(with_validation=True))
+    dh = DataHandler(dataset, config=DataConfig(scheme="ho", separation_ratio=None), random_seed=42)
+
+    assert "train_0" in dh.dataset
+    assert "train_1" in dh.dataset
+    assert "validation_0" in dh.dataset
+    assert "validation_1" in dh.dataset
+    assert Split.VALIDATION not in dh.dataset
+
+    assert _split_has_oos_labels(dh, "validation_0") is False
+    assert _split_has_oos_labels(dh, "validation_1") is True
