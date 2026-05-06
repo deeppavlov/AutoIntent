@@ -972,6 +972,155 @@
             },
             "title": "TokenizerConfig",
             "type": "object"
+        },
+        "VllmEmbeddingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for vLLM-based embeddings.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "model_name": {
+                    "default": "BAAI/bge-base-en-v1.5",
+                    "description": "Name of the HuggingFace model to load via vLLM.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 32,
+                    "description": "Number of texts to encode per vLLM encode() call.",
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_model_len": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum sequence length. Reduces VRAM usage for long-context models.",
+                    "title": "Max Model Len"
+                },
+                "gpu_memory_utilization": {
+                    "default": 0.9,
+                    "description": "Fraction of GPU memory vLLM is allowed to use (0.0 to 1.0).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Gpu Memory Utilization",
+                    "type": "number"
+                },
+                "dtype": {
+                    "default": "auto",
+                    "description": "Data type for model weights: 'auto', 'float16', 'bfloat16', 'float32'.",
+                    "title": "Dtype",
+                    "type": "string"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                },
+                "extra_init_kwargs": {
+                    "additionalProperties": true,
+                    "description": "Extra keyword arguments passed to the vLLM LLM() constructor.",
+                    "title": "Extra Init Kwargs",
+                    "type": "object"
+                },
+                "extra_encode_kwargs": {
+                    "additionalProperties": true,
+                    "description": "Extra keyword arguments passed to llm.encode() at inference time (e.g. custom SamplingParams).",
+                    "title": "Extra Encode Kwargs",
+                    "type": "object"
+                }
+            },
+            "title": "VllmEmbeddingConfig",
+            "type": "object"
         }
     },
     "description": "Configuration for the optimization process.\n\nOne can use it to customize optimization beyond choosing different preset.\nInstantiate it and pass to :py:meth:`autointent.Pipeline.from_optimization_config`.",
@@ -1018,6 +1167,9 @@
                 },
                 {
                     "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                },
+                {
+                    "$ref": "#/$defs/VllmEmbeddingConfig"
                 },
                 {
                     "$ref": "#/$defs/BaseEmbedderConfig"
