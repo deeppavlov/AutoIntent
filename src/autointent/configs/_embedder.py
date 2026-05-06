@@ -122,8 +122,41 @@ class HashingVectorizerEmbeddingConfig(BaseEmbedderConfig):
     dtype: str = Field("float32", description="Type of the matrix returned by fit_transform() or transform().")
 
 
+class VllmEmbeddingConfig(BaseEmbedderConfig):
+    """Configuration for vLLM-based embeddings."""
+
+    model_name: str = Field("BAAI/bge-base-en-v1.5", description="Name of the HuggingFace model to load via vLLM.")
+    batch_size: int = Field(32, description="Number of texts to encode per vLLM encode() call.")
+    max_model_len: int | None = Field(
+        None, description="Maximum sequence length. Reduces VRAM usage for long-context models."
+    )
+    gpu_memory_utilization: float = Field(
+        0.9,
+        ge=0.0,
+        le=1.0,
+        description="Fraction of GPU memory vLLM is allowed to use (0.0 to 1.0).",
+    )
+    dtype: str = Field(
+        "auto",
+        description="Data type for model weights: 'auto', 'float16', 'bfloat16', 'float32'.",
+    )
+    trust_remote_code: bool = Field(False, description="Whether to trust remote code when loading the model.")
+    extra_init_kwargs: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Extra keyword arguments passed to the vLLM LLM() constructor.",
+    )
+    extra_encode_kwargs: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Extra keyword arguments passed to llm.encode() at inference time (e.g. custom SamplingParams).",
+    )
+
+
 EmbedderConfig: TypeAlias = (
-    SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig | BaseEmbedderConfig
+    SentenceTransformerEmbeddingConfig
+    | OpenaiEmbeddingConfig
+    | HashingVectorizerEmbeddingConfig
+    | VllmEmbeddingConfig
+    | BaseEmbedderConfig
 )
 
 
@@ -140,4 +173,6 @@ def initialize_embedder_config(values: dict[str, Any] | str | BaseEmbedderConfig
         return get_default_embedder_config(model_name=values)
     if isinstance(values, dict) and "n_features" in values:
         return HashingVectorizerEmbeddingConfig(**values)
+    if isinstance(values, dict) and "gpu_memory_utilization" in values:
+        return VllmEmbeddingConfig(**values)
     return get_default_embedder_config(**values)

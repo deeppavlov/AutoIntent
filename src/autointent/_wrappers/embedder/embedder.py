@@ -16,11 +16,13 @@ from autointent.configs._embedder import (
     HashingVectorizerEmbeddingConfig,
     OpenaiEmbeddingConfig,
     SentenceTransformerEmbeddingConfig,
+    VllmEmbeddingConfig,
 )
 
 from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
+from .vllm import VllmEmbeddingBackend
 
 if TYPE_CHECKING:
     import numpy as np
@@ -64,8 +66,8 @@ class Embedder:
             return OpenaiEmbeddingBackend(self.config)
         if isinstance(self.config, HashingVectorizerEmbeddingConfig):
             return HashingVectorizerEmbeddingBackend(self.config)
-        # Check if it's exactly the abstract base config (not a subclass)
-
+        if isinstance(self.config, VllmEmbeddingConfig):
+            return VllmEmbeddingBackend(self.config)
         msg = f"Cannot instantiate abstract EmbedderConfig: {self.config.__repr__()}"
         raise TypeError(msg)
 
@@ -161,6 +163,8 @@ class Embedder:
             instance._backend = OpenaiEmbeddingBackend.load(backend_path)
         elif isinstance(config, HashingVectorizerEmbeddingConfig):
             instance._backend = HashingVectorizerEmbeddingBackend.load(backend_path)
+        elif isinstance(config, VllmEmbeddingConfig):
+            instance._backend = VllmEmbeddingBackend.load(backend_path)
         else:
             msg = f"Cannot load abstract EmbedderConfig: {config.__repr__()}"
             raise TypeError(msg)

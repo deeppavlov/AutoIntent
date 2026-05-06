@@ -1,16 +1,22 @@
+import importlib.util
 import os
 import platform
 
 import pytest
+import torch
 
 from autointent.configs import (
     HashingVectorizerEmbeddingConfig,
     OpenaiEmbeddingConfig,
     SentenceTransformerEmbeddingConfig,
+    VllmEmbeddingConfig,
 )
 
 # Check if OpenAI API key is available for testing
 openai_available = os.getenv("OPENAI_API_KEY") is not None
+
+# Check if vLLM is installed and CUDA is available
+vllm_available = importlib.util.find_spec("vllm") is not None and torch.cuda.is_available()
 
 
 @pytest.fixture
@@ -49,6 +55,19 @@ backend_configs = [
             reason="OpenAI API key not available (set OPENAI_API_KEY environment variable)",
         ),
         id="openai",
+    ),
+    pytest.param(
+        VllmEmbeddingConfig(
+            model_name="sergeyzh/rubert-tiny-turbo",
+            batch_size=4,
+            use_cache=False,
+            max_model_len=512,
+        ),
+        marks=pytest.mark.skipif(
+            not vllm_available,
+            reason="vLLM not installed or CUDA not available (pip install autointent[vllm])",
+        ),
+        id="vllm",
     ),
 ]
 
@@ -90,3 +109,16 @@ def create_openai_config(**kwargs) -> OpenaiEmbeddingConfig:
     }
     defaults.update(kwargs)
     return OpenaiEmbeddingConfig(**defaults)
+
+
+def create_vllm_config(**kwargs) -> VllmEmbeddingConfig:
+    """Helper function to create VllmEmbeddingConfig with test-friendly defaults."""
+    defaults = {
+        "model_name": "BAAI/bge-base-en-v1.5",
+        "batch_size": 4,
+        "use_cache": False,
+        "gpu_memory_utilization": 0.5,
+        "max_model_len": 512,
+    }
+    defaults.update(kwargs)
+    return VllmEmbeddingConfig(**defaults)

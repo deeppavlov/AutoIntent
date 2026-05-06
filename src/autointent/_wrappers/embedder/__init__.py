@@ -5,6 +5,7 @@ from .embedder import Embedder
 from .hashing_vectorizer import HashingVectorizerEmbeddingBackend
 from .openai import OpenaiEmbeddingBackend
 from .sentence_transformers import SentenceTransformerEmbeddingBackend
+from .vllm import VllmEmbeddingBackend
 
 __all__ = [
     "BaseEmbeddingBackend",
@@ -12,4 +13,5 @@ __all__ = [
     "HashingVectorizerEmbeddingBackend",
     "OpenaiEmbeddingBackend",
     "SentenceTransformerEmbeddingBackend",
+    "VllmEmbeddingBackend",
 ]
