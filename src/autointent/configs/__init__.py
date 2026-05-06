@@ -6,6 +6,7 @@ from ._embedder import (
     OpenaiEmbeddingConfig,
     SentenceTransformerEmbeddingConfig,
     TaskTypeEnum,
+    VllmEmbeddingConfig,
     get_default_embedder_config,
     initialize_embedder_config,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "TokenizerConfig",
     "TorchTrainingConfig",
     "VectorIndexConfig",
+    "VllmEmbeddingConfig",
     "VocabConfig",
     "get_default_embedder_config",
     "get_default_hfmodel_config",
