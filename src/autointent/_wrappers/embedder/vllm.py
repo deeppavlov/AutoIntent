@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import TYPE_CHECKING, Literal, cast, overload
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import torch
