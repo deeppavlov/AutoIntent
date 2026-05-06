@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     import numpy.typing as npt
-    from vllm import LLM
+    from vllm import LLM  # type: ignore[import-not-found]
 
     from autointent.configs import TaskTypeEnum
 
@@ -65,7 +65,7 @@ class VllmEmbeddingBackend(BaseEmbeddingBackend):
     def clear_ram(self) -> None:
         """Release GPU memory held by the vLLM engine."""
         if self._model is not None:
-            logger.debug("Clearing vLLM embedder %s from GPU memory", self.config.model_name)
+            logger.debug("Clearing vLLM embedder %s from GPU memory", self.config.model_name)  # type: ignore[unreachable]
             del self._model
             self._model = None
             torch.cuda.empty_cache()
