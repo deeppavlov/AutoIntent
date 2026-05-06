@@ -24,6 +24,7 @@ Submodules
    /autoapi/autointent/modules/index
    /autoapi/autointent/nodes/index
    /autoapi/autointent/schemas/index
+   /autoapi/autointent/server/index
    /autoapi/autointent/utils/index
 
 

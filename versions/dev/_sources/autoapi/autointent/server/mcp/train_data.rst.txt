@@ -1,0 +1,13 @@
+autointent.server.mcp.train_data
+================================
+
+.. py:function:: autointent.server.mcp.train_data(page = 1, page_size = 20, class_filter = None)
+
+   Access training samples with pagination and filtering options.
+
+   :param page: Page number (1-indexed)
+   :param page_size: Number of samples per page
+   :param class_filter: Filter by specific class IDs
+
+   :returns: Paginated and filtered training samples
+

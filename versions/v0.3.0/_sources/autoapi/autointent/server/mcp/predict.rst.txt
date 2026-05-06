@@ -1,0 +1,11 @@
+autointent.server.mcp.predict
+=============================
+
+.. py:function:: autointent.server.mcp.predict(utterances)
+
+   Classify text utterances using the trained AutoIntent pipeline.
+
+   :param utterances: List of text utterances to classify
+
+   :returns: Predictions for each utterance
+

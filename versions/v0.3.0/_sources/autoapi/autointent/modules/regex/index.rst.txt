@@ -1,0 +1,19 @@
+autointent.modules.regex
+========================
+
+.. py:module:: autointent.modules.regex
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/regex/SimpleRegex
+
+.. autoapisummary::
+
+   autointent.modules.regex.SimpleRegex
+
+

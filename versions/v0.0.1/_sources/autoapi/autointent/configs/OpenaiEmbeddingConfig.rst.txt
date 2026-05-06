@@ -1,0 +1,52 @@
+autointent.configs.OpenaiEmbeddingConfig
+========================================
+
+.. py:class:: autointent.configs.OpenaiEmbeddingConfig(/, **data)
+
+   Bases: :py:obj:`BaseEmbedderConfig`
+
+
+   Configuration for OpenAI based embeddings.
+
+
+   .. py:attribute:: model_name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: batch_size
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: max_retries
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: timeout
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: dimensions
+      :type:  int | None
+      :value: None
+
+
+
+   .. py:attribute:: max_concurrent
+      :type:  int | None
+      :value: None
+
+
+
+   .. py:attribute:: max_per_second
+      :type:  float | None
+      :value: None
+
+

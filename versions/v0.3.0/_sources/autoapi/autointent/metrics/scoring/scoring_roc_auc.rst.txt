@@ -1,0 +1,20 @@
+autointent.metrics.scoring.scoring_roc_auc
+==========================================
+
+.. py:function:: autointent.metrics.scoring.scoring_roc_auc(labels, scores)
+
+   Calculate ROC AUC score for multiclass and multilabel cases.
+
+   Macro averaged roc-auc for utterance classification task:
+
+   .. math::
+
+       \frac{1}{C}\sum_{k=1}^C ROCAUC(scores[:, k], labels[:, k])
+
+   where ``C`` is the number of classes.
+
+   :param labels: Ground truth labels for each utterance.
+   :param scores: For each utterance, scores for each of n_classes classes.
+
+   :returns: ROC AUC score.
+

@@ -1,7 +1,7 @@
 autointent.modules.KNNScorer
 ============================
 
-.. py:class:: autointent.modules.KNNScorer(k = 5, embedder_config = None, weights = 'distance')
+.. py:class:: autointent.modules.KNNScorer(k = 5, embedder_config = None, weights = 'distance', vector_index_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -41,15 +41,21 @@ autointent.modules.KNNScorer
       :value: 'knn'
 
 
+      Name of the module to reference in search space configuration.
+
 
    .. py:attribute:: supports_multilabel
       :value: True
 
 
+      Whether the module supports multilabel classification
+
 
    .. py:attribute:: supports_multiclass
       :value: True
 
+
+      Whether the module supports multiclass classification
 
 
    .. py:attribute:: embedder_config
@@ -63,6 +69,9 @@ autointent.modules.KNNScorer
    .. py:attribute:: weights
       :value: 'distance'
 
+
+
+   .. py:attribute:: vector_index_config
 
 
    .. py:method:: from_context(context, k = 5, weights = 'distance', embedder_config = None)
@@ -80,6 +89,14 @@ autointent.modules.KNNScorer
 
    .. py:method:: get_implicit_initialization_params()
 
+      Return default params used in ``__init__`` method.
+
+      Some parameters of the module may be inferred using context rather from ``__init__`` method.
+      But they need to be logged for reproducibility during loading from disk.
+
+      :returns: Dictionary of default params
+
+
 
    .. py:method:: fit(utterances, labels)
 
@@ -87,7 +104,6 @@ autointent.modules.KNNScorer
 
       :param utterances: List of training utterances
       :param labels: List of labels corresponding to the utterances
-      :param clear_cache: Whether to clear the vector index cache before fitting
 
       :raises ValueError: If the vector index mismatches the provided utterances
 

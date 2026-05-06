@@ -182,7 +182,7 @@ print(f"Training samples: {len(dataset_from_hub['train'])}")
 print("\nFirst 3 training samples:")
 train_split = dataset_from_hub["train"][:3]
 for i, (utterance, label) in enumerate(zip(train_split["utterance"], train_split["label"], strict=True)):
-    print(f"{i+1}. '{utterance}' → label {label}")
+    print(f"{i + 1}. '{utterance}' → label {label}")
 
 # %% [markdown]
 """

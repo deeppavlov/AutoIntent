@@ -1,0 +1,4 @@
+autointent.configs.get_default_embedder_config
+==============================================
+
+.. py:function:: autointent.configs.get_default_embedder_config(**kwargs)

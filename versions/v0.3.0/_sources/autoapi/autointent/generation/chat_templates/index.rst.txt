@@ -1,0 +1,66 @@
+autointent.generation.chat_templates
+====================================
+
+.. py:module:: autointent.generation.chat_templates
+
+.. autoapi-nested-parse::
+
+   Chat templates used throughout :py:mod:`autointent.generation` module.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.generation.chat_templates.EVOLUTION_NAMES
+   autointent.generation.chat_templates.EVOLUTION_MAPPING
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/chat_templates/AbstractEvolution
+   /autoapi/autointent/generation/chat_templates/EvolutionChatTemplate
+   /autoapi/autointent/generation/chat_templates/BaseSynthesizerTemplate
+   /autoapi/autointent/generation/chat_templates/ConcreteEvolution
+   /autoapi/autointent/generation/chat_templates/Message
+   /autoapi/autointent/generation/chat_templates/Role
+   /autoapi/autointent/generation/chat_templates/FormalEvolution
+   /autoapi/autointent/generation/chat_templates/FunnyEvolution
+   /autoapi/autointent/generation/chat_templates/GoofyEvolution
+   /autoapi/autointent/generation/chat_templates/InformalEvolution
+   /autoapi/autointent/generation/chat_templates/PromptDescription
+   /autoapi/autointent/generation/chat_templates/ReasoningEvolution
+   /autoapi/autointent/generation/chat_templates/EnglishSynthesizerTemplate
+   /autoapi/autointent/generation/chat_templates/RussianSynthesizerTemplate
+
+.. autoapisummary::
+
+   autointent.generation.chat_templates.AbstractEvolution
+   autointent.generation.chat_templates.EvolutionChatTemplate
+   autointent.generation.chat_templates.BaseSynthesizerTemplate
+   autointent.generation.chat_templates.ConcreteEvolution
+   autointent.generation.chat_templates.Message
+   autointent.generation.chat_templates.Role
+   autointent.generation.chat_templates.FormalEvolution
+   autointent.generation.chat_templates.FunnyEvolution
+   autointent.generation.chat_templates.GoofyEvolution
+   autointent.generation.chat_templates.InformalEvolution
+   autointent.generation.chat_templates.PromptDescription
+   autointent.generation.chat_templates.ReasoningEvolution
+   autointent.generation.chat_templates.EnglishSynthesizerTemplate
+   autointent.generation.chat_templates.RussianSynthesizerTemplate
+
+
+Package Contents
+----------------
+
+.. py:data:: EVOLUTION_NAMES
+
+.. py:data:: EVOLUTION_MAPPING
+

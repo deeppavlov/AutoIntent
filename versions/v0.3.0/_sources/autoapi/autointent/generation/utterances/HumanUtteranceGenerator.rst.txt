@@ -1,0 +1,54 @@
+autointent.generation.utterances.HumanUtteranceGenerator
+========================================================
+
+.. py:class:: autointent.generation.utterances.HumanUtteranceGenerator(generator, critic, async_mode = False, max_at_once = 5, max_per_second = 10)
+
+   Generator of human-like utterances.
+
+   This class rewrites given user utterances to make them sound more natural and human-like,
+   while preserving their original intent. The generation process is iterative and attempts
+   to bypass a critic that identifies machine-generated text.
+
+   .. warning:: This method is experimental and can yield inferior data quality.
+
+
+
+   .. py:attribute:: generator
+
+
+   .. py:attribute:: critic
+
+
+   .. py:attribute:: async_mode
+      :value: False
+
+
+
+   .. py:attribute:: max_at_once
+      :value: 5
+
+
+
+   .. py:attribute:: max_per_second
+      :value: 10
+
+
+
+   .. py:method:: augment(dataset, split_name = Split.TRAIN, update_split = True, n_final_per_class = 5)
+
+      Generate human-like utterances for each intent by iteratively refining machine-generated candidates.
+
+      :param dataset: The dataset to augment.
+      :param split_name: The name of the split to augment (e.g., 'train').
+      :param update_split: Whether to update the dataset split with the new utterances.
+      :param n_final_per_class: Number of successful utterances to generate per intent.
+
+      :returns: List of newly generated samples.
+      :rtype: list[Sample]
+
+
+
+   .. py:method:: augment_async(dataset, split_name = Split.TRAIN, update_split = True, n_final_per_class = 5)
+      :async:
+
+

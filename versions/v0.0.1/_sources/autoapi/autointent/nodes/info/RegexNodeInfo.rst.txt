@@ -12,28 +12,18 @@ autointent.nodes.info.RegexNodeInfo
    .. py:attribute:: metrics_available
       :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.regex.RegexMetricFn]]
 
-      Available metrics for the node.
-
 
    .. py:attribute:: modules_available
       :type:  ClassVar[collections.abc.Mapping[str, type[autointent.modules.base.BaseRegex]]]
 
-      Available modules for the node.
-
 
    .. py:attribute:: node_type
-
-      Node type.
 
 
    .. py:attribute:: multiclass_available_metrics
       :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.regex.RegexMetricFn]]
 
-      Available metrics for multiclass classification.
-
 
    .. py:attribute:: multilabel_available_metrics
       :type:  ClassVar[collections.abc.Mapping[str, autointent.metrics.regex.RegexMetricFn]]
-
-      Available metrics for multilabel classification.
 

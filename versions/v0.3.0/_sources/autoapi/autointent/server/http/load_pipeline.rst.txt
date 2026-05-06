@@ -1,0 +1,7 @@
+autointent.server.http.load_pipeline
+====================================
+
+.. py:function:: autointent.server.http.load_pipeline()
+
+   Load the optimized pipeline from disk.
+

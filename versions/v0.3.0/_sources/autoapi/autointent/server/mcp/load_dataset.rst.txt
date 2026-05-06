@@ -1,0 +1,7 @@
+autointent.server.mcp.load_dataset
+==================================
+
+.. py:function:: autointent.server.mcp.load_dataset()
+
+   Load the training dataset from the pipeline directory.
+

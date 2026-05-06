@@ -22,7 +22,7 @@ autointent.modules.PTuningScorer
 
        from autointent.modules import PTuningScorer
        scorer = PTuningScorer(
-           classification_model_config="prajjwal1/bert-tiny",
+           classification_model_config="cointegrated/rubert-tiny2",
            num_train_epochs=3,
            batch_size=8,
            num_virtual_tokens=10,
@@ -39,6 +39,8 @@ autointent.modules.PTuningScorer
    .. py:attribute:: name
       :value: 'ptuning'
 
+
+      Name of the module to reference in search space configuration.
 
 
    .. py:method:: from_context(context, classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, encoder_reparameterization_type = 'LSTM', num_virtual_tokens = 10, encoder_dropout = 0.1, encoder_hidden_size = 128, encoder_num_layers = 2, **ptuning_kwargs)
@@ -63,4 +65,9 @@ autointent.modules.PTuningScorer
 
 
    .. py:method:: dump(path)
+
+      Dump all data needed for inference.
+
+      :param path: Path to dump
+
 

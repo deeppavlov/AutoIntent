@@ -1,7 +1,7 @@
 autointent.modules.scoring.MLKnnScorer
 ======================================
 
-.. py:class:: autointent.modules.scoring.MLKnnScorer(k = 5, embedder_config = None, s = 1.0, ignore_first_neighbours = 0)
+.. py:class:: autointent.modules.scoring.MLKnnScorer(k = 5, embedder_config = None, s = 1.0, ignore_first_neighbours = 0, vector_index_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -44,15 +44,21 @@ autointent.modules.scoring.MLKnnScorer
       :value: 'mlknn'
 
 
+      Name of the module to reference in search space configuration.
+
 
    .. py:attribute:: supports_multiclass
       :value: False
 
 
+      Whether the module supports multiclass classification
+
 
    .. py:attribute:: supports_multilabel
       :value: True
 
+
+      Whether the module supports multilabel classification
 
 
    .. py:attribute:: k
@@ -73,6 +79,9 @@ autointent.modules.scoring.MLKnnScorer
 
 
 
+   .. py:attribute:: vector_index_config
+
+
    .. py:method:: from_context(context, k = 5, s = 1.0, ignore_first_neighbours = 0, embedder_config = None)
       :classmethod:
 
@@ -90,6 +99,14 @@ autointent.modules.scoring.MLKnnScorer
 
 
    .. py:method:: get_implicit_initialization_params()
+
+      Return default params used in ``__init__`` method.
+
+      Some parameters of the module may be inferred using context rather from ``__init__`` method.
+      But they need to be logged for reproducibility during loading from disk.
+
+      :returns: Dictionary of default params
+
 
 
    .. py:method:: fit(utterances, labels)

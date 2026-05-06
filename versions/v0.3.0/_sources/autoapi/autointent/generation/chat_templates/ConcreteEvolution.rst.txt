@@ -1,0 +1,15 @@
+autointent.generation.chat_templates.ConcreteEvolution
+======================================================
+
+.. py:class:: autointent.generation.chat_templates.ConcreteEvolution
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_evolver.EvolutionChatTemplate`
+
+
+   Chat template for evolution augmentation via concretizing.
+
+
+   .. py:attribute:: name
+      :value: 'concrete'
+
+

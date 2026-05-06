@@ -1,0 +1,46 @@
+autointent.generation.utterances.CriticHumanLike
+================================================
+
+.. py:class:: autointent.generation.utterances.CriticHumanLike(generator, max_retries = 3)
+
+   A simple critic class that classifies user utterances as either 'human' or 'generated'.
+
+   using an LLM-based binary classifier prompt.
+
+
+   .. py:attribute:: generator
+
+
+   .. py:attribute:: max_retries
+      :value: 3
+
+
+
+   .. py:method:: build_classification_prompt(example, intent_name)
+
+      Args.
+
+          example: The user utterance to classify.
+          intent_name: The name of the intent associated with the utterance.
+
+      :returns: A formatted message prompt for classification.
+      :rtype: Message
+
+
+
+   .. py:method:: is_human(utterance, intent_name)
+
+      Args.
+
+          utterance: The utterance to evaluate.
+          intent_name: The associated intent.
+
+      :returns: True if classified as human, False otherwise.
+      :rtype: bool
+
+
+
+   .. py:method:: is_human_async(utterance, intent_name)
+      :async:
+
+

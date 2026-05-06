@@ -1,0 +1,22 @@
+autointent.configs.SentenceTransformerEmbeddingConfig
+=====================================================
+
+.. py:class:: autointent.configs.SentenceTransformerEmbeddingConfig(/, **data)
+
+   Bases: :py:obj:`BaseEmbedderConfig`, :py:obj:`autointent.configs._transformers.HFModelConfig`
+
+
+   Configuration for Sentence Transformer based embeddings.
+
+
+   .. py:attribute:: model_name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: similarity_fn_name
+      :type:  str | None
+      :value: None
+
+
