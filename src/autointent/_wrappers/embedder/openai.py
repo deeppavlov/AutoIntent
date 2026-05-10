@@ -103,6 +103,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         hasher = Hasher()
         hasher.update(self.config.model_name)
         hasher.update(str(self.config.dimensions))
+        hasher.update(str(self.config.max_tokens_in_batch))
         return hasher.intdigest()
 
     @overload
@@ -155,9 +156,11 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 return embeddings_np
 
         logger.debug(
-            "Calculating embeddings with OpenAI model %s, batch_size=%d, dimensions=%s, prompt=%s, max_concurrent=%s",
+            "Calculating embeddings with OpenAI model %s, batch_size=%d, max_tokens_in_batch=%s, "
+            "dimensions=%s, prompt=%s, max_concurrent=%s",
             self.config.model_name,
             self.config.batch_size,
+            str(self.config.max_tokens_in_batch),
             str(self.config.dimensions),
             prompt,
             self.config.max_concurrent,
@@ -177,16 +180,21 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             return torch.from_numpy(embeddings_np)
         return embeddings_np
 
+    def _embedding_request_batches(self, utterances: list[str]) -> list[list[str]]:
+        """Slice utterances into batches for each embeddings API call."""
+        return _batch_strings_by_token_budget(
+            utterances,
+            model_name=self.config.model_name,
+            max_strings_per_batch=self.config.batch_size,
+            max_tokens_per_batch=self.config.max_tokens_in_batch,
+        )
+
     def _process_embeddings_sync(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         """Process embeddings synchronously."""
         client = self._get_client()
         all_embeddings = []
 
-        # Process in batches
-        for i in range(0, len(utterances), self.config.batch_size):
-            batch = utterances[i : i + self.config.batch_size]
-
-            # Prepare API call parameters
+        for batch in self._embedding_request_batches(utterances):
             kwargs: EmbeddingsCreateKwargs = {
                 "input": batch,
                 "model": self.config.model_name,
@@ -208,11 +216,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
     def _process_embeddings_async(self, utterances: list[str]) -> npt.NDArray[np.float32]:
         """Process embeddings asynchronously using aiometer."""
-        # Create batches
-        batches = []
-        for i in range(0, len(utterances), self.config.batch_size):
-            batch = utterances[i : i + self.config.batch_size]
-            batches.append(batch)
+        batches = self._embedding_request_batches(utterances)
 
         # Create async tasks
         tasks = [partial(self._process_batch_async, batch) for batch in batches]
@@ -308,3 +312,51 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Create instance
         return cls(config)
+
+
+def _batch_strings_by_token_budget(
+    texts: list[str],
+    *,
+    model_name: str,
+    max_strings_per_batch: int,
+    max_tokens_per_batch: int | None,
+) -> list[list[str]]:
+    """Split texts into API batches constrained by count and optional token sum."""
+    if max_tokens_per_batch is None:
+        return [texts[i : i + max_strings_per_batch] for i in range(0, len(texts), max_strings_per_batch)]
+
+    require("tiktoken", "openai")
+    import tiktoken
+
+    encoding = tiktoken.encoding_for_model(model_name)
+    batches: list[list[str]] = []
+    current_batch: list[str] = []
+    current_tokens = 0
+
+    for text in texts:
+        tokens = len(encoding.encode(text))
+        current_text = text
+
+        if current_batch and (
+            current_tokens + tokens > max_tokens_per_batch or len(current_batch) >= max_strings_per_batch
+        ):
+            batches.append(current_batch)
+            current_batch = []
+            current_tokens = 0
+
+        if tokens > max_tokens_per_batch:
+            logger.warning(
+                "Single utterance exceeds max_tokens_in_batch (%d); truncating for OpenAI embeddings.",
+                max_tokens_per_batch,
+            )
+            truncated_ids = encoding.encode(text)[:max_tokens_per_batch]
+            current_text = encoding.decode(truncated_ids)
+            tokens = len(encoding.encode(current_text))
+
+        current_batch.append(current_text)
+        current_tokens += tokens
+
+    if current_batch:
+        batches.append(current_batch)
+
+    return batches

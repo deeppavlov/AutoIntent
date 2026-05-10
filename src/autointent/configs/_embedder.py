@@ -89,6 +89,16 @@ class OpenaiEmbeddingConfig(BaseEmbedderConfig):
 
     model_name: str = Field("text-embedding-3-small", description="Name of the OpenAI embedding model.")
     batch_size: int = Field(100, description="Batch size for API requests.")
+    max_tokens_in_batch: PositiveInt | None = Field(
+        None,
+        description=(
+            "When set, cap each embeddings API call by the summed tiktoken length of inputs "
+            "(using the encoding for `model_name`). Requests are also limited to at most "
+            "`batch_size` strings. Use values around 200000 to avoid OpenAI "
+            "`max_tokens_per_request` errors on long texts. Requires `tiktoken` "
+            "(installed with `autointent[openai]`)."
+        ),
+    )
     max_retries: int = Field(3, description="Maximum number of retries for failed API requests.")
     timeout: float = Field(30.0, description="Timeout for API requests in seconds.")
     dimensions: int | None = Field(
