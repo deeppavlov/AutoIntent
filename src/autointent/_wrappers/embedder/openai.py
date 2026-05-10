@@ -24,12 +24,34 @@ if TYPE_CHECKING:
 
     import numpy.typing as npt
     import openai
+    from tiktoken import Encoding
     from typing_extensions import NotRequired
 
     from autointent.configs import TaskTypeEnum
 
 
 logger = logging.getLogger(__name__)
+
+# Third-party embedding model ids (e.g. OpenRouter) are unknown to tiktoken; use a conservative encoding
+# only for counting tokens when splitting batches.
+_FALLBACK_TIKTOKEN_ENCODING = "cl100k_base"
+
+
+def _tiktoken_encoding_for_embedding_model(model_name: str) -> Encoding:
+    """Resolve tiktoken encoding for batch sizing; fallback for unknown provider model ids."""
+    require("tiktoken", "openai")
+    import tiktoken
+
+    try:
+        return tiktoken.encoding_for_model(model_name)
+    except KeyError:
+        logger.warning(
+            "tiktoken has no mapping for embedding model %r; using %r for token counting "
+            "(per-request batch limits are approximate).",
+            model_name,
+            _FALLBACK_TIKTOKEN_ENCODING,
+        )
+        return tiktoken.get_encoding(_FALLBACK_TIKTOKEN_ENCODING)
 
 
 class EmbeddingsCreateKwargs(TypedDict):
@@ -325,10 +347,7 @@ def _batch_strings_by_token_budget(
     if max_tokens_per_batch is None:
         return [texts[i : i + max_strings_per_batch] for i in range(0, len(texts), max_strings_per_batch)]
 
-    require("tiktoken", "openai")
-    import tiktoken
-
-    encoding = tiktoken.encoding_for_model(model_name)
+    encoding = _tiktoken_encoding_for_embedding_model(model_name)
     batches: list[list[str]] = []
     current_batch: list[str] = []
     current_tokens = 0
