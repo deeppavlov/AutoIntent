@@ -23,6 +23,17 @@ def test_batch_strings_none_max_tokens_uses_batch_size_only() -> None:
     assert batches == [["a", "b", "c"], ["d", "e", "f"]]
 
 
+def test_batch_strings_unknown_model_uses_fallback_encoding() -> None:
+    """Third-party embedding ids (e.g. OpenRouter) are not in tiktoken's model map."""
+    batches = _batch_strings_by_token_budget(
+        ["hello", "world"],
+        model_name="qwen/qwen3-embedding-8b",
+        max_strings_per_batch=10,
+        max_tokens_per_batch=100,
+    )
+    assert batches == [["hello", "world"]]
+
+
 def test_batch_strings_respects_token_budget() -> None:
     encoding = tiktoken.encoding_for_model("text-embedding-3-small")
     batches = _batch_strings_by_token_budget(
