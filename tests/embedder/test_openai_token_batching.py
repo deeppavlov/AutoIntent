@@ -8,6 +8,7 @@ tiktoken = pytest.importorskip("tiktoken")
 from autointent._wrappers.embedder.openai import (  # noqa: E402
     OpenaiEmbeddingBackend,
     _batch_strings_by_token_budget,
+    _openai_api_error_message,
 )
 from autointent.configs import OpenaiEmbeddingConfig  # noqa: E402
 
@@ -72,3 +73,20 @@ def test_embedding_request_batches_on_backend() -> None:
     backend = OpenaiEmbeddingBackend(config)
     batches = backend._embedding_request_batches(["hello"] * 12)
     assert sum(len(b) for b in batches) == 12
+
+
+def test_openai_api_error_message_preserves_provider_details() -> None:
+    class ProviderError(Exception):
+        def __init__(self, message: str) -> None:
+            super().__init__(message)
+            self.status_code = 400
+            self.code = "context_length_exceeded"
+            self.body = {"error": {"message": "input is too long"}}
+
+    message = _openai_api_error_message(ProviderError("No embedding data received"), batch_size=3)
+
+    assert "Error calling OpenAI API (batch_size=3)" in message
+    assert "ProviderError: No embedding data received" in message
+    assert "status_code=400" in message
+    assert "code=context_length_exceeded" in message
+    assert "input is too long" in message

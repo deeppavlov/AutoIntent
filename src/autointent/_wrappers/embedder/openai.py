@@ -35,6 +35,44 @@ logger = logging.getLogger(__name__)
 # Third-party embedding model ids (e.g. OpenRouter) are unknown to tiktoken; use a conservative encoding
 # only for counting tokens when splitting batches.
 _FALLBACK_TIKTOKEN_ENCODING = "cl100k_base"
+_ERROR_DETAIL_LIMIT = 2000
+
+
+def _compact_error_detail(value: object) -> str:
+    """Render provider error details without letting huge bodies flood logs/results."""
+    if isinstance(value, (dict, list, tuple)):
+        try:
+            text = json.dumps(value, ensure_ascii=False)
+        except TypeError:
+            text = repr(value)
+    else:
+        text = str(value)
+
+    if len(text) <= _ERROR_DETAIL_LIMIT:
+        return text
+    return f"{text[:_ERROR_DETAIL_LIMIT]}... <truncated>"
+
+
+def _openai_api_error_message(exc: BaseException, *, batch_size: int) -> str:
+    """Build a RuntimeError message that preserves useful OpenAI/provider details."""
+    details = [f"{exc.__class__.__name__}: {_compact_error_detail(exc)}"]
+
+    for attr in ("status_code", "code", "type", "body"):
+        value = getattr(exc, attr, None)
+        if value is not None:
+            details.append(f"{attr}={_compact_error_detail(value)}")
+
+    response = getattr(exc, "response", None)
+    if response is not None:
+        status_code = getattr(response, "status_code", None)
+        if status_code is not None:
+            details.append(f"response_status_code={status_code}")
+
+        response_text = getattr(response, "text", None)
+        if response_text:
+            details.append(f"response_text={_compact_error_detail(response_text)}")
+
+    return f"Error calling OpenAI API (batch_size={batch_size}): {'; '.join(details)}"
 
 
 def _tiktoken_encoding_for_embedding_model(model_name: str) -> Encoding:
@@ -230,7 +268,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
                 all_embeddings.extend(batch_embeddings)
 
             except Exception as e:
-                msg = "Error calling OpenAI API"
+                msg = _openai_api_error_message(e, batch_size=len(batch))
                 logger.exception(msg)
                 raise RuntimeError(msg) from e
 
@@ -275,7 +313,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
             response = await client.embeddings.create(**kwargs)
             return [data.embedding for data in response.data]
         except Exception as e:
-            msg = f"Error calling OpenAI API for batch: {e}"
+            msg = _openai_api_error_message(e, batch_size=len(batch))
             logger.exception(msg)
             raise RuntimeError(msg) from e
 
