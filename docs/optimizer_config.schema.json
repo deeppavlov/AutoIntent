@@ -710,6 +710,20 @@
                     "title": "Batch Size",
                     "type": "integer"
                 },
+                "max_tokens_in_batch": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "When set, cap each embeddings API call by the summed tiktoken length of inputs (using the encoding for `model_name`). Requests are also limited to at most `batch_size` strings. Use values around 200000 to avoid OpenAI `max_tokens_per_request` errors on long texts. Requires `tiktoken` (installed with `autointent[openai]`).",
+                    "title": "Max Tokens In Batch"
+                },
                 "max_retries": {
                     "default": 3,
                     "description": "Maximum number of retries for failed API requests.",
