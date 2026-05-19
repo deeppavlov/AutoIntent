@@ -28,6 +28,7 @@ class EmbedderFineTuningConfig(BaseModel):
     early_stopping_patience: int = Field(default=1)
     early_stopping_threshold: float = Field(default=0.0)
     val_fraction: float = Field(default=0.2)
+    seed: int = Field(default=42, description="Random seed for train/val split and fine-tuning.")
     fp16: bool = Field(default=False)
     bf16: bool = Field(default=False)
 
