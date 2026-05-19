@@ -7,6 +7,8 @@ Auto ML for intent classification.
 
 Documentation: [deeppavlov.github.io/AutoIntent](https://deeppavlov.github.io/AutoIntent/).
 
+Changelog: [CHANGELOG.md](./CHANGELOG.md).
+
 The project is under active development.
 
 ## Installation
