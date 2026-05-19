@@ -33,6 +33,21 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def _set_training_seed(seed: int) -> None:
+    import random
+
+    random.seed(seed)
+    np.random.seed(seed)  # noqa: NPY002
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+    require("transformers", extra="transformers")
+    from transformers import set_seed
+
+    set_seed(seed)
+
+
 @lru_cache(maxsize=128)
 def _get_latest_commit_hash(model_name: str) -> str:
     """Get the latest commit hash for a given Hugging Face model.
@@ -239,6 +254,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
             return
 
         model = self._load_model()
+        _set_training_seed(config.seed)
 
         # Lazy import sentence-transformers training components (only needed for fine-tuning)
         require("sentence_transformers", extra="sentence-transformers")
@@ -252,7 +268,13 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         )
         from transformers import EarlyStoppingCallback
 
-        x_train, x_val, y_train, y_val = train_test_split(utterances, labels, test_size=config.val_fraction)
+        x_train, x_val, y_train, y_val = train_test_split(
+            utterances,
+            labels,
+            test_size=config.val_fraction,
+            random_state=config.seed,
+            stratify=labels,
+        )
         tr_ds = Dataset.from_dict({"text": x_train, "label": y_train})
         val_ds = Dataset.from_dict({"text": x_val, "label": y_val})
 
@@ -269,6 +291,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 warmup_ratio=config.warmup_ratio,
                 fp16=config.fp16,
                 bf16=config.bf16,
+                seed=config.seed,
+                data_seed=config.seed,
                 batch_sampler=training_args.BatchSamplers.NO_DUPLICATES,
                 metric_for_best_model="eval_loss",
                 load_best_model_at_end=True,

@@ -201,6 +201,98 @@
             "title": "BERTLoRAScorerInitModel",
             "type": "object"
         },
+        "BaseEmbedderConfig": {
+            "additionalProperties": false,
+            "description": "Base class for embedder configurations.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                }
+            },
+            "title": "BaseEmbedderConfig",
+            "type": "object"
+        },
         "BertScorerInitModel": {
             "additionalProperties": false,
             "properties": {
@@ -397,6 +489,12 @@
                             },
                             {
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
                             },
                             {
                                 "type": "string"
@@ -663,6 +761,12 @@
                             },
                             {
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
                             },
                             {
                                 "type": "string"
@@ -1029,6 +1133,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -1210,6 +1320,12 @@
                     "title": "Val Fraction",
                     "type": "number"
                 },
+                "seed": {
+                    "default": 42,
+                    "description": "Random seed for train/val split and fine-tuning.",
+                    "title": "Seed",
+                    "type": "integer"
+                },
                 "fp16": {
                     "default": false,
                     "title": "Fp16",
@@ -1378,6 +1494,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -1406,6 +1528,12 @@
                             },
                             {
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
                             },
                             {
                                 "type": "string"
@@ -1927,6 +2055,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -2126,6 +2260,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -2183,6 +2323,12 @@
                             },
                             {
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
                             },
                             {
                                 "type": "string"
@@ -2337,6 +2483,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -2464,6 +2616,20 @@
                     "description": "Batch size for API requests.",
                     "title": "Batch Size",
                     "type": "integer"
+                },
+                "max_tokens_in_batch": {
+                    "anyOf": [
+                        {
+                            "exclusiveMinimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": 200000,
+                    "description": "When set, cap each embeddings API call by the summed tiktoken length of inputs (using the encoding for `model_name`). Requests are also limited to at most `batch_size` strings. Use values around 200000 to avoid OpenAI `max_tokens_per_request` errors on long texts. Requires `tiktoken` (installed with `autointent[openai]`).",
+                    "title": "Max Tokens In Batch"
                 },
                 "max_retries": {
                     "default": 3,
@@ -3173,6 +3339,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -3236,6 +3408,12 @@
                             },
                             {
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
                             },
                             {
                                 "type": "string"
@@ -3654,6 +3832,12 @@
                                 "$ref": "#/$defs/HashingVectorizerEmbeddingConfig"
                             },
                             {
+                                "$ref": "#/$defs/VllmEmbeddingConfig"
+                            },
+                            {
+                                "$ref": "#/$defs/BaseEmbedderConfig"
+                            },
+                            {
                                 "type": "string"
                             },
                             {
@@ -3836,6 +4020,155 @@
                 "module_name"
             ],
             "title": "TunableDecisionInitModel",
+            "type": "object"
+        },
+        "VllmEmbeddingConfig": {
+            "additionalProperties": false,
+            "description": "Configuration for vLLM-based embeddings.",
+            "properties": {
+                "default_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Default prompt for the model. This is used when no task specific prompt is not provided.",
+                    "title": "Default Prompt"
+                },
+                "classification_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for classifier.",
+                    "title": "Classification Prompt"
+                },
+                "cluster_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for clustering.",
+                    "title": "Cluster Prompt"
+                },
+                "sts_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for finding most similar sentences.",
+                    "title": "Sts Prompt"
+                },
+                "query_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for query.",
+                    "title": "Query Prompt"
+                },
+                "passage_prompt": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Prompt for passage.",
+                    "title": "Passage Prompt"
+                },
+                "use_cache": {
+                    "default": true,
+                    "description": "Whether to use embeddings caching.",
+                    "title": "Use Cache",
+                    "type": "boolean"
+                },
+                "model_name": {
+                    "default": "BAAI/bge-base-en-v1.5",
+                    "description": "Name of the HuggingFace model to load via vLLM.",
+                    "title": "Model Name",
+                    "type": "string"
+                },
+                "batch_size": {
+                    "default": 32,
+                    "description": "Number of texts to encode per vLLM encode() call.",
+                    "title": "Batch Size",
+                    "type": "integer"
+                },
+                "max_model_len": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "Maximum sequence length. Reduces VRAM usage for long-context models.",
+                    "title": "Max Model Len"
+                },
+                "gpu_memory_utilization": {
+                    "default": 0.9,
+                    "description": "Fraction of GPU memory vLLM is allowed to use (0.0 to 1.0).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Gpu Memory Utilization",
+                    "type": "number"
+                },
+                "dtype": {
+                    "default": "auto",
+                    "description": "Data type for model weights: 'auto', 'float16', 'bfloat16', 'float32'.",
+                    "title": "Dtype",
+                    "type": "string"
+                },
+                "trust_remote_code": {
+                    "default": false,
+                    "description": "Whether to trust remote code when loading the model.",
+                    "title": "Trust Remote Code",
+                    "type": "boolean"
+                },
+                "extra_init_kwargs": {
+                    "additionalProperties": true,
+                    "description": "Extra keyword arguments passed to the vLLM LLM() constructor.",
+                    "title": "Extra Init Kwargs",
+                    "type": "object"
+                },
+                "extra_encode_kwargs": {
+                    "additionalProperties": true,
+                    "description": "Extra keyword arguments passed to llm.encode() at inference time (e.g. custom SamplingParams).",
+                    "title": "Extra Encode Kwargs",
+                    "type": "object"
+                }
+            },
+            "title": "VllmEmbeddingConfig",
             "type": "object"
         },
         "VocabConfig": {
