@@ -19,34 +19,45 @@ Key Features
 Installation
 ------------
 
+AutoIntent supports **Python** ``>=3.10,<3.15``. The full optional-extra matrix, recommended bundles, and notes on dependency conflicts are on :doc:`installation`.
+
 Basic Installation
 ..................
 
-AutoIntent is compatible with Python 3.10+. For core functionality:
+The PyPI package installs **core** dependencies only. For a minimal install:
 
 .. code-block:: bash
 
     pip install autointent
 
-With Experiment Tracking
-........................
-
-To include experiment tracking capabilities:
+Add stacks you need with extras, for example:
 
 .. code-block:: bash
 
-    pip install autointent[wandb,codecarbon]
+    pip install "autointent[sentence-transformers,catboost]"
+    pip install "autointent[openai]"
+    pip install "autointent[transformers,peft]"
+
+With Experiment Tracking
+........................
+
+Optional integrations are installed by name, for example:
+
+.. code-block:: bash
+
+    pip install "autointent[wandb]"
+    pip install "autointent[codecarbon]"
 
 Development Installation
 ........................
 
-To install the latest development version:
+To work from a Git checkout, use **uv** and the project ``Makefile`` (see ``CONTRIBUTING.md``):
 
 .. code-block:: bash
 
-    git clone https://github.com/voorhs/AutoIntent.git
+    git clone https://github.com/deeppavlov/AutoIntent.git
     cd AutoIntent
-    pip install .
+    make install
 
 Quick Example
 -------------
