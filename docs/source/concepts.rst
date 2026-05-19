@@ -85,6 +85,9 @@ A critical capability for production text classification systems, especially in 
 **🔗 Integration with Multi-Label**
    OOS detection works seamlessly with multi-label scenarios, enabling detection of completely unknown inputs vs. partial matches to known classes.
 
+**🧭 Split handling**
+   When splits contain OOS samples (``label is None``), the data handler keeps scoring stages on in-domain rows only: in hold-out mode it can duplicate affected splits into ``{split}_0`` (OOS removed for scoring) and ``{split}_1`` (full data for decision) when ``separation_ratio`` is not configured, and cross-validation similarly drops OOS from training folds used while scoring. Before fitting, you can validate whether your data supports splitting with :py:func:`autointent.context.data_handler.check_split_readiness`.
+
 .. _concepts-presets:
 
 Optimization Presets

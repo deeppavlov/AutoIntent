@@ -8,4 +8,5 @@ Data augmentation tutorials
 
    balancer
    dspy_augmentation
+   adversarial
    intent_description
