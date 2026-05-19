@@ -47,6 +47,9 @@ Getting Started
 :doc:`🚀 Quickstart <quickstart>`
    Jump right in! Install AutoIntent and build your first text classifier in minutes. Perfect for users who want to get up and running quickly with practical examples.
 
+:doc:`📦 Installation & optional extras <installation>`
+   Choose a minimal core install or add optional dependency groups (transformers, OpenAI, CatBoost, servers, tracking, and more). Includes recommended bundles and resolver notes.
+
 :doc:`📚 Key Concepts <concepts>`
    Essential terminology and concepts used throughout AutoIntent. Understanding these will help you navigate the documentation and make the most of the library's features.
 
@@ -76,6 +79,7 @@ Reference
    :maxdepth: 1
 
    quickstart
+   installation
    concepts
    user_guides
    learn/index

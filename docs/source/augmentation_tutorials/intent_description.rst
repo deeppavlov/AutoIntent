@@ -33,7 +33,7 @@ Ensure you have the necessary dependencies installed:
 
 .. code-block:: bash
 
-    pip install autointent openai
+    pip install "autointent[openai]"
 
 Usage
 -----
