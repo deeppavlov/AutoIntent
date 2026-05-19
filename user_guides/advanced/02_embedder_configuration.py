@@ -6,7 +6,20 @@ This tutorial covers comprehensive embedder configuration for text classificatio
 
 ## Overview
 
-AutoIntent uses the **sentence-transformers** library under the hood to access embedding models from the Hugging Face Hub. The library automatically detects available devices (CUDA, MPS, CPU, etc.) and optimizes performance accordingly. This means you don't need to manually specify device preferences in most cases - the system will automatically use the best available hardware.
+AutoIntent supports several **embedding backends**, selected by the config type you pass (or by heuristics when you pass a plain `dict`—see `initialize_embedder_config` in the API reference):
+
+- **Sentence Transformers** (default): Hugging Face models via `sentence-transformers`, with automatic device selection (CUDA, MPS, CPU).
+- **OpenAI**: hosted embedding models via the OpenAI API.
+- **vLLM**: local GPU inference for compatible Hugging Face embedding models.
+- **HashingVectorizer**: fast, dependency-light vectors from scikit-learn (useful for tests and baselines).
+
+Optional dependencies are grouped as pip extras (see `pyproject.toml`). For the default Sentence Transformers path, install:
+
+```bash
+pip install "autointent[sentence-transformers]"
+```
+
+Other backends need their own extras, for example `autointent[openai]` or `autointent[vllm]`, as shown in the sections below. When a backend package is missing, code paths that need it typically call `autointent._utils.require`, which raises an `ImportError` that includes the matching `pip install autointent[<extra>]` hint.
 
 ## Configuration Approaches
 
@@ -162,6 +175,109 @@ scorer = KNNScorer(embedder_config=multilingual_config, k=7)
 
 # %% [markdown]
 """
+## OpenAI embeddings
+
+Use `OpenaiEmbeddingConfig` when you want OpenAI-hosted models (install `pip install "autointent[openai]"`, which pulls in `openai` and `tiktoken`). Set `OPENAI_API_KEY` in your environment before calling `embed()`.
+
+Important knobs:
+
+- **`model_name`**: e.g. `"text-embedding-3-small"`.
+- **`max_tokens_in_batch`**: caps each request by total tiktoken length of the batch (default `200_000`) so long texts do not hit OpenAI token limits; requests are also limited to at most **`batch_size`** strings.
+- **`batch_size`**, **`max_concurrent`**, **`max_per_second`**: throughput and concurrency tuning.
+"""
+
+# %%
+from autointent.configs import OpenaiEmbeddingConfig
+
+openai_embedder_config = OpenaiEmbeddingConfig(
+    model_name="text-embedding-3-small",
+    batch_size=50,
+    max_tokens_in_batch=200_000,
+    use_cache=True,
+)
+
+# Pass the config object anywhere an embedder config is accepted, e.g.:
+# LinearScorer(embedder_config=openai_embedder_config)
+
+# %% [markdown]
+"""
+## vLLM embeddings
+
+`VllmEmbeddingConfig` runs a compatible Hugging Face embedding model through **vLLM** on a GPU. Install with `pip install "autointent[vllm]"`. Typical options include `model_name`, `batch_size`, `gpu_memory_utilization`, `max_model_len`, and `dtype` (`"auto"`, `"float16"`, `"bfloat16"`, `"float32"`). See `VllmEmbeddingConfig` in `autointent.configs._embedder` for the full field list and defaults.
+"""
+
+# %%
+from autointent.configs import VllmEmbeddingConfig
+
+vllm_embedder_config = VllmEmbeddingConfig(
+    model_name="BAAI/bge-base-en-v1.5",
+    batch_size=32,
+    dtype="auto",
+    gpu_memory_utilization=0.9,
+)
+
+# %% [markdown]
+"""
+## HashingVectorizer (lightweight)
+
+`HashingVectorizerEmbeddingConfig` maps text to a fixed-size sparse-ish hashed space via scikit-learn. It is **stateless**, has **no deep learning dependencies**, and is ideal for **fast tests** or CPU-only baselines. Use a smaller `n_features` (for example `512`) for quicker runs; the default is much larger for quality experiments.
+"""
+
+# %%
+from autointent.configs import HashingVectorizerEmbeddingConfig
+
+hashing_embedder_config = HashingVectorizerEmbeddingConfig(
+    n_features=512,
+    ngram_range=(1, 2),
+)
+
+# %% [markdown]
+"""
+## Fine-tuning embeddings
+
+**Training is only implemented for the Sentence Transformers backend.** `Embedder.train(utterances, labels, config)` delegates to that backend and raises `NotImplementedError` for OpenAI, vLLM, and HashingVectorizer configs.
+
+`EmbedderFineTuningConfig` (in `autointent.configs`) controls the training loop, including:
+
+- **`epoch_num`**, **`batch_size`**, **`learning_rate`**, **`warmup_ratio`**
+- **`margin`** (contrastive / retrieval-style objective hyperparameter used by the trainer)
+- **`val_fraction`**, **`early_stopping_patience`**, **`early_stopping_threshold`**
+- **`fp16`** and **`bf16`** for mixed-precision training (set at most one appropriately for your device)
+
+The **`RetrievalAimedEmbedding`** module accepts an optional **`ft_config`**: when present, `fit()` calls `Embedder.train(...)` before building the vector index—convenient when retrieval quality is your optimization target.
+"""
+
+# %%
+from autointent import Embedder
+from autointent.configs import EmbedderFineTuningConfig, SentenceTransformerEmbeddingConfig
+
+ft_cfg = EmbedderFineTuningConfig(
+    epoch_num=2,
+    batch_size=8,
+    learning_rate=2e-5,
+    val_fraction=0.2,
+    fp16=False,
+    bf16=False,
+)
+
+# Example (does not run training here): construct an embedder and call train when you have data.
+_embedder_for_ft = Embedder(
+    SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2")
+)
+# _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)
+
+# %%
+from autointent.modules.embedding import RetrievalAimedEmbedding
+
+_retrieval_with_ft = RetrievalAimedEmbedding(
+    k=5,
+    embedder_config="sentence-transformers/all-MiniLM-L6-v2",
+    ft_config=ft_cfg,
+)
+# _retrieval_with_ft.fit(utterances=[...], labels=[...])  # runs fine-tuning when ft_config is set
+
+# %% [markdown]
+"""
 ## Performance Tips
 
 ### 1. Leverage Automatic Device Detection
@@ -199,7 +315,8 @@ scorer = KNNScorer(embedder_config=multilingual_config, k=7)
 1. **Out of Memory Errors**
    - Reduce `batch_size`
    - Decrease `max_length`
-   - Enable mixed precision (`fp16=True`) [planned to implement]
+   - For Sentence Transformers inference, enable mixed precision with **`fp16`** / **`bf16`** on `SentenceTransformerEmbeddingConfig` when your device supports it
+   - For embedding fine-tuning, tune **`fp16`** / **`bf16`** on `EmbedderFineTuningConfig` instead
 
 2. **Slow Inference**
    - Increase `batch_size` (if memory allows)
