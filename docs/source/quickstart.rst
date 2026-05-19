@@ -22,7 +22,7 @@ Installation
 Basic Installation
 ..................
 
-AutoIntent supports Python ``>=3.10,<3.15``. For core functionality:
+AutoIntent is compatible with Python 3.10+. For core functionality:
 
 .. code-block:: bash
 
@@ -173,12 +173,10 @@ Available Presets
 .................
 
 - ``classic-light``: Fast training with traditional ML methods
-- ``classic-medium``: Medium-budget traditional ML search
 - ``classic-heavy``: Comprehensive search with traditional methods
 - ``nn-medium``: Classic neural network-based approaches (RNN, CNN)
 - ``nn-heavy``: Comprehensive neural network optimization
 - ``transformers-light``: Transformer models with limited search
-- ``transformers-heavy``: Deeper transformer search (more compute)
 - ``transformers-no-hpo``: Transformer models without hyperparameter optimization
 - ``zero-shot-llm``: Zero-shot classification using OpenAI models
 - ``zero-shot-encoders``: Zero-shot classification using transformer models
@@ -232,9 +230,8 @@ For more control, use individual components without AutoML:
 Available Modules
 .................
 
-- **Embedding**: :class:`autointent.modules.RetrievalAimedEmbedding`, :class:`autointent.modules.LogregAimedEmbedding`
-- **Scoring**: :class:`autointent.modules.KNNScorer`, :class:`autointent.modules.RerankScorer`, :class:`autointent.modules.GCNScorer`, :class:`autointent.modules.MLKnnScorer`, :class:`autointent.modules.BertScorer`, :class:`autointent.modules.SklearnScorer`, :class:`autointent.modules.CatBoostScorer`, and description-based scorers such as :class:`autointent.modules.BiEncoderDescriptionScorer`, :class:`autointent.modules.CrossEncoderDescriptionScorer`, :class:`autointent.modules.LLMDescriptionScorer`
-- **Decision**: :class:`autointent.modules.ArgmaxDecision`, :class:`autointent.modules.ThresholdDecision`, :class:`autointent.modules.JinoosDecision`, :class:`autointent.modules.TunableDecision`, :class:`autointent.modules.AdaptiveDecision`
+- **Scoring**: :class:`autointent.modules.KNNScorer`, :class:`autointent.modules.BertScorer`, :class:`autointent.modules.SklearnScorer`, :class:`autointent.modules.CatBoostScorer`
+- **Decision**: :class:`autointent.modules.ArgmaxDecision`,  :class:`autointent.modules.TunableDecision`, :class:`autointent.modules.AdaptiveDecision`
 
 See more at API reference  :doc:`Modules <autoapi/autointent/modules/index>`.
 
