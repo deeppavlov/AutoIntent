@@ -65,6 +65,9 @@ In-Depth Learning
 Reference
 .........
 
+:doc:`🌐 Inference servers <server>`
+   Deploy a trained pipeline behind HTTP (FastAPI) or MCP (FastMCP): installation extras, environment variables, and how to run each server.
+
 :doc:`🔧 API Reference <autoapi/autointent/index>`
    Complete technical documentation for all classes, methods, and functions. Essential reference for developers integrating AutoIntent into their applications.
    
@@ -80,4 +83,5 @@ Reference
    concepts
    user_guides
    learn/index
+   server
    autoapi/autointent/index
