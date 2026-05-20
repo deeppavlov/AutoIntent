@@ -1,0 +1,12 @@
+autointent.server.mcp.classes
+=============================
+
+.. py:function:: autointent.server.mcp.classes(page = 1, page_size = 20)
+
+   Get paginated list of all available classes/intents with their metadata.
+
+   :param page: Page number (1-indexed)
+   :param page_size: Number of classes per page
+
+   :returns: Paginated list of classes with metadata
+

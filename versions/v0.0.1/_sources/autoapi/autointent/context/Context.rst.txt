@@ -51,6 +51,9 @@ autointent.context.Context
    .. py:method:: configure_hpo(config)
 
 
+   .. py:method:: configure_vector_index(config)
+
+
    .. py:method:: set_dataset(dataset, config)
 
       Set the datasets for training, validation and testing.

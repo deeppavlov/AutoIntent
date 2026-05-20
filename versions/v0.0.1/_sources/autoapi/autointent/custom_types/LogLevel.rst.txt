@@ -1,7 +1,7 @@
 autointent.custom_types.LogLevel
 ================================
 
-.. py:class:: autointent.custom_types.LogLevel
+.. py:class:: autointent.custom_types.LogLevel(*args, **kwds)
 
    Bases: :py:obj:`enum.Enum`
 

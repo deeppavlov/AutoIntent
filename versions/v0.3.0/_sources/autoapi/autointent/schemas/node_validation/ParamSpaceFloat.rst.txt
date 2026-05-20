@@ -1,0 +1,57 @@
+autointent.schemas.node_validation.ParamSpaceFloat
+==================================================
+
+.. py:class:: autointent.schemas.node_validation.ParamSpaceFloat(/, **data)
+
+   Bases: :py:obj:`ParamSpace`
+
+
+   Float parameter search space configuration.
+
+
+   .. py:attribute:: low
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: high
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: step
+      :type:  float | None
+      :value: None
+
+
+
+   .. py:attribute:: log
+      :type:  bool
+      :value: None
+
+
+
+   .. py:method:: validate_step_with_log(v, info)
+      :classmethod:
+
+
+      Validate that step is not used when log is True.
+
+      :param v: The step value to validate
+      :param info: Validation info containing other field values
+
+      :returns: The validated step value
+
+      :raises ValueError: If step is provided when log is True
+
+
+
+   .. py:method:: n_possible_values()
+
+      Calculate the number of possible values in the search space.
+
+      :returns: The number of possible values or None if search space is continuous.
+
+

@@ -1,0 +1,16 @@
+autointent.server
+=================
+
+.. py:module:: autointent.server
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/server/http/index
+   /autoapi/autointent/server/mcp/index
+
+

@@ -16,8 +16,6 @@ autointent.modules.base.BaseScorer
       :value: False
 
 
-      Whether the module supports oos data
-
 
    .. py:method:: fit(utterances, labels)
       :abstractmethod:

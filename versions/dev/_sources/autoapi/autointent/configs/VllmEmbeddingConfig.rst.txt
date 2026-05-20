@@ -1,0 +1,58 @@
+autointent.configs.VllmEmbeddingConfig
+======================================
+
+.. py:class:: autointent.configs.VllmEmbeddingConfig(/, **data)
+
+   Bases: :py:obj:`BaseEmbedderConfig`
+
+
+   Configuration for vLLM-based embeddings.
+
+
+   .. py:attribute:: model_name
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: batch_size
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: max_model_len
+      :type:  int | None
+      :value: None
+
+
+
+   .. py:attribute:: gpu_memory_utilization
+      :type:  float
+      :value: None
+
+
+
+   .. py:attribute:: dtype
+      :type:  str
+      :value: None
+
+
+
+   .. py:attribute:: trust_remote_code
+      :type:  bool
+      :value: None
+
+
+
+   .. py:attribute:: extra_init_kwargs
+      :type:  dict[str, Any]
+      :value: None
+
+
+
+   .. py:attribute:: extra_encode_kwargs
+      :type:  dict[str, Any]
+      :value: None
+
+

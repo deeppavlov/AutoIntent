@@ -3,28 +3,28 @@ autointent.Embedder
 
 .. py:class:: autointent.Embedder(embedder_config)
 
-   A wrapper for managing embedding models using :py:class:`sentence_transformers.SentenceTransformer`.
+   A wrapper for managing embedding models with multiple backends.
 
    This class handles initialization, saving, loading, and clearing of
    embedding models, as well as calculating embeddings for input texts.
 
 
-   .. py:attribute:: embedding_model
-      :type:  sentence_transformers.SentenceTransformer
-
-
    .. py:attribute:: config
+
+
+   .. py:method:: train(utterances, labels, config)
+
+      Train the embedding model (only supported for backends with training support).
+
+      :param utterances: List of training utterances.
+      :param labels: List of labels corresponding to utterances.
+      :param config: Fine-tuning configuration.
+
 
 
    .. py:method:: clear_ram()
 
       Move the embedding model to CPU and delete it from memory.
-
-
-
-   .. py:method:: delete()
-
-      Delete the embedding model and its associated directory.
 
 
 
@@ -47,14 +47,16 @@ autointent.Embedder
 
 
 
-   .. py:method:: embed(utterances, task_type = None)
+   .. py:method:: embed(utterances: list[str], task_type: autointent.configs.TaskTypeEnum | None = None, *, return_tensors: Literal[True]) -> torch.Tensor
+                  embed(utterances: list[str], task_type: autointent.configs.TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False) -> numpy.typing.NDArray[numpy.float32]
 
       Calculate embeddings for a list of utterances.
 
       :param utterances: List of input texts to calculate embeddings for.
       :param task_type: Type of task for which embeddings are calculated.
+      :param return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
 
-      :returns: A numpy array of embeddings.
+      :returns: A numpy array or PyTorch tensor of embeddings.
 
 
 

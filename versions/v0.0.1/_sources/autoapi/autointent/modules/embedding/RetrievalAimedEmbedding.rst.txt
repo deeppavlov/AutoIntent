@@ -1,7 +1,7 @@
 autointent.modules.embedding.RetrievalAimedEmbedding
 ====================================================
 
-.. py:class:: autointent.modules.embedding.RetrievalAimedEmbedding(embedder_config = None, k = 10)
+.. py:class:: autointent.modules.embedding.RetrievalAimedEmbedding(embedder_config = None, vector_index_config = None, k = 10, ft_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseEmbedding`
 
@@ -13,6 +13,7 @@ autointent.modules.embedding.RetrievalAimedEmbedding
 
    :param k: Number of nearest neighbors to retrieve
    :param embedder_config: Config of the embedder used for creating embeddings
+   :param ft_config: settings for fine-tuning embeddings
 
    Examples:
    --------
@@ -55,10 +56,13 @@ autointent.modules.embedding.RetrievalAimedEmbedding
 
 
 
-   .. py:attribute:: embedder_config
+   .. py:attribute:: vector_index_config
 
 
-   .. py:method:: from_context(context, embedder_config = None, k = 10)
+   .. py:attribute:: ft_config
+
+
+   .. py:method:: from_context(context, embedder_config = None, k = 10, ft_config = None)
       :classmethod:
 
 
@@ -67,6 +71,7 @@ autointent.modules.embedding.RetrievalAimedEmbedding
       :param context: The context containing configurations and utilities
       :param k: Number of nearest neighbors to retrieve
       :param embedder_config: Config of the embedder to use
+      :param ft_config: settings for fine-tuning embeddings
 
 
 

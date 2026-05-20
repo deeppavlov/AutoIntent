@@ -1,0 +1,50 @@
+autointent.generation
+=====================
+
+.. py:module:: autointent.generation
+
+.. autoapi-nested-parse::
+
+   Some generative methods for enriching training datasets.
+
+   See :ref:`data-aug-tuts`.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/generation/chat_templates/index
+   /autoapi/autointent/generation/intents/index
+   /autoapi/autointent/generation/utterances/index
+
+
+Exceptions
+----------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/RetriesExceededError
+
+.. autoapisummary::
+
+   autointent.generation.RetriesExceededError
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/generation/Generator
+
+.. autoapisummary::
+
+   autointent.generation.Generator
+
+

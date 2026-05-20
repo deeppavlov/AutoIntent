@@ -1,0 +1,22 @@
+autointent.server.mcp.PaginationParams
+======================================
+
+.. py:class:: autointent.server.mcp.PaginationParams(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Params to perform pagination.
+
+
+   .. py:attribute:: page
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: page_size
+      :type:  int
+      :value: None
+
+

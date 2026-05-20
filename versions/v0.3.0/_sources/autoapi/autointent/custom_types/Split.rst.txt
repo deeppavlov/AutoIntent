@@ -1,0 +1,43 @@
+autointent.custom_types.Split
+=============================
+
+.. py:class:: autointent.custom_types.Split
+
+   Enumeration of data splits in the AutoIntent framework.
+
+   .. attribute:: TRAIN
+
+      Represents the training data split.
+
+   .. attribute:: VALIDATION
+
+      Represents the validation data split.
+
+   .. attribute:: TEST
+
+      Represents the test data split.
+
+   .. attribute:: INTENTS
+
+      Represents the intents data split.
+
+
+   .. py:attribute:: TRAIN
+      :value: 'train'
+
+
+
+   .. py:attribute:: VALIDATION
+      :value: 'validation'
+
+
+
+   .. py:attribute:: TEST
+      :value: 'test'
+
+
+
+   .. py:attribute:: INTENTS
+      :value: 'intents'
+
+

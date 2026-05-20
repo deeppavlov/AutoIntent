@@ -1,7 +1,7 @@
 autointent.modules.scoring.RerankScorer
 =======================================
 
-.. py:class:: autointent.modules.scoring.RerankScorer(k = 5, weights = 'distance', use_cross_encoder_scores = False, m = None, cross_encoder_config = None, embedder_config = None)
+.. py:class:: autointent.modules.scoring.RerankScorer(k = 5, weights = 'distance', use_cross_encoder_scores = False, m = None, cross_encoder_config = None, embedder_config = None, vector_index_config = None)
 
    Bases: :py:obj:`autointent.modules.scoring._knn.knn.KNNScorer`
 
@@ -27,6 +27,9 @@ autointent.modules.scoring.RerankScorer
 
 
    .. py:attribute:: cross_encoder_config
+
+
+   .. py:attribute:: vector_index_config
 
 
    .. py:attribute:: m

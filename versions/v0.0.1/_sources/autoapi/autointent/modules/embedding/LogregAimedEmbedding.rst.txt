@@ -1,7 +1,7 @@
 autointent.modules.embedding.LogregAimedEmbedding
 =================================================
 
-.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config = None, cv = 3)
+.. py:class:: autointent.modules.embedding.LogregAimedEmbedding(embedder_config = None, cv = 3, ft_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseEmbedding`
 
@@ -13,6 +13,7 @@ autointent.modules.embedding.LogregAimedEmbedding
 
    :param embedder_config: Config of the embedder used for creating embeddings
    :param cv: Number of folds used in LogisticRegressionCV
+   :param ft_config: settings for fine-tuning embeddings
 
    Examples:
    --------
@@ -48,15 +49,15 @@ autointent.modules.embedding.LogregAimedEmbedding
 
 
 
-   .. py:attribute:: embedder_config
-
-
    .. py:attribute:: cv
       :value: 3
 
 
 
-   .. py:method:: from_context(context, embedder_config = None, cv = 3)
+   .. py:attribute:: ft_config
+
+
+   .. py:method:: from_context(context, embedder_config = None, ft_config = None, cv = 3)
       :classmethod:
 
 
@@ -65,6 +66,7 @@ autointent.modules.embedding.LogregAimedEmbedding
       :param context: Context containing configurations and utilities
       :param cv: Number of folds used in LogisticRegressionCV
       :param embedder_config: Config of the embedder to use
+      :param ft_config: settings for fine-tuning embeddings
 
 
 

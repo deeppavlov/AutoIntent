@@ -1,0 +1,15 @@
+autointent.metrics.scoring_map
+==============================
+
+.. py:function:: autointent.metrics.scoring_map(labels, scores)
+
+   Calculate mean average precision (MAP) score for multilabel classification.
+
+   Measures precision at different ranking levels, averaged across all queries.
+   The ideal value is 1, indicating perfect ranking.
+
+   :param labels: Ground truth labels for each sample.
+   :param scores: For each sample, scores for each of n_classes classes.
+
+   :returns: Mean average precision score.
+

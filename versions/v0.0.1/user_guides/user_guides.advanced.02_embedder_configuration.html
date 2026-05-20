@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
     <script src="../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -51,12 +51,13 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guides/user_guides.advanced.02_embedder_configuration';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.2.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="https://deeppavlov.github.io/AutoIntent/versions/dev/_static/logo-white.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -65,20 +66,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -104,7 +111,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -223,11 +230,18 @@
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -240,8 +254,7 @@
           
           
           
-          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
         <li class="nav-item">
           
@@ -348,11 +361,18 @@
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
@@ -365,8 +385,7 @@
           
           
           
-          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
+          <a href="https://github.com/deeppavlov/AutoIntent" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
         </li>
         <li class="nav-item">
           
@@ -386,7 +405,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -474,7 +500,18 @@
 <p>This tutorial covers comprehensive embedder configuration for text classification modules in AutoIntent. Most scoring modules use embedders to convert text into vector representations, which are crucial for model performance.</p>
 <section id="Overview">
 <h2>Overview<a class="headerlink" href="#Overview" title="Link to this heading">#</a></h2>
-<p>AutoIntent uses the <strong>sentence-transformers</strong> library under the hood to access embedding models from the Hugging Face Hub. The library automatically detects available devices (CUDA, MPS, CPU, etc.) and optimizes performance accordingly. This means you don’t need to manually specify device preferences in most cases - the system will automatically use the best available hardware.</p>
+<p>AutoIntent supports several <strong>embedding backends</strong>, selected by the config type you pass (or by heuristics when you pass a plain <code class="docutils literal notranslate"><span class="pre">dict</span></code>—see <code class="docutils literal notranslate"><span class="pre">initialize_embedder_config</span></code> in the API reference):</p>
+<ul class="simple">
+<li><p><strong>Sentence Transformers</strong> (default): Hugging Face models via <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code>, with automatic device selection (CUDA, MPS, CPU).</p></li>
+<li><p><strong>OpenAI</strong>: hosted embedding models via the OpenAI API.</p></li>
+<li><p><strong>vLLM</strong>: local GPU inference for compatible Hugging Face embedding models.</p></li>
+<li><p><strong>HashingVectorizer</strong>: fast, dependency-light vectors from scikit-learn (useful for tests and baselines).</p></li>
+</ul>
+<p>Optional dependencies are grouped as pip extras (see <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>). For the default Sentence Transformers path, install:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[sentence-transformers]&quot;</span>
+</pre></div>
+</div>
+<p>Other backends need their own extras, for example <code class="docutils literal notranslate"><span class="pre">autointent[openai]</span></code> or <code class="docutils literal notranslate"><span class="pre">autointent[vllm]</span></code>, as shown in the sections below. When a backend package is missing, code paths that need it typically call <code class="docutils literal notranslate"><span class="pre">autointent._utils.require</span></code>, which raises an <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> that includes the matching <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autointent[&lt;extra&gt;]</span></code> hint.</p>
 </section>
 <section id="Configuration-Approaches">
 <h2>Configuration Approaches<a class="headerlink" href="#Configuration-Approaches" title="Link to this heading">#</a></h2>
@@ -497,7 +534,7 @@
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/opt/hostedtoolcache/Python/3.10.18/x64/lib/python3.10/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
   from .autonotebook import tqdm as notebook_tqdm
 </pre></div></div>
 </div>
@@ -509,7 +546,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbedderConfig</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_embedder_config</span>
 
 <span class="c1"># Using a dictionary for detailed configuration</span>
 <span class="n">advanced_embedder_config</span> <span class="o">=</span> <span class="p">{</span>
@@ -541,7 +578,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">TokenizerConfig</span>
 
-<span class="n">embedder_config</span> <span class="o">=</span> <span class="n">EmbedderConfig</span><span class="p">(</span>
+<span class="n">embedder_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
     <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-mpnet-base-v2&quot;</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="c1"># Device is auto-detected, but you can override if needed</span>
@@ -550,7 +587,6 @@
     <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">&quot;Classify the following text: &quot;</span><span class="p">,</span>  <span class="c1"># Task-specific prompt</span>
     <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">freeze</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Freeze model parameters for consistent embeddings</span>
 <span class="p">)</span>
 
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="n">embedder_config</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -610,7 +646,6 @@
 <h3>Performance Settings<a class="headerlink" href="#Performance-Settings" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><strong>``use_cache``</strong>: Cache embeddings to disk for repeated use (highly recommended)</p></li>
-<li><p><strong>``freeze``</strong>: Freeze model parameters for consistent embeddings across runs</p></li>
 <li><p><strong>``similarity_fn_name``</strong>: Similarity function (default: <code class="docutils literal notranslate"><span class="pre">&quot;cosine&quot;</span></code>; other options like <code class="docutils literal notranslate"><span class="pre">&quot;dot&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;euclidean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;manhattan&quot;</span></code> are available, but we recommend keeping the default unless you have a specific reason)</p></li>
 </ul>
 </section>
@@ -624,7 +659,7 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Performance-optimized configuration</span>
-<span class="n">perf_config</span> <span class="o">=</span> <span class="n">EmbedderConfig</span><span class="p">(</span>
+<span class="n">perf_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
     <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>  <span class="c1"># Fast, lightweight model</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>  <span class="c1"># Large batch for speed</span>
     <span class="c1"># Device auto-detected by sentence-transformers</span>
@@ -645,13 +680,12 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Quality-optimized configuration</span>
-<span class="n">quality_config</span> <span class="o">=</span> <span class="n">EmbedderConfig</span><span class="p">(</span>
+<span class="n">quality_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
     <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-mpnet-base-v2&quot;</span><span class="p">,</span>  <span class="c1"># High-quality model</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>  <span class="c1"># Smaller batch to handle longer sequences</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">),</span>  <span class="c1"># Longer sequences for context</span>
     <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">&quot;Classify the intent of this message: &quot;</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">freeze</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -667,12 +701,11 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Multilingual setup</span>
-<span class="n">multilingual_config</span> <span class="o">=</span> <span class="n">EmbedderConfig</span><span class="p">(</span>
+<span class="n">multilingual_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
     <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">),</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">freeze</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="n">multilingual_config</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
@@ -680,6 +713,121 @@
 </div>
 </div>
 </section>
+</section>
+<section id="OpenAI-embeddings">
+<h2>OpenAI embeddings<a class="headerlink" href="#OpenAI-embeddings" title="Link to this heading">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">OpenaiEmbeddingConfig</span></code> when you want OpenAI-hosted models (install <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;autointent[openai]&quot;</span></code>, which pulls in <code class="docutils literal notranslate"><span class="pre">openai</span></code> and <code class="docutils literal notranslate"><span class="pre">tiktoken</span></code>). Set <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code> in your environment before calling <code class="docutils literal notranslate"><span class="pre">embed()</span></code>.</p>
+<p>Important knobs:</p>
+<ul class="simple">
+<li><p><strong>``model_name``</strong>: e.g. <code class="docutils literal notranslate"><span class="pre">&quot;text-embedding-3-small&quot;</span></code>.</p></li>
+<li><p><strong>``max_tokens_in_batch``</strong>: caps each request by total tiktoken length of the batch (default <code class="docutils literal notranslate"><span class="pre">200_000</span></code>) so long texts do not hit OpenAI token limits; requests are also limited to at most <strong>``batch_size``</strong> strings.</p></li>
+<li><p><strong>``batch_size``</strong>, <strong>``max_concurrent``</strong>, <strong>``max_per_second``</strong>: throughput and concurrency tuning.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenaiEmbeddingConfig</span>
+
+<span class="n">openai_embedder_config</span> <span class="o">=</span> <span class="n">OpenaiEmbeddingConfig</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;text-embedding-3-small&quot;</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">max_tokens_in_batch</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
+    <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Pass the config object anywhere an embedder config is accepted, e.g.:</span>
+<span class="c1"># LinearScorer(embedder_config=openai_embedder_config)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="vLLM-embeddings">
+<h2>vLLM embeddings<a class="headerlink" href="#vLLM-embeddings" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">VllmEmbeddingConfig</span></code> runs a compatible Hugging Face embedding model through <strong>vLLM</strong> on a GPU. Install with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;autointent[vllm]&quot;</span></code>. Typical options include <code class="docutils literal notranslate"><span class="pre">model_name</span></code>, <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>, <code class="docutils literal notranslate"><span class="pre">gpu_memory_utilization</span></code>, <code class="docutils literal notranslate"><span class="pre">max_model_len</span></code>, and <code class="docutils literal notranslate"><span class="pre">dtype</span></code> (<code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;float16&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;bfloat16&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;float32&quot;</span></code>). See <code class="docutils literal notranslate"><span class="pre">VllmEmbeddingConfig</span></code> in <code class="docutils literal notranslate"><span class="pre">autointent.configs._embedder</span></code> for the full field list and defaults.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">VllmEmbeddingConfig</span>
+
+<span class="n">vllm_embedder_config</span> <span class="o">=</span> <span class="n">VllmEmbeddingConfig</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;BAAI/bge-base-en-v1.5&quot;</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">gpu_memory_utilization</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="HashingVectorizer-(lightweight)">
+<h2>HashingVectorizer (lightweight)<a class="headerlink" href="#HashingVectorizer-(lightweight)" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">HashingVectorizerEmbeddingConfig</span></code> maps text to a fixed-size sparse-ish hashed space via scikit-learn. It is <strong>stateless</strong>, has <strong>no deep learning dependencies</strong>, and is ideal for <strong>fast tests</strong> or CPU-only baselines. Use a smaller <code class="docutils literal notranslate"><span class="pre">n_features</span></code> (for example <code class="docutils literal notranslate"><span class="pre">512</span></code>) for quicker runs; the default is much larger for quality experiments.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">HashingVectorizerEmbeddingConfig</span>
+
+<span class="n">hashing_embedder_config</span> <span class="o">=</span> <span class="n">HashingVectorizerEmbeddingConfig</span><span class="p">(</span>
+    <span class="n">n_features</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+    <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Fine-tuning-embeddings">
+<h2>Fine-tuning embeddings<a class="headerlink" href="#Fine-tuning-embeddings" title="Link to this heading">#</a></h2>
+<p><strong>Training is only implemented for the Sentence Transformers backend.</strong> <code class="docutils literal notranslate"><span class="pre">Embedder.train(utterances,</span> <span class="pre">labels,</span> <span class="pre">config)</span></code> delegates to that backend and raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> for OpenAI, vLLM, and HashingVectorizer configs.</p>
+<p><code class="docutils literal notranslate"><span class="pre">EmbedderFineTuningConfig</span></code> (in <code class="docutils literal notranslate"><span class="pre">autointent.configs</span></code>) controls the training loop, including:</p>
+<ul class="simple">
+<li><p><strong>``epoch_num``</strong>, <strong>``batch_size``</strong>, <strong>``learning_rate``</strong>, <strong>``warmup_ratio``</strong></p></li>
+<li><p><strong>``margin``</strong> (contrastive / retrieval-style objective hyperparameter used by the trainer)</p></li>
+<li><p><strong>``val_fraction``</strong>, <strong>``early_stopping_patience``</strong>, <strong>``early_stopping_threshold``</strong></p></li>
+<li><p><strong>``fp16``</strong> and <strong>``bf16``</strong> for mixed-precision training (set at most one appropriately for your device)</p></li>
+</ul>
+<p>The <strong>``RetrievalAimedEmbedding``</strong> module accepts an optional <strong>``ft_config``</strong>: when present, <code class="docutils literal notranslate"><span class="pre">fit()</span></code> calls <code class="docutils literal notranslate"><span class="pre">Embedder.train(...)</span></code> before building the vector index—convenient when retrieval quality is your optimization target.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Embedder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbedderFineTuningConfig</span><span class="p">,</span> <span class="n">SentenceTransformerEmbeddingConfig</span>
+
+<span class="n">ft_cfg</span> <span class="o">=</span> <span class="n">EmbedderFineTuningConfig</span><span class="p">(</span>
+    <span class="n">epoch_num</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span>
+    <span class="n">val_fraction</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">fp16</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">bf16</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Example (does not run training here): construct an embedder and call train when you have data.</span>
+<span class="n">_embedder_for_ft</span> <span class="o">=</span> <span class="n">Embedder</span><span class="p">(</span>
+    <span class="n">SentenceTransformerEmbeddingConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="c1"># _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules.embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">RetrievalAimedEmbedding</span>
+
+<span class="n">_retrieval_with_ft</span> <span class="o">=</span> <span class="n">RetrievalAimedEmbedding</span><span class="p">(</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>
+    <span class="n">ft_config</span><span class="o">=</span><span class="n">ft_cfg</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># _retrieval_with_ft.fit(utterances=[...], labels=[...])  # runs fine-tuning when ft_config is set</span>
+</pre></div>
+</div>
+</div>
 </section>
 <section id="Performance-Tips">
 <h2>Performance Tips<a class="headerlink" href="#Performance-Tips" title="Link to this heading">#</a></h2>
@@ -739,7 +887,8 @@
 <ul class="simple">
 <li><p>Reduce <code class="docutils literal notranslate"><span class="pre">batch_size</span></code></p></li>
 <li><p>Decrease <code class="docutils literal notranslate"><span class="pre">max_length</span></code></p></li>
-<li><p>Enable mixed precision (<code class="docutils literal notranslate"><span class="pre">fp16=True</span></code>) [planned to implement]</p></li>
+<li><p>For Sentence Transformers inference, enable mixed precision with <strong>``fp16``</strong> / <strong>``bf16``</strong> on <code class="docutils literal notranslate"><span class="pre">SentenceTransformerEmbeddingConfig</span></code> when your device supports it</p></li>
+<li><p>For embedding fine-tuning, tune <strong>``fp16``</strong> / <strong>``bf16``</strong> on <code class="docutils literal notranslate"><span class="pre">EmbedderFineTuningConfig</span></code> instead</p></li>
 </ul>
 </li>
 <li><p><strong>Slow Inference</strong></p>
@@ -752,7 +901,6 @@
 </li>
 <li><p><strong>Inconsistent Results</strong></p>
 <ul class="simple">
-<li><p>Set <code class="docutils literal notranslate"><span class="pre">freeze=True</span></code> for reproducible embeddings</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">use_cache=True</span></code> to avoid recomputation</p></li>
 <li><p>Check if seed is set for your program</p></li>
 </ul>
@@ -807,16 +955,16 @@
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Overview">Overview</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Configuration-Approaches">Configuration Approaches</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Configuration-Approaches">Configuration Approaches</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Simple-Configuration">Simple Configuration</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Advanced-Configuration">Advanced Configuration</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Using-EmbedderConfig-Class">Using EmbedderConfig Class</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Key-Configuration-Options">Key Configuration Options</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Key-Configuration-Options">Key Configuration Options</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Model-Selection">Model Selection</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Infrastructure-Settings">Infrastructure Settings</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Tokenizer-Settings">Tokenizer Settings</a></li>
@@ -824,13 +972,17 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Performance-Settings">Performance Settings</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Practical-Examples">Practical Examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Practical-Examples">Practical Examples</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Performance-Optimized-Configuration">Performance-Optimized Configuration</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Quality-Optimized-Configuration">Quality-Optimized Configuration</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Multilingual-Configuration">Multilingual Configuration</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Performance-Tips">Performance Tips</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#OpenAI-embeddings">OpenAI embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vLLM-embeddings">vLLM embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#HashingVectorizer-(lightweight)">HashingVectorizer (lightweight)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Fine-tuning-embeddings">Fine-tuning embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Performance-Tips">Performance Tips</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-Leverage-Automatic-Device-Detection">1. Leverage Automatic Device Detection</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Use-Caching-Effectively">2. Use Caching Effectively</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-Optimize-Batch-Size">3. Optimize Batch Size</a></li>
@@ -839,7 +991,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#6.-Use-Mixed-Precision">6. Use Mixed Precision</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Troubleshooting">Troubleshooting</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Troubleshooting">Troubleshooting</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Common-Issues">Common Issues</a></li>
 </ul>
 </li>
@@ -859,8 +1011,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -871,7 +1023,7 @@
 
   <p class="copyright">
     
-      © Copyright 2025, DeepPavlov.
+      © Copyright 2026, DeepPavlov.
       <br/>
     
   </p>
@@ -880,7 +1032,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -894,7 +1046,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.18.0.
 </p></div>
       
     </div>

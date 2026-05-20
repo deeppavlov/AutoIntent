@@ -40,11 +40,7 @@ Classes
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/modules/BaseDecision
-   /autoapi/autointent/modules/BaseEmbedding
    /autoapi/autointent/modules/BaseModule
-   /autoapi/autointent/modules/BaseRegex
-   /autoapi/autointent/modules/BaseScorer
    /autoapi/autointent/modules/AdaptiveDecision
    /autoapi/autointent/modules/ArgmaxDecision
    /autoapi/autointent/modules/JinoosDecision
@@ -60,6 +56,7 @@ Classes
    /autoapi/autointent/modules/CNNScorer
    /autoapi/autointent/modules/CrossEncoderDescriptionScorer
    /autoapi/autointent/modules/DNNCScorer
+   /autoapi/autointent/modules/GCNScorer
    /autoapi/autointent/modules/KNNScorer
    /autoapi/autointent/modules/LinearScorer
    /autoapi/autointent/modules/LLMDescriptionScorer
@@ -71,11 +68,7 @@ Classes
 
 .. autoapisummary::
 
-   autointent.modules.BaseDecision
-   autointent.modules.BaseEmbedding
    autointent.modules.BaseModule
-   autointent.modules.BaseRegex
-   autointent.modules.BaseScorer
    autointent.modules.AdaptiveDecision
    autointent.modules.ArgmaxDecision
    autointent.modules.JinoosDecision
@@ -91,6 +84,7 @@ Classes
    autointent.modules.CNNScorer
    autointent.modules.CrossEncoderDescriptionScorer
    autointent.modules.DNNCScorer
+   autointent.modules.GCNScorer
    autointent.modules.KNNScorer
    autointent.modules.LinearScorer
    autointent.modules.LLMDescriptionScorer

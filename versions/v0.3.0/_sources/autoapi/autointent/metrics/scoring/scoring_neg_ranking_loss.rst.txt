@@ -1,0 +1,15 @@
+autointent.metrics.scoring.scoring_neg_ranking_loss
+===================================================
+
+.. py:function:: autointent.metrics.scoring.scoring_neg_ranking_loss(labels, scores)
+
+   Calculate negative ranking loss for multilabel classification.
+
+   Computes average number of incorrectly ordered label pairs weighted by label set size.
+   The ideal value is 0.
+
+   :param labels: Ground truth labels for each utterance.
+   :param scores: For each utterance, scores for each of n_classes classes.
+
+   :returns: Negative ranking loss score.
+

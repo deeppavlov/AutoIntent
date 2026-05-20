@@ -16,28 +16,20 @@ autointent.modules.regex.SimpleRegex
       :value: 'simple'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: supports_multiclass
       :value: True
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:attribute:: supports_multilabel
       :value: True
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: supports_oos
       :value: False
 
-
-      Whether the module supports oos data
 
 
    .. py:method:: from_context(context)
@@ -132,20 +124,8 @@ autointent.modules.regex.SimpleRegex
 
    .. py:method:: dump(path)
 
-      Dump all data needed for inference.
-
-      :param path: Path to dump
-
-
 
    .. py:method:: load(path, embedder_config = None, cross_encoder_config = None)
       :classmethod:
-
-
-      Load data from file system.
-
-      :param path: Path to load
-      :param embedder_config: one can override presaved settings
-      :param cross_encoder_config: one can override presaved settings
 
 

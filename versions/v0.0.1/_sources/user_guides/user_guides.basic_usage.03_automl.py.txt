@@ -52,6 +52,8 @@ pipeline = Pipeline.from_preset("classic-light")
 
 # %% [markdown]
 """
+The same preset can also be loaded as a typed %mddoclink(class,,OptimizationConfig) via ``OptimizationConfig.from_preset("classic-light")`` and passed to %mddoclink(method,Pipeline,from_optimization_config) when you want a validated configuration object instead of editing the raw dict from ``load_preset``.
+
 You can inspect the structure and default values of any preset:
 """
 
@@ -77,7 +79,7 @@ custom_pipeline = Pipeline.from_optimization_config(preset)
 
 # %% [markdown]
 """
-See tutorial %mddoclink(notebook,advanced.03_search_space_configuration) on how the search space is structured.
+See tutorial %mddoclink(notebook,advanced.03_automl) on how the search space is structured.
 """
 
 # %% [markdown]
@@ -115,10 +117,10 @@ You can specify which transformer models to use for text embeddings and cross-en
 """
 
 # %%
-from autointent.configs import CrossEncoderConfig, EmbedderConfig, TokenizerConfig
+from autointent.configs import CrossEncoderConfig, TokenizerConfig, get_default_embedder_config
 
 # Configure embedding model (used for vector representations)
-custom_pipeline.set_config(EmbedderConfig(model_name="prajjwal1/bert-tiny"))
+custom_pipeline.set_config(get_default_embedder_config(model_name="cointegrated/rubert-tiny2"))
 
 # Configure cross-encoder model (used for scoring text pairs)
 custom_pipeline.set_config(

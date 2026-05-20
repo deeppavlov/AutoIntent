@@ -1,0 +1,28 @@
+autointent.schemas.node_validation.EmbeddingNodeValidator
+=========================================================
+
+.. py:class:: autointent.schemas.node_validation.EmbeddingNodeValidator(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Search space configuration for the Embedding node.
+
+
+   .. py:attribute:: node_type
+      :type:  autointent.custom_types.NodeType
+
+
+   .. py:attribute:: target_metric
+      :type:  EmbeddingMetrics
+
+
+   .. py:attribute:: metrics
+      :type:  list[EmbeddingMetrics] | None
+      :value: None
+
+
+
+   .. py:attribute:: search_space
+      :type:  list[EmbeddingSearchSpaceType]
+

@@ -1,0 +1,20 @@
+autointent.server.mcp.TrainDataOutput
+=====================================
+
+.. py:class:: autointent.server.mcp.TrainDataOutput(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Output model for the train_data tool.
+
+
+   .. py:attribute:: samples
+      :type:  list[DataSample]
+      :value: None
+
+
+
+   .. py:attribute:: pagination_info
+      :type:  PaginationInfo
+

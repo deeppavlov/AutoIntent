@@ -1,0 +1,14 @@
+autointent.metrics.scoring.scoring_f1
+=====================================
+
+.. py:function:: autointent.metrics.scoring.scoring_f1(labels, scores)
+
+   Calculate F1 score for multiclass and multilabel classification.
+
+   Uses decision_f1 to evaluate decisions.
+
+   :param labels: Ground truth labels for each sample.
+   :param scores: For each sample, scores for each of n_classes classes.
+
+   :returns: F1 score.
+

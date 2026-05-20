@@ -16,6 +16,7 @@ Classes
    /autoapi/autointent/modules/scoring/CrossEncoderDescriptionScorer
    /autoapi/autointent/modules/scoring/LLMDescriptionScorer
    /autoapi/autointent/modules/scoring/DNNCScorer
+   /autoapi/autointent/modules/scoring/GCNScorer
    /autoapi/autointent/modules/scoring/KNNScorer
    /autoapi/autointent/modules/scoring/RerankScorer
    /autoapi/autointent/modules/scoring/LinearScorer
@@ -34,6 +35,7 @@ Classes
    autointent.modules.scoring.CrossEncoderDescriptionScorer
    autointent.modules.scoring.LLMDescriptionScorer
    autointent.modules.scoring.DNNCScorer
+   autointent.modules.scoring.GCNScorer
    autointent.modules.scoring.KNNScorer
    autointent.modules.scoring.RerankScorer
    autointent.modules.scoring.LinearScorer
