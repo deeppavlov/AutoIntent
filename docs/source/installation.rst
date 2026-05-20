@@ -1,11 +1,11 @@
 .. _installation:
 
-Installation and optional extras
-================================
+Installation
+============
 
 AutoIntent supports **Python** ``>=3.10,<3.15`` (see ``requires-python`` in the package metadata).
 
-Since **v0.3.0**, ``pip install autointent`` installs only the **core** runtime: PyTorch, scikit-learn, Optuna, vector search, datasets, and other always-on dependencies. Heavier or integration-specific libraries are shipped as **optional extras** (see ``[project.optional-dependencies]`` in ``pyproject.toml``).
+Since **v0.3.0**, ``pip install autointent`` installs only the **core** runtime: PyTorch, scikit-learn, Optuna, vector search, datasets, and other always-on dependencies. Heavier or integration-specific libraries are shipped as **optional extras**.
 
 Minimal install
 ---------------
