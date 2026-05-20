@@ -109,10 +109,10 @@ Combine extras in one install by listing them inside the brackets (no spaces ins
    pip install "autointent[wandb]"
    pip install "autointent[codecarbon]"
 
-``codecarbon`` vs ``fastmcp`` (uv)
-----------------------------------
+``codecarbon`` vs ``fastmcp``
+-----------------------------
 
-When you use **uv** to resolve the project, ``codecarbon`` and ``fastmcp`` are declared as **conflicting extras** in ``pyproject.toml`` (``[tool.uv]`` ``conflicts``). A single environment should not select both at once; pick the extra that matches your goal (emissions tracking **or** FastMCP), or use separate environments if you genuinely need both stacks isolated.
+``codecarbon`` and ``fastmcp`` are declared as **conflicting extras**. A single environment should not select both at once; pick the extra that matches your goal (emissions tracking **or** FastMCP), or use separate environments if you genuinely need both stacks isolated.
 
 Development install from Git
 ----------------------------
