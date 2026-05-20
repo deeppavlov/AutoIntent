@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
 project = "AutoIntent"
-copyright = "2025, DeepPavlov"
+copyright = "2026, DeepPavlov"
 author = "DeepPavlov"
 release = "0.3.0"
 
