@@ -19,6 +19,8 @@ autointent.nodes.NodeOptimizer
 
 
    .. py:attribute:: metrics
+      :value: None
+
 
 
    .. py:attribute:: modules_search_spaces

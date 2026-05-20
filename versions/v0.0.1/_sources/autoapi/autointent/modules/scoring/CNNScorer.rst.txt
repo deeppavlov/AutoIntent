@@ -3,7 +3,7 @@ autointent.modules.scoring.CNNScorer
 
 .. py:class:: autointent.modules.scoring.CNNScorer(embed_dim = 128, kernel_sizes = [3, 4, 5], num_filters = 100, dropout = 0.1, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 42, device = None, vocab_config = None, early_stopping_config = None)
 
-   Bases: :py:obj:`autointent.modules.scoring._torch.base_scorer.BaseVocabTorchScorer`
+   Bases: :py:obj:`autointent.modules.scoring._torch.base_scorer.BaseTorchScorer`
 
 
    Convolutional Neural Network (CNN) scorer for intent classification.
@@ -59,8 +59,6 @@ autointent.modules.scoring.CNNScorer
       :value: 'cnn'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: embed_dim
       :value: 128
@@ -84,13 +82,5 @@ autointent.modules.scoring.CNNScorer
 
    .. py:method:: from_context(context, embed_dim = 128, kernel_sizes = [3, 4, 5], num_filters = 100, dropout = 0.1, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 42, vocab_config = None, early_stopping_config = None)
       :classmethod:
-
-
-      Initialize self from context.
-
-      :param context: Context to init from
-      :param \*\*kwargs: Additional kwargs
-
-      :returns: Initialized module
 
 

@@ -57,21 +57,15 @@ autointent.modules.CatBoostScorer
       :value: 'catboost'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: supports_multiclass
       :value: True
 
 
-      Whether the module supports multiclass classification
-
 
    .. py:attribute:: supports_multilabel
       :value: True
 
-
-      Whether the module supports multilabel classification
 
 
    .. py:attribute:: encoder_features_types
@@ -125,24 +119,8 @@ autointent.modules.CatBoostScorer
       :classmethod:
 
 
-      Initialize self from context.
-
-      :param context: Context to init from
-      :param \*\*kwargs: Additional kwargs
-
-      :returns: Initialized module
-
-
 
    .. py:method:: get_implicit_initialization_params()
-
-      Return default params used in ``__init__`` method.
-
-      Some parameters of the module may be inferred using context rather from ``__init__`` method.
-      But they need to be logged for reproducibility during loading from disk.
-
-      :returns: Dictionary of default params
-
 
 
    .. py:method:: get_extra_params()
@@ -150,25 +128,9 @@ autointent.modules.CatBoostScorer
 
    .. py:method:: fit(utterances, labels)
 
-      Fit the scoring module to the training data.
-
-      :param utterances: List of training utterances.
-      :param labels: List of training labels.
-
-
 
    .. py:method:: predict(utterances)
 
-      Predict scores for a list of utterances.
-
-      :param utterances: List of utterances to score.
-
-      :returns: Array of predicted scores.
-
-
 
    .. py:method:: clear_cache()
-
-      Clear cache.
-
 

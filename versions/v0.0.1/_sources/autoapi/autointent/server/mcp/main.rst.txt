@@ -1,7 +1,0 @@
-autointent.server.mcp.main
-==========================
-
-.. py:function:: autointent.server.mcp.main()
-
-   Main entry point for the MCP server.
-

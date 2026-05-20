@@ -82,11 +82,3 @@ autointent.configs.LoggingConfig
       Use this method instead of direct adressing to :py:attr:`autointent.configs.LoggingConfig.run_name`.
 
 
-
-   .. py:method:: validate_report_to(value)
-      :classmethod:
-
-
-      Validate the `report_to` field to ensure it is either 'none' or a list of valid reporter names.
-
-

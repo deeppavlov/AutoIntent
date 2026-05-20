@@ -1,7 +1,0 @@
-autointent.metrics.retrieval.ignore_oos
-=======================================
-
-.. py:function:: autointent.metrics.retrieval.ignore_oos(func)
-
-   Ignore OOS in metrics calculation (decorator).
-

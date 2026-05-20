@@ -50,26 +50,11 @@ autointent.modules.scoring.BERTLoRAScorer
       :value: 'lora'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:method:: from_context(context, classification_model_config = None, num_train_epochs = 3, batch_size = 8, learning_rate = 5e-05, seed = 0, **lora_kwargs)
       :classmethod:
 
 
-      Initialize self from context.
-
-      :param context: Context to init from
-      :param \*\*kwargs: Additional kwargs
-
-      :returns: Initialized module
-
-
 
    .. py:method:: dump(path)
-
-      Dump all data needed for inference.
-
-      :param path: Path to dump
-
 

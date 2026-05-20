@@ -1,7 +1,7 @@
 autointent.modules.scoring.KNNScorer
 ====================================
 
-.. py:class:: autointent.modules.scoring.KNNScorer(k = 5, embedder_config = None, weights = 'distance', vector_index_config = None)
+.. py:class:: autointent.modules.scoring.KNNScorer(k = 5, embedder_config = None, weights = 'distance')
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -71,9 +71,6 @@ autointent.modules.scoring.KNNScorer
 
 
 
-   .. py:attribute:: vector_index_config
-
-
    .. py:method:: from_context(context, k = 5, weights = 'distance', embedder_config = None)
       :classmethod:
 
@@ -104,6 +101,7 @@ autointent.modules.scoring.KNNScorer
 
       :param utterances: List of training utterances
       :param labels: List of labels corresponding to the utterances
+      :param clear_cache: Whether to clear the vector index cache before fitting
 
       :raises ValueError: If the vector index mismatches the provided utterances
 

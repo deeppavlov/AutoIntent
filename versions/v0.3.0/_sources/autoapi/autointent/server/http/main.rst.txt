@@ -1,7 +1,0 @@
-autointent.server.http.main
-===========================
-
-.. py:function:: autointent.server.http.main()
-
-   Main entry point for the HTTP server.
-

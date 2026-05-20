@@ -47,31 +47,3 @@ autointent.context.data_handler.StratifiedSplitter
       :raises ValueError: If OOS samples are present but allow_oos_in_train is not specified.
 
 
-
-   .. py:method:: has_oos_samples(dataset)
-
-      Check if the dataset contains out-of-scope samples.
-
-      :param dataset: The dataset to check.
-
-      :returns: True if the dataset contains OOS samples, False otherwise.
-
-
-
-   .. py:method:: get_stratify_inputs(dataset, multilabel, allow_oos_in_train)
-
-      Return the effective dataset and post-split hook for stratification.
-
-      Single source of truth for OOS handling: both splitting and readiness
-      checks use this so logic is not duplicated.
-
-      :param dataset: The input dataset (may contain OOS).
-      :param multilabel: Whether the dataset is multi-label.
-      :param allow_oos_in_train: Whether OOS samples are allowed in the train split.
-                                 Must be set when the dataset contains OOS samples.
-
-      :returns: StratifyInputs with the dataset to stratify on and a post_split_fn.
-
-      :raises ValueError: If the dataset contains OOS samples and allow_oos_in_train is None.
-
-

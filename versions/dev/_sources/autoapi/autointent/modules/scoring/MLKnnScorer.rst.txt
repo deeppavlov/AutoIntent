@@ -1,7 +1,7 @@
 autointent.modules.scoring.MLKnnScorer
 ======================================
 
-.. py:class:: autointent.modules.scoring.MLKnnScorer(k = 5, embedder_config = None, s = 1.0, ignore_first_neighbours = 0, vector_index_config = None)
+.. py:class:: autointent.modules.scoring.MLKnnScorer(k = 5, embedder_config = None, s = 1.0, ignore_first_neighbours = 0)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -77,9 +77,6 @@ autointent.modules.scoring.MLKnnScorer
    .. py:attribute:: ignore_first_neighbours
       :value: 0
 
-
-
-   .. py:attribute:: vector_index_config
 
 
    .. py:method:: from_context(context, k = 5, s = 1.0, ignore_first_neighbours = 0, embedder_config = None)

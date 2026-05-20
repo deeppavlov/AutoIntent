@@ -1,4 +1,0 @@
-autointent.configs.initialize_embedder_config
-=============================================
-
-.. py:function:: autointent.configs.initialize_embedder_config(values)

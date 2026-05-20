@@ -1,4 +1,0 @@
-autointent.configs.get_default_vector_index_config
-==================================================
-
-.. py:function:: autointent.configs.get_default_vector_index_config()

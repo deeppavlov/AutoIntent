@@ -15,8 +15,6 @@ Classes
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/generation/utterances/CriticHumanLike
-   /autoapi/autointent/generation/utterances/HumanUtteranceGenerator
    /autoapi/autointent/generation/utterances/DatasetBalancer
    /autoapi/autointent/generation/utterances/UtteranceGenerator
    /autoapi/autointent/generation/utterances/IncrementalUtteranceEvolver
@@ -24,8 +22,6 @@ Classes
 
 .. autoapisummary::
 
-   autointent.generation.utterances.CriticHumanLike
-   autointent.generation.utterances.HumanUtteranceGenerator
    autointent.generation.utterances.DatasetBalancer
    autointent.generation.utterances.UtteranceGenerator
    autointent.generation.utterances.IncrementalUtteranceEvolver

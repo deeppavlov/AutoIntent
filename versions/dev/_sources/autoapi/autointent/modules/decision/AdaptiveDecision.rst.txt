@@ -66,6 +66,8 @@ autointent.modules.decision.AdaptiveDecision
 
 
    .. py:attribute:: search_space
+      :value: None
+
 
 
    .. py:method:: from_context(context, search_space = None)

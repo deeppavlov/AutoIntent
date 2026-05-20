@@ -9,24 +9,12 @@ autointent.configs
 
 
 
-Attributes
-----------
-
-.. autoapisummary::
-
-   autointent.configs.EmbedderConfig
-
-
 Classes
 -------
 
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/configs/HashingVectorizerEmbeddingConfig
-   /autoapi/autointent/configs/OpenaiEmbeddingConfig
-   /autoapi/autointent/configs/SentenceTransformerEmbeddingConfig
-   /autoapi/autointent/configs/TaskTypeEnum
    /autoapi/autointent/configs/InferenceNodeConfig
    /autoapi/autointent/configs/DataConfig
    /autoapi/autointent/configs/HPOConfig
@@ -35,19 +23,13 @@ Classes
    /autoapi/autointent/configs/VocabConfig
    /autoapi/autointent/configs/CrossEncoderConfig
    /autoapi/autointent/configs/EarlyStoppingConfig
-   /autoapi/autointent/configs/EmbedderFineTuningConfig
+   /autoapi/autointent/configs/EmbedderConfig
    /autoapi/autointent/configs/HFModelConfig
+   /autoapi/autointent/configs/TaskTypeEnum
    /autoapi/autointent/configs/TokenizerConfig
-   /autoapi/autointent/configs/FaissConfig
-   /autoapi/autointent/configs/OpenSearchConfig
-   /autoapi/autointent/configs/VectorIndexConfig
 
 .. autoapisummary::
 
-   autointent.configs.HashingVectorizerEmbeddingConfig
-   autointent.configs.OpenaiEmbeddingConfig
-   autointent.configs.SentenceTransformerEmbeddingConfig
-   autointent.configs.TaskTypeEnum
    autointent.configs.InferenceNodeConfig
    autointent.configs.DataConfig
    autointent.configs.HPOConfig
@@ -56,37 +38,9 @@ Classes
    autointent.configs.VocabConfig
    autointent.configs.CrossEncoderConfig
    autointent.configs.EarlyStoppingConfig
-   autointent.configs.EmbedderFineTuningConfig
+   autointent.configs.EmbedderConfig
    autointent.configs.HFModelConfig
+   autointent.configs.TaskTypeEnum
    autointent.configs.TokenizerConfig
-   autointent.configs.FaissConfig
-   autointent.configs.OpenSearchConfig
-   autointent.configs.VectorIndexConfig
-
-
-Functions
----------
-
-.. toctree::
-   :hidden:
-
-   /autoapi/autointent/configs/get_default_embedder_config
-   /autoapi/autointent/configs/initialize_embedder_config
-   /autoapi/autointent/configs/get_default_hfmodel_config
-   /autoapi/autointent/configs/get_default_vector_index_config
-
-.. autoapisummary::
-
-   autointent.configs.get_default_embedder_config
-   autointent.configs.initialize_embedder_config
-   autointent.configs.get_default_hfmodel_config
-   autointent.configs.get_default_vector_index_config
-
-
-Package Contents
-----------------
-
-.. py:type:: EmbedderConfig
-   :canonical: SentenceTransformerEmbeddingConfig | OpenaiEmbeddingConfig | HashingVectorizerEmbeddingConfig | BaseEmbedderConfig
 
 

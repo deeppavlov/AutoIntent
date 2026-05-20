@@ -1,4 +1,0 @@
-autointent.configs.get_default_hfmodel_config
-=============================================
-
-.. py:function:: autointent.configs.get_default_hfmodel_config()

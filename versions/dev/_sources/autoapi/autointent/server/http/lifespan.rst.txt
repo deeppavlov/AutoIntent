@@ -1,9 +1,0 @@
-autointent.server.http.lifespan
-===============================
-
-.. py:function:: autointent.server.http.lifespan(_)
-   :async:
-
-
-   Load pipe.
-

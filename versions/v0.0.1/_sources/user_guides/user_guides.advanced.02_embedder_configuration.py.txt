@@ -29,7 +29,7 @@ For more control, pass a dictionary with configuration parameters:
 """
 
 # %%
-from autointent.configs import get_default_embedder_config
+from autointent.configs import EmbedderConfig
 
 # Using a dictionary for detailed configuration
 advanced_embedder_config = {
@@ -59,7 +59,7 @@ import torch
 
 from autointent.configs import TokenizerConfig
 
-embedder_config = get_default_embedder_config(
+embedder_config = EmbedderConfig(
     model_name="sentence-transformers/all-mpnet-base-v2",
     batch_size=32,
     # Device is auto-detected, but you can override if needed
@@ -68,6 +68,7 @@ embedder_config = get_default_embedder_config(
     classification_prompt="Classify the following text: ",  # Task-specific prompt
     similarity_fn_name="cosine",
     use_cache=True,
+    freeze=True,  # Freeze model parameters for consistent embeddings
 )
 
 scorer = KNNScorer(embedder_config=embedder_config, k=10)
@@ -106,6 +107,7 @@ Prompts can significantly improve embedding quality for specific tasks:
 
 ### Performance Settings
 - **`use_cache`**: Cache embeddings to disk for repeated use (highly recommended)
+- **`freeze`**: Freeze model parameters for consistent embeddings across runs
 - **`similarity_fn_name`**: Similarity function (default: `"cosine"`; other options like `"dot"`, `"euclidean"`, `"manhattan"` are available, but we recommend keeping the default unless you have a specific reason)
 
 ## Practical Examples
@@ -115,7 +117,7 @@ Prompts can significantly improve embedding quality for specific tasks:
 
 # %%
 # Example: Performance-optimized configuration
-perf_config = get_default_embedder_config(
+perf_config = EmbedderConfig(
     model_name="sentence-transformers/all-MiniLM-L6-v2",  # Fast, lightweight model
     batch_size=128,  # Large batch for speed
     # Device auto-detected by sentence-transformers
@@ -133,12 +135,13 @@ scorer = KNNScorer(embedder_config=perf_config, k=5)
 
 # %%
 # Example: Quality-optimized configuration
-quality_config = get_default_embedder_config(
+quality_config = EmbedderConfig(
     model_name="sentence-transformers/all-mpnet-base-v2",  # High-quality model
     batch_size=16,  # Smaller batch to handle longer sequences
     tokenizer_config=TokenizerConfig(max_length=512),  # Longer sequences for context
     classification_prompt="Classify the intent of this message: ",
     use_cache=True,
+    freeze=True,
     similarity_fn_name="cosine",
 )
 
@@ -151,11 +154,12 @@ scorer = LinearScorer(embedder_config=quality_config)
 
 # %%
 # Example: Multilingual setup
-multilingual_config = get_default_embedder_config(
+multilingual_config = EmbedderConfig(
     model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
     batch_size=32,
     tokenizer_config=TokenizerConfig(max_length=256),
     use_cache=True,
+    freeze=True,
 )
 
 scorer = KNNScorer(embedder_config=multilingual_config, k=7)
@@ -208,6 +212,7 @@ scorer = KNNScorer(embedder_config=multilingual_config, k=7)
    - Ensure GPU/MPS utilization
 
 3. **Inconsistent Results**
+   - Set `freeze=True` for reproducible embeddings
    - Use `use_cache=True` to avoid recomputation
    - Check if seed is set for your program
 """

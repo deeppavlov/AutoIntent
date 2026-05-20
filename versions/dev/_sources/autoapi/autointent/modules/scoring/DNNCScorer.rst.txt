@@ -1,7 +1,7 @@
 autointent.modules.scoring.DNNCScorer
 =====================================
 
-.. py:class:: autointent.modules.scoring.DNNCScorer(k = 5, cross_encoder_config = None, embedder_config = None, vector_index_config = None)
+.. py:class:: autointent.modules.scoring.DNNCScorer(k = 5, cross_encoder_config = None, embedder_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -70,9 +70,6 @@ autointent.modules.scoring.DNNCScorer
    .. py:attribute:: k
       :value: 5
 
-
-
-   .. py:attribute:: vector_index_config
 
 
    .. py:method:: from_context(context, k = 5, cross_encoder_config = None, embedder_config = None)

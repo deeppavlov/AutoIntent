@@ -1,7 +1,7 @@
 autointent.modules.DNNCScorer
 =============================
 
-.. py:class:: autointent.modules.DNNCScorer(k = 5, cross_encoder_config = None, embedder_config = None, vector_index_config = None)
+.. py:class:: autointent.modules.DNNCScorer(k = 5, cross_encoder_config = None, embedder_config = None)
 
    Bases: :py:obj:`autointent.modules.base.BaseScorer`
 
@@ -44,21 +44,15 @@ autointent.modules.DNNCScorer
       :value: 'dnnc'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: supports_multilabel
       :value: False
 
 
-      Whether the module supports multilabel classification
-
 
    .. py:attribute:: supports_multiclass
       :value: True
 
-
-      Whether the module supports multiclass classification
 
 
    .. py:attribute:: cross_encoder_config
@@ -70,9 +64,6 @@ autointent.modules.DNNCScorer
    .. py:attribute:: k
       :value: 5
 
-
-
-   .. py:attribute:: vector_index_config
 
 
    .. py:method:: from_context(context, k = 5, cross_encoder_config = None, embedder_config = None)
@@ -89,14 +80,6 @@ autointent.modules.DNNCScorer
 
 
    .. py:method:: get_implicit_initialization_params()
-
-      Return default params used in ``__init__`` method.
-
-      Some parameters of the module may be inferred using context rather from ``__init__`` method.
-      But they need to be logged for reproducibility during loading from disk.
-
-      :returns: Dictionary of default params
-
 
 
    .. py:method:: fit(utterances, labels)

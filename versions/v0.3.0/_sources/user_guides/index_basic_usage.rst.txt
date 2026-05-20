@@ -1,8 +1,0 @@
-Basic Usage
-===========
-
-.. nbgallery::
-   user_guides.basic_usage.01_data.py
-   user_guides.basic_usage.02_modules.py
-   user_guides.basic_usage.03_automl.py
-   user_guides.basic_usage.04_inference.py

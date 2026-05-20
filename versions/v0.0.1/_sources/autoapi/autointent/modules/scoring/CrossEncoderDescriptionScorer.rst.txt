@@ -53,8 +53,6 @@ autointent.modules.scoring.CrossEncoderDescriptionScorer
       :value: 'description_cross'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: cross_encoder_config
 

@@ -37,18 +37,14 @@ Classes
 .. toctree::
    :hidden:
 
-   /autoapi/autointent/custom_types/Document
    /autoapi/autointent/custom_types/LogLevel
    /autoapi/autointent/custom_types/NodeType
-   /autoapi/autointent/custom_types/RerankedItem
    /autoapi/autointent/custom_types/Split
 
 .. autoapisummary::
 
-   autointent.custom_types.Document
    autointent.custom_types.LogLevel
    autointent.custom_types.NodeType
-   autointent.custom_types.RerankedItem
    autointent.custom_types.Split
 
 

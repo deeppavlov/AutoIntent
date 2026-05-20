@@ -30,16 +30,6 @@ autointent.OptimizationConfig
 
    .. py:attribute:: embedder_config
       :type:  autointent.configs.EmbedderConfig
-      :value: None
-
-
-
-   .. py:method:: validate_embedder_config(v)
-      :classmethod:
-
-
-      Validate and convert embedder config to proper type.
-
 
 
    .. py:attribute:: cross_encoder_config
@@ -57,10 +47,5 @@ autointent.OptimizationConfig
    .. py:attribute:: seed
       :type:  pydantic.PositiveInt
       :value: 42
-
-
-
-   .. py:method:: from_preset(preset)
-      :classmethod:
 
 

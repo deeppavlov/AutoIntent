@@ -58,28 +58,20 @@ autointent.modules.TunableDecision
       :value: 'tunable'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: supports_multilabel
       :value: True
 
-
-      Whether the module supports multilabel classification
 
 
    .. py:attribute:: supports_multiclass
       :value: True
 
 
-      Whether the module supports multiclass classification
-
 
    .. py:attribute:: supports_oos
       :value: True
 
-
-      Whether the module supports oos data
 
 
    .. py:attribute:: tags

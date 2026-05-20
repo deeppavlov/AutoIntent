@@ -51,8 +51,6 @@ autointent.modules.scoring.BiEncoderDescriptionScorer
       :value: 'description_bi'
 
 
-      Name of the module to reference in search space configuration.
-
 
    .. py:attribute:: embedder_config
 

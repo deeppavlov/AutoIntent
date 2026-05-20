@@ -1,7 +1,0 @@
-autointent.metrics.scoring.ignore_oos
-=====================================
-
-.. py:function:: autointent.metrics.scoring.ignore_oos(func)
-
-   Ignore OOS in metrics calculation (decorator).
-

@@ -97,7 +97,7 @@ print("Sample training examples:")
 for i in range(3):
     utterance = dataset["train_0"]["utterance"][i]
     label = dataset["train_0"]["label"][i]
-    print(f'  {i + 1}. "{utterance}" → {label}')
+    print(f'  {i+1}. "{utterance}" → {label}')
 
 print(f"\nTotal unique intents: {len(set(dataset['train_0']['label']))}")
 
