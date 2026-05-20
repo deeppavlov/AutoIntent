@@ -83,10 +83,6 @@ vllm = [
 ]
 
 [tool.uv]
-override-dependencies = [
-    # yarl 1.24.0 shipped incomplete wheels on PyPI (cp310 only); remove when fixed.
-    "yarl<1.24.0",
-]
 conflicts = [
     [
         { extra = "codecarbon" },
