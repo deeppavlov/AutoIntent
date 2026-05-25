@@ -5,6 +5,8 @@ import platform
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
+
 from autointent.configs import FaissConfig
 from autointent.custom_types import Document
 
@@ -61,7 +63,7 @@ class FaissBackend(BaseIndexBackend):
         self._index.reset()
 
     def get_all_embeddings(self) -> NDArray[Any]:
-        return self._index.reconstruct_n(0, self._index.ntotal)  # type: ignore[no-any-return]
+        return np.asarray(self._index.reconstruct_n(0, self._index.ntotal))
 
     def add(self, embeddings: NDArray[Any], documents: list[Document]) -> None:
         self._index.add(embeddings)
