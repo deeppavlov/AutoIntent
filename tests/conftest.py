@@ -12,6 +12,31 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+def _disable_transformers_mistral_regex_patch() -> None:
+    # transformers.PreTrainedTokenizerBase._patch_mistral_regex calls
+    # huggingface_hub.model_info() for every tokenizer load with vocab > 100k
+    # (e.g. XLM-RoBERTa-based models like intfloat/multilingual-e5-*). On CI
+    # that uncacheable API call hammers the HF rate limit (429s). Tests never
+    # load mistralai tokenizers, so the correction is pure overhead — replace
+    # it with a no-op for the whole test session.
+    try:
+        from transformers import tokenization_utils_base
+    except ImportError:
+        return
+
+    base = getattr(tokenization_utils_base, "PreTrainedTokenizerBase", None)
+    if base is None or not hasattr(base, "_patch_mistral_regex"):
+        return
+
+    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):  # noqa: ARG001
+        return tokenizer
+
+    base._patch_mistral_regex = classmethod(_noop_patch_mistral_regex)
+
+
+_disable_transformers_mistral_regex_patch()
+
+
 def setup_environment() -> Path:
     return ires.files("tests").joinpath("logs")
 
