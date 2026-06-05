@@ -62,10 +62,17 @@ jobs:
           # still catches the previous warmed cache so only the diff is
           # re-downloaded.
           key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-${{ github.run_id }}
+          # Do NOT include the broad `${{ runner.os }}-hf-` wildcard here.
+          # The warm-cache job is the canonical source of the cache content;
+          # if it restores some other workflow's cache (especially the old
+          # pre-split Windows test-job caches that were ~9 GB) it ends up
+          # re-saving 9 GB of content the prewarm list doesn't even mention,
+          # blowing the 10 GB per-repo budget and LRU-evicting the Linux
+          # warm-cache save. Stick to warmed-only restores so the cache
+          # content stays bounded by hf-prewarm-*.yaml.
           restore-keys: |
             ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-
             ${{ runner.os }}-hf-warmed-
-            ${{ runner.os }}-hf-
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
