@@ -1,0 +1,12 @@
+# Windows-only HF prewarm list. Kept much smaller than the Linux list
+# because the HF cache on Windows uses file copies instead of symlinks,
+# inflating cache size ~2x. The 10 GB per-repo cache budget can't fit both
+# the full Linux warm-cache (~5 GB) and a full Windows warm-cache (~9 GB).
+#
+# test-embedder is the only test job that runs on Windows (matrix
+# include in reusable-test.yaml), and the only models it loads are these
+# two. Every other workflow on Windows would be downloading models it
+# would never use, so they don't belong here.
+models:
+  - sergeyzh/rubert-tiny-turbo@93769a3baad2b037e5c2e4312fccf6bcfe082bf1
+  - intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3

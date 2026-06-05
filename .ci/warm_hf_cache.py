@@ -155,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--config",
         type=Path,
-        default=Path(".ci/hf-prewarm.yaml"),
+        default=Path(".ci/hf-prewarm-linux.yaml"),
         help="Path to the prewarm config YAML (default: %(default)s).",
     )
     parser.add_argument(
