@@ -3,6 +3,7 @@
 - **Date:** 2026-05-23
 - **Status:** Proposal (pre-implementation)
 - **Audience:** AutoIntent maintainers / contributor picking up the task
+- **Scope of this document:** technical specification — *what* the advisor estimates and the formulas it uses. Architectural and system-design choices (where the advisor lives in the codebase, how it integrates with the optimizer, the public API surface, file/module layout) are deliberately left to the implementer.
 
 ## Problem
 
@@ -38,13 +39,15 @@ The advisor analyses only the **local, model-bearing** modules whose footprint c
 | `VllmEmbeddingConfig`                                                            | yes       | local transformer with extra engine overhead       |
 | `HFModelConfig`-based scorers (`bert`, `lora`, `ptuning`, `dnnc`, cross-encoder) | yes       | the actual heavyweights                            |
 | GCN scorer when configured with a transformer backbone                           | yes       | inherits the backbone cost                         |
+| `LinearScorer` (sklearn `LogisticRegression` / `LogisticRegressionCV`)           | yes       | dominant cost on presets with no transformer fine-tune; the CV path multiplies a single fit by ~30 |
+| `CatBoostScorer`                                                                 | yes       | dominant cost on presets with no transformer fine-tune; high default `iterations` |
 | `OpenaiEmbeddingConfig`                                                          | no        | no local resources to estimate                     |
 | `HashingVectorizerEmbeddingConfig`                                               | no        | trivial cost                                       |
-| `knn`, `mlknn`, `linear`, `sklearn`, `catboost`, `description`                   | no        | negligible next to a fine-tune                     |
+| `knn`, `mlknn`, generic `sklearn` classifiers via `SklearnScorer`, `description` | no        | bounded so far below any in-scope module that they cannot plausibly be the bottleneck |
 | `decision` and `regex` nodes                                                     | no        | negligible                                         |
 
 
-Rationale: the user's real risk is the heavy transformer-backed modules. A cheap module cannot be the reason a run fails for resource reasons; we don't owe an estimate for it.
+Rationale: the user's real risk is whichever module is the actual bottleneck. On heavy presets that is a transformer fine-tune; on light presets it shifts to `linear` (CV-multiplied) or `catboost` (1000 default iterations × dataset shape). Modules left out of scope are ones whose cost is bounded so far below any in-scope module that they cannot plausibly be the reason a run fails.
 
 ### Inputs
 
@@ -88,17 +91,33 @@ Numbers are reported with honest precision (one significant figure for time, two
 
 ### Algorithm (proposal, allowed to adjust)
 
-1. **Collect candidates.** Walk the search space; collect every unique `(module_type, model_name, mode)` triple, where `mode ∈ {inference, lora, full-finetune}`. Also collect HPO knobs that drive cost: `n_trials`, `epochs`, `batch_size`, `max_length`, `dtype` (fp16/bf16/fp32).
-2. **Resolve checkpoints.** For each unique `model_name`, query HF Hub for safetensors metadata to read parameter count and weight dtype. Fall back to file-size aggregation if safetensors metadata is missing. Fall back to a "unknown — heuristic only" tag with low-confidence labelling if HF Hub is offline or the repo is private.
-3. **Apply formulas.**
-  - **Disk** = sum over unique checkpoints of total file size, plus a small fixed overhead per checkpoint for tokenizers and config.
-  - **RAM** = max over modules of `params × dtype_bytes + dataset_tokens × 4 bytes`, treated as a loose upper bound for tokenized buffers.
+1. **Collect candidates.** Walk the search space; collect every unique in-scope module. For transformer-bearing modules the identity is `(module_type, model_name, mode)` with `mode ∈ {inference, lora, full-finetune}`. For `linear` and `catboost` the identity is `(module_type, embedder_name, task_kind)` with `task_kind ∈ {multiclass, multilabel}` — the routing through `LogisticRegressionCV` vs `MultiOutputClassifier`, and CatBoost's per-class trees, both depend on it. Also collect the HPO knobs that drive cost: `n_trials` plus per-module knobs — transformer (`epochs`, `batch_size`, `max_length`, `dtype` ∈ {fp16, bf16, fp32}), `linear` (`cv`, `max_iter`), `catboost` (`iterations`, `depth`, `task_type`, `features_type`).
+2. **Resolve checkpoints.** For each unique `model_name`, query HF Hub for safetensors metadata to read parameter count and weight dtype. Fall back to file-size aggregation if safetensors metadata is missing. Fall back to a "unknown — heuristic only" tag with low-confidence labelling if HF Hub is offline or the repo is private. `LinearScorer` and `CatBoostScorer` have no checkpoint of their own; they reuse the embedder resolved by this step in their formulas (their cost is parameterised by `embedder_dim`, not parameter count).
+3. **Apply formulas.** All values are honest upper bounds; convergence and early stopping often terminate well below them.
+  - **Disk** = sum over unique downloadable checkpoints of total file size, plus a small fixed overhead per checkpoint for tokenizers and config. `LinearScorer` and `CatBoostScorer` contribute zero (they consume embedder output that is already accounted for upstream).
+  - **RAM per module:**
+    - Transformer modules (any mode): `params × dtype_bytes + dataset_tokens × 4 bytes`, treated as a loose upper bound for tokenized buffers.
+    - `LinearScorer`: `8 × n_samples × embedder_dim` (float64 data matrix — the dominant term) `+ 8 × n_classes × embedder_dim` (coefficients) `+ ~10 × 8 × embedder_dim` (L-BFGS history).
+    - `CatBoostScorer`: `4 × n_samples × n_features` (data, float32 internally) `+ 4 × n_features × n_bins` (histograms; default `n_bins = 254`) `+ iterations × 2^depth × ~32 bytes` (tree storage). For `features_type ∈ {embedding, both}`, `n_features = embedder_dim`. For `features_type = text`, `n_features` is the BoW vocab discovered at fit; bound with a coarse default (e.g. 50 000) and tag the estimate low-confidence.
+    - For `linear` and `catboost`, `embedder_dim` is taken from the largest embedder in the same node group — same worst-case stance as the rest of the estimate.
   - **VRAM per module:**
     - Inference embedder: `params × dtype_bytes × ~1.3` (small constant for activations).
     - Full fine-tune (`bert`, GCN backbone, soft-prompt `ptuning`): `params × dtype_bytes × (1 + 1 + 2)` for weights + grads + Adam state, halved when fp16/bf16 mixed precision is configured.
     - LoRA: inference VRAM + a small adapter constant.
     - Reranker (cross-encoder, `dnnc`): inference VRAM × small factor for the reranking pass.
-  - **Time per module** = `n_trials × epochs × (dataset_size / batch_size) × per_step_seconds(params, max_length, device_class)`, where `per_step_seconds` is a small static lookup table keyed on coarse device class (`cpu`, `low-gpu`, `mid-gpu`, `high-gpu`, `apple-silicon`) auto-detected from `torch.cuda.get_device_name` or `platform`/`torch.backends.mps`. Total time = sum across modules. MPS time numbers are coarser than CUDA's (one tier for now); we accept that.
+    - `LinearScorer`: N/A (sklearn is CPU-only).
+    - `CatBoostScorer`: 0 by default; if `task_type="GPU"` is configured, the RAM formula above lives on device instead.
+  - **Time per module:**
+    - Transformer modules: `n_trials × epochs × (dataset_size / batch_size) × per_step_seconds(params, max_length, device_class)`, where `per_step_seconds` is a small static lookup keyed on coarse device class (`cpu`, `low-gpu`, `mid-gpu`, `high-gpu`, `apple-silicon`) auto-detected from `torch.cuda.get_device_name` or `platform`/`torch.backends.mps`.
+    - `LinearScorer`: `n_trials × C_cpu × n_samples × embedder_dim × max_iter × cv_multiplier × class_multiplier`, where:
+      - `C_cpu ≈ 1e-8 s` per `(sample × feature × iteration)` on a single modern CPU core.
+      - `cv_multiplier = Cs × cv + 1 ≈ 31` for the multiclass path (`LogisticRegressionCV` with default `Cs = 10`, repo default `cv = 3`, plus one final refit). `cv_multiplier = 1` for the multilabel path (no inner CV).
+      - `class_multiplier = n_classes` for the multilabel path (`MultiOutputClassifier` fits one binary LogReg per class); `class_multiplier = 1` otherwise.
+    - `CatBoostScorer`: `n_trials × iterations × C_device × n_samples × n_features × depth × class_multiplier`, where:
+      - `C_device ≈ 1e-9 s` on CPU, ~5–20× faster on GPU. Resolve `C_device` via the same `device_class` lookup as the transformer time formula.
+      - `class_multiplier = n_classes` for both the multiclass `MultiClass` loss (per-class trees per iteration) and the multilabel routing (one CatBoost per class).
+      - Early stopping is not modelled; `iterations` is treated as the upper bound.
+  - Total time = sum across modules. MPS time numbers are coarser than CUDA's (one tier for now); we accept that.
 4. **Compare to detected hardware.** Per-dimension status is green / yellow / red against a configurable headroom (defaults: **red** if estimate > 100 % of available, **yellow** if > 70 %). On MPS, "VRAM" and "RAM" estimates draw from the same physical pool; we compare *the larger of the two* against the unified-memory budget rather than each independently.
 5. **Render summary.** Log at INFO. If any dimension is red, emit at WARNING so it shows in non-logging contexts.
 
@@ -120,7 +139,7 @@ The feasibility check has two modes sharing the same estimation pipeline:
 
 Using the same per-module estimates, the pruner applies three least-destructive steps in order:
 
-1. **Filter discrete-choice hyperparameters.** For lists of cost-driving values (model name, batch size, training epochs), keep only entries whose worst-case estimate fits.
+1. **Filter discrete-choice hyperparameters.** For lists of cost-driving values (model name, batch size, training epochs, CatBoost `iterations` / `depth`, sklearn `cv`), keep only entries whose worst-case estimate fits.
 2. **Cap continuous ranges.** For `{low, high}` ranges of cost-driving parameters, lower the upper bound to the largest fitting value. Ranges of non-cost parameters (learning rate, decision thresholds) are not touched.
 3. **Drop module variants.** If a module entry has any required hyperparameter with no satisfiable value left, drop that module entry from its node's search space.
 
